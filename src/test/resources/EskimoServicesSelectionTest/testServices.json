@@ -1,0 +1,172 @@
+{
+  "cerebro": {
+    "col": 1,
+    "conditional": "NONE",
+    "configOrder": 13,
+    "mandatory": false,
+    "name": "cerebro",
+    "row": 2,
+    "title": "Elastic Stack Cerebro",
+    "unique": true
+  },
+  "elasticsearch": {
+    "col": 3,
+    "conditional": "NONE",
+    "configOrder": 14,
+    "mandatory": false,
+    "name": "elasticsearch",
+    "row": 3,
+    "title": "ElasticSearch",
+    "unique": false
+  },
+  "gdash": {
+    "col": 2,
+    "conditional": "NONE",
+    "configOrder": 5,
+    "mandatory": false,
+    "name": "gdash",
+    "row": 4,
+    "title": "Dashboard",
+    "unique": true
+  },
+  "gluster": {
+    "col": 3,
+    "conditional": "MULTIPLE_NODES",
+    "configOrder": 4,
+    "mandatory": true,
+    "name": "gluster",
+    "row": 1,
+    "title": "Gluster FS",
+    "unique": false
+  },
+  "grafana": {
+    "col": 1,
+    "conditional": "NONE",
+    "configOrder": 3,
+    "mandatory": false,
+    "name": "grafana",
+    "row": 6,
+    "title": "Monitoring Grafana",
+    "unique": true
+  },
+  "kafka": {
+    "col": 2,
+    "conditional": "NONE",
+    "configOrder": 8,
+    "mandatory": false,
+    "name": "kafka",
+    "row": 5,
+    "title": "Kafka Broker",
+    "unique": false
+  },
+  "kafka-manager": {
+    "col": 1,
+    "conditional": "NONE",
+    "configOrder": 9,
+    "mandatory": false,
+    "name": "kafka-manager",
+    "row": 5,
+    "title": "Kafka Manager",
+    "unique": true
+  },
+  "kibana": {
+    "col": 1,
+    "conditional": "NONE",
+    "configOrder": 15,
+    "mandatory": false,
+    "name": "kibana",
+    "row": 3,
+    "title": "Elastic Stack Kibana",
+    "unique": true
+  },
+  "logstash": {
+    "col": 3,
+    "conditional": "NONE",
+    "configOrder": 12,
+    "mandatory": false,
+    "name": "logstash",
+    "row": 5,
+    "title": "Elastic Stack Logstash",
+    "unique": false
+  },
+  "mesos-agent": {
+    "col": 3,
+    "conditional": "NONE",
+    "configOrder": 7,
+    "mandatory": false,
+    "name": "mesos-agent",
+    "row": 2,
+    "title": "Mesos Agent",
+    "unique": false
+  },
+  "mesos-master": {
+    "col": 2,
+    "conditional": "NONE",
+    "configOrder": 6,
+    "mandatory": false,
+    "name": "mesos-master",
+    "row": 3,
+    "title": "Mesos Master",
+    "unique": true
+  },
+  "ntp": {
+    "col": 2,
+    "conditional": "NONE",
+    "configOrder": 0,
+    "mandatory": true,
+    "name": "ntp",
+    "row": 1,
+    "title": "NTP",
+    "unique": false
+  },
+  "prometheus": {
+    "col": 2,
+    "conditional": "NONE",
+    "configOrder": 2,
+    "mandatory": true,
+    "name": "prometheus",
+    "row": 6,
+    "title": "Prometheus",
+    "unique": false
+  },
+  "spark-executor": {
+    "col": 3,
+    "conditional": "NONE",
+    "configOrder": 11,
+    "mandatory": false,
+    "name": "spark-executor",
+    "row": 4,
+    "title": "Spark Executor",
+    "unique": false
+  },
+  "spark-history-server": {
+    "col": 1,
+    "conditional": "NONE",
+    "configOrder": 10,
+    "mandatory": false,
+    "name": "spark-history-server",
+    "row": 1,
+    "title": "History Server",
+    "unique": true
+  },
+  "zeppelin": {
+    "col": 1,
+    "conditional": "NONE",
+    "configOrder": 16,
+    "mandatory": false,
+    "name": "zeppelin",
+    "row": 4,
+    "title": "Zeppelin",
+    "unique": true
+  },
+  "zookeeper": {
+    "col": 2,
+    "conditional": "NONE",
+    "configOrder": 1,
+    "mandatory": false,
+    "name": "zookeeper",
+    "row": 2,
+    "title": "Zookeeper",
+    "unique": true
+  }
+}

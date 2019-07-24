@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
+
+Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Author : eskimo.sh / https://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>eskimo-ce</artifactId>
+	<packaging>war</packaging>
+	<name>Eskimo CE</name>
+	<description>Eskimo Platform Console - Community Edition</description>
+	<url>https://www.niceideas.ch</url>
+	<version>0.1-SNAPSHOT</version>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.4.RELEASE</version>
+	</parent>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- json -->
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20180813</version>
+		</dependency>
+
+		<!-- Web -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mitre.dsmiley.httpproxy</groupId>
+			<artifactId>smiley-http-proxy-servlet</artifactId>
+			<version>1.11</version>
+		</dependency>
+
+        <!-- Ajaxterm4j -->
+        <!-- https://github.com/java-native-access/jna -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <!-- https://github.com/jenkinsci/trilead-ssh2 -->
+        <dependency>
+            <groupId>org.jenkins-ci</groupId>
+            <artifactId>trilead-ssh2</artifactId>
+            <version>build-217-jenkins-16</version>
+        </dependency>
+        <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
+
+        <!-- Web with Tomcat + Embed -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+
+		<!-- SSH client -->
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.7.26</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>4.2.8.RELEASE</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.10</version>
+        </dependency>
+
+		<!-- test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13-beta-3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<version>2.35.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- for HTML Unit -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>9.4.16.v20190411</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- SSH testing -->
+		<dependency>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-core</artifactId>
+			<version>2.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-sftp</artifactId>
+			<version>2.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sshd</groupId>
+			<artifactId>sshd-scp</artifactId>
+			<version>2.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.60</version>
+			<scope>test</scope>
+		</dependency>
+
+
+	</dependencies>
+
+	<build>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.12</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/test/javawebtests</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M3</version>
+				<configuration>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+				</configuration>
+			</plugin>
+
+            <!-- Package as an executable war -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.1.4.RELEASE</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                    </descriptors>
+                    <finalName>eskimo-ce-${project.version}</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+	</build>
+
+	<profiles>
+        <profile>
+            <id>pdfDoc</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-pdf</artifactId>
+								<version>1.5.0-alpha.18</version>
+                            </dependency>
+                            <!-- Comment this section to use the default jruby artifact provided by the plugin -->
+                            <dependency>
+                                <groupId>org.jruby</groupId>
+                                <artifactId>jruby-complete</artifactId>
+                                <version>9.2.7.0</version>
+                            </dependency>
+                            <!-- Comment this section to use the default AsciidoctorJ artifact provided by the plugin -->
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj</artifactId>
+                                <version>1.6.2</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-diagram</artifactId>
+                                <version>1.5.18</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+
+                            <requires>
+                                <require>asciidoctor-diagram</require>
+                            </requires>
+
+                            <!-- Attributes common to all output formats -->
+                            <attributes>
+                                <sourcedir>${project.build.sourceDirectory}</sourcedir>
+                                <imagesoutdir>pngs</imagesoutdir>
+                                <toclevels>4</toclevels>
+                            </attributes>
+                        </configuration>
+                        <executions>
+
+                            <execution>
+                                <id>service-dev-guide-pdf</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDocumentName>service-dev-guide.adoc</sourceDocumentName>
+                                    <sourceDirectory>doc/guides/service-dev-guide</sourceDirectory>
+                                    <backend>pdf</backend>
+                                    <doctype>book</doctype>
+                                    <sourceHighlighter>rouge</sourceHighlighter>
+                                    <imagesDir>.</imagesDir>
+                                    <preserveDirectories>true</preserveDirectories>
+                                    <attributes>
+                                        <pdf-stylesdir>${project.basedir}/doc/theme</pdf-stylesdir>
+                                        <pdf-style>eskimo</pdf-style>
+                                        <pdf-fontsdir>${project.basedir}/doc/fonts</pdf-fontsdir>
+                                        <icons>font</icons>
+                                        <sectnums>true</sectnums>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
+                                        <project-version>${project.version}</project-version>
+                                    </attributes>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>eskimo-guide-pdf</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDocumentName>eskimo-guide.adoc</sourceDocumentName>
+                                    <sourceDirectory>doc/guides/eskimo-guide</sourceDirectory>
+                                    <backend>pdf</backend>
+                                    <doctype>book</doctype>
+                                    <sourceHighlighter>rouge</sourceHighlighter>
+                                    <imagesDir>.</imagesDir>
+                                    <preserveDirectories>true</preserveDirectories>
+                                    <attributes>
+                                        <pdf-stylesdir>${project.basedir}/doc/theme</pdf-stylesdir>
+                                        <pdf-style>eskimo</pdf-style>
+                                        <pdf-fontsdir>${project.basedir}/doc/fonts</pdf-fontsdir>
+                                        <icons>font</icons>
+                                        <sectnums>true</sectnums>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
+                                        <project-version>${project.version}</project-version>
+                                    </attributes>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+		<profile>
+			<id>htmlDoc</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctor-maven-plugin</artifactId>
+						<version>1.5.7.1</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.asciidoctor</groupId>
+								<artifactId>asciidoctorj-pdf</artifactId>
+								<version>1.5.0-alpha.16</version>
+							</dependency>
+							<!-- Comment this section to use the default jruby artifact provided by the plugin -->
+							<dependency>
+								<groupId>org.jruby</groupId>
+								<artifactId>jruby-complete</artifactId>
+								<version>9.1.17.0</version>
+							</dependency>
+							<!-- Comment this section to use the default AsciidoctorJ artifact provided by the plugin -->
+							<dependency>
+								<groupId>org.asciidoctor</groupId>
+								<artifactId>asciidoctorj</artifactId>
+								<version>1.5.8</version>
+							</dependency>
+							<dependency>
+								<groupId>org.asciidoctor</groupId>
+								<artifactId>asciidoctorj-diagram</artifactId>
+								<version>1.5.9</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+
+							<requires>
+								<require>asciidoctor-diagram</require>
+							</requires>
+
+							<!-- Attributes common to all output formats -->
+							<attributes>
+								<sourcedir>${project.build.sourceDirectory}</sourcedir>
+								<imagesoutdir>pngs</imagesoutdir>
+								<toclevels>4</toclevels>
+							</attributes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>eskimo-guide-html</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>process-asciidoc</goal>
+								</goals>
+								<configuration>
+									<backend>html5</backend>
+									<sourceHighlighter>coderay</sourceHighlighter>
+									<sourceDocumentName>eskimo-guide.adoc</sourceDocumentName>
+									<sourceDirectory>doc/guides/eskimo-guide</sourceDirectory>
+									<imagesDir>./</imagesDir>
+
+									<!--
+                                    Scenarios for linking vs embedding assets:
+
+                                    Link to both stylesheets and images::
+
+                                      - don't set embedAssets option
+                                      - set linkcss attribute to true
+                                      - set imagesdir attribute to path relative to AsciiDoc source file
+
+                                      <attributes>
+                                          <linkcss>true</linkcss>
+                                          <imagesdir>./images</imagesdir>
+                                      </attributes>
+
+                                    Embed stylesheets and images::
+
+                                      - set embedAssets option to true
+                                      - don't set linkcss attribute
+                                      - set imagesdir attribute to path relative to project root
+
+                                      <embedAssets>true</embedAssets>
+                                      <attributes>
+                                          <imagesdir>src/docs/asciidoc/images</imagesdir>
+                                      </attributes>
+
+                                    Link to stylesheets but embed images::
+
+                                      - set embedAssets option to true
+                                      - set linkcss attribute to true
+                                      - set imagesdir attribute to path relative to project root
+
+                                      <embedAssets>true</embedAssets>
+                                      <attributes>
+                                          <linkcss>true</linkcss>
+                                          <imagesdir>src/docs/asciidoc/images</imagesdir>
+                                      </attributes>
+
+                                    Embed stylesheets but link images (default)::
+
+                                      - don't set embedAssets option
+                                      - don't set linkcss attribute
+                                      - set imagesdir attribute to path relative to AsciiDoc source file
+
+                                      <attributes>
+                                          <imagesdir>./images</imagesdir>
+                                      </attributes>
+
+                                    IMPORTANT: When you enable image embedding, you must qualify the path the the imagesdir, as shown above.
+                                    -->
+									<attributes>
+										<!--<imagesdir>./pngs</imagesdir>-->
+										<stylesheet>../../theme/eskimo.css</stylesheet>
+										<sectnums>true</sectnums>
+										<toc>left</toc>
+										<icons>font</icons>
+										<sectanchors>true</sectanchors>
+										<!-- set the idprefix to blank -->
+										<idprefix/>
+										<idseparator>-</idseparator>
+										<docinfo1>true</docinfo1>
+										<project-version>${project.version}</project-version>
+									</attributes>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>service-dev-guide-html</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>process-asciidoc</goal>
+								</goals>
+								<configuration>
+									<backend>html5</backend>
+									<sourceHighlighter>coderay</sourceHighlighter>
+									<sourceDocumentName>service-dev-guide.adoc</sourceDocumentName>
+									<sourceDirectory>doc/guides/service-dev-guide</sourceDirectory>
+									<imagesDir>./</imagesDir>
+									<attributes>
+										<!--<imagesdir>./pngs</imagesdir>-->
+										<stylesheet>../../theme/eskimo.css</stylesheet>
+										<sectnums>true</sectnums>
+										<toc>left</toc>
+										<icons>font</icons>
+										<sectanchors>true</sectanchors>
+										<!-- set the idprefix to blank -->
+										<idprefix/>
+										<idseparator>-</idseparator>
+										<docinfo1>true</docinfo1>
+										<project-version>${project.version}</project-version>
+									</attributes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

@@ -1,0 +1,2134 @@
+● cent-node1
+    State: degraded
+     Jobs: 0 queued
+   Failed: 4 units
+    Since: Fri 2019-05-03 06:58:50 UTC; 49min ago
+   CGroup: /
+           ├─1 /usr/lib/systemd/systemd --switched-root --system --deserialize 21
+           ├─mesos
+           ├─docker
+           │ ├─4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98
+           │ │ └─18602 /usr/local/lib/kibana/bin/../node/bin/node --no-warnings /usr/local/lib/kibana/bin/../src/cli
+           │ ├─1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246
+           │ │ └─18540 /usr/bin/java -Xms1g -Xmx1g -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTouch -Xss1m -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djna.nosys=true -XX:-OmitStackTraceInFastThrow -Dio.netty.noUnsafe=true -Dio.netty.noKeySetOptimization=true -Dio.netty.recycler.maxCapacityPerThread=0 -Dlog4j.shutdownHookEnabled=false -Dlog4j2.disable.jmx=true -Djava.io.tmpdir=/tmp/elasticsearch.NMpignBl -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=data -XX:ErrorFile=logs/hs_err_pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -Xloggc:logs/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=32 -XX:GCLogFileSize=64m -Des.path.home=/usr/local/lib/elasticsearch -Des.path.conf=/usr/local/lib/elasticsearch/config -Des.distribution.flavor=default -Des.distribution.type=tar -cp /usr/local/lib/elasticsearch/lib/* org.elasticsearch.bootstrap.Elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ ├─0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948
+           │ │ ├─ 3839 /bin/bash /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ │ ├─ 4544 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp /usr/local/lib/spark-2.4.2/conf/:/usr/local/lib/spark/jars/* -Xmx1g org.apache.spark.deploy.mesos.MesosExternalShuffleService
+           │ │ └─18755 sleep 5
+           │ ├─a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260
+           │ │ └─3783 /usr/sbin/ntpd -n -g
+           │ └─fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb
+           │   └─3495 java -Duser.dir=/usr/local/lib/cerebro-0.8.1 -Dhttp.port=9000 -Dhttp.address=0.0.0.0 -cp  -jar /usr/local/lib/cerebro-0.8.1/lib/cerebro.cerebro-0.8.1-launcher.jar
+           ├─mesos_executors.slice
+           ├─user.slice
+           │ ├─user-1000.slice
+           │ │ └─session-5073.scope
+           │ │   ├─ 3061 sshd: vagrant [priv]    
+           │ │   ├─ 3133 sshd: vagrant@pts/0     
+           │ │   ├─ 3134 -bash
+           │ │   ├─ 3593 sudo su
+           │ │   ├─ 3608 su
+           │ │   ├─ 3631 bash
+           │ │   └─18803 systemctl status -al
+           │ └─user-0.slice
+           │   └─session-290.scope
+           │     └─16511 /usr/sbin/anacron -s
+           └─system.slice
+             ├─var-lib-docker-overlay2-9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309-merged.mount
+             ├─kibana.service
+             │ └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo:kibana /usr/local/lib/kibana/bin/kibana
+             ├─elasticsearch.service
+             │ └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+             ├─run-user-1000.mount
+             ├─run-user-0.mount
+             ├─NetworkManager-wait-online.service
+             ├─run-docker-netns-61740979da98.mount
+             ├─run-docker-netns-5917ddd5c53e.mount
+             ├─var-lib-docker-containers-0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948-mounts-shm.mount
+             ├─run-docker-netns-2d70dd26dbd1.mount
+             ├─var-lib-docker-overlay2-464e6043dbeb163632cb44d1becbb4c3005ea1e80747929241371adb5599a5a4-merged.mount
+             ├─var-lib-docker-overlay2-be9ae2183431f03a268290971d487c1869d7be1b83685a727409b86ed9a1359e-merged.mount
+             ├─var-lib-docker-containers-fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb-mounts-shm.mount
+             ├─var-lib-docker-containers-a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260-mounts-shm.mount
+             ├─var-lib-docker-overlay2-a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375-merged.mount
+             ├─spark-nfs-master.service
+             ├─ntp.service
+             │ └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+             ├─cerebro.service
+             │ └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo:cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
+             ├─spark-executor.service
+             │ ├─3284 /bin/bash -c . /run/spark_mesos_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo:spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+             │ └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+             ├─docker.service
+             │ ├─ 2725 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+             │ ├─ 3393 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9000 -container-ip 172.17.0.2 -container-port 9000
+             │ ├─ 3503 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.4 -container-port 123
+             │ ├─ 3555 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.6 -container-port 7337
+             │ ├─18487 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.3 -container-port 9300
+             │ ├─18510 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.3 -container-port 9200
+             │ └─18564 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5601 -container-ip 172.17.0.5 -container-port 5601
+             ├─network.service
+             ├─rsyslog.service
+             │ └─2717 /usr/sbin/rsyslogd -n
+             ├─mesos-agent.service
+             │ ├─2715 /usr/local/sbin/mesos-slave 
+             │ ├─2729 logger -p user.info -t mesos-slave[2715]
+             │ └─2732 logger -p user.err -t mesos-slave[2715]
+             ├─containerd.service
+             │ ├─ 2724 /usr/bin/containerd
+             │ ├─ 3450 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─ 3561 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─ 3684 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─18517 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ └─18575 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             ├─sshd.service
+             │ ├─ 2712 /usr/sbin/sshd -D -u0
+             │ ├─18800 sshd: [accepted]        
+             │ └─18802 sshd: [net]             
+             ├─tuned.service
+             │ └─2711 /usr/bin/python2 -Es /usr/sbin/tuned -l -P
+             ├─systemd-user-sessions.service
+             ├─crond.service
+             │ └─2395 /usr/sbin/crond -n
+             ├─rhel-dmesg.service
+             ├─systemd-update-utmp.service
+             ├─irqbalance.service
+             │ └─2366 /usr/sbin/irqbalance --foreground
+             ├─NetworkManager.service
+             │ ├─5682 /usr/sbin/NetworkManager --no-daemon
+             │ └─5774 /sbin/dhclient -d -q -sf /usr/libexec/nm-dhcp-helper -pf /var/run/dhclient-eth0.pid -lf /var/lib/NetworkManager/dhclient-5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03-eth0.lease -cf /var/lib/NetworkManager/dhclient-eth0.conf eth0
+             ├─dbus.service
+             │ └─2345 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+             ├─gssproxy.service
+             │ └─2356 /usr/sbin/gssproxy -D
+             ├─chronyd.service
+             │ └─2350 /usr/sbin/chronyd
+             ├─systemd-logind.service
+             │ └─2332 /usr/lib/systemd/systemd-logind
+             ├─polkit.service
+             │ └─2331 /usr/lib/polkit-1/polkitd --no-debug
+             ├─systemd-tmpfiles-setup.service
+             ├─var-lib-nfs-rpc_pipefs.mount
+             ├─auditd.service
+             │ └─2244 /sbin/auditd
+             ├─systemd-udev-trigger.service
+             ├─systemd-random-seed.service
+             ├─systemd-vconsole-setup.service
+             ├─lvm2-monitor.service
+             ├─systemd-tmpfiles-setup-dev.service
+             ├─systemd-journal-flush.service
+             ├─systemd-udevd.service
+             │ └─1191 /usr/lib/systemd/systemd-udevd
+             ├─lvm2-lvmetad.service
+             │ └─1186 /usr/sbin/lvmetad -f
+             ├─rhel-domainname.service
+             ├─rhel-readonly.service
+             ├─systemd-remount-fs.service
+             ├─kmod-static-nodes.service
+             ├─systemd-sysctl.service
+             ├─swapfile.swap
+             ├─-.mount
+             ├─systemd-fsck-root.service
+             ├─sys-kernel-config.mount
+             ├─sys-kernel-debug.mount
+             ├─system-getty.slice
+             │ └─getty@tty1.service
+             │   └─2396 /sbin/agetty --noclear tty1 linux
+             ├─system-selinux\x2dpolicy\x2dmigrate\x2dlocal\x2dchanges.slice
+             ├─dev-hugepages.mount
+             ├─proc-fs-nfsd.mount
+             ├─dev-mqueue.mount
+             └─systemd-journald.service
+               └─1142 /usr/lib/systemd/systemd-journald
+
+● proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point
+   Loaded: loaded (/usr/lib/systemd/system/proc-sys-fs-binfmt_misc.automount; static; vendor preset: disabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Where: /proc/sys/fs/binfmt_misc
+     Docs: https://www.kernel.org/doc/Documentation/admin-guide/binfmt-misc.rst
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VB3db33aeb\x2d29db9fe3.device - VBOX_HARDDISK
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VB3db33aeb\x2d29db9fe3\x2dpart1.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:55 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:01.1\x2data\x2d1.0.device - VBOX_HARDDISK
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:01.1\x2data\x2d1.0\x2dpart1.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:55 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+● dev-disk-by\x2duuid-f52f361a\x2dda1a\x2d4ea0\x2d8c7f\x2dca2706e86b46.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:55 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+● dev-sda.device - VBOX_HARDDISK
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+● dev-sda1.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:55 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+● dev-ttyS0.device - /dev/ttyS0
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS0.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS0
+
+● dev-ttyS1.device - /dev/ttyS1
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS1
+
+● dev-ttyS2.device - /dev/ttyS2
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS2.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS2
+
+● dev-ttyS3.device - /dev/ttyS3
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS3.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS3
+
+● sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device - VBOX_HARDDISK 1
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:55 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+● sys-devices-pci0000:00-0000:00:01.1-ata1-host0-target0:0:0-0:0:0:0-block-sda.device - VBOX_HARDDISK
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:01.1/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+● sys-devices-pci0000:00-0000:00:03.0-net-eth0.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:03.0/net/eth0
+
+● sys-devices-pci0000:00-0000:00:05.0-sound-card0.device - 82801AA AC'97 Audio Controller
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:58 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:05.0/sound/card0
+
+● sys-devices-pci0000:00-0000:00:08.0-net-eth1.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:08.0/net/eth1
+
+● sys-devices-platform-serial8250-tty-ttyS0.device - /sys/devices/platform/serial8250/tty/ttyS0
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS0
+
+● sys-devices-platform-serial8250-tty-ttyS1.device - /sys/devices/platform/serial8250/tty/ttyS1
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS1
+
+● sys-devices-platform-serial8250-tty-ttyS2.device - /sys/devices/platform/serial8250/tty/ttyS2
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS2
+
+● sys-devices-platform-serial8250-tty-ttyS3.device - /sys/devices/platform/serial8250/tty/ttyS3
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:54 UTC; 49min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS3
+
+● sys-devices-virtual-net-docker0.device - /sys/devices/virtual/net/docker0
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:18 UTC; 50min ago
+   Device: /sys/devices/virtual/net/docker0
+
+● sys-devices-virtual-net-veth7a9fea2.device - /sys/devices/virtual/net/veth7a9fea2
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+   Device: /sys/devices/virtual/net/veth7a9fea2
+
+● sys-devices-virtual-net-veth89bb42b.device - /sys/devices/virtual/net/veth89bb42b
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+   Device: /sys/devices/virtual/net/veth89bb42b
+
+● sys-devices-virtual-net-vetha40f081.device - /sys/devices/virtual/net/vetha40f081
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+   Device: /sys/devices/virtual/net/vetha40f081
+
+● sys-devices-virtual-net-vethd941919.device - /sys/devices/virtual/net/vethd941919
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+   Device: /sys/devices/virtual/net/vethd941919
+
+● sys-devices-virtual-net-vethd968468.device - /sys/devices/virtual/net/vethd968468
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+   Device: /sys/devices/virtual/net/vethd968468
+
+● sys-module-configfs.device - /sys/module/configfs
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+   Device: /sys/module/configfs
+
+● sys-subsystem-net-devices-docker0.device - /sys/subsystem/net/devices/docker0
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:18 UTC; 50min ago
+   Device: /sys/devices/virtual/net/docker0
+
+● sys-subsystem-net-devices-eth0.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:03.0/net/eth0
+
+● sys-subsystem-net-devices-eth1.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+   Device: /sys/devices/pci0000:00/0000:00:08.0/net/eth1
+
+● sys-subsystem-net-devices-veth7a9fea2.device - /sys/subsystem/net/devices/veth7a9fea2
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+   Device: /sys/devices/virtual/net/veth7a9fea2
+
+● sys-subsystem-net-devices-veth89bb42b.device - /sys/subsystem/net/devices/veth89bb42b
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+   Device: /sys/devices/virtual/net/veth89bb42b
+
+● sys-subsystem-net-devices-vetha40f081.device - /sys/subsystem/net/devices/vetha40f081
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+   Device: /sys/devices/virtual/net/vetha40f081
+
+● sys-subsystem-net-devices-vethd941919.device - /sys/subsystem/net/devices/vethd941919
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+   Device: /sys/devices/virtual/net/vethd941919
+
+● sys-subsystem-net-devices-vethd968468.device - /sys/subsystem/net/devices/vethd968468
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+   Device: /sys/devices/virtual/net/vethd968468
+
+● -.mount - /
+   Loaded: loaded (/etc/fstab; bad; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:47 UTC; 49min ago
+    Where: /
+     What: /dev/sda1
+     Docs: man:fstab(5)
+           man:systemd-fstab-generator(8)
+    Tasks: 0
+   Memory: 0B
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-hugepages.mount - Huge Pages File System
+   Loaded: loaded (/usr/lib/systemd/system/dev-hugepages.mount; static; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Where: /dev/hugepages
+     What: hugetlbfs
+     Docs: https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0
+   Memory: 0B
+
+● dev-mqueue.mount - POSIX Message Queue File System
+   Loaded: loaded (/usr/lib/systemd/system/dev-mqueue.mount; static; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Where: /dev/mqueue
+     What: mqueue
+     Docs: man:mq_overview(7)
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0
+   Memory: 652.0K
+
+● proc-fs-nfsd.mount - NFSD configuration filesystem
+   Loaded: loaded (/usr/lib/systemd/system/proc-fs-nfsd.mount; static; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Where: /proc/fs/nfsd
+     What: nfsd
+    Tasks: 0
+   Memory: 156.0K
+
+May 03 06:58:52 cent-node1 systemd[1]: Mounted NFSD configuration filesystem.
+
+● proc-sys-fs-binfmt_misc.mount - Arbitrary Executable File Formats File System
+   Loaded: loaded (/usr/lib/systemd/system/proc-sys-fs-binfmt_misc.mount; static; vendor preset: disabled)
+   Active: inactive (dead)
+    Where: /proc/sys/fs/binfmt_misc
+     What: binfmt_misc
+     Docs: https://www.kernel.org/doc/Documentation/admin-guide/binfmt-misc.rst
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● run-docker-netns-2b7ca46e1b52.mount - /run/docker/netns/2b7ca46e1b52
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:48:24 UTC; 3s ago
+    Where: /run/docker/netns/2b7ca46e1b52
+     What: proc
+
+● run-docker-netns-2d70dd26dbd1.mount - /run/docker/netns/2d70dd26dbd1
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:24 UTC; 50min ago
+    Where: /run/docker/netns/2d70dd26dbd1
+     What: proc
+    Tasks: 0
+   Memory: 0B
+
+● run-docker-netns-5917ddd5c53e.mount - /run/docker/netns/5917ddd5c53e
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:26 UTC; 50min ago
+    Where: /run/docker/netns/5917ddd5c53e
+     What: proc
+    Tasks: 0
+   Memory: 0B
+
+● run-docker-netns-61740979da98.mount - /run/docker/netns/61740979da98
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:27 UTC; 50min ago
+    Where: /run/docker/netns/61740979da98
+     What: proc
+    Tasks: 0
+   Memory: 0B
+
+● run-docker-netns-d7032b0e7f03.mount - /run/docker/netns/d7032b0e7f03
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+    Where: /run/docker/netns/d7032b0e7f03
+     What: proc
+
+● run-user-0.mount - /run/user/0
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:01:01 UTC; 47min ago
+    Where: /run/user/0
+     What: tmpfs
+    Tasks: 0
+   Memory: 0B
+
+● run-user-1000.mount - /run/user/1000
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:45:47 UTC; 2min 40s ago
+    Where: /run/user/1000
+     What: tmpfs
+    Tasks: 0
+   Memory: 0B
+
+● sys-fs-fuse-connections.mount - FUSE Control File System
+   Loaded: loaded (/usr/lib/systemd/system/sys-fs-fuse-connections.mount; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Where: /sys/fs/fuse/connections
+     What: fusectl
+     Docs: https://www.kernel.org/doc/Documentation/filesystems/fuse.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● sys-kernel-config.mount - Configuration File System
+   Loaded: loaded (/usr/lib/systemd/system/sys-kernel-config.mount; static; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:48 UTC; 49min ago
+    Where: /sys/kernel/config
+     What: configfs
+     Docs: https://www.kernel.org/doc/Documentation/filesystems/configfs/configfs.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0
+   Memory: 0B
+
+May 03 06:58:48 localhost.localdomain systemd[1]: Mounting Configuration File System...
+May 03 06:58:48 localhost.localdomain systemd[1]: Mounted Configuration File System.
+
+● sys-kernel-debug.mount - Debug File System
+   Loaded: loaded (/usr/lib/systemd/system/sys-kernel-debug.mount; static; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Where: /sys/kernel/debug
+     What: debugfs
+     Docs: https://www.kernel.org/doc/Documentation/filesystems/debugfs.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0
+   Memory: 0B
+
+● tmp.mount - Temporary Directory
+   Loaded: loaded (/usr/lib/systemd/system/tmp.mount; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+    Where: /tmp
+     What: tmpfs
+     Docs: man:hier(7)
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● var-lib-docker-containers-0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948-mounts-shm.mount - /var/lib/docker/containers/0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:24 UTC; 50min ago
+    Where: /var/lib/docker/containers/0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948/mounts/shm
+     What: shm
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-docker-containers-1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246-mounts-shm.mount - /var/lib/docker/containers/1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+    Where: /var/lib/docker/containers/1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246/mounts/shm
+     What: shm
+
+● var-lib-docker-containers-4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98-mounts-shm.mount - /var/lib/docker/containers/4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+    Where: /var/lib/docker/containers/4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98/mounts/shm
+     What: shm
+
+● var-lib-docker-containers-a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260-mounts-shm.mount - /var/lib/docker/containers/a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:24 UTC; 50min ago
+    Where: /var/lib/docker/containers/a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260/mounts/shm
+     What: shm
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-docker-containers-fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb-mounts-shm.mount - /var/lib/docker/containers/fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+    Where: /var/lib/docker/containers/fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb/mounts/shm
+     What: shm
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-docker-overlay2-0252b8496fef14cb45937b5ae7f00cbe84dc84081e7cf61e2b99fef279072a88-merged.mount - /var/lib/docker/overlay2/0252b8496fef14cb45937b5ae7f00cbe84dc84081e7cf61e2b99fef279072a88/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+    Where: /var/lib/docker/overlay2/0252b8496fef14cb45937b5ae7f00cbe84dc84081e7cf61e2b99fef279072a88/merged
+     What: overlay
+
+● var-lib-docker-overlay2-464e6043dbeb163632cb44d1becbb4c3005ea1e80747929241371adb5599a5a4-merged.mount - /var/lib/docker/overlay2/464e6043dbeb163632cb44d1becbb4c3005ea1e80747929241371adb5599a5a4/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:22 UTC; 50min ago
+    Where: /var/lib/docker/overlay2/464e6043dbeb163632cb44d1becbb4c3005ea1e80747929241371adb5599a5a4/merged
+     What: overlay
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-docker-overlay2-9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309-merged.mount - /var/lib/docker/overlay2/9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+    Where: /var/lib/docker/overlay2/9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309/merged
+     What: overlay
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-docker-overlay2-a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375-merged.mount - /var/lib/docker/overlay2/a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+    Where: /var/lib/docker/overlay2/a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375/merged
+     What: overlay
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-docker-overlay2-be9ae2183431f03a268290971d487c1869d7be1b83685a727409b86ed9a1359e-merged.mount - /var/lib/docker/overlay2/be9ae2183431f03a268290971d487c1869d7be1b83685a727409b86ed9a1359e/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:23 UTC; 50min ago
+    Where: /var/lib/docker/overlay2/be9ae2183431f03a268290971d487c1869d7be1b83685a727409b86ed9a1359e/merged
+     What: overlay
+    Tasks: 0
+   Memory: 0B
+
+● var-lib-nfs-rpc_pipefs.mount - RPC Pipe File System
+   Loaded: loaded (/usr/lib/systemd/system/var-lib-nfs-rpc_pipefs.mount; static; vendor preset: disabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+    Where: /var/lib/nfs/rpc_pipefs
+     What: sunrpc
+    Tasks: 0
+   Memory: 0B
+
+May 03 06:58:56 cent-node1 systemd[1]: Mounting RPC Pipe File System...
+May 03 06:58:56 cent-node1 systemd[1]: Mounted RPC Pipe File System.
+
+● systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch
+   Loaded: loaded (/usr/lib/systemd/system/systemd-ask-password-console.path; static; vendor preset: disabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-ask-password-console.service(8)
+
+● systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch
+   Loaded: loaded (/usr/lib/systemd/system/systemd-ask-password-wall.path; static; vendor preset: disabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-ask-password-console.service(8)
+
+● session-290.scope - Session 290 of user root
+   Loaded: loaded (/run/systemd/system/session-290.scope; static; vendor preset: disabled)
+  Drop-In: /run/systemd/system/session-290.scope.d
+           └─50-After-systemd-logind\x2eservice.conf, 50-After-systemd-user-sessions\x2eservice.conf, 50-Description.conf, 50-SendSIGHUP.conf, 50-Slice.conf, 50-TasksMax.conf
+   Active: active (abandoned) since Fri 2019-05-03 07:01:01 UTC; 47min ago
+   CGroup: /user.slice/user-0.slice/session-290.scope
+           └─16511 /usr/sbin/anacron -s
+
+May 03 07:01:01 cent-node1 systemd[1]: Started Session 290 of user root.
+May 03 07:01:01 cent-node1 CROND[16496]: (root) CMD (run-parts /etc/cron.hourly)
+May 03 07:01:01 cent-node1 anacron[16511]: Anacron started on 2019-05-03
+May 03 07:01:01 cent-node1 anacron[16511]: Will run job `cron.daily' in 43 min.
+May 03 07:01:01 cent-node1 anacron[16511]: Will run job `cron.weekly' in 63 min.
+May 03 07:01:01 cent-node1 anacron[16511]: Will run job `cron.monthly' in 83 min.
+May 03 07:01:01 cent-node1 anacron[16511]: Jobs will be executed sequentially
+May 03 07:44:01 cent-node1 anacron[16511]: Job `cron.daily' started
+May 03 07:46:06 cent-node1 anacron[16511]: Job `cron.daily' terminated
+
+● session-5073.scope - Session 5073 of user vagrant
+   Loaded: loaded (/run/systemd/system/session-5073.scope; static; vendor preset: disabled)
+  Drop-In: /run/systemd/system/session-5073.scope.d
+           └─50-After-systemd-logind\x2eservice.conf, 50-After-systemd-user-sessions\x2eservice.conf, 50-Description.conf, 50-SendSIGHUP.conf, 50-Slice.conf, 50-TasksMax.conf
+   Active: active (running) since Fri 2019-05-03 07:45:47 UTC; 2min 40s ago
+   CGroup: /user.slice/user-1000.slice/session-5073.scope
+           ├─ 3061 sshd: vagrant [priv]    
+           ├─ 3133 sshd: vagrant@pts/0     
+           ├─ 3134 -bash
+           ├─ 3593 sudo su
+           ├─ 3608 su
+           ├─ 3631 bash
+           └─18803 systemctl status -al
+
+May 03 07:45:47 cent-node1 systemd[1]: Started Session 5073 of user vagrant.
+May 03 07:45:47 cent-node1 sshd[3061]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+May 03 07:45:50 cent-node1 sudo[3593]:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/su
+May 03 07:45:50 cent-node1 sudo[3593]: pam_unix(sudo:session): session opened for user root by vagrant(uid=0)
+May 03 07:45:50 cent-node1 su[3608]: (to root) vagrant on pts/0
+May 03 07:45:50 cent-node1 su[3608]: pam_unix(su:session): session opened for user root by vagrant(uid=0)
+
+● auditd.service - Security Auditing Service
+   Loaded: loaded (/usr/lib/systemd/system/auditd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:auditd(8)
+           https://github.com/linux-audit/audit-documentation
+ Main PID: 2244 (auditd)
+    Tasks: 2
+   Memory: 36.9M
+   CGroup: /system.slice/auditd.service
+           └─2244 /sbin/auditd
+
+May 03 06:58:56 cent-node1 augenrules[2286]: backlog 1
+May 03 06:58:56 cent-node1 systemd[1]: Started Security Auditing Service.
+May 03 07:02:33 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:08:39 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:14:18 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:20:11 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:26:26 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:32:35 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:38:48 cent-node1 auditd[2244]: Audit daemon rotating log files
+May 03 07:45:26 cent-node1 auditd[2244]: Audit daemon rotating log files
+
+● auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS
+   Loaded: loaded (/usr/lib/systemd/system/auth-rpcgss-module.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+
+● cerebro.service - Cerebro Admin Backend
+   Loaded: loaded (/usr/lib/systemd/system/cerebro.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:21 UTC; 50min ago
+     Docs: http://www.elastic.co
+ Main PID: 3202 (docker)
+    Tasks: 10
+   Memory: 36.3M
+   CGroup: /system.slice/cerebro.service
+           └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo:cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
+
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223)
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.IOUtil.read(IOUtil.java:192)
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:380)
+May 03 07:48:19 cent-node1 docker[3202]: [[31merror[0m] application - Error processing request [path: /navbar, body: {"host":"Eskimo"}]
+May 03 07:48:19 cent-node1 docker[3202]: java.io.IOException: Connection reset by peer
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.FileDispatcherImpl.read0(Native Method)
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:39)
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223)
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.IOUtil.read(IOUtil.java:192)
+May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:380)
+
+● chronyd.service - NTP client/server
+   Loaded: loaded (/usr/lib/systemd/system/chronyd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:chronyd(8)
+           man:chrony.conf(5)
+ Main PID: 2350 (chronyd)
+    Tasks: 1
+   Memory: 1.4M
+   CGroup: /system.slice/chronyd.service
+           └─2350 /usr/sbin/chronyd
+
+May 03 06:58:57 cent-node1 chronyd[2350]: chronyd version 3.2 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SECHASH +SIGND +ASYNCDNS +IPV6 +DEBUG)
+May 03 06:58:57 cent-node1 chronyd[2350]: Frequency -7.121 +/- 17.234 ppm read from /var/lib/chrony/drift
+May 03 06:58:57 cent-node1 systemd[1]: Started NTP client/server.
+May 03 06:59:04 cent-node1 chronyd[2350]: Selected source 195.186.4.100
+May 03 06:59:04 cent-node1 chronyd[2350]: System clock wrong by -47.129719 seconds, adjustment started
+May 03 06:58:17 cent-node1 chronyd[2350]: System clock was stepped by -47.129719 seconds
+May 03 06:58:19 cent-node1 chronyd[2350]: Selected source 192.33.96.102
+May 03 06:59:23 cent-node1 chronyd[2350]: Selected source 157.161.57.2
+May 03 07:00:28 cent-node1 chronyd[2350]: Selected source 192.33.96.102
+May 03 07:45:44 cent-node1 chronyd[2350]: Source 157.161.57.2 replaced with 185.17.70.106
+
+● containerd.service - containerd container runtime
+   Loaded: loaded (/usr/lib/systemd/system/containerd.service; disabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:59:01 UTC; 49min ago
+     Docs: https://containerd.io
+ Main PID: 2724 (containerd)
+    Tasks: 67
+   Memory: 74.7M
+   CGroup: /system.slice/containerd.service
+           ├─ 2724 /usr/bin/containerd
+           ├─ 3450 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─ 3561 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─ 3684 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─18517 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           └─18575 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+
+May 03 07:48:12 cent-node1 containerd[2724]: time="2019-05-03T07:48:12.080248804Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/27e94451601b70622eaeb48af940d90cbbcc8b1719ac38c7c102a050d7cc2ba3/shim.sock" debug=false pid=17559
+May 03 07:48:12 cent-node1 containerd[2724]: time="2019-05-03T07:48:12.976346802Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/781aaa9b30906242fcf49b2c898f0bd00136f45394e039556a74afab27aa81fa/shim.sock" debug=false pid=17705
+May 03 07:48:17 cent-node1 containerd[2724]: time="2019-05-03T07:48:17.139396179Z" level=info msg="shim reaped" id=781aaa9b30906242fcf49b2c898f0bd00136f45394e039556a74afab27aa81fa
+May 03 07:48:17 cent-node1 containerd[2724]: time="2019-05-03T07:48:17.523097045Z" level=info msg="shim reaped" id=27e94451601b70622eaeb48af940d90cbbcc8b1719ac38c7c102a050d7cc2ba3
+May 03 07:48:17 cent-node1 containerd[2724]: time="2019-05-03T07:48:17.954870712Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/63c55616f7b201a7e8fd53ea446adac486536cb0939877351acc83ae1e623ad3/shim.sock" debug=false pid=18041
+May 03 07:48:18 cent-node1 containerd[2724]: time="2019-05-03T07:48:18.230303993Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/632ef88dfde2d691f821f894b69e7eb5811b6085222cd1d4c3bc803ae3042c24/shim.sock" debug=false pid=18123
+May 03 07:48:22 cent-node1 containerd[2724]: time="2019-05-03T07:48:22.892439638Z" level=info msg="shim reaped" id=63c55616f7b201a7e8fd53ea446adac486536cb0939877351acc83ae1e623ad3
+May 03 07:48:23 cent-node1 containerd[2724]: time="2019-05-03T07:48:23.479655357Z" level=info msg="shim reaped" id=632ef88dfde2d691f821f894b69e7eb5811b6085222cd1d4c3bc803ae3042c24
+May 03 07:48:24 cent-node1 containerd[2724]: time="2019-05-03T07:48:24.305997544Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246/shim.sock" debug=false pid=18517
+May 03 07:48:24 cent-node1 containerd[2724]: time="2019-05-03T07:48:24.546425629Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98/shim.sock" debug=false pid=18575
+
+● cpupower.service - Configure CPU power related settings
+   Loaded: loaded (/usr/lib/systemd/system/cpupower.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+
+● crond.service - Command Scheduler
+   Loaded: loaded (/usr/lib/systemd/system/crond.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+ Main PID: 2395 (crond)
+    Tasks: 1
+   Memory: 748.0K
+   CGroup: /system.slice/crond.service
+           └─2395 /usr/sbin/crond -n
+
+May 03 06:58:57 cent-node1 systemd[1]: Started Command Scheduler.
+May 03 06:58:57 cent-node1 crond[2395]: (CRON) INFO (RANDOM_DELAY will be scaled with factor 66% if used.)
+May 03 06:58:59 cent-node1 crond[2395]: (CRON) INFO (running with inotify support)
+
+● dbus.service - D-Bus System Message Bus
+   Loaded: loaded (/usr/lib/systemd/system/dbus.service; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:dbus-daemon(1)
+ Main PID: 2345 (dbus-daemon)
+    Tasks: 2
+   Memory: 1.5M
+   CGroup: /system.slice/dbus.service
+           └─2345 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+
+May 03 06:58:57 cent-node1 systemd[1]: Started D-Bus System Message Bus.
+May 03 06:58:57 cent-node1 dbus[2345]: [system] Successfully activated service 'org.freedesktop.systemd1'
+May 03 06:58:58 cent-node1 dbus[2345]: [system] Activating via systemd: service name='org.freedesktop.hostname1' unit='dbus-org.freedesktop.hostname1.service'
+May 03 06:58:58 cent-node1 dbus[2345]: [system] Successfully activated service 'org.freedesktop.hostname1'
+May 03 06:58:58 cent-node1 dbus[2345]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-org.freedesktop.nm-dispatcher.service'
+May 03 06:58:58 cent-node1 dbus[2345]: [system] Successfully activated service 'org.freedesktop.nm_dispatcher'
+May 03 06:58:41 cent-node1 dbus[2345]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-org.freedesktop.nm-dispatcher.service'
+May 03 06:58:41 cent-node1 dbus[2345]: [system] Successfully activated service 'org.freedesktop.nm_dispatcher'
+May 03 06:58:42 cent-node1 dbus[2345]: [system] Activating via systemd: service name='org.freedesktop.hostname1' unit='dbus-org.freedesktop.hostname1.service'
+May 03 06:58:42 cent-node1 dbus[2345]: [system] Successfully activated service 'org.freedesktop.hostname1'
+
+● dm-event.service - Device-mapper event daemon
+   Loaded: loaded (/usr/lib/systemd/system/dm-event.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:dmeventd(8)
+
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:19 UTC; 50min ago
+     Docs: https://docs.docker.com
+ Main PID: 2725 (dockerd)
+    Tasks: 58
+   Memory: 138.8M
+   CGroup: /system.slice/docker.service
+           ├─ 2725 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+           ├─ 3393 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9000 -container-ip 172.17.0.2 -container-port 9000
+           ├─ 3503 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.4 -container-port 123
+           ├─ 3555 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.6 -container-port 7337
+           ├─18487 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.3 -container-port 9300
+           ├─18510 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.3 -container-port 9200
+           └─18564 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5601 -container-ip 172.17.0.5 -container-port 5601
+
+May 03 07:47:56 cent-node1 dockerd[2725]: time="2019-05-03T07:47:56.888428044Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:47:59 cent-node1 dockerd[2725]: time="2019-05-03T07:47:59.381477212Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:02 cent-node1 dockerd[2725]: time="2019-05-03T07:48:02.748858906Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:04 cent-node1 dockerd[2725]: time="2019-05-03T07:48:04.506237646Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:10 cent-node1 dockerd[2725]: time="2019-05-03T07:48:10.590287920Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:11 cent-node1 dockerd[2725]: time="2019-05-03T07:48:11.530364920Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:17 cent-node1 dockerd[2725]: time="2019-05-03T07:48:17.154134800Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:17 cent-node1 dockerd[2725]: time="2019-05-03T07:48:17.533239826Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:22 cent-node1 dockerd[2725]: time="2019-05-03T07:48:22.900758030Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:23 cent-node1 dockerd[2725]: time="2019-05-03T07:48:23.493324671Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+
+● dracut-shutdown.service - Restore /run/initramfs
+   Loaded: loaded (/usr/lib/systemd/system/../../dracut/modules.d/98systemd/dracut-shutdown.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:dracut-shutdown.service(8)
+
+● ebtables.service - Ethernet Bridge Filtering tables
+   Loaded: loaded (/usr/lib/systemd/system/ebtables.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+
+● elasticsearch.service - Elasticsearch Server
+   Loaded: loaded (/usr/lib/systemd/system/elasticsearch.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 07:48:23 UTC; 4s ago
+     Docs: http://www.elastic.co
+  Process: 18356 ExecStop=/usr/bin/docker stop elasticsearch (code=exited, status=0/SUCCESS)
+  Process: 18427 ExecStartPre=/usr/bin/docker rm -f elasticsearch (code=exited, status=0/SUCCESS)
+  Process: 18400 ExecStartPre=/usr/bin/docker kill elasticsearch (code=exited, status=1/FAILURE)
+ Main PID: 18443 (docker)
+    Tasks: 8
+   Memory: 22.0M
+   CGroup: /system.slice/elasticsearch.service
+           └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+
+May 03 07:48:23 cent-node1 systemd[1]: elasticsearch.service holdoff time over, scheduling restart.
+May 03 07:48:23 cent-node1 systemd[1]: Stopped Elasticsearch Server.
+May 03 07:48:23 cent-node1 systemd[1]: Starting Elasticsearch Server...
+May 03 07:48:23 cent-node1 docker[18400]: Error response from daemon: Cannot kill container: elasticsearch: Container 63c55616f7b201a7e8fd53ea446adac486536cb0939877351acc83ae1e623ad3 is not running
+May 03 07:48:23 cent-node1 docker[18427]: elasticsearch
+May 03 07:48:23 cent-node1 systemd[1]: Started Elasticsearch Server.
+
+● emergency.service - Emergency Shell
+   Loaded: loaded (/usr/lib/systemd/system/emergency.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:sulogin(8)
+
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:firewalld(1)
+
+● getty@tty1.service - Getty on tty1
+   Loaded: loaded (/usr/lib/systemd/system/getty@.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:agetty(8)
+           man:systemd-getty-generator(8)
+           http://0pointer.de/blog/projects/serial-console.html
+ Main PID: 2396 (agetty)
+   CGroup: /system.slice/system-getty.slice/getty@tty1.service
+           └─2396 /sbin/agetty --noclear tty1 linux
+
+May 03 06:58:57 cent-node1 systemd[1]: Started Getty on tty1.
+
+● gssproxy.service - GSSAPI Proxy Daemon
+   Loaded: loaded (/usr/lib/systemd/system/gssproxy.service; disabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+ Main PID: 2356 (gssproxy)
+    Tasks: 6
+   Memory: 1.4M
+   CGroup: /system.slice/gssproxy.service
+           └─2356 /usr/sbin/gssproxy -D
+
+May 03 06:58:57 cent-node1 systemd[1]: Starting GSSAPI Proxy Daemon...
+May 03 06:58:57 cent-node1 systemd[1]: Started GSSAPI Proxy Daemon.
+
+● irqbalance.service - irqbalance daemon
+   Loaded: loaded (/usr/lib/systemd/system/irqbalance.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+ Main PID: 2366 (irqbalance)
+    Tasks: 1
+   Memory: 332.0K
+   CGroup: /system.slice/irqbalance.service
+           └─2366 /usr/sbin/irqbalance --foreground
+
+May 03 06:58:57 cent-node1 systemd[1]: Started irqbalance daemon.
+
+● kibana.service - Kibana UI
+   Loaded: loaded (/usr/lib/systemd/system/kibana.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 07:48:24 UTC; 4s ago
+     Docs: http://www.elastic.co
+  Process: 18404 ExecStop=/usr/bin/docker stop kibana (code=exited, status=0/SUCCESS)
+  Process: 18459 ExecStartPre=/usr/bin/docker rm -f kibana (code=exited, status=0/SUCCESS)
+  Process: 18445 ExecStartPre=/usr/bin/docker kill kibana (code=exited, status=1/FAILURE)
+ Main PID: 18473 (docker)
+    Tasks: 8
+   Memory: 19.7M
+   CGroup: /system.slice/kibana.service
+           └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo:kibana /usr/local/lib/kibana/bin/kibana
+
+May 03 07:48:23 cent-node1 systemd[1]: kibana.service holdoff time over, scheduling restart.
+May 03 07:48:23 cent-node1 systemd[1]: Stopped Kibana UI.
+May 03 07:48:23 cent-node1 systemd[1]: Starting Kibana UI...
+May 03 07:48:24 cent-node1 docker[18445]: Error response from daemon: Cannot kill container: kibana: Container 632ef88dfde2d691f821f894b69e7eb5811b6085222cd1d4c3bc803ae3042c24 is not running
+May 03 07:48:24 cent-node1 docker[18459]: kibana
+May 03 07:48:24 cent-node1 systemd[1]: Started Kibana UI.
+
+● kmod-static-nodes.service - Create list of required static device nodes for the current kernel
+   Loaded: loaded (/usr/lib/systemd/system/kmod-static-nodes.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+ Main PID: 1151 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/kmod-static-nodes.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Started Create list of required static device nodes for the current kernel.
+
+● lvm2-lvmetad.service - LVM2 metadata daemon
+   Loaded: loaded (/usr/lib/systemd/system/lvm2-lvmetad.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:lvmetad(8)
+ Main PID: 1186 (lvmetad)
+    Tasks: 1
+   Memory: 3.0M
+   CGroup: /system.slice/lvm2-lvmetad.service
+           └─1186 /usr/sbin/lvmetad -f
+
+May 03 06:58:53 cent-node1 systemd[1]: Started LVM2 metadata daemon.
+
+● lvm2-lvmpolld.service - LVM2 poll daemon
+   Loaded: loaded (/usr/lib/systemd/system/lvm2-lvmpolld.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:lvmpolld(8)
+
+● lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling
+   Loaded: loaded (/usr/lib/systemd/system/lvm2-monitor.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:55 UTC; 49min ago
+     Docs: man:dmeventd(8)
+           man:lvcreate(8)
+           man:lvchange(8)
+           man:vgchange(8)
+ Main PID: 1148 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/lvm2-monitor.service
+
+May 03 06:58:55 cent-node1 systemd[1]: Started Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+
+● mesos-agent.service - Mesos Agent
+   Loaded: loaded (/usr/lib/systemd/system/mesos-agent.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:59:01 UTC; 49min ago
+ Main PID: 2715 (mesos-slave)
+    Tasks: 16
+   Memory: 239.7M
+   CGroup: /system.slice/mesos-agent.service
+           ├─2715 /usr/local/sbin/mesos-slave 
+           ├─2729 logger -p user.info -t mesos-slave[2715]
+           └─2732 logger -p user.err -t mesos-slave[2715]
+
+May 03 07:46:43 cent-node1 mesos-slave[2732]: 2019-05-03 07:46:43,439:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 12ms
+May 03 07:46:56 cent-node1 mesos-slave[2732]: 2019-05-03 07:46:56,808:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 12ms
+May 03 07:47:06 cent-node1 mesos-slave[2732]: 2019-05-03 07:47:06,846:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 22ms
+May 03 07:47:20 cent-node1 mesos-slave[2732]: 2019-05-03 07:47:20,218:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 12ms
+May 03 07:47:25 cent-node1 mesos-slave[2732]: I0503 07:47:25.542302  3312 slave.cpp:6860] Current disk usage 24.37%. Max allowed age: 4.594220775286400days
+May 03 07:47:26 cent-node1 mesos-slave[2732]: 2019-05-03 07:47:26,908:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 15ms
+May 03 07:47:30 cent-node1 mesos-slave[2732]: 2019-05-03 07:47:30,258:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 13ms
+May 03 07:47:50 cent-node1 mesos-slave[2732]: 2019-05-03 07:47:50,325:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 16ms
+May 03 07:48:13 cent-node1 mesos-slave[2732]: 2019-05-03 07:48:13,717:2715(0x7f880cdbb700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 12ms
+May 03 07:48:25 cent-node1 mesos-slave[2732]: I0503 07:48:25.548913  3312 slave.cpp:6860] Current disk usage 24.37%. Max allowed age: 4.593882810602847days
+
+● network.service - LSB: Bring up/down networking
+   Loaded: loaded (/etc/rc.d/init.d/network; bad; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:59:00 UTC; 49min ago
+     Docs: man:systemd-sysv-generator(8)
+    Tasks: 0
+   Memory: 0B
+
+May 03 06:58:59 cent-node1 systemd[1]: Starting LSB: Bring up/down networking...
+May 03 06:59:00 cent-node1 network[2470]: Bringing up loopback interface:  [  OK  ]
+May 03 06:59:00 cent-node1 network[2470]: Bringing up interface eth0:  [  OK  ]
+May 03 06:59:00 cent-node1 network[2470]: Bringing up interface eth1:  [  OK  ]
+May 03 06:59:00 cent-node1 systemd[1]: Started LSB: Bring up/down networking.
+
+● NetworkManager-wait-online.service - Network Manager Wait Online
+   Loaded: loaded (/usr/lib/systemd/system/NetworkManager-wait-online.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:44 UTC; 49min ago
+     Docs: man:nm-online(1)
+  Process: 5694 ExecStart=/usr/bin/nm-online -s -q --timeout=30 (code=exited, status=0/SUCCESS)
+ Main PID: 5694 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/NetworkManager-wait-online.service
+
+May 03 06:58:42 cent-node1 systemd[1]: Starting Network Manager Wait Online...
+May 03 06:58:44 cent-node1 systemd[1]: Started Network Manager Wait Online.
+
+● NetworkManager.service - Network Manager
+   Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:42 UTC; 49min ago
+     Docs: man:NetworkManager(8)
+ Main PID: 5682 (NetworkManager)
+    Tasks: 4
+   Memory: 16.1M
+   CGroup: /system.slice/NetworkManager.service
+           ├─5682 /usr/sbin/NetworkManager --no-daemon
+           └─5774 /sbin/dhclient -d -q -sf /usr/libexec/nm-dhcp-helper -pf /var/run/dhclient-eth0.pid -lf /var/lib/NetworkManager/dhclient-5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03-eth0.lease -cf /var/lib/NetworkManager/dhclient-eth0.conf eth0
+
+May 03 07:48:18 cent-node1 NetworkManager[5682]: <info>  [1556869698.4522] device (vethcbf4041): carrier: link connected
+May 03 07:48:23 cent-node1 NetworkManager[5682]: <info>  [1556869703.0006] manager: (vethd2d0634): new Veth device (/org/freedesktop/NetworkManager/Devices/1840)
+May 03 07:48:23 cent-node1 NetworkManager[5682]: <info>  [1556869703.0505] device (veth8180e68): released from master device docker0
+May 03 07:48:23 cent-node1 NetworkManager[5682]: <info>  [1556869703.5821] device (vethcbf4041): released from master device docker0
+May 03 07:48:24 cent-node1 NetworkManager[5682]: <info>  [1556869704.1259] manager: (vethb3e6648): new Veth device (/org/freedesktop/NetworkManager/Devices/1841)
+May 03 07:48:24 cent-node1 NetworkManager[5682]: <info>  [1556869704.1282] manager: (veth7a9fea2): new Veth device (/org/freedesktop/NetworkManager/Devices/1842)
+May 03 07:48:24 cent-node1 NetworkManager[5682]: <info>  [1556869704.3892] manager: (veth72db1ff): new Veth device (/org/freedesktop/NetworkManager/Devices/1843)
+May 03 07:48:24 cent-node1 NetworkManager[5682]: <info>  [1556869704.3908] manager: (vethd968468): new Veth device (/org/freedesktop/NetworkManager/Devices/1844)
+May 03 07:48:24 cent-node1 NetworkManager[5682]: <info>  [1556869704.8158] device (veth7a9fea2): carrier: link connected
+May 03 07:48:25 cent-node1 NetworkManager[5682]: <info>  [1556869705.1824] device (vethd968468): carrier: link connected
+
+● nfs-config.service - Preprocess NFS configuration
+   Loaded: loaded (/usr/lib/systemd/system/nfs-config.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+ Main PID: 2089 (code=exited, status=0/SUCCESS)
+
+May 03 06:58:55 cent-node1 systemd[1]: Starting Preprocess NFS configuration...
+May 03 06:58:56 cent-node1 systemd[1]: Started Preprocess NFS configuration.
+
+● nfs-idmapd.service - NFSv4 ID-name mapping service
+   Loaded: loaded (/usr/lib/systemd/system/nfs-idmapd.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:25 UTC; 50min ago
+ Main PID: 2285 (code=killed, signal=TERM)
+
+May 03 06:58:56 cent-node1 systemd[1]: Starting NFSv4 ID-name mapping service...
+May 03 06:58:56 cent-node1 systemd[1]: Started NFSv4 ID-name mapping service.
+May 03 06:58:24 cent-node1 systemd[1]: Stopping NFSv4 ID-name mapping service...
+May 03 06:58:25 cent-node1 systemd[1]: Stopped NFSv4 ID-name mapping service.
+
+● nfs-mountd.service - NFS Mount Daemon
+   Loaded: loaded (/usr/lib/systemd/system/nfs-mountd.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:25 UTC; 50min ago
+ Main PID: 2734 (code=exited, status=0/SUCCESS)
+
+May 03 06:59:01 cent-node1 systemd[1]: Starting NFS Mount Daemon...
+May 03 06:59:01 cent-node1 rpc.mountd[2714]: Could not bind socket: (98) Address already in use
+May 03 06:59:01 cent-node1 rpc.mountd[2714]: Could not bind socket: (98) Address already in use
+May 03 06:59:01 cent-node1 rpc.mountd[2714]: Could not bind socket: (98) Address already in use
+May 03 06:59:01 cent-node1 rpc.mountd[2714]: Could not bind socket: (98) Address already in use
+May 03 06:59:01 cent-node1 rpc.mountd[2714]: mountd: No V2 or V3 listeners created!
+May 03 06:59:01 cent-node1 rpc.mountd[2734]: Version 1.3.0 starting
+May 03 06:59:01 cent-node1 systemd[1]: Started NFS Mount Daemon.
+May 03 06:58:24 cent-node1 systemd[1]: Stopping NFS Mount Daemon...
+May 03 06:58:25 cent-node1 systemd[1]: Stopped NFS Mount Daemon.
+
+● nfs-server.service - NFS server and services
+   Loaded: loaded (/usr/lib/systemd/system/nfs-server.service; enabled; vendor preset: disabled)
+  Drop-In: /run/systemd/generator/nfs-server.service.d
+           └─order-with-mounts.conf
+   Active: failed (Result: exit-code) since Fri 2019-05-03 06:58:24 UTC; 50min ago
+  Process: 3608 ExecStart=/usr/sbin/rpc.nfsd $RPCNFSDARGS (code=exited, status=1/FAILURE)
+  Process: 3545 ExecStartPre=/usr/sbin/exportfs -r (code=exited, status=0/SUCCESS)
+  Process: 2735 ExecStartPre=/bin/sleep 10 (code=exited, status=0/SUCCESS)
+ Main PID: 3608 (code=exited, status=1/FAILURE)
+
+May 03 06:59:01 cent-node1 systemd[1]: Starting NFS server and services...
+May 03 06:58:24 cent-node1 systemd[1]: nfs-server.service: main process exited, code=exited, status=1/FAILURE
+May 03 06:58:24 cent-node1 rpc.nfsd[3608]: rpc.nfsd: writing fd to kernel failed: errno 111 (Connection refused)
+May 03 06:58:24 cent-node1 rpc.nfsd[3608]: rpc.nfsd: unable to set any sockets for nfsd
+May 03 06:58:24 cent-node1 systemd[1]: Failed to start NFS server and services.
+May 03 06:58:24 cent-node1 systemd[1]: Unit nfs-server.service entered failed state.
+May 03 06:58:24 cent-node1 systemd[1]: nfs-server.service failed.
+
+● nfs-utils.service - NFS server and client services
+   Loaded: loaded (/usr/lib/systemd/system/nfs-utils.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+
+● ntp.service - NTP Server
+   Loaded: loaded (/usr/lib/systemd/system/ntp.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:21 UTC; 50min ago
+ Main PID: 3223 (docker)
+    Tasks: 8
+   Memory: 27.6M
+   CGroup: /system.slice/ntp.service
+           └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+
+May 03 07:45:20 cent-node1 docker[3223]: 3 May 07:45:20 ntpd[1]: Soliciting pool server 2a01:4f8:0:a0a1::2:1
+May 03 07:45:23 cent-node1 docker[3223]: 3 May 07:45:23 ntpd[1]: Soliciting pool server 2a01:4f8:0:a112::2:2
+May 03 07:45:26 cent-node1 docker[3223]: 3 May 07:45:26 ntpd[1]: Soliciting pool server 2a01:4f8:0:a101::2:3
+May 03 07:46:24 cent-node1 docker[3223]: 3 May 07:46:24 ntpd[1]: Soliciting pool server 2a01:4f8:0:a0a1::2:1
+May 03 07:46:27 cent-node1 docker[3223]: 3 May 07:46:27 ntpd[1]: Soliciting pool server 2a01:4f8:0:a112::2:2
+May 03 07:46:33 cent-node1 docker[3223]: 3 May 07:46:33 ntpd[1]: Soliciting pool server 2a01:4f8:0:a101::2:3
+May 03 07:47:29 cent-node1 docker[3223]: 3 May 07:47:29 ntpd[1]: Soliciting pool server 2a01:4f8:0:a0a1::2:1
+May 03 07:47:31 cent-node1 docker[3223]: 3 May 07:47:31 ntpd[1]: Soliciting pool server 2a01:4f8:0:a112::2:2
+May 03 07:47:38 cent-node1 docker[3223]: 3 May 07:47:38 ntpd[1]: Soliciting pool server 2a01:4f8:0:a101::2:3
+May 03 07:47:50 cent-node1 docker[3223]: 3 May 07:47:50 ntpd[1]: 0.0.0.0 0618 08 no_sys_peer
+
+● polkit.service - Authorization Manager
+   Loaded: loaded (/usr/lib/systemd/system/polkit.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:polkit(8)
+ Main PID: 2331 (polkitd)
+    Tasks: 7
+   Memory: 15.3M
+   CGroup: /system.slice/polkit.service
+           └─2331 /usr/lib/polkit-1/polkitd --no-debug
+
+May 03 06:58:56 cent-node1 systemd[1]: Starting Authorization Manager...
+May 03 06:58:57 cent-node1 polkitd[2331]: Started polkitd version 0.112
+May 03 06:58:57 cent-node1 polkitd[2331]: Loading rules from directory /etc/polkit-1/rules.d
+May 03 06:58:57 cent-node1 polkitd[2331]: Loading rules from directory /usr/share/polkit-1/rules.d
+May 03 06:58:57 cent-node1 polkitd[2331]: Finished loading, compiling and executing 2 rules
+May 03 06:58:57 cent-node1 polkitd[2331]: Acquired the name org.freedesktop.PolicyKit1 on the system bus
+May 03 06:58:57 cent-node1 systemd[1]: Started Authorization Manager.
+May 03 07:46:01 cent-node1 polkitd[2331]: Registered Authentication Agent for unix-process:6913:288186 (system bus name :1.15294 [/usr/bin/pkttyagent --notify-fd 5 --fallback], object path /org/freedesktop/PolicyKit1/AuthenticationAgent, locale en_US.UTF-8)
+May 03 07:46:08 cent-node1 polkitd[2331]: Unregistered Authentication Agent for unix-process:6913:288186 (system bus name :1.15294, object path /org/freedesktop/PolicyKit1/AuthenticationAgent, locale en_US.UTF-8) (disconnected from bus)
+
+● postfix.service - Postfix Mail Transport Agent
+   Loaded: loaded (/usr/lib/systemd/system/postfix.service; enabled; vendor preset: disabled)
+   Active: failed (Result: exit-code) since Fri 2019-05-03 06:59:03 UTC; 49min ago
+
+May 03 06:59:00 cent-node1 systemd[1]: Starting Postfix Mail Transport Agent...
+May 03 06:59:01 cent-node1 aliasesdb[2710]: /usr/sbin/postconf: fatal: parameter inet_interfaces: no local interface found for ::1
+May 03 06:59:02 cent-node1 postfix/sendmail[2741]: fatal: parameter inet_interfaces: no local interface found for ::1
+May 03 06:59:02 cent-node1 aliasesdb[2710]: newaliases: fatal: parameter inet_interfaces: no local interface found for ::1
+May 03 06:59:02 cent-node1 postfix[2747]: fatal: parameter inet_interfaces: no local interface found for ::1
+May 03 06:59:03 cent-node1 systemd[1]: postfix.service: control process exited, code=exited status=1
+May 03 06:59:03 cent-node1 systemd[1]: Failed to start Postfix Mail Transport Agent.
+May 03 06:59:03 cent-node1 systemd[1]: Unit postfix.service entered failed state.
+May 03 06:59:03 cent-node1 systemd[1]: postfix.service failed.
+
+● rc-local.service - /etc/rc.d/rc.local Compatibility
+   Loaded: loaded (/usr/lib/systemd/system/rc-local.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+
+● rescue.service - Rescue Shell
+   Loaded: loaded (/usr/lib/systemd/system/rescue.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:sulogin(8)
+
+● rhel-autorelabel.service - Relabel all filesystems, if necessary
+   Loaded: loaded (/usr/lib/systemd/system/rhel-autorelabel.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:55 UTC; 49min ago
+
+● rhel-configure.service - Reconfigure the system on administrator request
+   Loaded: loaded (/usr/lib/systemd/system/rhel-configure.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:55 UTC; 49min ago
+
+● rhel-dmesg.service - Dump dmesg to /var/log/dmesg
+   Loaded: loaded (/usr/lib/systemd/system/rhel-dmesg.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+ Main PID: 2327 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/rhel-dmesg.service
+
+May 03 06:58:56 cent-node1 systemd[1]: Starting Dump dmesg to /var/log/dmesg...
+May 03 06:58:57 cent-node1 systemd[1]: Started Dump dmesg to /var/log/dmesg.
+
+● rhel-domainname.service - Read and set NIS domainname from /etc/sysconfig/network
+   Loaded: loaded (/usr/lib/systemd/system/rhel-domainname.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+ Main PID: 1150 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/rhel-domainname.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Started Read and set NIS domainname from /etc/sysconfig/network.
+
+● rhel-import-state.service - Import network configuration from initramfs
+   Loaded: loaded (/usr/lib/systemd/system/rhel-import-state.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:55 UTC; 49min ago
+
+● rhel-loadmodules.service - Load legacy module configuration
+   Loaded: loaded (/usr/lib/systemd/system/rhel-loadmodules.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+
+● rhel-readonly.service - Configure read-only root support
+   Loaded: loaded (/usr/lib/systemd/system/rhel-readonly.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+ Main PID: 1169 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/rhel-readonly.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Starting Configure read-only root support...
+May 03 06:58:52 cent-node1 systemd[1]: Started Configure read-only root support.
+
+● rpc-gssd.service - RPC security service for NFS client and server
+   Loaded: loaded (/usr/lib/systemd/system/rpc-gssd.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:57 UTC; 49min ago
+
+● rpc-statd-notify.service - Notify NFS peers of a restart
+   Loaded: loaded (/usr/lib/systemd/system/rpc-statd-notify.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:25 UTC; 50min ago
+  Process: 3656 ExecStart=/usr/sbin/sm-notify $SMNOTIFYARGS (code=exited, status=0/SUCCESS)
+
+May 03 06:58:24 cent-node1 systemd[1]: Starting Notify NFS peers of a restart...
+May 03 06:58:25 cent-node1 systemd[1]: Started Notify NFS peers of a restart.
+
+● rpc-statd.service - NFS status monitor for NFSv2/3 locking.
+   Loaded: loaded (/usr/lib/systemd/system/rpc-statd.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+
+May 03 06:58:56 cent-node1 systemd[1]: Dependency failed for NFS status monitor for NFSv2/3 locking..
+May 03 06:58:56 cent-node1 systemd[1]: Job rpc-statd.service/start failed with result 'dependency'.
+
+● rpcbind.service - RPC bind service
+   Loaded: loaded (/usr/lib/systemd/system/rpcbind.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+
+May 03 06:58:56 cent-node1 systemd[1]: Dependency failed for RPC bind service.
+May 03 06:58:56 cent-node1 systemd[1]: Job rpcbind.service/start failed with result 'dependency'.
+
+● rsyslog.service - System Logging Service
+   Loaded: loaded (/usr/lib/systemd/system/rsyslog.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:59:01 UTC; 49min ago
+     Docs: man:rsyslogd(8)
+           http://www.rsyslog.com/doc/
+ Main PID: 2717 (rsyslogd)
+    Tasks: 3
+   Memory: 12.7M
+   CGroup: /system.slice/rsyslog.service
+           └─2717 /usr/sbin/rsyslogd -n
+
+May 03 07:07:59 cent-node1 rsyslogd[2717]: imjournal: begin to drop messages due to rate-limiting
+May 03 07:09:02 cent-node1 rsyslogd[2717]: imjournal: 2237 messages lost due to rate-limiting
+May 03 07:17:35 cent-node1 rsyslogd[2717]: sd_journal_get_cursor() failed: 'Cannot assign requested address'  [v8.24.0-34.el7]
+May 03 07:17:35 cent-node1 rsyslogd[2717]: imjournal: journal reloaded... [v8.24.0-34.el7 try http://www.rsyslog.com/e/0 ]
+May 03 07:18:48 cent-node1 rsyslogd[2717]: imjournal: begin to drop messages due to rate-limiting
+May 03 07:19:03 cent-node1 rsyslogd[2717]: imjournal: 401 messages lost due to rate-limiting
+May 03 07:27:52 cent-node1 rsyslogd[2717]: sd_journal_get_cursor() failed: 'Cannot assign requested address'  [v8.24.0-34.el7]
+May 03 07:27:52 cent-node1 rsyslogd[2717]: imjournal: journal reloaded... [v8.24.0-34.el7 try http://www.rsyslog.com/e/0 ]
+May 03 07:38:18 cent-node1 rsyslogd[2717]: sd_journal_get_cursor() failed: 'Cannot assign requested address'  [v8.24.0-34.el7]
+May 03 07:38:18 cent-node1 rsyslogd[2717]: imjournal: journal reloaded... [v8.24.0-34.el7 try http://www.rsyslog.com/e/0 ]
+
+● selinux-policy-migrate-local-changes@targeted.service - Migrate local SELinux policy changes from the old store structure to the new structure
+   Loaded: loaded (/usr/lib/systemd/system/basic.target.wants/../selinux-policy-migrate-local-changes@.service; static; vendor preset: disabled)
+   Active: failed (Result: exit-code) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+ Main PID: 2110 (code=exited, status=208/STDIN)
+
+May 03 06:58:55 cent-node1 systemd[1]: Starting Migrate local SELinux policy changes from the old store structure to the new structure...
+May 03 06:58:56 cent-node1 systemd[1]: selinux-policy-migrate-local-changes@targeted.service: main process exited, code=exited, status=208/STDIN
+May 03 06:58:56 cent-node1 systemd[1]: Failed to start Migrate local SELinux policy changes from the old store structure to the new structure.
+May 03 06:58:56 cent-node1 systemd[1]: Unit selinux-policy-migrate-local-changes@targeted.service entered failed state.
+May 03 06:58:56 cent-node1 systemd[1]: selinux-policy-migrate-local-changes@targeted.service failed.
+
+● spark-executor.service - Mesos Shuffle Service for Spark executors
+   Loaded: loaded (/usr/lib/systemd/system/spark-executor.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:22 UTC; 50min ago
+ Main PID: 3284 (bash)
+    Tasks: 9
+   Memory: 22.4M
+   CGroup: /system.slice/spark-executor.service
+           ├─3284 /bin/bash -c . /run/spark_mesos_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo:spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+
+May 03 06:58:19 cent-node1 systemd[1]: Starting Mesos Shuffle Service for Spark executors...
+May 03 06:58:21 cent-node1 docker[3120]: Error response from daemon: Cannot kill container: spark-mesos-shuffle-service: Container c77f08559061fe206ef23f7f0d329f98b7e68c0cc3c6a42f85936e161de29d1e is not running
+May 03 06:58:22 cent-node1 docker[3164]: spark-mesos-shuffle-service
+May 03 06:58:22 cent-node1 systemd[1]: Started Mesos Shuffle Service for Spark executors.
+May 03 06:58:30 cent-node1 bash[3284]: starting org.apache.spark.deploy.mesos.MesosExternalShuffleService, logging to /usr/local/lib/spark-2.4.2/logs/spark--org.apache.spark.deploy.mesos.MesosExternalShuffleService-1-0076b7c8fb7c.out
+May 03 06:58:39 cent-node1 bash[3284]: failed to launch: nice -n 0 /usr/local/lib/spark/bin/spark-class org.apache.spark.deploy.mesos.MesosExternalShuffleService
+May 03 06:58:39 cent-node1 bash[3284]: full log in /usr/local/lib/spark-2.4.2/logs/spark--org.apache.spark.deploy.mesos.MesosExternalShuffleService-1-0076b7c8fb7c.out
+
+● spark-nfs-master.service - NFS Master for Spark
+   Loaded: loaded (/usr/lib/systemd/system/spark-nfs-master.service; enabled; vendor preset: disabled)
+   Active: active (exited) (Result: exit-code) since Fri 2019-05-03 06:58:19 UTC; 50min ago
+ Main PID: 3124 (code=exited, status=255)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/spark-nfs-master.service
+
+May 03 06:58:19 cent-node1 systemd[1]: Started NFS Master for Spark.
+May 03 06:58:19 cent-node1 bash[3124]: nfsd server has been found down \!
+May 03 06:58:20 cent-node1 systemd[1]: spark-nfs-master.service: main process exited, code=exited, status=255/n/a
+
+● sshd-keygen.service - OpenSSH Server Key Generation
+   Loaded: loaded (/usr/lib/systemd/system/sshd-keygen.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:56 UTC; 49min ago
+
+● sshd.service - OpenSSH server daemon
+   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:59:01 UTC; 49min ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+ Main PID: 2712 (sshd)
+    Tasks: 2
+   Memory: 5.7M
+   CGroup: /system.slice/sshd.service
+           ├─ 2712 /usr/sbin/sshd -D -u0
+           └─18800 sshd: eskimo [priv]     
+
+May 03 07:48:14 cent-node1 sshd[17846]: Accepted publickey for eskimo from 192.168.10.1 port 59272 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:21 cent-node1 sshd[18266]: Accepted publickey for eskimo from 192.168.10.1 port 59334 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:22 cent-node1 sshd[18287]: Accepted publickey for eskimo from 192.168.10.1 port 59354 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:23 cent-node1 sshd[18351]: Accepted publickey for eskimo from 192.168.10.1 port 59372 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:23 cent-node1 sshd[18438]: Accepted publickey for eskimo from 192.168.10.1 port 59380 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:24 cent-node1 sshd[18620]: Accepted publickey for eskimo from 192.168.10.1 port 59394 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:25 cent-node1 sshd[18739]: Accepted publickey for eskimo from 192.168.10.1 port 59404 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:26 cent-node1 sshd[18769]: Accepted publickey for eskimo from 192.168.10.1 port 59414 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:27 cent-node1 sshd[18785]: Accepted publickey for eskimo from 192.168.10.1 port 59424 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:28 cent-node1 sshd[18800]: Accepted publickey for eskimo from 192.168.10.1 port 59434 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+
+● systemd-ask-password-console.service - Dispatch Password Requests to Console
+   Loaded: loaded (/usr/lib/systemd/system/systemd-ask-password-console.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd-ask-password-console.service(8)
+
+● systemd-ask-password-wall.service - Forward Password Requests to Wall
+   Loaded: loaded (/usr/lib/systemd/system/systemd-ask-password-wall.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd-ask-password-console.service(8)
+
+● systemd-binfmt.service - Set Up Additional Binary Formats
+   Loaded: loaded (/usr/lib/systemd/system/systemd-binfmt.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-binfmt.service(8)
+           man:binfmt.d(5)
+           https://www.kernel.org/doc/Documentation/admin-guide/binfmt-misc.rst
+
+● systemd-firstboot.service - First Boot Wizard
+   Loaded: loaded (/usr/lib/systemd/system/systemd-firstboot.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-firstboot(1)
+
+● systemd-fsck-root.service - File System Check on Root Device
+   Loaded: loaded (/usr/lib/systemd/system/systemd-fsck-root.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-fsck-root.service(8)
+ Main PID: 1050 (code=exited, status=0/SUCCESS)
+   CGroup: /system.slice/systemd-fsck-root.service
+
+May 03 06:58:48 localhost.localdomain systemd[1]: Starting File System Check on /dev/disk/by-uuid/f52f361a-da1a-4ea0-8c7f-ca2706e86b46...
+May 03 06:58:48 localhost.localdomain systemd-fsck[1050]: /sbin/fsck.xfs: XFS file system.
+May 03 06:58:48 localhost.localdomain systemd[1]: Started File System Check on /dev/disk/by-uuid/f52f361a-da1a-4ea0-8c7f-ca2706e86b46.
+
+● systemd-hwdb-update.service - Rebuild Hardware Database
+   Loaded: loaded (/usr/lib/systemd/system/systemd-hwdb-update.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:hwdb(7)
+           man:systemd-hwdb(8)
+
+● systemd-initctl.service - /dev/initctl Compatibility Daemon
+   Loaded: loaded (/usr/lib/systemd/system/systemd-initctl.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd-initctl.service(8)
+
+● systemd-journal-catalog-update.service - Rebuild Journal Catalog
+   Loaded: loaded (/usr/lib/systemd/system/systemd-journal-catalog-update.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:55 UTC; 49min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+
+● systemd-journal-flush.service - Flush Journal to Persistent Storage
+   Loaded: loaded (/usr/lib/systemd/system/systemd-journal-flush.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+ Main PID: 1178 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-journal-flush.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Starting Flush Journal to Persistent Storage...
+May 03 06:58:53 cent-node1 systemd[1]: Started Flush Journal to Persistent Storage.
+
+● systemd-journald.service - Journal Service
+   Loaded: loaded (/usr/lib/systemd/system/systemd-journald.service; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+ Main PID: 1142 (systemd-journal)
+   Status: "Processing requests..."
+    Tasks: 1
+   Memory: 105.4M
+   CGroup: /system.slice/systemd-journald.service
+           └─1142 /usr/lib/systemd/systemd-journald
+
+May 03 06:58:52 cent-node1 systemd-journal[1142]: Runtime journal is using 8.0M (max allowed 233.8M, trying to leave 350.8M free of 2.2G available → current limit 233.8M).
+May 03 06:58:52 cent-node1 systemd-journal[1142]: Journal started
+
+● systemd-logind.service - Login Service
+   Loaded: loaded (/usr/lib/systemd/system/systemd-logind.service; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:systemd-logind.service(8)
+           man:logind.conf(5)
+           http://www.freedesktop.org/wiki/Software/systemd/logind
+           http://www.freedesktop.org/wiki/Software/systemd/multiseat
+ Main PID: 2332 (systemd-logind)
+   Status: "Processing requests..."
+    Tasks: 1
+   Memory: 1008.0K
+   CGroup: /system.slice/systemd-logind.service
+           └─2332 /usr/lib/systemd/systemd-logind
+
+May 03 07:48:24 cent-node1 systemd-logind[2332]: New session 5202 of user eskimo.
+May 03 07:48:24 cent-node1 systemd-logind[2332]: Removed session 5202.
+May 03 07:48:25 cent-node1 systemd-logind[2332]: New session 5203 of user eskimo.
+May 03 07:48:25 cent-node1 systemd-logind[2332]: Removed session 5203.
+May 03 07:48:26 cent-node1 systemd-logind[2332]: New session 5204 of user eskimo.
+May 03 07:48:26 cent-node1 systemd-logind[2332]: Removed session 5204.
+May 03 07:48:27 cent-node1 systemd-logind[2332]: New session 5205 of user eskimo.
+May 03 07:48:27 cent-node1 systemd-logind[2332]: Removed session 5205.
+May 03 07:48:28 cent-node1 systemd-logind[2332]: New session 5206 of user eskimo.
+May 03 07:48:28 cent-node1 systemd-logind[2332]: Removed session 5206.
+
+● systemd-machine-id-commit.service - Commit a transient machine-id on disk
+   Loaded: loaded (/usr/lib/systemd/system/systemd-machine-id-commit.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:55 UTC; 49min ago
+     Docs: man:systemd-machine-id-commit.service(8)
+
+● systemd-modules-load.service - Load Kernel Modules
+   Loaded: loaded (/usr/lib/systemd/system/systemd-modules-load.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-modules-load.service(8)
+           man:modules-load.d(5)
+
+● systemd-random-seed.service - Load/Save Random Seed
+   Loaded: loaded (/usr/lib/systemd/system/systemd-random-seed.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:systemd-random-seed.service(8)
+           man:random(4)
+ Main PID: 1187 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-random-seed.service
+
+May 03 06:58:53 cent-node1 systemd[1]: Starting Load/Save Random Seed...
+May 03 06:58:53 cent-node1 systemd[1]: Started Load/Save Random Seed.
+
+● systemd-readahead-collect.service - Collect Read-Ahead Data
+   Loaded: loaded (/usr/lib/systemd/system/systemd-readahead-collect.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-readahead-replay.service(8)
+
+● systemd-readahead-done.service - Stop Read-Ahead Data Collection
+   Loaded: loaded (/usr/lib/systemd/system/systemd-readahead-done.service; indirect; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-readahead-replay.service(8)
+
+● systemd-readahead-replay.service - Replay Read-Ahead Data
+   Loaded: loaded (/usr/lib/systemd/system/systemd-readahead-replay.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-readahead-replay.service(8)
+
+● systemd-reboot.service - Reboot
+   Loaded: loaded (/usr/lib/systemd/system/systemd-reboot.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd-halt.service(8)
+
+● systemd-remount-fs.service - Remount Root and Kernel File Systems
+   Loaded: loaded (/usr/lib/systemd/system/systemd-remount-fs.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-remount-fs.service(8)
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+ Main PID: 1154 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-remount-fs.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Started Remount Root and Kernel File Systems.
+
+● systemd-shutdownd.service - Delayed Shutdown Service
+   Loaded: loaded (/usr/lib/systemd/system/systemd-shutdownd.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd-shutdownd.service(8)
+
+● systemd-sysctl.service - Apply Kernel Variables
+   Loaded: loaded (/usr/lib/systemd/system/systemd-sysctl.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-sysctl.service(8)
+           man:sysctl.d(5)
+ Main PID: 1156 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-sysctl.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Started Apply Kernel Variables.
+
+● systemd-tmpfiles-clean.service - Cleanup of Temporary Directories
+   Loaded: loaded (/usr/lib/systemd/system/systemd-tmpfiles-clean.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 07:12:59 UTC; 35min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+  Process: 5476 ExecStart=/usr/bin/systemd-tmpfiles --clean (code=exited, status=0/SUCCESS)
+ Main PID: 5476 (code=exited, status=0/SUCCESS)
+
+May 03 07:12:59 cent-node1 systemd[1]: Starting Cleanup of Temporary Directories...
+May 03 07:12:59 cent-node1 systemd[1]: Started Cleanup of Temporary Directories.
+
+● systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev
+   Loaded: loaded (/usr/lib/systemd/system/systemd-tmpfiles-setup-dev.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+ Main PID: 1173 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-tmpfiles-setup-dev.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Starting Create Static Device Nodes in /dev...
+May 03 06:58:53 cent-node1 systemd[1]: Started Create Static Device Nodes in /dev.
+
+● systemd-tmpfiles-setup.service - Create Volatile Files and Directories
+   Loaded: loaded (/usr/lib/systemd/system/systemd-tmpfiles-setup.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+ Main PID: 2109 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-tmpfiles-setup.service
+
+May 03 06:58:55 cent-node1 systemd[1]: Starting Create Volatile Files and Directories...
+May 03 06:58:56 cent-node1 systemd[1]: Started Create Volatile Files and Directories.
+
+● systemd-udev-trigger.service - udev Coldplug all Devices
+   Loaded: loaded (/usr/lib/systemd/system/systemd-udev-trigger.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:udev(7)
+           man:systemd-udevd.service(8)
+ Main PID: 1185 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-udev-trigger.service
+
+May 03 06:58:52 cent-node1 systemd[1]: Starting udev Coldplug all Devices...
+May 03 06:58:53 cent-node1 systemd[1]: Started udev Coldplug all Devices.
+
+● systemd-udevd.service - udev Kernel Device Manager
+   Loaded: loaded (/usr/lib/systemd/system/systemd-udevd.service; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:systemd-udevd.service(8)
+           man:udev(7)
+ Main PID: 1191 (systemd-udevd)
+   Status: "Processing with 12 children at max"
+    Tasks: 1
+   Memory: 9.3M
+   CGroup: /system.slice/systemd-udevd.service
+           └─1191 /usr/lib/systemd/systemd-udevd
+
+May 03 06:58:53 cent-node1 systemd[1]: Starting udev Kernel Device Manager...
+May 03 06:58:53 cent-node1 systemd-udevd[1191]: starting version 219
+May 03 06:58:53 cent-node1 systemd-udevd[1191]: Network interface NamePolicy= disabled on kernel command line, ignoring.
+May 03 06:58:53 cent-node1 systemd[1]: Started udev Kernel Device Manager.
+
+● systemd-update-done.service - Update is Completed
+   Loaded: loaded (/usr/lib/systemd/system/systemd-update-done.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:55 UTC; 49min ago
+     Docs: man:systemd-update-done.service(8)
+
+● systemd-update-utmp-runlevel.service - Update UTMP about System Runlevel Changes
+   Loaded: loaded (/usr/lib/systemd/system/systemd-update-utmp-runlevel.service; static; vendor preset: disabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:22 UTC; 50min ago
+     Docs: man:systemd-update-utmp.service(8)
+           man:utmp(5)
+ Main PID: 3289 (code=exited, status=0/SUCCESS)
+
+May 03 06:58:22 cent-node1 systemd[1]: Starting Update UTMP about System Runlevel Changes...
+May 03 06:58:22 cent-node1 systemd[1]: Started Update UTMP about System Runlevel Changes.
+
+● systemd-update-utmp.service - Update UTMP about System Boot/Shutdown
+   Loaded: loaded (/usr/lib/systemd/system/systemd-update-utmp.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:systemd-update-utmp.service(8)
+           man:utmp(5)
+ Main PID: 2319 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-update-utmp.service
+
+May 03 06:58:56 cent-node1 systemd[1]: Starting Update UTMP about System Boot/Shutdown...
+May 03 06:58:56 cent-node1 systemd[1]: Started Update UTMP about System Boot/Shutdown.
+
+● systemd-user-sessions.service - Permit User Sessions
+   Loaded: loaded (/usr/lib/systemd/system/systemd-user-sessions.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:systemd-user-sessions.service(8)
+ Main PID: 2384 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-user-sessions.service
+
+May 03 06:58:57 cent-node1 systemd[1]: Starting Permit User Sessions...
+May 03 06:58:57 cent-node1 systemd[1]: Started Permit User Sessions.
+
+● systemd-vconsole-setup.service - Setup Virtual Console
+   Loaded: loaded (/usr/lib/systemd/system/systemd-vconsole-setup.service; static; vendor preset: disabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:systemd-vconsole-setup.service(8)
+           man:vconsole.conf(5)
+ Main PID: 1159 (code=exited, status=0/SUCCESS)
+    Tasks: 0
+   Memory: 0B
+   CGroup: /system.slice/systemd-vconsole-setup.service
+
+May 03 06:58:53 cent-node1 systemd[1]: Started Setup Virtual Console.
+
+● tuned.service - Dynamic System Tuning Daemon
+   Loaded: loaded (/usr/lib/systemd/system/tuned.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:17 UTC; 50min ago
+     Docs: man:tuned(8)
+           man:tuned.conf(5)
+           man:tuned-adm(8)
+ Main PID: 2711 (tuned)
+    Tasks: 5
+   Memory: 18.2M
+   CGroup: /system.slice/tuned.service
+           └─2711 /usr/bin/python2 -Es /usr/sbin/tuned -l -P
+
+May 03 06:59:00 cent-node1 systemd[1]: Starting Dynamic System Tuning Daemon...
+May 03 06:58:17 cent-node1 systemd[1]: Started Dynamic System Tuning Daemon.
+
+● vgauthd.service - VGAuth Service for open-vm-tools
+   Loaded: loaded (/usr/lib/systemd/system/vgauthd.service; enabled; vendor preset: disabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: http://github.com/vmware/open-vm-tools
+
+● vmtoolsd.service - Service for virtual machines hosted on VMware
+   Loaded: loaded (/usr/lib/systemd/system/vmtoolsd.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: http://github.com/vmware/open-vm-tools
+
+● -.slice - Root Slice
+   Loaded: loaded (/usr/lib/systemd/system/-.slice; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:47 UTC; 49min ago
+     Docs: man:systemd.special(7)
+    Tasks: 367
+   Memory: 3.0G
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● mesos_executors.slice - Mesos Executors Slice
+   Loaded: loaded (/run/systemd/system/mesos_executors.slice; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:23 UTC; 50min ago
+    Tasks: 0
+   Memory: 0B
+
+May 03 06:58:23 cent-node1 systemd[1]: Created slice Mesos Executors Slice.
+
+● system-getty.slice
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Tasks: 1
+   Memory: 172.0K
+   CGroup: /system.slice/system-getty.slice
+           └─getty@tty1.service
+             └─2396 /sbin/agetty --noclear tty1 linux
+
+● system-selinux\x2dpolicy\x2dmigrate\x2dlocal\x2dchanges.slice
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+    Tasks: 0
+   Memory: 0B
+
+● system.slice - System Slice
+   Loaded: loaded (/usr/lib/systemd/system/system.slice; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:47 UTC; 49min ago
+     Docs: man:systemd.special(7)
+    Tasks: 223
+   Memory: 861.2M
+   CGroup: /system.slice
+           ├─var-lib-docker-overlay2-9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309-merged.mount
+           ├─kibana.service
+           │ └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo:kibana /usr/local/lib/kibana/bin/kibana
+           ├─elasticsearch.service
+           │ └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           ├─run-user-1000.mount
+           ├─run-user-0.mount
+           ├─NetworkManager-wait-online.service
+           ├─run-docker-netns-61740979da98.mount
+           ├─run-docker-netns-5917ddd5c53e.mount
+           ├─var-lib-docker-containers-0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948-mounts-shm.mount
+           ├─run-docker-netns-2d70dd26dbd1.mount
+           ├─var-lib-docker-overlay2-464e6043dbeb163632cb44d1becbb4c3005ea1e80747929241371adb5599a5a4-merged.mount
+           ├─var-lib-docker-overlay2-be9ae2183431f03a268290971d487c1869d7be1b83685a727409b86ed9a1359e-merged.mount
+           ├─var-lib-docker-containers-fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb-mounts-shm.mount
+           ├─var-lib-docker-containers-a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260-mounts-shm.mount
+           ├─var-lib-docker-overlay2-a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375-merged.mount
+           ├─spark-nfs-master.service
+           ├─ntp.service
+           │ └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           ├─cerebro.service
+           │ └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo:cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
+           ├─spark-executor.service
+           │ ├─3284 /bin/bash -c . /run/spark_mesos_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo:spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           ├─docker.service
+           │ ├─ 2725 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+           │ ├─ 3393 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9000 -container-ip 172.17.0.2 -container-port 9000
+           │ ├─ 3503 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.4 -container-port 123
+           │ ├─ 3555 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.6 -container-port 7337
+           │ ├─18487 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.3 -container-port 9300
+           │ ├─18510 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.3 -container-port 9200
+           │ └─18564 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5601 -container-ip 172.17.0.5 -container-port 5601
+           ├─network.service
+           ├─rsyslog.service
+           │ └─2717 /usr/sbin/rsyslogd -n
+           ├─mesos-agent.service
+           │ ├─2715 /usr/local/sbin/mesos-slave 
+           │ ├─2729 logger -p user.info -t mesos-slave[2715]
+           │ └─2732 logger -p user.err -t mesos-slave[2715]
+           ├─containerd.service
+           │ ├─ 2724 /usr/bin/containerd
+           │ ├─ 3450 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/fb90a0058bcc41b6db964bd02ffa2cae6a839b8e6c670ced4a7c14062b5890fb -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─ 3561 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/a794e28961e6a7106d42a09540007fe2845afe1077da6326dfa0007f722ed260 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─ 3684 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/0076b7c8fb7c302c0d4d58401b54e5905c14fc67395528435f943886acf1d948 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─18517 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/1b6a724214a09830268397e8dc1ae8ffcce51f4f8175148f2a525a01ca657246 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ └─18575 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/4b084eb0f15ed0c1c424c020538a3925fff7c397d63500ffcb5118eb1e7cbe98 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─sshd.service
+           │ ├─ 2712 /usr/sbin/sshd -D -u0
+           │ └─18800 sshd: eskimo [priv]     
+           ├─tuned.service
+           │ └─2711 /usr/bin/python2 -Es /usr/sbin/tuned -l -P
+           ├─systemd-user-sessions.service
+           ├─crond.service
+           │ └─2395 /usr/sbin/crond -n
+           ├─rhel-dmesg.service
+           ├─systemd-update-utmp.service
+           ├─irqbalance.service
+           │ └─2366 /usr/sbin/irqbalance --foreground
+           ├─NetworkManager.service
+           │ ├─5682 /usr/sbin/NetworkManager --no-daemon
+           │ └─5774 /sbin/dhclient -d -q -sf /usr/libexec/nm-dhcp-helper -pf /var/run/dhclient-eth0.pid -lf /var/lib/NetworkManager/dhclient-5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03-eth0.lease -cf /var/lib/NetworkManager/dhclient-eth0.conf eth0
+           ├─dbus.service
+           │ └─2345 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+           ├─gssproxy.service
+           │ └─2356 /usr/sbin/gssproxy -D
+           ├─chronyd.service
+           │ └─2350 /usr/sbin/chronyd
+           ├─systemd-logind.service
+           │ └─2332 /usr/lib/systemd/systemd-logind
+           ├─polkit.service
+           │ └─2331 /usr/lib/polkit-1/polkitd --no-debug
+           ├─systemd-tmpfiles-setup.service
+           ├─var-lib-nfs-rpc_pipefs.mount
+           ├─auditd.service
+           │ └─2244 /sbin/auditd
+           ├─systemd-udev-trigger.service
+           ├─systemd-random-seed.service
+           ├─systemd-vconsole-setup.service
+           ├─lvm2-monitor.service
+           ├─systemd-tmpfiles-setup-dev.service
+           ├─systemd-journal-flush.service
+           ├─systemd-udevd.service
+           │ └─1191 /usr/lib/systemd/systemd-udevd
+           ├─lvm2-lvmetad.service
+           │ └─1186 /usr/sbin/lvmetad -f
+           ├─rhel-domainname.service
+           ├─rhel-readonly.service
+           ├─systemd-remount-fs.service
+           ├─kmod-static-nodes.service
+           ├─systemd-sysctl.service
+           ├─swapfile.swap
+           ├─-.mount
+           ├─systemd-fsck-root.service
+           ├─sys-kernel-config.mount
+           ├─sys-kernel-debug.mount
+           ├─system-getty.slice
+           │ └─getty@tty1.service
+           │   └─2396 /sbin/agetty --noclear tty1 linux
+           ├─system-selinux\x2dpolicy\x2dmigrate\x2dlocal\x2dchanges.slice
+           ├─dev-hugepages.mount
+           ├─proc-fs-nfsd.mount
+           ├─dev-mqueue.mount
+           └─systemd-journald.service
+             └─1142 /usr/lib/systemd/systemd-journald
+
+May 03 07:48:25 cent-node1 sshd[18739]: Accepted publickey for eskimo from 192.168.10.1 port 59404 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:26 cent-node1 systemd-logind[2332]: New session 5204 of user eskimo.
+May 03 07:48:26 cent-node1 systemd-logind[2332]: Removed session 5204.
+May 03 07:48:26 cent-node1 sshd[18769]: Accepted publickey for eskimo from 192.168.10.1 port 59414 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:27 cent-node1 systemd-logind[2332]: New session 5205 of user eskimo.
+May 03 07:48:27 cent-node1 systemd-logind[2332]: Removed session 5205.
+May 03 07:48:27 cent-node1 sshd[18785]: Accepted publickey for eskimo from 192.168.10.1 port 59424 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:48:28 cent-node1 systemd-logind[2332]: New session 5206 of user eskimo.
+May 03 07:48:28 cent-node1 systemd-logind[2332]: Removed session 5206.
+May 03 07:48:28 cent-node1 sshd[18800]: Accepted publickey for eskimo from 192.168.10.1 port 59434 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+
+● user-0.slice - User Slice of root
+   Loaded: loaded (/run/systemd/system/user-0.slice; static; vendor preset: disabled)
+  Drop-In: /run/systemd/system/user-0.slice.d
+           └─50-After-systemd-logind\x2eservice.conf, 50-After-systemd-user-sessions\x2eservice.conf, 50-Description.conf, 50-TasksMax.conf
+   Active: active since Fri 2019-05-03 07:01:01 UTC; 47min ago
+   CGroup: /user.slice/user-0.slice
+           └─session-290.scope
+             └─16511 /usr/sbin/anacron -s
+
+May 03 07:01:01 cent-node1 systemd[1]: Created slice User Slice of root.
+May 03 07:01:01 cent-node1 CROND[16496]: (root) CMD (run-parts /etc/cron.hourly)
+May 03 07:01:01 cent-node1 anacron[16511]: Anacron started on 2019-05-03
+May 03 07:01:01 cent-node1 anacron[16511]: Will run job `cron.daily' in 43 min.
+May 03 07:01:01 cent-node1 anacron[16511]: Will run job `cron.weekly' in 63 min.
+May 03 07:01:01 cent-node1 anacron[16511]: Will run job `cron.monthly' in 83 min.
+May 03 07:01:01 cent-node1 anacron[16511]: Jobs will be executed sequentially
+May 03 07:44:01 cent-node1 anacron[16511]: Job `cron.daily' started
+May 03 07:46:06 cent-node1 anacron[16511]: Job `cron.daily' terminated
+
+● user-1000.slice - User Slice of vagrant
+   Loaded: loaded (/run/systemd/system/user-1000.slice; static; vendor preset: disabled)
+  Drop-In: /run/systemd/system/user-1000.slice.d
+           └─50-After-systemd-logind\x2eservice.conf, 50-After-systemd-user-sessions\x2eservice.conf, 50-Description.conf, 50-TasksMax.conf
+   Active: active since Fri 2019-05-03 07:45:47 UTC; 2min 41s ago
+   CGroup: /user.slice/user-1000.slice
+           └─session-5073.scope
+             ├─ 3061 sshd: vagrant [priv]    
+             ├─ 3133 sshd: vagrant@pts/0     
+             ├─ 3134 -bash
+             ├─ 3593 sudo su
+             ├─ 3608 su
+             ├─ 3631 bash
+             └─18803 systemctl status -al
+
+May 03 07:45:47 cent-node1 systemd[1]: Created slice User Slice of vagrant.
+May 03 07:45:47 cent-node1 sshd[3061]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+May 03 07:45:50 cent-node1 sudo[3593]:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/su
+May 03 07:45:50 cent-node1 sudo[3593]: pam_unix(sudo:session): session opened for user root by vagrant(uid=0)
+May 03 07:45:50 cent-node1 su[3608]: (to root) vagrant on pts/0
+May 03 07:45:50 cent-node1 su[3608]: pam_unix(su:session): session opened for user root by vagrant(uid=0)
+
+● user.slice - User and Session Slice
+   Loaded: loaded (/usr/lib/systemd/system/user.slice; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd.special(7)
+    Tasks: 8
+   Memory: 43.0M
+   CGroup: /user.slice
+           ├─user-1000.slice
+           │ └─session-5073.scope
+           │   ├─ 3061 sshd: vagrant [priv]    
+           │   ├─ 3133 sshd: vagrant@pts/0     
+           │   ├─ 3134 -bash
+           │   ├─ 3593 sudo su
+           │   ├─ 3608 su
+           │   ├─ 3631 bash
+           │   └─18803 systemctl status -al
+           └─user-0.slice
+             └─session-290.scope
+               └─16511 /usr/sbin/anacron -s
+
+● dbus.socket - D-Bus System Message Bus Socket
+   Loaded: loaded (/usr/lib/systemd/system/dbus.socket; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+   Listen: /run/dbus/system_bus_socket (Stream)
+
+May 03 06:58:56 cent-node1 systemd[1]: Listening on D-Bus System Message Bus Socket.
+
+● dm-event.socket - Device-mapper event daemon FIFOs
+   Loaded: loaded (/usr/lib/systemd/system/dm-event.socket; enabled; vendor preset: enabled)
+   Active: active (listening) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:dmeventd(8)
+   Listen: /run/dmeventd-server (FIFO)
+           /run/dmeventd-client (FIFO)
+
+● docker.socket - Docker Socket for the API
+   Loaded: loaded (/usr/lib/systemd/system/docker.socket; disabled; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+   Listen: /var/run/docker.sock (Stream)
+
+May 03 06:58:56 cent-node1 systemd[1]: Starting Docker Socket for the API.
+May 03 06:58:56 cent-node1 systemd[1]: Listening on Docker Socket for the API.
+
+● lvm2-lvmetad.socket - LVM2 metadata daemon socket
+   Loaded: loaded (/usr/lib/systemd/system/lvm2-lvmetad.socket; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:lvmetad(8)
+   Listen: /run/lvm/lvmetad.socket (Stream)
+
+● lvm2-lvmpolld.socket - LVM2 poll daemon socket
+   Loaded: loaded (/usr/lib/systemd/system/lvm2-lvmpolld.socket; enabled; vendor preset: enabled)
+   Active: active (listening) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:lvmpolld(8)
+   Listen: /run/lvm/lvmpolld.socket (Stream)
+
+● rpcbind.socket - RPCbind Server Activation Socket
+   Loaded: loaded (/usr/lib/systemd/system/rpcbind.socket; enabled; vendor preset: enabled)
+   Active: failed (Result: resources)
+   Listen: /var/run/rpcbind.sock (Stream)
+           0.0.0.0:111 (Stream)
+           0.0.0.0:111 (Datagram)
+
+May 03 06:58:56 cent-node1 systemd[1]: rpcbind.socket failed to listen on sockets: Address family not supported by protocol
+May 03 06:58:56 cent-node1 systemd[1]: Failed to listen on RPCbind Server Activation Socket.
+May 03 06:58:56 cent-node1 systemd[1]: Unit rpcbind.socket entered failed state.
+
+● sshd.socket - OpenSSH Server Socket
+   Loaded: loaded (/usr/lib/systemd/system/sshd.socket; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+   Listen: 0.0.0.0:22 (Stream)
+ Accepted: 0; Connected: 0
+
+● syslog.socket - Syslog Socket
+   Loaded: loaded (/usr/lib/systemd/system/syslog.socket; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/syslog
+   Listen: /run/systemd/journal/syslog (Datagram)
+
+● systemd-initctl.socket - /dev/initctl Compatibility Named Pipe
+   Loaded: loaded (/usr/lib/systemd/system/systemd-initctl.socket; static; vendor preset: disabled)
+   Active: active (listening) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-initctl.service(8)
+   Listen: /run/systemd/initctl/fifo (FIFO)
+
+● systemd-journald.socket - Journal Socket
+   Loaded: loaded (/usr/lib/systemd/system/systemd-journald.socket; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:47 UTC; 49min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+   Listen: /run/systemd/journal/stdout (Stream)
+           /run/systemd/journal/socket (Datagram)
+           /dev/log (Datagram)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-shutdownd.socket - Delayed Shutdown Socket
+   Loaded: loaded (/usr/lib/systemd/system/systemd-shutdownd.socket; static; vendor preset: disabled)
+   Active: active (listening) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-shutdownd.service(8)
+   Listen: /run/systemd/shutdownd (Datagram)
+
+● systemd-udevd-control.socket - udev Control Socket
+   Loaded: loaded (/usr/lib/systemd/system/systemd-udevd-control.socket; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-udevd.service(8)
+           man:udev(7)
+   Listen: /run/udev/control (SequentialPacket)
+
+● systemd-udevd-kernel.socket - udev Kernel Socket
+   Loaded: loaded (/usr/lib/systemd/system/systemd-udevd-kernel.socket; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd-udevd.service(8)
+           man:udev(7)
+   Listen: kobject-uevent 1 (Netlink)
+
+● swapfile.swap - /swapfile
+   Loaded: loaded (/etc/fstab; bad; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     What: /swapfile
+     Docs: man:fstab(5)
+           man:systemd-fstab-generator(8)
+    Tasks: 0
+   Memory: 184.0K
+
+May 03 06:58:52 cent-node1 systemd[1]: Activating swap /swapfile...
+May 03 06:58:53 cent-node1 systemd[1]: Activated swap /swapfile.
+
+● basic.target - Basic System
+   Loaded: loaded (/usr/lib/systemd/system/basic.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:56 cent-node1 systemd[1]: Reached target Basic System.
+
+● cryptsetup.target - Local Encrypted Volumes
+   Loaded: loaded (/usr/lib/systemd/system/cryptsetup.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+● emergency.target - Emergency Mode
+   Loaded: loaded (/usr/lib/systemd/system/emergency.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● final.target - Final Step
+   Loaded: loaded (/usr/lib/systemd/system/final.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● getty-pre.target - Login Prompts (Pre)
+   Loaded: loaded (/usr/lib/systemd/system/getty-pre.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+           man:systemd-getty-generator(8)
+           http://0pointer.de/blog/projects/serial-console.html
+
+● getty.target - Login Prompts
+   Loaded: loaded (/usr/lib/systemd/system/getty.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:systemd.special(7)
+           man:systemd-getty-generator(8)
+           http://0pointer.de/blog/projects/serial-console.html
+
+May 03 06:58:57 cent-node1 systemd[1]: Reached target Login Prompts.
+
+● graphical.target - Graphical Interface
+   Loaded: loaded (/usr/lib/systemd/system/graphical.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● local-fs-pre.target - Local File Systems (Pre)
+   Loaded: loaded (/usr/lib/systemd/system/local-fs-pre.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:55 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:55 cent-node1 systemd[1]: Reached target Local File Systems (Pre).
+
+● local-fs.target - Local File Systems
+   Loaded: loaded (/usr/lib/systemd/system/local-fs.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:55 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:55 cent-node1 systemd[1]: Reached target Local File Systems.
+
+● multi-user.target - Multi-User System
+   Loaded: loaded (/usr/lib/systemd/system/multi-user.target; enabled; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:22 UTC; 50min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:22 cent-node1 systemd[1]: Reached target Multi-User System.
+
+● network-online.target - Network is Online
+   Loaded: loaded (/usr/lib/systemd/system/network-online.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:59:01 UTC; 49min ago
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/NetworkTarget
+
+May 03 06:59:01 cent-node1 systemd[1]: Reached target Network is Online.
+
+● network-pre.target - Network (Pre)
+   Loaded: loaded (/usr/lib/systemd/system/network-pre.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/NetworkTarget
+
+● network.target - Network
+   Loaded: loaded (/usr/lib/systemd/system/network.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:59:00 UTC; 49min ago
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/NetworkTarget
+
+May 03 06:59:00 cent-node1 systemd[1]: Reached target Network.
+
+● nfs-client.target - NFS client services
+   Loaded: loaded (/usr/lib/systemd/system/nfs-client.target; enabled; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:57 UTC; 49min ago
+
+May 03 06:58:57 cent-node1 systemd[1]: Reached target NFS client services.
+
+● nss-lookup.target - Host and Network Name Lookups
+   Loaded: loaded (/usr/lib/systemd/system/nss-lookup.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+● nss-user-lookup.target - User and Group Name Lookups
+   Loaded: loaded (/usr/lib/systemd/system/nss-user-lookup.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● paths.target - Paths
+   Loaded: loaded (/usr/lib/systemd/system/paths.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+● remote-fs-pre.target - Remote File Systems (Pre)
+   Loaded: loaded (/usr/lib/systemd/system/remote-fs-pre.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:57 cent-node1 systemd[1]: Reached target Remote File Systems (Pre).
+
+● remote-fs.target - Remote File Systems
+   Loaded: loaded (/usr/lib/systemd/system/remote-fs.target; enabled; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:57 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:57 cent-node1 systemd[1]: Reached target Remote File Systems.
+
+● rescue.target - Rescue Mode
+   Loaded: loaded (/usr/lib/systemd/system/rescue.target; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● rpc_pipefs.target
+   Loaded: loaded (/usr/lib/systemd/system/rpc_pipefs.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:56 UTC; 49min ago
+
+May 03 06:58:56 cent-node1 systemd[1]: Reached target rpc_pipefs.target.
+
+● rpcbind.target - RPC Port Mapper
+   Loaded: loaded (/usr/lib/systemd/system/rpcbind.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+● shutdown.target - Shutdown
+   Loaded: loaded (/usr/lib/systemd/system/shutdown.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● slices.target - Slices
+   Loaded: loaded (/usr/lib/systemd/system/slices.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:52 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+● sockets.target - Sockets
+   Loaded: loaded (/usr/lib/systemd/system/sockets.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:56 cent-node1 systemd[1]: Reached target Sockets.
+
+● sound.target - Sound Card
+   Loaded: loaded (/usr/lib/systemd/system/sound.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:58 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:58 cent-node1 systemd[1]: Reached target Sound Card.
+
+● swap.target - Swap
+   Loaded: loaded (/usr/lib/systemd/system/swap.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:53 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:53 cent-node1 systemd[1]: Reached target Swap.
+
+● sysinit.target - System Initialization
+   Loaded: loaded (/usr/lib/systemd/system/sysinit.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:56 cent-node1 systemd[1]: Reached target System Initialization.
+
+● time-sync.target - System Time Synchronized
+   Loaded: loaded (/usr/lib/systemd/system/time-sync.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● timers.target - Timers
+   Loaded: loaded (/usr/lib/systemd/system/timers.target; static; vendor preset: disabled)
+   Active: active since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:systemd.special(7)
+
+May 03 06:58:56 cent-node1 systemd[1]: Reached target Timers.
+
+● umount.target - Unmount All Filesystems
+   Loaded: loaded (/usr/lib/systemd/system/umount.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● systemd-readahead-done.timer - Stop Read-Ahead Data Collection 10s After Completed Startup
+   Loaded: loaded (/usr/lib/systemd/system/systemd-readahead-done.timer; indirect; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:22 UTC; 50min ago
+     Docs: man:systemd-readahead-replay.service(8)
+
+● systemd-tmpfiles-clean.timer - Daily Cleanup of Temporary Directories
+   Loaded: loaded (/usr/lib/systemd/system/systemd-tmpfiles-clean.timer; static; vendor preset: disabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:56 UTC; 49min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+
+May 03 06:58:56 cent-node1 systemd[1]: Started Daily Cleanup of Temporary Directories.

@@ -1,0 +1,131 @@
+# This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+# well to this individual file than to the Eskimo Project as a whole.
+#
+# Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+# Author : eskimo.sh / https://www.eskimo.sh
+#
+# Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+# If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+# terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+# Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+# Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+# commercial license.
+#
+# Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Affero Public License for more details.
+#
+# You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+# see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA, 02110-1301 USA.
+#
+# You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+# commercial license is mandatory as soon as :
+# - you develop activities involving Eskimo without disclosing the source code of your own product, software,
+#   platform, use cases or scripts.
+# - you deploy eskimo as part of a commercial product, platform or software.
+# For more information, please contact eskimo.sh at https://www.eskimo.sh
+#
+# The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+# Software.
+
+
+#see https://github.com/asciidoctor/asciidoctor-pdf/blob/master/docs/theming-guide.adoc
+font:
+  catalog:
+    DINPro:
+      normal: DINPro-Regular.ttf
+      bold: DINPro-Bold.ttf
+      italic: DINPro-Italic.ttf
+      bold_italic: DINPro-Bold.ttf
+    Noto Serif:
+      normal: notoserif-regular-subset.ttf
+      bold: notoserif-bold-subset.ttf
+      italic: notoserif-italic-subset.ttf
+      bold_italic: notoserif-bold_italic-subset.ttf
+    # M+ 1mn supports ASCII and the circled numbers used for conums
+    M+ 1mn:
+      normal: mplus1mn-regular-ascii-conums.ttf
+      bold: mplus1mn-bold-ascii.ttf
+      italic: mplus1mn-italic-ascii.ttf
+      bold_italic: mplus1mn-bold_italic-ascii.ttf
+    # M+ 1p supports Latin, Latin-1 Supplement, Latin Extended, Greek, Cyrillic, Vietnamese, Japanese & an assortment of symbols
+    # It also provides arrows for ->, <-, => and <= replacements in case these glyphs are missing from font
+    M+ 1p Fallback:
+      normal: mplus1p-regular-fallback.ttf
+      bold: mplus1p-regular-fallback.ttf
+      italic: mplus1p-regular-fallback.ttf
+      bold_italic: mplus1p-regular-fallback.ttf
+  fallbacks:
+    [DINPro]
+title_page:
+  align: center
+  logo:
+      top: 0%
+  title:
+    top: 55%
+    font_size: $heading_h1_font_size
+    font_style: bold
+    font_color: 698fa4
+    line_height: 0.9
+  subtitle:
+    font_size: $heading_h3_font_size
+    font_style: bold
+    line_height: 1
+  authors:
+    margin_top: $base_font_size * 1.25
+    font_size: $base_font_size * 1.5
+    font_color: 181818
+  revision:
+    margin_top: $base_font_size * 1.25
+
+page:
+  layout: portrait
+  margin: [0.5in, 0.75in, 0.5in, 0.75in]
+  size: A4
+base:
+  font-family: DINPro
+  font_color: #333333
+  line_height_length: 14
+  line_height: $base_line_height_length / $base_font_size
+vertical_rhythm: $base_line_height_length
+heading:
+  font_color: #698fa4
+  font_size: 17
+  font_style: bold
+  line_height: 1.2
+  margin_bottom: $vertical_rhythm
+link:
+  font_color: #009900
+outline_list:
+  indent: $base_font_size * 1.5
+header:
+  height: 0.75in
+  line_height: 1
+  recto_content:
+    center: '{document-title}'
+  verso_content:
+    center: '{document-title}'
+     #image_vertical_align: <alignment> or <number>
+      # additional attributes for content:
+      # * {page-count}
+      # * {page-number}
+      # * {document-title}
+      # * {document-subtitle}
+      # * {chapter-title}
+      # * {section-title}
+      # * {section-or-chapter-title}
+footer:
+  height: 0.75in
+  line_height: 1
+  recto_content:
+    right: '{chapter-title} | *{page-number}*'
+  verso_content:
+    left: '*{page-number}* | {chapter-title}'
+image:
+  align: center
+caption:
+  align: center
+  font_color: #FF0000
+  font_size: 10

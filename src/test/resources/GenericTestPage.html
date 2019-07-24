@@ -1,0 +1,52 @@
+<html>
+<head>
+    <title>Generic Test Page</title>
+</head>
+<body>
+<script>
+
+    function loadScript (target) {
+        console.log ("loading script : " + target);
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.src = target;
+        document.head.appendChild(s);
+    }
+
+</script>
+
+<ul class="panel-list" id="mainFolderMenu">
+    <li id="mainFolderMenuAnchor">Eskimo Services</li>
+</ul>
+
+<section id="main-content">
+
+<!-- eskimoNodeStatus.html -->
+<div class="inner-content" id="inner-content-status"> </div>
+
+<!-- eskimoConsoles.html -->
+<div class="inner-content" id="inner-content-consoles"></div>
+
+<!-- eskimoMessaging.html -->
+<div class="inner-content" id="inner-content-pending" style="display: none; visibility: hidden;"> </div>
+
+<!-- eskimoSetup.html -->
+<div class="inner-content" id="inner-content-setup" style="visibility: hidden; display: none;"></div>
+
+<!-- eskimoNodesConfig.html -->
+<div class="inner-content" id="inner-content-nodes" style="visibility: hidden; display: none;"></div>
+
+<!-- eskimoFileManagers.html -->
+<div class="inner-content" id="inner-content-file-managers" style="visibility: hidden; display: none;"></div>
+
+
+<!-- modal dialog for services selection -->
+<div id="services-selection-modal-wrapper"></div>
+
+<!-- modal dialog for operation confirmation -->
+<div id="operations-command-modal-wrapper"></div>
+
+</section>
+
+</body>
+</html>

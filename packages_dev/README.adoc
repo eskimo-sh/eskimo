@@ -1,0 +1,205 @@
+////
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
+
+Copyright 2019 www.eskimo.sh - All rights reserved.
+Author : http://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+////
+
+
+:sectnums:
+:authors: www.eskimo.sh / 2019
+:copyright: www.eskimo.sh / 2019
+
+== Eskimo Introduction
+
+Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
+*Big Data 2.0* clusters using *Docker* and *Mesos*.
+
+Reach https://www.eskimo.sh for more information on Eskimo or look at the documentation in the folder `doc`.
+
+=== Eskimo Service Development Framework
+
+The *Service Development framework* is actually composed by two distinct parts:
+
+* The *Docker Images Development Framework* which is used to build the docker images deployed on the eskimo cluster
+nodes
+* The *Services Installation Framework* which is used to install these images as services on the eskimo cluster nodes.
+
+
+
+
+
+
+// marker for inclusion : line 60
+== Docker Images Development Framework
+
+This document presents the docker images or packages development framework.
+
+The Docker Images Development Framework provides tools and standards to build the docker images deployed on the eskimo
+cluster nodes.
+
+Eskimo is leveraging on docker to deploy services accross the cluster ndes and to ensure independence from node
+OSes and specificities as well as proper isolation between services.
+
+Docker images can be downloaded from internet (or the internal corporation network) or build locally on the machine
+running eskimo. +
+The later is achieved using the packages development framework which is presented in this guide.
+
+=== Principle
+
+The principle is pretty straightforward
+
+* Every docker image (or package) is built by calling `build.sh` from the corresponding package folder, i.e. a
+sub-folder of this very folder `packages_dev`
+* That `build.sh` script is free to perform whatever it wants as long as the result is a docker image with the expected
+name put in the folder `packages_distrib` in the parent folder and packaging the target software component.
+
+Build files are provided for each and every service pre-packaged within eskimo.
+
+The user is welcome to modify them in order to fine tune everything the way he wants or implement his own packages for
+other software components not yet bundled with eskimo. +
+Again, the only requirement is that at the end of the build process a corresponding image is put in `packages_distrib`
+as well as that some conventions are properly followed as explained below.
+
+Internet is usually required on the eskimo machine to build or re-build the eskimo provided pre-packages images since
+the target software component is downloaded from Internet.
+
+=== property 'system.packagesToBuild' in eskimo.properties
+
+Eskimo needs a way during initial setup time to know which packages need to be built or downloaded.
+
+This is indicated by the property `system.packagesToBuild` in the configuration file `eskimo.properties`, such as, for
+instance:
+
+.default `system.packagesToBuild` property
+----
+system.packagesToBuild=base_eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin
+----
+
+Whenever one wants to implement a new package for a new service to be managed by eskimo, one needs to declare this new
+package in the given list.
+
+=== Standards and conventions over requirements
+
+There are no requirements when building an eskimo package docker image. The image developer is free to install the
+software package within the image the way he wants and no specific requirement is enforced by eskimo.
+
+However, adhering to some conventions eases a lot the maintenance and evolution of these images. +
+These standard conventions are as follows:
+
+* All docker images are based on the `base_eskimo` image which is itself based on a lightweight debian stretch image.
+* A software component named _X_ with _version Y_ should be installed in `/usr/local/lib/_x_-_y_` (if and only if it is
+not available in apt repositories and installed using standard debian `apt-get install x`).
+** In this case, a simlink preventing the further *Services Installation framework* from the need to mess with version
+numbers should be created : `/usr/local/lib/x` pointing to `/usr/local/lib/x-version`.
+** This simlink is pretty important. In the second stage, when installing services on eskimo cluster nodes, it is
+important that setup and installation scripts can be prevented from knowing about the version of the software
+component. Hence te important of that simlink.
+* The presence of a single `build.sh` script is a requirement. That script is called by eskimo to build the package if
+it is not yet available (either built or downloaded)
+* The script performing the in container installation of the software component X should be called `installX.sh`.
+* Software versions to be downloaded and extracted within docker images are coded _once and for all_ in the file
+`common/common.sh`. This is actually a requirement since most of the time software version for common components such
+as ElasticSearch or scala are used in several different packages. Defining version numbers of software components to be
+downloaded and installed in a common place helps to enforce consistency.
+
+=== Typical build.sh process
+
+==== Operations performed
+
+The build process implemented as a standard in the `build.sh` script has two different stages:
+
+. The container preparation and all the container setup operated from outside the container
+. The software installation done from inside the container
+
+As a convention, all dependencies installation is performed from outside the container but then the installation of the
+software packaged in the container is performed from a script called within the container.
+
+The build process thus typically looks this way:
+
+1. From outside the container:
+* Creation of the container from the base eskimo image (debian based)
+* Installation of the prerequisites (Java JDK, Scala, python, etc.) using `docker exec ...`
+* Calling of the software installation script : `docker exec -it ... installX.sh`
+
+2. From inside the container:
+* Downloading of the software from internet
+* Installation in a temporary folder
+* Moving of the installation software to `/usr/local/lib/X-Version` or else
+* symlinking the software from `/usr/local/lib/X` (without version number)
+
+And that's it.
+
+The package installation is limited to this, all the customizations is done at a later stage, during the *Service
+Installation* on eskimo cluster noes.
+
+=== Look for examples and get inspired
+
+Look at the eskimo pre-packaged component packages development scripts for examples and the way they are built to get
+inspired for developing your own packages.
+
+
+
+// marker for exclusion : line 60
+
+[appendix]
+== Copyright and License
+
+
+Eskimo is Copyright 2019 eskimo.sh - All rights reserved. +
+Author : https://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL. +
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version. +
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+
+* you develop activities involving Eskimo without disclosing the source code of your own product, software,  platform,
+  use cases or scripts.
+* you deploy eskimo as part of a commercial product, platform or software.
+
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.

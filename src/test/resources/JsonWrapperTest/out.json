@@ -1,0 +1,55 @@
+{
+    "context": {
+        "operation": "ABCD",
+        "errors" : [],
+        "clean": true,
+        "ready": true
+    },
+    "dto": {
+        "contentObject": {
+            "dummy": {
+                "property": null,
+                "internalArray": [],                
+            },
+            "identifier": {
+                "value": "123456789",
+                "properties": {},
+                "errors": []
+            },
+            "dummyProperty" : "XYZ",
+            "internalObject": {
+                "value": "2BB",
+                "properties": {},
+                "errors": []
+            },
+            "ready": false,
+            "netAmount": {
+                "currency": {
+                    "code": "USD",
+                    "properties": {},
+                    "errors": []
+                },
+                "amount": {
+                    "formattedValue": "132'456.789",
+                    "value": 132456.789,
+                    "properties": {},
+                    "errors": []
+                },
+                "properties": {},
+                "errors": []
+            }
+        },
+        "identifier": {
+            "value": "123456789",
+            "properties": {},
+            "errors": []
+        },
+        "date": "20.08.2010",
+        "time": "09:31",
+        "name": "ABCD",
+        "mode": "1234",
+        "busy": false,
+        "dirty" : false,
+        "errors": []
+    }
+}

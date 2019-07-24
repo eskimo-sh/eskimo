@@ -1,0 +1,158 @@
+/*
+ * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+ * well to this individual file than to the Eskimo Project as a whole.
+ *
+ * Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Author : eskimo.sh / https://www.eskimo.sh
+ *
+ * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+ * If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+ * terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+ * Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ * Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+ * commercial license.
+ *
+ * Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Affero Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+ * see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA, 02110-1301 USA.
+ *
+ * You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+ * commercial license is mandatory as soon as :
+ * - you develop activities involving Eskimo without disclosing the source code of your own product, software,
+ *   platform, use cases or scripts.
+ * - you deploy eskimo as part of a commercial product, platform or software.
+ * For more information, please contact eskimo.sh at https://www.eskimo.sh
+ *
+ * The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+ * Software.
+ */
+
+package ch.niceideas.eskimo.services;
+
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class MemoryComputerTest {
+
+    private MemoryComputer memoryComputer = null;
+
+    private ServicesDefinition servicesDefinition;
+
+    private String jsonConfig = null;
+
+    @Before
+    public void setUp() throws Exception {
+        jsonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
+
+        servicesDefinition = new ServicesDefinition();
+        servicesDefinition.afterPropertiesSet();;
+
+        memoryComputer = new MemoryComputer();
+        memoryComputer.setServicesDefinition(servicesDefinition);
+
+        memoryComputer.setSshCommandService(new SSHCommandService() {
+            @Override
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                switch (hostAddress) {
+                    case "192.168.10.11":
+                        return "MemTotal:        5969796 kB";
+                    case "192.168.10.12":
+                        return "MemTotal:        5799444 kB";
+                    default:
+                        return "MemTotal:        3999444 kB";
+                }
+            }
+            @Override
+            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+                return null;
+            }
+            @Override
+            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+                // just do nothing
+            }
+        });
+    }
+
+    @Test
+    public void testComputeMemory() throws Exception {
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(jsonConfig);
+
+        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(nodesConfig, new HashSet<>());
+
+        assertNotNull(res);
+        assertEquals(3, res.size());
+
+        Map<String, Long> memmModel1 = res.get("192.168.10.11");
+        assertNotNull(memmModel1);
+        assertEquals(4, memmModel1.size());
+
+        assertEquals(Long.valueOf(438), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(1314), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(876), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(1314), memmModel1.get("spark-executor"));
+
+        Map<String, Long> memmModel2 = res.get("192.168.10.12");
+        assertNotNull(memmModel2);
+        assertEquals(4, memmModel2.size());
+
+        assertEquals(Long.valueOf(422), memmModel2.get("logstash"));
+        assertEquals(Long.valueOf(1266), memmModel2.get("elasticsearch"));
+        assertEquals(Long.valueOf(844), memmModel2.get("kafka"));
+        assertEquals(Long.valueOf(1266), memmModel2.get("spark-executor"));
+
+        Map<String, Long> memmModel3 = res.get("192.168.10.13");
+        assertNotNull(memmModel3);
+        assertEquals(5, memmModel3.size());
+
+        assertEquals(Long.valueOf(241), memmModel3.get("zeppelin"));
+        assertEquals(Long.valueOf(723), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(482), memmModel3.get("kafka"));
+        assertEquals(Long.valueOf(723), memmModel3.get("spark-executor"));
+        assertEquals(Long.valueOf(241), memmModel3.get("kibana"));
+
+    }
+
+    @Test
+    public void testGetMemoryMap() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("service_b1", "on");
+            put("action_id2", "192.168.10.12");
+            put("service_a2", "on");
+            put("service_b2", "on");
+            put("service_c2", "on");
+            put("action_id3", "192.168.10.13");
+            put("service_c3", "on");
+            put("action_id4", "192.168.10.14");
+            put("service_c4", "on");
+            put("service_b4", "on");
+        }});
+
+        Map<String, Long> memMap = memoryComputer.getMemoryMap(nodesConfig, new HashSet<String>());
+
+        assertNotNull(memMap);
+        assertEquals(4, memMap.size());
+        assertEquals(5818, (long) memMap.get("192.168.10.11"));
+        assertEquals(5652, (long) memMap.get("192.168.10.12"));
+        assertEquals(3898, (long) memMap.get("192.168.10.13"));
+        assertEquals(3898, (long) memMap.get("192.168.10.14"));
+    }
+}

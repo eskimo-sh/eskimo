@@ -1,0 +1,2199 @@
+● deb-node1
+    State: degraded
+     Jobs: 0 queued
+   Failed: 2 units
+    Since: Fri 2019-05-03 06:58:39 GMT; 50min ago
+   CGroup: /
+           ├─docker
+           │ ├─8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193
+           │ │ └─32217 /usr/bin/java -Xms1g -Xmx1g -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTouch -Xss1m -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djna.nosys=true -XX:-OmitStackTraceInFastThrow -Dio.netty.noUnsafe=true -Dio.netty.noKeySetOptimization=true -Dio.netty.recycler.maxCapacityPerThread=0 -Dlog4j.shutdownHookEnabled=false -Dlog4j2.disable.jmx=true -Djava.io.tmpdir=/tmp/elasticsearch.8xrwS2Mx -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=data -XX:ErrorFile=logs/hs_err_pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -Xloggc:logs/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=32 -XX:GCLogFileSize=64m -Des.path.home=/usr/local/lib/elasticsearch -Des.path.conf=/usr/local/lib/elasticsearch/config -Des.distribution.flavor=default -Des.distribution.type=tar -cp /usr/local/lib/elasticsearch/lib/* org.elasticsearch.bootstrap.Elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ ├─da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d
+           │ │ ├─3171 /usr/local/sbin/mesos-master
+           │ │ ├─3277 logger -p user info -t mesos-master[1]
+           │ │ └─3278 logger -p user err -t mesos-master[1]
+           │ ├─aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34
+           │ │ ├─ 2142 /bin/bash /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ │ ├─ 2561 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp /usr/local/lib/spark-2.4.2/conf/:/usr/local/lib/spark/jars/* -Xmx1g org.apache.spark.deploy.mesos.MesosExternalShuffleService
+           │ │ └─32323 sleep 5
+           │ ├─9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02
+           │ │ └─2238 /usr/bin/java -Dzookeeper.log.dir=/var/log/zookeeper -Dzookeeper.root.logger=INFO,ROLLINGFILE -cp /etc/zookeeper/conf:/usr/share/java/jline.jar:/usr/share/java/log4j-1.2.jar:/usr/share/java/xercesImpl.jar:/usr/share/java/xmlParserAPIs.jar:/usr/share/java/netty.jar:/usr/share/java/slf4j-api.jar:/usr/share/java/slf4j-log4j12.jar:/usr/share/java/zookeeper.jar -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false org.apache.zookeeper.server.quorum.QuorumPeerMain /etc/zookeeper/conf/zoo.cfg
+           │ ├─c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7
+           │ │ ├─ 2038 /bin/bash /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           │ │ ├─ 2370 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp /usr/local/lib/spark-2.4.2/conf/:/usr/local/lib/spark/jars/* -Xmx1g org.apache.spark.deploy.history.HistoryServer
+           │ │ └─32317 sleep 5
+           │ └─338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77
+           │   └─1965 /usr/sbin/ntpd -n -g
+           ├─mesos_executors.slice
+           ├─mesos
+           ├─user.slice
+           │ └─user-1000.slice
+           │   ├─session-9626.scope
+           │   │ ├─17908 sshd: vagrant [priv]
+           │   │ ├─17917 sshd: vagrant@pts/0
+           │   │ ├─17918 -bash
+           │   │ ├─17963 sudo su
+           │   │ ├─17964 su
+           │   │ ├─17965 bash
+           │   │ └─32324 systemctl status -al
+           │   └─user@1000.service
+           │     └─init.scope
+           │       ├─17910 /lib/systemd/systemd --user
+           │       └─17911 (sd-pam)
+           ├─init.scope
+           │ └─1 /lib/systemd/systemd --system --deserialize 19
+           └─system.slice
+             ├─irqbalance.service
+             │ └─383 /usr/sbin/irqbalance --foreground
+             ├─dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1\x2dpart5.swap
+             ├─sys-kernel-debug.mount
+             ├─var-lib-docker-containers-c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7-mounts-shm.mount
+             ├─systemd-random-seed.service
+             ├─systemd-journal-flush.service
+             ├─containerd.service
+             │ ├─  418 /usr/bin/containerd
+             │ ├─ 1849 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─ 1961 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─ 1991 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─ 2081 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ ├─ 3126 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             │ └─32199 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+             ├─systemd-timesyncd.service
+             │ └─6173 /lib/systemd/systemd-timesyncd
+             ├─systemd-user-sessions.service
+             ├─unattended-upgrades.service
+             ├─dev-sda5.swap
+             ├─dev-hugepages.mount
+             ├─run-rpc_pipefs.mount
+             ├─var-lib-docker-containers-9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02-mounts-shm.mount
+             ├─dbus.service
+             │ └─377 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+             ├─systemd-modules-load.service
+             ├─dev-mqueue.mount
+             ├─run-user-1000.mount
+             ├─var-lib-docker-overlay2-7ab501f4462bb1b2b20f1ca311028b12297e292e125622f6a5b04ec5f19f9484-merged.mount
+             ├─docker.service
+             │ ├─  421 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+             │ ├─ 1753 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.2 -container-port 123
+             │ ├─ 1804 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.3 -container-port 7337
+             │ ├─ 1837 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 3888 -container-ip 172.17.0.4 -container-port 3888
+             │ ├─ 1861 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2888 -container-ip 172.17.0.4 -container-port 2888
+             │ ├─ 1990 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2181 -container-ip 172.17.0.4 -container-port 2181
+             │ ├─32179 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.5 -container-port 9300
+             │ └─32192 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.5 -container-port 9200
+             ├─ssh.service
+             │ └─7259 /usr/sbin/sshd -D
+             ├─systemd-tmpfiles-setup.service
+             ├─run-docker-netns-13aab08686af.mount
+             ├─ifup@eth0.service
+             │ └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
+             ├─ntp.service
+             │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+             ├─var-lib-docker-containers-aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34-mounts-shm.mount
+             ├─systemd-remount-fs.service
+             ├─system-getty.slice
+             │ └─getty@tty1.service
+             │   └─423 /sbin/agetty --noclear tty1 linux
+             ├─var-lib-docker-overlay2-4a0d7ad92f66cd4e3afdd52fafa62f5f59837071be9a092982b77a4e74165908-merged.mount
+             ├─var-lib-docker-containers-338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77-mounts-shm.mount
+             ├─systemd-update-utmp.service
+             ├─var-lib-docker-overlay2-f5e469fa15bb15e37ef1486f7c77c30ec8fff6eda8939bc7a6ad6062fd57ed63-merged.mount
+             ├─dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
+             ├─keyboard-setup.service
+             ├─spark-executor.service
+             │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+             ├─rpcbind.service
+             │ └─339 /sbin/rpcbind -f -w
+             ├─dev-disk-by\x2dpartuuid-ddf9cebf\x2d05.swap
+             ├─systemd-logind.service
+             │ └─382 /lib/systemd/systemd-logind
+             ├─mesos-agent.service
+             │ ├─7260 /usr/local/sbin/mesos-slave
+             │ ├─7269 logger -p user info -t mesos-slave[7260]
+             │ └─7270 logger -p user err -t mesos-slave[7260]
+             ├─run-docker-netns-23af9b9fe2c7.mount
+             ├─packagekit.service
+             │ └─1133 /usr/lib/packagekit/packagekitd
+             ├─run-docker-netns-default.mount
+             ├─mesos-master.service
+             │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+             ├─polkit.service
+             │ └─1157 /usr/lib/policykit-1/polkitd --no-debug
+             ├─var-lib-docker-overlay2-b06ce37581a582356f4e9b4eb4dd81dae21d140cc9301cddb0bd8549291a8578-merged.mount
+             ├─cron.service
+             │ └─380 /usr/sbin/cron -f
+             ├─systemd-udevd.service
+             │ └─6060 /lib/systemd/systemd-udevd
+             ├─var-lib-docker-containers-da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d-mounts-shm.mount
+             ├─rsyslog.service
+             │ └─381 /usr/sbin/rsyslogd -n
+             ├─dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart5.swap
+             ├─var-lib-docker-overlay2-f7d91997db43692b95993c87498aa9929b2798d31e86a86a906a266b9fa59e40-merged.mount
+             ├─spark-history-server.service
+             │ └─1586 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-history-server /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+             ├─networking.service
+             ├─systemd-tmpfiles-setup-dev.service
+             ├─systemd-journald.service
+             │ └─184 /lib/systemd/systemd-journald
+             ├─zookeeper.service
+             │ └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+             ├─console-setup.service
+             ├─kmod-static-nodes.service
+             ├─elasticsearch.service
+             │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+             ├─systemd-sysctl.service
+             ├─-.mount
+             ├─run-docker-netns-86131c73ea7d.mount
+             └─systemd-udev-trigger.service
+
+● proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point
+   Loaded: loaded (/lib/systemd/system/proc-sys-fs-binfmt_misc.automount; static; vendor preset: enabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+    Where: /proc/sys/fs/binfmt_misc
+     Docs: https://www.kernel.org/doc/Documentation/binfmt_misc.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608.device - VBOX_HARDDISK
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart1.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart2.device - VBOX_HARDDISK 2
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda2.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart5.device - VBOX_HARDDISK 5
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda5.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda5
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpartuuid-ddf9cebf\x2d01.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpartuuid-ddf9cebf\x2d02.device - VBOX_HARDDISK 2
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda2.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpartuuid-ddf9cebf\x2d05.device - VBOX_HARDDISK 5
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda5.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda5
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1.device - VBOX_HARDDISK
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1\x2dpart1.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1\x2dpart2.device - VBOX_HARDDISK 2
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda2.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1\x2dpart5.device - VBOX_HARDDISK 5
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda5.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda5
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2duuid-069a8191\x2d72ad\x2d48d5\x2dbc5b\x2d678826e1a40e.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.device - VBOX_HARDDISK 5
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda5.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda5
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-sda.device - VBOX_HARDDISK
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-sda1.device - VBOX_HARDDISK 1
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-sda2.device - VBOX_HARDDISK 2
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda2.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-sda5.device - VBOX_HARDDISK 5
+   Follow: unit currently follows state of sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda5.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda5
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-ttyS0.device - /dev/ttyS0
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS0.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-ttyS1.device - /dev/ttyS1
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS1.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-ttyS2.device - /dev/ttyS2
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS2.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-ttyS3.device - /dev/ttyS3
+   Follow: unit currently follows state of sys-devices-platform-serial8250-tty-ttyS3.device
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS3
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-pci0000:00-0000:00:03.0-net-eth0.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:03.0/net/eth0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-pci0000:00-0000:00:08.0-net-eth1.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:08.0/net/eth1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda1.device - VBOX_HARDDISK 1
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda2.device - VBOX_HARDDISK 2
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda-sda5.device - VBOX_HARDDISK 5
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda/sda5
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-pci0000:00-0000:00:0d.0-ata1-host0-target0:0:0-0:0:0:0-block-sda.device - VBOX_HARDDISK
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:0d.0/ata1/host0/target0:0:0/0:0:0:0/block/sda
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-platform-serial8250-tty-ttyS0.device - /sys/devices/platform/serial8250/tty/ttyS0
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-platform-serial8250-tty-ttyS1.device - /sys/devices/platform/serial8250/tty/ttyS1
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-platform-serial8250-tty-ttyS2.device - /sys/devices/platform/serial8250/tty/ttyS2
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS2
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-platform-serial8250-tty-ttyS3.device - /sys/devices/platform/serial8250/tty/ttyS3
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/platform/serial8250/tty/ttyS3
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-virtual-net-docker0.device - /sys/devices/virtual/net/docker0
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:49 GMT; 50min ago
+   Device: /sys/devices/virtual/net/docker0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-virtual-net-veth005f114.device - /sys/devices/virtual/net/veth005f114
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+   Device: /sys/devices/virtual/net/veth005f114
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-virtual-net-vethd4a8bc6.device - /sys/devices/virtual/net/vethd4a8bc6
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+   Device: /sys/devices/virtual/net/vethd4a8bc6
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-devices-virtual-net-vethe8f1ab9.device - /sys/devices/virtual/net/vethe8f1ab9
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 07:49:03 GMT; 2s ago
+   Device: /sys/devices/virtual/net/vethe8f1ab9
+
+● sys-devices-virtual-net-vethf84e6af.device - /sys/devices/virtual/net/vethf84e6af
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+   Device: /sys/devices/virtual/net/vethf84e6af
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-subsystem-net-devices-docker0.device - /sys/subsystem/net/devices/docker0
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:49 GMT; 50min ago
+   Device: /sys/devices/virtual/net/docker0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-subsystem-net-devices-eth0.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:03.0/net/eth0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-subsystem-net-devices-eth1.device - 82540EM Gigabit Ethernet Controller (PRO/1000 MT Desktop Adapter)
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+   Device: /sys/devices/pci0000:00/0000:00:08.0/net/eth1
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-subsystem-net-devices-veth005f114.device - /sys/subsystem/net/devices/veth005f114
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+   Device: /sys/devices/virtual/net/veth005f114
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-subsystem-net-devices-vethd4a8bc6.device - /sys/subsystem/net/devices/vethd4a8bc6
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+   Device: /sys/devices/virtual/net/vethd4a8bc6
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sys-subsystem-net-devices-vethe8f1ab9.device - /sys/subsystem/net/devices/vethe8f1ab9
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 07:49:03 GMT; 2s ago
+   Device: /sys/devices/virtual/net/vethe8f1ab9
+
+● sys-subsystem-net-devices-vethf84e6af.device - /sys/subsystem/net/devices/vethf84e6af
+   Loaded: loaded
+   Active: active (plugged) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+   Device: /sys/devices/virtual/net/vethf84e6af
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● -.mount - Root Mount
+   Loaded: loaded (/etc/fstab; generated; vendor preset: enabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+    Where: /
+     What: /dev/sda1
+     Docs: man:fstab(5)
+           man:systemd-fstab-generator(8)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/-.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-hugepages.mount - Huge Pages File System
+   Loaded: loaded (/proc/self/mountinfo; static; vendor preset: enabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+    Where: /dev/hugepages
+     What: hugetlbfs
+     Docs: https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0 (limit: 4915)
+   Memory: 8.0K
+      CPU: 1ms
+   CGroup: /system.slice/dev-hugepages.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-mqueue.mount - POSIX Message Queue File System
+   Loaded: loaded (/proc/self/mountinfo; static; vendor preset: enabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+    Where: /dev/mqueue
+     What: mqueue
+     Docs: man:mq_overview(7)
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 2ms
+   CGroup: /system.slice/dev-mqueue.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● proc-sys-fs-binfmt_misc.mount - Arbitrary Executable File Formats File System
+   Loaded: loaded (/lib/systemd/system/proc-sys-fs-binfmt_misc.mount; static; vendor preset: enabled)
+   Active: inactive (dead)
+    Where: /proc/sys/fs/binfmt_misc
+     What: binfmt_misc
+     Docs: https://www.kernel.org/doc/Documentation/binfmt_misc.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● run-docker-netns-13aab08686af.mount - /run/docker/netns/13aab08686af
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:14 GMT; 50min ago
+    Where: /run/docker/netns/13aab08686af
+     What: nsfs
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/run-docker-netns-13aab08686af.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● run-docker-netns-23af9b9fe2c7.mount - /run/docker/netns/23af9b9fe2c7
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:12 GMT; 50min ago
+    Where: /run/docker/netns/23af9b9fe2c7
+     What: nsfs
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/run-docker-netns-23af9b9fe2c7.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● run-docker-netns-2919306f479b.mount - /run/docker/netns/2919306f479b
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:49:03 GMT; 2s ago
+    Where: /run/docker/netns/2919306f479b
+     What: nsfs
+
+● run-docker-netns-86131c73ea7d.mount - /run/docker/netns/86131c73ea7d
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:13 GMT; 50min ago
+    Where: /run/docker/netns/86131c73ea7d
+     What: nsfs
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/run-docker-netns-86131c73ea7d.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● run-docker-netns-default.mount - /run/docker/netns/default
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:09 GMT; 50min ago
+    Where: /run/docker/netns/default
+     What: nsfs
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/run-docker-netns-default.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● run-rpc_pipefs.mount - RPC Pipe File System
+   Loaded: loaded (/proc/self/mountinfo; static; vendor preset: enabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+    Where: /run/rpc_pipefs
+     What: sunrpc
+    Tasks: 0 (limit: 4915)
+   Memory: 4.0K
+      CPU: 2ms
+   CGroup: /system.slice/run-rpc_pipefs.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● run-user-1000.mount - /run/user/1000
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:45:43 GMT; 3min 21s ago
+    Where: /run/user/1000
+     What: tmpfs
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/run-user-1000.mount
+
+● sys-fs-fuse-connections.mount - FUSE Control File System
+   Loaded: loaded (/lib/systemd/system/sys-fs-fuse-connections.mount; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:40 GMT; 50min ago
+    Where: /sys/fs/fuse/connections
+     What: fusectl
+     Docs: https://www.kernel.org/doc/Documentation/filesystems/fuse.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● sys-kernel-config.mount - Configuration File System
+   Loaded: loaded (/lib/systemd/system/sys-kernel-config.mount; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:40 GMT; 50min ago
+    Where: /sys/kernel/config
+     What: configfs
+     Docs: https://www.kernel.org/doc/Documentation/filesystems/configfs/configfs.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+
+● sys-kernel-debug.mount - Debug File System
+   Loaded: loaded (/proc/self/mountinfo; static; vendor preset: enabled)
+   Active: active (mounted) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+    Where: /sys/kernel/debug
+     What: debugfs
+     Docs: https://www.kernel.org/doc/Documentation/filesystems/debugfs.txt
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+    Tasks: 0 (limit: 4915)
+   Memory: 852.0K
+      CPU: 9ms
+   CGroup: /system.slice/sys-kernel-debug.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-containers-338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77-mounts-shm.mount - /var/lib/docker/containers/338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:09 GMT; 50min ago
+    Where: /var/lib/docker/containers/338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77/mounts/shm
+     What: shm
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-containers-338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77-mounts-shm.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-containers-8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193-mounts-shm.mount - /var/lib/docker/containers/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:49:03 GMT; 2s ago
+    Where: /var/lib/docker/containers/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193/mounts/shm
+     What: shm
+
+● var-lib-docker-containers-9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02-mounts-shm.mount - /var/lib/docker/containers/9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:10 GMT; 50min ago
+    Where: /var/lib/docker/containers/9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02/mounts/shm
+     What: shm
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-containers-9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02-mounts-shm.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-containers-aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34-mounts-shm.mount - /var/lib/docker/containers/aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:09 GMT; 50min ago
+    Where: /var/lib/docker/containers/aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34/mounts/shm
+     What: shm
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-containers-aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34-mounts-shm.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-containers-c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7-mounts-shm.mount - /var/lib/docker/containers/c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:09 GMT; 50min ago
+    Where: /var/lib/docker/containers/c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7/mounts/shm
+     What: shm
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-containers-c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7-mounts-shm.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-containers-da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d-mounts-shm.mount - /var/lib/docker/containers/da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d/mounts/shm
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:23 GMT; 50min ago
+    Where: /var/lib/docker/containers/da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d/mounts/shm
+     What: shm
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-containers-da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d-mounts-shm.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-overlay2-004f8a54474929c025ee4647d440f934da6bf4fba08b107b88dc085f6601e75b-merged.mount - /var/lib/docker/overlay2/004f8a54474929c025ee4647d440f934da6bf4fba08b107b88dc085f6601e75b/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 07:49:03 GMT; 2s ago
+    Where: /var/lib/docker/overlay2/004f8a54474929c025ee4647d440f934da6bf4fba08b107b88dc085f6601e75b/merged
+     What: overlay
+
+● var-lib-docker-overlay2-4a0d7ad92f66cd4e3afdd52fafa62f5f59837071be9a092982b77a4e74165908-merged.mount - /var/lib/docker/overlay2/4a0d7ad92f66cd4e3afdd52fafa62f5f59837071be9a092982b77a4e74165908/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+    Where: /var/lib/docker/overlay2/4a0d7ad92f66cd4e3afdd52fafa62f5f59837071be9a092982b77a4e74165908/merged
+     What: overlay
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-overlay2-4a0d7ad92f66cd4e3afdd52fafa62f5f59837071be9a092982b77a4e74165908-merged.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-overlay2-7ab501f4462bb1b2b20f1ca311028b12297e292e125622f6a5b04ec5f19f9484-merged.mount - /var/lib/docker/overlay2/7ab501f4462bb1b2b20f1ca311028b12297e292e125622f6a5b04ec5f19f9484/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+    Where: /var/lib/docker/overlay2/7ab501f4462bb1b2b20f1ca311028b12297e292e125622f6a5b04ec5f19f9484/merged
+     What: overlay
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-overlay2-7ab501f4462bb1b2b20f1ca311028b12297e292e125622f6a5b04ec5f19f9484-merged.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-overlay2-b06ce37581a582356f4e9b4eb4dd81dae21d140cc9301cddb0bd8549291a8578-merged.mount - /var/lib/docker/overlay2/b06ce37581a582356f4e9b4eb4dd81dae21d140cc9301cddb0bd8549291a8578/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+    Where: /var/lib/docker/overlay2/b06ce37581a582356f4e9b4eb4dd81dae21d140cc9301cddb0bd8549291a8578/merged
+     What: overlay
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-overlay2-b06ce37581a582356f4e9b4eb4dd81dae21d140cc9301cddb0bd8549291a8578-merged.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-overlay2-f5e469fa15bb15e37ef1486f7c77c30ec8fff6eda8939bc7a6ad6062fd57ed63-merged.mount - /var/lib/docker/overlay2/f5e469fa15bb15e37ef1486f7c77c30ec8fff6eda8939bc7a6ad6062fd57ed63/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:08 GMT; 50min ago
+    Where: /var/lib/docker/overlay2/f5e469fa15bb15e37ef1486f7c77c30ec8fff6eda8939bc7a6ad6062fd57ed63/merged
+     What: overlay
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-overlay2-f5e469fa15bb15e37ef1486f7c77c30ec8fff6eda8939bc7a6ad6062fd57ed63-merged.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-docker-overlay2-f7d91997db43692b95993c87498aa9929b2798d31e86a86a906a266b9fa59e40-merged.mount - /var/lib/docker/overlay2/f7d91997db43692b95993c87498aa9929b2798d31e86a86a906a266b9fa59e40/merged
+   Loaded: loaded (/proc/self/mountinfo)
+   Active: active (mounted) since Fri 2019-05-03 06:58:23 GMT; 50min ago
+    Where: /var/lib/docker/overlay2/f7d91997db43692b95993c87498aa9929b2798d31e86a86a906a266b9fa59e40/merged
+     What: overlay
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/var-lib-docker-overlay2-f7d91997db43692b95993c87498aa9929b2798d31e86a86a906a266b9fa59e40-merged.mount
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-spark-data.mount - /var/lib/spark/data
+   Loaded: loaded (/etc/fstab; generated; vendor preset: enabled)
+   Active: failed (Result: timeout) since Fri 2019-05-03 06:59:26 GMT; 49min ago
+    Where: /var/lib/spark/data
+     What: 192.168.10.13:/var/lib/spark/data
+     Docs: man:fstab(5)
+           man:systemd-fstab-generator(8)
+      CPU: 12ms
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● var-lib-spark-eventlog.mount - /var/lib/spark/eventlog
+   Loaded: loaded (/etc/fstab; generated; vendor preset: enabled)
+   Active: failed (Result: timeout) since Fri 2019-05-03 06:59:26 GMT; 49min ago
+    Where: /var/lib/spark/eventlog
+     What: 192.168.10.13:/var/lib/spark/eventlog
+     Docs: man:fstab(5)
+           man:systemd-fstab-generator(8)
+      CPU: 10ms
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch
+   Loaded: loaded (/lib/systemd/system/systemd-ask-password-console.path; static; vendor preset: enabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-ask-password-console.service(8)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch
+   Loaded: loaded (/lib/systemd/system/systemd-ask-password-wall.path; static; vendor preset: enabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-ask-password-console.service(8)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● init.scope - System and Service Manager
+   Loaded: loaded
+Transient: yes
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd(1)
+    Tasks: 1 (limit: 4915)
+   Memory: 25.2M
+      CPU: 2min 14.021s
+   CGroup: /init.scope
+           └─1 /lib/systemd/systemd --system --deserialize 19
+
+May 03 07:49:01 deb-node1 systemd[1]: Stopping User Manager for UID 1001...
+May 03 07:49:01 deb-node1 systemd[1]: Stopped User Manager for UID 1001.
+May 03 07:49:01 deb-node1 systemd[1]: Removed slice User Slice of eskimo.
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Main process exited, code=exited, status=1/FAILURE
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Unit entered failed state.
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Failed with result 'exit-code'.
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Service hold-off time over, scheduling restart.
+May 03 07:49:02 deb-node1 systemd[1]: Stopped Elasticsearch Server.
+May 03 07:49:03 deb-node1 systemd[1]: Starting Elasticsearch Server...
+May 03 07:49:03 deb-node1 systemd[1]: Started Elasticsearch Server.
+
+● session-9626.scope - Session 9626 of user vagrant
+   Loaded: loaded (/run/systemd/transient/session-9626.scope; transient; vendor preset: enabled)
+Transient: yes
+   Active: active (running) since Fri 2019-05-03 07:45:43 GMT; 3min 21s ago
+    Tasks: 7
+   CGroup: /user.slice/user-1000.slice/session-9626.scope
+           ├─17908 sshd: vagrant [priv]
+           ├─17917 sshd: vagrant@pts/0
+           ├─17918 -bash
+           ├─17963 sudo su
+           ├─17964 su
+           ├─17965 bash
+           └─32324 systemctl status -al
+
+May 03 07:45:43 deb-node1 systemd[1]: Started Session 9626 of user vagrant.
+May 03 07:45:46 deb-node1 sudo[17963]:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/su
+May 03 07:45:46 deb-node1 sudo[17963]: pam_unix(sudo:session): session opened for user root by vagrant(uid=0)
+May 03 07:45:46 deb-node1 su[17964]: Successful su for root by root
+May 03 07:45:46 deb-node1 su[17964]: + /dev/pts/0 root:root
+May 03 07:45:46 deb-node1 su[17964]: pam_unix(su:session): session opened for user root by vagrant(uid=0)
+May 03 07:45:46 deb-node1 su[17964]: pam_systemd(su:session): Cannot create session: Already running in a session
+
+● apt-daily-upgrade.service - Daily apt upgrade and clean activities
+   Loaded: loaded (/lib/systemd/system/apt-daily-upgrade.service; static; vendor preset: enabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:59:31 GMT; 49min ago
+     Docs: man:apt(8)
+ Main PID: 2550 (code=exited, status=0/SUCCESS)
+      CPU: 44.010s
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● apt-daily.service - Daily apt download activities
+   Loaded: loaded (/lib/systemd/system/apt-daily.service; static; vendor preset: enabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:15 GMT; 50min ago
+     Docs: man:apt(8)
+ Main PID: 394 (code=exited, status=0/SUCCESS)
+      CPU: 4.866s
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS
+   Loaded: loaded (/lib/systemd/system/auth-rpcgss-module.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:39 GMT; 50min ago
+
+● console-setup.service - Set console font and keymap
+   Loaded: loaded (/lib/systemd/system/console-setup.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+ Main PID: 312 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/console-setup.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● containerd.service - containerd container runtime
+   Loaded: loaded (/lib/systemd/system/containerd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: https://containerd.io
+ Main PID: 418 (containerd)
+    Tasks: 82
+   Memory: 73.5M
+      CPU: 4min 16.754s
+   CGroup: /system.slice/containerd.service
+           ├─  418 /usr/bin/containerd
+           ├─ 1849 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─ 1961 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─ 1991 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─ 2081 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─ 3126 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           └─32199 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+
+May 03 07:48:44 deb-node1 containerd[418]: time="2019-05-03T07:48:44.271262596Z" level=info msg="shim reaped" id=b9950e48e469141879e8993ed36417ebbc9b813eb8aaf60337a1acd358085eeb
+May 03 07:48:45 deb-node1 containerd[418]: time="2019-05-03T07:48:45.193119460Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/8db79e02ca194d00789e28c94aee4cb94b5795d50d80e7c761af3da1d756bdea/shim.sock" debug=false pid=30917
+May 03 07:48:48 deb-node1 containerd[418]: time="2019-05-03T07:48:48.858152255Z" level=info msg="shim reaped" id=8db79e02ca194d00789e28c94aee4cb94b5795d50d80e7c761af3da1d756bdea
+May 03 07:48:49 deb-node1 containerd[418]: time="2019-05-03T07:48:49.967466836Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/0daaf3f5877e645e537ec021fe815eeb4e3e97ed3258f8a444acadb24a64059c/shim.sock" debug=false pid=31159
+May 03 07:48:53 deb-node1 containerd[418]: time="2019-05-03T07:48:53.419904133Z" level=info msg="shim reaped" id=0daaf3f5877e645e537ec021fe815eeb4e3e97ed3258f8a444acadb24a64059c
+May 03 07:48:54 deb-node1 containerd[418]: time="2019-05-03T07:48:54.223335199Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/fff6af41b5ac8271e1cab0babd63152f8104f27bfc727738238966cba1cf2599/shim.sock" debug=false pid=31404
+May 03 07:48:57 deb-node1 containerd[418]: time="2019-05-03T07:48:57.590028936Z" level=info msg="shim reaped" id=fff6af41b5ac8271e1cab0babd63152f8104f27bfc727738238966cba1cf2599
+May 03 07:48:58 deb-node1 containerd[418]: time="2019-05-03T07:48:58.556060637Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/e607b3588dc1e91cf97f69399b8e7dd0cba6306804fcd5ef9ba7c8fd6be2f2da/shim.sock" debug=false pid=31702
+May 03 07:49:02 deb-node1 containerd[418]: time="2019-05-03T07:49:02.536560225Z" level=info msg="shim reaped" id=e607b3588dc1e91cf97f69399b8e7dd0cba6306804fcd5ef9ba7c8fd6be2f2da
+May 03 07:49:03 deb-node1 containerd[418]: time="2019-05-03T07:49:03.326734987Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193/shim.sock" debug=false pid=32199
+
+● cron.service - Regular background program processing daemon
+   Loaded: loaded (/lib/systemd/system/cron.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:cron(8)
+ Main PID: 380 (cron)
+    Tasks: 1 (limit: 4915)
+   Memory: 484.0K
+      CPU: 12ms
+   CGroup: /system.slice/cron.service
+           └─380 /usr/sbin/cron -f
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dbus.service - D-Bus System Message Bus
+   Loaded: loaded (/lib/systemd/system/dbus.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:dbus-daemon(1)
+ Main PID: 377 (dbus-daemon)
+    Tasks: 1 (limit: 4915)
+   Memory: 1.9M
+      CPU: 1min 18.351s
+   CGroup: /system.slice/dbus.service
+           └─377 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:51 GMT; 50min ago
+     Docs: https://docs.docker.com
+ Main PID: 421 (dockerd)
+    Tasks: 64
+   Memory: 138.3M
+      CPU: 2min 32.601s
+   CGroup: /system.slice/docker.service
+           ├─  421 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+           ├─ 1753 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.2 -container-port 123
+           ├─ 1804 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.3 -container-port 7337
+           ├─ 1837 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 3888 -container-ip 172.17.0.4 -container-port 3888
+           ├─ 1861 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2888 -container-ip 172.17.0.4 -container-port 2888
+           ├─ 1990 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2181 -container-ip 172.17.0.4 -container-port 2181
+           ├─32179 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.5 -container-port 9300
+           └─32192 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.5 -container-port 9200
+
+May 03 07:48:22 deb-node1 dockerd[421]: time="2019-05-03T07:48:22.433944312Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:27 deb-node1 dockerd[421]: time="2019-05-03T07:48:27.160437906Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:31 deb-node1 dockerd[421]: time="2019-05-03T07:48:31.062122124Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:34 deb-node1 dockerd[421]: time="2019-05-03T07:48:34.832940730Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:38 deb-node1 dockerd[421]: time="2019-05-03T07:48:38.526000684Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:44 deb-node1 dockerd[421]: time="2019-05-03T07:48:44.281252691Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:48 deb-node1 dockerd[421]: time="2019-05-03T07:48:48.869569304Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:53 deb-node1 dockerd[421]: time="2019-05-03T07:48:53.429626686Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:48:57 deb-node1 dockerd[421]: time="2019-05-03T07:48:57.601008412Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:49:02 deb-node1 dockerd[421]: time="2019-05-03T07:49:02.546601169Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+
+● elasticsearch.service - Elasticsearch Server
+   Loaded: loaded (/lib/systemd/system/elasticsearch.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 07:49:03 GMT; 2s ago
+     Docs: http://www.elastic.co
+  Process: 32122 ExecStop=/usr/bin/docker stop elasticsearch (code=exited, status=0/SUCCESS)
+  Process: 32141 ExecStartPre=/usr/bin/docker rm -f elasticsearch (code=exited, status=0/SUCCESS)
+  Process: 32131 ExecStartPre=/usr/bin/docker kill elasticsearch (code=exited, status=1/FAILURE)
+ Main PID: 32152 (docker)
+    Tasks: 9 (limit: 4915)
+   Memory: 20.0M
+      CPU: 195ms
+   CGroup: /system.slice/elasticsearch.service
+           └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Service hold-off time over, scheduling restart.
+May 03 07:49:02 deb-node1 systemd[1]: Stopped Elasticsearch Server.
+May 03 07:49:03 deb-node1 systemd[1]: Starting Elasticsearch Server...
+May 03 07:49:03 deb-node1 docker[32131]: Error response from daemon: Cannot kill container: elasticsearch: Container e607b3588dc1e91cf97f69399b8e7dd0cba6306804fcd5ef9ba7c8fd6be2f2da is not running
+May 03 07:49:03 deb-node1 docker[32141]: elasticsearch
+May 03 07:49:03 deb-node1 systemd[1]: Started Elasticsearch Server.
+
+● emergency.service - Emergency Shell
+   Loaded: loaded (/lib/systemd/system/emergency.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:sulogin(8)
+
+● getty-static.service - getty on tty2-tty6 if dbus and logind are not available
+   Loaded: loaded (/lib/systemd/system/getty-static.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+● getty@tty1.service - Getty on tty1
+   Loaded: loaded (/lib/systemd/system/getty@.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:agetty(8)
+           man:systemd-getty-generator(8)
+           http://0pointer.de/blog/projects/serial-console.html
+ Main PID: 423 (agetty)
+   CGroup: /system.slice/system-getty.slice/getty@tty1.service
+           └─423 /sbin/agetty --noclear tty1 linux
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● ifup@eth0.service - ifup for eth0
+   Loaded: loaded (/lib/systemd/system/ifup@.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+ Main PID: 317 (code=exited, status=0/SUCCESS)
+    Tasks: 1 (limit: 4915)
+   Memory: 4.1M
+      CPU: 50ms
+   CGroup: /system.slice/ifup@eth0.service
+           └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● irqbalance.service - irqbalance daemon
+   Loaded: loaded (/lib/systemd/system/irqbalance.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+ Main PID: 383 (irqbalance)
+    Tasks: 1 (limit: 4915)
+   Memory: 1.3M
+      CPU: 95ms
+   CGroup: /system.slice/irqbalance.service
+           └─383 /usr/sbin/irqbalance --foreground
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● keyboard-setup.service - Set the console keyboard layout
+   Loaded: loaded (/lib/systemd/system/keyboard-setup.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+ Main PID: 189 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/keyboard-setup.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● kmod-static-nodes.service - Create list of required static device nodes for the current kernel
+   Loaded: loaded (/lib/systemd/system/kmod-static-nodes.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+ Main PID: 181 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/kmod-static-nodes.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● mesos-agent.service - Mesos Agent
+   Loaded: loaded (/lib/systemd/system/mesos-agent.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:59:12 GMT; 49min ago
+ Main PID: 7260 (mesos-slave)
+    Tasks: 16 (limit: 4915)
+   Memory: 12.4M
+      CPU: 23.292s
+   CGroup: /system.slice/mesos-agent.service
+           ├─7260 /usr/local/sbin/mesos-slave
+           ├─7269 logger -p user info -t mesos-slave[7260]
+           └─7270 logger -p user err -t mesos-slave[7260]
+
+May 03 07:43:49 deb-node1 mesos-slave[7270]: 2019-05-03 07:43:49,651:7260(0x7f4036e28700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 51ms
+May 03 07:43:53 deb-node1 mesos-slave[7270]: 2019-05-03 07:43:53,000:7260(0x7f4036e28700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 16ms
+May 03 07:43:56 deb-node1 mesos-slave[7270]: 2019-05-03 07:43:56,350:7260(0x7f4036e28700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 15ms
+May 03 07:44:13 deb-node1 mesos-slave[7270]: I0503 07:44:13.433897  7282 slave.cpp:6860] Current disk usage 64.42%. Max allowed age: 1.790279036704826days
+May 03 07:44:43 deb-node1 mesos-slave[7270]: 2019-05-03 07:44:43,074:7260(0x7f4036e28700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 13ms
+May 03 07:45:13 deb-node1 mesos-slave[7270]: I0503 07:45:13.434820  7288 slave.cpp:6860] Current disk usage 64.43%. Max allowed age: 1.789904537882037days
+May 03 07:45:33 deb-node1 mesos-slave[7270]: 2019-05-03 07:45:33,129:7260(0x7f4036e28700):ZOO_WARN@zookeeper_interest@1597: Exceeded deadline by 11ms
+May 03 07:46:13 deb-node1 mesos-slave[7270]: I0503 07:46:13.436075  7288 slave.cpp:6860] Current disk usage 64.43%. Max allowed age: 1.789560735684074days
+May 03 07:47:13 deb-node1 mesos-slave[7270]: I0503 07:47:13.439482  7284 slave.cpp:6860] Current disk usage 64.44%. Max allowed age: 1.789256839098368days
+May 03 07:48:13 deb-node1 mesos-slave[7270]: I0503 07:48:13.445180  7285 slave.cpp:6860] Current disk usage 64.44%. Max allowed age: 1.788943733525220days
+
+● mesos-master.service - Mesos Master
+   Loaded: loaded (/lib/systemd/system/mesos-master.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:22 GMT; 50min ago
+ Main PID: 3020 (docker)
+    Tasks: 9 (limit: 4915)
+   Memory: 19.9M
+      CPU: 570ms
+   CGroup: /system.slice/mesos-master.service
+           └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● networking.service - Raise network interfaces
+   Loaded: loaded (/lib/systemd/system/networking.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:interfaces(5)
+ Main PID: 323 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/networking.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● nfs-config.service - Preprocess NFS configuration
+   Loaded: loaded (/lib/systemd/system/nfs-config.service; static; vendor preset: enabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+ Main PID: 310 (code=exited, status=0/SUCCESS)
+      CPU: 4ms
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● nfs-utils.service - NFS server and client services
+   Loaded: loaded (/lib/systemd/system/nfs-utils.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+
+● ntp.service - NTP Server
+   Loaded: loaded (/lib/systemd/system/ntp.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:06 GMT; 50min ago
+ Main PID: 1504 (docker)
+    Tasks: 10 (limit: 4915)
+   Memory: 19.9M
+      CPU: 494ms
+   CGroup: /system.slice/ntp.service
+           └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● packagekit.service - PackageKit Daemon
+   Loaded: loaded (/lib/systemd/system/packagekit.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:49 GMT; 50min ago
+ Main PID: 1133 (packagekitd)
+    Tasks: 3 (limit: 4915)
+   Memory: 5.0M
+      CPU: 15.787s
+   CGroup: /system.slice/packagekit.service
+           └─1133 /usr/lib/packagekit/packagekitd
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● polkit.service - Authorization Manager
+   Loaded: loaded (/lib/systemd/system/polkit.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:49 GMT; 50min ago
+     Docs: man:polkit(8)
+ Main PID: 1157 (polkitd)
+    Tasks: 3 (limit: 4915)
+   Memory: 1.4M
+      CPU: 17.272s
+   CGroup: /system.slice/polkit.service
+           └─1157 /usr/lib/policykit-1/polkitd --no-debug
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● rc-local.service - /etc/rc.local Compatibility
+   Loaded: loaded (/lib/systemd/system/rc-local.service; static; vendor preset: enabled)
+  Drop-In: /lib/systemd/system/rc-local.service.d
+           └─debian.conf
+   Active: inactive (dead)
+
+● rescue.service - Rescue Shell
+   Loaded: loaded (/lib/systemd/system/rescue.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:sulogin(8)
+
+● rpc-gssd.service - RPC security service for NFS client and server
+   Loaded: loaded (/lib/systemd/system/rpc-gssd.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+● rpc-svcgssd.service - RPC security service for NFS server
+   Loaded: loaded (/lib/systemd/system/rpc-svcgssd.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+● rpcbind.service - RPC bind portmap service
+   Loaded: loaded (/lib/systemd/system/rpcbind.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:rpcbind(8)
+ Main PID: 339 (rpcbind)
+    Tasks: 1 (limit: 4915)
+   Memory: 2.6M
+      CPU: 14ms
+   CGroup: /system.slice/rpcbind.service
+           └─339 /sbin/rpcbind -f -w
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● rsync.service - fast remote file copy program daemon
+   Loaded: loaded (/lib/systemd/system/rsync.service; enabled; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+● rsyslog.service - System Logging Service
+   Loaded: loaded (/lib/systemd/system/rsyslog.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:rsyslogd(8)
+           http://www.rsyslog.com/doc/
+ Main PID: 381 (rsyslogd)
+    Tasks: 4 (limit: 4915)
+   Memory: 36.3M
+      CPU: 19.056s
+   CGroup: /system.slice/rsyslog.service
+           └─381 /usr/sbin/rsyslogd -n
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● spark-executor.service - Mesos Shuffle Service for Spark executors
+   Loaded: loaded (/lib/systemd/system/spark-executor.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+ Main PID: 1566 (docker)
+    Tasks: 13 (limit: 4915)
+   Memory: 20.5M
+      CPU: 509ms
+   CGroup: /system.slice/spark-executor.service
+           └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● spark-history-server.service - Spark History Server
+   Loaded: loaded (/lib/systemd/system/spark-history-server.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+ Main PID: 1586 (docker)
+    Tasks: 10 (limit: 4915)
+   Memory: 20.1M
+      CPU: 562ms
+   CGroup: /system.slice/spark-history-server.service
+           └─1586 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-history-server /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● ssh.service - OpenBSD Secure Shell server
+   Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:59:12 GMT; 49min ago
+  Process: 7256 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+ Main PID: 7259 (sshd)
+    Tasks: 1 (limit: 4915)
+   Memory: 4.6M
+      CPU: 2min 51.576s
+   CGroup: /system.slice/ssh.service
+           └─7259 /usr/sbin/sshd -D
+
+May 03 07:49:00 deb-node1 sshd[31959]: Accepted publickey for eskimo from 192.168.10.1 port 57186 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:49:00 deb-node1 sshd[31959]: pam_unix(sshd:session): session opened for user eskimo by (uid=0)
+May 03 07:49:00 deb-node1 sshd[31985]: Accepted publickey for eskimo from 192.168.10.1 port 57188 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:49:00 deb-node1 sshd[31985]: pam_unix(sshd:session): session opened for user eskimo by (uid=0)
+May 03 07:49:00 deb-node1 sshd[32006]: Accepted publickey for eskimo from 192.168.10.1 port 57192 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:49:00 deb-node1 sshd[32006]: pam_unix(sshd:session): session opened for user eskimo by (uid=0)
+May 03 07:49:00 deb-node1 sshd[32027]: Accepted publickey for eskimo from 192.168.10.1 port 57194 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:49:00 deb-node1 sshd[32027]: pam_unix(sshd:session): session opened for user eskimo by (uid=0)
+May 03 07:49:01 deb-node1 sshd[32048]: Accepted publickey for eskimo from 192.168.10.1 port 57204 ssh2: RSA SHA256:tfOJGe2/OeIX7alMvPdATlvMAKzY1yd1Skx0nMtYHzA
+May 03 07:49:01 deb-node1 sshd[32048]: pam_unix(sshd:session): session opened for user eskimo by (uid=0)
+
+● systemd-ask-password-console.service - Dispatch Password Requests to Console
+   Loaded: loaded (/lib/systemd/system/systemd-ask-password-console.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-ask-password-console.service(8)
+
+● systemd-ask-password-wall.service - Forward Password Requests to Wall
+   Loaded: loaded (/lib/systemd/system/systemd-ask-password-wall.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-ask-password-console.service(8)
+
+● systemd-binfmt.service - Set Up Additional Binary Formats
+   Loaded: loaded (/lib/systemd/system/systemd-binfmt.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-binfmt.service(8)
+           man:binfmt.d(5)
+           https://www.kernel.org/doc/Documentation/binfmt_misc.txt
+
+● systemd-fsck-root.service - File System Check on Root Device
+   Loaded: loaded (/lib/systemd/system/systemd-fsck-root.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-fsck-root.service(8)
+
+● systemd-fsckd.service - File System Check Daemon to report status
+   Loaded: loaded (/lib/systemd/system/systemd-fsckd.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-fsckd.service(8)
+
+● systemd-hwdb-update.service - Rebuild Hardware Database
+   Loaded: loaded (/lib/systemd/system/systemd-hwdb-update.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:hwdb(7)
+           man:systemd-hwdb(8)
+
+● systemd-initctl.service - /dev/initctl Compatibility Daemon
+   Loaded: loaded (/lib/systemd/system/systemd-initctl.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd-initctl.service(8)
+
+● systemd-journal-flush.service - Flush Journal to Persistent Storage
+   Loaded: loaded (/lib/systemd/system/systemd-journal-flush.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+ Main PID: 212 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-journal-flush.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-journald.service - Journal Service
+   Loaded: loaded (/lib/systemd/system/systemd-journald.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+ Main PID: 184 (systemd-journal)
+   Status: "Processing requests..."
+    Tasks: 1 (limit: 4915)
+   Memory: 49.9M
+      CPU: 2min 9.633s
+   CGroup: /system.slice/systemd-journald.service
+           └─184 /lib/systemd/systemd-journald
+
+May 03 07:37:41 deb-node1 systemd-journald[184]: Suppressed 609 messages from /user.slice/user-1001.slice
+May 03 07:38:13 deb-node1 systemd-journald[184]: Suppressed 402 messages from /user.slice/user-1001.slice
+May 03 07:39:17 deb-node1 systemd-journald[184]: Suppressed 416 messages from /user.slice/user-1001.slice
+May 03 07:39:47 deb-node1 systemd-journald[184]: Suppressed 185 messages from /user.slice/user-1001.slice
+May 03 07:40:56 deb-node1 systemd-journald[184]: Suppressed 538 messages from /user.slice/user-1001.slice
+May 03 07:41:28 deb-node1 systemd-journald[184]: Suppressed 481 messages from /user.slice/user-1001.slice
+May 03 07:42:34 deb-node1 systemd-journald[184]: Suppressed 402 messages from /user.slice/user-1001.slice
+May 03 07:43:08 deb-node1 systemd-journald[184]: Suppressed 596 messages from /user.slice/user-1001.slice
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-logind.service - Login Service
+   Loaded: loaded (/lib/systemd/system/systemd-logind.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:systemd-logind.service(8)
+           man:logind.conf(5)
+           http://www.freedesktop.org/wiki/Software/systemd/logind
+           http://www.freedesktop.org/wiki/Software/systemd/multiseat
+ Main PID: 382 (systemd-logind)
+   Status: "Processing requests..."
+    Tasks: 1 (limit: 4915)
+   Memory: 1.1M
+      CPU: 1min 8.173s
+   CGroup: /system.slice/systemd-logind.service
+           └─382 /lib/systemd/systemd-logind
+
+May 03 07:49:00 deb-node1 systemd-logind[382]: New session 9954 of user eskimo.
+May 03 07:49:00 deb-node1 systemd-logind[382]: Removed session 9954.
+May 03 07:49:00 deb-node1 systemd-logind[382]: New session 9956 of user eskimo.
+May 03 07:49:00 deb-node1 systemd-logind[382]: Removed session 9956.
+May 03 07:49:00 deb-node1 systemd-logind[382]: New session 9958 of user eskimo.
+May 03 07:49:00 deb-node1 systemd-logind[382]: Removed session 9958.
+May 03 07:49:00 deb-node1 systemd-logind[382]: New session 9960 of user eskimo.
+May 03 07:49:01 deb-node1 systemd-logind[382]: Removed session 9960.
+May 03 07:49:01 deb-node1 systemd-logind[382]: New session 9962 of user eskimo.
+May 03 07:49:01 deb-node1 systemd-logind[382]: Removed session 9962.
+
+● systemd-machine-id-commit.service - Commit a transient machine-id on disk
+   Loaded: loaded (/lib/systemd/system/systemd-machine-id-commit.service; static; vendor preset: enabled)
+   Active: inactive (dead)
+Condition: start condition failed at Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd-machine-id-commit.service(8)
+
+● systemd-modules-load.service - Load Kernel Modules
+   Loaded: loaded (/lib/systemd/system/systemd-modules-load.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-modules-load.service(8)
+           man:modules-load.d(5)
+ Main PID: 195 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-modules-load.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-random-seed.service - Load/Save Random Seed
+   Loaded: loaded (/lib/systemd/system/systemd-random-seed.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-random-seed.service(8)
+           man:random(4)
+ Main PID: 210 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-random-seed.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-remount-fs.service - Remount Root and Kernel File Systems
+   Loaded: loaded (/lib/systemd/system/systemd-remount-fs.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-remount-fs.service(8)
+           http://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+ Main PID: 183 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-remount-fs.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-sysctl.service - Apply Kernel Variables
+   Loaded: loaded (/lib/systemd/system/systemd-sysctl.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-sysctl.service(8)
+           man:sysctl.d(5)
+ Main PID: 211 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-sysctl.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-timesyncd.service - Network Time Synchronization
+   Loaded: loaded (/lib/systemd/system/systemd-timesyncd.service; enabled; vendor preset: enabled)
+  Drop-In: /lib/systemd/system/systemd-timesyncd.service.d
+           └─disable-with-time-daemon.conf
+   Active: active (running) since Fri 2019-05-03 06:59:09 GMT; 49min ago
+     Docs: man:systemd-timesyncd.service(8)
+ Main PID: 6173 (systemd-timesyn)
+   Status: "Synchronized to time server 212.25.15.128:123 (0.debian.pool.ntp.org)."
+    Tasks: 2 (limit: 4915)
+   Memory: 872.0K
+      CPU: 47ms
+   CGroup: /system.slice/systemd-timesyncd.service
+           └─6173 /lib/systemd/systemd-timesyncd
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-tmpfiles-clean.service - Cleanup of Temporary Directories
+   Loaded: loaded (/lib/systemd/system/systemd-tmpfiles-clean.service; static; vendor preset: enabled)
+   Active: inactive (dead) since Fri 2019-05-03 07:12:51 GMT; 36min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+  Process: 17264 ExecStart=/bin/systemd-tmpfiles --clean (code=exited, status=0/SUCCESS)
+ Main PID: 17264 (code=exited, status=0/SUCCESS)
+      CPU: 11ms
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev
+   Loaded: loaded (/lib/systemd/system/systemd-tmpfiles-setup-dev.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+ Main PID: 198 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-tmpfiles-setup-dev.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-tmpfiles-setup.service - Create Volatile Files and Directories
+   Loaded: loaded (/lib/systemd/system/systemd-tmpfiles-setup.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+ Main PID: 319 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-tmpfiles-setup.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-udev-trigger.service - udev Coldplug all Devices
+   Loaded: loaded (/lib/systemd/system/systemd-udev-trigger.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:udev(7)
+           man:systemd-udevd.service(8)
+ Main PID: 221 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-udev-trigger.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-udevd.service - udev Kernel Device Manager
+   Loaded: loaded (/lib/systemd/system/systemd-udevd.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:59:07 GMT; 49min ago
+     Docs: man:systemd-udevd.service(8)
+           man:udev(7)
+ Main PID: 6060 (systemd-udevd)
+   Status: "Processing with 12 children at max"
+    Tasks: 1
+   Memory: 11.8M
+      CPU: 34.245s
+   CGroup: /system.slice/systemd-udevd.service
+           └─6060 /lib/systemd/systemd-udevd
+
+May 03 07:48:49 deb-node1 systemd-udevd[31120]: Could not generate persistent MAC address for vethf5ec755: No such file or directory
+May 03 07:48:49 deb-node1 systemd-udevd[31121]: Could not generate persistent MAC address for veth0b9414c: No such file or directory
+May 03 07:48:54 deb-node1 systemd-udevd[31366]: Could not generate persistent MAC address for veth5ccafb6: No such file or directory
+May 03 07:48:54 deb-node1 systemd-udevd[31367]: Could not generate persistent MAC address for veth79cd99f: No such file or directory
+May 03 07:48:58 deb-node1 systemd-udevd[31663]: Could not generate persistent MAC address for veth12589f1: No such file or directory
+May 03 07:48:58 deb-node1 systemd-udevd[31662]: Could not generate persistent MAC address for veth9cc2a30: No such file or directory
+May 03 07:49:02 deb-node1 systemd-udevd[32108]: link_config: could not get ethtool features for veth9cc2a30
+May 03 07:49:02 deb-node1 systemd-udevd[32108]: Could not set offload features of veth9cc2a30: No such device
+May 03 07:49:03 deb-node1 systemd-udevd[32163]: Could not generate persistent MAC address for vethe8f1ab9: No such file or directory
+May 03 07:49:03 deb-node1 systemd-udevd[32162]: Could not generate persistent MAC address for veth3d6f5b7: No such file or directory
+
+● systemd-update-utmp-runlevel.service - Update UTMP about System Runlevel Changes
+   Loaded: loaded (/lib/systemd/system/systemd-update-utmp-runlevel.service; static; vendor preset: enabled)
+   Active: inactive (dead) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+     Docs: man:systemd-update-utmp.service(8)
+           man:utmp(5)
+ Main PID: 1587 (code=exited, status=0/SUCCESS)
+      CPU: 3ms
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-update-utmp.service - Update UTMP about System Boot/Shutdown
+   Loaded: loaded (/lib/systemd/system/systemd-update-utmp.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd-update-utmp.service(8)
+           man:utmp(5)
+ Main PID: 344 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-update-utmp.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-user-sessions.service - Permit User Sessions
+   Loaded: loaded (/lib/systemd/system/systemd-user-sessions.service; static; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:systemd-user-sessions.service(8)
+ Main PID: 410 (code=exited, status=0/SUCCESS)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/systemd-user-sessions.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● unattended-upgrades.service - Unattended Upgrades Shutdown
+   Loaded: loaded (/lib/systemd/system/unattended-upgrades.service; enabled; vendor preset: enabled)
+   Active: active (exited) since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:unattended-upgrade(8)
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/unattended-upgrades.service
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● user@1000.service - User Manager for UID 1000
+   Loaded: loaded (/lib/systemd/system/user@.service; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 07:45:43 GMT; 3min 22s ago
+ Main PID: 17910 (systemd)
+   Status: "Startup finished in 47ms."
+    Tasks: 2
+   CGroup: /user.slice/user-1000.slice/user@1000.service
+           └─init.scope
+             ├─17910 /lib/systemd/systemd --user
+             └─17911 (sd-pam)
+
+May 03 07:45:43 deb-node1 systemd[17910]: Listening on GnuPG cryptographic agent (access for web browsers).
+May 03 07:45:43 deb-node1 systemd[17910]: Listening on GnuPG cryptographic agent (ssh-agent emulation).
+May 03 07:45:43 deb-node1 systemd[17910]: Listening on GnuPG cryptographic agent and passphrase cache.
+May 03 07:45:43 deb-node1 systemd[17910]: Listening on GnuPG cryptographic agent and passphrase cache (restricted).
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Sockets.
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Paths.
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Basic System.
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Default.
+May 03 07:45:43 deb-node1 systemd[17910]: Startup finished in 47ms.
+May 03 07:45:43 deb-node1 systemd[1]: Started User Manager for UID 1000.
+
+● zookeeper.service - zookeeper Server
+   Loaded: loaded (/lib/systemd/system/zookeeper.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:07 GMT; 50min ago
+ Main PID: 1542 (docker)
+    Tasks: 9 (limit: 4915)
+   Memory: 20.1M
+      CPU: 546ms
+   CGroup: /system.slice/zookeeper.service
+           └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● -.slice - Root Slice
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd.special(7)
+   Memory: 2.5G
+      CPU: 1h 17min 5.435s
+   CGroup: /
+           ├─docker
+           │ ├─338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77
+           │ │ └─1965 /usr/sbin/ntpd -n -g
+           │ ├─8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193
+           │ │ └─32217 /usr/bin/java -Xms1g -Xmx1g -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTouch -Xss1m -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djna.nosys=true -XX:-OmitStackTraceInFastThrow -Dio.netty.noUnsafe=true -Dio.netty.noKeySetOptimization=true -Dio.netty.recycler.maxCapacityPerThread=0 -Dlog4j.shutdownHookEnabled=false -Dlog4j2.disable.jmx=true -Djava.io.tmpdir=/tmp/elasticsearch.8xrwS2Mx -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=data -XX:ErrorFile=logs/hs_err_pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -Xloggc:logs/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=32 -XX:GCLogFileSize=64m -Des.path.home=/usr/local/lib/elasticsearch -Des.path.conf=/usr/local/lib/elasticsearch/config -Des.distribution.flavor=default -Des.distribution.type=tar -cp /usr/local/lib/elasticsearch/lib/* org.elasticsearch.bootstrap.Elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ ├─9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02
+           │ │ └─2238 /usr/bin/java -Dzookeeper.log.dir=/var/log/zookeeper -Dzookeeper.root.logger=INFO,ROLLINGFILE -cp /etc/zookeeper/conf:/usr/share/java/jline.jar:/usr/share/java/log4j-1.2.jar:/usr/share/java/xercesImpl.jar:/usr/share/java/xmlParserAPIs.jar:/usr/share/java/netty.jar:/usr/share/java/slf4j-api.jar:/usr/share/java/slf4j-log4j12.jar:/usr/share/java/zookeeper.jar -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false org.apache.zookeeper.server.quorum.QuorumPeerMain /etc/zookeeper/conf/zoo.cfg
+           │ ├─aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34
+           │ │ ├─ 2142 /bin/bash /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ │ ├─ 2561 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp /usr/local/lib/spark-2.4.2/conf/:/usr/local/lib/spark/jars/* -Xmx1g org.apache.spark.deploy.mesos.MesosExternalShuffleService
+           │ │ └─32323 sleep 5
+           │ ├─c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7
+           │ │ ├─ 2038 /bin/bash /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           │ │ ├─ 2370 /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -cp /usr/local/lib/spark-2.4.2/conf/:/usr/local/lib/spark/jars/* -Xmx1g org.apache.spark.deploy.history.HistoryServer
+           │ │ └─32317 sleep 5
+           │ └─da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d
+           │   ├─3171 /usr/local/sbin/mesos-master
+           │   ├─3277 logger -p user info -t mesos-master[1]
+           │   └─3278 logger -p user err -t mesos-master[1]
+           ├─init.scope
+           │ └─1 /lib/systemd/systemd --system --deserialize 19
+           ├─system.slice
+           │ ├─containerd.service
+           │ │ ├─  418 /usr/bin/containerd
+           │ │ ├─ 1849 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ │ ├─ 1961 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ │ ├─ 1991 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ │ ├─ 2081 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ │ ├─ 3126 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ │ └─32199 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─cron.service
+           │ │ └─380 /usr/sbin/cron -f
+           │ ├─dbus.service
+           │ │ └─377 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+           │ ├─docker.service
+           │ │ ├─  421 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+           │ │ ├─ 1753 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.2 -container-port 123
+           │ │ ├─ 1804 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.3 -container-port 7337
+           │ │ ├─ 1837 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 3888 -container-ip 172.17.0.4 -container-port 3888
+           │ │ ├─ 1861 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2888 -container-ip 172.17.0.4 -container-port 2888
+           │ │ ├─ 1990 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2181 -container-ip 172.17.0.4 -container-port 2181
+           │ │ ├─32179 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.5 -container-port 9300
+           │ │ └─32192 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.5 -container-port 9200
+           │ ├─elasticsearch.service
+           │ │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ ├─ifup@eth0.service
+           │ │ └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
+           │ ├─irqbalance.service
+           │ │ └─383 /usr/sbin/irqbalance --foreground
+           │ ├─mesos-agent.service
+           │ │ ├─7260 /usr/local/sbin/mesos-slave
+           │ │ ├─7269 logger -p user info -t mesos-slave[7260]
+           │ │ └─7270 logger -p user err -t mesos-slave[7260]
+           │ ├─mesos-master.service
+           │ │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+           │ ├─ntp.service
+           │ │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           │ ├─packagekit.service
+           │ │ └─1133 /usr/lib/packagekit/packagekitd
+           │ ├─polkit.service
+           │ │ └─1157 /usr/lib/policykit-1/polkitd --no-debug
+           │ ├─rpcbind.service
+           │ │ └─339 /sbin/rpcbind -f -w
+           │ ├─rsyslog.service
+           │ │ └─381 /usr/sbin/rsyslogd -n
+           │ ├─spark-executor.service
+           │ │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ ├─spark-history-server.service
+           │ │ └─1586 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-history-server /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           │ ├─ssh.service
+           │ │ └─7259 /usr/sbin/sshd -D
+           │ ├─system-getty.slice
+           │ │ └─getty@tty1.service
+           │ │   └─423 /sbin/agetty --noclear tty1 linux
+           │ ├─systemd-journald.service
+           │ │ └─184 /lib/systemd/systemd-journald
+           │ ├─systemd-logind.service
+           │ │ └─382 /lib/systemd/systemd-logind
+           │ ├─systemd-timesyncd.service
+           │ │ └─6173 /lib/systemd/systemd-timesyncd
+           │ ├─systemd-udevd.service
+           │ │ └─6060 /lib/systemd/systemd-udevd
+           │ └─zookeeper.service
+           │   └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+           └─user.slice
+             └─user-1000.slice
+               ├─session-9626.scope
+               │ ├─17908 sshd: vagrant [priv]
+               │ ├─17917 sshd: vagrant@pts/0
+               │ ├─17918 -bash
+               │ ├─17963 sudo su
+               │ ├─17964 su
+               │ ├─17965 bash
+               │ └─32324 systemctl status -al
+               └─user@1000.service
+                 └─init.scope
+                   ├─17910 /lib/systemd/systemd --user
+                   └─17911 (sd-pam)
+
+May 03 07:49:01 deb-node1 systemd[1]: Stopped User Manager for UID 1001.
+May 03 07:49:01 deb-node1 systemd[1]: Removed slice User Slice of eskimo.
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Main process exited, code=exited, status=1/FAILURE
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Unit entered failed state.
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Failed with result 'exit-code'.
+May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Service hold-off time over, scheduling restart.
+May 03 07:49:02 deb-node1 systemd[1]: Stopped Elasticsearch Server.
+May 03 07:49:03 deb-node1 systemd[1]: Starting Elasticsearch Server...
+May 03 07:49:03 deb-node1 docker[32141]: elasticsearch
+May 03 07:49:03 deb-node1 systemd[1]: Started Elasticsearch Server.
+
+● mesos_executors.slice - Mesos Executors Slice
+   Loaded: loaded (/run/systemd/system/mesos_executors.slice; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:48 GMT; 50min ago
+    Tasks: 0
+   Memory: 0B
+      CPU: 0
+   CGroup: /mesos_executors.slice
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● system-getty.slice
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:39 GMT; 50min ago
+    Tasks: 1
+   Memory: 444.0K
+      CPU: 4ms
+   CGroup: /system.slice/system-getty.slice
+           └─getty@tty1.service
+             └─423 /sbin/agetty --noclear tty1 linux
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● system.slice - System Slice
+   Loaded: loaded (/lib/systemd/system/system.slice; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd.special(7)
+    Tasks: 244
+   Memory: 959.4M
+      CPU: 19min 56.958s
+   CGroup: /system.slice
+           ├─containerd.service
+           │ ├─  418 /usr/bin/containerd
+           │ ├─ 1849 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/338f13d631ffe695badb8d506b96f7f4eb3e0d020c77b4e3cb9e5c49ac256c77 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─ 1961 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/c058b97f021d3ab12ee89b553798acebec3ac5d5b554b4bdd1707c1b47c806f7 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─ 1991 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─ 2081 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/9d77ea9c42cb765aaf83901c3c315d0472e931dc971f1249a9aee0ab6b00ed02 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ ├─ 3126 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/da578fe835248c74aa2638d6490ff3e3f70e458821a7d433884a6712fe43d80d -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           │ └─32199 containerd-shim -namespace moby -workdir /var/lib/containerd/io.containerd.runtime.v1.linux/moby/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193 -address /run/containerd/containerd.sock -containerd-binary /usr/bin/containerd -runtime-root /var/run/docker/runtime-runc
+           ├─cron.service
+           │ └─380 /usr/sbin/cron -f
+           ├─dbus.service
+           │ └─377 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+           ├─docker.service
+           │ ├─  421 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+           │ ├─ 1753 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 123 -container-ip 172.17.0.2 -container-port 123
+           │ ├─ 1804 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7337 -container-ip 172.17.0.3 -container-port 7337
+           │ ├─ 1837 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 3888 -container-ip 172.17.0.4 -container-port 3888
+           │ ├─ 1861 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2888 -container-ip 172.17.0.4 -container-port 2888
+           │ ├─ 1990 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2181 -container-ip 172.17.0.4 -container-port 2181
+           │ ├─32179 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.5 -container-port 9300
+           │ └─32192 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.5 -container-port 9200
+           ├─elasticsearch.service
+           │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           ├─ifup@eth0.service
+           │ └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
+           ├─irqbalance.service
+           │ └─383 /usr/sbin/irqbalance --foreground
+           ├─mesos-agent.service
+           │ ├─7260 /usr/local/sbin/mesos-slave
+           │ ├─7269 logger -p user info -t mesos-slave[7260]
+           │ └─7270 logger -p user err -t mesos-slave[7260]
+           ├─mesos-master.service
+           │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+           ├─ntp.service
+           │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           ├─packagekit.service
+           │ └─1133 /usr/lib/packagekit/packagekitd
+           ├─polkit.service
+           │ └─1157 /usr/lib/policykit-1/polkitd --no-debug
+           ├─rpcbind.service
+           │ └─339 /sbin/rpcbind -f -w
+           ├─rsyslog.service
+           │ └─381 /usr/sbin/rsyslogd -n
+           ├─spark-executor.service
+           │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           ├─spark-history-server.service
+           │ └─1586 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-history-server /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           ├─ssh.service
+           │ └─7259 /usr/sbin/sshd -D
+           ├─system-getty.slice
+           │ └─getty@tty1.service
+           │   └─423 /sbin/agetty --noclear tty1 linux
+           ├─systemd-journald.service
+           │ └─184 /lib/systemd/systemd-journald
+           ├─systemd-logind.service
+           │ └─382 /lib/systemd/systemd-logind
+           ├─systemd-timesyncd.service
+           │ └─6173 /lib/systemd/systemd-timesyncd
+           ├─systemd-udevd.service
+           │ └─6060 /lib/systemd/systemd-udevd
+           └─zookeeper.service
+             └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+
+May 03 07:49:02 deb-node1 docker[31624]: Refer to the log for complete error details.
+May 03 07:49:02 deb-node1 containerd[418]: time="2019-05-03T07:49:02.536560225Z" level=info msg="shim reaped" id=e607b3588dc1e91cf97f69399b8e7dd0cba6306804fcd5ef9ba7c8fd6be2f2da
+May 03 07:49:02 deb-node1 dockerd[421]: time="2019-05-03T07:49:02.546601169Z" level=info msg="ignoring event" module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+May 03 07:49:02 deb-node1 systemd-udevd[32108]: link_config: could not get ethtool features for veth9cc2a30
+May 03 07:49:02 deb-node1 systemd-udevd[32108]: Could not set offload features of veth9cc2a30: No such device
+May 03 07:49:02 deb-node1 docker[32122]: elasticsearch
+May 03 07:49:03 deb-node1 docker[32131]: Error response from daemon: Cannot kill container: elasticsearch: Container e607b3588dc1e91cf97f69399b8e7dd0cba6306804fcd5ef9ba7c8fd6be2f2da is not running
+May 03 07:49:03 deb-node1 systemd-udevd[32163]: Could not generate persistent MAC address for vethe8f1ab9: No such file or directory
+May 03 07:49:03 deb-node1 systemd-udevd[32162]: Could not generate persistent MAC address for veth3d6f5b7: No such file or directory
+May 03 07:49:03 deb-node1 containerd[418]: time="2019-05-03T07:49:03.326734987Z" level=info msg="shim containerd-shim started" address="/containerd-shim/moby/8f3806453542792fee4b96a7d5a35ad20bbcbfcacb292ae9a904274287813193/shim.sock" debug=false pid=32199
+
+● user-1000.slice - User Slice of vagrant
+   Loaded: loaded (/run/systemd/transient/user-1000.slice; transient; vendor preset: enabled)
+Transient: yes
+   Active: active since Fri 2019-05-03 07:45:43 GMT; 3min 22s ago
+    Tasks: 9 (limit: 10813)
+   CGroup: /user.slice/user-1000.slice
+           ├─session-9626.scope
+           │ ├─17908 sshd: vagrant [priv]
+           │ ├─17917 sshd: vagrant@pts/0
+           │ ├─17918 -bash
+           │ ├─17963 sudo su
+           │ ├─17964 su
+           │ ├─17965 bash
+           │ └─32324 systemctl status -al
+           └─user@1000.service
+             └─init.scope
+               ├─17910 /lib/systemd/systemd --user
+               └─17911 (sd-pam)
+
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Paths.
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Basic System.
+May 03 07:45:43 deb-node1 systemd[17910]: Reached target Default.
+May 03 07:45:43 deb-node1 systemd[17910]: Startup finished in 47ms.
+May 03 07:45:46 deb-node1 sudo[17963]:  vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/su
+May 03 07:45:46 deb-node1 sudo[17963]: pam_unix(sudo:session): session opened for user root by vagrant(uid=0)
+May 03 07:45:46 deb-node1 su[17964]: Successful su for root by root
+May 03 07:45:46 deb-node1 su[17964]: + /dev/pts/0 root:root
+May 03 07:45:46 deb-node1 su[17964]: pam_unix(su:session): session opened for user root by vagrant(uid=0)
+May 03 07:45:46 deb-node1 su[17964]: pam_systemd(su:session): Cannot create session: Already running in a session
+
+● user.slice - User and Session Slice
+   Loaded: loaded (/lib/systemd/system/user.slice; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd.special(7)
+    Tasks: 9
+   Memory: 21.8M
+      CPU: 6min 27.646s
+   CGroup: /user.slice
+           └─user-1000.slice
+             ├─session-9626.scope
+             │ ├─17908 sshd: vagrant [priv]
+             │ ├─17917 sshd: vagrant@pts/0
+             │ ├─17918 -bash
+             │ ├─17963 sudo su
+             │ ├─17964 su
+             │ ├─17965 bash
+             │ └─32324 systemctl status -al
+             └─user@1000.service
+               └─init.scope
+                 ├─17910 /lib/systemd/systemd --user
+                 └─17911 (sd-pam)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dbus.socket - D-Bus System Message Bus Socket
+   Loaded: loaded (/lib/systemd/system/dbus.socket; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Listen: /var/run/dbus/system_bus_socket (Stream)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● docker.socket - Docker Socket for the API
+   Loaded: loaded (/lib/systemd/system/docker.socket; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+   Listen: /var/run/docker.sock (Stream)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● rpcbind.socket - RPCbind Server Activation Socket
+   Loaded: loaded (/lib/systemd/system/rpcbind.socket; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+   Listen: /run/rpcbind.sock (Stream)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● syslog.socket - Syslog Socket
+   Loaded: loaded (/lib/systemd/system/syslog.socket; static; vendor preset: disabled)
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/syslog
+   Listen: /run/systemd/journal/syslog (Datagram)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-fsckd.socket - fsck to fsckd communication Socket
+   Loaded: loaded (/lib/systemd/system/systemd-fsckd.socket; static; vendor preset: enabled)
+   Active: active (listening) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-fsckd.service(8)
+           man:systemd-fsck@.service(8)
+           man:systemd-fsck-root.service(8)
+   Listen: /run/systemd/fsck.progress (Stream)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-initctl.socket - /dev/initctl Compatibility Named Pipe
+   Loaded: loaded (/lib/systemd/system/systemd-initctl.socket; static; vendor preset: enabled)
+   Active: active (listening) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-initctl.service(8)
+   Listen: /run/systemd/initctl/fifo (FIFO)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-journald-audit.socket - Journal Audit Socket
+   Loaded: loaded (/lib/systemd/system/systemd-journald-audit.socket; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+   Listen: audit 1 (Netlink)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-journald-dev-log.socket - Journal Socket (/dev/log)
+   Loaded: loaded (/lib/systemd/system/systemd-journald-dev-log.socket; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+   Listen: /run/systemd/journal/dev-log (Datagram)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-journald.socket - Journal Socket
+   Loaded: loaded (/lib/systemd/system/systemd-journald.socket; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+   Listen: /run/systemd/journal/stdout (Stream)
+           /run/systemd/journal/socket (Datagram)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-udevd-control.socket - udev Control Socket
+   Loaded: loaded (/lib/systemd/system/systemd-udevd-control.socket; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd-udevd.service(8)
+           man:udev(7)
+   Listen: /run/udev/control (SequentialPacket)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-udevd-kernel.socket - udev Kernel Socket
+   Loaded: loaded (/lib/systemd/system/systemd-udevd-kernel.socket; static; vendor preset: enabled)
+   Active: active (running) since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd-udevd.service(8)
+           man:udev(7)
+   Listen: kobject-uevent 1 (Netlink)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart5.swap - /dev/disk/by-id/ata-VBOX_HARDDISK_VBce7c2943-df2d5608-part5
+   Follow: unit currently follows state of dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     What: /dev/disk/by-id/ata-VBOX_HARDDISK_VBce7c2943-df2d5608-part5
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart5.swap
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpartuuid-ddf9cebf\x2d05.swap - /dev/disk/by-partuuid/ddf9cebf-05
+   Follow: unit currently follows state of dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     What: /dev/disk/by-partuuid/ddf9cebf-05
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/dev-disk-by\x2dpartuuid-ddf9cebf\x2d05.swap
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1\x2dpart5.swap - /dev/disk/by-path/pci-0000:00:0d.0-ata-1-part5
+   Follow: unit currently follows state of dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     What: /dev/disk/by-path/pci-0000:00:0d.0-ata-1-part5
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/dev-disk-by\x2dpath-pci\x2d0000:00:0d.0\x2data\x2d1\x2dpart5.swap
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap - /dev/disk/by-uuid/c089e8c6-8d86-42ce-9642-6be125441ee9
+   Loaded: loaded (/etc/fstab; generated; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     What: /dev/disk/by-uuid/c089e8c6-8d86-42ce-9642-6be125441ee9
+     Docs: man:fstab(5)
+           man:systemd-fstab-generator(8)
+    Tasks: 0 (limit: 4915)
+   Memory: 232.0K
+      CPU: 2ms
+   CGroup: /system.slice/dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● dev-sda5.swap - /dev/sda5
+   Follow: unit currently follows state of dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
+   Loaded: loaded
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     What: /dev/sda5
+    Tasks: 0 (limit: 4915)
+   Memory: 0B
+      CPU: 0
+   CGroup: /system.slice/dev-sda5.swap
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● basic.target - Basic System
+   Loaded: loaded (/lib/systemd/system/basic.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● cryptsetup.target - Encrypted Volumes
+   Loaded: loaded (/lib/systemd/system/cryptsetup.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● emergency.target - Emergency Mode
+   Loaded: loaded (/lib/systemd/system/emergency.target; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● getty.target - Login Prompts
+   Loaded: loaded (/lib/systemd/system/getty.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:systemd.special(7)
+           man:systemd-getty-generator(8)
+           http://0pointer.de/blog/projects/serial-console.html
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● graphical.target - Graphical Interface
+   Loaded: loaded (/lib/systemd/system/graphical.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:07 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● local-fs-pre.target - Local File Systems (Pre)
+   Loaded: loaded (/lib/systemd/system/local-fs-pre.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● local-fs.target - Local File Systems
+   Loaded: loaded (/lib/systemd/system/local-fs.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● multi-user.target - Multi-User System
+   Loaded: loaded (/lib/systemd/system/multi-user.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:07 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● network-online.target - Network is Online
+   Loaded: loaded (/lib/systemd/system/network-online.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/NetworkTarget
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● network-pre.target - Network (Pre)
+   Loaded: loaded (/lib/systemd/system/network-pre.target; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/NetworkTarget
+
+● network.target - Network
+   Loaded: loaded (/lib/systemd/system/network.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:42 GMT; 50min ago
+     Docs: man:systemd.special(7)
+           http://www.freedesktop.org/wiki/Software/systemd/NetworkTarget
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● nfs-client.target - NFS client services
+   Loaded: loaded (/lib/systemd/system/nfs-client.target; enabled; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● nss-user-lookup.target - User and Group Name Lookups
+   Loaded: loaded (/lib/systemd/system/nss-user-lookup.target; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● paths.target - Paths
+   Loaded: loaded (/lib/systemd/system/paths.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:40 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● remote-fs-pre.target - Remote File Systems (Pre)
+   Loaded: loaded (/lib/systemd/system/remote-fs-pre.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● remote-fs.target - Remote File Systems
+   Loaded: loaded (/lib/systemd/system/remote-fs.target; enabled; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● rescue.target - Rescue Mode
+   Loaded: loaded (/lib/systemd/system/rescue.target; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● rpcbind.target - RPC Port Mapper
+   Loaded: loaded (/lib/systemd/system/rpcbind.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● shutdown.target - Shutdown
+   Loaded: loaded (/lib/systemd/system/shutdown.target; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● slices.target - Slices
+   Loaded: loaded (/lib/systemd/system/slices.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:39 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sockets.target - Sockets
+   Loaded: loaded (/lib/systemd/system/sockets.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● swap.target - Swap
+   Loaded: loaded (/lib/systemd/system/swap.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● sysinit.target - System Initialization
+   Loaded: loaded (/lib/systemd/system/sysinit.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● time-sync.target - System Time Synchronized
+   Loaded: loaded (/lib/systemd/system/time-sync.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● timers.target - Timers
+   Loaded: loaded (/lib/systemd/system/timers.target; static; vendor preset: enabled)
+   Active: active since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:systemd.special(7)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● umount.target - Unmount All Filesystems
+   Loaded: loaded (/lib/systemd/system/umount.target; static; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+● apt-daily-upgrade.timer - Daily apt upgrade and clean activities
+   Loaded: loaded (/lib/systemd/system/apt-daily-upgrade.timer; enabled; vendor preset: enabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● apt-daily.timer - Daily apt download activities
+   Loaded: loaded (/lib/systemd/system/apt-daily.timer; enabled; vendor preset: enabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
+
+● systemd-tmpfiles-clean.timer - Daily Cleanup of Temporary Directories
+   Loaded: loaded (/lib/systemd/system/systemd-tmpfiles-clean.timer; static; vendor preset: enabled)
+   Active: active (waiting) since Fri 2019-05-03 06:58:41 GMT; 50min ago
+     Docs: man:tmpfiles.d(5)
+           man:systemd-tmpfiles(8)
+
+Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.

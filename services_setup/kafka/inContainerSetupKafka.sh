@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+#
+# This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+# well to this individual file than to the Eskimo Project as a whole.
+#
+# Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+# Author : eskimo.sh / https://www.eskimo.sh
+#
+# Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+# If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+# terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+# Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+# Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+# commercial license.
+#
+# Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Affero Public License for more details.
+#
+# You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+# see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA, 02110-1301 USA.
+#
+# You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+# commercial license is mandatory as soon as :
+# - you develop activities involving Eskimo without disclosing the source code of your own product, software,
+#   platform, use cases or scripts.
+# - you deploy eskimo as part of a commercial product, platform or software.
+# For more information, please contact eskimo.sh at https://www.eskimo.sh
+#
+# The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+# Software.
+#
+
+set -e
+
+SELF_IP_ADDRESS=$1
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP Address passed in argument"
+    exit -1
+fi
+
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $SCRIPT_DIR/common.sh "$@"
+
+
+echo "-- SETTING UP KAFKA ------------------------------------------------------"
+
+
+echo " - Getting kafka user ID"
+set +e
+kafka_user_id=`id -u kafka 2> /tmp/cerebro_install_log`
+set -e
+echo " - Found user with ID $kafka_user_id"
+if [[ $kafka_user_id == "" ]]; then
+    echo "Docker Kafka USER ID not found"
+    exit -2
+fi
+
+
+echo " - Simlinking kafka logs to /var/log/"
+sudo rm -Rf /usr/local/lib/kafka/logs
+sudo ln -s /var/log/kafka /usr/local/lib/kafka/logs
+
+echo " - Simlinking kafka config to /usr/local/etc/kafka"
+sudo ln -s /usr/local/lib/kafka/config /usr/local/etc/kafka
+
+echo " - Creating temporary folder for kafka"
+sudo mkdir -p /tmp/kafka-logs/
+sudo chown -R kafka /tmp/kafka-logs/
+
+
+echo " - Creating kafka binaries wrappres to /usr/local/bin"
+
+for i in `ls -1 /usr/local/lib/kafka/bin/connect*`; do
+    create_binary_wrapper $i /usr/local/bin/kafka-`basename $i`
+done
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-broker-api-versions.sh /usr/local/bin/kafka-broker-api-versions.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-console-consumer.sh /usr/local/bin/kafka-console-consumer.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-console-producer.sh /usr/local/bin/kafka-console-producer.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-consumer-groups.sh /usr/local/bin/kafka-consumer-groups.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-consumer-perf-test.sh /usr/local/bin/kafka-consumer-perf-test.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-delegation-tokens.sh /usr/local/bin/kafka-delegation-tokens.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-delete-records.sh /usr/local/bin/kafka-delete-records.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-dump-log.sh /usr/local/bin/kafka-dump-log.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-log-dirs.sh /usr/local/lib/kafka-log-dirs.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-producer-perf-test.sh /usr/local/bin/kafka-producer-perf-test.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-run-class.sh /usr/local/bin/kafka-run-class.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-simple-consumer-shell.sh /usr/local/bin/kafka-simple-consumer-shell.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-topics.sh /usr/local/bin/kafka-topics.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-verifiable-consumer.sh /usr/local/bin/kafka-verifiable-consumer.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-verifiable-producer.sh /usr/local/bin/kafka-verifiable-producer.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/trogdor.sh /usr/local/bin/kafka-trogdor.sh
+
+
+echo " - Creating kafka system binaries wrappers to /usr/local/sbin"
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-acls.sh /usr/local/sbin/kafka-acls.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/sbin/kafka-server-start.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-server-stop.sh /usr/local/sbin/kafka-server-stop.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-configs.sh /usr/local/sbin/kafka-configs.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-mirror-maker.sh /usr/local/sbin/kafka-mirror-maker.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-preferred-replica-election.sh /usr/local/sbin/kafka-preferred-replica-election.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-reassign-partitions.sh /usr/local/sbin/kafka-reassign-partitions.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-replay-log-producer.sh /usr/local/sbin/kafka-replay-log-producer.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-replica-verification.sh /usr/local/sbin/kafka-replica-verification.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-streams-application-reset.sh /usr/local/sbin/kafka-streams-application-reset.sh
+
+
+echo " - Adapting configuration in file server.properties"
+sudo sed -i s/"log.dirs=\/tmp\/kafka-logs"/"log.dirs=\/var\/lib\/kafka"/g /usr/local/etc/kafka/server.properties
+sudo sed -i s/"zookeeper.connection.timeout.ms=6000"/"zookeeper.connection.timeout.ms=22000"/g /usr/local/etc/kafka/server.properties
+
+#sudo bash -c "echo -e \"\n\n#Using IP as host name \"  >> /usr/local/etc/kafka/server.properties"
+#sudo bash -c "echo -e \"host.name=$SELF_IP_ADDRESS\"  >> /usr/local/etc/kafka/server.properties"
+#sudo bash -c "echo -e \"advertised.host.name=$SELF_IP_ADDRESS\"  >> /usr/local/etc/kafka/server.properties"
+
+sudo sed -i s/"#listeners=PLAINTEXT:\/\/:9092"/"listeners=PLAINTEXT:\/\/0.0.0.0:9092"/g /usr/local/etc/kafka/server.properties
+
+sudo bash -c "echo -e \"\n\n#Enabling topic deletion. \"  >> /usr/local/etc/kafka/server.properties"
+sudo bash -c "echo -e \"delete.topic.enable=true\"  >> /usr/local/etc/kafka/server.properties"
+
+echo " - Enabling user kafka later on to change configuration file"
+chown kafka. /usr/local/etc/kafka/server.properties
+
+
+echo " - Enabling JMX"
+sudo sed -i s/\
+"KAFKA_JMX_OPTS=\"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false \""\
+/\
+"KAFKA_JMX_OPTS=\"-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=\$JMX_PORT -Djava.rmi.server.hostname=$SELF_IP_ADDRESS -Djava.net.preferIPv4Stack=true\""/g /usr/local/lib/kafka/bin/kafka-run-class.sh
+
+sudo sed -i s/"COMMAND=\$1"/"export JMX_PORT=\${JMX_PORT:-9999}\nCOMMAND=\$1"/g /usr/local/lib/kafka/bin/kafka-server-start.sh
+
+
+
+# Caution : the in container setup script must mandatorily finish with this log"
+echo " - In container config SUCCESS"

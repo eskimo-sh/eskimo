@@ -1,0 +1,226 @@
+{
+  "tmp": {
+    "permissions": "drwxrwxrwt",
+    "count": "13",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 15:36"
+  },
+  "vmlinuz": {
+    "permissions": "lrwxrwxrwx",
+    "count": "1",
+    "user": "root",
+    "group": "root",
+    "size": "30",
+    "timestamp": "Dec 28 19:15"
+  },
+  "snap": {
+    "permissions": "drwxr-xr-x",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 19:08"
+  },
+  "etc": {
+    "permissions": "drwxr-xr-x",
+    "count": "101",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 15:31"
+  },
+  ".": {
+    "permissions": "drwxr-xr-x",
+    "count": "24",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 07:12"
+  },
+  "boot": {
+    "permissions": "drwxr-xr-x",
+    "count": "3",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 19:24"
+  },
+  "opt": {
+    "permissions": "drwxr-xr-x",
+    "count": "4",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 07:20"
+  },
+  "lib": {
+    "permissions": "drwxr-xr-x",
+    "count": "21",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 19:16"
+  },
+  "lib64": {
+    "permissions": "drwxr-xr-x",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 18:58"
+  },
+  "proc": {
+    "permissions": "dr-xr-xr-x",
+    "count": "188",
+    "user": "root",
+    "group": "root",
+    "size": "0",
+    "timestamp": "Jun  7 07:11"
+  },
+  "lost+found": {
+    "permissions": "drwx------",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "16384",
+    "timestamp": "Dec 28 18:58"
+  },
+  "initrd.img": {
+    "permissions": "lrwxrwxrwx",
+    "count": "1",
+    "user": "root",
+    "group": "root",
+    "size": "33",
+    "timestamp": "Dec 28 19:15"
+  },
+  "sbin": {
+    "permissions": "drwxr-xr-x",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "12288",
+    "timestamp": "Jun  7 07:22"
+  },
+  "var": {
+    "permissions": "drwxr-xr-x",
+    "count": "13",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 19:03"
+  },
+  "..": {
+    "permissions": "drwxr-xr-x",
+    "count": "24",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 07:12"
+  },
+  "srv": {
+    "permissions": "drwxr-xr-x",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jul 25  2018"
+  },
+  "vmlinuz.old": {
+    "permissions": "lrwxrwxrwx",
+    "count": "1",
+    "user": "root",
+    "group": "root",
+    "size": "30",
+    "timestamp": "Dec 28 18:59"
+  },
+  "root": {
+    "permissions": "drwx------",
+    "count": "3",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 07:12"
+  },
+  "mnt": {
+    "permissions": "drwxr-xr-x",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jul 25  2018"
+  },
+  "bin": {
+    "permissions": "drwxr-xr-x",
+    "count": "2",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 19:09"
+  },
+  "media": {
+    "permissions": "drwxr-xr-x",
+    "count": "3",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 18:58"
+  },
+  "dev": {
+    "permissions": "drwxr-xr-x",
+    "count": "18",
+    "user": "root",
+    "group": "root",
+    "size": "3800",
+    "timestamp": "Jun  7 07:11"
+  },
+  "initrd.img.old": {
+    "permissions": "lrwxrwxrwx",
+    "count": "1",
+    "user": "root",
+    "group": "root",
+    "size": "33",
+    "timestamp": "Dec 28 18:59"
+  },
+  "sys": {
+    "permissions": "dr-xr-xr-x",
+    "count": "13",
+    "user": "root",
+    "group": "root",
+    "size": "0",
+    "timestamp": "Jun  7 07:11"
+  },
+  "home": {
+    "permissions": "drwxr-xr-x",
+    "count": "4",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Jun  7 07:12"
+  },
+  "run": {
+    "permissions": "drwxr-xr-x",
+    "count": "37",
+    "user": "root",
+    "group": "root",
+    "size": "1260",
+    "timestamp": "Jun  7 15:30"
+  },
+  "usr": {
+    "permissions": "drwxr-xr-x",
+    "count": "10",
+    "user": "root",
+    "group": "root",
+    "size": "4096",
+    "timestamp": "Dec 28 18:58"
+  },
+  "vagrant": {
+    "permissions": "drwxr-xr-x",
+    "count": "1",
+    "user": "vagrant",
+    "group": "vagrant",
+    "size": "4096",
+    "timestamp": "May 23 19:45"
+  }
+}

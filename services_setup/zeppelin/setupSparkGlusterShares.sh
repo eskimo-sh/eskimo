@@ -1,0 +1,1 @@
+../spark-executor/setupSparkGlusterShares.sh

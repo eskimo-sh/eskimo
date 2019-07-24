@@ -1,0 +1,104 @@
+#
+# This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+# well to this individual file than to the Eskimo Project as a whole.
+#
+# Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+# Author : eskimo.sh / https://www.eskimo.sh
+#
+# Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+# If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+# terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+# Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+# Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+# commercial license.
+#
+# Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Affero Public License for more details.
+#
+# You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+# see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA, 02110-1301 USA.
+#
+# You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+# commercial license is mandatory as soon as :
+# - you develop activities involving Eskimo without disclosing the source code of your own product, software,
+#   platform, use cases or scripts.
+# - you deploy eskimo as part of a commercial product, platform or software.
+# For more information, please contact eskimo.sh at https://www.eskimo.sh
+#
+# The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+# Software.
+#
+
+[Unit]
+Description=Mesos Master
+Wants=network-online.target
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+RemainAfterExit=false
+ExecStartPre=-/usr/bin/docker kill mesos-master
+ExecStartPre=-/usr/bin/docker rm -f mesos-master
+
+# Find out about version of mesos available
+ExecStartPre=/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/system_mesos_environment"
+#EnvironmentFile=/run/system_mesos_environment
+
+ExecStart=/bin/bash -c ". /run/system_mesos_environment && /usr/bin/docker run \
+        -i\
+        --name mesos-master \
+        --network host \
+        -v /var/lib/mesos:/var/lib/mesos \
+        -v /var/log/mesos:/var/log/mesos \
+        -v /var/run/mesos:/var/run/mesos \
+        -v /usr/local/bin:/usr/local/bin \
+        -v /usr/local/sbin:/usr/local/sbin \
+        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
+        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        -e NODE_NAME=$HOSTNAME \
+        eskimo:mesos-master \
+        /usr/local/sbin/inContainerStartService.sh"
+
+ExecStop=/usr/bin/docker stop mesos-master
+Type=simple
+
+Restart=always
+StartLimitBurst=3
+StartLimitInterval=30
+
+#        -p 123:123 \
+#        -p 53:53 \
+#        -p 61003:61003 \
+#        -p 61003:61003 \
+#        -p 61091:61091 \
+#        -p 61420:61420 \
+#        -p 62080:62080 \
+#        -p 62080:62080 \
+#        -p 64000:64000 \
+#        -p 5050:5050 \
+#        -p 7070:7070 \
+#        -p 8101:8101 \
+#        -p 8123:8123 \
+#        -p 8200:8200 \
+#        -p 8201:8201 \
+#        -p 8443:8443 \
+#        -p 8888:8888 \
+#        -p 9090:9090 \
+#        -p 9443:9443 \
+#        -p 9990:9990 \
+#        -p 15055:15055 \
+#        -p 15201:15201 \
+#        -p 61053:61053 \
+#        -p 61430:61430 \
+#        -p 61053:61053 \
+
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,70 @@
+{
+  "gdash": {
+    "group": "Gluster",
+    "name": "Dash-board"
+  },
+  "zookeeper": {
+    "group": "",
+    "name": "Zookeeper"
+  },
+  "mesos-master": {
+    "group": "Mesos",
+    "name": "Master"
+  },
+  "zeppelin": {
+    "group": "",
+    "name": "Zeppelin"
+  },
+  "ntp": {
+    "group": "",
+    "name": "NTP"
+  },
+  "gluster": {
+    "group": "Gluster",
+    "name": "FS"
+  },
+  "mesos-agent": {
+    "group": "Mesos",
+    "name": "Agent"
+  },
+  "logstash": {
+    "group": "Elastic Stack",
+    "name": "Logstash"
+  },
+  "cerebro": {
+    "group": "Elastic Stack",
+    "name": "Cerebro"
+  },
+  "elasticsearch": {
+    "group": "Elastic Stack",
+    "name": "Elastic-Search"
+  },
+  "grafana": {
+    "group": "Monitoring",
+    "name": "Grafana"
+  },
+  "kafka-manager": {
+    "group": "Kafka",
+    "name": "Manager"
+  },
+  "kafka": {
+    "group": "Kafka",
+    "name": "Broker"
+  },
+  "spark-executor": {
+    "group": "Spark",
+    "name": "Executor"
+  },
+  "prometheus": {
+    "group": "Monitoring",
+    "name": "Prometheus"
+  },
+  "kibana": {
+    "group": "Elastic Stack",
+    "name": "Kibana"
+  },
+  "spark-history-server": {
+    "group": "Spark",
+    "name": "History Server"
+  }
+}

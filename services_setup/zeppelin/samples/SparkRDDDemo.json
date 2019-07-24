@@ -1,0 +1,4378 @@
+﻿{
+  "paragraphs":[
+    {
+      "text":"%md\n# Analyzing network intrusion dataset with Python and Spark\n## Original work By [Saptak Sen](http://saptak.in) / Updated to Eskimo by Jerome Kehrli [www.niceideas.ch](http://www.niceideas.ch)\n---\n\n## Introduction\n\nIn this tutorial we are going to analyze a network intrusion events dataset with **Python** in a Zeppelin Notebook. The Zeppelin Notebook provides an easy and interactive surface for data scientists to explore data through data processing engines like **Hive** and **Spark**. Hive and Spark in turn benefit from robust managability, resource allocation policies, security and scalability running on a YARN managed infrasturcture.\n\n```\n                                                                  ┏━━━━━━━━━━━━━━━━━━━━━┓\n                                                                  ┃                     ┃\n                                                                  ┃      Executer       ┃\n           ┌─────────────────────────────────────────────────────▶┃     Cache, Task     ┃\n           │                                                      ┃                     ┃\n           │                                                      ┃                     ┃\n           │                                                      ┗━━━━━━━━━━━━━━━━━━━━━┛\n           │\n           │\n           │\n┏━━━━━━━━━━━━━━━━━━━━━┓          ┏━━━━━━━━━━━━━━━━━━━━━┓          ┏━━━━━━━━━━━━━━━━━━━━━┓\n┃                     ┃          ┃                     ┃          ┃                     ┃\n┃       Driver        ┃          ┃   Cluster Manager   ┃          ┃      Executer       ┃\n┃    Spark Context    ┃─────────▶┃       (Mesos)       ┃─────────▶┃     Cache, Task     ┃\n┃                     ┃          ┃                     ┃          ┃                     ┃\n┃                     ┃          ┃                     ┃          ┃                     ┃\n┗━━━━━━━━━━━━━━━━━━━━━┛          ┗━━━━━━━━━━━━━━━━━━━━━┛          ┗━━━━━━━━━━━━━━━━━━━━━┛\n           │\n           │\n           │\n           │                                                      ┏━━━━━━━━━━━━━━━━━━━━━┓\n           │                                                      ┃                     ┃\n           │                                                      ┃      Executer       ┃\n           └─────────────────────────────────────────────────────▶┃     Cache, Task     ┃\n                                                                  ┃                     ┃\n                                                                  ┃                     ┃\n                                                                  ┗━━━━━━━━━━━━━━━━━━━━━┛\n```\n\n## Resilient Distributed Dataset\nThe key concept in Spark are RDDs or Resilient Distributed Datasets.RDD is a fault-tolerant collection of elements that can be operated on in parallel.\n \n\n## Spark Application\nA typical Spark application has the following four phases:\n\n```\n┏━━━━━━━━━━━━━━━━━━━━━━━┓\n┃                       ┃\n┃      Instantiate      ┃\n┃      Input RDDs       ┃\n┃                       ┃\n┗━━━━━━━━━━━┳━━━━━━━━━━━┛\n            │\n            │\n┏━━━━━━━━━━━▼━━━━━━━━━━━┓\n┃                       ┃\n┃    Transform RDDs     ┃\n┃                       ┃\n┃                       ┃\n┗━━━━━━━━━━━┳━━━━━━━━━━━┛\n            │\n            │\n┏━━━━━━━━━━━▼━━━━━━━━━━━┓\n┃                       ┃\n┃        Persist        ┃\n┃   Intermediate RDDs   ┃\n┃                       ┃\n┗━━━━━━━━━━━┳━━━━━━━━━━━┛\n            │\n            │\n┏━━━━━━━━━━━▼━━━━━━━━━━━┓\n┃                       ┃\n┃    Action on RDDs     ┃\n┃                       ┃\n┃                       ┃\n┗━━━━━━━━━━━━━━━━━━━━━━━┛\n```\n\n## Commenting with Markdown\n\nThis block of comments and instructions is formatted as [Markdown](https://help.github.com/articles/github-flavored-markdown/). Every block of code or comments in Zeppelin is also often referred to as a paragraph. \n\nA block formatted as markdown can be specified when we start the block with `%md`. Any block is executed and rendered when we click the play button on the top-left-hand corner of a block.\n\n## Downloading the Data with Shell commands\n\nIn the next block of code we are going to download the data using shell commands. The shell command in a Zeppelin notebook can be invoked when we prepend the block of shell commands with a line containing the characters `%sh`.",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:58:49+0000",
+      "config":{
+        "tableHide":false,
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionSupport":false
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h1>Analyzing network intrusion dataset with Python and Spark</h1>\n<h2>Original work By <a href=\"http://saptak.in\">Saptak Sen</a> / Updated to Eskimo by Jerome Kehrli <a href=\"http://www.niceideas.ch\">www.niceideas.ch</a></h2>\n<hr/>\n<h2>Introduction</h2>\n<p>In this tutorial we are going to analyze a network intrusion events dataset with <strong>Python</strong> in a Zeppelin Notebook. The Zeppelin Notebook provides an easy and interactive surface for data scientists to explore data through data processing engines like <strong>Hive</strong> and <strong>Spark</strong>. Hive and Spark in turn benefit from robust managability, resource allocation policies, security and scalability running on a YARN managed infrasturcture.</p>\n<pre><code>                                                                  ┏━━━━━━━━━━━━━━━━━━━━━┓\n                                                                  ┃                     ┃\n                                                                  ┃      Executer       ┃\n           ┌─────────────────────────────────────────────────────▶┃     Cache, Task     ┃\n           │                                                      ┃                     ┃\n           │                                                      ┃                     ┃\n           │                                                      ┗━━━━━━━━━━━━━━━━━━━━━┛\n           │\n           │\n           │\n┏━━━━━━━━━━━━━━━━━━━━━┓          ┏━━━━━━━━━━━━━━━━━━━━━┓          ┏━━━━━━━━━━━━━━━━━━━━━┓\n┃                     ┃          ┃                     ┃          ┃                     ┃\n┃       Driver        ┃          ┃   Cluster Manager   ┃          ┃      Executer       ┃\n┃    Spark Context    ┃─────────▶┃       (Mesos)       ┃─────────▶┃     Cache, Task     ┃\n┃                     ┃          ┃                     ┃          ┃                     ┃\n┃                     ┃          ┃                     ┃          ┃                     ┃\n┗━━━━━━━━━━━━━━━━━━━━━┛          ┗━━━━━━━━━━━━━━━━━━━━━┛          ┗━━━━━━━━━━━━━━━━━━━━━┛\n           │\n           │\n           │\n           │                                                      ┏━━━━━━━━━━━━━━━━━━━━━┓\n           │                                                      ┃                     ┃\n           │                                                      ┃      Executer       ┃\n           └─────────────────────────────────────────────────────▶┃     Cache, Task     ┃\n                                                                  ┃                     ┃\n                                                                  ┃                     ┃\n                                                                  ┗━━━━━━━━━━━━━━━━━━━━━┛\n</code></pre>\n<h2>Resilient Distributed Dataset</h2>\n<p>The key concept in Spark are RDDs or Resilient Distributed Datasets.RDD is a fault-tolerant collection of elements that can be operated on in parallel.</p>\n<h2>Spark Application</h2>\n<p>A typical Spark application has the following four phases:</p>\n<pre><code>┏━━━━━━━━━━━━━━━━━━━━━━━┓\n┃                       ┃\n┃      Instantiate      ┃\n┃      Input RDDs       ┃\n┃                       ┃\n┗━━━━━━━━━━━┳━━━━━━━━━━━┛\n            │\n            │\n┏━━━━━━━━━━━▼━━━━━━━━━━━┓\n┃                       ┃\n┃    Transform RDDs     ┃\n┃                       ┃\n┃                       ┃\n┗━━━━━━━━━━━┳━━━━━━━━━━━┛\n            │\n            │\n┏━━━━━━━━━━━▼━━━━━━━━━━━┓\n┃                       ┃\n┃        Persist        ┃\n┃   Intermediate RDDs   ┃\n┃                       ┃\n┗━━━━━━━━━━━┳━━━━━━━━━━━┛\n            │\n            │\n┏━━━━━━━━━━━▼━━━━━━━━━━━┓\n┃                       ┃\n┃    Action on RDDs     ┃\n┃                       ┃\n┃                       ┃\n┗━━━━━━━━━━━━━━━━━━━━━━━┛\n</code></pre>\n<h2>Commenting with Markdown</h2>\n<p>This block of comments and instructions is formatted as <a href=\"https://help.github.com/articles/github-flavored-markdown/\">Markdown</a>. Every block of code or comments in Zeppelin is also often referred to as a paragraph. </p>\n<p>A block formatted as markdown can be specified when we start the block with <code>%md</code>. Any block is executed and rendered when we click the play button on the top-left-hand corner of a block.</p>\n<h2>Downloading the Data with Shell commands</h2>\n<p>In the next block of code we are going to download the data using shell commands. The shell command in a Zeppelin notebook can be invoked when we prepend the block of shell commands with a line containing the characters <code>%sh</code>.</p>\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327557_352919610",
+      "id":"20151020-035411_911943644",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "focus":true,
+      "$$hashKey":"object:169",
+      "dateFinished":"2019-06-23T20:58:49+0000",
+      "dateStarted":"2019-06-23T20:58:49+0000"
+    },
+    {
+      "text":"%sh\n\n#remove existing copies of dataset from HDFS\nhadoop fs -rm  /tmp/kddcup.data_10_percent.gz\n\n#Download the data and pace it into the /tmp folder of Hortonworks Sandbox\nwget http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data_10_percent.gz -O /tmp/kddcup.data_10_percent.gz\n\n# Copying it to gluster shared /var/lib/spark/data\nmkdir /var/lib/spark/data/tmp\nmv /tmp/kddcup.data_10_percent.gz /var/lib/spark/data/tmp/\n\n\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:02:20+0000",
+      "config":{
+        "tableHide":false,
+        "colWidth":12,
+        "editorMode":"ace/mode/sh",
+        "editorHide":false,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"sh",
+          "editOnDblClick":false,
+          "completionSupport":false
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"bash: line 1: hadoop: command not found\n--2019-06-23 21:02:20--  http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data_10_percent.gz\nResolving kdd.ics.uci.edu (kdd.ics.uci.edu)... 128.195.1.86\nConnecting to kdd.ics.uci.edu (kdd.ics.uci.edu)|128.195.1.86|:80... connected.\nHTTP request sent, awaiting response... 200 OK\nLength: 2144903 (2.0M) [application/x-gzip]\nSaving to: '/tmp/kddcup.data_10_percent.gz'\n\n     0K .......... .......... .......... .......... ..........  2%  113K 18s\n    50K .......... .......... .......... .......... ..........  4%  284K 12s\n   100K .......... .......... .......... .......... ..........  7%  113M 8s\n   150K .......... .......... .......... .......... ..........  9% 19.7M 6s\n   200K .......... .......... .......... .......... .......... 11%  248K 6s\n   250K .......... .......... .......... .......... .......... 14%  149M 5s\n   300K .......... .......... .......... .......... .......... 16% 23.7M 4s\n   350K .......... .......... .......... .......... .......... 19%  245K 4s\n   400K .......... .......... .......... .......... .......... 21% 66.6M 4s\n   450K .......... .......... .......... .......... .......... 23%  158M 3s\n   500K .......... .......... .......... .......... .......... 26% 97.7M 3s\n   550K .......... .......... .......... .......... .......... 28%  250M 3s\n   600K .......... .......... .......... .......... .......... 31%  335K 3s\n   650K .......... .......... .......... .......... .......... 33% 37.8M 2s\n   700K .......... .......... .......... .......... .......... 35% 46.7M 2s\n   750K .......... .......... .......... .......... .......... 38% 62.0M 2s\n   800K .......... .......... .......... .......... .......... 40%  140K 2s\n   850K .......... .......... .......... .......... .......... 42%  110M 2s\n   900K .......... .......... .......... .......... .......... 45%  345M 2s\n   950K .......... .......... .......... .......... .......... 47%  151M 2s\n  1000K .......... .......... .......... .......... .......... 50% 38.6M 2s\n  1050K .......... .......... .......... .......... .......... 52%  341K 2s\n  1100K .......... .......... .......... .......... .......... 54% 30.6M 1s\n  1150K .......... .......... .......... .......... .......... 57% 27.2M 1s\n  1200K .......... .......... .......... .......... .......... 59%  294M 1s\n  1250K .......... .......... .......... .......... .......... 62% 37.2M 1s\n  1300K .......... .......... .......... .......... .......... 64%  108K 1s\n  1350K .......... .......... .......... .......... .......... 66% 36.0M 1s\n  1400K .......... .......... .......... .......... .......... 69% 41.2M 1s\n  1450K .......... .......... .......... .......... .......... 71% 16.4M 1s\n  1500K .......... .......... .......... .......... .......... 73% 7.88M 1s\n  1550K .......... .......... .......... .......... .......... 76%  365K 1s\n  1600K .......... .......... .......... .......... .......... 78% 22.1M 1s\n  1650K .......... .......... .......... .......... .......... 81% 11.7M 1s\n  1700K .......... .......... .......... .......... .......... 83% 39.7M 0s\n  1750K .......... .......... .......... .......... .......... 85% 39.0M 0s\n  1800K .......... .......... .......... .......... .......... 88%  361K 0s\n  1850K .......... .......... .......... .......... .......... 90% 5.24M 0s\n  1900K .......... .......... .......... .......... .......... 93% 15.9M 0s\n  1950K .......... .......... .......... .......... .......... 95% 23.6M 0s\n  2000K .......... .......... .......... .......... .......... 97% 31.8M 0s\n  2050K .......... .......... .......... .......... ....      100% 40.7M=2.5s\n\n2019-06-23 21:02:23 (849 KB/s) - '/tmp/kddcup.data_10_percent.gz' saved [2144903/2144903]\n\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327558_805751667",
+      "id":"20151020-035535_1468713571",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:170",
+      "dateFinished":"2019-06-23T21:02:23+0000",
+      "dateStarted":"2019-06-23T21:02:20+0000"
+    },
+    {
+      "text":"%md\n###Using Scala function calls to fetch environment variables\n\nIn the next code block we are using function calls in Scala to fetch environment information. To specify a code block as Scala it is enough to just start the code block with `%spark` \n\nWhether you are programming in Scala or Python the important thing to notice is the `sc` object better know as SparkContext.\nSparkContext is created by your driver program in this case Zeppelin and Pyspark. We will use the SparkContext to further instantiate RDDs in the next section.\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using Scala function calls to fetch environment variables</h3>\n<p>In the next code block we are using function calls in Scala to fetch environment information. To specify a code block as Scala it is enough to just start the code block with <code>%spark</code></p>\n<p>Whether you are programming in Scala or Python the important thing to notice is the <code>sc</code> object better know as SparkContext.\n<br  />SparkContext is created by your driver program in this case Zeppelin and Pyspark. We will use the SparkContext to further instantiate RDDs in the next section.</p>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327558_-782675011",
+      "id":"20151025-002521_506859008",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:171"
+    },
+    {
+      "text":"%spark\nsc.version\nSystem.getenv().get(\"PYTHONPATH\")\nSystem.getenv().get(\"SPARK_HOME\")",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:59:13+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/scala",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"scala",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"res3: String = 2.4.3\nres4: String = /usr/local/lib/spark//python/lib/py4j-0.10.7-src.zip:/usr/local/lib/spark//python/:\nres5: String = /usr/local/lib/spark/\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327558_-1670581328",
+      "id":"20151025-000911_681184475",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:172",
+      "dateFinished":"2019-06-23T20:59:15+0000",
+      "dateStarted":"2019-06-23T20:59:14+0000"
+    },
+    {
+      "text":"%md\n###Creating RDDs\n\nBelow we create a RDD by calling the textFile function on the SparkContext and passing the HDFS path to the raw datset. You can also create RDDs from:\n\n  * JDBC\n  * Cassandra\n  * HBase\n  * Elasticsearch\n  * JSON, CSV, sequence files, object files, ORC, Parquet, Avro\n\nThe code block below starts with `%pyspark` which indicates we are going to use the Python programming language to interact with Spark. Also for the rest of the tutorial we will continue to use PySpark.\n\nWhen we execute the next section of the code block to create the RDDs we will notice that it executes super fast. The reason it executes super fast is because it actually does not touch the data yet. You can continue to apply various transformation operations on this RDD and still it will not touch the data, but only construct a DAG or a Directed Acyclic Graph. \n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Creating RDDs</h3>\n<p>Below we create a RDD by calling the textFile function on the SparkContext and passing the HDFS path to the raw datset. You can also create RDDs from:</p>\n<ul>\n<li>JDBC</li>\n<li>Cassandra</li>\n<li>HBase</li>\n<li>Elasticsearch</li>\n<li>JSON, CSV, sequence files, object files, ORC, Parquet, Avro</li>\n</ul>\n<p>The code block below starts with <code>%pyspark</code> which indicates we are going to use the Python programming language to interact with Spark. Also for the rest of the tutorial we will continue to use PySpark.</p>\n<p>When we execute the next section of the code block to create the RDDs we will notice that it executes super fast. The reason it executes super fast is because it actually does not touch the data yet. You can continue to apply various transformation operations on this RDD and still it will not touch the data, but only construct a DAG or a Directed Acyclic Graph.</p>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327563_1674249690",
+      "id":"20151025-023520_258833607",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:173"
+    },
+    {
+      "text":"%pyspark\n\ninput_file = \"file:///var/lib/spark/data/tmp/kddcup.data_10_percent.gz\"\n\nraw_rdd = sc.textFile(input_file)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:02:39+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327564_-1761793710",
+      "id":"20151020-041058_1023360958",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:174",
+      "dateFinished":"2019-06-23T21:02:39+0000",
+      "dateStarted":"2019-06-23T21:02:39+0000"
+    },
+    {
+      "text":"%md\n###RDD Actions\n\nIn the next code block we will count the number of lines in the file by calling the count function on the RDD. Count function on a RDD is a Action operation, which means Spark and YARN will be forced to allocate resource and execute the DAG it has been creating to calculate the result. We will notice that the next code block takes a little longer to run than the previous one for that reason. ",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>RDD Actions</h3>\n<p>In the next code block we will count the number of lines in the file by calling the count function on the RDD. Count function on a RDD is a Action operation, which means Spark and YARN will be forced to allocate resource and execute the DAG it has been creating to calculate the result. We will notice that the next code block takes a little longer to run than the previous one for that reason.</p>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327564_-20244354",
+      "id":"20151025-033801_974200319",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:175"
+    },
+    {
+      "text":"%pyspark\n\nprint raw_rdd.count()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:02:43+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"494021\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327565_1872454204",
+      "id":"20151020-041637_1396716094",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:176",
+      "dateFinished":"2019-06-23T21:02:46+0000",
+      "dateStarted":"2019-06-23T21:02:43+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=2"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Inspect what the data looks like",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Inspect what the data looks like</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327566_1089552284",
+      "id":"20151025-041754_1010831945",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:177"
+    },
+    {
+      "text":"%pyspark\nprint raw_rdd.take(5)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:02:50+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"[u'0,tcp,http,SF,181,5450,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,8,0.00,0.00,0.00,0.00,1.00,0.00,0.00,9,9,1.00,0.00,0.11,0.00,0.00,0.00,0.00,0.00,normal.', u'0,tcp,http,SF,239,486,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,8,0.00,0.00,0.00,0.00,1.00,0.00,0.00,19,19,1.00,0.00,0.05,0.00,0.00,0.00,0.00,0.00,normal.', u'0,tcp,http,SF,235,1337,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,8,0.00,0.00,0.00,0.00,1.00,0.00,0.00,29,29,1.00,0.00,0.03,0.00,0.00,0.00,0.00,0.00,normal.', u'0,tcp,http,SF,219,1337,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,6,6,0.00,0.00,0.00,0.00,1.00,0.00,0.00,39,39,1.00,0.00,0.03,0.00,0.00,0.00,0.00,0.00,normal.', u'0,tcp,http,SF,217,2032,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,6,6,0.00,0.00,0.00,0.00,1.00,0.00,0.00,49,49,1.00,0.00,0.02,0.00,0.00,0.00,0.00,0.00,normal.']\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327567_-1837618394",
+      "id":"20151020-041733_761077228",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:178",
+      "dateFinished":"2019-06-23T21:02:51+0000",
+      "dateStarted":"2019-06-23T21:02:50+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=3"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Filtering lines in the data",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Filtering lines in the data</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327567_613349609",
+      "id":"20151025-042742_1412779040",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:179"
+    },
+    {
+      "text":"%pyspark\nnormal_raw_rdd = raw_rdd.filter(lambda x: 'normal.' in x)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:02:55+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327568_-1078397127",
+      "id":"20151020-153124_467610492",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:180",
+      "dateFinished":"2019-06-23T21:02:55+0000",
+      "dateStarted":"2019-06-23T21:02:55+0000"
+    },
+    {
+      "text":"%md\n###Count the filtered RDD",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Count the filtered RDD</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327568_-344906101",
+      "id":"20151025-042841_261479489",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:181"
+    },
+    {
+      "text":"%pyspark\n\nnormal_count = normal_raw_rdd.count()\n\nprint normal_count",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:00+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"97278\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327569_1577992320",
+      "id":"20151020-153409_1001360617",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:182",
+      "dateFinished":"2019-06-23T21:03:02+0000",
+      "dateStarted":"2019-06-23T21:03:00+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=4"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Importing local libraries",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Importing local libraries</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327569_2108654590",
+      "id":"20151025-042924_1173734316",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:183"
+    },
+    {
+      "text":"%pyspark\n\nfrom pprint import pprint\n\ncsv_rdd = raw_rdd.map(lambda x: x.split(\",\"))\n\nhead_rows = csv_rdd.take(5)\n\npprint(head_rows[0])\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:08+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"[u'0',\n u'tcp',\n u'http',\n u'SF',\n u'181',\n u'5450',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'1',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'0',\n u'8',\n u'8',\n u'0.00',\n u'0.00',\n u'0.00',\n u'0.00',\n u'1.00',\n u'0.00',\n u'0.00',\n u'9',\n u'9',\n u'1.00',\n u'0.00',\n u'0.11',\n u'0.00',\n u'0.00',\n u'0.00',\n u'0.00',\n u'0.00',\n u'normal.']\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327570_1094323943",
+      "id":"20151020-153930_2114893315",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:184",
+      "dateFinished":"2019-06-23T21:03:09+0000",
+      "dateStarted":"2019-06-23T21:03:09+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=5"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Using map functions in transformation",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using map functions in transformation</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327571_1164174964",
+      "id":"20151025-043024_234751730",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:185"
+    },
+    {
+      "text":"%pyspark\n\ndef parse_interaction(line):\n    elems = line.split(\",\")\n    tag = elems[41]\n    return (tag, elems)\n    \nkey_csv_rdd = raw_rdd.map(parse_interaction)\nhead_rows = key_csv_rdd.take(5)\npprint(head_rows[0])",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:14+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"(u'normal.',\n [u'0',\n  u'tcp',\n  u'http',\n  u'SF',\n  u'181',\n  u'5450',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'1',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'0',\n  u'8',\n  u'8',\n  u'0.00',\n  u'0.00',\n  u'0.00',\n  u'0.00',\n  u'1.00',\n  u'0.00',\n  u'0.00',\n  u'9',\n  u'9',\n  u'1.00',\n  u'0.00',\n  u'0.11',\n  u'0.00',\n  u'0.00',\n  u'0.00',\n  u'0.00',\n  u'0.00',\n  u'normal.'])\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327571_1267688480",
+      "id":"20151020-154737_124701995",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:186",
+      "dateFinished":"2019-06-23T21:03:14+0000",
+      "dateStarted":"2019-06-23T21:03:14+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=6"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Using collect() on the Spark driver",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using collect() on the Spark driver</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327572_1830557270",
+      "id":"20151025-043052_1223908016",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:187"
+    },
+    {
+      "text":"%pyspark\n\n#all_raw_rdd = raw_rdd.collect()\n\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:20+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327572_-1815892530",
+      "id":"20151020-155215_321328122",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:188",
+      "dateFinished":"2019-06-23T21:03:20+0000",
+      "dateStarted":"2019-06-23T21:03:20+0000"
+    },
+    {
+      "text":"%md\n###Extracting a smaller sample of the RDD",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Extracting a smaller sample of the RDD</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327573_1055817356",
+      "id":"20151025-043641_741109691",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:189"
+    },
+    {
+      "text":"%pyspark\n\nraw_rdd_sample = raw_rdd.sample(False, 0.1, 1234)\nprint raw_rdd_sample.count()\nprint raw_rdd.count()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:31+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"49493\n494021\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327574_1940089688",
+      "id":"20151020-155621_1541966917",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:190",
+      "dateFinished":"2019-06-23T21:03:36+0000",
+      "dateStarted":"2019-06-23T21:03:31+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=7",
+            "http://192.168.10.11:4040/jobs/job?id=8"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Local sample for local processing",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Local sample for local processing</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327577_362367471",
+      "id":"20151025-043813_1909205882",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:191"
+    },
+    {
+      "text":"%pyspark\n\nraw_data_local_sample = raw_rdd.takeSample(False, 1000, 1234)\n\nnormal_data_sample = [x.split(\",\") for x in raw_data_local_sample if \"normal.\" in x]\n\nnormal_data_sample_size = len(normal_data_sample)\n\nnormal_ratio = normal_data_sample_size/1000.0\n\nprint normal_ratio\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:39+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"0.188\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327580_-1812557260",
+      "id":"20151020-160650_1218451495",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:192",
+      "dateFinished":"2019-06-23T21:03:43+0000",
+      "dateStarted":"2019-06-23T21:03:39+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=9",
+            "http://192.168.10.11:4040/jobs/job?id=10"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Subtracting on RDD from another",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Subtracting on RDD from another</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327580_1264787465",
+      "id":"20151025-044008_680146541",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:193"
+    },
+    {
+      "text":"%pyspark\n\nattack_raw_rdd = raw_rdd.subtract(normal_raw_rdd)\n\nprint attack_raw_rdd.count()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:03:48+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"396743\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327581_1404454082",
+      "id":"20151020-162431_1736006903",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:194",
+      "dateFinished":"2019-06-23T21:04:01+0000",
+      "dateStarted":"2019-06-23T21:03:48+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=11"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Listing the distinct items",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Listing the distinct items</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327581_1006143601",
+      "id":"20151025-044203_1596662643",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:195"
+    },
+    {
+      "text":"%pyspark\n\nprotocols = csv_rdd.map(lambda x: x[1]).distinct()\n\nprint protocols.collect()\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:04:05+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"[u'udp', u'icmp', u'tcp']\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327582_723506984",
+      "id":"20151020-163531_966055264",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:196",
+      "dateFinished":"2019-06-23T21:04:11+0000",
+      "dateStarted":"2019-06-23T21:04:05+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=12"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%pyspark\n\nservices = csv_rdd.map(lambda x: x[2]).distinct()\nprint services.collect()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:04:14+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"[u'domain', u'http_443', u'Z39_50', u'smtp', u'urp_i', u'private', u'echo', u'shell', u'red_i', u'eco_i', u'sunrpc', u'ftp_data', u'urh_i', u'pm_dump', u'pop_3', u'pop_2', u'systat', u'ftp', u'uucp', u'whois', u'netbios_dgm', u'efs', u'remote_job', u'daytime', u'ntp_u', u'finger', u'ldap', u'netbios_ns', u'kshell', u'iso_tsap', u'ecr_i', u'nntp', u'printer', u'domain_u', u'uucp_path', u'courier', u'exec', u'time', u'netstat', u'telnet', u'gopher', u'rje', u'sql_net', u'link', u'auth', u'netbios_ssn', u'csnet_ns', u'X11', u'IRC', u'tftp_u', u'login', u'supdup', u'name', u'nnsp', u'mtp', u'http', u'bgp', u'ctf', u'hostnames', u'klogin', u'vmnet', u'tim_i', u'discard', u'imap4', u'other', u'ssh']\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327583_-24214597",
+      "id":"20151020-164018_963420148",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:197",
+      "dateFinished":"2019-06-23T21:04:19+0000",
+      "dateStarted":"2019-06-23T21:04:14+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=13"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Cartesion product",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Cartesion product</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327583_160192559",
+      "id":"20151025-044327_920393858",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:198"
+    },
+    {
+      "text":"%pyspark\n\nproduct = protocols.cartesian(services).collect()\n\nprint len(product)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:04:24+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"198\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327584_1243660254",
+      "id":"20151020-164120_1905949484",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:199",
+      "dateFinished":"2019-06-23T21:04:24+0000",
+      "dateStarted":"2019-06-23T21:04:24+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=14"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Filtering\nFiltering out the normal and attack events",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Filtering</h3>\n<p>Filtering out the normal and attack events</p>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327584_-327569995",
+      "id":"20151025-044451_1279874784",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:200"
+    },
+    {
+      "text":"%pyspark\n\nnormal_csv_data = csv_rdd.filter(lambda x: x[41]==\"normal.\")\nattack_csv_data = csv_rdd.filter(lambda x: x[41]!=\"normal.\")",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:04:39+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327585_-1192519067",
+      "id":"20151020-164638_2050317014",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:201",
+      "dateFinished":"2019-06-23T21:04:39+0000",
+      "dateStarted":"2019-06-23T21:04:39+0000"
+    },
+    {
+      "text":"%md\n###Reduce",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Reduce</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327585_-731789913",
+      "id":"20151025-044553_1060339044",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:202"
+    },
+    {
+      "text":"%pyspark\n\nnormal_duration_data = normal_csv_data.map(lambda x: int(x[0]))\ntotal_normal_duration = normal_duration_data.reduce(lambda x, y: x + y)\nprint total_normal_duration\n\nattack_duration_data = attack_csv_data.map(lambda x: int(x[0]))\ntotal_attack_duration = attack_duration_data.reduce(lambda x, y: x + y)\nprint total_attack_duration",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:04:49+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"21075991\n2626792\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327586_2006713908",
+      "id":"20151020-164253_1147743871",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:203",
+      "dateFinished":"2019-06-23T21:04:59+0000",
+      "dateStarted":"2019-06-23T21:04:49+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=15",
+            "http://192.168.10.11:4040/jobs/job?id=16"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n\n###Deriving Mean",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Deriving Mean</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327587_2113176007",
+      "id":"20151025-161102_1843984349",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:204"
+    },
+    {
+      "text":"%pyspark\n\nnormal_count = normal_duration_data.count()\nattack_count = attack_duration_data.count()\n\nprint round(total_normal_duration/float(normal_count),3)\nprint round(total_attack_duration/float(attack_count),3)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:04:57+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"216.657\n6.621\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327588_730063583",
+      "id":"20151020-165248_1533675296",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:205",
+      "dateFinished":"2019-06-23T21:05:08+0000",
+      "dateStarted":"2019-06-23T21:04:57+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=17",
+            "http://192.168.10.11:4040/jobs/job?id=18"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n\n###Using Aggregate functions to calulate mean in one pass",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using Aggregate functions to calulate mean in one pass</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327588_1234911779",
+      "id":"20151025-161243_1508443786",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:206"
+    },
+    {
+      "text":"%pyspark\n\nnormal_sum_count = normal_duration_data.aggregate(\n    (0,0), # the initial value\n    (lambda acc, value: (acc[0] + value, acc[1] + 1)), # combine val/acc\n    (lambda acc1, acc2: (acc1[0] + acc2[0], acc1[1] + acc2[1]))\n)\n\nprint round(normal_sum_count[0]/float(normal_sum_count[1]),3)\n\nattack_sum_count = attack_duration_data.aggregate(\n    (0,0), # the initial value\n    (lambda acc, value: (acc[0] + value, acc[1] + 1)), # combine value with acc\n    (lambda acc1, acc2: (acc1[0] + acc2[0], acc1[1] + acc2[1])) # combine accumulators\n)\n\nprint round(attack_sum_count[0]/float(attack_sum_count[1]),3)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:05:12+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"216.657\n6.621\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327598_714225493",
+      "id":"20151020-165707_2016593579",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:207",
+      "dateFinished":"2019-06-23T21:05:22+0000",
+      "dateStarted":"2019-06-23T21:05:12+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=19",
+            "http://192.168.10.11:4040/jobs/job?id=20"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n\n###Constructing a Key-Value RDD",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Constructing a Key-Value RDD</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327599_-1753078054",
+      "id":"20151025-161349_962088361",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:208"
+    },
+    {
+      "text":"%pyspark\n\nkey_value_rdd = csv_rdd.map(lambda x: (x[41], x))\n\nprint key_value_rdd.take(1)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:05:28+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"[(u'normal.', [u'0', u'tcp', u'http', u'SF', u'181', u'5450', u'0', u'0', u'0', u'0', u'0', u'1', u'0', u'0', u'0', u'0', u'0', u'0', u'0', u'0', u'0', u'0', u'8', u'8', u'0.00', u'0.00', u'0.00', u'0.00', u'1.00', u'0.00', u'0.00', u'9', u'9', u'1.00', u'0.00', u'0.11', u'0.00', u'0.00', u'0.00', u'0.00', u'0.00', u'normal.'])]\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327599_-91485518",
+      "id":"20151020-170153_1603800777",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:209",
+      "dateFinished":"2019-06-23T21:05:28+0000",
+      "dateStarted":"2019-06-23T21:05:28+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=21"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Using reduceByKey to group and aggregate",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using reduceByKey to group and aggregate</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327601_1531814904",
+      "id":"20151025-161435_1491781947",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:210"
+    },
+    {
+      "text":"%pyspark\n\nkey_value_duration = csv_rdd.map(lambda x: (x[41], float(x[0]))) \ndurations_by_key = key_value_duration.reduceByKey(lambda x, y: x + y)\n\nprint durations_by_key.collect()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:05:34+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"[(u'guess_passwd.', 144.0), (u'nmap.', 0.0), (u'warezmaster.', 301.0), (u'rootkit.', 1008.0), (u'warezclient.', 627563.0), (u'smurf.', 0.0), (u'pod.', 0.0), (u'neptune.', 0.0), (u'normal.', 21075991.0), (u'spy.', 636.0), (u'ftp_write.', 259.0), (u'phf.', 18.0), (u'portsweep.', 1991911.0), (u'teardrop.', 0.0), (u'buffer_overflow.', 2751.0), (u'land.', 0.0), (u'imap.', 72.0), (u'loadmodule.', 326.0), (u'perl.', 124.0), (u'multihop.', 1288.0), (u'back.', 284.0), (u'ipsweep.', 43.0), (u'satan.', 64.0)]\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327601_-978589649",
+      "id":"20151020-170625_2051205977",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:211",
+      "dateFinished":"2019-06-23T21:05:39+0000",
+      "dateStarted":"2019-06-23T21:05:34+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=22"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Using countByKey on a key-value RDD",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using countByKey on a key-value RDD</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327601_1032991254",
+      "id":"20151025-161633_1074893320",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:212"
+    },
+    {
+      "text":"%pyspark\n\ncounts_by_key = key_value_rdd.countByKey()\nprint counts_by_key",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:05:41+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"defaultdict(<type 'int'>, {u'guess_passwd.': 53, u'nmap.': 231, u'warezmaster.': 20, u'rootkit.': 10, u'warezclient.': 1020, u'smurf.': 280790, u'pod.': 264, u'neptune.': 107201, u'normal.': 97278, u'spy.': 2, u'ftp_write.': 8, u'phf.': 4, u'portsweep.': 1040, u'teardrop.': 979, u'buffer_overflow.': 30, u'land.': 21, u'imap.': 12, u'loadmodule.': 9, u'perl.': 3, u'multihop.': 7, u'back.': 2203, u'ipsweep.': 1247, u'satan.': 1589})\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327602_-338428385",
+      "id":"20151020-170817_439456736",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:213",
+      "dateFinished":"2019-06-23T21:05:45+0000",
+      "dateStarted":"2019-06-23T21:05:41+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=23"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n\n###Using combineByKey to get duration and attempts by type in a single pass from a key-value RDD",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Using combineByKey to get duration and attempts by type in a single pass from a key-value RDD</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327602_-600121820",
+      "id":"20151025-161924_2005284664",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:214"
+    },
+    {
+      "text":"%pyspark\n\nsum_counts = key_value_duration.combineByKey(\n    (lambda x: (x, 1)), # the initial value, with value x and count 1\n    (lambda acc, value: (acc[0]+value, acc[1]+1)), # how to combine a pair value with the accumulator: sum value, and increment count\n    (lambda acc1, acc2: (acc1[0]+acc2[0], acc1[1]+acc2[1])) # combine accumulators\n)\n\nprint sum_counts.collectAsMap()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:05:47+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"{u'guess_passwd.': (144.0, 53), u'nmap.': (0.0, 231), u'loadmodule.': (326.0, 9), u'rootkit.': (1008.0, 10), u'warezclient.': (627563.0, 1020), u'smurf.': (0.0, 280790), u'pod.': (0.0, 264), u'neptune.': (0.0, 107201), u'normal.': (21075991.0, 97278), u'spy.': (636.0, 2), u'ftp_write.': (259.0, 8), u'phf.': (18.0, 4), u'portsweep.': (1991911.0, 1040), u'teardrop.': (0.0, 979), u'buffer_overflow.': (2751.0, 30), u'land.': (0.0, 21), u'imap.': (72.0, 12), u'warezmaster.': (301.0, 20), u'perl.': (124.0, 3), u'multihop.': (1288.0, 7), u'back.': (284.0, 2203), u'ipsweep.': (43.0, 1247), u'satan.': (64.0, 1589)}\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327602_2083958764",
+      "id":"20151020-170956_1204906051",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:215",
+      "dateFinished":"2019-06-23T21:05:52+0000",
+      "dateStarted":"2019-06-23T21:05:47+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=24"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Sorting a key-value RDD",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Sorting a key-value RDD</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327606_-122465713",
+      "id":"20151025-162043_805316413",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:216"
+    },
+    {
+      "text":"%pyspark\n\nduration_means_by_type = sum_counts.map(lambda (key,value): (key, round(value[0]/value[1],3))).collectAsMap()\n\n# Print them sorted\nfor tag in sorted(duration_means_by_type, key=duration_means_by_type.get, reverse=True):\n    print tag, duration_means_by_type[tag]",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:05:59+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"portsweep. 1915.299\nwarezclient. 615.258\nspy. 318.0\nnormal. 216.657\nmultihop. 184.0\nrootkit. 100.8\nbuffer_overflow. 91.7\nperl. 41.333\nloadmodule. 36.222\nftp_write. 32.375\nwarezmaster. 15.05\nimap. 6.0\nphf. 4.5\nguess_passwd. 2.717\nback. 0.129\nsatan. 0.04\nipsweep. 0.034\nnmap. 0.0\nsmurf. 0.0\npod. 0.0\nneptune. 0.0\nteardrop. 0.0\nland. 0.0\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327606_546970718",
+      "id":"20151020-171127_166126716",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:217",
+      "dateFinished":"2019-06-23T21:05:59+0000",
+      "dateStarted":"2019-06-23T21:05:59+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=26"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n\n###Creating a DataFrame",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Creating a DataFrame</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327607_2091383681",
+      "id":"20151025-162202_1511009897",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:218"
+    },
+    {
+      "text":"%pyspark\n\nfrom pyspark.sql import Row\n\nrow_data = csv_rdd.map(lambda p: Row(\n    duration=int(p[0]), \n    protocol_type=p[1],\n    service=p[2],\n    flag=p[3],\n    src_bytes=int(p[4]),\n    dst_bytes=int(p[5])\n    )\n)\n\ninteractions_df = sqlContext.createDataFrame(row_data)\ninteractions_df.registerTempTable(\"interactions\")",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:06:52+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327608_-1326145720",
+      "id":"20151020-171250_677927139",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:219",
+      "dateFinished":"2019-06-23T21:06:52+0000",
+      "dateStarted":"2019-06-23T21:06:52+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=28"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Querying with SQL statments over a DataFrame",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Querying with SQL statments over a DataFrame</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327610_-1199237878",
+      "id":"20151025-162240_154982058",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:220"
+    },
+    {
+      "text":"%sql\n\nSELECT duration, dst_bytes FROM interactions WHERE protocol_type = 'tcp' AND duration > 1000 AND dst_bytes = 0",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T21:07:00+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/sql",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              },
+              "setting":{
+                "table":{
+                  "tableGridState":{
+
+                  },
+                  "tableColumnTypeState":{
+                    "names":{
+                      "duration":"string",
+                      "dst_bytes":"string"
+                    },
+                    "updated":false
+                  },
+                  "tableOptionSpecHash":"[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue":{
+                    "useFilter":false,
+                    "showPagination":false,
+                    "showAggregationFooter":false
+                  },
+                  "updated":false,
+                  "initialized":false
+                }
+              },
+              "commonSetting":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"sql",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TABLE",
+            "data":"duration\tdst_bytes\n5057\t0\n5059\t0\n5051\t0\n5056\t0\n5051\t0\n5039\t0\n5062\t0\n5041\t0\n5056\t0\n5064\t0\n5043\t0\n5061\t0\n5049\t0\n5061\t0\n5048\t0\n5047\t0\n5044\t0\n5063\t0\n5068\t0\n5062\t0\n5046\t0\n5052\t0\n5044\t0\n5054\t0\n5039\t0\n5058\t0\n5051\t0\n5032\t0\n5063\t0\n5040\t0\n5051\t0\n5066\t0\n5044\t0\n5051\t0\n5036\t0\n5055\t0\n2426\t0\n5047\t0\n5057\t0\n5037\t0\n5057\t0\n5062\t0\n5051\t0\n5051\t0\n5053\t0\n5064\t0\n5044\t0\n5051\t0\n5033\t0\n5066\t0\n5063\t0\n5056\t0\n5042\t0\n5063\t0\n5060\t0\n5056\t0\n5049\t0\n5043\t0\n5039\t0\n5041\t0\n42448\t0\n42088\t0\n41065\t0\n40929\t0\n40806\t0\n40682\t0\n40571\t0\n40448\t0\n40339\t0\n40232\t0\n40121\t0\n36783\t0\n36674\t0\n36570\t0\n36467\t0\n36323\t0\n36204\t0\n32038\t0\n31925\t0\n31809\t0\n31709\t0\n31601\t0\n31501\t0\n31401\t0\n31301\t0\n31194\t0\n31061\t0\n30935\t0\n30835\t0\n30735\t0\n30619\t0\n30518\t0\n30418\t0\n30317\t0\n30217\t0\n30077\t0\n25420\t0\n22921\t0\n22821\t0\n22721\t0\n22616\t0\n22516\t0\n22416\t0\n22316\t0\n22216\t0\n21987\t0\n21887\t0\n21767\t0\n21661\t0\n21561\t0\n21455\t0\n21334\t0\n21223\t0\n21123\t0\n20983\t0\n14682\t0\n14420\t0\n14319\t0\n14198\t0\n14098\t0\n13998\t0\n13898\t0\n13796\t0\n13678\t0\n13578\t0\n13448\t0\n13348\t0\n13241\t0\n13141\t0\n13033\t0\n12933\t0\n12833\t0\n12733\t0\n12001\t0\n5678\t0\n5010\t0\n1298\t0\n1031\t0\n36438\t0\n"
+          },
+          {
+            "type":"TEXT",
+            "data":""
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327611_6885440",
+      "id":"20151020-194340_1845988549",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"FINISHED",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:221",
+      "dateFinished":"2019-06-23T21:07:13+0000",
+      "dateStarted":"2019-06-23T21:07:00+0000",
+      "runtimeInfos":{
+        "jobUrl":{
+          "propertyName":"jobUrl",
+          "label":"SPARK JOB",
+          "tooltip":"View in Spark web UI",
+          "group":"spark",
+          "values":[
+            "http://192.168.10.11:4040/jobs/job?id=29"
+          ],
+          "interpreterSettingId":"spark"
+        }
+      }
+    },
+    {
+      "text":"%md\n###Printing the schema of the DataFrame",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Printing the schema of the DataFrame</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327615_-1205309920",
+      "id":"20151025-162341_1003254343",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:222"
+    },
+    {
+      "text":"%pyspark\n\ninteractions_df.printSchema()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"root\n |-- dst_bytes: long (nullable = true)\n |-- duration: long (nullable = true)\n |-- flag: string (nullable = true)\n |-- protocol_type: string (nullable = true)\n |-- service: string (nullable = true)\n |-- src_bytes: long (nullable = true)\n\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327617_-1132031372",
+      "id":"20151020-194417_1802294435",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:223"
+    },
+    {
+      "text":"%md \n###Querying a DataFrame",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Querying a DataFrame</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327618_2061869772",
+      "id":"20151025-162335_648508524",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:224"
+    },
+    {
+      "text":"%pyspark\n\ninteractions_df.select(\"protocol_type\", \"duration\", \"dst_bytes\").groupBy(\"protocol_type\").count().show()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"protocol_type count \nudp           20354 \ntcp           190065\nicmp          283602\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327618_812779192",
+      "id":"20151020-194709_695055854",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:225"
+    },
+    {
+      "text":"%pyspark\n\ninteractions_df.select(\"protocol_type\", \"duration\", \"dst_bytes\").filter(interactions_df.duration>1000).filter(interactions_df.dst_bytes==0).groupBy(\"protocol_type\").count().show()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"protocol_type count\ntcp           139  \n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327621_869251768",
+      "id":"20151020-195405_164097486",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:226"
+    },
+    {
+      "text":"%md\n\n###Calculating a derived column on a DataFrame",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>Calculating a derived column on a DataFrame</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327621_623166885",
+      "id":"20151025-162508_1142356987",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:227"
+    },
+    {
+      "text":"%pyspark\n\ndef get_label_type(label):\n    if label!=\"normal.\":\n        return \"attack\"\n    else:\n        return \"normal\"\n    \nrow_labeled_data = csv_rdd.map(lambda p: Row(\n    duration=int(p[0]), \n    protocol_type=p[1],\n    service=p[2],\n    flag=p[3],\n    src_bytes=int(p[4]),\n    dst_bytes=int(p[5]),\n    label=get_label_type(p[41])\n    )\n)\ninteractions_labeled_df = sqlContext.createDataFrame(row_labeled_data)",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327622_79139618",
+      "id":"20151020-195641_1610602237",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:228"
+    },
+    {
+      "text":"%pyspark\n\ninteractions_labeled_df.select(\"label\").groupBy(\"label\").count().show()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"label  count \nattack 396743\nnormal 97278 \n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327622_2064504366",
+      "id":"20151020-195909_100412061",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:229"
+    },
+    {
+      "text":"%md\n\n###groupBY on a DataFrame ",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<h3>groupBY on a DataFrame</h3>\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327623_155674054",
+      "id":"20151025-162617_120349085",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:230"
+    },
+    {
+      "text":"%pyspark\n\ninteractions_labeled_df.select(\"label\", \"protocol_type\").groupBy(\"label\", \"protocol_type\").count().show()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"label  protocol_type count \nattack udp           1177  \nattack tcp           113252\nattack icmp          282314\nnormal udp           19177 \nnormal tcp           76813 \nnormal icmp          1288  \n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327625_-164568838",
+      "id":"20151020-195957_179265569",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:231"
+    },
+    {
+      "text":"%pyspark\n\ninteractions_labeled_df.select(\"label\", \"protocol_type\", \"dst_bytes\").groupBy(\"label\", \"protocol_type\", interactions_labeled_df.dst_bytes==0).count().show()",
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "results":[
+          {
+            "graph":{
+              "mode":"table",
+              "height":300,
+              "optionOpen":false,
+              "keys":[
+
+              ],
+              "values":[
+
+              ],
+              "groups":[
+
+              ],
+              "scatter":{
+
+              }
+            }
+          }
+        ],
+        "enabled":true,
+        "fontSize":9,
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"label  protocol_type (dst_bytes = 0) count \nnormal icmp          true            1288  \nattack udp           true            1166  \nattack udp           false           11    \nnormal udp           true            3594  \nnormal udp           false           15583 \nattack tcp           true            110583\nattack tcp           false           2669  \nnormal tcp           true            9313  \nnormal tcp           false           67500 \nattack icmp          true            282314\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327626_1379730517",
+      "id":"20151020-200116_1068349697",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:232"
+    },
+    {
+      "user":"anonymous",
+      "dateUpdated":"2019-06-23T20:55:27+0000",
+      "config":{
+        "colWidth":12,
+        "editorMode":"ace/mode/scala",
+        "graph":{
+          "mode":"table",
+          "height":300,
+          "optionOpen":false,
+          "keys":[
+
+          ],
+          "values":[
+
+          ],
+          "groups":[
+
+          ],
+          "scatter":{
+
+          }
+        },
+        "enabled":true,
+        "fontSize":9,
+        "results":{
+
+        },
+        "editorSetting":{
+          "language":"scala",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        }
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "apps":[
+
+      ],
+      "jobName":"paragraph_1561323327626_-860203723",
+      "id":"20151020-200231_820336316",
+      "dateCreated":"2019-06-23T20:55:27+0000",
+      "status":"READY",
+      "errorMessage":"",
+      "progressUpdateIntervalMs":500,
+      "$$hashKey":"object:233"
+    }
+  ],
+  "name":"Tutorials / Spark RDD Demo",
+  "id":"2EF39W5MG",
+  "noteParams":{
+
+  },
+  "noteForms":{
+
+  },
+  "angularObjects":{
+    "md:shared_process":[
+
+    ],
+    "sh:shared_process":[
+
+    ],
+    "spark:shared_process":[
+
+    ]
+  },
+  "config":{
+    "isZeppelinNotebookCronEnable":false,
+    "looknfeel":"default",
+    "personalizedMode":"false"
+  },
+  "info":{
+
+  }
+}

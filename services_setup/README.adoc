@@ -1,0 +1,347 @@
+////
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
+
+Copyright 2019 www.eskimo.sh - All rights reserved.
+Author : http://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+////
+
+
+:sectnums:
+:authors: www.eskimo.sh / 2019
+:copyright: www.eskimo.sh / 2019
+
+== Eskimo Introduction
+
+Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
+*Big Data 2.0* clusters using *Docker* and *Mesos*.
+
+Reach http://www.eskimo.sh for more information on Eskimo or look at the documentation in the folder `doc`.
+
+=== Eskimo Service Development Framework
+
+The *Service Development framework* is actually composed by two distinct parts:
+
+* The *Docker Images Development Framework* which is used to build the docker images deployed on the eskimo cluster
+nodes
+* The *Services Installation Framework* which is used to install these images as services on the eskimo cluster nodes.
+
+
+
+
+
+
+// marker for inclusion : line 60
+== Services Installation Framework
+
+This document presents the Services Installation framework.
+
+The Services Installation Framework provides tools and standards to install the packaged docker images containing the
+target software component on the eskimo cluster nodes.
+
+Eskimo is leveraging on both docker and systemd to deploy the services on the cluster nodes and to operate them.
+
+The Eskimo Nodes Configuration process takes care of installing the services defined in the _services.json_
+configuration file and and copies them over to the nodes where they are intended to run. After the proper installation,
+eskimo relies on plain old _systemctl_ commands to operate (start / stop / restart / query / etc.) the services.
+
+=== Principle
+
+The principle is pretty straightforward:
+
+* Whenever a service `serviceX` is configured on a node, eskimo makes an archive of the folder
+`services_setup/serviceX`, copies that archive over to the node and extracts it in a subfolder of `/tmp`.
+* Then eskimo calls the script `setup.sh` from within that folder. The script `setup.sh` can do whatever it wants but has
+to respect the following constraint
+** After that `setup.sh` script is properly executed, a systemd system service configuration file with name
+`serviceX.service` has to exist in such a way that commands such as `systemctl start serviceX` can be used to control
+serviceX.
+
+Aside from the above, nothing is enforced and service developers can implement services the way they want.
+
+=== Standards and conventions over requirements
+
+There are no requirements when setting up a service on a node aside from the constraints mentioned above.
+Services developers can set up services on nodes the way then want and no specific requirement is enforced by eskimo.
+
+However, adhering to some conventions eases a lot the maintenance and evolution of these services. +
+These standard conventions are as follows (illustrated for a service called `serviceX`).
+
+* Services should put their persistent data (to be persisted between two docker container restart) in `/var/lib/serviceX`
+* Services should put their log files in `/var/log/serviceX`.
+* If the service required a file to track it's PID, that file should be stored under `/var/run/serviceX`
+
+At the end of the day, it's really plain old Unix standards. The only challenge comes from the use of docker which
+requires to play with docker mounts a little. +
+Just look at eskimo pre-packaged services to see examples.
+
+=== Typical setup.sh process
+
+==== Operations performed
+
+The setup process implemented as a standard in the `setup.sh` script has three different stages:
+
+. The container setup operated from outside the container
+. The software component setup performed from inside the container
+. The software component configuration applied at runtime, i.e. at the time the containr starts, re-applied everytime.
+
+The third phase is most of the time required to apply configurations depending on environment dynamically at startup
+time and not statically at setup time. +
+The goal is to address situations where, for instance,  master services are moved to another node. In this case,
+applying the master setup conriguration at service startup time instead of statically enables to simply restart a slave
+service whenever the master node is moved to another node instead of requiring to entirely re-configure them.
+
+The build process thus typically looks this way:
+
+1. From outside the container:
+* Perform required configurations on host OS (create `/var/lib` subfolder, required system user, etc.)
+* Run docker container that will be used to create the set up image
+* Call in container setup script
+
+2. From inside the container:
+* Create the in container required folders and system user, etc.
+* Adapt configuration files to eskimo context (static configuration only !)
+
+3. At service startup time:
+* Adapt configuration to topology (See <<topology>> below)
+* Start service
+
+And that's it.
+
+Again, the most essential configuration, the adaptation to the cluster _topology_ is not done statically at container
+setup time but dynamically at service startup time.
+
+==== Standard and conventions
+
+While nothing is really enforced as a requirement by eskimo (aside of systemd and the name of the `setup.sh` script,
+there are some standards that should be followed (illustrated for a service named `serviceX`:
+
+* The in container setup script is usually called `inContainerSetupServiceX.sh`
+* The script taking care of the dynamic configuration and the starting of the service - the one actually called by
+systemd upon service startup - is usually called `inContainerStartServiceX.sh`
+* The systemd system configuration file is usually limited to stopping and starting the docker container
+
+
+==== Look for examples and get inspired
+
+Look at examples and the way the packages provided with eskimo are setup and get inspired for developing your own
+packages.
+
+
+=== Eskimo services configuration
+
+Creating the service setup folder and writing the `setup.sh` script is unfortunately not sufficient for eskimo to be
+able to operate the service. +
+A few additional steps are required, most importantly, defining the new service in the configuration file
+`services.json`.
+
+==== Configuration file `services.json`
+
+In order for a service to be understood and operable by eskimo, it needs to be declared in the *services configuration
+file*  `services.json`.
+
+A service declaration in `services.json` for instance for `serviceX` would be defined as follows:
+
+.ServiceX declaration in `services.json`
+----
+"serviceX" : {
+
+  "config": {
+
+    ## [mandatory] giving the column nbr in status table
+    "order": [0-X],
+
+    ## [mandatory] whether or not it has to be instaled on every node
+    "mandatory": [true,false],
+
+    ## [optional] name of the group to associate it in the status table
+    "group" : "{group name}",
+
+    ## [mandatory] name of the service. miust be consistend with service under 'service_setup'
+    "name" : "{service name},
+
+    ## [mandatory] where to place the service in 'Service Selection Window'
+    "selectionLayout" : {
+      "row" : [1-X],
+      "col" : [1-X]
+    },
+
+    ## memory to allocate to the service
+    "memory": "[neglectable|small|medium|large]"
+  },
+
+  ## [optional] configuration of the serice web console (if anym)
+  "ui": {
+
+    ## optional] either URL template should be configured ...
+    "urlTemplate": "http://{NODE_ADDRESS}:{PORT}/",
+
+    ## [optional] or proxy configuration in case the service has to be proxied by eskimo
+    "proxyContext": "{service name}",
+    "proxyTargetPort" : {target port},
+
+    ## [mandatory] the time  to wait for the web console to initialize before making it available
+    "waitTime": {1000 - X},
+
+    ## [mandatory] the name of the menu entry
+    "title" : "{menu name}",
+
+    ## [optional] the icon to use (must be available)
+    "icon" : "{path relative to web context}"
+  }
+
+  ## [optional] array of dependencies that need to be available and configured
+  "dependencies": [
+    {
+
+      ## [mandatory] THIS IS THE MOST ESSENTIAL CONFIG :
+      ## THE WAY THE MASTER IS IDENTIFIED FOR A SLSAVE SERVICE
+      "masterElectionStrategy": "[NONE|FIRST_NODE|SAME_NODE_OR_RANDOM|RANDOM|RANDOM_NODE_AFTER|SAME_NODE]"
+
+      ## the service relating to this dependency
+      "masterService": "{master service name}",
+
+      ## The number of master expected
+      "numberOfMasters": [1-x],
+
+      ## whether that dependency is mandatory or not
+      "mandatory": [true,false],
+    }
+  ]
+}
+----
+
+Everything is pretty straightforward and one should really look at the services pre-packaged within eskimo to get
+inspiration when designing a new service to be operated by eskimo.
+
+
+[[topology]]
+==== Eskimo Topology and dependency management
+
+As stated above, the most essential configuration property in a _service definition_ is the `masterElectionStrategy`
+of a dependency. +
+The whole master / slave topology management logic as well as the whole dependencies framework of eskimo relies on it.
+
+==== Master Election strategy
+
+Let's start by introducing what are the supported values for this `masterElectionStrategy` property:
+
+* `NONE` : This is the simplest case. This enables a service to define as requiring another service without
+bothering where it should be installed. It just has to be present somewhere on the cluster and the first service
+doesn't care where.
+* `FIRST_NODE` : This is used to define a simple dependency on another service. In addition, FIRST_NODE indicates that
+the first service wants to know about at least one node where that other service is available. That other node
+should be the _first node_ found where that other service is available.
+* `SAME_NODE_OR_RANDOM` : This is used to define a simple dependency on another service. In addition,
+SAME_NODE_OR_RANDOM indicates that the first service wants to know about at least one node where that other service is
+available. That other node should be the same node if that other service is available on the same node than the
+first service or any random one if that is not the case.
+* `RANDOM` : This is used to define a simple dependency on another service. In addition, RANDOM indicates that the
+first service wants to know about at least one node where that other service is available. That other node should be
+any node of the cluster where the second service is installed.
+* `RANDOM_NODE_AFTER` : This is used to define a simple dependency on another service. In addition, RANDOM_NODE_AFTER
+indicates that the first service wants to know about at least one node where that other service is available. That other
+node should be any node of the cluster where the second service is installed yet with a *node number* (internal eskimo
+node configuration) greater than the current node where the first service is installed.
+* `SAME_NODE` : Same node means that the other service is expected to be available on the same node than the first
+service, otherwise eskimo will report an error during node configuration.
+
+==== Memory allocation
+
+Another pretty important property in a service configuration in `services.json` is the memory consumption property:
+`memory`.
+
+The possible values for that property are as follows :
+
+* `neglectable` : the service is not accounted in memory allocation
+* `small` : the service gets a single share of memory
+* `medium` : the service gets two shares of memory
+* `large` : the service gets three shares of memory
+
+The system then works by computing the sum of shares for all nodes and then allocating the available memory on the node
+to every service by dividing it amongst share and giving the required portion of memory to every service. +
+Of course, the system removes from the available memory a significant portion to ensure some room for kernel and
+filesystem cache.
+
+==== Topology file on cluster nodes
+
+Every time the cluster nodes / services configuration is changed. Eskimo will verify the global services topology and
+generate for every node of the cluster a "*topology definition file*".
+
+That topology definition file defines all the dependencies and where to find them (using the notion of MASTER) for every
+service running on every node.
+
+The "topology definition file" can be find on nodes in `/etc/eskimo_topology.sh`.
+
+
+
+
+
+
+
+
+
+// marker for exclusion : line 310
+
+
+
+[appendix]
+== Copyright and License
+
+
+Eskimo is Copyright 2019 eskimo.sh - All rights reserved. +
+Author : http://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL. +
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version. +
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+
+* you develop activities involving Eskimo without disclosing the source code of your own product, software, platform,
+  use cases or scripts.
+* you deploy eskimo as part of a commercial product, platform or software.
+
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.

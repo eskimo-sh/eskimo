@@ -1,0 +1,21 @@
+{
+    "a": {
+        "firstObject": {
+            "internalArray1": [],
+            "internalArray2": []
+        }        
+    },
+    "underObject": {
+        "value": "12346579",
+        "warnings": [],
+        "errors": []
+    },
+    
+    "date": "20.08.2010",
+    "time": "09:31",
+    "name": "ABCD",
+    "mode": "1234",
+    "busy": false,
+    "dirty" : false,
+    "errors": []
+}

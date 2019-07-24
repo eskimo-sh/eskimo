@@ -1,0 +1,414 @@
+{
+
+  "ntp" : {
+    "config": {
+      "order": 0,
+      "mandatory": true,
+      "name" : "NTP",
+      "selectionLayout" : { "row" : 1, "col" : 2},
+      "memory": "neglectable"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "ntp",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "zookeeper": {
+    "config": {
+      "order": 1,
+      "unique": true,
+      "name" : "Zookeeper",
+      "selectionLayout" : { "row" : 2, "col" : 2},
+      "memory": "neglectable"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ],
+    "additionalEnvironment": [ "SERVICE_NUMBER_1_BASED" ]
+  },
+
+  "prometheus" : {
+    "config": {
+      "order": 2,
+      "mandatory": true,
+      "group" : "Monitoring",
+      "name" : "Prometheus",
+      "selectionLayout" : { "row" : 6, "col" : 2},
+      "memory": "neglectable"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "grafana",
+        "numberOfMasters": 1,
+        "mandatory": false
+      }
+    ],
+    "additionalEnvironment": [ "ALL_NODES_LIST_prometheus" ]
+  },
+
+  "grafana" : {
+    "config": {
+      "order": 3,
+      "unique": true,
+      "group" : "Monitoring",
+      "name" : "Grafana",
+      "selectionLayout" : { "row" : 6, "col" : 1},
+      "memory": "small"
+    },
+    "ui": {
+      "urlTemplate": "http://{NODE_ADDRESS}:3000/",
+      "waitTime": 10000,
+      "title" : "Grafana Monitoring",
+      "icon" : "images/grafana-icon.png"
+    }
+  },
+
+  "gluster" : {
+    "config": {
+      "order": 4,
+      "mandatory": true,
+      "conditional": "MULTIPLE_NODES",
+      "group" : "Gluster",
+      "name" : "FS",
+      "selectionLayout" : { "row" : 1, "col" : 3},
+      "memory": "neglectable"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM_NODE_AFTER",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "gdash" : {
+    "config": {
+      "order": 5,
+      "unique": true,
+      "group" : "Gluster",
+      "name" : "Dash-board",
+      "selectionLayout" : { "row" : 4, "col" : 2},
+      "memory": "neglectable"
+    },
+    "ui": {
+      "urlTemplate": "http://{NODE_ADDRESS}:28180/",
+      "waitTime": 8000,
+      "title" : "Gluster Dashboard",
+      "icon" : "images/gdash-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "mesos-master": {
+    "config": {
+      "order": 6,
+      "unique": true,
+      "group" : "Mesos",
+      "name" : "Master",
+      "selectionLayout" : { "row" : 3, "col" : 2},
+      "memory": "neglectable"
+    },
+    "ui": {
+      "urlTemplate": "http://{NODE_ADDRESS}:5050/#/",
+      "waitTime": 10000,
+      "title" : "Mesos Console",
+      "icon" : "images/mesos-master-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "mesos-agent": {
+    "config": {
+      "order": 7,
+      "group" : "Mesos",
+      "name" : "Agent",
+      "selectionLayout" : { "row" : 2, "col" : 3},
+      "memory": "neglectable"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "mesos-master",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "kafka" : {
+    "config": {
+      "order": 8,
+      "group" : "Kafka",
+      "name" : "Broker",
+      "selectionLayout" : { "row" : 5, "col" : 2},
+      "memory": "medium"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ],
+    "additionalEnvironment": [ "SERVICE_NUMBER_0_BASED" ]
+  },
+
+  "kafka-manager": {
+    "config": {
+      "order": 9,
+      "unique": true,
+      "group" : "Kafka",
+      "name" : "Manager",
+      "selectionLayout" : { "row" : 5, "col" : 1},
+      "memory": "neglectable"
+    },
+    "ui": {
+      "proxyContext": "./kafka-manager/",
+      "proxyTargetPort" : 22080,
+      "waitTime": 30000,
+      "title" : "Kafka manager",
+      "icon" : "images/kafka-manager-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "kafka",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "spark-history-server" : {
+    "config": {
+      "order": 10,
+      "unique": true,
+      "group" : "Spark",
+      "name" : "History Server",
+      "selectionLayout" : { "row" : 1, "col" : 1},
+      "memory": "neglectable"
+    },
+    "ui": {
+      "proxyContext": "./spark-history-server/",
+      "proxyTargetPort" : 18080,
+      "waitTime": 24000,
+      "title" : "Spark Console",
+      "icon" : "images/spark-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      }
+    ]
+  },
+
+  "spark-executor" : {
+    "config": {
+      "order": 11,
+      "group" : "Spark",
+      "name" : "Executor",
+      "selectionLayout" : { "row" : 4, "col" : 3},
+      "memory": "large"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "mesos-agent",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "logstash" : {
+    "config": {
+      "order": 12,
+      "group" : "Elastic Stack",
+      "name" : "Logstash",
+      "selectionLayout" : { "row" : 5, "col" : 3},
+      "memory": "small"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "cerebro" : {
+    "config": {
+      "order": 13,
+      "unique": true,
+      "group" : "Elastic Stack",
+      "name" : "Cerebro",
+      "selectionLayout" : { "row" : 2, "col" : 1},
+      "memory": "neglectable"
+    },
+    "ui": {
+      "urlTemplate": "http://{NODE_ADDRESS}:9000/#/overview?host=Eskimo",
+      "waitTime": 10000,
+      "title" : "Cerebro",
+      "icon" : "images/cerebro-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "elasticsearch": {
+    "config": {
+      "order": 14,
+      "group" : "Elastic Stack",
+      "name" : "Elastic-Search",
+      "selectionLayout" : { "row" : 3, "col" : 3},
+      "memory": "large"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM_NODE_AFTER",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": false
+      }
+    ]
+  },
+
+  "kibana" : {
+    "config": {
+      "order": 15,
+      "unique": true,
+      "group" : "Elastic Stack",
+      "name" : "Kibana",
+      "selectionLayout" : { "row" : 3, "col" : 1},
+      "memory": "small"
+    },
+    "ui": {
+      "urlTemplate": "http://{NODE_ADDRESS}:5601/",
+      "waitTime": 45000,
+      "title" : "Kibana",
+      "icon" : "images/kibana-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+  "zeppelin" : {
+    "config": {
+      "order": 16,
+      "unique": true,
+      "name" : "Zeppelin",
+      "selectionLayout" : { "row" : 4, "col" : 1},
+      "memory": "small",
+      "____comment": "We need to know about the spark executor memory to set",
+      "memoryAdditional": ["spark-executor"]
+    },
+    "ui": {
+      "urlTemplate": "http://{NODE_ADDRESS}:38080/",
+      "waitTime": 35000,
+      "title" : "Zeppelin",
+      "icon" : "images/zeppelin-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "spark-executor",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  }
+
+}

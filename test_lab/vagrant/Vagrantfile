@@ -1,0 +1,125 @@
+﻿# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#
+# This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+# well to this individual file than to the Eskimo Project as a whole.
+#
+# Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+# Author : eskimo.sh / https://www.eskimo.sh
+#
+# Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+# If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+# terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+# Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+# Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+# commercial license.
+#
+# Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Affero Public License for more details.
+#
+# You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+# see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA, 02110-1301 USA.
+#
+# You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+# commercial license is mandatory as soon as :
+# - you develop activities involving Eskimo without disclosing the source code of your own product, software,
+#   platform, use cases or scripts.
+# - you deploy eskimo as part of a commercial product, platform or software.
+# For more information, please contact eskimo.sh at https://www.eskimo.sh
+#
+# The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+# Software.
+#
+
+
+# Sanity checks
+if Vagrant.has_plugin?("vagrant-vbguest")
+  puts '!!! "vagrant-vbguest" plugin is installed on your host system and known to lead to issues with this setup. !!!'
+end
+
+# Installing required plugins (if any missing)
+required_plugins = %w(vagrant-reload vagrant-disksize) # vagrant-vbguest)
+plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+if not plugins_to_install.empty?
+  puts "Installing plugins: #{plugins_to_install.join(' ')}"
+  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+    exec "vagrant #{ARGV.join(' ')}"
+  else
+    abort "Installation of one or more plugins has failed. Aborting."
+  end
+end
+
+# Define cluster nodes
+nodes = [
+  { :hostname => 'deb-node1', :box => 'debian/stretch64',  :ip => '192.168.10.11', :ram => 6000 },
+  { :hostname => 'deb-node2', :box => 'ubuntu/xenial64',  :ip => '192.168.10.12', :ram => 6000 },
+  { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.10.13', :ram => 6000},
+  { :hostname => 'cent-node2', :box => 'fedora/29-cloud-base', :ip => '192.168.10.14', :ram => 6000 }
+]
+
+# All Vagrant configuration is done here. The most common configuration
+# options are documented and commented below. For a complete reference,
+# please see the online documentation at vagrantup.com.
+
+Vagrant.configure("2") do |config|
+
+  # common configurations
+  #config.vm.synced_folder  "/setup", "./"
+  config.vm.boot_timeout = 600
+  #config.ssh.private_key_path = "ssh_key"
+  #config.ssh.insert_key  = false
+
+
+  # specific configuration for each node
+  nodes.each do |node|
+    config.vm.define node[:hostname] do |nodeconfig|
+
+      # node setup
+      nodeconfig.vm.box = node[:box]
+      nodeconfig.vm.hostname = node[:hostname]
+      nodeconfig.vm.network :private_network, ip: node[:ip]
+      # This actually doesn't work since it would require to change the partitions on the VM
+      #nodeconfig.disksize.size = '20GB'
+      memory = node[:ram] ? node[:ram] : 2500;
+      nodeconfig.vm.provider :virtualbox do |vb|
+        vb.name = node[:hostname]
+        vb.customize ["modifyvm", :id, "--memory", memory.to_s]
+        vb.customize ["modifyvm", :id, "--ioapic", "on"]
+        vb.customize ["modifyvm", :id, "--cpus", "2"]
+      end
+
+      nodeconfig.vm.provision "file", source: "ssh_key.pub", destination: "./.ssh/id_rsa.pub"
+      nodeconfig.vm.provision "shell" do |s|
+          ssh_pub_key = File.readlines("ssh_key.pub").first.strip
+          s.inline = <<-SHELL
+            if [[ -f "/etc/debian_version" ]]; then
+                useradd -m -G root,sudo,users,staff eskimo
+            else
+                useradd -m -G root,wheel,users eskimo
+            fi
+            echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+            sudo mkdir -p /root/.ssh/
+            echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
+            sudo mkdir -p /home/eskimo/.ssh/
+            echo #{ssh_pub_key} >> /home/eskimo/.ssh/authorized_keys
+            sudo chown -R eskimo.eskimo /home/eskimo/.ssh/
+            sudo chmod 600 /home/eskimo/.ssh/authorized_keys
+            echo "eskimo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/eskimo
+            sudo chmod 440 /etc/sudoers.d/eskimo
+          SHELL
+      end
+
+      # Node provisionning
+      #nodeconfig.vm.provision "shell", path: "../provisionning/provision.sh", args: node[:prov_args]
+
+      # trigger reload after provisionning 
+      #nodeconfig.vm.provision :reload
+    end
+
+  end
+
+end

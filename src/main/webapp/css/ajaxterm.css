@@ -1,0 +1,114 @@
+/*
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
+
+Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Author : eskimo.sh / https://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+*/
+
+
+.ajaxterm:focus {
+	outline: none;
+}
+.ajaxterm .fitter {
+    display: inline-block;
+}
+.ajaxterm pre.stat {/* status indicator line */
+	margin: 0px;
+	padding: 4px;
+	display: block;
+	font-family: monospace;
+	white-space: pre;
+	background-color: black;
+	border-top: 1px solid black;
+	color: white;
+}
+.ajaxterm pre.stat span {/* buttons inside the status line */
+	padding: 0px;
+}
+.ajaxterm pre.stat span.on {/* button on state */
+	background-color: #080;
+	font-weight: bold;
+	color: white;
+	cursor: pointer;
+}
+.ajaxterm pre.stat span.off {/* button off state */
+	background-color: #888;
+	font-weight: bold;
+	color: white;
+	cursor: pointer;
+}
+.ajaxterm div.spacer {/* sibling to pre.stat, holds all the screen. this one can have margin & border. */
+    padding: 4px;
+    background-color: black;
+    border-top: 1px solid white;
+}
+.ajaxterm div.spacer div.screen {
+    position: relative; /* acts as an anchor of cursor, which is absolutely positioned. */
+    font-family: monospace;
+}
+.ajaxterm div.spacer div.screen pre.term {/* this is what the server sends us */
+	margin: 0px;
+	padding: 0px;
+	display: block;
+	white-space: pre;
+	color: #eee;
+	background-color: transparent;
+	border: 0px none;
+}
+.ajaxterm div.spacer div.screen pre.term.dead {/* the session has finished */
+    opacity: 0.5;
+}
+
+/* color output */
+.ajaxterm span.f0  { color: #000; }
+.ajaxterm span.f1  { color: #b00; }
+.ajaxterm span.f2  { color: #0b0; }
+.ajaxterm span.f3  { color: #bb0; }
+.ajaxterm span.f4  { color: #00b; }
+.ajaxterm span.f5  { color: #b0b; }
+.ajaxterm span.f6  { color: #0bb; }
+.ajaxterm span.f7  { color: #bbb; }
+.ajaxterm span.f8  { color: #666; }
+.ajaxterm span.f9  { color: #f00; font-weight: bold; }
+.ajaxterm span.f10 { color: #0f0; font-weight: bold; }
+.ajaxterm span.f11 { color: #ff0; font-weight: bold; }
+.ajaxterm span.f12 { color: #00f; font-weight: bold; }
+.ajaxterm span.f13 { color: #f0f; font-weight: bold; }
+.ajaxterm span.f14 { color: #0ff; font-weight: bold; }
+.ajaxterm span.f15 { color: #fff; font-weight: bold; }
+.ajaxterm span.b0  { background-color: #000; }
+.ajaxterm span.b1  { background-color: #b00; }
+.ajaxterm span.b2  { background-color: #0b0; }
+.ajaxterm span.b3  { background-color: #bb0; }
+.ajaxterm span.b4  { background-color: #00b; }
+.ajaxterm span.b5  { background-color: #b0b; }
+.ajaxterm span.b6  { background-color: #0bb; }
+.ajaxterm span.b7  { background-color: #bbb; }
+/*pre.term span.cur { text-decoration: underline; }*/
