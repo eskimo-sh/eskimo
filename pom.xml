@@ -40,8 +40,8 @@ Software.
 	<packaging>war</packaging>
 	<name>Eskimo CE</name>
 	<description>Eskimo Platform Console - Community Edition</description>
-	<url>https://www.niceideas.ch</url>
-	<version>0.1-SNAPSHOT</version>
+	<url>https://www.eskimo.sh</url>
+	<version>0.2-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
