@@ -74,10 +74,10 @@ public class SystemServiceTest extends AbstractSystemTest {
         assertTrue(testSSHCommandScript.toString().startsWith("rm -Rf /tmp/zookeeper\n" +
                 "rm -f /tmp/zookeeper.tgz\n"));
 
-        assertTrue(testSSHCommandScript.toString().endsWith(
+        assertTrue(testSSHCommandScript.toString().contains(
                 "tar xfz /tmp/zookeeper.tgz --directory=/tmp/\n" +
-                "chmod 755 /tmp/zookeeper/setup.sh\n" +
-                "mv docker_template_zookeeper.tar.gz /tmp/zookeeper/ \n" +
+                "chmod 755 /tmp/zookeeper/setup.sh\n"));
+        assertTrue(testSSHCommandScript.toString().contains(
                 "bash /tmp/zookeeper/setup.sh localhost \n" +
                 "rm -Rf /tmp/zookeeper\n" +
                 "rm -f /tmp/zookeeper.tgz\n"));
