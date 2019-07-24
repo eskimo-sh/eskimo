@@ -101,9 +101,9 @@ services and let eskimo distribute and operate them, or extend current services.
 
 The *Service Development framework* is actually composed by two distinct parts:
 
-* The *Docker Images Development Framework* which is used to build the docker images deployed on the eskimo cluster
+* The <<docker_images_development_framework>> which is used to build the docker images deployed on the eskimo cluster
 nodes
-* The *Services Installation Framework* which is used to install these images as services on the eskimo cluster nodes.
+* The <<services_installation_framework>> which is used to install these images as services on the eskimo cluster nodes.
 
 
 === Core principles
@@ -111,10 +111,12 @@ nodes
 The core principles on which both the _Docker Images Development Framework_ and the _Services Installation Framework_
 are built are as follows:
 
-* A service is mostly a docker image and the scripts aimed at installing and setting it up.
+* A service is eventually two things
+** a docker image packaging the software component and
+** the set of scripts and systemd configuration required to install it, set it up and operate it
 * Everything - from building the docker image to installing it on cluster nodes - is done using simple shell scripts.
-With Eskimo a system administrator desiring to leverage on eskimo to implement his own service doesn't need to need any
-new and fancy technology, just plain old shell scripting, docker and systemd.
+With Eskimo a system administrator desiring to leverage on eskimo to implement his own services doesn't need to learn
+any new and fancy technology, just plain old shell scripting, docker and systemd. Period.
 * Eskimo leverages on unix standards. Software components are installed in `/usr/local`, log files are in sub-folders of
 `/var/log`, persistent data is in sub-folders of `/var/lib`, etc.
 
@@ -122,7 +124,7 @@ new and fancy technology, just plain old shell scripting, docker and systemd.
 
 // included package developer README
 
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..160]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..180]
 
 
 

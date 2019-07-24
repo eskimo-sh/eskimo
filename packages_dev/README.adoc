@@ -58,6 +58,8 @@ nodes
 
 
 // marker for inclusion : line 60
+[[docker_images_development_framework]]
+
 == Docker Images Development Framework
 
 This document presents the docker images or packages development framework.
@@ -167,7 +169,15 @@ inspired for developing your own packages.
 
 
 
-// marker for exclusion : line 60
+
+
+
+
+
+
+
+
+// marker for exclusion : line 180
 
 [appendix]
 == Copyright and License

@@ -58,6 +58,7 @@ nodes
 
 
 // marker for inclusion : line 60
+[[services_installation_framework]]
 == Services Installation Framework
 
 This document presents the Services Installation framework.
@@ -78,7 +79,7 @@ The principle is pretty straightforward:
 * Whenever a service `serviceX` is configured on a node, eskimo makes an archive of the folder
 `services_setup/serviceX`, copies that archive over to the node and extracts it in a subfolder of `/tmp`.
 * Then eskimo calls the script `setup.sh` from within that folder. The script `setup.sh` can do whatever it wants but has
-to respect the following constraint
+to respect the following constraint:
 ** After that `setup.sh` script is properly executed, a systemd system service configuration file with name
 `serviceX.service` has to exist in such a way that commands such as `systemctl start serviceX` can be used to control
 serviceX.
@@ -95,7 +96,7 @@ These standard conventions are as follows (illustrated for a service called `ser
 
 * Services should put their persistent data (to be persisted between two docker container restart) in `/var/lib/serviceX`
 * Services should put their log files in `/var/log/serviceX`.
-* If the service required a file to track it's PID, that file should be stored under `/var/run/serviceX`
+* If the service required a file to track its PID, that file should be stored under `/var/run/serviceX`
 
 At the end of the day, it's really plain old Unix standards. The only challenge comes from the use of docker which
 requires to play with docker mounts a little. +
@@ -107,14 +108,14 @@ Just look at eskimo pre-packaged services to see examples.
 
 The setup process implemented as a standard in the `setup.sh` script has three different stages:
 
-. The container setup operated from outside the container
+. The container instantiation from the pre-packaged image performed from outside the container
 . The software component setup performed from inside the container
 . The software component configuration applied at runtime, i.e. at the time the containr starts, re-applied everytime.
 
 The third phase is most of the time required to apply configurations depending on environment dynamically at startup
 time and not statically at setup time. +
 The goal is to address situations where, for instance,  master services are moved to another node. In this case,
-applying the master setup conriguration at service startup time instead of statically enables to simply restart a slave
+applying the master setup configuration at service startup time instead of statically enables to simply restart a slave
 service whenever the master node is moved to another node instead of requiring to entirely re-configure them.
 
 The build process thus typically looks this way:
@@ -237,6 +238,9 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 }
 ----
 
+(Bear in mind that since json actually doesn't support such thing as comments, the example above is actually not a valid
+JSON snippet)
+
 Everything is pretty straightforward and one should really look at the services pre-packaged within eskimo to get
 inspiration when designing a new service to be operated by eskimo.
 
@@ -255,21 +259,21 @@ Let's start by introducing what are the supported values for this `masterElectio
 * `NONE` : This is the simplest case. This enables a service to define as requiring another service without
 bothering where it should be installed. It just has to be present somewhere on the cluster and the first service
 doesn't care where.
-* `FIRST_NODE` : This is used to define a simple dependency on another service. In addition, FIRST_NODE indicates that
+* `FIRST_NODE` : This is used to define a simple dependency on another service. In addition, `FIRST_NODE` indicates that
 the first service wants to know about at least one node where that other service is available. That other node
 should be the _first node_ found where that other service is available.
 * `SAME_NODE_OR_RANDOM` : This is used to define a simple dependency on another service. In addition,
-SAME_NODE_OR_RANDOM indicates that the first service wants to know about at least one node where that other service is
+`SAME_NODE_OR_RANDOM` indicates that the first service wants to know about at least one node where that other service is
 available. That other node should be the same node if that other service is available on the same node than the
 first service or any random one if that is not the case.
-* `RANDOM` : This is used to define a simple dependency on another service. In addition, RANDOM indicates that the
+* `RANDOM` : This is used to define a simple dependency on another service. In addition, `RANDOM` indicates that the
 first service wants to know about at least one node where that other service is available. That other node should be
 any node of the cluster where the second service is installed.
-* `RANDOM_NODE_AFTER` : This is used to define a simple dependency on another service. In addition, RANDOM_NODE_AFTER
+* `RANDOM_NODE_AFTER` : This is used to define a simple dependency on another service. In addition, `RANDOM_NODE_AFTER`
 indicates that the first service wants to know about at least one node where that other service is available. That other
 node should be any node of the cluster where the second service is installed yet with a *node number* (internal eskimo
 node configuration) greater than the current node where the first service is installed.
-* `SAME_NODE` : Same node means that the other service is expected to be available on the same node than the first
+* `SAME_NODE` : This means that the other service is expected to be available on the same node than the first
 service, otherwise eskimo will report an error during node configuration.
 
 ==== Memory allocation
@@ -285,8 +289,8 @@ The possible values for that property are as follows :
 * `large` : the service gets three shares of memory
 
 The system then works by computing the sum of shares for all nodes and then allocating the available memory on the node
-to every service by dividing it amongst share and giving the required portion of memory to every service. +
-Of course, the system removes from the available memory a significant portion to ensure some room for kernel and
+to every service by dividing it amongst shares and allocating the corresponding portion of memory to every service. +
+Of course, the system first removes from the available memory a significant portion to ensure some room for kernel and
 filesystem cache.
 
 ==== Topology file on cluster nodes
@@ -297,7 +301,7 @@ generate for every node of the cluster a "*topology definition file*".
 That topology definition file defines all the dependencies and where to find them (using the notion of MASTER) for every
 service running on every node.
 
-The "topology definition file" can be find on nodes in `/etc/eskimo_topology.sh`.
+The "topology definition file" can be fond on nodes in `/etc/eskimo_topology.sh`.
 
 
 
