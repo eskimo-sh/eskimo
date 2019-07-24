@@ -41,7 +41,7 @@ Software.
 	<name>Eskimo CE</name>
 	<description>Eskimo Platform Console - Community Edition</description>
 	<url>https://www.niceideas.ch</url>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
