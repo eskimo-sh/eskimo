@@ -427,6 +427,23 @@ Software.
 								<imagesoutdir>pngs</imagesoutdir>
 								<toclevels>4</toclevels>
 							</attributes>
+							<resources>
+								<resource>
+									<directory>doc/fonts</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option `outputDirectory` -->
+									<!--<targetPath>OUTPUT_DIR</targetPath>-->
+								</resource>
+								<resource>
+									<directory>doc/guides/eskimo-guide/pngs</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option `outputDirectory` -->
+									<targetPath>pngs</targetPath>
+								</resource>
+								<resource>
+									<directory>doc/guides/service-dev-guide/pngs</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option `outputDirectory` -->
+									<targetPath>pngs</targetPath>
+								</resource>
+							</resources>
 						</configuration>
 						<executions>
 							<execution>
@@ -441,56 +458,6 @@ Software.
 									<sourceDocumentName>eskimo-guide.adoc</sourceDocumentName>
 									<sourceDirectory>doc/guides/eskimo-guide</sourceDirectory>
 									<imagesDir>./</imagesDir>
-
-									<!--
-                                    Scenarios for linking vs embedding assets:
-
-                                    Link to both stylesheets and images::
-
-                                      - don't set embedAssets option
-                                      - set linkcss attribute to true
-                                      - set imagesdir attribute to path relative to AsciiDoc source file
-
-                                      <attributes>
-                                          <linkcss>true</linkcss>
-                                          <imagesdir>./images</imagesdir>
-                                      </attributes>
-
-                                    Embed stylesheets and images::
-
-                                      - set embedAssets option to true
-                                      - don't set linkcss attribute
-                                      - set imagesdir attribute to path relative to project root
-
-                                      <embedAssets>true</embedAssets>
-                                      <attributes>
-                                          <imagesdir>src/docs/asciidoc/images</imagesdir>
-                                      </attributes>
-
-                                    Link to stylesheets but embed images::
-
-                                      - set embedAssets option to true
-                                      - set linkcss attribute to true
-                                      - set imagesdir attribute to path relative to project root
-
-                                      <embedAssets>true</embedAssets>
-                                      <attributes>
-                                          <linkcss>true</linkcss>
-                                          <imagesdir>src/docs/asciidoc/images</imagesdir>
-                                      </attributes>
-
-                                    Embed stylesheets but link images (default)::
-
-                                      - don't set embedAssets option
-                                      - don't set linkcss attribute
-                                      - set imagesdir attribute to path relative to AsciiDoc source file
-
-                                      <attributes>
-                                          <imagesdir>./images</imagesdir>
-                                      </attributes>
-
-                                    IMPORTANT: When you enable image embedding, you must qualify the path the the imagesdir, as shown above.
-                                    -->
 									<attributes>
 										<!--<imagesdir>./pngs</imagesdir>-->
 										<stylesheet>../../theme/eskimo.css</stylesheet>

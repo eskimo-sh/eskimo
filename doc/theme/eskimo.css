@@ -32,7 +32,26 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
-@import "dinpro.css";
+@font-face {
+    font-family: 'DINPro-Light';
+    url('DINPro-Light.ttf')  format('truetype'),
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DINPro-Regular';
+    url('DINPro-Regular.ttf')  format('truetype'),
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DINPro-Bold';
+    url('DINPro-Bold.ttf')  format('truetype'),
+    font-weight: normal;
+    font-style: normal;
+}
 
 
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {

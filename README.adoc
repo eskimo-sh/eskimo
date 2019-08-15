@@ -37,6 +37,7 @@ Software.
 :authors: www.eskimo.sh / 2019
 :copyright: www.eskimo.sh / 2019
 
+
 == Eskimo Introduction
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
@@ -51,6 +52,10 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
   Kafka-Manager, Grafana and Prometheus*.
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
+
+=== Eskimo CE Project Status
+
+image:https://travis-ci.com/eskimo-sh/eskimo.svg?branch=master["Build Status", link="https://travis-ci.com/eskimo-sh/eskimo"]
 
 == Information
 
