@@ -66,7 +66,7 @@ public class SystemService {
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
     @Autowired
-    private ProxyConfigService proxyConfigService;
+    private ProxyManagerService proxyManagerService;
 
     @Autowired
     private SetupService setupService;
@@ -148,8 +148,8 @@ public class SystemService {
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
     }
-    void setProxyConfigService (ProxyConfigService proxyConfigService) {
-        this.proxyConfigService = proxyConfigService;
+    void setProxyManagerService(ProxyManagerService proxyManagerService) {
+        this.proxyManagerService = proxyManagerService;
     }
     void setSystemOperationService(SystemOperationService systemOperationService) {
         this.systemOperationService = systemOperationService;
@@ -699,7 +699,7 @@ public class SystemService {
                                 statusMap.put(("service_" + service + "_" + nodeName), "OK");
 
                                 // configure proxy if required
-                                proxyConfigService.setServer(service, ipAddress);
+                                proxyManagerService.updateServerForService(service, ipAddress);
                             }
                         }
                     } else {

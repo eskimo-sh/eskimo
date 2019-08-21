@@ -51,7 +51,7 @@ public abstract class AbstractSystemTest {
 
     protected MessagingService messagingService = null;
 
-    protected ProxyConfigService proxyConfigService = null;
+    protected ProxyManagerService proxyManagerService = null;
 
     protected ServicesDefinition servicesDefinition = null;
 
@@ -75,14 +75,14 @@ public abstract class AbstractSystemTest {
 
         servicesDefinition = new ServicesDefinition();
 
-        proxyConfigService = new ProxyConfigService();
-        proxyConfigService.setServicesDefinition(servicesDefinition);
+        proxyManagerService = new ProxyManagerService();
+        proxyManagerService.setServicesDefinition(servicesDefinition);
 
         setupService = new SetupService();
 
         systemService = new SystemService();
         systemService.setSetupService(setupService);
-        systemService.setProxyConfigService(proxyConfigService);
+        systemService.setProxyManagerService(proxyManagerService);
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override

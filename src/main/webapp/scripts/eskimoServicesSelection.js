@@ -309,6 +309,7 @@ eskimo.ServicesSelection = function() {
                         rowHTML +=
                             '<div class="radio col-md-4 text-right no-padding">' +
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>'+
+                            '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="images/'+serviceConfig.name+'-logo.png"/></label>'+
                             '    <label class="radio-inline">' +
                             '        <input  type="radio" ' +
                             '                onmousedown="javascript:eskimoMain.getServicesSelection().servicesSelectionRadioMouseDown(this);" ' +
@@ -319,6 +320,7 @@ eskimo.ServicesSelection = function() {
                         rowHTML +=
                             '<div class="checkbox col-md-4 text-right no-padding">' +
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>' +
+                            '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="images/'+serviceConfig.name+'-logo.png"/></label>'+
                             '    <label class="checkbox-inline">' +
                             '        <input  type="checkbox" class="input-md" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice"></input>' +
                             '    </label>' +

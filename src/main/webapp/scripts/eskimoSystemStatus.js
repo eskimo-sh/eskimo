@@ -433,7 +433,12 @@ eskimo.SystemStatus = function() {
                             '        <td class="nodes-status-carousel-status"><span class="font-weight-bold '+
                             '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '         " style="color: '+color+';">' +
-                            service +
+                            '            <div class="status-service-icon">' +
+                            '                <img class="status-service-icon-image" src="images/' + service + '-icon.png"/> ' +
+                            '            </div>' +
+                            '            <div class="status-service-text">' +
+                            '&nbsp;' + service +
+                            '            </div>' +
                             '        </span></td>\n' +
                             fillInActions (service, nodeAddress, true, "nodes-status-carousel-actions") +
                             '    </tr>\n' +

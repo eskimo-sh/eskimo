@@ -52,10 +52,10 @@ import java.util.List;
 
 public class EskimoServiceProxyServlet extends ProxyServlet {
 
-    private final ProxyConfigService proxyConfig;
+    private final ProxyManagerService proxyManagerService;
 
-    public EskimoServiceProxyServlet (ProxyConfigService proxyConfig) {
-        this.proxyConfig = proxyConfig;
+    public EskimoServiceProxyServlet (ProxyManagerService proxyManagerService) {
+        this.proxyManagerService = proxyManagerService;
     }
 
     /** Copy response body data (the entity) from the proxy to the servlet client. */
@@ -108,13 +108,13 @@ public class EskimoServiceProxyServlet extends ProxyServlet {
     @Override
     protected HttpHost getTargetHost(HttpServletRequest servletRequest) {
         String serviceName = getServiceName(servletRequest);
-        return proxyConfig.getServerHost(serviceName);
+        return proxyManagerService.getServerHost(serviceName);
     }
 
     @Override
     protected String getTargetUri(HttpServletRequest servletRequest) {
         String serviceName = getServiceName(servletRequest);
-        return proxyConfig.getServerURI(serviceName);
+        return proxyManagerService.getServerURI(serviceName);
     }
 
     private String getServiceName(HttpServletRequest servletRequest) {

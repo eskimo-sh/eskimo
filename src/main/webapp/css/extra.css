@@ -129,7 +129,9 @@ body.empty-page {
 }
 
 .node-config-element {
-    border-bottom: 1px solid #BBBBBB;
+    border: 1px solid #BBBBBB;
+    padding-top: 10px;
+    border-radius: 10px;
 }
 .node-config-element-wrapper {
     padding-bottom: 5px;
@@ -202,7 +204,7 @@ body.empty-page {
 }
 
 #services-selection-modal-dialog {
-    width: 800px;
+    width: 850px;
     max-width: 100%;
 }
 
@@ -468,6 +470,54 @@ li.disabled a .menu-text {
 	 margin-left: 50px;
      margin-right: 0px;
 }
+
+.control-logo-logo {
+    width: 20px;
+    height: 20px;
+}
+
+.radio label.control-logo, .checkbox label.control-logo,
+.control-logo {
+    padding-bottom: 8px;
+    padding-left: 4px;
+}
+
+.nodes-config-logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+
+.nodes-config-entry {
+    padding-bottom: 3px;
+}
+
+.server-icon {
+    width: 20px;
+    height: 20px;
+}
+.server-title-icon {
+    float: left;
+    margin-top: 5px;
+}
+.server-title-text {
+    float: left;
+    margin-top: 7px;
+}
+
+.status-service-icon-image {
+    width: 14px;
+    height: 14px;
+}
+.status-service-icon {
+    float: left;
+}
+.status-service-text {
+    padding-top: 1px;
+    padding-left: 4px;
+    float: left;
+}
+
 /*################ Theme Content Section Style Close Here ############################*/
 
 /*################## Style Selector Theme Color Start ###########################*/

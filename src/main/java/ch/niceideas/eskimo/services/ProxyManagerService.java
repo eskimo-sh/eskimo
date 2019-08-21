@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class ProxyConfigService {
+public class ProxyManagerService {
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -70,11 +70,30 @@ public class ProxyConfigService {
         return serverHost.getSchemeName() + "://" + serverHost.getHostName() + ":" + serverHost.getPort() + "/";
     }
 
-    public void setServer(String serviceName, String host) {
+    public void updateServerForService(String serviceName, String host) {
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
-            // TODO remove scheme hardcording
-            serverHostMap.put(serviceName, new HttpHost(host, service.getUiConfig().getProxyTargetPort(), "http"));
+
+            // Don't bother with HTTPS, everything will go through SSH tunnels in anyway
+            HttpHost newHHost = new HttpHost(host, service.getUiConfig().getProxyTargetPort(), "http");
+
+            HttpHost prevHHost = serverHostMap.get(serviceName);
+
+            if (prevHHost == null || !prevHHost.toURI().equals(newHHost.toURI())) {
+
+                // TODO Handle host has changed !
+
+                if (prevHHost != null) {
+
+                    // TODO former tunnel needs to be closed
+
+                } else {
+
+                    // TODO Create new tunnel
+                }
+            }
+
+            serverHostMap.put(serviceName, newHHost);
         }
     }
 }

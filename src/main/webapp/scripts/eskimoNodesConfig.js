@@ -238,14 +238,24 @@ eskimo.NodesConfig = function() {
                                 serviceName = match[1]
 
                                 var placeHolder = $("#field"+nbr).find(".configured-multiple-services-placeholder");
-                                placeHolder.html(placeHolder.html() + serviceName + "<br>" );
+                                placeHolder.html(placeHolder.html() +
+                                    '<div class="nodes-config-entry">' +
+                                    '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                                    serviceName +
+                                    '<br>' +
+                                    '</div>');
 
                             } else {
                                 nbr = data[serviceConfig];
                                 serviceName = serviceConfig;
 
                                 var placeHolder = $("#field"+nbr).find(".configured-unique-services-placeholder");
-                                placeHolder.html(placeHolder.html() + serviceName + "<br>");
+                                placeHolder.html(placeHolder.html() +
+                                    '<div class="nodes-config-entry">' +
+                                    '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                                    serviceName +
+                                    '<br>' +
+                                    '</div>');
                             }
 
                             //console.log ('#'+serviceName+nbr);
@@ -320,7 +330,13 @@ eskimo.NodesConfig = function() {
                 var serviceName = UNIQUE_SERVICES[j];
                 if ($('#' + serviceName + i).length) {
                     if ($('#' + serviceName + i).get(0).checked) {
-                        placeHolderUs.html(placeHolderUs.html() + serviceName + "<br>");
+                        placeHolderUs.html(placeHolderUs.html() +
+                            '<div class="nodes-config-entry">' +
+                            '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                            serviceName +
+                            '<br>' +
+                            '</div>');
+
                     }
                 }
             }
@@ -329,7 +345,12 @@ eskimo.NodesConfig = function() {
                 var serviceName = MULTIPLE_SERVICES[j];
                 if ($('#'+serviceName+i).length) {
                     if ($('#'+serviceName+i).get(0).checked) {
-                        placeHolderMs.html(placeHolderMs.html() + serviceName + "<br>");
+                        placeHolderMs.html(placeHolderMs.html() +
+                            '<div class="nodes-config-entry">' +
+                            '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                            serviceName +
+                            '<br>' +
+                            '</div>');
                     }
                 }
             }
@@ -552,11 +573,7 @@ eskimo.NodesConfig = function() {
             $(nodes[i]["input"]).attr("name", "action_id" + (i + 1));
             $(nodes[i]["input"]).attr("id", "action_id" + (i + 1));
             $(nodes[i]["remove"]).attr("id", "remove" + (i + 1));
-            if (nodes[i]["type"] == "range") {
-                $(nodes[i]["label"]).html("Range no " + (i + 1));
-            } else {
-                $(nodes[i]["label"]).html("Node no " + (i + 1));
-            }
+            $(nodes[i]["label"]).html(getNodeTitle(nodes[i]["type"] == "range") + '<div class="server-title-text">' + (i + 1) + '</div>');
             $(nodes[i]["label"]).attr("id", "label" + (i + 1));
             for (var j = 0; j < CONFIGURED_SERVICES.length; j++) {
 
@@ -589,6 +606,22 @@ eskimo.NodesConfig = function() {
 
     function addRange () {
         addNewElement(true);
+    }
+
+    function getNodeTitle(isRange) {
+        if (isRange) {
+            return ''+
+                '<div class="server-title-icon">' +
+                '    <img class="server-icon" src="images/range-icon.png" /> ' +
+                '</div>' +
+                '<div class="server-title-text">&nbsp;Range no&nbsp;</div>';
+        } else {
+            return ''+
+                '<div class="server-title-icon">' +
+                '    <img class="server-icon" src="images/node-icon.png" /> ' +
+                '</div>' +
+                '<div class="server-title-text">&nbsp;Node no&nbsp;</div>';
+        }
     }
 
     function addNewElement (isRange) {
@@ -630,7 +663,7 @@ eskimo.NodesConfig = function() {
         var newIn = ' '+
             '<div id="field'+ next +'" name="field'+ next +'" class="form-group col-md-12 node-config-element" >'+
             '    <div class="col-md-12 node-config-element-wrapper"> '+
-            '        <label class="col-md-3 control-label" id="label'+next+'">'+(isRange ? 'Range no' : 'Node no')+' ' + next + '</label> '+
+            '        <label class="col-md-3 control-label" id="label'+next+'">'+getNodeTitle(isRange)+' <div class="server-title-text">' + next + '</div></label> '+
             '        <div class="col-md-6"> '+
             '            <input id="action_id'+next+'" name="action_id'+next+'" type="text" placeholder="'+
                                 (isRange ? 'IP addresses range, e.g 192.168.1.10-192.168.1.25' : 'IP address, e.g. 192.168.10.10')+
