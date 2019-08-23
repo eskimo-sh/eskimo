@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.Service;
 import org.apache.http.HttpHost;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,12 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -51,49 +56,113 @@ public class ProxyManagerService {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    private Map<String, HttpHost> serverHostMap = new ConcurrentHashMap<>();
+    @Autowired
+    private ConnectionManagerService connectionManagerService;
+
+    //private Map<String, HttpHost> serverHostMap = new ConcurrentHashMap<>();
+    private Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
     /** For tests */
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
 
-    public HttpHost getServerHost(String service) {
-        return serverHostMap.get(service);
+    public HttpHost getServerHost(String serviceId) {
+        ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
+        return new HttpHost("localhost", config.getLocalPort(), "http");
     }
 
-    public String getServerURI(String service) {
-        HttpHost serverHost = getServerHost(service);
+    public String getServerURI(String serviceName, String pathInfo) {
+
+        Service service = servicesDefinition.getService(serviceName);
+
+        String serviceId = null;
+        String targetHost = null;
+        if (!service.isUnique()) {
+            targetHost = pathInfo.startsWith("/") ?
+                    pathInfo.substring(pathInfo.indexOf("/", 1)) :
+                    pathInfo.substring(pathInfo.indexOf("/"));
+        }
+        serviceId = service.getServiceId(targetHost);
+
+        HttpHost serverHost = getServerHost(serviceId);
         if (serverHost == null) {
-            throw new IllegalStateException("No host stored for " + service);
+            throw new IllegalStateException("No host stored for " + serviceId);
         }
         return serverHost.getSchemeName() + "://" + serverHost.getHostName() + ":" + serverHost.getPort() + "/";
     }
 
-    public void updateServerForService(String serviceName, String host) {
+    public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
+        return proxyTunnelConfigs.values().stream()
+                .filter(config -> config.getRemoteAddress().equals(host))
+                .collect(Collectors.toList());
+    }
+
+    public void updateServerForService(String serviceName, String host) throws ConnectionManagerException  {
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
 
-            // Don't bother with HTTPS, everything will go through SSH tunnels in anyway
-            HttpHost newHHost = new HttpHost(host, service.getUiConfig().getProxyTargetPort(), "http");
+            // need to make a distinction between unique and multiple services here !!
+            String serviceId = service.getServiceId(host);
 
-            HttpHost prevHHost = serverHostMap.get(serviceName);
+            ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
-            if (prevHHost == null || !prevHHost.toURI().equals(newHHost.toURI())) {
+            if (prevConfig == null || !prevConfig.getRemoteAddress().equals(host)) {
 
-                // TODO Handle host has changed !
+                // Handle host has changed !
+                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(generateLocalPort(), host, service.getUiConfig().getProxyTargetPort());
+                proxyTunnelConfigs.put(serviceId, newConfig);
 
-                if (prevHHost != null) {
-
-                    // TODO former tunnel needs to be closed
-
-                } else {
-
-                    // TODO Create new tunnel
+                if (prevConfig != null) {
+                    connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
                 }
-            }
 
-            serverHostMap.put(serviceName, newHHost);
+                connectionManagerService.recreateTunnels (host);
+            }
         }
     }
+
+    public void removeServerForService(String serviceName, String ipAddress) throws ConnectionManagerException {
+
+        Service service = servicesDefinition.getService(serviceName);
+        String serviceId = service.getServiceId(ipAddress);
+
+        ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
+
+        if (prevConfig != null) {
+
+            proxyTunnelConfigs.remove(serviceId);
+            connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
+        }
+
+    }
+
+    /** get a port number from 49152 to 65535 */
+    private int generateLocalPort() {
+        int portNumber = -1;
+        int tryCount = 0;
+        do {
+            int randInc = (int) (Math.random() * (65534.0 - 49152.0));
+            portNumber = 49152 + randInc;
+            tryCount++;
+        } while (isLocalPortInUse(portNumber) && tryCount < 10000);
+        if (tryCount >= 10000) {
+            throw new IllegalStateException();
+        }
+        return portNumber;
+    }
+
+    private boolean isLocalPortInUse(int port) {
+        try {
+            // ServerSocket try to open a LOCAL port
+            new ServerSocket(port).close();
+            // local port can be opened, it's available
+            return false;
+        } catch(IOException e) {
+            // local port cannot be opened, it's in use
+            return true;
+        }
+    }
+
+
 }

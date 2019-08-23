@@ -151,7 +151,7 @@ public class ServicesDefinition implements InitializingBean {
 
             if (servicesConfig.hasPath(serviceString+".ui")) {
 
-                UIConfig uiConfig = new UIConfig();
+                UIConfig uiConfig = new UIConfig(service);
                 uiConfig.setUrlTemplate((String) servicesConfig.getValueForPath(serviceString+".ui.urlTemplate"));
                 uiConfig.setWaitTime((Integer) servicesConfig.getValueForPath(serviceString+".ui.waitTime"));
                 uiConfig.setProxyContext((String) servicesConfig.getValueForPath(serviceString+".ui.proxyContext"));

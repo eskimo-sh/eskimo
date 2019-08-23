@@ -43,12 +43,18 @@ public class UIConfig {
 
     private static final Logger logger = Logger.getLogger(UIConfig.class);
 
+    private final Service service;
+
     private String urlTemplate;
     private String proxyContext;
     private Integer proxyTargetPort;
     private int waitTime;
     private String title;
     private String icon;
+
+    public UIConfig (Service service) {
+        this.service = service;
+    }
 
     public String getIcon() {
         return icon;
@@ -98,6 +104,7 @@ public class UIConfig {
             put("waitTime", waitTime);
             put("title", title);
             put("icon", icon);
+            put("unique", service.isUnique());
         }});
     }
 

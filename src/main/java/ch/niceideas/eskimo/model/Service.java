@@ -238,4 +238,12 @@ public class Service {
     public void addAdditionalMemory(String memAdditionalService) {
         this.additionalmemoryServices.add(memAdditionalService);
     }
+
+    public String getServiceId(String host) {
+        if (isUnique()) {
+            return name;
+        } else {
+            return name + host;
+        }
+    }
 }

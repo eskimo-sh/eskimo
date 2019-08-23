@@ -35,7 +35,7 @@
 package ch.niceideas.eskimo.configurations;
 
 import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.services.EskimoServiceProxyServlet;
+import ch.niceideas.eskimo.services.ServicesProxyServlet;
 import ch.niceideas.eskimo.services.ProxyManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
@@ -63,7 +63,7 @@ public class ProxyConfiguration {
     public ServletRegistrationBean servletRegistrationBean(){
 
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean<>(
-                new EskimoServiceProxyServlet(proxyManagerService),//, service.getName()),
+                new ServicesProxyServlet(proxyManagerService, servicesDefinition),//, service.getName()),
                 Arrays.stream(servicesDefinition.listUIServices())
                         .map(serviceName -> servicesDefinition.getService(serviceName))
                         .filter(Service::isProxied)

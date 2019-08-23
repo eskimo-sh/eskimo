@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class EskimoServicesConfigChecker {
+public class NodesConfigurationChecker {
 
     private static Pattern re = Pattern.compile("([a-zA-Z\\-_]+)([0-9]*)");
 

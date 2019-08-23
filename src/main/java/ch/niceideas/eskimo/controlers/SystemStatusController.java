@@ -84,7 +84,7 @@ public class SystemStatusController {
             setupService.ensureSetupCompleted();
             return systemService.getStatus();
 
-        } catch (JSONException | FileException | SystemException | NodesConfigurationException e) {
+        } catch (JSONException | FileException | SystemException | NodesConfigurationException | ConnectionManagerException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus (e);
 

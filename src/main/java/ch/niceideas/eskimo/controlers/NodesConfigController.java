@@ -72,7 +72,7 @@ public class NodesConfigController {
     private SetupService setupService;
 
     @Autowired
-    private EskimoServicesConfigChecker nodesConfigChecker;
+    private NodesConfigurationChecker nodesConfigChecker;
 
     @Autowired
     private ServicesDefinition servicesDefinition;

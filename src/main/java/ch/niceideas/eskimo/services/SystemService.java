@@ -236,7 +236,7 @@ public class SystemService {
         }
     }
 
-    public String getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException {
+    public String getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
 
         // 0. Build returned status
         SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
@@ -494,7 +494,7 @@ public class SystemService {
 
                         try {
                             operation.call(opToPerform, error);
-                        } catch (SystemException | JSONException | FileException | SetupException e) {
+                        } catch (SystemException | JSONException | FileException | SetupException | ConnectionManagerException e) {
                             logger.error(e, e);
                             error.set(e);
                             throw new RuntimeException(e);
@@ -543,30 +543,32 @@ public class SystemService {
         }
     }
 
-    void restartServiceForSystem(String service, String ipAddress) throws FileException, SetupException, JSONException, SystemException {
+    void restartServiceForSystem(String service, String ipAddress) throws JSONException, SystemException {
         systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
                 (builder) -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
                 status -> {});
     }
 
     void uninstallService(String service, String ipAddress)
-            throws SystemException, JSONException, FileException, SetupException {
+            throws SystemException, JSONException, ConnectionManagerException {
         String nodeName = ipAddress.replaceAll("\\.", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 (builder) -> proceedWithServiceUninstallation(builder, ipAddress, service),
                 status -> status.removeRootKey(service + "_installed_on_IP_" + nodeName));
+        proxyManagerService.removeServerForService(service, ipAddress);
     }
 
     void uninstallServiceNoOp(String service, String ipAddress)
-            throws SystemException, JSONException, FileException, SetupException {
+            throws SystemException, JSONException, ConnectionManagerException {
         String nodeName = ipAddress.replaceAll("\\.", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 (builder) -> {},
                 status -> status.removeRootKey(service + "_installed_on_IP_" + nodeName));
+        proxyManagerService.removeServerForService(service, ipAddress);
     }
 
     void installService(String service, String ipAddress)
-            throws SystemException, JSONException, FileException, SetupException {
+            throws SystemException, JSONException {
         String nodeName = ipAddress.replaceAll("\\.", "-");
         systemOperationService.applySystemOperation("installation of " + service + " on " + ipAddress,
                 (builder) -> proceedWithServiceInstallation(builder, ipAddress, service),
@@ -684,7 +686,7 @@ public class SystemService {
                     if (shall) {
                         if (!installed) {
 
-                            statusMap.put(("service_" + service + "_" + nodeName), "NA");
+                            statusMap.put("service_" + service + "_" + nodeName, "NA");
 
                         } else {
 
@@ -693,10 +695,10 @@ public class SystemService {
                             boolean running = parser.getServiceStatus(service).equals("running");
 
                             if (!running) {
-                                statusMap.put(("service_" + service + "_" + nodeName), "KO");
+                                statusMap.put("service_" + service + "_" + nodeName, "KO");
 
                             } else {
-                                statusMap.put(("service_" + service + "_" + nodeName), "OK");
+                                statusMap.put("service_" + service + "_" + nodeName, "OK");
 
                                 // configure proxy if required
                                 proxyManagerService.updateServerForService(service, ipAddress);
@@ -704,18 +706,20 @@ public class SystemService {
                         }
                     } else {
                         if (installed) {
-                            statusMap.put(("service_" + service + "_" + nodeName), "TD"); // To Be Deleted
+                            statusMap.put("service_" + service + "_" + nodeName, "TD"); // To Be Deleted
                         }
                     }
                 }
             }
-        } catch (SSHCommandException | JSONException e) {
+        } catch (SSHCommandException | JSONException | ConnectionManagerException e) {
             logger.error(e, e);
             throw new SystemException(e.getMessage(), e);
         }
     }
 
-    public void handleStatusChanges(ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> liveIps) throws FileException, SetupException {
+    public void handleStatusChanges(
+            ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> liveIps)
+            throws FileException, SetupException, ConnectionManagerException {
 
         // If there is some processing pending, then nothing is reliable, just move on
         if (!isProcessingPending()) {
@@ -774,7 +778,10 @@ public class SystemService {
         }
     }
 
-    boolean handleRemoveServiceIfDown(ServicesInstallStatusWrapper savedSystemStatusWrapper, SystemStatusWrapper systemStatusWrapper, String serviceStatusFullString, String savedService, String nodeName) throws JSONException {
+    boolean handleRemoveServiceIfDown(
+            ServicesInstallStatusWrapper savedSystemStatusWrapper, SystemStatusWrapper systemStatusWrapper,
+            String serviceStatusFullString, String savedService, String nodeName)
+            throws JSONException, ConnectionManagerException {
 
         boolean changes = false;
 
@@ -793,7 +800,9 @@ public class SystemService {
         return changes;
     }
 
-    boolean countErrorAndRemoveServices(ServicesInstallStatusWrapper servicesInstallationStatus, String serviceStatusFullString, String savedService, String nodeName) {
+    boolean countErrorAndRemoveServices(
+            ServicesInstallStatusWrapper servicesInstallationStatus, String serviceStatusFullString,
+            String savedService, String nodeName) throws ConnectionManagerException {
         boolean changes = false;
         // otherwise count error
         Integer counter = serviceMissingCounter.get(serviceStatusFullString);
@@ -811,6 +820,10 @@ public class SystemService {
                 servicesInstallationStatus.removeRootKey(serviceStatusFullString);
                 serviceMissingCounter.remove(serviceStatusFullString);
                 notificationService.addEvent("error", "Service " + savedService + " on " + nodeName + " vanished!");
+
+                // unconfigure proxy if required
+                proxyManagerService.removeServerForService(savedService, nodeName.replaceAll("-", "."));
+
                 changes = true;
 
             } else {
@@ -1043,7 +1056,8 @@ public class SystemService {
 
 
     interface PooledOperation {
-        void call(Pair<String, String> operation, AtomicReference<Exception> error) throws SystemException, JSONException, FileException, SetupException;
+        void call(Pair<String, String> operation, AtomicReference<Exception> error)
+                throws SystemException, JSONException, FileException, SetupException, ConnectionManagerException;
     }
 
     interface ServiceOperation<V> {

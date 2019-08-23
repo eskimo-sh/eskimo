@@ -60,7 +60,7 @@ Software.
 
     <Loggers>
         <!-- LOG everything at INFO level -->
-        <Root level="info">
+        <Root level="debug">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Root>
@@ -68,6 +68,7 @@ Software.
         <Logger name="org" level="info"></Logger>
         <Logger name="com" level="info"></Logger>
         <Logger name="ch" level="info"></Logger>
+        <Logger name="ch.niceideas.eskimo.services" level="debug"></Logger>
     </Loggers>
 
 </Configuration>

@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,7 +45,7 @@ import static org.junit.Assert.assertThrows;
 
 public class EskimoServicesConfigCheckerTest  {
 
-    private EskimoServicesConfigChecker nodeConfigChecker = new EskimoServicesConfigChecker();
+    private NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
 
     @Before
     public void setUp() throws Exception {

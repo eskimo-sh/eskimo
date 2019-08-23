@@ -36,7 +36,9 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +48,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -61,9 +61,14 @@ public class ConnectionManagerService {
     @Autowired
     private SetupService setupService;
 
+    @Autowired
+    private ProxyManagerService proxyManagerService;
+
     private ReentrantLock connectionMapLock = new ReentrantLock();
 
     private Map<String, Connection> connectionMap = new HashMap<>();
+    private Map<Connection, List<LocalPortForwarderWrapper>> portForwardersMap = new HashMap<>();
+
     private Map<String, Long> connectionAges = new HashMap<>();
 
     private String privateSShKeyContent = null;
@@ -106,6 +111,7 @@ public class ConnectionManagerService {
 
             // if connection doesn't exist, create it
             if (connection == null) {
+                logger.info ("Creating connection to " + hostAddress);
                 connection = new Connection(hostAddress, sshPort);
                 connection.setTCPNoDelay(true);
                 connection.connect(null, tcpConnectionTimeout, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
@@ -120,6 +126,8 @@ public class ConnectionManagerService {
                         (String)systemConfig.getValueForPath("ssh_username"),
                         privateSShKeyContent.toCharArray(),
                         null);
+
+                recreateTunnels(connection, hostAddress);
 
                 if (!connection.isAuthenticationComplete()) {
                     throw new IOException("Authentication failed");
@@ -140,6 +148,7 @@ public class ConnectionManagerService {
                         logger.warn ("Previous connection to " + hostAddress + " is too old. Recreating ...");
                         connectionMap.remove(hostAddress);
                         connectionAges.remove(hostAddress);
+                        closeConnection(connection);
                         return getConnection(hostAddress);
                     }
 
@@ -172,6 +181,7 @@ public class ConnectionManagerService {
 
     }
 
+
     public void forceRecreateConnection(String hostAddress) {
         connectionMapLock.lock();
 
@@ -183,7 +193,7 @@ public class ConnectionManagerService {
                 throw new IllegalStateException();
             }
 
-            connection.close();
+            closeConnection(connection);
 
             connectionMap.remove(hostAddress);
             connectionAges.remove(hostAddress);
@@ -191,6 +201,74 @@ public class ConnectionManagerService {
         } finally  {
             connectionMapLock.unlock();
         }
+    }
+
+    private void closeConnection (Connection connection) {
+        try {
+            logger.info ("Closing connection");
+
+            for (LocalPortForwarderWrapper localPortForwarder : portForwardersMap.get(connection)) {
+                localPortForwarder.close();
+            }
+
+            connection.close();
+        } catch (Exception e) {
+            logger.debug (e, e);
+        }
+    }
+
+
+    private void recreateTunnels(Connection connection, String host) throws ConnectionManagerException {
+
+        // Find out about declared forwarders to be handled
+        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(host);
+
+        // close port forwarders that are not declared anymore
+        final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
+        List<LocalPortForwarderWrapper> toBeClosed = previousForwarders.stream()
+                .filter(forwarder -> notIn (forwarder, tunnelConfigs))
+                .collect(Collectors.toList());
+
+        try {
+            for (LocalPortForwarderWrapper forwarder : toBeClosed) {
+                forwarder.close();
+                previousForwarders.remove(forwarder);
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+            logger.debug(e, e);
+        }
+
+        // recreate those that need to be recreated
+        List<ProxyTunnelConfig> toBeCreated = tunnelConfigs.stream()
+                .filter(config -> notIn (config, previousForwarders))
+                .collect(Collectors.toList());
+
+        for (ProxyTunnelConfig config : toBeCreated) {
+            previousForwarders.add (new LocalPortForwarderWrapper(
+                    connection, config.getLocalPort(), config.getRemoteAddress(), config.getRemotePort()));
+        }
+    }
+
+    private List<LocalPortForwarderWrapper> getForwarders(Connection connection) {
+        List<LocalPortForwarderWrapper> previousForwarders = portForwardersMap.get(connection);
+        if (previousForwarders == null) {
+            previousForwarders = new ArrayList<>();
+            portForwardersMap.put(connection, previousForwarders);
+        }
+        return previousForwarders;
+    }
+
+    private boolean notIn(ProxyTunnelConfig config, List<LocalPortForwarderWrapper> previousForwarders) {
+        return !previousForwarders.stream().anyMatch(forwarder -> forwarder.matches(config));
+    }
+
+    private boolean notIn(LocalPortForwarderWrapper forwarder, List<ProxyTunnelConfig> tunnelConfigs) {
+        return !tunnelConfigs.stream().anyMatch(config -> forwarder.matches(config));
+    }
+
+    public void recreateTunnels(String host) throws ConnectionManagerException {
+        recreateTunnels(getConnection(host), host);
     }
 
     private class ConnectionOperationWatchDog {
@@ -203,18 +281,66 @@ public class ConnectionManagerService {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    try {
-                        logger.warn ("Force closing connection");
-                        connection.close();
-                    } catch (Exception e) {
-                        logger.debug (e, e);
-                    }
+                    closeConnection(connection);
                 }
             }, sshOperationTimeout);
         }
 
         public void close() {
             timer.cancel();
+        }
+    }
+
+    private class LocalPortForwarderWrapper {
+
+        private final LocalPortForwarder forwarder;
+
+        private final int localPort;
+        private final String targetHost;
+        private final int targetPort;
+
+        public LocalPortForwarderWrapper (Connection connection, int localPort, String targetHost, int targetPort) throws ConnectionManagerException {
+            this.localPort = localPort;
+            this.targetHost = targetHost;
+            this.targetPort = targetPort;
+            try {
+                logger.info ("Creating tunnel from " + localPort + " to " + targetHost + ":" + targetPort);
+                this.forwarder = connection.createLocalPortForwarder(localPort, targetHost, targetPort);
+            } catch (IOException e) {
+                logger.error (e, e);
+                throw new ConnectionManagerException(e);
+            }
+        }
+
+        public void close() {
+            try {
+                forwarder.close();
+            } catch (IOException e) {
+                logger.warn (e.getMessage());
+                logger.debug (e, e);
+            }
+        }
+
+        public boolean matches (String targetHost, int targetPort) {
+            return targetHost.equals(this.targetHost) && (targetPort == this.targetPort);
+        }
+
+        public boolean matches(ProxyTunnelConfig config) {
+            return matches(config.getRemoteAddress(), config.getRemotePort());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            LocalPortForwarderWrapper that = (LocalPortForwarderWrapper) o;
+            return targetPort == that.targetPort &&
+                    Objects.equals(targetHost, that.targetHost);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(targetHost, targetPort);
         }
     }
 }

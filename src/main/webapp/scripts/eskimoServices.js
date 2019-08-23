@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     eskimo = {}
 }
-eskimo.Services = function() {
+eskimo.Services = function () {
 
     var that = this;
 
@@ -95,7 +95,7 @@ eskimo.Services = function() {
     }
 
     /* For tests */
-    this.setEmptyFrameTarget = function (emptyFrameTarget){
+    this.setEmptyFrameTarget = function (emptyFrameTarget) {
         EMPTY_FRAMETARGET = emptyFrameTarget;
     };
     this.setUiServices = function (uiServices) {
@@ -109,7 +109,7 @@ eskimo.Services = function() {
 
         if (!eskimoMain.isSetupDone()) {
 
-            showSetupNotDone ("Service " + service + " is not available at this stage.");
+            showSetupNotDone("Service " + service + " is not available at this stage.");
 
         } else {
 
@@ -128,6 +128,7 @@ eskimo.Services = function() {
             }
         }
     }
+
     this.showServiceIFrame = showServiceIFrame;
 
     function checkIFrames() {
@@ -145,24 +146,31 @@ eskimo.Services = function() {
         $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
 
         // ... and back to URL
-        setTimeout (function() { $("#iframe-content-" + service).attr('src', uiConfig.actualUrl); });
+        setTimeout(function () {
+            $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
+        });
     };
 
     function buildUrl(uiConfig, nodeAddress) {
         var actualUrl = null;
         if (uiConfig.proxyContext != null && uiConfig.proxyContext != "") {
-            actualUrl = uiConfig.proxyContext;
+            if (uiConfig.unique) {
+                actualUrl = uiConfig.proxyContext;
+            } else {
+                actualUrl = uiConfig.proxyContext + "/" + nodeAddress;
+            }
         } else {
 
             if (uiConfig.urlTemplate == null || uiConfig.urlTemplate == "") {
                 throw "uiConfig.urlTemplate is empty !";
             }
-            actualUrl = uiConfig.urlTemplate.substring (0, uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}"))
+            actualUrl = uiConfig.urlTemplate.substring(0, uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}"))
                 + nodeAddress
-                + uiConfig.urlTemplate.substring (uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}") + 14);
+                + uiConfig.urlTemplate.substring(uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}") + 14);
         }
         return actualUrl;
     }
+
     /* For tests */
     this.buildUrl = buildUrl;
 
@@ -172,7 +180,7 @@ eskimo.Services = function() {
 
         var urlChanged = false;
         if (uiConfig.actualUrl != null && uiConfig.actualUrl != "") {
-            var newUrl = buildUrl (uiConfig, nodeAddress);
+            var newUrl = buildUrl(uiConfig, nodeAddress);
             if (uiConfig.actualUrl != newUrl) {
                 urlChanged = true;
             }
@@ -182,6 +190,7 @@ eskimo.Services = function() {
 
         return urlChanged;
     }
+
     /* For tests */
     this.shouldReinitialize = shouldReinitialize;
 
@@ -239,6 +248,7 @@ eskimo.Services = function() {
             }
         }
     }
+
     this.serviceMenuServiceFoundHook = serviceMenuServiceFoundHook;
 
     function createServicesMenu() {
@@ -249,7 +259,7 @@ eskimo.Services = function() {
 
             var uiConfig = UI_SERVICES_CONFIG[service];
 
-            var menuEntry = ''+
+            var menuEntry = '' +
                 '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                 '    <a href="javascript:eskimoMain.getServices().showServiceIFrame(\'' + service + '\');">\n' +
                 '        <img src="' + uiConfig.icon + '"></img>\n' +
@@ -260,6 +270,7 @@ eskimo.Services = function() {
             $("#mainFolderMenuAnchor").after(menuEntry);
         }
     }
+
     /** for tests */
     this.createServicesMenu = createServicesMenu;
 
@@ -285,6 +296,7 @@ eskimo.Services = function() {
             $("#main-content").append($(iframeWrapperString));
         }
     }
+
     /** for tests */
     this.createServicesIFrames = createServicesIFrames;
 
