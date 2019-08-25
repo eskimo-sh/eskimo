@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.ProxyReplacement;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.Service;
 import org.apache.http.*;
@@ -194,6 +195,10 @@ public class ServicesProxyServlet extends ProxyServlet {
     protected void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse,
                                       HttpRequest proxyRequest, HttpServletRequest servletRequest)
             throws IOException {
+
+        String serviceName = getServiceName(servletRequest);
+        Service service = servicesDefinition.getService(serviceName);
+
         HttpEntity entity = proxyResponse.getEntity();
 
         String prefixPath = getPrefixPath(servletRequest);
@@ -213,61 +218,40 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         } else {
             if (entity != null) {
-                OutputStream servletOutputStream = servletResponse.getOutputStream();
 
-                StringWriter sw = new StringWriter();
-                BufferedWriter write = new BufferedWriter(sw);
+                String inputString = StreamUtils.getAsString(entity.getContent());
 
-                BufferedReader read = new BufferedReader(new InputStreamReader(entity.getContent()));
+                String resultString = performReplacements(service, servletRequest.getRequestURI(), prefixPath, inputString);
 
-
-                performReplacements(servletRequest.getRequestURI(), prefixPath, write, read);
-
-                write.close();
-                read.close();
-
-                byte[] result = sw.toString().getBytes();
+                byte[] result = resultString.getBytes();
 
                 // overwrite content length header
                 servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);
 
+                OutputStream servletOutputStream = servletResponse.getOutputStream();
                 StreamUtils.copy(new ByteArrayInputStream(result), servletOutputStream);
             }
         }
     }
 
-    void performReplacements(String requestURI, String prefixPath, BufferedWriter write, BufferedReader read) throws IOException {
-        String line = null;
-        while ((line = read.readLine()) != null) {
-            line = line.replaceAll("src=\"/", "src=\"/"+ prefixPath +"/");
-            line = line.replaceAll("action=\"/", "action=\"/"+ prefixPath +"/");
-            line = line.replaceAll("href=\"/", "href=\"/"+ prefixPath +"/");
-            line = line.replaceAll("/api/v1","/"+ prefixPath +"/api/v1");
-            line = line.replaceAll("\"/static/", "\"/"+ prefixPath +"/static/");
-            line = line.replaceAll("uiroot}}/history", "uiroot}}/"+ prefixPath +"/history");
+    String performReplacements(Service service, String requestURI, String prefixPath, String input) throws IOException {
+        input = input.replace("src=\"/", "src=\"/"+ prefixPath +"/");
+        input = input.replace("action=\"/", "action=\"/"+ prefixPath +"/");
+        input = input.replace("href=\"/", "href=\"/"+ prefixPath +"/");
+        input = input.replace("href='/", "href='/"+ prefixPath +"/");
+        input = input.replace("/api/v1","/"+ prefixPath +"/api/v1");
+        input = input.replace("\"/static/", "\"/"+ prefixPath +"/static/");
 
-            // Mesos specific stuff
-            line = line.replaceAll("'//' \\+ leader_info.hostname \\+ ':' \\+ leader_info.port", "'/"+ prefixPath+"'");
-            line = line.replaceAll("agentURLPrefix\\(agent, false\\)", "'/mesos-agent/' + agent.hostname");
-            line = line.replaceAll("agentURLPrefix\\(agent, true\\)", "'/mesos-agent/' + agent.hostname + '/' + agent.pid.substring(0, agent.pid.indexOf('@'))");
-
-
-            if (requestURI.contains("controllers.js")) {
-                line = line.replaceAll("return '';", "return '/"+ prefixPath + "';");
-            }
-
-
-            // FIXME Now I need to detect (for mesos for instance) links to other services (console to agents)
-            // TDO
-
-            for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
-                ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
-                line.replaceAll(config.getRemoteAddress()+":"+config.getLocalPort(), "/" + key);
-            }
-
-            write.write(line);
-            write.write("\n");
+        for (ProxyReplacement replacement : service.getUiConfig().getProxyReplacements()) {
+            input = replacement.performReplacement(input, prefixPath, requestURI);
         }
+
+        for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
+            ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
+            input = input.replaceAll(config.getRemoteAddress()+":"+config.getLocalPort(), "/" + key);
+        }
+
+        return input;
     }
 
     /**

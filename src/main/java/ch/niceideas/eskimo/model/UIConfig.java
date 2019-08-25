@@ -37,7 +37,9 @@ package ch.niceideas.eskimo.model;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class UIConfig {
 
@@ -50,6 +52,7 @@ public class UIConfig {
     private int waitTime;
     private String title;
     private String icon;
+    private List<ProxyReplacement> proxyReplacements = new ArrayList<>();
 
     public UIConfig (Service service) {
         this.service = service;
@@ -104,5 +107,13 @@ public class UIConfig {
     }
     public void setProxyTargetPort(Integer proxyTargetPort) {
         this.proxyTargetPort = proxyTargetPort;
+    }
+
+    public void addProxyReplacement(ProxyReplacement pr) {
+        proxyReplacements.add (pr);
+    }
+
+    public List<ProxyReplacement> getProxyReplacements() {
+        return proxyReplacements;
     }
 }

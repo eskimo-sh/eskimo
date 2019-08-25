@@ -130,6 +130,29 @@
     },
     "ui": {
       "proxyTargetPort" : 5050,
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "'//' + leader_info.hostname + ':' + leader_info.port",
+          "target" : "'/{PREFIX_PATH}'"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "agentURLPrefix(agent, false)",
+          "target" : "'/mesos-agent/' + agent.hostname"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "agentURLPrefix(agent, true)",
+          "target" : "'/mesos-agent/' + agent.hostname + '/' + agent.pid.substring(0, agent.pid.indexOf('@'))"
+        },
+        {
+          "type" : "PLAIN",
+          "urlPattern" : "controllers.js",
+          "source" : "return '';",
+          "target" : "return '/{PREFIX_PATH}';"
+        }
+      ],
       "waitTime": 10000,
       "title" : "Mesos Console",
       "icon" : "images/mesos-master-icon.png"
@@ -237,7 +260,14 @@
       "proxyTargetPort" : 18080,
       "waitTime": 24000,
       "title" : "Spark Console",
-      "icon" : "images/spark-icon.png"
+      "icon" : "images/spark-icon.png",
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "uiroot}}/history\", \"uiroot}}/",
+          "target" : "uiroot}}/{PREFIX_PATH}/history"
+        }
+      ]
     },
     "dependencies": [
       {

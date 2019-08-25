@@ -162,6 +162,28 @@ public class ServicesDefinition implements InitializingBean {
                 uiConfig.setIcon((String) servicesConfig.getValueForPath(serviceString+".ui.icon"));
 
                 service.setUiConfig(uiConfig);
+
+                if (servicesConfig.hasPath(serviceString+".ui.proxyReplacements")) {
+
+                    JSONArray proxyReplacements = servicesConfig.getSubJSONObject(serviceString).getJSONObject("ui").getJSONArray("proxyReplacements");
+                    for (int i = 0; i < proxyReplacements.length(); i++) {
+
+                        JSONObject proxyReplacement = proxyReplacements.getJSONObject(i);
+                        String typeAsString = proxyReplacement.getString("type");
+                        String source = proxyReplacement.getString("source");
+                        String target = proxyReplacement.getString("target");
+                        String urlPattern = proxyReplacement.has("urlPattern") ? proxyReplacement.getString("urlPattern") : null;
+
+                        ProxyReplacement pr = new ProxyReplacement();
+                        pr.setType(ProxyReplacement.ProxyReplacementType.valueOf(typeAsString));
+                        pr.setSource(source);
+                        pr.setTarget(target);
+                        pr.setUrlPattern(urlPattern);
+
+                        uiConfig.addProxyReplacement (pr);
+                    }
+
+                }
             }
 
             if (servicesConfig.hasPath(serviceString+".dependencies")) {
