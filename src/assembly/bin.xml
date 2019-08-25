@@ -123,18 +123,4 @@ Software.
             <destName>services.json</destName>
         </file>
     </files>
-    <!--
-    <files>
-        <file>
-            <source>AWESOME.txt</source>
-            <outputDirectory>/MyFiles</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>LICENSE.txt</source>
-            <outputDirectory>/License</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-    </files>
-    -->
 </assembly>

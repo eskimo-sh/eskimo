@@ -153,8 +153,10 @@ public class ServicesDefinition implements InitializingBean {
 
                 UIConfig uiConfig = new UIConfig(service);
                 uiConfig.setUrlTemplate((String) servicesConfig.getValueForPath(serviceString+".ui.urlTemplate"));
-                uiConfig.setWaitTime((Integer) servicesConfig.getValueForPath(serviceString+".ui.waitTime"));
-                uiConfig.setProxyContext((String) servicesConfig.getValueForPath(serviceString+".ui.proxyContext"));
+                Integer uiWaitTime = (Integer) servicesConfig.getValueForPath(serviceString+".ui.waitTime");
+                if (uiWaitTime != null) {
+                    uiConfig.setWaitTime(uiWaitTime);
+                }
                 uiConfig.setProxyTargetPort((Integer) servicesConfig.getValueForPath(serviceString+".ui.proxyTargetPort"));
                 uiConfig.setTitle((String) servicesConfig.getValueForPath(serviceString+".ui.title"));
                 uiConfig.setIcon((String) servicesConfig.getValueForPath(serviceString+".ui.icon"));
@@ -281,16 +283,23 @@ public class ServicesDefinition implements InitializingBean {
                 .sorted().toArray(String[]::new);
     }
 
+    public String[] listProxiedServices() {
+        return services.values().stream()
+                .filter(it -> it.isProxied())
+                .sorted(Comparator.comparingInt(Service::getConfigOrder))
+                .map(Service::getName).toArray(String[]::new);
+    }
+
     public String[] listUIServices() {
         return services.values().stream()
-                .filter(it -> it.getUiConfig() != null)
+                .filter(it -> it.isUiService())
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
                 .map(Service::getName).toArray(String[]::new);
     }
 
     public Map<String, UIConfig> getUIServicesConfig() {
         return services.values().stream()
-                .filter(it -> it.getUiConfig() != null)
+                .filter(it -> it.isUiService())
                 .collect(Collectors.toMap(Service::getName, Service::getUiConfig));
     }
 

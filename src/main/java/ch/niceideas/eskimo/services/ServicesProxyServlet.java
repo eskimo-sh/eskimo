@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.Service;
 import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -78,21 +80,32 @@ public class ServicesProxyServlet extends ProxyServlet {
             return serviceName;
         } else {
 
-            String targetHost = getTargetHost(servletRequest, serviceName);
-            return serviceName + "/" + targetHost;
+            String targetHost = proxyManagerService.extractHostFromPathInfo(servletRequest.getPathInfo());
+            return serviceName + "/" + targetHost.replaceAll("\\.", "-");
         }
     }
 
+    /*
     private String getTargetHost(HttpServletRequest servletRequest, String serviceName) {
         String uri = servletRequest.getRequestURI();
         int indexOfServiceName = uri.indexOf(serviceName);
         return uri.substring(indexOfServiceName+1, uri.indexOf("/", indexOfServiceName + 2));
     }
+    */
 
     @Override
     protected HttpHost getTargetHost(HttpServletRequest servletRequest) {
         String serviceName = getServiceName(servletRequest);
-        return proxyManagerService.getServerHost(serviceName);
+
+        Service service = servicesDefinition.getService(serviceName);
+
+        String serviceId = serviceName;
+        if (!service.isUnique()) {
+            String targetHost = proxyManagerService.extractHostFromPathInfo(servletRequest.getPathInfo());
+            serviceId = service.getServiceId(targetHost);
+        }
+
+        return proxyManagerService.getServerHost(serviceId);
     }
 
     @Override
@@ -202,29 +215,58 @@ public class ServicesProxyServlet extends ProxyServlet {
             if (entity != null) {
                 OutputStream servletOutputStream = servletResponse.getOutputStream();
 
-                BufferedWriter write = new BufferedWriter(new OutputStreamWriter(servletOutputStream));
+                StringWriter sw = new StringWriter();
+                BufferedWriter write = new BufferedWriter(sw);
 
                 BufferedReader read = new BufferedReader(new InputStreamReader(entity.getContent()));
-                String line = null;
-                while ((line = read.readLine()) != null) {
-                    line = line.replaceAll("src=\"/", "src=\"/"+ prefixPath +"/");
-                    line = line.replaceAll("action=\"/", "action=\"/"+ prefixPath +"/");
-                    line = line.replaceAll("href=\"/", "href=\"/"+ prefixPath +"/");
-                    line = line.replaceAll("/api/v1","/"+ prefixPath +"/api/v1");
-                    line = line.replaceAll("\"/static/", "\"/"+ prefixPath +"/static/");
-                    line = line.replaceAll("uiroot}}/history", "uiroot}}/"+ prefixPath +"/history");
 
 
-                    // FIXME Now I need to detect (for mesos for instance) links to other services (console to agents)
-                    // TDO
-
-                    write.write(line);
-                    write.write("\n");
-                }
+                performReplacements(servletRequest.getRequestURI(), prefixPath, write, read);
 
                 write.close();
                 read.close();
+
+                byte[] result = sw.toString().getBytes();
+
+                // overwrite content length header
+                servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);
+
+                StreamUtils.copy(new ByteArrayInputStream(result), servletOutputStream);
             }
+        }
+    }
+
+    void performReplacements(String requestURI, String prefixPath, BufferedWriter write, BufferedReader read) throws IOException {
+        String line = null;
+        while ((line = read.readLine()) != null) {
+            line = line.replaceAll("src=\"/", "src=\"/"+ prefixPath +"/");
+            line = line.replaceAll("action=\"/", "action=\"/"+ prefixPath +"/");
+            line = line.replaceAll("href=\"/", "href=\"/"+ prefixPath +"/");
+            line = line.replaceAll("/api/v1","/"+ prefixPath +"/api/v1");
+            line = line.replaceAll("\"/static/", "\"/"+ prefixPath +"/static/");
+            line = line.replaceAll("uiroot}}/history", "uiroot}}/"+ prefixPath +"/history");
+
+            // Mesos specific stuff
+            line = line.replaceAll("'//' \\+ leader_info.hostname \\+ ':' \\+ leader_info.port", "'/"+ prefixPath+"'");
+            line = line.replaceAll("agentURLPrefix\\(agent, false\\)", "'/mesos-agent/' + agent.hostname");
+            line = line.replaceAll("agentURLPrefix\\(agent, true\\)", "'/mesos-agent/' + agent.hostname + '/' + agent.pid.substring(0, agent.pid.indexOf('@'))");
+
+
+            if (requestURI.contains("controllers.js")) {
+                line = line.replaceAll("return '';", "return '/"+ prefixPath + "';");
+            }
+
+
+            // FIXME Now I need to detect (for mesos for instance) links to other services (console to agents)
+            // TDO
+
+            for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
+                ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
+                line.replaceAll(config.getRemoteAddress()+":"+config.getLocalPort(), "/" + key);
+            }
+
+            write.write(line);
+            write.write("\n");
         }
     }
 

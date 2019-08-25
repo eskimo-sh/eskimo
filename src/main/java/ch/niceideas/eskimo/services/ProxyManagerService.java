@@ -44,6 +44,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,7 +61,6 @@ public class ProxyManagerService {
     @Autowired
     private ConnectionManagerService connectionManagerService;
 
-    //private Map<String, HttpHost> serverHostMap = new ConcurrentHashMap<>();
     private Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
     /** For tests */
@@ -69,6 +70,9 @@ public class ProxyManagerService {
 
     public HttpHost getServerHost(String serviceId) {
         ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
+        if (config == null) {
+            throw new IllegalStateException("No config found for " + serviceId);
+        }
         return new HttpHost("localhost", config.getLocalPort(), "http");
     }
 
@@ -79,9 +83,7 @@ public class ProxyManagerService {
         String serviceId = null;
         String targetHost = null;
         if (!service.isUnique()) {
-            targetHost = pathInfo.startsWith("/") ?
-                    pathInfo.substring(pathInfo.indexOf("/", 1)) :
-                    pathInfo.substring(pathInfo.indexOf("/"));
+            targetHost = extractHostFromPathInfo(pathInfo);
         }
         serviceId = service.getServiceId(targetHost);
 
@@ -90,6 +92,18 @@ public class ProxyManagerService {
             throw new IllegalStateException("No host stored for " + serviceId);
         }
         return serverHost.getSchemeName() + "://" + serverHost.getHostName() + ":" + serverHost.getPort() + "/";
+    }
+
+    public String extractHostFromPathInfo(String pathInfo) {
+        int startIndex = 0;
+        if (pathInfo.startsWith("/")) {
+            startIndex = 1;
+        }
+        int lastIndex = pathInfo.indexOf("/", startIndex + 1);
+        if (lastIndex == -1) {
+            lastIndex = pathInfo.length();
+        }
+        return pathInfo.substring(startIndex, lastIndex);
     }
 
     public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
@@ -165,4 +179,11 @@ public class ProxyManagerService {
     }
 
 
+    public Collection<String> getAllTunnelConfigKeys() {
+        return proxyTunnelConfigs.keySet();
+    }
+
+    public ProxyTunnelConfig getTunnelConfig(String key) {
+        return proxyTunnelConfigs.get(key);
+    }
 }

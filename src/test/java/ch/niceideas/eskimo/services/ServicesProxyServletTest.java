@@ -32,47 +32,52 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.configurations;
+package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.services.ServicesProxyServlet;
-import ch.niceideas.eskimo.services.ProxyManagerService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.mitre.dsmiley.httpproxy.ProxyServlet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.MemoryModel;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.Topology;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
-@Configuration
-public class ProxyConfiguration {
+import static org.junit.Assert.*;
 
-    @Autowired
-    private ProxyManagerService proxyManagerService;
+public class ServicesProxyServletTest {
 
-    @Autowired
-    private ServicesDefinition servicesDefinition;
+    private ProxyManagerService pms;
+    private ServicesDefinition sd;
 
-    @Autowired
-    private Environment env;
+    private ServicesProxyServlet servlet;
 
-    @Bean
-    public ServletRegistrationBean servletRegistrationBean(){
-
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean<>(
-                new ServicesProxyServlet(proxyManagerService, servicesDefinition),//, service.getName()),
-                Arrays.stream(servicesDefinition.listProxiedServices())
-                        .map(serviceName -> servicesDefinition.getService(serviceName))
-                        .map(service -> "/" + service.getName() + "/*")
-                        .toArray(String[]::new));
-
-        servletRegistrationBean.addInitParameter(ProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
-
-        servletRegistrationBean.setName("eskimo-proxy");
-        return servletRegistrationBean;
+    @Before
+    public void setUp() throws Exception {
+        pms = new ProxyManagerService();
+        sd = new ServicesDefinition();
+        sd.afterPropertiesSet();
+        servlet = new ServicesProxyServlet(pms, sd);
     }
 
+    @Test
+    public void testMesosSpecificReplacements() throws Exception {
+        String toReplace = "return '//' + leader_info.hostname + ':' + leader_info.port;";
+        StringWriter result = new StringWriter();
+        servlet.performReplacements("", "test/test", new BufferedWriter (result), new BufferedReader(new StringReader(toReplace)));
+        assertEquals("return '/test/test';", result.toString());
+
+        toReplace = "    // time we are retrieving state), fallback to the current master.\n" +
+                "    return '';";
+        result = new StringWriter();
+        servlet.performReplacements("controllers.js", "test/test", new BufferedWriter (result), new BufferedReader(new StringReader(toReplace)));
+        assertEquals("return '/test/test';", result.toString());
+    }
 }

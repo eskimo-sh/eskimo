@@ -221,7 +221,7 @@ public class Service {
     }
 
     public boolean isProxied() {
-        return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getProxyContext());
+        return getUiConfig() != null && getUiConfig().getProxyTargetPort() != null;
     }
 
     public boolean hasDependency(Service service) {
@@ -243,7 +243,11 @@ public class Service {
         if (isUnique()) {
             return name;
         } else {
-            return name + host;
+            return name + "/" + host.replaceAll("\\.", "-");
         }
+    }
+
+    public boolean isUiService() {
+        return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getTitle());
     }
 }

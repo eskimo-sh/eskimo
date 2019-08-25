@@ -129,7 +129,7 @@
       "memory": "neglectable"
     },
     "ui": {
-      "urlTemplate": "http://{NODE_ADDRESS}:5050/#/",
+      "proxyTargetPort" : 5050,
       "waitTime": 10000,
       "title" : "Mesos Console",
       "icon" : "images/mesos-master-icon.png"
@@ -141,7 +141,10 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
-    ]
+    ],
+    "comment": {
+      "urlTemplate": "http://{NODE_ADDRESS}:5050/#/"
+    }
   },
 
   "mesos-agent": {
@@ -151,6 +154,9 @@
       "name" : "Agent",
       "selectionLayout" : { "row" : 2, "col" : 3},
       "memory": "neglectable"
+    },
+    "ui": {
+      "proxyTargetPort" : 5051
     },
     "dependencies": [
       {
@@ -197,7 +203,6 @@
       "memory": "neglectable"
     },
     "ui": {
-      "proxyContext": "./kafka-manager/",
       "proxyTargetPort" : 22080,
       "waitTime": 30000,
       "title" : "Kafka manager",
@@ -229,7 +234,6 @@
       "memory": "neglectable"
     },
     "ui": {
-      "proxyContext": "./spark-history-server/",
       "proxyTargetPort" : 18080,
       "waitTime": 24000,
       "title" : "Spark Console",

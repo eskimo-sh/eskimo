@@ -46,7 +46,6 @@ public class UIConfig {
     private final Service service;
 
     private String urlTemplate;
-    private String proxyContext;
     private Integer proxyTargetPort;
     private int waitTime;
     private String title;
@@ -89,18 +88,10 @@ public class UIConfig {
         this.urlTemplate = urlTemplate;
     }
 
-    public String getProxyContext() {
-        return proxyContext;
-    }
-
-    public void setProxyContext(String proxyContext) {
-        this.proxyContext = proxyContext;
-    }
-
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
-            put("proxyContext", proxyContext == null ? "" : proxyContext);
+            put("proxyContext", "./"+service.getName()+"/");
             put("waitTime", waitTime);
             put("title", title);
             put("icon", icon);

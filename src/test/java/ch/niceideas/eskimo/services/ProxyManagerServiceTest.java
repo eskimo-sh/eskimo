@@ -32,47 +32,34 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.configurations;
+package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.services.ServicesProxyServlet;
-import ch.niceideas.eskimo.services.ProxyManagerService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.mitre.dsmiley.httpproxy.ProxyServlet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 
-@Configuration
-public class ProxyConfiguration {
+import static org.junit.Assert.assertEquals;
 
-    @Autowired
-    private ProxyManagerService proxyManagerService;
+public class ProxyManagerServiceTest {
 
-    @Autowired
-    private ServicesDefinition servicesDefinition;
+    private ProxyManagerService pms;
+    private ServicesDefinition sd;
 
-    @Autowired
-    private Environment env;
+    @Before
+    public void setUp() throws Exception {
+        pms = new ProxyManagerService();
+        sd = new ServicesDefinition();
 
-    @Bean
-    public ServletRegistrationBean servletRegistrationBean(){
-
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean<>(
-                new ServicesProxyServlet(proxyManagerService, servicesDefinition),//, service.getName()),
-                Arrays.stream(servicesDefinition.listProxiedServices())
-                        .map(serviceName -> servicesDefinition.getService(serviceName))
-                        .map(service -> "/" + service.getName() + "/*")
-                        .toArray(String[]::new));
-
-        servletRegistrationBean.addInitParameter(ProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
-
-        servletRegistrationBean.setName("eskimo-proxy");
-        return servletRegistrationBean;
     }
 
+    @Test
+    public void testExtractHostFromPathInfo() throws Exception {
+        assertEquals("192-168-10-11", pms.extractHostFromPathInfo("192-168-10-11//slave(1)/monitor/statistics"));
+        assertEquals("192-168-10-11", pms.extractHostFromPathInfo("/192-168-10-11//slave(1)/monitor/statistics"));
+        assertEquals("192-168-10-11", pms.extractHostFromPathInfo("/192-168-10-11"));
+    }
 }
