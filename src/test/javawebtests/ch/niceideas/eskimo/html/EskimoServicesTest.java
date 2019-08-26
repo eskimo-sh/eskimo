@@ -136,8 +136,11 @@ public class EskimoServicesTest extends AbstractWebTest {
         page.executeJavaScript("uiConfig = {'urlTemplate': 'http://{NODE_ADDRESS}:9999/test'}"); // proxyContext
         assertEquals("http://192.168.10.11:9999/test", page.executeJavaScript("eskimoServices.buildUrl(uiConfig, '192.168.10.11')").getJavaScriptResult());
 
-        page.executeJavaScript("uiConfig = {'proxyContext': '/test'}"); //
+        page.executeJavaScript("uiConfig = {'proxyContext': '/test', 'unique': true}"); //
         assertEquals("/test", page.executeJavaScript("eskimoServices.buildUrl(uiConfig, '192.168.10.11')").getJavaScriptResult());
+
+        page.executeJavaScript("uiConfig = {'proxyContext': '/test'}"); //
+        assertEquals("/test/192-168-10-11", page.executeJavaScript("eskimoServices.buildUrl(uiConfig, '192.168.10.11')").getJavaScriptResult());
     }
 
 }

@@ -73,7 +73,17 @@ public abstract class AbstractSystemTest {
         clearResultBuilder();
         clearCommandScript();
 
-        servicesDefinition = new ServicesDefinition();
+        servicesDefinition = new ServicesDefinition() {
+            @Override
+            public String getAllServicesString() {
+                return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster gdash spark-history-server";
+            }
+            @Override
+            public String[] getAllServices() {
+                return new String[] {"kafka zookeeper", "ntp", "mesos-master", "spark-executor", "kibana cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server"};
+            }
+        };
+        servicesDefinition.afterPropertiesSet();
 
         proxyManagerService = new ProxyManagerService();
         proxyManagerService.setServicesDefinition(servicesDefinition);
@@ -113,17 +123,7 @@ public abstract class AbstractSystemTest {
         systemOperationService.setSystemService(systemService);
         systemService.setSystemOperationService (systemOperationService);
 
-        ServicesDefinition sd = new ServicesDefinition() {
-            @Override
-            public String getAllServicesString() {
-                return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster gdash spark-history-server";
-            }
-            @Override
-            public String[] getAllServices() {
-                return new String[] {"kafka zookeeper", "ntp", "mesos-master", "spark-executor", "kibana cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server"};
-            }
-        };
-        systemService.setServicesDefinition(sd);
+        systemService.setServicesDefinition(servicesDefinition);
     }
 
     protected void clearCommandScript() {

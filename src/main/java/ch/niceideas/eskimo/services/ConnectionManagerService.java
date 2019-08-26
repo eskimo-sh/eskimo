@@ -99,20 +99,23 @@ public class ConnectionManagerService {
     void setSetupService (SetupService setupService) {
         this.setupService = setupService;
     }
+    void setProxyManagerService (ProxyManagerService proxyManagerService) {
+        this.proxyManagerService = proxyManagerService;
+    }
 
 
-    public Connection getConnection (String hostAddress) throws ConnectionManagerException {
+    public Connection getConnection (String ipAddress) throws ConnectionManagerException {
 
         connectionMapLock.lock();
 
         try {
 
-            Connection connection = connectionMap.get(hostAddress);
+            Connection connection = connectionMap.get(ipAddress);
 
             // if connection doesn't exist, create it
             if (connection == null) {
-                logger.info ("Creating connection to " + hostAddress);
-                connection = new Connection(hostAddress, sshPort);
+                logger.info ("Creating connection to " + ipAddress);
+                connection = new Connection(ipAddress, sshPort);
                 connection.setTCPNoDelay(true);
                 connection.connect(null, tcpConnectionTimeout, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 
@@ -127,14 +130,14 @@ public class ConnectionManagerService {
                         privateSShKeyContent.toCharArray(),
                         null);
 
-                recreateTunnels(connection, hostAddress);
+                recreateTunnels(connection, ipAddress);
 
                 if (!connection.isAuthenticationComplete()) {
                     throw new IOException("Authentication failed");
                 }
 
-                connectionMap.put(hostAddress, connection);
-                connectionAges.put(hostAddress, System.currentTimeMillis());
+                connectionMap.put(ipAddress, connection);
+                connectionAges.put(ipAddress, System.currentTimeMillis());
             }
 
             // otherwise test it and attempt to recreate it if it is down or too old
@@ -142,14 +145,14 @@ public class ConnectionManagerService {
 
                 try {
 
-                    Long connectionAge = connectionAges.get(hostAddress);
+                    Long connectionAge = connectionAges.get(ipAddress);
 
                     if (connectionAge + maximumConnectionAge < System.currentTimeMillis()) {
-                        logger.warn ("Previous connection to " + hostAddress + " is too old. Recreating ...");
-                        connectionMap.remove(hostAddress);
-                        connectionAges.remove(hostAddress);
+                        logger.warn ("Previous connection to " + ipAddress + " is too old. Recreating ...");
+                        connectionMap.remove(ipAddress);
+                        connectionAges.remove(ipAddress);
                         closeConnection(connection);
-                        return getConnection(hostAddress);
+                        return getConnection(ipAddress);
                     }
 
                     ConnectionOperationWatchDog sg = new ConnectionOperationWatchDog(connection);
@@ -158,13 +161,13 @@ public class ConnectionManagerService {
                     sg.close();
 
                     // update connection age
-                    connectionAges.put(hostAddress, System.currentTimeMillis());
+                    connectionAges.put(ipAddress, System.currentTimeMillis());
 
                 } catch (IOException | IllegalStateException e) {
-                    logger.warn ("Previous connection to " + hostAddress + " got into problems. Recreating ...");
-                    connectionMap.remove(hostAddress);
-                    connectionAges.remove(hostAddress);
-                    return getConnection(hostAddress);
+                    logger.warn ("Previous connection to " + ipAddress + " got into problems. Recreating ...");
+                    connectionMap.remove(ipAddress);
+                    connectionAges.remove(ipAddress);
+                    return getConnection(ipAddress);
                 }
             }
 
@@ -182,12 +185,12 @@ public class ConnectionManagerService {
     }
 
 
-    public void forceRecreateConnection(String hostAddress) {
+    public void forceRecreateConnection(String ipAddress) {
         connectionMapLock.lock();
 
         try {
 
-            Connection connection = connectionMap.get(hostAddress);
+            Connection connection = connectionMap.get(ipAddress);
 
             if (connection == null) {
                 throw new IllegalStateException();
@@ -195,8 +198,8 @@ public class ConnectionManagerService {
 
             closeConnection(connection);
 
-            connectionMap.remove(hostAddress);
-            connectionAges.remove(hostAddress);
+            connectionMap.remove(ipAddress);
+            connectionAges.remove(ipAddress);
 
         } finally  {
             connectionMapLock.unlock();
@@ -218,10 +221,10 @@ public class ConnectionManagerService {
     }
 
 
-    private void recreateTunnels(Connection connection, String host) throws ConnectionManagerException {
+    private void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
 
         // Find out about declared forwarders to be handled
-        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(host);
+        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
 
         // close port forwarders that are not declared anymore
         final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);

@@ -67,6 +67,9 @@ public class ProxyManagerService {
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
+    void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
+        this.connectionManagerService = connectionManagerService;
+    }
 
     public HttpHost getServerHost(String serviceId) {
         ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
@@ -112,26 +115,26 @@ public class ProxyManagerService {
                 .collect(Collectors.toList());
     }
 
-    public void updateServerForService(String serviceName, String host) throws ConnectionManagerException  {
+    public void updateServerForService(String serviceName, String ipAddress) throws ConnectionManagerException  {
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
 
             // need to make a distinction between unique and multiple services here !!
-            String serviceId = service.getServiceId(host);
+            String serviceId = service.getServiceId(ipAddress);
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
-            if (prevConfig == null || !prevConfig.getRemoteAddress().equals(host)) {
+            if (prevConfig == null || !prevConfig.getRemoteAddress().equals(ipAddress)) {
 
                 // Handle host has changed !
-                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(generateLocalPort(), host, service.getUiConfig().getProxyTargetPort());
+                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(generateLocalPort(), ipAddress, service.getUiConfig().getProxyTargetPort());
                 proxyTunnelConfigs.put(serviceId, newConfig);
 
                 if (prevConfig != null) {
                     connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
                 }
 
-                connectionManagerService.recreateTunnels (host);
+                connectionManagerService.recreateTunnels (ipAddress);
             }
         }
     }

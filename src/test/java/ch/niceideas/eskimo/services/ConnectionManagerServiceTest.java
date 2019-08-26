@@ -54,6 +54,8 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         return new ProcessShellCommandFactory();
     }
 
+    private ProxyManagerService pms = null;
+
     private ConnectionManagerService cm = null;
 
     private SetupService setupService = null;
@@ -62,11 +64,17 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     public void setUp() throws Exception {
         setupService = new SetupService();
         String tempPath = SystemServiceTest.createTempStoragePath();
+
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
         cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT);
         cm.setSetupService (setupService);
+
+        pms = new ProxyManagerService();
+        pms.setConnectionManagerService(cm);
+        cm.setProxyManagerService(pms);
+        pms.setConnectionManagerService(cm);
     }
 
     @Test

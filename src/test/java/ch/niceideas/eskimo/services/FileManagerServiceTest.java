@@ -74,6 +74,8 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     private ConnectionManagerService cm = null;
 
+    private ProxyManagerService pms = null;
+
     private FileManagerService sc = null;
 
     private SSHCommandService scs = null;
@@ -97,6 +99,11 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         sc.setConnectionManagerService(cm);
         sc.setSshCommandService(scs);
+
+        pms = new ProxyManagerService();
+        pms.setConnectionManagerService(cm);
+        cm.setProxyManagerService(pms);
+        pms.setConnectionManagerService(cm);
     }
 
     @Test

@@ -157,7 +157,7 @@ eskimo.Services = function () {
             if (uiConfig.unique) {
                 actualUrl = uiConfig.proxyContext;
             } else {
-                actualUrl = uiConfig.proxyContext + "/" + nodeAddress;
+                actualUrl = uiConfig.proxyContext + "/" + nodeAddress.replace(/\./g, "-");
             }
         } else {
 
