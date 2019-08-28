@@ -67,10 +67,38 @@
       "memory": "small"
     },
     "ui": {
-      "urlTemplate": "http://{NODE_ADDRESS}:3000/",
+      "urlTemplateTTT": "http://{NODE_ADDRESS}:3000/",
+      "urlTemplateTTTT": "./kibana/app/kibana",
+      "proxyTargetPort" : 3000,
       "waitTime": 10000,
       "title" : "Grafana Monitoring",
-      "icon" : "images/grafana-icon.png"
+      "icon" : "images/grafana-icon.png",
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "<base href=\"/grafana/grafana/\" />",
+          "target" : "<base href=\"/grafana/\" />"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "\"url\":\"/grafana/grafana/",
+          "target" : "\"url\":\"/grafana/"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "\"appSubUrl\":\"/grafana/grafana\"",
+          "target" : "\"appSubUrl\":\"/grafana\""
+        },
+        {
+          "comment": {
+            "text": "for whatever reason, I need to\
+            replace"
+          },
+          "type" : "PLAIN",
+          "source" : "/grafana/api/v1",
+          "target" : "/api/v1"
+        }
+      ]
     }
   },
 
@@ -343,7 +371,8 @@
       "memory": "neglectable"
     },
     "ui": {
-      "urlTemplate": "http://{NODE_ADDRESS}:9000/#/overview?host=Eskimo",
+      "urlTemplate": "./cerebro/#/overview?host=Eskimo",
+      "proxyTargetPort" : 9000,
       "waitTime": 10000,
       "title" : "Cerebro",
       "icon" : "images/cerebro-icon.png"
@@ -386,10 +415,12 @@
       "memory": "small"
     },
     "ui": {
-      "urlTemplate": "http://{NODE_ADDRESS}:5601/",
+      "urlTemplate": "./kibana/app/kibana",
+      "proxyTargetPort" : 5601,
       "waitTime": 45000,
       "title" : "Kibana",
-      "icon" : "images/kibana-icon.png"
+      "icon" : "images/kibana-icon.png",
+      "applyStandardProxyReplacements": false
     },
     "dependencies": [
       {

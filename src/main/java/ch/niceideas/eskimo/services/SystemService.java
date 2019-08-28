@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
 import org.apache.log4j.Logger;

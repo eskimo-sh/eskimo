@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
-import com.trilead.ssh2.Connection;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assume;

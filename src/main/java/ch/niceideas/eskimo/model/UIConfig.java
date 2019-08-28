@@ -52,10 +52,19 @@ public class UIConfig {
     private int waitTime;
     private String title;
     private String icon;
+    private boolean applyStandardProxyReplacements = true;
     private List<ProxyReplacement> proxyReplacements = new ArrayList<>();
 
     public UIConfig (Service service) {
         this.service = service;
+    }
+
+    public boolean isApplyStandardProxyReplacements() {
+        return applyStandardProxyReplacements;
+    }
+
+    public void setApplyStandardProxyReplacements(boolean applyStandardProxyReplacements) {
+        this.applyStandardProxyReplacements = applyStandardProxyReplacements;
     }
 
     public String getIcon() {

@@ -61,6 +61,9 @@ sudo sed -i s/"#server.name: \"your-hostname\""/"server.name: \"Eskimo\""/g /usr
 sudo sed -i s/"#pid.file: \/var\/run\/kibana.pid"/"pid.file: \/var\/run\/kibana\/kibana.pid"/g /usr/local/etc/kibana//kibana.yml
 sudo sed -i s/"#logging.dest: stdout"/"logging.dest: \/var\/log\/kibana\/kibana.log"/g /usr/local/etc/kibana/kibana.yml
 
+# It runs behind a proxy in eskimo
+sudo sed -i s/"#server.basePath: \"\""/"server.basePath: \"\/kibana\""/g /usr/local/etc/kibana/kibana.yml
+
 echo " - enabling user elasticsearch to change config"
 chown -R elasticsearch. /usr/local/lib/kibana/config
 

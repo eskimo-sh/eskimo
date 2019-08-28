@@ -84,6 +84,38 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '# enable anonymous access\nenabled = true'\
 '/g;p;}' /usr/local/lib/grafana/conf/defaults.ini
 
+# #################################### Server ##############################
+# [server]
+# # Protocol (http, https, socket)
+# protocol = http
+#
+# # The ip address to bind to, empty will bind to all interfaces
+# http_addr =
+#
+# # The http port to use
+# http_port = 3000
+#
+# # The public facing domain name used to access grafana from a browser
+# domain = localhost
+#
+# # Redirect to correct domain if host header does not match domain
+# # Prevents DNS rebinding attacks
+# enforce_domain = false
+#
+# # The full public facing url
+# root_url = %(protocol)s://%(domain)s:%(http_port)s/
+#
+# # Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
+# serve_from_sub_path = false
+
+sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = \/grafana\/"/g \
+    /usr/local/lib/grafana/conf/defaults.ini
+
+sed -i s/"serve_from_sub_path = false"/"serve_from_sub_path = true"/g /usr/local/lib/grafana/conf/defaults.ini
+
+
+
+
 echo " - Copying provisioning configuration"
 sudo cp -Rf /eskimo/provisioning/* /usr/local/lib/grafana/conf/provisioning/
 

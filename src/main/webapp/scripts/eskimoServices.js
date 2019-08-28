@@ -153,20 +153,29 @@ eskimo.Services = function () {
 
     function buildUrl(uiConfig, nodeAddress) {
         var actualUrl = null;
-        if (uiConfig.proxyContext != null && uiConfig.proxyContext != "") {
+        if (uiConfig.urlTemplate != null && uiConfig.urlTemplate != "") {
+
+            var indexOfNodeAddress = uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}");
+
+            if (indexOfNodeAddress <= 0) {
+                actualUrl = uiConfig.urlTemplate;
+            } else {
+
+                actualUrl = uiConfig.urlTemplate.substring(0, indexOfNodeAddress)
+                    + nodeAddress
+                    + uiConfig.urlTemplate.substring(indexOfNodeAddress + 14);
+            }
+        } else {
+
+            if (uiConfig.proxyContext == null || uiConfig.proxyContext == "") {
+                throw "uiConfig.proxyContext is empty !";
+            }
+
             if (uiConfig.unique) {
                 actualUrl = uiConfig.proxyContext;
             } else {
                 actualUrl = uiConfig.proxyContext + "/" + nodeAddress.replace(/\./g, "-");
             }
-        } else {
-
-            if (uiConfig.urlTemplate == null || uiConfig.urlTemplate == "") {
-                throw "uiConfig.urlTemplate is empty !";
-            }
-            actualUrl = uiConfig.urlTemplate.substring(0, uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}"))
-                + nodeAddress
-                + uiConfig.urlTemplate.substring(uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}") + 14);
         }
         return actualUrl;
     }

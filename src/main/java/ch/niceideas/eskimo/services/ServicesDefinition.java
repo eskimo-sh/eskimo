@@ -161,6 +161,10 @@ public class ServicesDefinition implements InitializingBean {
                 uiConfig.setTitle((String) servicesConfig.getValueForPath(serviceString+".ui.title"));
                 uiConfig.setIcon((String) servicesConfig.getValueForPath(serviceString+".ui.icon"));
 
+                if (servicesConfig.hasPath(serviceString+".ui.applyStandardProxyReplacements")) {
+                    uiConfig.setApplyStandardProxyReplacements((Boolean)servicesConfig.getValueForPath(serviceString+".ui.applyStandardProxyReplacements"));
+                }
+
                 service.setUiConfig(uiConfig);
 
                 if (servicesConfig.hasPath(serviceString+".ui.proxyReplacements")) {

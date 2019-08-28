@@ -34,21 +34,29 @@
 
 package ch.niceideas.eskimo.configurations;
 
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.services.ServicesProxyServlet;
-import ch.niceideas.eskimo.services.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import org.apache.catalina.connector.Connector;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import java.util.Arrays;
 
 @Configuration
-public class ProxyConfiguration {
+@EnableWebSocket
+public class ProxyConfiguration implements WebSocketConfigurer {
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -58,6 +66,37 @@ public class ProxyConfiguration {
 
     @Autowired
     private Environment env;
+
+    /**
+     * Avoid
+     * <code>
+     *     2019-08-28T14:42:32,123 INFO  [http-nio-9090-exec-8] o.a.j.l.DirectJDKLog: Error parsing HTTP request header
+     * Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+     * java.lang.IllegalArgumentException: Invalid character found in the request target. The valid characters are defined in RFC 7230 and RFC 3986
+     * at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:467)
+     * at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:294)
+     * at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+     * at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:834)
+     * at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1415)
+     * at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+     * at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+     * at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+     * at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+     * at java.lang.Thread.run(Thread.java:748)
+     * </code>
+     * @return
+     */
+    @Bean
+    public ConfigurableServletWebServerFactory webServerFactory() {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+        factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
+            @Override
+            public void customize(Connector connector) {
+                connector.setProperty("relaxedQueryChars", "|{}[]");
+            }
+        });
+        return factory;
+    }
 
     @Bean
     public ServletRegistrationBean servletRegistrationBean(){
@@ -73,6 +112,13 @@ public class ProxyConfiguration {
 
         servletRegistrationBean.setName("eskimo-proxy");
         return servletRegistrationBean;
+    }
+
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(new WebSocketProxyServer(), Arrays.stream(servicesDefinition.listProxiedServices())
+                .map(serviceName -> servicesDefinition.getService(serviceName))
+                .map(service -> "/ws/" + service.getName() + "/*")
+                .toArray(String[]::new));
     }
 
 }

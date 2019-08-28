@@ -32,67 +32,31 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.MemoryModel;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.model.Topology;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.*;
-
-public class ServicesProxyServletTest {
+public class ProxyManagerServiceTest {
 
     private ProxyManagerService pms;
     private ServicesDefinition sd;
-
-    private ServicesProxyServlet servlet;
 
     @Before
     public void setUp() throws Exception {
         pms = new ProxyManagerService();
         sd = new ServicesDefinition();
-        sd.afterPropertiesSet();
-        servlet = new ServicesProxyServlet(pms, sd);
+
     }
 
     @Test
-    public void testNominalReplacements() throws Exception {
-
-        Service kafkaManagerService = sd.getService("kafka-manager");
-
-        String toReplace  = "\n <a href='/toto.txt'>\na/a>";
-        String result = servlet.performReplacements(kafkaManagerService, "", "test/test", toReplace );
-        assertEquals("\n" +
-                " <a href='/test/test/toto.txt'>\n" +
-                "a/a>", result);
-    }
-
-    @Test
-    public void testMesosSpecificReplacements() throws Exception {
-
-        Service mesosMasterService = sd.getService("mesos-master");
-
-        String toReplace  = "return '//' + leader_info.hostname + ':' + leader_info.port;";
-        String result = servlet.performReplacements(mesosMasterService, "", "test/test", toReplace );
-        assertEquals("return '/test/test';", result);
-
-        toReplace = "    // time we are retrieving state), fallback to the current master.\n" +
-                "    return '';";
-        result = servlet.performReplacements(mesosMasterService, "controllers.js", "test/test", toReplace );
-        assertEquals("    // time we are retrieving state), fallback to the current master.\n" +
-                "    return '/test/test';", result);
+    public void testExtractHostFromPathInfo() throws Exception {
+        assertEquals("192-168-10-11", pms.extractHostFromPathInfo("192-168-10-11//slave(1)/monitor/statistics"));
+        assertEquals("192-168-10-11", pms.extractHostFromPathInfo("/192-168-10-11//slave(1)/monitor/statistics"));
+        assertEquals("192-168-10-11", pms.extractHostFromPathInfo("/192-168-10-11"));
     }
 }

@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 
