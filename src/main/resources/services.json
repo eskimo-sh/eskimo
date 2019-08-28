@@ -129,10 +129,17 @@
       "memory": "neglectable"
     },
     "ui": {
-      "urlTemplate": "http://{NODE_ADDRESS}:28180/",
+      "proxyTargetPort" : 28180,
       "waitTime": 8000,
       "title" : "Gluster Dashboard",
-      "icon" : "images/gdash-icon.png"
+      "icon" : "images/gdash-icon.png",
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "apiUrl%22%3A%22/data",
+          "target" : "apiUrl%22%3A%22/gdash/data"
+        }
+      ]
     },
     "dependencies": [
       {
