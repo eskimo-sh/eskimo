@@ -90,10 +90,7 @@
           "target" : "\"appSubUrl\":\"/grafana\""
         },
         {
-          "comment": {
-            "text": "for whatever reason, I need to\
-            replace"
-          },
+          "comment": "for whatever reason, I need to replace this without grafana. The thing is that I am not the one putting it ?!?",
           "type" : "PLAIN",
           "source" : "/grafana/api/v1",
           "target" : "/api/v1"
