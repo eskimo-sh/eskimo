@@ -43,7 +43,9 @@ import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 
@@ -237,14 +239,6 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     String performReplacements(Service service, String requestURI, String prefixPath, String input) throws IOException {
         if (service.getUiConfig().isApplyStandardProxyReplacements()) {
-
-            /*
-            USE PROXY IN GRAFANA
-
-                    AND HERE DON'T REPLACE IF ALREADY CONTAINS
-
-                    use custome method and not only .replace()
-                    */
 
             input = input.replace("src=\"/", "src=\"/" + prefixPath + "/");
             input = input.replace("action=\"/", "action=\"/" + prefixPath + "/");

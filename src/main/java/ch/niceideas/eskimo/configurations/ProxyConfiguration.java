@@ -68,7 +68,8 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     private Environment env;
 
     /**
-     * Avoid
+     * This is to avoid following problem with REST requests passed by grafana
+     *
      * <code>
      *     2019-08-28T14:42:32,123 INFO  [http-nio-9090-exec-8] o.a.j.l.DirectJDKLog: Error parsing HTTP request header
      * Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
@@ -84,17 +85,11 @@ public class ProxyConfiguration implements WebSocketConfigurer {
      * at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
      * at java.lang.Thread.run(Thread.java:748)
      * </code>
-     * @return
      */
     @Bean
     public ConfigurableServletWebServerFactory webServerFactory() {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
-            @Override
-            public void customize(Connector connector) {
-                connector.setProperty("relaxedQueryChars", "|{}[]");
-            }
-        });
+        factory.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> connector.setProperty("relaxedQueryChars", "|{}[]"));
         return factory;
     }
 
@@ -115,7 +110,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     }
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketProxyServer(), Arrays.stream(servicesDefinition.listProxiedServices())
+        registry.addHandler(new WebSocketProxyServer(proxyManagerService, servicesDefinition), Arrays.stream(servicesDefinition.listProxiedServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
                 .map(service -> "/ws/" + service.getName() + "/*")
                 .toArray(String[]::new));

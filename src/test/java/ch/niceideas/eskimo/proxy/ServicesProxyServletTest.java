@@ -85,4 +85,74 @@ public class ServicesProxyServletTest {
         assertEquals("    // time we are retrieving state), fallback to the current master.\n" +
                 "    return '/test/test';", result);
     }
+
+    @Test
+    public void testZeppelinReplacements() throws Exception {
+
+        Service zeppelinService = sd.getService("zeppelin");
+
+        String toReplace = "function(e, t, n) {\n" +
+                "    \"use strict\";\n" +
+                "    function r() {\n" +
+                "        this.getPort = function() {\n" +
+                "            var e = Number(location.port);\n" +
+                "            return e || (e = 80,\n" +
+                "            \"https:\" === location.protocol && (e = 443)),\n" +
+                "            9e3 === e && (e = 8080),\n" +
+                "            e\n" +
+                "        }\n" +
+                "        ,\n" +
+                "        this.getWebsocketUrl = function() {\n" +
+                "            var t = \"https:\" === location.protocol ? \"wss:\" : \"ws:\";\n" +
+                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + e(location.pathname) + \"/ws\"\n" +
+                "        }\n" +
+                "        ,\n" +
+                "        this.getBase = function() {\n" +
+                "            return location.protocol + \"//\" + location.hostname + \":\" + this.getPort() + location.pathname\n" +
+                "        }\n" +
+                "        ,\n" +
+                "        this.getRestApiBase = function() {\n" +
+                "            return e(this.getBase()) + \"/api\"\n" +
+                "        }\n" +
+                "        ;\n" +
+                "        var e = function(e) {\n" +
+                "            return e.replace(/\\/$/, \"\")\n" +
+                "        }\n" +
+                "    }\n" +
+                "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
+                "}";
+
+        String result = servlet.performReplacements(zeppelinService, "controllers.js", "test/test", toReplace );
+
+        assertEquals("function(e, t, n) {\n" +
+                "    \"use strict\";\n" +
+                "    function r() {\n" +
+                "        this.getPort = function() {\n" +
+                "            var e = Number(location.port);\n" +
+                "            return e || (e = 80,\n" +
+                "            \"https:\" === location.protocol && (e = 443)),\n" +
+                "            9e3 === e && (e = 8080),\n" +
+                "            e\n" +
+                "        }\n" +
+                "        ,\n" +
+                "        this.getWebsocketUrl = function() {\n" +
+                "            var t = \"https:\" === location.protocol ? \"wss:\" : \"ws:\";\n" +
+                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname) + \"/ws\"\n" +
+                "        }\n" +
+                "        ,\n" +
+                "        this.getBase = function() {\n" +
+                "            return location.protocol + \"//\" + location.hostname + \":\" + this.getPort() + location.pathname\n" +
+                "        }\n" +
+                "        ,\n" +
+                "        this.getRestApiBase = function() {\n" +
+                "            return e(this.getBase()) + \"/api\"\n" +
+                "        }\n" +
+                "        ;\n" +
+                "        var e = function(e) {\n" +
+                "            return e.replace(/\\/$/, \"\")\n" +
+                "        }\n" +
+                "    }\n" +
+                "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
+                "}", result);
+    }
 }

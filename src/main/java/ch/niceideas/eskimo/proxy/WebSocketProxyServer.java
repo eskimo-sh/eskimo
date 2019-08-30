@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,20 +16,29 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WebSocketProxyServer extends AbstractWebSocketHandler {
 
-    private final Map<String, WebSocketProxyForwarder> nextHops = new ConcurrentHashMap<>();
+    private final ProxyManagerService proxyManagerService;
 
-    @Override
-    public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
-        getNextHop(webSocketSession).sendMessageToNextHop(webSocketMessage);
+    private final ServicesDefinition servicesDefinition;
+
+    private final Map<String, WebSocketProxyForwarder> forwarders = new ConcurrentHashMap<>();
+
+    public WebSocketProxyServer(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition) {
+        this.proxyManagerService = proxyManagerService;
+        this.servicesDefinition = servicesDefinition;
     }
 
-    private WebSocketProxyForwarder getNextHop(WebSocketSession webSocketSession) {
-        WebSocketProxyForwarder nextHop = nextHops.get(webSocketSession.getId());
-        if (nextHop == null) {
-            nextHop = new WebSocketProxyForwarder(webSocketSession);
-            nextHops.put(webSocketSession.getId(), nextHop);
+    @Override
+    public void handleMessage(WebSocketSession webSocketServerSession, WebSocketMessage<?> webSocketMessage) throws Exception {
+        getForwarder(webSocketServerSession).sendMessageToNextHop(webSocketMessage);
+    }
+
+    private WebSocketProxyForwarder getForwarder(WebSocketSession webSocketServerSession) {
+        WebSocketProxyForwarder forwarder = forwarders.get(webSocketServerSession.getId());
+        if (forwarder == null) {
+            forwarder = new WebSocketProxyForwarder(proxyManagerService, servicesDefinition, webSocketServerSession);
+            forwarders.put(webSocketServerSession.getId(), forwarder);
         }
-        return nextHop;
+        return forwarder;
     }
 
 }

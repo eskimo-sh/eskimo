@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.log4j.Logger;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketMessage;
@@ -14,11 +15,25 @@ import java.util.concurrent.TimeUnit;
 
 public class WebSocketProxyForwarder {
 
-    private final WebSocketSession webSocketClientSession;
     private final Logger logger = Logger.getLogger(this.getClass());
 
-    public WebSocketProxyForwarder(WebSocketSession webSocketServerSession) {
+    private final WebSocketSession webSocketServerSession;
+
+    private WebSocketSession webSocketClientSession;
+
+    private final ProxyManagerService proxyManagerService;
+
+    private final ServicesDefinition servicesDefinition;
+
+    public WebSocketProxyForwarder(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition, WebSocketSession webSocketServerSession) {
+        this.proxyManagerService = proxyManagerService;
+        this.servicesDefinition = servicesDefinition;
+        this.webSocketServerSession = webSocketServerSession;
         webSocketClientSession = createWebSocketClientSession(webSocketServerSession);
+    }
+
+    public boolean isClosed() {
+        return !webSocketClientSession.isOpen();
     }
 
     private WebSocketHttpHeaders getWebSocketHttpHeaders(final WebSocketSession userAgentSession) {
@@ -47,15 +62,21 @@ public class WebSocketProxyForwarder {
     private WebSocketSession createWebSocketClientSession(WebSocketSession webSocketServerSession) {
         try {
             WebSocketHttpHeaders headers = getWebSocketHttpHeaders(webSocketServerSession);
-            return new StandardWebSocketClient()
-                    .doHandshake(new WebSocketProxyClientHandler(webSocketServerSession), headers, new URI("ws://localhost:9999"))
-                    .get(1000, TimeUnit.MILLISECONDS);
+            WebSocketSession clientSession = new StandardWebSocketClient()
+                    .doHandshake(new WebSocketProxyClientHandler(webSocketServerSession), headers, new URI("ws://192.168.10.11:38080/ws"))
+                    .get(30 * 1000, TimeUnit.MILLISECONDS);
+            clientSession.setBinaryMessageSizeLimit(10_000_000); // 10Mb
+            clientSession.setTextMessageSizeLimit(10_000_000); // 10Mb
+            return clientSession;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public void sendMessageToNextHop(WebSocketMessage<?> webSocketMessage) throws IOException {
+        if (!webSocketClientSession.isOpen()) {
+            webSocketClientSession = createWebSocketClientSession(webSocketServerSession);
+        }
         webSocketClientSession.sendMessage(webSocketMessage);
     }
 

@@ -447,10 +447,18 @@
       "memoryAdditional": ["spark-executor"]
     },
     "ui": {
-      "urlTemplate": "http://{NODE_ADDRESS}:38080/",
+      "urlTemplateOLD": "http://{NODE_ADDRESS}:38080/",
+      "proxyTargetPort" : 38080,
       "waitTime": 35000,
       "title" : "Zeppelin",
-      "icon" : "images/zeppelin-icon.png"
+      "icon" : "images/zeppelin-icon.png",
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws",
+          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname) + \"/ws"
+        }
+      ]
     },
     "dependencies": [
       {
