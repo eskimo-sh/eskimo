@@ -64,6 +64,9 @@ public class ProxyManagerService {
     @Autowired
     private ConnectionManagerService connectionManagerService;
 
+    @Autowired
+    private WebSocketProxyServer webSocketProxyServer;
+
     private Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
     /** For tests */
@@ -138,6 +141,7 @@ public class ProxyManagerService {
                 }
 
                 connectionManagerService.recreateTunnels (ipAddress);
+                webSocketProxyServer.removeForwarders (serviceId); // just remove them, they will be recreated automagically
             }
         }
     }
@@ -153,6 +157,7 @@ public class ProxyManagerService {
 
             proxyTunnelConfigs.remove(serviceId);
             connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
+            webSocketProxyServer.removeForwarders (serviceId);
         }
 
     }
@@ -189,7 +194,7 @@ public class ProxyManagerService {
         return proxyTunnelConfigs.keySet();
     }
 
-    public ProxyTunnelConfig getTunnelConfig(String key) {
-        return proxyTunnelConfigs.get(key);
+    public ProxyTunnelConfig getTunnelConfig(String serviceId) {
+        return proxyTunnelConfigs.get(serviceId);
     }
 }
