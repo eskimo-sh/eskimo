@@ -318,6 +318,7 @@ public class ConnectionManagerService {
 
         public void close() {
             try {
+                logger.info ("CLOSING tunnel from " + localPort + " to " + targetHost + ":" + targetPort);
                 forwarder.close();
             } catch (IOException e) {
                 logger.warn (e.getMessage());

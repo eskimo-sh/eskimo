@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ProxyReplacement;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.Service;
@@ -330,7 +331,12 @@ public class ServicesProxyServlet extends ProxyServlet {
                 }
             }
             // Context path starts with a / if it is not blank
-            curUrl.append(servletRequest.getContextPath());
+            String contextPath = servletRequest.getContextPath();
+            if (StringUtils.isNotBlank(contextPath)) {
+                curUrl.append(contextPath);
+            } else {
+                curUrl.append("/");
+            }
 
             // Servlet path starts with a / if it is not blank
             //curUrl.append(servletRequest.getServletPath()).append("/"); // JKE

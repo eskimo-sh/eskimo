@@ -296,7 +296,7 @@
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
-          "source" : "uiroot}}/history\", \"uiroot}}/",
+          "source" : "uiroot}}/history",
           "target" : "uiroot}}/{PREFIX_PATH}/history"
         }
       ]
