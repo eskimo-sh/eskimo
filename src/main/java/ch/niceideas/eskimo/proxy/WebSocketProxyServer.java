@@ -72,7 +72,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
         }
         WebSocketProxyForwarder forwarder = forwardersForSession.get(targetPath);
         if (forwarder == null) {
-            logger.info ("Creating new forwarder for session " + webSocketServerSession.getId() + " -service ID " + serviceId + " - target path " + targetPath);
+            logger.info ("Creating new forwarder for session : " + webSocketServerSession.getId() + " - service ID : " + serviceId + " - target path : " + targetPath);
             forwarder = new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, servicesDefinition, webSocketServerSession);
             forwardersForSession.put(targetPath, forwarder);
         }
@@ -80,6 +80,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
     }
 
     public void removeForwarders(String serviceId) {
+        logger.info ("Dropping all forwarders for  service ID " + serviceId);
         Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.get(serviceId);
         if (forwardersForService != null) {
             for (Map<String, WebSocketProxyForwarder> forwardersForSession : forwardersForService.values()) {
