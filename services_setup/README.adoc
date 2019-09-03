@@ -200,14 +200,15 @@ A service declaration in `services.json` for instance for `serviceX` would be de
   ## [optional] configuration of the serice web console (if anym)
   "ui": {
 
-    ## optional] either URL template should be configured ...
+    ## optional] (A) either URL template should be configured ...
     "urlTemplate": "http://{NODE_ADDRESS}:{PORT}/",
 
-    ## [optional] or proxy configuration in case the service has to be proxied by eskimo
-    "proxyContext": "{service name}",
+    ## [optional] (B) .... or proxy configuration in case the service has
+    ## to be proxied by eskimo
     "proxyTargetPort" : {target port},
 
-    ## [mandatory] the time  to wait for the web console to initialize before making it available
+    ## [mandatory] the time  to wait for the web console to initialize before
+    ## making it available
     "waitTime": {1000 - X},
 
     ## [mandatory] the name of the menu entry
@@ -215,6 +216,31 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 
     ## [optional] the icon to use (must be available)
     "icon" : "{path relative to web context}"
+
+    ## Whether standard rewrite rules need to be applied to this service
+    "applyStandardProxyReplacements": false,
+
+    ## List of custom rewrite rules for proxying of web consoles
+    "proxyReplacements" : [
+
+      ## first rewrite rule. As many as required can be declared
+      {
+
+        ## [mandatory] Type of rwrite rule. At the moment only PLAIN is supported
+        ## for full text search and replace
+        ## In the future REGEXP type shall be implemented
+        "type" : "PLAIN",
+
+        ## [optional] a text searched in the URL. this replacement is applied only
+        ## if the text is found in the URL
+        "urlPattern" : "url_pattern", ## e.g. controllers.js
+
+        ## [mandatory] source text to be replaced
+        "source" : "[source_URL]", ## e.g. "/API"
+
+        ## [mandatory] replacement text
+        "target" : "[proxied_URL]" ## e.g. "/eskimo/kibana/API"
+      }
   }
 
   ## [optional] array of dependencies that need to be available and configured
@@ -302,6 +328,42 @@ That topology definition file defines all the dependencies and where to find the
 service running on every node.
 
 The "topology definition file" can be fond on nodes in `/etc/eskimo_topology.sh`.
+
+[[proxying]]
+=== Proxying services web consoles
+
+Many services managed by eskimo have web consoles used to administer them, such as mesos-agents, mesos-master,
+kafka-manager, etc.
+Some are even only web consoles used to administer other services or perform Data Science tasks, such as Kibana,
+Zeppelin or GDash, etc.
+
+Eskimo supports two modes for providing these web consoles in its own UI as presented in configuration above:
+
+1. (A) Configuration of an `urlTemplate` which is used by eskimo to show an iframe displaying directly the web console
+from the node on which it is installed. *This method is supported for backwards compatibility purpose but it is not
+recommended*
+2. (B) Configuration of a `proxyTargetPort` for full proxying and tnneling (using SSH) of the whole HTTP flow to the
+web console using eskimo embedded proxying and tunneling feature. *This is the recommanded way* and this is the way
+used by all eskimo pre-packaged services and web consoles.
+
+Proxying works as explained  in the User Guide in the section "SSH Tunelling".
+
+Proxying is however much more complicated to set up since eskimo needs to perform a lot of rewriting on the text
+resources (javascript, html and json) served by the proxied web console to rewrite served URLs to make them pass
+through the proxy.
+
+Eskimo provides a powerful rewrite engine that one can use to implement the rewrite rules defined in the configuration
+as presented above.
+
+*TODO Explain rewrite rule.*
+
+*TODO Explain standard rewrite rules*
+
+*TODO Explain custom rewrite rules*
+
+*TODO Explain patterns such as CONTEXT_PATH, PREFIX_PATH and detail available patterns*
+
+
 
 
 
