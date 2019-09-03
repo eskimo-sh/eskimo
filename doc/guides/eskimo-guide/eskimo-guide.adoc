@@ -57,6 +57,8 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
 
+image::pngs/eskimo_platform.png[800, 800, align="center"]
+
 === Key Features
 
 Eskimo key features are as follows:
@@ -69,7 +71,8 @@ Just define where you want to run which services and let eskimo take care of eve
 
 Move services between nodes or install new services in just a few clicks.
 
-Don’t bother remembering where you installed Web consoles and UI applications, Eskimo wraps them all in a single UI.
+Don’t bother remembering where you installed Web consoles and UI applications, Eskimo wraps them all in a single and
+consistent UI.
 
 a|image::pngs/console.jpg[60, 60]| *Eskimo Web Console*
 
@@ -207,7 +210,7 @@ Choose your services and let eskimo take care of everything.
 
 Eskimo's technical architecture can be illustraed as follows:
 
-image::pngs/technical_architecture.jpg[800, 800, align="center"]
+image::pngs/technical_architecture.png[800, 800, align="center"]
 
 Three components are available in the storage layer
 
@@ -236,7 +239,7 @@ Docker is used to operate and manage services and components along with systemd.
 
 A typical Eskimo application architecture can be illustrated as follows:
 
-image::pngs/application_architecture.jpg[800, 800, align="center"]
+image::pngs/application_architecture.png[800, 800, align="center"]
 
 The above schema illustrates typical data flows within Eskimo
 
@@ -244,15 +247,31 @@ The above schema illustrates typical data flows within Eskimo
 
 This is an example of a possible deployment of Eskimo on a 6 nodes cluster:
 
-image::pngs/system_architecture.jpg[800, 800, align="center"]
+image::pngs/system_architecture.png[800, 800, align="center"]
 
 The Eskimo application itself can be deployed on any of the cluster nodes or on another machine, as in the example
 above.
 
+
+=== SSH Tunelling
+
+One of the most important feature of the Eskimo Web Console is its ability to provide in a single and consistent
+Graphical User Interface al the underlying components administration Consoles such as the mesos Console or the Kafka
+Manager, just as the essential Data Science Application such as Kibana and Zeppelin.
+
+The Eskimo Frontend wraps these other web applications in it's own User Interface and the Eskimo backend proxies their
+HTTP data flows to their respective backend, in a transparent way. The actual localization of these console backends is
+only known by the eskimo backend and is handled automatically.
+Whenever such a console or service is moved from a node to another node, that is completely transparent to the end
+user.
+
+image::pngs/ssh-tunneling.png[800, 800, align="center"]
+
 === Eskimo building
 
-Eskimo build instructions are given in the file `README.adoc` located in the root folder of the eskimo source code
-distribution.
+Eskimo build instructions are given in the file `README.adoc` located in the root folder of the *eskimo source code
+distribution*.
+
 
 [[chap-installation]]
 == Eskimo Installation
