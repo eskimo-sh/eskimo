@@ -87,7 +87,7 @@ sudo bash -c "cd /usr/local/lib/zeppelin/interpreter && ln -s shell sh"
 echo " - FIX - Replacing zeppelin commes-lang3 version 3.4 by spark's version 3.5"
 for i in `find /usr/local/lib/zeppelin/ -name *lang3*3.4*.jar`; do
   sudo rm -f $i
-  sudo ln -s /usr/local/lib/spark-2.4.3/jars/commons-lang3-3.5.jar $i
+  sudo ln -s /usr/local/lib/spark/jars/commons-lang3-3.5.jar $i
 done
 
 echo " - FIX - Replacing zeppelin commes-lang3 version 3.4 by spark's version 3.5 in spark interpreter archive"
