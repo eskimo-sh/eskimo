@@ -222,7 +222,7 @@ public class ConnectionManagerService {
     }
 
 
-    private void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+    protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
 
         // Find out about declared forwarders to be handled
         List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);

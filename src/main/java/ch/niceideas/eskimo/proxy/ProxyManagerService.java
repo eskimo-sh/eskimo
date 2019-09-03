@@ -76,6 +76,9 @@ public class ProxyManagerService {
     public void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
         this.connectionManagerService = connectionManagerService;
     }
+    public void setWebSocketProxyServer(WebSocketProxyServer webSocketProxyServer) {
+        this.webSocketProxyServer = webSocketProxyServer;
+    }
 
     public HttpHost getServerHost(String serviceId) {
         ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);

@@ -84,6 +84,7 @@ public class WebSocketProxyForwarder {
             clientSession.setTextMessageSizeLimit(10_000_000); // 10Mb
             return clientSession;
         } catch (Exception e) {
+            logger.error (e, e);
             throw new RuntimeException(e);
         }
     }

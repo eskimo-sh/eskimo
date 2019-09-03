@@ -37,9 +37,16 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
+import ch.niceideas.eskimo.services.ConnectionManagerException;
+import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import com.trilead.ssh2.Connection;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.servlet.http.HttpServletRequest;
+
+import java.lang.reflect.Proxy;
 
 import static org.junit.Assert.*;
 
@@ -56,6 +63,101 @@ public class ServicesProxyServletTest {
         sd = new ServicesDefinition();
         sd.afterPropertiesSet();
         servlet = new ServicesProxyServlet(pms, sd, "");
+        pms.setServicesDefinition(sd);
+
+        pms.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
+            protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+                // No Op
+            }
+            @Override
+            public void recreateTunnels(String host) throws ConnectionManagerException {
+                // No Op
+            }
+        });
+        pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
+            @Override
+            public void removeForwarders(String serviceId) {
+                // No Op
+            }
+        });
+    }
+
+    @Test
+    public void testGetTargetUri() throws Exception {
+        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletRequest.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getRequestURI")) {
+                        return "/mesos-master/statistics";
+                    } else if (method.getName().equals("getPathInfo")) {
+                        return "/mesos-master/statistics";
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+        pms.updateServerForService("mesos-master", "192.168.10.11");
+
+        assertEquals ("http://localhost:"
+                + pms.getTunnelConfig("mesos-master").getLocalPort()
+                + "/",
+                servlet.getTargetUri(request));
+    }
+
+    @Test
+    public void testRewriteUrlFromRequest() throws Exception {
+        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletRequest.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getRequestURI")) {
+                        return "/mesos-master/statistics?server=192.168.10.13";
+                    } else if (method.getName().equals("getPathInfo")) {
+                        return "/mesos-master/statistics";
+                    } else if (method.getName().equals("getQueryString")) {
+                        return "server=192.168.10.13";
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+        pms.updateServerForService("mesos-master", "192.168.10.11");
+
+        assertEquals("http://localhost:"
+                + pms.getTunnelConfig("mesos-master").getLocalPort()
+                + "/mesos-master/statistics?server=192.168.10.13",
+                servlet.rewriteUrlFromRequest(request));
+    }
+
+    @Test
+    public void testRewriteUrlFromResponse() throws Exception {
+        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletRequest.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getRequestURI")) {
+                        return "/mesos-master/statistics?server=192.168.10.13";
+                    } else if (method.getName().equals("getPathInfo")) {
+                        return "/mesos-master/statistics";
+                    } else if (method.getName().equals("getRequestURL")) {
+                        return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                    } else if (method.getName().equals("getQueryString")) {
+                        return "server=192.168.10.13";
+                    } else if (method.getName().equals("getContextPath")) {
+                        return null;
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+        pms.updateServerForService("mesos-master", "192.168.10.11");
+
+        assertEquals("http://localhost:9090/mesos-master/nodeStats/statistics=192.168.10.13",
+                servlet.rewriteUrlFromResponse(request, "http://localhost:" +
+                     pms.getTunnelConfig("mesos-master").getLocalPort() +
+                    "/nodeStats/statistics=192.168.10.13"));
     }
 
     @Test
@@ -104,7 +206,7 @@ public class ServicesProxyServletTest {
                 "        ,\n" +
                 "        this.getWebsocketUrl = function() {\n" +
                 "            var t = \"https:\" === location.protocol ? \"wss:\" : \"ws:\";\n" +
-                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + e(location.pathname) + \"/ws\"\n" +
+                "            return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws\"\n"+
                 "        }\n" +
                 "        ,\n" +
                 "        this.getBase = function() {\n" +
@@ -137,7 +239,7 @@ public class ServicesProxyServletTest {
                 "        ,\n" +
                 "        this.getWebsocketUrl = function() {\n" +
                 "            var t = \"https:\" === location.protocol ? \"wss:\" : \"ws:\";\n" +
-                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname) + \"/ws\"\n" +
+                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws/zeppelin/ws\"\n" +
                 "        }\n" +
                 "        ,\n" +
                 "        this.getBase = function() {\n" +

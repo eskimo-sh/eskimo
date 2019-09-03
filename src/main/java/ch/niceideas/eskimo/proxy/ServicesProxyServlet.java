@@ -141,15 +141,6 @@ public class ServicesProxyServlet extends ProxyServlet {
         return proxyManagerService.getServerURI(serviceName, servletRequest.getPathInfo());
     }
 
-    /**
-     * Allow overrides of {@link javax.servlet.http.HttpServletRequest#getPathInfo()}.
-     * Useful when url-pattern of servlet-mapping (web.xml) requires manipulation.
-     */
-    @Override
-    protected String rewritePathInfoFromRequest(HttpServletRequest servletRequest) {
-        return servletRequest.getPathInfo();
-    }
-
     private StringBuilder buildRequestUriPath(HttpServletRequest servletRequest) {
         StringBuilder uri = new StringBuilder(500);
 
