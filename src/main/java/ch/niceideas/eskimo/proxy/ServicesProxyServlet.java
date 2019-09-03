@@ -162,13 +162,13 @@ public class ServicesProxyServlet extends ProxyServlet {
         String pathInfo = rewritePathInfoFromRequest(servletRequest);
         if (pathInfo != null) {//ex: /my/path.html
 
+            if (pathInfo.startsWith("/")) {
+                pathInfo = pathInfo.substring(1);
+            }
+
             // Need to remove host from pathInfo
             if (!service.isUnique()) {
-                if (pathInfo.startsWith("/")) {
-                    pathInfo = pathInfo.substring(pathInfo.indexOf("/", 1));
-                } else {
-                    pathInfo = pathInfo.substring(pathInfo.indexOf("/"));
-                }
+                pathInfo = pathInfo.substring(pathInfo.indexOf("/"));
             }
 
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters
@@ -357,7 +357,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             // Context path starts with a / if it is not blank
             String contextPath = servletRequest.getContextPath();
             if (StringUtils.isNotBlank(contextPath)) {
-                curUrl.append(contextPath);
+                curUrl.append(contextPath + "/");
             } else {
                 curUrl.append("/");
             }
