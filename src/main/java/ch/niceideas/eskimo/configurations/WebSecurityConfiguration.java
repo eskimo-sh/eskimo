@@ -60,7 +60,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${security.userJsonFile}")
     private String userJsonFilePath = "/tmp/eskimo-users.json";
 
-    @Value("${server.servlet.context-path}")
+    @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
 
     @Override

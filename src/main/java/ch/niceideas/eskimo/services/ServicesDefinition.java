@@ -67,7 +67,7 @@ public class ServicesDefinition implements InitializingBean {
     private String servicesDefinitionFile = "classpath:services.json";
 
 
-    @Value("${server.servlet.context-path}")
+    @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
 
     private ReentrantLock persistEnvLock = new ReentrantLock();

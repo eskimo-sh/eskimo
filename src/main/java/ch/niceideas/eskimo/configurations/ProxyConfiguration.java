@@ -68,7 +68,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     @Autowired
     private Environment env;
 
-    @Value("${server.servlet.context-path}")
+    @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
 
     /**
