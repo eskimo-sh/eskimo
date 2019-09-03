@@ -245,7 +245,7 @@ eskimo.FileManagers = function() {
             dataType: "json",
             context: this,
             contentType: "application/json; charset=utf-8",
-            url: "/file-manager-open-file?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file,
+            url: "file-manager-open-file?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file,
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -294,7 +294,7 @@ eskimo.FileManagers = function() {
             dataType: "json",
             context: this,
             contentType: "application/json; charset=utf-8",
-            url: "/file-manager-delete?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file ,
+            url: "file-manager-delete?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file ,
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -360,7 +360,7 @@ eskimo.FileManagers = function() {
             dataType: "json",
             context: this,
             contentType: "application/json; charset=utf-8",
-            url: "/file-manager-navigate?address=" + nodeAddress + "&folder=" + currentFolder + "&subFolder=" + subFolder ,
+            url: "file-manager-navigate?address=" + nodeAddress + "&folder=" + currentFolder + "&subFolder=" + subFolder ,
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -421,7 +421,7 @@ eskimo.FileManagers = function() {
             dataType: "json",
             context: this,
             contentType: "application/json; charset=utf-8",
-            url: "/file-manager-connect?address=" +nodeAddress ,
+            url: "file-manager-connect?address=" +nodeAddress ,
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {

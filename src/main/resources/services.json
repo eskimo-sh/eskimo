@@ -67,8 +67,6 @@
       "memory": "small"
     },
     "ui": {
-      "urlTemplateTTT": "http://{NODE_ADDRESS}:3000/",
-      "urlTemplateTTTT": "./kibana/app/kibana",
       "proxyTargetPort" : 3000,
       "waitTime": 10000,
       "title" : "Grafana Monitoring",
@@ -76,27 +74,24 @@
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
-          "source" : "<base href=\"/grafana/grafana/\" />",
-          "target" : "<base href=\"/grafana/\" />"
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "\"url\":\"/grafana/grafana/",
-          "target" : "\"url\":\"/grafana/"
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "\"appSubUrl\":\"/grafana/grafana\"",
-          "target" : "\"appSubUrl\":\"/grafana\""
+          "source" : "{PREFIX_PATH}/{PREFIX_PATH}",
+          "target" : "{PREFIX_PATH}"
         },
         {
           "comment": "for whatever reason, I need to replace this without grafana. The thing is that I am not the one putting it ?!?",
           "type" : "PLAIN",
-          "source" : "/grafana/api/v1",
-          "target" : "/api/v1"
+          "source" : "{CONTEXT_PATH}api/v1",
+          "target" : "api/v1"
+        },
+        {
+          "comment": "for whatever reason, I need to replace this without grafana. The thing is that I am not the one putting it ?!?",
+          "type" : "PLAIN",
+          "source" : "{PREFIX_PATH}/api/v1",
+          "target" : "api/v1"
         }
       ]
-    }
+    },
+    "additionalEnvironment": [ "CONTEXT_PATH" ]
   },
 
   "gluster" : {
@@ -137,7 +132,7 @@
         {
           "type" : "PLAIN",
           "source" : "apiUrl%22%3A%22/data",
-          "target" : "apiUrl%22%3A%22/gdash/data"
+          "target" : "apiUrl%22%3A%22/{PREFIX_PATH}/data"
         }
       ]
     },
@@ -171,12 +166,12 @@
         {
           "type" : "PLAIN",
           "source" : "agentURLPrefix(agent, false)",
-          "target" : "'/mesos-agent/' + agent.hostname"
+          "target" : "'/{CONTEXT_PATH}mesos-agent/' + agent.hostname"
         },
         {
           "type" : "PLAIN",
           "source" : "agentURLPrefix(agent, true)",
-          "target" : "'/mesos-agent/' + agent.hostname + '/' + agent.pid.substring(0, agent.pid.indexOf('@'))"
+          "target" : "'/{CONTEXT_PATH}mesos-agent/' + agent.hostname + '/' + agent.pid.substring(0, agent.pid.indexOf('@'))"
         },
         {
           "type" : "PLAIN",
@@ -424,7 +419,29 @@
       "waitTime": 45000,
       "title" : "Kibana",
       "icon" : "images/kibana-icon.png",
-      "applyStandardProxyReplacements": false
+      "applyStandardProxyReplacements": false,
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "'/kibana",
+          "target" : "'/{PREFIX_PATH}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "\"/kibana",
+          "target" : "\"/{PREFIX_PATH}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "&quot;/kibana",
+          "target" : "&quot;/{PREFIX_PATH}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "url(/kibana",
+          "target" : "url(/{PREFIX_PATH}"
+        }
+      ]
     },
     "dependencies": [
       {
@@ -456,7 +473,7 @@
         {
           "type" : "PLAIN",
           "source" : "return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws",
-          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname) + \"/ws"
+          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws/zeppelin/ws"
         }
       ]
     },

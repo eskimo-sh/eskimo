@@ -55,7 +55,7 @@ public class ServicesProxyServletTest {
         pms = new ProxyManagerService();
         sd = new ServicesDefinition();
         sd.afterPropertiesSet();
-        servlet = new ServicesProxyServlet(pms, sd);
+        servlet = new ServicesProxyServlet(pms, sd, "");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ServicesProxyServletTest {
         Service kafkaManagerService = sd.getService("kafka-manager");
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
-        String result = servlet.performReplacements(kafkaManagerService, "", "test/test", toReplace );
+        String result = servlet.performReplacements(kafkaManagerService, "", "", "test/test", toReplace );
         assertEquals("\n" +
                 " <a href='/test/test/toto.txt'>\n" +
                 "a/a>", result);
@@ -76,12 +76,12 @@ public class ServicesProxyServletTest {
         Service mesosMasterService = sd.getService("mesos-master");
 
         String toReplace  = "return '//' + leader_info.hostname + ':' + leader_info.port;";
-        String result = servlet.performReplacements(mesosMasterService, "", "test/test", toReplace );
+        String result = servlet.performReplacements(mesosMasterService, "", "", "test/test", toReplace );
         assertEquals("return '/test/test';", result);
 
         toReplace = "    // time we are retrieving state), fallback to the current master.\n" +
                 "    return '';";
-        result = servlet.performReplacements(mesosMasterService, "controllers.js", "test/test", toReplace );
+        result = servlet.performReplacements(mesosMasterService, "controllers.js", "", "test/test", toReplace );
         assertEquals("    // time we are retrieving state), fallback to the current master.\n" +
                 "    return '/test/test';", result);
     }
@@ -122,7 +122,7 @@ public class ServicesProxyServletTest {
                 "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}";
 
-        String result = servlet.performReplacements(zeppelinService, "controllers.js", "test/test", toReplace );
+        String result = servlet.performReplacements(zeppelinService, "controllers.js", "", "test/test", toReplace );
 
         assertEquals("function(e, t, n) {\n" +
                 "    \"use strict\";\n" +

@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.configurations;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.security.JSONBackedUserDetailsManager;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -59,8 +60,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${security.userJsonFile}")
     private String userJsonFilePath = "/tmp/eskimo-users.json";
 
+    @Value("${server.servlet.context-path}")
+    private String configuredContextPath = "";
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        String contextPath = StringUtils.isBlank(configuredContextPath) ?
+                "" :
+                (configuredContextPath.startsWith("/") ? "" : "/") + configuredContextPath;
+
         http
             // authentication and authorization stuff
             .authorizeRequests()
@@ -79,7 +88,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     if (isAjax(httpServletRequest)) {
                         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     } else {
-                        httpServletResponse.sendRedirect("/login.html");
+                        httpServletResponse.sendRedirect(contextPath + "/login.html");
                     }
                 }).and()
             // own login stuff

@@ -56,7 +56,7 @@ eskimo.Services = function () {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/get-ui-services-config",
+            url: "get-ui-services-config",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -77,7 +77,7 @@ eskimo.Services = function () {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/list-ui-services",
+            url: "list-ui-services",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {

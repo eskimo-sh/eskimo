@@ -88,7 +88,8 @@ public class Topology {
         return nodeNbr;
     }
 
-    public static Topology create(NodesConfigWrapper nodesConfig, Set<String> deadIps, ServicesDefinition servicesDefinition)
+    public static Topology create(
+            NodesConfigWrapper nodesConfig, Set<String> deadIps, ServicesDefinition servicesDefinition, String contextPath)
             throws ServiceDefinitionException, NodesConfigurationException {
 
         Topology topology = new Topology();
@@ -105,7 +106,7 @@ public class Topology {
 
                 topology.defineMasters(service, deadIps, result.getValue(), nodesConfig);
 
-                topology.defineAdditionalEnvionment(service, servicesDefinition, result.getValue(), nodesConfig);
+                topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getValue(), nodesConfig);
             }
 
         } catch (JSONException | FileException | SetupException e) {
@@ -117,7 +118,7 @@ public class Topology {
     }
 
     private void defineAdditionalEnvionment (
-            Service service, ServicesDefinition servicesDefinition, int nodeNbr, NodesConfigWrapper nodesConfig)
+            Service service, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, JSONException, FileException, SetupException {
 
         String ipAddress = nodesConfig.getNodeAddress (nodeNbr);
@@ -168,6 +169,19 @@ public class Topology {
                 String allAddresses = String.join(",", nodesConfig.getAllNodeAddressesWithService(serviceToList).toArray(new String[0]));
 
                 addEnvForService.put (addEnv, allAddresses);
+
+            } else if (addEnv.equals("CONTEXT_PATH")) {
+
+                if (StringUtils.isNotBlank(contextPath)) {
+
+                    // remove leading and trailing slashes if any
+                    String contextPathVar = contextPath.startsWith("/") ? contextPath.substring(1) : contextPath;
+                    if (contextPathVar.endsWith("/")) {
+                        contextPathVar = contextPathVar.substring(0, contextPathVar.length() - 1);
+                    }
+
+                    addEnvForService.put (addEnv, contextPathVar);
+                }
             }
         }
     }

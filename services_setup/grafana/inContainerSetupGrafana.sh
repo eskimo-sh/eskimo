@@ -46,6 +46,9 @@ if [[ $GRAFANA_USER_ID == "" ]]; then
     exit -2
 fi
 
+ESKIMO_CONTEXT_PATH=$2
+
+
 echo "-- SETTING UP GRAFANA -----------------------------------------------------------"
 
 echo " - Creating grafana user (if not exist) in container"
@@ -108,8 +111,14 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 # # Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
 # serve_from_sub_path = false
 
-sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = \/grafana\/"/g \
-    /usr/local/lib/grafana/conf/defaults.ini
+
+if [[ $ESKIMO_CONTEXT_PATH != "" ]]; then
+    sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = \/$ESKIMO_CONTEXT_PATH\/grafana\/"/g \
+        /usr/local/lib/grafana/conf/defaults.ini
+else
+    sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = \/grafana\/"/g \
+        /usr/local/lib/grafana/conf/defaults.ini
+fi
 
 sed -i s/"serve_from_sub_path = false"/"serve_from_sub_path = true"/g /usr/local/lib/grafana/conf/defaults.ini
 

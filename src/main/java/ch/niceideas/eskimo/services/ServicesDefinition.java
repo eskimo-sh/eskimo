@@ -66,6 +66,10 @@ public class ServicesDefinition implements InitializingBean {
     @Value("${servicesDefinitionFile}")
     private String servicesDefinitionFile = "classpath:services.json";
 
+
+    @Value("${server.servlet.context-path}")
+    private String configuredContextPath = "";
+
     private ReentrantLock persistEnvLock = new ReentrantLock();
 
     private Map<String, Service> services = new HashMap<>();
@@ -281,7 +285,7 @@ public class ServicesDefinition implements InitializingBean {
 
     public Topology getTopology(NodesConfigWrapper nodesConfig, Set<String> deadIps)
             throws ServiceDefinitionException, NodesConfigurationException {
-        return Topology.create(nodesConfig, deadIps, this);
+        return Topology.create(nodesConfig, deadIps, this, configuredContextPath);
     }
 
     public Service getService(String serviceName) {

@@ -81,7 +81,7 @@ eskimo.SystemStatus = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/get-ui-services-status-config",
+            url: "get-ui-services-status-config",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -103,7 +103,7 @@ eskimo.SystemStatus = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/list-services",
+            url: "list-services",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -205,7 +205,7 @@ eskimo.SystemStatus = function() {
             dataType: "json",
             timeout: 1000 * 3600,
             contentType: "application/json; charset=utf-8",
-            url: "/" + action + "?service=" + service + "&address=" + nodeAddress,
+            url: action + "?service=" + service + "&address=" + nodeAddress,
             success: function (data, status, jqXHR) {
 
                 // OK
@@ -706,7 +706,7 @@ eskimo.SystemStatus = function() {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/get-last-operation-result",
+            url: "get-last-operation-result",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -740,7 +740,7 @@ eskimo.SystemStatus = function() {
             type: "GET",
             dataType: "json",
             context: that,
-            url: "/get-status",
+            url: "get-status",
             success: function (data, status, jqXHR) {
 
                 eskimoMain.serviceMenuClear();

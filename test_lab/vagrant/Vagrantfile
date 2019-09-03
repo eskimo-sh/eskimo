@@ -55,7 +55,7 @@ end
 
 # Define cluster nodes
 nodes = [
-  { :hostname => 'deb-node1', :box => 'debian/buster64',  :ip => '192.168.10.11', :ram => 6000 },
+  { :hostname => 'deb-node1', :box => 'debian/buster64',  :ip => '192.168.10.11', :ram => 8000 },
   { :hostname => 'deb-node2', :box => 'ubuntu/xenial64',  :ip => '192.168.10.12', :ram => 6000 },
   { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.10.13', :ram => 6000},
   { :hostname => 'cent-node2', :box => 'fedora/29-cloud-base', :ip => '192.168.10.14', :ram => 6000 }

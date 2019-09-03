@@ -119,7 +119,7 @@ eskimo.OperationsCommand = function() {
             dataType: "json",
             timeout: 1000 * 3600,
             contentType: "application/json; charset=utf-8",
-            url:"/apply-nodes-config",
+            url:"apply-nodes-config",
             success: function (data, status, jqXHR) {
 
                 // OK

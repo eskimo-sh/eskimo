@@ -98,7 +98,7 @@ eskimo.NodesConfig = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/get-services-dependencies",
+            url: "get-services-dependencies",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -118,7 +118,7 @@ eskimo.NodesConfig = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/list-config-services",
+            url: "list-config-services",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
@@ -177,7 +177,7 @@ eskimo.NodesConfig = function() {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/load-nodes-config",
+            url: "load-nodes-config",
             success: function (data, status, jqXHR) {
 
                 console.log (data);
@@ -715,7 +715,7 @@ eskimo.NodesConfig = function() {
             dataType: "json",
             timeout: 1000 * 3600,
             contentType: "application/json; charset=utf-8",
-            url: reinstall ? "/reinstall-nodes-config" : "/save-nodes-config",
+            url: reinstall ? "reinstall-nodes-config" : "save-nodes-config",
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {
 

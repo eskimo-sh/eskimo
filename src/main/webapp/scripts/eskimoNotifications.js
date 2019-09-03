@@ -53,7 +53,7 @@ eskimo.Notifications = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/get-lastline-notification",
+            url: "get-lastline-notification",
             success: function (data, status, jqXHR) {
                 if (data && data.status) {
                     lastLineNotifications = data.lastLine;
@@ -70,7 +70,7 @@ eskimo.Notifications = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/fetch-notifications?last_line=" + lastLineNotifications,
+            url: "fetch-notifications?last_line=" + lastLineNotifications,
             success: function (data, status, jqXHR) {
 
                 // OK
@@ -127,7 +127,7 @@ eskimo.Notifications = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/clear-notifications",
+            url: "clear-notifications",
             success: function (data, status, jqXHR) {
                 lastLineNotifications = 0;
 

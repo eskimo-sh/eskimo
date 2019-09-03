@@ -358,10 +358,9 @@ The directory structure of the eskimo source distribution is as follows:
 
 Look at the following files for more information
 
-* `readme.adoc` in the folder `packages_dev` for information about the docker packages building framework
-* `readme.adoc` in the folder `services_setup` for information about the services installation and operation framework.
-* Look at the eskimo guide located in the folder `doc` to discover about eskimo initial setup and other useful
-information
+* https://github.com/eskimo-sh/eskimo/blob/master/doc/guides/eskimo-guide/eskimo-guide.adoc[The Eskimo User Guide]
+* https://github.com/eskimo-sh/eskimo/blob/master/packages_dev/README.adoc[`readme.adoc` in the folder `packages_dev`] for information about the docker packages building framework
+* https://github.com/eskimo-sh/eskimo/blob/master/services_setup/README.adoc[`readme.adoc` in the folder `services_setup`] for information about the services installation and operation framework.
 
 
 

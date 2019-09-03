@@ -100,7 +100,7 @@ eskimo.Setup = function() {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/load-setup",
+            url: "load-setup",
             success: function (data, status, jqXHR) {
 
                 eskimoMain.setSetupLoaded();
@@ -226,7 +226,7 @@ eskimo.Setup = function() {
             dataType: "json",
             contentType: "application/json; charset=utf-8",
             timeout: 1000 * 7200,
-            url: "/apply-setup",
+            url: "apply-setup",
             data: JSON.stringify(setupConfig),
             success: function (data, status, jqXHR) {
 

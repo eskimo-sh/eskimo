@@ -49,6 +49,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,26 +68,47 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     private final ServicesDefinition servicesDefinition;
 
-    public ServicesProxyServlet(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition) {
+    private final String configuredContextPath;
+
+    public ServicesProxyServlet(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition, String configuredContextPath) {
+        this.configuredContextPath = configuredContextPath;
         this.proxyManagerService = proxyManagerService;
         this.servicesDefinition = servicesDefinition;
     }
 
     private String getServiceName(HttpServletRequest servletRequest) {
         String uri = servletRequest.getRequestURI();
-        return uri.substring(1, uri.indexOf("/", 2));
+        if (StringUtils.isBlank(configuredContextPath)) {
+            return uri.substring(1, uri.indexOf("/", 2));
+        } else {
+            int indexOfContextPath = uri.indexOf(configuredContextPath);
+            int startIndex = indexOfContextPath + configuredContextPath.length();
+            if (!configuredContextPath.endsWith("/")) {
+                startIndex = startIndex + 1;
+            }
+            return uri.substring(startIndex, uri.indexOf("/", startIndex + 1));
+        }
     }
 
-    private String getPrefixPath(HttpServletRequest servletRequest) {
+    private String getContextPath (HttpServletRequest servletRequest) {
+        return StringUtils.isBlank(configuredContextPath) ?
+                "" :
+                ((configuredContextPath.startsWith("/") ? configuredContextPath.substring(1) : configuredContextPath)
+                        + (configuredContextPath.endsWith("/") ? "" : "/"));
+    }
+
+    private String getPrefixPath(HttpServletRequest servletRequest, String contextPathPrefix) {
         String serviceName = getServiceName(servletRequest);
         Service service = servicesDefinition.getService(serviceName);
 
+
+
         if (service.isUnique()) {
-            return serviceName;
+            return contextPathPrefix + serviceName;
         } else {
 
             String targetHost = proxyManagerService.extractHostFromPathInfo(servletRequest.getPathInfo());
-            return serviceName + "/" + targetHost.replaceAll("\\.", "-");
+            return contextPathPrefix + serviceName + "/" + targetHost.replaceAll("\\.", "-");
         }
     }
 
@@ -205,7 +227,9 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         HttpEntity entity = proxyResponse.getEntity();
 
-        String prefixPath = getPrefixPath(servletRequest);
+        String contextPathPrefix = getContextPath (servletRequest);
+
+        String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
 
         boolean isText = false;
         if (entity != null && entity.getContentType() != null) {
@@ -225,7 +249,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
                 String inputString = StreamUtils.getAsString(entity.getContent());
 
-                String resultString = performReplacements(service, servletRequest.getRequestURI(), prefixPath, inputString);
+                String resultString = performReplacements(service, servletRequest.getRequestURI(), contextPathPrefix, prefixPath, inputString);
 
                 byte[] result = resultString.getBytes();
 
@@ -238,7 +262,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
     }
 
-    String performReplacements(Service service, String requestURI, String prefixPath, String input) throws IOException {
+    String performReplacements(Service service, String requestURI, String contextPath, String prefixPath, String input) throws IOException {
         if (service.getUiConfig().isApplyStandardProxyReplacements()) {
 
             input = input.replace("src=\"/", "src=\"/" + prefixPath + "/");
@@ -253,7 +277,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
 
         for (ProxyReplacement replacement : service.getUiConfig().getProxyReplacements()) {
-            input = replacement.performReplacement(input, prefixPath, requestURI);
+            input = replacement.performReplacement(input, contextPath, prefixPath, requestURI);
         }
 
         for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
@@ -341,7 +365,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             // Servlet path starts with a / if it is not blank
             //curUrl.append(servletRequest.getServletPath()).append("/"); // JKE
 
-            curUrl.append(getPrefixPath(servletRequest)).append("/"); // JKE
+            curUrl.append(getPrefixPath(servletRequest, "")).append("/"); // JKE
 
 
             curUrl.append(theUrl, targetUri.length(), theUrl.length());

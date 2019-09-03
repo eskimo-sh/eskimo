@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.catalina.connector.Connector;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -66,6 +67,9 @@ public class ProxyConfiguration implements WebSocketConfigurer {
 
     @Autowired
     private Environment env;
+
+    @Value("${server.servlet.context-path}")
+    private String configuredContextPath = "";
 
     /**
      * This is to avoid following problem with REST requests passed by grafana
@@ -97,7 +101,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     public ServletRegistrationBean servletRegistrationBean(){
 
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean<>(
-                new ServicesProxyServlet(proxyManagerService, servicesDefinition),//, service.getName()),
+                new ServicesProxyServlet(proxyManagerService, servicesDefinition, configuredContextPath),
                 Arrays.stream(servicesDefinition.listProxiedServices())
                         .map(serviceName -> servicesDefinition.getService(serviceName))
                         .map(service -> "/" + service.getName() + "/*")

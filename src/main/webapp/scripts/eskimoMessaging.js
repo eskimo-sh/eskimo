@@ -56,7 +56,7 @@ eskimo.Messaging = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "/get-lastline-messaging",
+            url: "get-lastline-messaging",
             success: function (data, status, jqXHR) {
                 if (data && data.status) {
                     lastLineMessaging = data.lastLine;
@@ -78,7 +78,7 @@ eskimo.Messaging = function() {
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",
-                    url: "/clear-messaging",
+                    url: "clear-messaging",
                     success: function (data, status, jqXHR) {
                         lastLineMessaging = 0;
                         $("#pending-message-content").html("");
@@ -96,7 +96,7 @@ eskimo.Messaging = function() {
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",
-                    url: "/interupt-processing",
+                    url: "interupt-processing",
                     success: function (data, status, jqXHR) {
                     },
                     error: errorHandler
@@ -144,7 +144,7 @@ eskimo.Messaging = function() {
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                url: "/fetch-messaging?last_line="+lastLineMessaging,
+                url: "fetch-messaging?last_line="+lastLineMessaging,
                 success: function (data, status, jqXHR) {
 
                     // OK

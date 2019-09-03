@@ -59,7 +59,7 @@ eskimo.ServicesSelection = function() {
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                url: "/get-services-config",
+                url: "get-services-config",
                 success: function (data, status, jqXHR) {
 
                     if (data.status == "OK") {
