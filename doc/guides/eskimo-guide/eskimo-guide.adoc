@@ -52,8 +52,8 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
 * an Administration Application aimed at drastically simplifying the deployment, administration and operation of your
   Big Data Cluster
 * a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Spark,
-  Kafka and ElasticSearch* with all the required tools and consoles to manage them such as *Cerebro, Kibana, Zeppelin,
-  Kafka-Manager, Grafana and Prometheus*.
+  Kafka, Flink and ElasticSearch* with all the required tools and consoles to manage them such as *Cerebro, Kibana,
+  Zeppelin, Kafka-Manager, Grafana and Prometheus*.
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
 
@@ -87,7 +87,7 @@ a|image::pngs/framework.jpg[60, 60]| *Services Framework*
 
 Eskimo is a Big Data Components service development and integration framework based on Docker and Systemd.
 
-Eskimo provides out of the box ready-to use components such as Spark, ElasticSearch, Kafka, Mesos, Zeppelin, etc.
+Eskimo provides out of the box ready-to use components such as Spark, Flink, ElasticSearch, Kafka, Mesos, Zeppelin, etc.
 
 Eskimo also enables the user to develop his own services very easily.
 |===
@@ -100,13 +100,14 @@ Eskimo takes care of everything.
 
 * *Big Data 2.0* +
 Most if not all private-cloud Big Data Platform such as Hortonworks, Cloudera, MapR, etc. are based on Hadoop, HDFS,
-YARN, etc. which are quite old components and technology.Eskimo is based on Mesos, ElasticSearch, Kafka and Spark,
+YARN, etc. which are quite old components and technology. +
+Eskimo is based on Mesos, ElasticSearch, Kafka and Spark,
 cutting edge components from a newer generation.
 
 * *Leveraging on docker* +
 Most if not all private-cloud Big Data Platform such as Hortonworks, Cloudera, MapR, etc. install components natively,
-thus having strong requirements and impacts on  underlying nodes.Eskimo uses docker to isolates Eskimo components
-from underlying hosts and vice versa.
+thus having strong requirements and impacts on  underlying nodes. +
+Eskimo uses docker to isolates Eskimo components from underlying hosts and vice versa.
 
 * *Eskimo is an open platform.* +
 Eskimo works out of the box but users can customize and extend the way they like, the way they decide
@@ -122,6 +123,7 @@ In contrary to popular Hadoop-based and other Big Data Platforms, Eskimo is base
 
 * GlusterFS instead of HDFS
 * Spark instead of Hive and Pig
+* Flink instead of Storm
 * Mesos instead of Yarn
 * Docker instead of not native deployment
 * ElasticSearch instead of not HBase
@@ -140,7 +142,7 @@ than on a large production cluster.
 
 a|image::pngs/ring.jpg[80, 80] a| *One ring to Rule them all*
 
-Making docker, gluster, elasticsearch, kafka, spark, zeppelin, etc. all work perfectly and 100% together is very
+Making docker, gluster, elasticsearch, kafka, spark, Flink, zeppelin, etc. all work perfectly and 100% together is very
 tedious and difficult.
 
 Eskimo takes care of everything and fine tunes all these services to make them understand each other and work together.
@@ -161,7 +163,7 @@ a|image::pngs/lightweight.jpg[80, 80] a| *Lightweight in DNA*
 
 MapR, Hortonworks, Cloudera and every other hadoop based Big Data Platforms are Behemoths.
 
-Eskimo leverages on gluster, mesos, spark, elasticsearch, logstash, kibana, Zeppelin, etc. - simple and extremely
+Eskimo leverages on gluster, mesos, spark, flink, elasticsearch, logstash, kibana, Zeppelin, etc. - simple and extremely
 lightweight components that have a broad use cases coverage while simplifying administration, operation and usage.
 
 a|image::pngs/platform.jpg[80, 80] a| *Open platform extensible and customizable*
@@ -222,16 +224,17 @@ The processing layer makes the following services available:
 
 * Kafka : used for real-time integration and streaming abilities
 * Spark : the large scale very versatile computation engine
+* Flink : distributed processing engine for stateful computations over data stream
 * As a sidenote, ElasticSearch can also be considered part of the processing tier since it provides many processing
 abilities (ppeline computations, aggregations, etc.)
 * logstash : used for data processing and ingestion
 
-Spark is operation by mesos to achieve cluster resources booking and negotiation.
+Spark and Flink are operated by mesos to achieve cluster resources booking and negotiation.
 
 The user layer is intended for data / result visualizations and platform administration with the following components:
 
 * Kibana, Grafana and Zeppelin for data and result visualizations
-* Cerebro, The Spark Console, the Kafka Manager and the Mesos UI for platform administration
+* Cerebro, The Spark Console, The Flink Dashboard, the Kafka Manager and the Mesos UI for platform administration
 
 Docker is used to operate and manage services and components along with systemd.
 
@@ -339,6 +342,7 @@ the following port numbers need to be explicitly open (for both UDP and TCP) for
 * [ntp] 123
 * [prometheus] : 9090, 9091, 9093, 9094, 9100
 * [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
+* [flink] : 6121, 6122, 6123, 6130, 8081
 * [spark-history-server] : 18080
 * [zeppelin] : 38080, 38081
 * [zookeeper] : 2181, 2888, 3888
