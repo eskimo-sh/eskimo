@@ -184,7 +184,8 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [optional] name of the group to associate it in the status table
     "group" : "{group name}",
 
-    ## [mandatory] name of the service. miust be consistend with service under 'service_setup'
+    ## [mandatory] name of the service. miust be consistend with service under
+    ## 'service_setup'
     "name" : "{service name},
 
     ## [mandatory] where to place the service in 'Service Selection Window'
@@ -217,29 +218,30 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [optional] the icon to use (must be available)
     "icon" : "{path relative to web context}"
 
-    ## Whether standard rewrite rules need to be applied to this service
-    "applyStandardProxyReplacements": false,
+    ## [optional] Whether standard rewrite rules need to be applied to this service
+    ## (default is true)
+    "applyStandardProxyReplacements": [true|false],
 
-    ## List of custom rewrite rules for proxying of web consoles
+    ## [optional] List of custom rewrite rules for proxying of web consoles
     "proxyReplacements" : [
 
       ## first rewrite rule. As many as required can be declared
       {
 
         ## [mandatory] Type of rwrite rule. At the moment only PLAIN is supported
-        ## for full text search and replace
+        ## for full text search and replace.
         ## In the future REGEXP type shall be implemented
-        "type" : "PLAIN",
+        "type" : "[PLAIN]",
 
         ## [optional] a text searched in the URL. this replacement is applied only
         ## if the text is found in the URL
-        "urlPattern" : "url_pattern", ## e.g. controllers.js
+        "urlPattern" : "{url_pattern}", ## e.g. controllers.js
 
         ## [mandatory] source text to be replaced
-        "source" : "[source_URL]", ## e.g. "/API"
+        "source" : "{source_URL}", ## e.g. "/API"
 
         ## [mandatory] replacement text
-        "target" : "[proxied_URL]" ## e.g. "/eskimo/kibana/API"
+        "target" : "{proxied_URL}" ## e.g. "/eskimo/kibana/API"
       }
   }
 
@@ -355,13 +357,88 @@ through the proxy.
 Eskimo provides a powerful rewrite engine that one can use to implement the rewrite rules defined in the configuration
 as presented above.
 
-*TODO Explain rewrite rule.*
+==== Rewrite rules
 
-*TODO Explain standard rewrite rules*
+Proxying web consoles HTTP flow means that a lot of the text resources served by the individual target web consoles
+need to be processed in such a way that absolute URLs are rewritten.
+This is unfortunately tricky and mayn different situation occurs, from URL build dynamically in javascript to static
+resources URLs in CSS files for instance.
 
-*TODO Explain custom rewrite rules*
+An eskimo service developer needs to analyze the application, debug it and understand every pattern that needs to be
+replaced and define a *rewrite rule* for each of them.
 
-*TODO Explain patterns such as CONTEXT_PATH, PREFIX_PATH and detail available patterns*
+==== Standard rewrite rules
+
+A set of standard rewrite rules are implemented once and for all by the eskimo HTTP proxy for all services. By default
+these standard rewrite rules are enabled for a service unless the service config declares
+`"applyStandardProxyReplacements": false` in which case they are not applied to that specific service. +
+This is usefull when a standard rule is actually harming a specific web console behaviour.
+
+The standard rewrite rules are as follows:
+
+.Standard rewrite rules
+----
+
+{
+  "type" : "PLAIN",
+  "source" : "src=\"/",
+  "target" : "src=\"/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "action=\"/",
+  "target" : "action=\"/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "href=\"/",
+  "target" : "href=\"/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "href='/",
+  "target" : "href='/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "url(\"/",
+  "target" : "url(\"/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "url('/",
+  "target" : "url('/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "url(/",
+  "target" : "url(/{PREFIX_PATH}/"
+},
+{
+  "type" : "PLAIN",
+  "source" : "/api/v1",
+  "target" : "/{PREFIX_PATH}/api/v1"
+},
+{
+  "type" : "PLAIN",
+  "source" : "\"/static/",
+  "target" : "\"/{PREFIX_PATH}/static/"
+},
+----
+
+==== Custom rewrite rules
+
+In addition to the standard rewrite rules - that can be used or not by a service web console - an eskimo service
+developer can define as many custom rewrite rules as he wants in the service configuration in `services.json` as
+presented above.
+
+Some patterns can be used in both the `source` and `target` strings that will be replaced by the framework before they
+are searched, respectively injected, in the text stream:
+
+* `CONTEXT_PATH` will be resolved by the context root at which the eskimo web application is deployed, such as for
+instance `eskimo`
+* `PREFIX_PATH` will be resolved by the specific context path of the service web console context, suchas for instance
+for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no context root is used.
 
 
 
@@ -370,10 +447,7 @@ as presented above.
 
 
 
-
-
-
-// marker for exclusion : line 310
+// marker for exclusion : line 450
 
 
 
