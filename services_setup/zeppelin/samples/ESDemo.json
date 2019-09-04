@@ -43,7 +43,7 @@
       "$$hashKey": "object:284"
     },
     {
-      "text": "size 1000\nsearch /kibana_sample_data_flights/ { \"from\" : 0, \"query\" : { \"match_all\" : {} } }",
+      "text": "%elasticsearch\nsize 1000\nsearch /kibana_sample_data_flights/ { \"from\" : 0, \"query\" : { \"match_all\" : {} } }",
       "user": "anonymous",
       "dateUpdated": "2019-07-23T15:11:22+0000",
       "config": {
@@ -443,7 +443,7 @@
       "$$hashKey": "object:285"
     },
     {
-      "text": "help\n",
+      "text": "%elasticsearch\nhelp\n",
       "user": "anonymous",
       "dateUpdated": "2019-07-23T15:09:28+0000",
       "config": {
@@ -483,7 +483,7 @@
     },
     {
       "title": "Average Distance by Airways",
-      "text": "search /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"Carrier\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"DistanceMiles\"\n          }\n        }\n      }\n    }\n  } \n}",
+      "text": "%elasticsearch\nsearch /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"Carrier\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"DistanceMiles\"\n          }\n        }\n      }\n    }\n  } \n}",
       "user": "anonymous",
       "dateUpdated": "2019-07-23T15:13:29+0000",
       "config": {
@@ -908,7 +908,7 @@
     },
     {
       "title": "Average delay by source country",
-      "text": "search /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"OriginCountry\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"FlightDelayMin\"\n          }\n        }\n      }\n    }\n  } \n}",
+      "text": "%elasticsearch\nsearch /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"OriginCountry\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"FlightDelayMin\"\n          }\n        }\n      }\n    }\n  } \n}",
       "user": "anonymous",
       "dateUpdated": "2019-07-23T15:13:29+0000",
       "config": {
