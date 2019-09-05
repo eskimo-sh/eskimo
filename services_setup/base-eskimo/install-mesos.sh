@@ -34,7 +34,7 @@
 # Software.
 #
 
-export AMESOS_VERSION=1.7.2
+export AMESOS_VERSION=1.8.1
 
 
 function create_binary_wrapper(){

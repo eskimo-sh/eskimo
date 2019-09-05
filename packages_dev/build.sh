@@ -42,6 +42,7 @@ cd $SCRIPT_DIR
 package=""  # Default to empty package
 
 export DONT_OVERWRITE=0
+export USE_VIRTUALBOX=0
 
 echo_usage() {
       echo "Usage:"
@@ -52,6 +53,7 @@ echo_usage() {
       echo "                                                 ntp, spark, etc."
       echo "        Options:"
       echo "          -n Don't rebuild if image is already built"
+      echo "          -b Use virtualBox instead of libvirt for building"
 }
 
 # Parse options to the `pip` command
@@ -67,6 +69,9 @@ while getopts ":hn" opt; do
      ;;
    n )
      export DONT_OVERWRITE=1
+     ;;
+   n )
+     export USE_VIRTUALBOX=1
      ;;
   esac
 done

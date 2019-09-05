@@ -36,7 +36,7 @@
 
 # Version of software to install
 export SPARK_VERSION=2.4.4
-export AMESOS_VERSION=1.7.2
+export AMESOS_VERSION=1.8.1
 export ES_VERSION=6.5.4
 export CEREBRO_VERSION=0.8.1
 export KAFKA_VERSION=2.2.0

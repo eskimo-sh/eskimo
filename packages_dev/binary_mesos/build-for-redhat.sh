@@ -45,7 +45,9 @@ check_for_internet
 
 check_for_vagrant
 
-check_for_virtualbox
+if [[ $USE_VIRTUALBOX == 1 ]]; then
+    check_for_virtualbox
+fi
 
 
 mkdir -p /tmp/build-mesos-redhat
@@ -61,7 +63,7 @@ trap cleanup EXIT
 
 err_report() {
     echo "Error on line $1"
-    tail -n 500 /tmp/build-mesos-redhat-log
+    tail -n 2000 /tmp/build-mesos-redhat-log
 }
 
 trap 'err_report $LINENO' ERR
@@ -84,7 +86,11 @@ echo " - Destroying any previously existing VM"
 vagrant destroy --force rhel-build-node >> /tmp/build-mesos-redhat-log 2>&1
 
 echo " - Bringing Build VM up"
-vagrant up rhel-build-node >> /tmp/build-mesos-redhat-log 2>&1
+if [[ $USE_VIRTUALBOX == 1 ]]; then
+    vagrant up rhel-build-node >> /tmp/build-mesos-redhat-log 2>&1
+else
+    vagrant up rhel-build-node --provider=libvirt >> /tmp/build-mesos-redhat-log 2>&1
+fi
 
 #deb http://httpredir.debian.org/debian/ jessie main
 #deb http://httpredir.debian.org/debian/ jessie main contrib non-free
@@ -120,7 +126,7 @@ echo " - Installing other Mesos dependencies"
 vagrant ssh -c "sudo yum install -y  apache-maven zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel rhel-build-node" rhel-build-node  >> /tmp/build-mesos-redhat-log 2>&1
 
 echo " - Building Mesos"
-vagrant ssh -c "sudo JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.el7_6.x86_64 /vagrant/buildMesosFromSources.sh" rhel-build-node
+vagrant ssh -c "sudo JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64 /vagrant/buildMesosFromSources.sh" rhel-build-node
 
 echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
 vagrant ssh -c "sudo bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" rhel-build-node  >> /tmp/build-mesos-debian-log 2>&1

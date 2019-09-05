@@ -82,7 +82,7 @@ end
 
 # Define build-nodes
 nodes = [
-  { :hostname => 'deb-build-node', :box => 'antoniogalea/debian-jessie64-bigdisk', :ip => '192.168.10.101', :ram => 16000},
+  { :hostname => 'deb-build-node', :box => 'generic/debian8', :ip => '192.168.10.101', :ram => 16000},
   { :hostname => 'rhel-build-node', :box => 'centos/7',  :ip => '192.168.10.103', :ram => 16000},
 ]
 
@@ -97,12 +97,25 @@ Vagrant.configure("2") do |config|
       nodeconfig.vm.box = node[:box]
       nodeconfig.vm.hostname = node[:hostname]
       nodeconfig.vm.network :private_network, ip: node[:ip]
+
       memory = node[:ram] ? node[:ram] : 2500;
+
+      # force rsync for libvirt
+      nodeconfig.vm.synced_folder './', '/vagrant', type: 'rsync'
+
+      # Config for VirtualBox
       nodeconfig.vm.provider :virtualbox do |vb|
         vb.name = node[:hostname]
         vb.customize ["modifyvm", :id, "--memory", memory.to_s]
         vb.customize ["modifyvm", :id, "--ioapic", "on"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]
+      end
+
+      # Config for libvirt
+      nodeconfig.vm.provider :libvirt do |lv|
+        lv.cpus = 2
+        lv.memory = memory
+        lv.machine_virtual_size = 20
       end
 
       nodeconfig.vm.provision "file", source: "ssh_key.pub", destination: "./.ssh/id_rsa.pub"

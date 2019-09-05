@@ -168,6 +168,41 @@ Look at the eskimo pre-packaged component packages development scripts for examp
 inspired for developing your own packages.
 
 
+== Apache Mesos Building
+
+Bulding Apache Mesos is a different story. There are two different components:
+
+* The *Mesos Master* which runs in a docker container just as every other service within Eskimo. The Mesos Master is
+responsible for orchestrating the resources requests and manages offering.
+* The *Mesos Agent* which runs natively on the Host OS.  The Mesos Agent is responsible for understanding the available
+resources on every node of the Eskimo cluster and answers offers.
+
+The reason why the Mesos Agent runs natively is that it needs to have low level access to the machine to understand its
+topology and the available resources. To be transparent, it could run as a docker container as well but that comes with
+some limitations that are not acceptable for a production cluster.
+
+*The Mesos Agent is the single and only component running natively within Eskimo (understand, not in a docker
+container).*
+
+As such, Mesos is build natively and mesos packages are tarballs (`tar.gz`) to be extracted on the Host OS on every
+node.
+
+In this very folder (`packages_dev`) eskimo provides a build framework for Mesos. +
+Currently Mesos is built for two targets : RHEL based (RHEL, CentOS, Fedora, etc.) and Debian based (Debian, Ubuntu,
+etc.).
+
+
+=== Building Mesos
+
+The Eskimo build system for Mesos is based on Vagrant and either VirtualBox or libvirt + QEMU/kvm. Vagrant takes care
+of building VMs using either VirtualBox or LibVirt, installs all the requred packages for building mesos, builds mesos
+and creates installable packages.
+
+.For instance, toBuild Mesos package for Debian
+----
+..../packages_dev$ ./build.sh mesos-deb # for building with libvirt
+..../packages_dev$ ./build.sh -b mesos-deb # for building with VirtualBox
+----
 
 
 
@@ -177,7 +212,12 @@ inspired for developing your own packages.
 
 
 
-// marker for exclusion : line 180
+
+
+
+
+
+// marker for exclusion : line 220
 
 [appendix]
 == Copyright and License

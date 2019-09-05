@@ -45,7 +45,9 @@ check_for_internet
 
 check_for_vagrant
 
-check_for_virtualbox
+if [[ $USE_VIRTUALBOX == 1 ]]; then
+    check_for_virtualbox
+fi
 
 
 mkdir -p /tmp/build-mesos-debian
@@ -84,7 +86,11 @@ echo " - Destroying any previously existing VM"
 vagrant destroy --force deb-build-node >> /tmp/build-mesos-debian-log 2>&1
 
 echo " - Bringing Build VM up"
-vagrant up deb-build-node >> /tmp/build-mesos-debian-log 2>&1
+if [[ $USE_VIRTUALBOX == 1 ]]; then
+    vagrant up deb-build-node >> /tmp/build-mesos-debian-log 2>&1
+else
+    vagrant up deb-build-node --provider=libvirt >> /tmp/build-mesos-debian-log 2>&1
+fi
 
 #deb http://httpredir.debian.org/debian/ jessie main
 #deb http://httpredir.debian.org/debian/ jessie main contrib non-free

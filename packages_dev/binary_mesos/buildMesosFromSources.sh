@@ -71,10 +71,13 @@ fail_if_error $? "/tmp/mesos_install_log" -2
 
 echo " - Configuring source tree (preparing build)"
 cd ./mesos-$AMESOS_VERSION/
+
 mkdir build
 cd build
+
 ../configure --prefix=/usr/local/lib/mesos-$AMESOS_VERSION/ >> /tmp/mesos_install_log 2>&1
 fail_if_error $? "/tmp/mesos_install_log" -3
+
 echo " - Building source tree (!! this takes a long time, up to 1 hour or more !!!)"
 make -j 2 > /tmp/mesos_install_log 2>&1
 fail_if_error $? "/tmp/mesos_install_log" -4
