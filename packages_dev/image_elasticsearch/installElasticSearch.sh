@@ -57,7 +57,7 @@ mkdir -p /tmp/es_setup
 cd /tmp/es_setup
 
 echo " - Downloading elasticsearch-$ES_VERSION"
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.tar.gz > /tmp/es_install_log 2>&1
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION-linux-x86_64.tar.gz > /tmp/es_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad elasticsearch-$ES_VERSION from https://artifacts.elastic.co/downloads/. Trying to download from niceideas.ch"
     exit -1
@@ -66,7 +66,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Extracting elasticsearch-$ES_VERSION"
-tar -xvf elasticsearch-$ES_VERSION.tar.gz > /tmp/es_install_log 2>&1
+tar -xvf elasticsearch-$ES_VERSION-linux-x86_64.tar.gz > /tmp/es_install_log 2>&1
 fail_if_error $? "/tmp/es_install_log" -2
 
 echo " - Installing ElasticSearch"

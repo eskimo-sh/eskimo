@@ -47,12 +47,34 @@ fi
 
 echo " - Adapting configuration in file elasticsearch.yml"
 
-sed -i s/"#node.name: node-1"/"node.name: $NODE_NAME"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+# FIXME
+# I was using node name previously, but now the problem is that a node has to be known by the same name it has
+# in node.name and the same that is declared in cluster.initial_master_nodes ...
+# And the problem is that I only know the master as itis IP address
+#sed -i s/"#node.name: node-1"/"node.name: $NODE_NAME"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+sed -i s/"#node.name: node-1"/"node.name: $SELF_IP_ADDRESS"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
 if [[ $MASTER_IP_ADDRESS != "" ]]; then
     echo " - Adapting configuration in file elasticsearch.yml - enabling discovery of master"
+
+    # EX 6.x
     sed -i s/"#discovery.zen.ping.unicast.hosts: \[\"host1\", \"host2\"\]"/"discovery.zen.ping.unicast.hosts: \[\"$MASTER_IP_ADDRESS\"\]"/g \
         /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+    # ES 7.x
+    sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\"$MASTER_IP_ADDRESS\"\]"/g \
+        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$MASTER_IP_ADDRESS\", \"$SELF_IP_ADDRESS\"\]"/g \
+        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+
+
+else
+
+    # ES 7.x
+    sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\]"/g \
+        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
 fi
 
 bash -c "echo \"network.publish_host: $SELF_IP_ADDRESS\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"

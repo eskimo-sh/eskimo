@@ -47,6 +47,7 @@ fi
 
 echo " - Adapting configuration in file application.conf"
 
+# Cerebro 0.8.1
 sed -i -n '1h;1!H;${;g;s/'\
 '  #{\n'\
 '  #  host = \"http:\/\/localhost:9200\"\n'\
@@ -56,5 +57,20 @@ sed -i -n '1h;1!H;${;g;s/'\
 '  {\n'\
 '    host = \"http:\/\/'$ELASTICSEARCH_MASTER':9200\"\n'\
 '    name = \"Eskimo\"\n '\
+' }/g;p;}' /usr/local/lib/cerebro/conf/application.conf
+
+
+# Cerebro 0.8.4
+sed -i -n '1h;1!H;${;g;s/'\
+'  #{\n'\
+'  #  host = \"http:\/\/localhost:9200\"\n'\
+'  #  name = \"Localhost cluster\"\n'\
+'  #  headers-whitelist = \[ \"x-proxy-user\", \"x-proxy-roles\", \"X-Forwarded-For\" \]\n'\
+'  #}'\
+'/'\
+'  {\n'\
+'    host = \"http:\/\/'$ELASTICSEARCH_MASTER':9200\"\n'\
+'    name = \"Eskimo\"\n'\
+'    headers-whitelist = \[ \"x-proxy-user\", \"x-proxy-roles\", \"X-Forwarded-For\" \]\n'\
 ' }/g;p;}' /usr/local/lib/cerebro/conf/application.conf
 

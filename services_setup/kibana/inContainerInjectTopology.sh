@@ -46,8 +46,12 @@ if [[ $ELASTICSEARCH_MASTER == "" ]]; then
 fi
 
 echo " - Adapting Configuration file"
+
+# ES / Kibana 6.x
 sed -i s/"#elasticsearch.url: \"http:\/\/localhost:9200\""/"elasticsearch.url: \"http:\/\/$ELASTICSEARCH_MASTER:9200\""/g \
         /usr/local/etc/kibana/kibana.yml
 
-
+# ES / Kibana 7.x
+sed -i s/"#elasticsearch.hosts: \[\"http:\/\/localhost:9200\"\]"/"elasticsearch.hosts: \[\"http:\/\/$ELASTICSEARCH_MASTER:9200\"\]"/g \
+        /usr/local/etc/kibana/kibana.yml
 

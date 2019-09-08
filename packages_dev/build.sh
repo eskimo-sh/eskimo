@@ -118,7 +118,7 @@ elif [[ $package == "mesos-all" ]] ; then
         echo "RedHat Mesos package already built"
     fi
 
-elif [[ $package == "all" ]]; then
+elif [[ $package == "all_images" ]]; then
 
     check_for_docker
 
@@ -153,6 +153,12 @@ elif [[ $package == "all" ]]; then
         bash -c "cd image_gdash && bash build.sh"
     else
         echo "image gdash already built"
+    fi
+
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_mesos-master.tar.gz ]]; then
+        bash -c "cd image_mesos-master && bash build.sh"
+    else
+        echo "image mesos-master already built"
     fi
 
     if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_prometheus.tar.gz ]]; then
@@ -191,10 +197,16 @@ elif [[ $package == "all" ]]; then
         echo "image kibana already built"
     fi
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_grafana.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_kafka.tar.gz ]]; then
         bash -c "cd image_kafka && bash build.sh"
     else
-        echo "image grafana already built"
+        echo "image kafka already built"
+    fi
+
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_kafka-manager.tar.gz ]]; then
+        bash -c "cd image_kafka-manager && bash build.sh"
+    else
+        echo "image kafka-manager already built"
     fi
 
     if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_spark.tar.gz ]]; then

@@ -75,7 +75,15 @@ sed -i s/"#path.data: \/path\/to\/data"/"path.data: \/var\/lib\/elasticsearch"/g
 sed -i s/"#path.logs: \/path\/to\/logs"/"path.logs: \/usr\/local\/lib\/elasticsearch\/logs"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 sed -i s/"#bootstrap.memory_lock: true"/"bootstrap.memory_lock: false"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 sed -i s/"#network.host: 192.168.0.1"/"network.host: 0.0.0.0"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+# FIXME take into account cluster size here
+
+# ES 6.x
 sed -i s/"#discovery.zen.minimum_master_nodes: 3"/"discovery.zen.minimum_master_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+# ES 7.x
+sed -i s/"#gateway.recover_after_nodes: 3"/"gateway.recover_after_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
 
 echo " - Addressing issue with multiple interfaces but only one global"
 bash -c "echo -e \"\n#If you set a network.host that results in multiple bind addresses yet rely on a specific address\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"

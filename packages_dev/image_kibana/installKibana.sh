@@ -108,7 +108,7 @@ trap check_stop_es_kibana EXIT
 #fi
 
 echo " - Starting Kibana"
-/usr/local/lib/kibana-$ES_VERSION/bin/kibana > /tmp/kibana_run_log 2>&1 &
+/usr/local/lib/kibana-$ES_VERSION/bin/kibana --allow-root > /tmp/kibana_run_log 2>&1 &
 export KIBANA_PROC_ID=$!
 
 echo " - Checking Kibana startup"
