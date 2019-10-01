@@ -243,6 +243,8 @@ public class SetupService {
 
         } catch (JSONException | FileException e) {
             logger.error(e, e);
+            messagingService.addLines("\nerror : "
+                    + e.getMessage());
             return ErrorStatusHelper.createErrorStatus (e);
         }
     }

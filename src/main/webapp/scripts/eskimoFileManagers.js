@@ -40,6 +40,8 @@ eskimo.FileManagers = function() {
 
     var that = this;
 
+    this.fileEditHook = null;
+
     // Caution : this variable is populated by EskimoNodesStatus.
     var availableNodes = [];
 
@@ -57,6 +59,10 @@ eskimo.FileManagers = function() {
             }
 
         });
+    };
+
+    this.setFileEditHook = function (fileEditHook) {
+        this.fileEditHook = fileEditHook;
     };
 
     this.setOpenedFileManagers = function(handles) {
@@ -262,12 +268,17 @@ eskimo.FileManagers = function() {
 
                         if (data.fileViewable) {
 
-                            $("#file-viewer-title").html("Viewing File : " + data.fileName);
+                            if (this.fileEditHook != null) {
+                                this.fileEditHook (nodeAddress, nodeName, data.fileName);
 
-                            $('#file-viewer-modal').modal("show");
+                            } else {
 
-                            $("#file-viewer-body").html("<pre>" + atob(data.fileContent) + "</pre>");
+                                $("#file-viewer-title").html("Viewing File : " + data.fileName);
 
+                                $('#file-viewer-modal').modal("show");
+
+                                $("#file-viewer-body").html("<pre>" + atob(data.fileContent) + "</pre>");
+                            }
 
                         } else {
 

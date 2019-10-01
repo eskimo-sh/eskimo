@@ -32,7 +32,7 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
-$(document).ready(function() {
+var initHoe = function() {
     HoeDatapp = {
         appinit: function() {
             HoeDatapp.HandleSidebartoggle();
@@ -271,4 +271,4 @@ $(document).ready(function() {
 
     };
     HoeDatapp.appinit();
-});
+};

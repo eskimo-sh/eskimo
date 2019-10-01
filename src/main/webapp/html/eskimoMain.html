@@ -1,0 +1,184 @@
+<!--
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
+
+Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Author : eskimo.sh / https://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+-->
+
+<header id="hoe-header" hoe-color-type="logo-bg8" hoe-lpanel-effect="shrink">
+
+    <div class="hoe-left-header">
+        <a href="#" style="margin-right: 10px; padding-left: 7px;">
+            <img class="img-circle" src="images/eskimo-icon.png" style="width: 30px;">
+        </a>
+        <a href="#"> <span id="eskimoTitle">Eskimo Console</span></a>
+        <span class="hoe-sidebar-toggle"><a href="#"></a></span>
+    </div>
+
+    <div class="hoe-right-header" hoe-color-type="header-bg8" hoe-position-type="relative" >
+        <span class="hoe-sidebar-toggle"><a href="#"></a></span>
+
+        <ul class="left-navbar">
+
+            <li class="dropdown hoe-rheader-submenu message-notification left-min-30">
+                <span class="dashboardTitle"><b>Platform Administration and Operation</b></span><span id="dashboardTitle" class="dashboardTitle"></span>
+            </li>
+
+            <li style="padding-left: 5px;" class="dropdown hoe-rheader-submenu message-notification left-min-30">
+                <a href="#" onclick="javascript:eskimoMain.getNotifications().notificationsShown();" class="dropdown-toggle icon-circle" data-toggle="dropdown" >
+                    <i class="fa fa-bell-o"></i>
+                    <span id="new-notifications-count" class="badge badge-success"></span>
+                </a>
+                <ul id="notifications-container" class="dropdown-menu ">
+                    <li class="hoe-submenu-label">
+                        <h3><span id="notifications-count" class="bold">0</span> Notification(s) <a href="javascript:eskimoMain.getNotifications().clearNotifications();"><span style="color: #333333;">Clear</span></a></h3>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+
+        <ul class="right-navbar">
+            <li class="dropdown hoe-rheader-submenu hidden-xs">
+                <a href="#" class="dropdown-toggle icon-circle" data-toggle="dropdown"><i class="fa fa-question"></i></a>
+            </li>
+        </ul>
+
+    </div>
+</header>
+<div id="hoeapp-container" hoe-color-type="lpanel-bg8" hoe-lpanel-effect="shrink">
+    <aside id="hoe-left-panel" hoe-position-type="absolute">
+        <!--
+        <div class="profile-box">
+            <div class="media">
+                <div class="media-body">
+                    <h5 class="media-heading">Eskimo <span>Platform</span></h5>
+                    <small>Admin</small>
+                </div>
+            </div>
+        </div>
+        -->
+        <ul class="nav panel-list" id="mainFolderMenu">
+            <li id="mainFolderMenuAnchor" class="nav-level">Eskimo Services</li>
+
+            <li class="folder-menu-items disabled" id="folderMenuConsoles">
+                <a href="javascript:eskimoMain.getConsoles().showConsoles();">
+                    <i class="fa fa-terminal"></i>
+                    <span class="menu-text">SSH Terminals</span>
+                </a>
+            </li>
+            <li class="folder-menu-items disabled" id="folderMenuFileManagers">
+                <a href="javascript:eskimoMain.getFileManagers().showFileManagers();">
+                    <i class="fa fa-folder"></i>
+                    <span class="menu-text">SFTP File Manager</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="nav panel-list last-menu">
+            <li id="adminTitle" class="nav-level" style="border-top: 2px solid #677889;">Platform Administration</li>
+            <li class="config-menu-items disabled">
+                <a href="javascript:eskimoMain.getSystemStatus().showStatus();">
+                    <i class="fa fa-server"></i>
+                    <span class="menu-text">Status</span>
+                </a>
+            </li>
+            <li class="config-menu-items disabled" id="menu-configure-setup">
+                <a href="javascript:eskimoMain.getSetup().showSetup();">
+                    <i class="fa fa-check-square"></i>
+                    <span class="menu-text">Setup</span>
+                </a>
+            </li>
+            <li class="config-menu-items disabled">
+                <a href="javascript:eskimoMain.getNodesConfig().showNodesConfig();">
+                    <i class="fa fa-cog"></i>
+                    <span class="menu-text">Configure Eskimo Nodes</span>
+                </a>
+            </li>
+            <li class="config-menu-items disabled"  id="menu-messages">
+                <a href="javascript:eskimoMain.getMessaging().showMessages();">
+                    <i class="fa fa-envelope"></i>
+                    <span class="menu-text">Backend messages</span>
+                </a>
+            </li>
+            <li class="config-menu-items disabled">
+                <a href="javascript:window.location='logout';">
+                    <i class="fa fa-sign-out"></i>
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+
+    </aside>
+    <section id="main-content">
+
+        <!-- eskimoNodeStatus.html -->
+        <div class="inner-content" id="inner-content-status" style="visibility: hidden;"> </div>
+
+        <!-- eskimoConsoles.html -->
+        <div class="inner-content" id="inner-content-consoles" style="visibility: hidden;"></div>
+
+        <!-- eskimoMessaging.html -->
+        <div class="inner-content" id="inner-content-pending" style="visibility: hidden;"> </div>
+
+        <!-- eskimoSetup.html -->
+        <div class="inner-content" id="inner-content-setup" style="visibility: hidden;"></div>
+
+        <!-- eskimoNodesConfig.html -->
+        <div class="inner-content" id="inner-content-nodes" style="visibility: hidden;"></div>
+
+        <!-- eskimoFileManagers.html -->
+        <div class="inner-content" id="inner-content-file-managers" style="visibility: hidden;"></div>
+
+        <!-- progress bar -->
+        <div class="inner-content-show" id="inner-content-progress"
+             style="z-index: 10; height: 100%; background: white; opacity: 0.4; display: none; visibility: hidden;">
+            <div class="inner-content-inner " style="top: 50%;width: 100%; height: 50px;">
+
+                <div class="progress progress-striped active">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- the various service iframes  -->
+        <!-- ... -->
+
+        <!-- modal dialog for services selection -->
+        <div id="services-selection-modal-wrapper"></div>
+
+        <!-- modal dialog for operation confirmation -->
+        <div id="operations-command-modal-wrapper"></div>
+
+    </section>
+
+</div>

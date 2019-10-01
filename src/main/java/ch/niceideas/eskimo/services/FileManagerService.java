@@ -91,7 +91,7 @@ public class FileManagerService {
     private SSHCommandService sshCommandService;
 
     @Value("${fileManager.maxFileSize}")
-    private int maxFileSize = 2097152;
+    protected int maxFileSize = 2097152;
 
     /* Controlers are singleton */
     private Map<String, SFTPv3Client> sftpClients = new ConcurrentHashMap<>();
