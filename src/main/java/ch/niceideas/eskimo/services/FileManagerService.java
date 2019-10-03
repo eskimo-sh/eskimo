@@ -256,19 +256,32 @@ public class FileManagerService {
         }
     }
 
-    public void uploadFile(String hostAddress, String folder, long size, String name, byte[] bytes) throws IOException {
+    public void uploadFile(String hostAddress, String folder, String name, byte[] bytes) throws IOException {
 
         try {
             SFTPv3Client client = getClient(hostAddress);
 
             String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + name);
 
+            writeFile(hostAddress, fullPath, bytes);
+
+        } catch (ConnectionManagerException ex) {
+            logger.error("Error writing file to output stream. Filename was " + name, ex);
+            throw new IOException("IOError writing file to output stream", ex);
+        }
+    }
+
+    protected void writeFile(String hostAddress, String fullPath, byte[] bytes) throws IOException {
+
+        try {
+            SFTPv3Client client = getClient(hostAddress);
+
             OutputStream os = client.writeToFile(fullPath);
 
             StreamUtils.copyThenClose (new ByteArrayInputStream(bytes), os);
 
         } catch (ConnectionManagerException ex) {
-            logger.error("Error writing file to output stream. Filename was " + name, ex);
+            logger.error("Error writing file to output stream. Filename path " + fullPath, ex);
             throw new IOException("IOError writing file to output stream", ex);
         }
     }

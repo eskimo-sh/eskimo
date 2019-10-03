@@ -46,6 +46,17 @@ public class ErrorStatusHelper {
         return createErrorStatus(e.getMessage());
     }
 
+    static String buildFullMessage(Exception e) {
+        StringBuilder errorMessageBuilder = new StringBuilder();
+        errorMessageBuilder.append (e.getMessage());
+        Throwable inner = e;
+        while ( (inner = inner.getCause()) != null) {
+            errorMessageBuilder.append("\n");
+            errorMessageBuilder.append(inner.getMessage());
+        }
+        return errorMessageBuilder.toString();
+    }
+
     public static String createErrorStatus (String errorMessage) {
 
         try {
@@ -61,10 +72,12 @@ public class ErrorStatusHelper {
 
     public static String createEncodedErrorStatus (Exception e) {
 
+        String errorMessageBuilder = buildFullMessage(e);
+
         try {
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "KO");
-                put("error", Base64.getEncoder().encodeToString(e.getMessage().getBytes()));
+                put("error", Base64.getEncoder().encodeToString(errorMessageBuilder.getBytes()));
             }}).toString(2);
         } catch (JSONException e1) {
             // cannot happen

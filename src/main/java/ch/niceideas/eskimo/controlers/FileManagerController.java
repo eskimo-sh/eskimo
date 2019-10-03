@@ -162,7 +162,7 @@ public class FileManagerController {
             @RequestParam("file") MultipartFile file) {
 
         try {
-            fileManagerService.uploadFile (hostAddress, folder, file.getSize(), filename, file.getBytes());
+            fileManagerService.uploadFile (hostAddress, folder, filename, file.getBytes());
 
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
