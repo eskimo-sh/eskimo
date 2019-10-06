@@ -105,6 +105,27 @@ public class FileManagerController {
         }
     }
 
+    @GetMapping("/file-manager-create-file")
+    @ResponseBody
+    public String createFile(
+            @RequestParam("address") String hostAddress,
+            @RequestParam("folder") String folder,
+            @RequestParam("fileName") String fileName) {
+
+        try {
+            Pair<String, JSONObject> result = fileManagerService.createFile(hostAddress, folder, fileName);
+
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("folder", result.getKey());
+                put("content", result.getValue());
+            }}).toString(2);
+
+        } catch (IOException | JSONException e) {
+            return ErrorStatusHelper.createErrorStatus(e);
+        }
+    }
+
     @GetMapping("/file-manager-open-file")
     @ResponseBody
     public String openFile(

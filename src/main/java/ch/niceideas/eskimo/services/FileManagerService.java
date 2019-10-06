@@ -81,7 +81,8 @@ public class FileManagerService {
             "application/javascript",
             "application/json",
             "application/x-latex",
-            "application/xml"
+            "application/xml",
+            "inode/x-empty"
     };
 
     @Autowired
@@ -130,6 +131,24 @@ public class FileManagerService {
 
             return new Pair<>(newPath, directoryListToJson (listing));
 
+        } catch (IOException | ConnectionManagerException | JSONException e) {
+            logger.error (e, e);
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
+    public Pair<String, JSONObject> createFile(String hostAddress, String folder, String fileName) throws IOException {
+
+        try {
+
+            SFTPv3Client client = getClient(hostAddress);
+
+            String newFilePath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + fileName);
+
+            client.createFile(newFilePath);
+
+            return navigateFileManager (hostAddress, folder, ".");
+
 
         } catch (IOException | ConnectionManagerException | JSONException e) {
             logger.error (e, e);
@@ -147,6 +166,7 @@ public class FileManagerService {
 
             // test file type
             String fileMimeType = getFileMimeType(hostAddress, newPath);
+            logger.info ("File " + newPath + " has MIME type " + fileMimeType);
 
             if (fileMimeType.contains("inode/directory")) {
 

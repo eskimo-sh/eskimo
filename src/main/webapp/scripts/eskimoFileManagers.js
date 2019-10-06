@@ -365,6 +365,55 @@ eskimo.FileManagers = function() {
     }
     this.refreshFolder = refreshFolder;
 
+    function createFile (nodeAddress, nodeName) {
+        var openedFileManager = findFileManager(nodeName);
+        var currentFolder = openedFileManager.current;
+
+        $('#filename-input-nodeName').val(nodeName);
+        $('#filename-input-nodeAddress').val(nodeAddress);
+        $('#filename-input-currentfolder').val(currentFolder);
+
+
+        $('#filename-input-modal').modal("show");
+    }
+    this.createFile = createFile;
+
+    this.validateCreateFile = function () {
+
+        var nodeName = $('#filename-input-nodeName').val();
+        var nodeAddress = $('#filename-input-nodeAddress').val();
+        var currentFolder = $('#filename-input-currentfolder').val();
+        var newFileName = $("#filename-input-input").val();
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            context: this,
+            contentType: "application/json; charset=utf-8",
+            url: "file-manager-create-file?address=" + nodeAddress + "&folder=" + currentFolder + "&fileName=" + newFileName,
+            success: function (data, status, jqXHR) {
+
+                if (data.status == "OK") {
+
+                    this.listFolder (nodeAddress, nodeName, data.folder, data.content);
+
+                } else {
+                    alert(data.error);
+
+                    // FIXME Close File Manager or make disabled
+                }
+            },
+            error: errorHandler
+        });
+
+
+        $('#filename-input-modal').modal("hide");
+    };
+
+    this.closeFilenameInput = function () {
+        $('#filename-input-modal').modal("hide");
+    };
+
     this.openFolder = function (nodeAddress, nodeName, currentFolder, subFolder) {
         $.ajax({
             type: "GET",
@@ -491,6 +540,9 @@ eskimo.FileManagers = function() {
                 '                <input type="hidden" id="file-manager-hidden-folder-' + nodeName + '" name="folder">' +
                 '                <input type="hidden" id="file-manager-hidden-filename-' + nodeName + '" name="filename">' +
                 '            </form></div>' +
+                '            <div class="btn-group">' +
+                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().createFile(\'' + nodeAddress + '\', \'' + nodeName + '\');" class="btn btn-default"><i class="fa fa-file"></i> Create file</button>\n' +
+                '            </div>' +
                 '           <div class="btn-group">' +
                 '                <label id="file-manager-folder-current-' + nodeName + '" class="btn"></label>' +
                 '            </div>' +
