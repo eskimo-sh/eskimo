@@ -36,9 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.MemoryModel;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.Topology;
+import ch.niceideas.eskimo.model.*;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +44,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -355,5 +354,90 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode(nrr.resolveRanges(nodesConfig), emptyModel, 1));
+    }
+
+    @Test
+    public void testEditableConfiguration() throws Exception {
+
+        Service sparkService = def.getService("spark-executor");
+        assertNotNull(sparkService);
+
+        List<EditableConfiguration> confs = sparkService.getEditableConfigurations();
+        assertNotNull(confs);
+        assertEquals(1, confs.size());
+
+        EditableConfiguration conf = confs.get(0);
+        assertNotNull(conf);
+
+        assertEquals("spark-defaults.conf", conf.getFilename());
+        assertEquals (EditablePropertyType.VARIABLE, conf.getPropertyType());
+        assertEquals ("{name}={value}", conf.getPropertyFormat());
+        assertEquals("#", conf.getCommentPrefix());
+
+        List<EditableProperty> props = conf.getProperties();
+        assertNotNull(props);
+
+        assertEquals(8, props.size());
+
+        EditableProperty firstProp = props.get(0);
+        assertNotNull(firstProp);
+
+        assertEquals("spark.driver.memory", firstProp.getName());
+        assertEquals("Limiting the driver (client) memory", firstProp.getComment());
+        assertEquals("800m", firstProp.getDefaultValue());
+
+        EditableProperty lastProp = props.get(7);
+        assertNotNull(lastProp);
+
+        assertEquals("spark.executor.memory", lastProp.getName());
+        assertEquals("Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched ", lastProp.getComment());
+        assertEquals("[ESKIMO_DEFAULT]", lastProp.getDefaultValue());
+
+        assertEquals("{\n" +
+                "  \"service\": \"spark-executor\",\n"+
+                "  \"properties\": [\n" +
+                "    {\n" +
+                "      \"name\": \"spark.driver.memory\",\n" +
+                "      \"defaultValue\": \"800m\",\n" +
+                "      \"comment\": \"Limiting the driver (client) memory\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.rpc.numRetries\",\n" +
+                "      \"defaultValue\": \"5\",\n" +
+                "      \"comment\": \"Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number.\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.rpc.retry.wait\",\n" +
+                "      \"defaultValue\": \"5s\",\n" +
+                "      \"comment\": \"Duration for an RPC ask operation to wait before retrying.\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.scheduler.mode\",\n" +
+                "      \"defaultValue\": \"FAIR\",\n" +
+                "      \"comment\": \"The scheduling mode between jobs submitted to the same SparkContext. \\nCan be FIFO or FAIR. FAIR Seem not to work well with mesos\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.locality.wait\",\n" +
+                "      \"defaultValue\": \"20s\",\n" +
+                "      \"comment\": \"How long to wait to launch a data-local task before giving up and launching it on a less-local node.\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.dynamicAllocation.executorIdleTimeout\",\n" +
+                "      \"defaultValue\": \"200s\",\n" +
+                "      \"comment\": \"If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \\n (Caution here : small values cause issues. I have executors killed with 10s for instance)\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.dynamicAllocation.cachedExecutorIdleTimeout\",\n" +
+                "      \"defaultValue\": \"300s\",\n" +
+                "      \"comment\": \"If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \\n (Caution here : small values cause issues. I have executors killed with 10s for instance)\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"spark.executor.memory\",\n" +
+                "      \"defaultValue\": \"[ESKIMO_DEFAULT]\",\n" +
+                "      \"comment\": \"Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \\nUSE [ESKIMO_DEFAULT] to leave untouched \"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"filename\": \"spark-defaults.conf\"\n" +
+                "}", conf.toJSON().toString(2));
     }
 }

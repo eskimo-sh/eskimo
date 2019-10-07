@@ -197,6 +197,10 @@ public class SystemService {
         lastOperationSuccess = success;
     }
 
+    public void showJournal(String service, String ipAddress) throws SSHCommandException {
+        applyServiceOperation(service, ipAddress, "Showing journal of", () -> sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + service));
+    }
+
     public void startService(String service, String ipAddress) throws SSHCommandException {
         applyServiceOperation(service, ipAddress, "Starting", () -> sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + service));
     }

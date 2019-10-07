@@ -119,7 +119,7 @@ function install_and_check_service_file() {
     fail_if_error $? "$2" -7
 
     echo " - Testing systemd startup - Checking startup"
-    sleep 8
+    sleep 10
     sudo systemctl status $1 >> $2 2>&1
     fail_if_error $? "$2" -8
 

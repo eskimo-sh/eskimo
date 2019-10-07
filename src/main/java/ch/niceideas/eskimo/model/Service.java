@@ -38,10 +38,7 @@ import ch.niceideas.common.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Service {
@@ -52,6 +49,7 @@ public class Service {
 
     private final List<Dependency> dependencies = new ArrayList<>();
     private final List<String> additionalEnvironment= new ArrayList<>();
+    private final List<EditableConfiguration> editableConfigurations = new ArrayList<>();
 
     // configuration
     private int configOrder = -1;
@@ -187,6 +185,14 @@ public class Service {
         dependencies.add (dep);
     }
 
+    public void addEditableConfiguration (EditableConfiguration conf) {
+        editableConfigurations.add(conf);
+    }
+
+    public List<EditableConfiguration> getEditableConfigurations() {
+        return Collections.unmodifiableList(editableConfigurations);
+    }
+
     public int getRelevantDependenciesCount() {
         return (int) dependencies.stream()
                 .filter(dep -> !dep.getMasterService().equals(getName()) && !dep.getMasterService().equals("action_id"))
@@ -217,7 +223,19 @@ public class Service {
             put("group", StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() : "");
             put("name", getStatusName());
         }});
+    }
 
+    public JSONObject getEditableConfigurationsJSON() {
+
+        JSONArray configsArray = new JSONArray(getEditableConfigurations().stream()
+                .map(config -> config.toJSON())
+                .collect(Collectors.toList())
+        );
+
+        return new JSONObject(new HashMap<String, Object>() {{
+            put("name", getName());
+            put("configs", configsArray);
+        }});
     }
 
     public boolean isProxied() {
@@ -250,4 +268,5 @@ public class Service {
     public boolean isUiService() {
         return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getTitle());
     }
+
 }

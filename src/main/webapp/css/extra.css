@@ -55,6 +55,22 @@ body.empty-page {
     align-items: center;
 }
 
+
+.left-panel-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-right: 17px; /* Increase/decrease this value for cross-browser compatibility */
+    box-sizing: content-box; /* So the width will be 100% + 17px */
+}
+#hoe-left-panel[hoe-position-type="absolute"] {
+    /*overflow-y: auto;*/
+    overflow-y: hidden;
+    overflow-x: visible;
+}
+
+
 .last-menu,
 #hoe-left-panel .last-menu {
     padding-bottom: 40px;
@@ -146,6 +162,9 @@ body.empty-page {
 }
 .service-status-action {
     font-size: smaller;
+}
+.service-status-action-journal {
+    color: lightblue;
 }
 .service-status-action-stop {
     color: red;

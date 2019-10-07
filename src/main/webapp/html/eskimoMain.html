@@ -75,6 +75,7 @@ Software.
 </header>
 <div id="hoeapp-container" hoe-color-type="lpanel-bg8" hoe-lpanel-effect="shrink">
     <aside id="hoe-left-panel" hoe-position-type="absolute">
+        <div class="left-panel-container">
         <!--
         <div class="profile-box">
             <div class="media">
@@ -121,6 +122,12 @@ Software.
                     <span class="menu-text">Configure Eskimo Nodes</span>
                 </a>
             </li>
+            <li class="config-menu-items disabled">
+                <a href="javascript:eskimoMain.getServicesConfig().showServicesConfig();">
+                    <i class="fa fa-cog"></i>
+                    <span class="menu-text">Configure Services</span>
+                </a>
+            </li>
             <li class="config-menu-items disabled"  id="menu-messages">
                 <a href="javascript:eskimoMain.getMessaging().showMessages();">
                     <i class="fa fa-envelope"></i>
@@ -134,7 +141,7 @@ Software.
                 </a>
             </li>
         </ul>
-
+        </div>
     </aside>
     <section id="main-content">
 
@@ -152,6 +159,9 @@ Software.
 
         <!-- eskimoNodesConfig.html -->
         <div class="inner-content" id="inner-content-nodes" style="visibility: hidden;"></div>
+
+        <!-- eskimoServicesConfig.html -->
+        <div class="inner-content" id="inner-content-services-config" style="visibility: hidden;"></div>
 
         <!-- eskimoFileManagers.html -->
         <div class="inner-content" id="inner-content-file-managers" style="visibility: hidden;"></div>

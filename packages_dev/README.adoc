@@ -204,8 +204,8 @@ and creates installable packages.
 ..../packages_dev$ ./build.sh -b mesos-deb # for building with VirtualBox
 ----
 
-
-
+These both commands require vagrant and VirtualBox, respectively libvirt, kvm and the libvirt vagrant provider properly
+installed.
 
 
 

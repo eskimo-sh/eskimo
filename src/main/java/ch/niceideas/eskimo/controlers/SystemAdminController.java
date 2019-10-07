@@ -94,6 +94,26 @@ public class SystemAdminController {
         }
     }
 
+    @GetMapping("/show-journal")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String showJournal(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
+
+        try {
+            systemService.showJournal(service, address);
+
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("messages", service + " journal display from " + address  + ".");
+            }}).toString(2);
+
+        } catch (JSONException | SSHCommandException e) {
+            logger.error(e, e);
+            return ErrorStatusHelper.createErrorStatus(e);
+
+        }
+    }
+
     @GetMapping("/start-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody

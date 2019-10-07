@@ -85,7 +85,7 @@ Type=simple
 
 Restart=always
 StartLimitBurst=5
-StartLimitInterval=30
+StartLimitInterval=60
 
 StandardOutput=syslog
 StandardError=syslog

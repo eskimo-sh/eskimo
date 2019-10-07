@@ -39,192 +39,50 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemException;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class NodesConfigWrapper extends JsonWrapper {
+public class ServicesConfigWrapper extends JsonWrapper {
 
-    private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
+    private static final Logger logger = Logger.getLogger(ServicesConfigWrapper.class);
 
-    public NodesConfigWrapper(File statusFile) throws FileException, JSONException {
-        super(FileUtils.readFile(statusFile));
+    public ServicesConfigWrapper(File configFile) throws FileException, JSONException {
+        super(FileUtils.readFile(configFile));
     }
 
-    public static NodesConfigWrapper empty() throws JSONException{
-        return new NodesConfigWrapper("{}");
+    public static ServicesConfigWrapper initEmpty(ServicesDefinition def) throws JSONException{
+
+        List<JSONObject> allConfigurations = Arrays.stream(def.getAllServices())
+                .map(serviceName -> def.getService(serviceName))
+                .map (service -> service.getEditableConfigurationsJSON())
+                .collect(Collectors.toList());
+
+        JSONObject configObject = new JSONObject(new HashMap<String, Object>() {{
+            put("configs", new JSONArray(allConfigurations));
+        }});
+
+        return new ServicesConfigWrapper(configObject.toString(2));
     }
 
-    public NodesConfigWrapper(JSONObject json) throws JSONException {
+    public ServicesConfigWrapper(JSONObject json) throws JSONException {
         super(json);
     }
 
-    public NodesConfigWrapper(Map<String, Object> map) throws JSONException {
+    public ServicesConfigWrapper(Map<String, Object> map) throws JSONException {
         super(new JSONObject(map));
     }
 
-    public NodesConfigWrapper(String jsonString) throws JSONException {
+    public ServicesConfigWrapper(String jsonString) throws JSONException {
         super(jsonString);
     }
 
-    public boolean hasServiceConfigured(String serviceName) {
-        try {
-            return this.keySet().stream()
-                    .anyMatch(serviceName::equals);
-        } catch (JSONException e) {
-            logger.debug (e, e);
-            return false;
-        }
-    }
-
-    public boolean isEmpty() {
-        try {
-            return getFormattedValue().trim().length() <= 3;
-        } catch (JSONException e) {
-            logger.error (e, e);
-            return true;
-        }
-    }
-
-    public List<String> getIpAddressKeys() {
-        return getRootKeys().stream()
-                .filter(key -> key.startsWith("action_id"))
-                .collect(Collectors.toList());
-    }
-
-    public List<String> getServiceKeys() {
-        return getRootKeys().stream()
-                .filter(key -> !key.contains("action_id"))
-                .collect(Collectors.toList());
-    }
-
-    public String getNodeAddress(int nodeNbr) throws JSONException {
-        return (String) getValueForPath("action_id" + nodeNbr);
-    }
-
-    public List<String> getAllNodeAddressesWithService(String serviceName) {
-        return getRootKeys().stream()
-                .map (key -> {
-                    try {
-                        return Topology.parseKeyToServiceConfig(key, this);
-                    } catch (NodesConfigurationException | JSONException e) {
-                        logger.debug (e, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .filter(serviceConfig -> serviceConfig.getKey().equals(serviceName))
-                .map(serviceConfig -> {
-                    try {
-                        return getNodeAddress (serviceConfig.getValue());
-                    } catch (JSONException e) {
-                        logger.debug (e, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    public List<Pair<String, String>> getNodeAdresses() {
-        List<Pair<String, String>> retList = new ArrayList<>();
-
-        getIpAddressKeys()
-                .forEach(key -> {
-                    try {
-                        retList.add(new Pair<>(key.substring("action_id".length()), (String) getValueForPath(key)));
-                    } catch (JSONException e) {
-                        throw new RuntimeException();
-                    }
-                });
-
-        return retList;
-    }
-
-    public List<String> getServicesForIpAddress (String ipAddress) throws SystemException {
-        return getServicesForNode(getNodeNumber(ipAddress));
-    }
-
-    public List<String> getServicesForNode (int number) {
-        return getServiceKeys().stream()
-                .map (key -> {
-                    try {
-                        return Topology.parseKeyToServiceConfig(key, this);
-                    } catch (NodesConfigurationException | JSONException e) {
-                        logger.debug (e, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .filter(serviceConfig -> serviceConfig.getValue() == number)
-                .map(Pair::getKey)
-                .collect(Collectors.toList());
-    }
-
-    public int getNodeNumber(String ipAddress) throws SystemException {
-        for (String key : getRootKeys()) {
-            if (key.startsWith("action_id")) {
-
-                try {
-                    if (getValueForPath(key).equals(ipAddress)) {
-                        return Integer.parseInt(key.substring("action_id".length()));
-                    }
-                } catch (JSONException e) {
-                    logger.error (e, e);
-                    throw new SystemException(e);
-                }
-            }
-        }
-        throw new SystemException("Impossible to find node number for ipAddress " + ipAddress);
-    }
-
-    public boolean shouldInstall(String service, int nodeNbr) throws JSONException {
-
-        boolean shall = false;
-
-        // First case : unique service
-        if (getValueForPath(service) != null && getValueForPath(service).equals("" + nodeNbr)) {
-            shall = true;
-        }
-        // second case multiple service
-        else if (getValueForPath(service + nodeNbr) != null && getValueForPath(service + nodeNbr).equals("on")) {
-            shall = true;
-        }
-
-        return shall;
-    }
-
-    public List<String> getIpAddresses() {
-        return getIpAddressKeys().stream()
-                .map(key -> {
-                    try {
-                        return (String) getValueForPath(key);
-                    } catch (JSONException e) {
-                        logger.debug (e, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    public List<Integer> getNodeNumbers(String service) throws JSONException {
-        return getRootKeys().stream()
-                .map(key -> {
-                    try {
-                        return Topology.parseKeyToServiceConfig(key, this);
-                    } catch (NodesConfigurationException | JSONException e) {
-                        logger.error(e, e);
-                        throw new RuntimeException(e);
-                    }
-                })
-                .filter(result -> result.getKey().equals(service))
-                .map(result -> result.getValue() == null ? -1 : result.getValue())
-                .collect(Collectors.toList());
-    }
 }

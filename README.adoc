@@ -355,6 +355,47 @@ The directory structure of the eskimo source distribution is as follows:
 * `src` contains the source files to build eskimo
 * `test_lab` contains various tools to build VMs aimed at testing eskimo
 
+== Test Laboratory
+
+The folder `test_lab` folder in the Eskimo CE project root folder contains a *Vagrant* framework used to create virtual
+machines to test Eskimo.
+
+The supported virtual machines are declared in the file `VagrantFile` in the variable `nodes`:
+
+.Vagrant Virtual Machines declaration
+----
+# Define cluster nodes
+nodes = [
+  { :hostname => 'deb-node1',  :box => 'debian/buster64',
+                               :ip => '192.168.10.11', :ram => 8000 },
+  { :hostname => 'deb-node2',  :box => 'ubuntu/xenial64',
+                               :ip => '192.168.10.12', :ram => 6000 },
+  { :hostname => 'cent-node1', :box => 'centos/7',
+                               :ip => '192.168.10.13', :ram => 6000},
+  { :hostname => 'cent-node2', :box => 'fedora/29-cloud-base',
+                               :ip => '192.168.10.14', :ram => 6000 }
+]
+----
+
+The defined VMs use different Operating Systems to test Eskimo's installation on different OSes. +
+One can edit this variable to declare one's own VM's as required.
+
+An individual VM is then started with `vargrant` using _VirtualBox_  as follows:
+
+.Start deb-node1 with VirtualBox
+----
+$ cd ./test_lab/vagrant/
+$ vagrant up deb-node1
+----
+
+Vagrant can also start VM's using libvirt / QEMU / kvm if the required libraries and provider are properly installed:
+
+.Start deb-node1 with libvirt
+----
+$ cd ./test_lab/vagrant/
+$ vagrant up deb-node1 --provider=libvirt
+----
+
 
 == Further informations
 

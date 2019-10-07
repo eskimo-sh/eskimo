@@ -158,6 +158,7 @@ echo " - Importing Zeppelin Sample notebooks"
 sleep 5 # wait a little more
 for i in `find ./samples/`; do
     if [[ ! -d $1 ]]; then
+        echo "   + importing $i"
         curl -XPOST -H "Content-Type: application/json" \
                 http://localhost:38080/api/notebook/import \
                 -d @"$i" >> /tmp/zeppelin_install_log 2>&1

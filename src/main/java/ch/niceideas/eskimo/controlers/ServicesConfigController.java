@@ -34,9 +34,10 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.*;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -47,183 +48,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.HashMap;
 
 
 @Controller
-public class NodesConfigController {
+public class ServicesConfigController {
 
-    private static final Logger logger = Logger.getLogger(NodesConfigController.class);
-
-    @Resource
-    private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private SystemService systemService;
-
-    @Autowired
-    private SetupService setupService;
-
-    @Autowired
-    private NodesConfigurationChecker nodesConfigChecker;
+    private static final Logger logger = Logger.getLogger(ServicesConfigController.class);
 
     @Autowired
     private ServicesDefinition servicesDefinition;
 
     @Autowired
-    private NodeRangeResolver nodeRangeResolver;
+    private ServicesConfigService servicesConfigService;
 
-    @GetMapping("/load-nodes-config")
+    @GetMapping("/load-services-config")
     @ResponseBody
-    public String loadNodesConfig() {
+    public String loadServicesConfig() {
         try {
-            setupService.ensureSetupCompleted();
-            NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
-            if (nodesConfig == null || nodesConfig.isEmpty()) { ;
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
-            }
-            return nodesConfig.getFormattedValue();
-        } catch (SystemException | JSONException e) {
+
+            ServicesConfigWrapper wrapper = servicesConfigService.loadServicesConfig();
+
+            wrapper.setValueForPath("status", "OK");
+
+            return wrapper.getFormattedValue();
+        } catch (JSONException | FileException | SetupException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus(e.getMessage());
-        } catch (SetupException e) {
-            // this is OK. means application is not yet initialized
-            logger.debug (e, e);
-            return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
         }
     }
 
-    @PostMapping("/reinstall-nodes-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
-    @ResponseBody
-    public String reinstallNodesConfig(@RequestBody String reinstallModel, HttpSession session) {
-
-        logger.info ("Got model : " + reinstallModel);
-
-        try {
-
-            ServicesInstallStatusWrapper servicesInstallStatus = systemService.loadServicesInstallationStatus();
-            ServicesInstallStatusWrapper newServicesInstallStatus = ServicesInstallStatusWrapper.empty();
-
-            NodesConfigWrapper reinstallModelConfig = new NodesConfigWrapper(reinstallModel);
-
-            for (String serviceInstallStatusFlag : servicesInstallStatus.getInstalledServicesFlags()) {
-
-                String serviceInstallation = servicesInstallStatus.getServiceInstallation(serviceInstallStatusFlag);
-
-                if (!reinstallModelConfig.hasServiceConfigured(serviceInstallation)) {
-                    newServicesInstallStatus.copyFrom (serviceInstallStatusFlag, servicesInstallStatus);
-                }
-            }
-
-            NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
-            if (nodesConfig == null || nodesConfig.isEmpty()) {
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
-            }
-
-            // Create OperationsCommand
-            OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, newServicesInstallStatus, nodesConfig);
-
-            // store command and config in HTTP Session
-            session.setAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE", newServicesInstallStatus);
-            session.setAttribute("PENDING_OPERATIONS_COMMAND", command);
-
-            return returnCommand (command);
-
-        } catch (JSONException | FileException | NodesConfigurationException | SetupException | SystemException e) {
-            logger.error(e, e);
-            messagingService.addLines (e.getMessage());
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
-    }
-
-    private String returnCommand(OperationsCommand command) {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("command", command.toJSON());
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
-    }
-
-    @PostMapping("/save-nodes-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
-    @ResponseBody
-    public String saveNodesConfig(@RequestBody String configAsString, HttpSession session) {
-
-        logger.info ("Got config : " + configAsString);
-
-        try {
-
-            // first of all check nodes config
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(configAsString);
-            nodesConfigChecker.checkServicesConfig(nodesConfig);
-
-            ServicesInstallStatusWrapper serviceInstallStatus = systemService.loadServicesInstallationStatus();
-
-            // Create OperationsCommand
-            OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
-
-            // store command and config in HTTP Session
-            session.removeAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
-            session.setAttribute("PENDING_OPERATIONS_COMMAND", command);
-
-            return returnCommand (command);
-
-        } catch (JSONException | SetupException | FileException | NodesConfigurationException e) {
-            logger.error(e, e);
-            messagingService.addLines (e.getMessage());
-            notificationService.addEvent("error", "Nodes installation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
-    }
-
-    @PostMapping("/apply-nodes-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
-    @ResponseBody
-    public String applyNodesConfig(HttpSession session) {
-
-        try {
-
-            if (systemService.isProcessingPending()) {
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
-                }}).toString(2);
-            }
-
-            OperationsCommand command = (OperationsCommand) session.getAttribute("PENDING_OPERATIONS_COMMAND");
-
-            ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
-            // newNodesStatus is null in case of nodes config change (as opposed to forced reinstall)
-            if (newServicesInstallationStatus != null) {
-                systemService.saveServicesInstallationStatus(newServicesInstallationStatus);
-            }
-
-            systemService.saveNodesConfig(command.getRawConfig());
-
-            systemService.applyNodesConfig(command);
-
-            return "{\"status\": \"OK\" }";
-
-        } catch (SystemException e) {
-            logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-
-        } catch (JSONException | SetupException | FileException | NodesConfigurationException | ServiceDefinitionException e) {
-            logger.error(e, e);
-            messagingService.addLines (e.getMessage());
-            notificationService.addEvent("error", "Nodes installation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
-    }
 }

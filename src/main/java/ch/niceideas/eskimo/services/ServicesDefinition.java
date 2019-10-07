@@ -235,6 +235,42 @@ public class ServicesDefinition implements InitializingBean {
                 }
             }
 
+            if (servicesConfig.hasPath(serviceString+".editableConfigurations")) {
+
+                JSONArray editableConfArray = servicesConfig.getSubJSONObject(serviceString).getJSONArray("editableConfigurations");
+                for (int i = 0; i < editableConfArray.length(); i++) {
+                    JSONObject conf = editableConfArray.getJSONObject(i);
+
+                    String filename = conf.getString("filename");
+                    String propertyTypeAsString = conf.getString("propertyType");
+                    EditablePropertyType propertyType = EditablePropertyType.valueOf(propertyTypeAsString.toUpperCase());
+                    String propertyFormat = conf.getString("propertyFormat");
+
+                    EditableConfiguration configuration = new EditableConfiguration(service, filename, propertyType, propertyFormat);
+
+                    if (conf.has("commentPrefix")) {
+                        String commentPrefix = conf.getString("commentPrefix");
+                        configuration.setCommentPrefix(commentPrefix);
+                    }
+
+
+                    JSONArray propertiesArray = conf.getJSONArray("properties");
+                    for (int j = 0; j < propertiesArray.length(); j++) {
+                        JSONObject prop = propertiesArray.getJSONObject(j);
+
+                        String propName = prop.getString("name");
+                        String comment = prop.getString("comment");
+                        String defaultValue = prop.getString("defaultValue");
+
+                        EditableProperty property = new EditableProperty(propName, comment, defaultValue);
+
+                        configuration.addProperty(property);
+                    }
+
+                    service.addEditableConfiguration(configuration);
+                }
+            }
+
             services.put(serviceString, service);
         }
     }

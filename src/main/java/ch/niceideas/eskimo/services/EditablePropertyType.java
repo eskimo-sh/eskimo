@@ -1,6 +1,6 @@
 package ch.niceideas.eskimo.services;
 
-public enum EditableConfigurationPropertyType {
+public enum EditablePropertyType {
 
     VARIABLE;
 }

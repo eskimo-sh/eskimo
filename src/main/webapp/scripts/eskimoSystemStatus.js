@@ -231,6 +231,13 @@ eskimo.SystemStatus = function() {
         });
     }
 
+    function showJournal (service, nodeAddress) {
+        console.log("showJournal", service, nodeAddress);
+
+        serviceAction("show-journal", service, nodeAddress);
+    }
+    this.showJournal = showJournal;
+
     function startService (service, nodeAddress) {
         console.log("startService ", service, nodeAddress);
 
@@ -645,6 +652,19 @@ eskimo.SystemStatus = function() {
     function fillInActions(service, nodeAddress, up, tdClassName) {
 
         var retActionsHtml = '';
+
+        retActionsHtml +=
+            '        <td class="' + tdClassName + '">\n' +
+            '            <a href="#" title="Show journal" ' +
+            (!eskimoMain.isOperationInProgress() ?
+                'onclick="eskimoMain.getSystemStatus().showJournal(\'' + service + '\', \'' + nodeAddress + '\');"':
+                'onclick="event.preventDefault(); return false;"') +
+            '                >\n' +
+            '                <span class="service-status-action service-status-action-journal ' +
+            '        '+(eskimoMain.isOperationInProgress() ? 'invisible disabled' : '') +
+            '                "><i class="fa fa-file"></i></span>\n' +
+            '            </a>\n' +
+            '        </td>\n';
 
         if (up) {
             retActionsHtml +=
