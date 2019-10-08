@@ -51,30 +51,18 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
+        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoNodesConfig.js')");
-
-        page.executeJavaScript("$('#inner-content-nodes').html('" +
-                "<div id=\"nodes-management\"" +
-                "     class=\"panel theme-panel inner-content-inner \">" +
-                "    <form id=\"nodes-config\">" +
-                "        <div id=\"nodeContainer-nodes\" style=\"position: relative;\">" +
-                "            <div id=\"nodes-placeholder\">" +
-                "            </div>" +
-                "        </div>" +
-                "    </form>" +
-                "</div>')");
 
         page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"];");
         page.executeJavaScript("MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        // redefine constructor
-        page.executeJavaScript("eskimo.NodesConfig.initialize = function() {};");
-
         // instantiate test object
         page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
+
+        waitForElementIdinDOM("reset-nodes-config");
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 

@@ -34,57 +34,40 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URL;
+import static junit.framework.TestCase.assertEquals;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-public class EskimoServicesSelectionTest extends AbstractWebTest {
-
-    private String jsonServices = null;
+public class EskimoSetupTest extends AbstractWebTest {
 
     @Before
     public void setUp() throws Exception {
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
-
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoServicesSelection.js')");
+        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoSetup.js')");
+
+        page.executeJavaScript("function errorHandler() {};");
+
+        String currentDir = System.getProperty("user.dir");
+        System.out.println("Current dir using System:" +currentDir);
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection();");
+        page.executeJavaScript("eskimoSetup = new eskimo.Setup();");
 
-        waitForElementIdinDOM("select-all-services-button");
-
-        URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
-
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
-
-        page.executeJavaScript("eskimoServicesSelection.setServicesConfigForTest(SERVICES_CONFIGURATION);");
+        waitForElementIdinDOM("setup-warning");
     }
 
     @Test
-    public void testGetService() throws Exception {
+    public void testSaveSetupMessages() throws Exception {
 
-        assertEquals ("spark-history-server", page.executeJavaScript("eskimoServicesSelection.getService(1, 1).name").getJavaScriptResult().toString());
-        assertEquals ("elasticsearch", page.executeJavaScript("eskimoServicesSelection.getService(3, 3).name").getJavaScriptResult().toString());
+        // add services menu
+        page.executeJavaScript("eskimoSetup.saveSetup()");
 
-    }
+        //System.out.println (page.asXml());
 
-    @Test
-    public void testInitModalServicesConfig() throws Exception {
-
-        page.executeJavaScript("eskimoServicesSelection.initModalServicesConfig()");
-
-        assertEquals("1.0", page.executeJavaScript("$('#cerebro-choice').length").getJavaScriptResult().toString());
-        assertEquals("1.0", page.executeJavaScript("$('#kibana-choice').length").getJavaScriptResult().toString());
-        assertEquals("1.0", page.executeJavaScript("$('#grafana-choice').length").getJavaScriptResult().toString());
+        // should have displayed the error
+        assertEquals ("inherit", page.executeJavaScript("$('#setup-warning').css('display')").getJavaScriptResult());
 
     }
 

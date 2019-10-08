@@ -48,14 +48,10 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoServices.js')");
 
         page.executeJavaScript("function errorHandler() {};");
-
-        // redefine constructor
-        page.executeJavaScript("eskimo.Services.initialize = function() {};");
 
         // instantiate test object
         page.executeJavaScript("eskimoServices = new eskimo.Services();");

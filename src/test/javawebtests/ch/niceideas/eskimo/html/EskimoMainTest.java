@@ -44,7 +44,6 @@ public class EskimoMainTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoMain.js')");
 
         // redefine constructor
@@ -56,6 +55,7 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimo.Consoles = function(){};");
         page.executeJavaScript("eskimo.Services = function(){};");
         page.executeJavaScript("eskimo.ServicesSelection = function(){};");
+        page.executeJavaScript("eskimo.ServicesConfig = function(){};");
         page.executeJavaScript("eskimo.OperationsCommand = function(){};");
         page.executeJavaScript("eskimo.FileManagers = function(){};");
         page.executeJavaScript("eskimo.Setup = function(){};");
@@ -75,6 +75,7 @@ public class EskimoMainTest extends AbstractWebTest {
         assertEquals("hidden", page.executeJavaScript("$('#inner-content-consoles').css('visibility')").getJavaScriptResult());
         assertEquals("hidden", page.executeJavaScript("$('#inner-content-setup').css('visibility')").getJavaScriptResult());
         assertEquals("hidden", page.executeJavaScript("$('#inner-content-nodes').css('visibility')").getJavaScriptResult());
+        assertEquals("hidden", page.executeJavaScript("$('#inner-content-services-config').css('visibility')").getJavaScriptResult());
         assertEquals("hidden", page.executeJavaScript("$('#inner-content-file-managers').css('visibility')").getJavaScriptResult());
 
         assertEquals("visible", page.executeJavaScript("$('#inner-content-pending').css('visibility')").getJavaScriptResult());

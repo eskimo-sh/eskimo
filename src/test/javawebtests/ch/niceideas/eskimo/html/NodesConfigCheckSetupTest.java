@@ -57,7 +57,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
+
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoNodesConfig.js')");
 
         ServicesController sc = new ServicesController();

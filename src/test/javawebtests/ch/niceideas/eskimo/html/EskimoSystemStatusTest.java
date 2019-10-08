@@ -54,63 +54,17 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         jsonStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoNodesStatusTest/testStatus.json"));
         jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoNodesStatusTest/testStatusConfig.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
+        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoSystemStatus.js')");
-
-        page.executeJavaScript("$('#inner-content-nodes').html('" +
-                "<div id=\"status-management\"" +
-                "     class=\"panel theme-panel inner-content-inner \">" +
-                "    <div id=\"nodeContainer-status\" style=\"position: relative;\">" +
-                "        <div class=\"col-xs-12\">" +
-                "            <div class=\"col-md-12\" id=\"status-message-title\">" +
-                "                <h3>Eskimo Cluster Node Status</h3>" +
-                "            </div>" +
-                "        </div>" +
-                "        <div class=\"col-xs-12 col-md-12\" id=\"status-node-container-carousel\" style=\"visibility: hidden;\">" +
-                "            <div id=\"nodes-status-carousel-content\">" +
-                "            </div>" +
-                "            <div class=\"col-md-12 btn-toolbar\">" +
-                "                <div class=\"btn-group\">" +
-                "                    <button id=\"show-table-view-btn\" name=\"show-table-view-btn\" class=\"btn btn-primary\">" +
-                "                        Show Table View" +
-                "                    </button>" +
-                "                </div>" +
-                "            </div>" +
-                "        </div>"+
-                "        <div class=\"col-xs-12 col-md-12\" id=\"status-node-container\" style=\"overflow-x: auto;\">" +
-                "            <div class=\"col-xs-12 col-md-12\" id=\"status-node-container-table\" style=\"visibility: hidden;\">" +
-                "                <div class=\"table-responsive status-table\" >" +
-                "                <table id=\"status-node-table\" class=\"table table-bordered table-hover\">" +
-                "                <thead id=\"status-node-table-head\">" +
-                "                </thead>" +
-                "                <tbody id=\"status-node-table-body\">" +
-                "                </tbody>" +
-                "                </table>" +
-                "            </div>" +
-                "            <div class=\"col-md-12 btn-toolbar\">" +
-                "            <div class=\"btn-group\">" +
-                "                <button id=\"show-machine-view-btn\" name=\"show-machine-view-btn\" class=\"btn btn-primary\">" +
-                "                Show Node View" +
-                "                </button>" +
-                "            </div>" +
-                "            <br>" +
-                "        </div>" +
-                "    </div>" +
-                "    <div class=\"col-xs-12 col-md-12\" id=\"service-status-warning\" style=\"visibility: hidden; display: none;\">" +
-                "        <div class=\"alert alert-warning\" role=\"alert\" id=\"service-status-warning-message\">" +
-                "        </div>" +
-                "    </div>" +
-                "</div>')");
 
         page.executeJavaScript("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"gdash\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-history-server\",\"spark-executor\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
 
         page.executeJavaScript("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
 
-        // redefine constructor
-        page.executeJavaScript("eskimo.SystemStatus.initialize = function() {};");
-
         // instantiate test object
         page.executeJavaScript("eskimoNodesStatus = new eskimo.SystemStatus();");
+
+        waitForElementIdinDOM("service-status-warning");
 
         // set services for tests
         page.executeJavaScript("eskimoNodesStatus.setStatusServices (STATUS_SERVICES);");

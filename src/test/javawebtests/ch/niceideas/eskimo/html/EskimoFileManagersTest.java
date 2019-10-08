@@ -51,42 +51,16 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoFileManagers.js')");
 
         page.executeJavaScript("function errorHandler() {};");
 
-        page.executeJavaScript("$('#inner-content-file-managers').html('" +
-                "<div id=\"file-managers-management\"" +
-                "     class=\"panel theme-panel inner-content-inner \">" +
-                "    <div class=\"col-xs-12\" style=\"padding-bottom: 5px; margin-bottom: 5px; border-bottom: 1px solid #AAAAAA;\">" +
-                "        <div class=\"col-md-12\" id=\"file-managers-action\">" +
-                "            <div class=\"btn-group\">" +
-                "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-                "                    Open SFTP File Manager <span class=\"caret\"></span>" +
-                "                </button>" +
-                "                <ul id=\"file-managers-action-open-file-manager\" class=\"dropdown-menu\">" +
-                "                </ul>" +
-                "            </div>" +
-                "        </div>" +
-                "    </div>" +
-                "    <div class=\"col-xs-12\">" +
-                "        <div class=\"col-md-12\" id=\"file-managers-file-managers\">" +
-                "            <ul id=\"file-managers-tab-list\" class=\"nav nav-tabs\" style=\"padding-bottom: 8px;\"> </ul>" +
-                "        </div>" +
-                "    </div>" +
-                "    <div id=\"file-managers-file-manager-content\" class=\"col-xs-12\">" +
-                "    </div>" +
-                "</div>" +
-                "')");
-
         page.executeJavaScript("var dirContent = " + dirContent + "");
-
-        // redefine constructor
-        page.executeJavaScript("eskimo.FileManagers.initialize = function() {};");
 
         // instantiate test object
         page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers();");
+
+        waitForElementIdinDOM("file-managers-file-manager-content");
 
         page.executeJavaScript("var openedFileManagers = [];");
         page.executeJavaScript("eskimoFileManagers.setOpenedFileManagers(openedFileManagers);");

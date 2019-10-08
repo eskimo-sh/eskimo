@@ -44,39 +44,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoConsoles.js')");
-
-        page.executeJavaScript("$('#inner-content-consoles').html('" +
-                "<div id=\"consoles-management\"" +
-                "     class=\"panel theme-panel inner-content-inner \">" +
-                "    <div class=\"col-xs-12\">" +
-                "        <div class=\"col-md-12\" id=\"consoles-title\">" +
-                "        </div>" +
-                "    </div>" +
-                "    <div class=\"col-xs-12\" style=\"padding-bottom: 5px; margin-bottom: 5px; border-bottom: 1px solid #AAAAAA;\">" +
-                "        <div class=\"col-md-12\" id=\"consoles-action\">" +
-                "            <div class=\"btn-group\">" +
-                "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-                "                    Open Console <span class=\"caret\"></span>" +
-                "                </button>" +
-                "                <ul id=\"consoles-action-open-console\" class=\"dropdown-menu\">" +
-                "                </ul>" +
-                "            </div>" +
-                "        </div>" +
-                "    </div>" +
-                "    <div class=\"col-xs-12\">" +
-                "        <div class=\"col-md-12\" id=\"consoles-consoles\">" +
-                "            <ul id=\"consoles-tab-list\" class=\"nav nav-tabs\"> </ul>" +
-                "        </div>" +
-                "    </div>" +
-                "    <div id=\"consoles-console-content\" class=\"col-xs-12\">" +
-                "    </div>" +
-                "</div>')");
-
-
-        // redefine constructor
-        page.executeJavaScript("eskimo.Consoles.initialize = function() {};");
 
         // mock ajax term
         page.executeJavaScript("ajaxterm = {};");
@@ -87,6 +55,8 @@ public class EskimoConsolesTest extends AbstractWebTest {
 
         // instantiate test object
         page.executeJavaScript("eskimoConsoles = new eskimo.Consoles();");
+
+        waitForElementIdinDOM("consoles-console-content");
 
         page.executeJavaScript("var openedConsoles = [];");
         page.executeJavaScript("eskimoConsoles.setOpenedConsoles(openedConsoles);");

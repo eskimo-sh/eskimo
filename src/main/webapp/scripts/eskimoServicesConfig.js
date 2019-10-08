@@ -46,6 +46,14 @@ eskimo.ServicesConfig = function() {
         $("#inner-content-services-config").load("html/eskimoServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
 
             loadServicesConfig(statusTxt, jqXHR);
+
+            $("#save-services-config-btn").click(function (e) {
+                saveServicesConfig();
+
+                e.preventDefault();
+                return false;
+            });
+
         });
     };
 
@@ -74,6 +82,10 @@ eskimo.ServicesConfig = function() {
         } else if (statusTxt == "error") {
             alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
         }
+    }
+
+    function saveServicesConfig() {
+        alert ("TODO save");
     }
 
     function showServicesConfig () {

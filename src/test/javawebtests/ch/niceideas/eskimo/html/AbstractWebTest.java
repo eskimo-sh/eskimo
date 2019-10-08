@@ -79,10 +79,25 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
         page.executeJavaScript("eskimoMain.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
+
+        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
+
+        // override jquery load
+        page.executeJavaScript("$.fn._internalLoad = $.fn.load;");
+        page.executeJavaScript("$.fn.load = function (resource, callback) { return this._internalLoad ('../../src/main/webapp/'+resource, callback); };");
+
     }
 
     @After
     public void close() throws Exception {
         webClient.close();
+    }
+
+    protected void waitForElementIdinDOM(String elementId) throws InterruptedException {
+        int attempt = 0;
+        while (page.getElementById(elementId) == null && attempt < 10) {
+            Thread.sleep(500);
+            attempt++;
+        }
     }
 }

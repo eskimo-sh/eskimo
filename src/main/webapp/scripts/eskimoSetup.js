@@ -261,6 +261,7 @@ eskimo.Setup = function() {
             }
         });
     }
+    this.saveSetup = saveSetup;
 
 
     // call constructor

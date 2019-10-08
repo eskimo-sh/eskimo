@@ -390,11 +390,12 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertNotNull(lastProp);
 
         assertEquals("spark.executor.memory", lastProp.getName());
-        assertEquals("Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched ", lastProp.getComment());
+        assertEquals("Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \n" +
+                "USE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc.", lastProp.getComment());
         assertEquals("[ESKIMO_DEFAULT]", lastProp.getDefaultValue());
 
         assertEquals("{\n" +
-                "  \"service\": \"spark-executor\",\n"+
+                "  \"service\": \"spark-executor\",\n" +
                 "  \"properties\": [\n" +
                 "    {\n" +
                 "      \"name\": \"spark.driver.memory\",\n" +
@@ -434,7 +435,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "    {\n" +
                 "      \"name\": \"spark.executor.memory\",\n" +
                 "      \"defaultValue\": \"[ESKIMO_DEFAULT]\",\n" +
-                "      \"comment\": \"Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \\nUSE [ESKIMO_DEFAULT] to leave untouched \"\n" +
+                "      \"comment\": \"Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \\nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc.\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"filename\": \"spark-defaults.conf\"\n" +
