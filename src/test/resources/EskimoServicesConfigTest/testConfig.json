@@ -1,0 +1,173 @@
+{
+  "configs": [
+    {
+      "configs": [],
+      "name": "gdash"
+    },
+    {
+      "configs": [],
+      "name": "mesos-master"
+    },
+    {
+      "configs": [],
+      "name": "zookeeper"
+    },
+    {
+      "configs": [],
+      "name": "zeppelin"
+    },
+    {
+      "configs": [],
+      "name": "ntp"
+    },
+    {
+      "configs": [],
+      "name": "gluster"
+    },
+    {
+      "configs": [],
+      "name": "mesos-agent"
+    },
+    {
+      "configs": [],
+      "name": "logstash"
+    },
+    {
+      "configs": [],
+      "name": "cerebro"
+    },
+    {
+      "configs": [{
+        "filename": "elasticsearch.yml",
+        "service": "elasticsearch",
+        "properties": [
+          {
+            "defaultValue": "false",
+            "name": "bootstrap.memory_lock",
+            "comment": "Lock the memory on startup"
+          },
+          {
+            "defaultValue": "true",
+            "name": "action.destructive_requires_name",
+            "comment": "Require explicit names when deleting indices"
+          }
+        ]
+      }],
+      "name": "elasticsearch"
+    },
+    {
+      "configs": [],
+      "name": "grafana"
+    },
+    {
+      "configs": [],
+      "name": "kafka-manager"
+    },
+    {
+      "configs": [{
+        "filename": "server.properties",
+        "service": "kafka",
+        "properties": [
+          {
+            "defaultValue": "3",
+            "name": "num.network.threads",
+            "comment": "The number of threads that the server uses for receiving requests from the network and sending responses to the network"
+          },
+          {
+            "defaultValue": "8",
+            "name": "num.io.threads",
+            "comment": "The number of threads that the server uses for processing requests, which may include disk I/O"
+          },
+          {
+            "defaultValue": "102400",
+            "name": "socket.send.buffer.bytes",
+            "comment": "The send buffer (SO_SNDBUF) used by the socket server"
+          },
+          {
+            "defaultValue": "102400",
+            "name": "socket.receive.buffer.bytes",
+            "comment": "The receive buffer (SO_RCVBUF) used by the socket server"
+          },
+          {
+            "defaultValue": "104857600",
+            "name": "socket.request.max.bytes",
+            "comment": "The maximum size of a request that the socket server will accept (protection against OOM)"
+          },
+          {
+            "defaultValue": "1",
+            "name": "num.partitions",
+            "comment": "The default number of log partitions per topic. More partitions allow greater parallelism for consumption, but this will also result in more files across the brokers."
+          },
+          {
+            "defaultValue": "168",
+            "name": "log.retention.hours",
+            "comment": "The minimum age of a log file to be eligible for deletion due to age"
+          }
+        ]
+      }],
+      "name": "kafka"
+    },
+    {
+      "configs": [{
+        "filename": "spark-defaults.conf",
+        "service": "spark-executor",
+        "properties": [
+          {
+            "defaultValue": "800m",
+            "name": "spark.driver.memory",
+            "comment": "Limiting the driver (client) memory"
+          },
+          {
+            "defaultValue": "5",
+            "name": "spark.rpc.numRetries",
+            "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number."
+          },
+          {
+            "defaultValue": "5s",
+            "name": "spark.rpc.retry.wait",
+            "comment": "Duration for an RPC ask operation to wait before retrying."
+          },
+          {
+            "defaultValue": "FAIR",
+            "name": "spark.scheduler.mode",
+            "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with mesos"
+          },
+          {
+            "defaultValue": "20s",
+            "name": "spark.locality.wait",
+            "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node."
+          },
+          {
+            "defaultValue": "200s",
+            "name": "spark.dynamicAllocation.executorIdleTimeout",
+            "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+          },
+          {
+            "defaultValue": "300s",
+            "name": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
+            "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+          },
+          {
+            "defaultValue": "[ESKIMO_DEFAULT]",
+            "name": "spark.executor.memory",
+            "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
+          }
+        ]
+      }],
+      "name": "spark-executor"
+    },
+    {
+      "configs": [],
+      "name": "prometheus"
+    },
+    {
+      "configs": [],
+      "name": "kibana"
+    },
+    {
+      "configs": [],
+      "name": "spark-history-server"
+    }
+  ],
+  "status": "OK"
+}

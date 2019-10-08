@@ -45,44 +45,47 @@ eskimo.ServicesConfig = function() {
     this.initialize = function() {
         $("#inner-content-services-config").load("html/eskimoServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
 
-            loadServicesConfig(statusTxt, jqXHR);
+            if (statusTxt == "success") {
 
-            $("#save-services-config-btn").click(function (e) {
-                saveServicesConfig();
+                $("#save-services-config-btn").click(function (e) {
+                    saveServicesConfig();
 
-                e.preventDefault();
-                return false;
-            });
+                    e.preventDefault();
+                    return false;
+                });
+
+
+            } else if (statusTxt == "error") {
+                alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
+            }
 
         });
     };
 
-    function loadServicesConfig(statusTxt, jqXHR) {
-        if (statusTxt == "success") {
+    function loadServicesConfig() {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            url: "load-services-config",
+            success: function (data, status, jqXHR) {
 
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                url: "load-services-config",
-                success: function (data, status, jqXHR) {
+                if (data.status == "OK") {
 
-                    if (data.status == "OK") {
-
-                        SERVICES_CONFIGURATION = data.configs;
+                    SERVICES_CONFIGURATION = data.configs;
+                    layoutServicesConfig();
 
 
-                    } else {
-                        alert(data.error);
-                    }
-                },
-                error: errorHandler
-            });
-
-        } else if (statusTxt == "error") {
-            alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
-        }
+                } else {
+                    alert(data.error);
+                }
+            },
+            error: errorHandler
+        });
     }
+    this.setServicesConfigForTest = function (servicesConfig) {
+        SERVICES_CONFIGURATION = servicesConfig;
+    };
 
     function saveServicesConfig() {
         alert ("TODO save");
@@ -101,8 +104,8 @@ eskimo.ServicesConfig = function() {
             eskimoMain.showProgressbar();
         }
 
+        loadServicesConfig();
 
-        layoutServicesConfig();
 
         eskimoMain.showOnlyContent("services-config");
     }
@@ -137,6 +140,8 @@ eskimo.ServicesConfig = function() {
 
                         var property = serviceEditableConfig.properties[k];
 
+                        var inputName = serviceName + "-" + property.name.replace(/\./g, "-");
+
                         servicesConfigContent = servicesConfigContent +
                             '<div class="col-md-12 col-sd-12">\n' +
                             '     <label class="col-md-12 control-label" id="label_storage">'+
@@ -148,7 +153,7 @@ eskimo.ServicesConfig = function() {
                             property.comment.replace("\n", "<br>") +
                             '     </div>'+
                             '     <div class="col-md-12" style="margin-bottom: 5px;">\n' +
-                            '         <input id="' + property.name + '" name="' + property.name + '" type="text"\n' +
+                            '         <input id="' + inputName + '" name="' + inputName + '" type="text"\n' +
                             '                placeholder="" class="form-control input-md"' +
                             '                value="' + property.defaultValue + '"'+
                             '         >\n' +
@@ -163,8 +168,8 @@ eskimo.ServicesConfig = function() {
         }
 
         $("#services-config-placeholder").html(servicesConfigContent)
-
     }
+    this.layoutServicesConfig = layoutServicesConfig;
 
     // call constructor
     this.initialize();

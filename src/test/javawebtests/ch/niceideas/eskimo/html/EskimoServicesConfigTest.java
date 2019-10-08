@@ -34,53 +34,58 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import java.net.URL;
 
-public class EskimoSetupTest extends AbstractWebTest {
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
+
+public class EskimoServicesConfigTest extends AbstractWebTest {
+
+    private String jsonConfig = null;
 
     @Before
     public void setUp() throws Exception {
 
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoSetup.js')");
-
-        page.executeJavaScript("function errorHandler() {};");
-
-        String currentDir = System.getProperty("user.dir");
-        System.out.println("Current dir using System:" +currentDir);
+        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoServicesConfig.js')");
 
         // instantiate test object
-        page.executeJavaScript("eskimoSetup = new eskimo.Setup();");
+        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig();");
 
-        waitForElementIdinDOM("setup-warning");
+        waitForElementIdinDOM("reset-services-config-btn");
+
+        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
+
+        page.executeJavaScript("var TEST_SERVICE_CONFIG = " + jsonConfig + ";");
+
+        page.executeJavaScript("eskimoServicesConfig.setServicesConfigForTest(TEST_SERVICE_CONFIG.configs)");
+
     }
 
     @Test
-    public void testSaveSetupMessages() throws Exception {
+    public void testLayoutServicesConfig() throws Exception {
 
-        // add services menu
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        page.executeJavaScript("eskimoServicesConfig.layoutServicesConfig();");
 
         //System.out.println (page.asXml());
 
-        // should have displayed the error
-        assertEquals ("inherit", page.executeJavaScript("$('#setup-warning').css('display')").getJavaScriptResult());
-        assertEquals ("Configuration Storage path should be set", page.executeJavaScript("$('#setup-warning-message').html()").getJavaScriptResult());
+        // test a few input values
 
-        page.executeJavaScript("$('#setup_storage').val('/tmp/test')");
+        assertEquals ("true", page.executeJavaScript("$('#elasticsearch-action-destructive_requires_name').val()").getJavaScriptResult());
 
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        assertEquals ("102400", page.executeJavaScript("$('#kafka-socket-send-buffer-bytes').val()").getJavaScriptResult());
 
-        assertEquals ("SSH Username to use to reach cluster nodes should be set", page.executeJavaScript("$('#setup-warning-message').html()").getJavaScriptResult());
+        assertEquals ("1", page.executeJavaScript("$('#kafka-num-partitions').val()").getJavaScriptResult());
 
-        page.executeJavaScript("$('#ssh_username').val('eskimo')");
+        assertEquals ("5", page.executeJavaScript("$('#spark-executor-spark-rpc-numRetries').val()").getJavaScriptResult());
 
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        assertEquals ("300s", page.executeJavaScript("$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()").getJavaScriptResult());
 
-        assertEquals ("SSH Identity Private Key to use to reach cluster nodes should be set", page.executeJavaScript("$('#setup-warning-message').html()").getJavaScriptResult());
     }
 
 }

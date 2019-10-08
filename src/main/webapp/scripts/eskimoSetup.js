@@ -199,19 +199,19 @@ eskimo.Setup = function() {
         // coherence checks
         var setupStorage = $("#setup_storage");
         if (setupStorage.val() == null || setupStorage.val() == "") {
-            showSetupMessage("Configuration Storage path should be input", false);
+            showSetupMessage("Configuration Storage path should be set", false);
             return false;
         }
 
         var sshUserName = $("#ssh_username");
         if (sshUserName.val() == null || sshUserName.val() == "") {
-            showSetupMessage("SSH Username to use to reach cluster nodes should be input", false);
+            showSetupMessage("SSH Username to use to reach cluster nodes should be set", false);
             return false;
         }
 
         var contentSShKey = $("#content-ssh-key");
         if (contentSShKey.val() == null || contentSShKey.val() == "") {
-            showSetupMessage("SSH Identity Private Key to use to reach cluster nodes should be input", false);
+            showSetupMessage("SSH Identity Private Key to use to reach cluster nodes should be set", false);
             return false;
         }
 
