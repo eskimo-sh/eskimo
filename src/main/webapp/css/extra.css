@@ -434,11 +434,17 @@ li.disabled a .menu-text {
 }
 .theme-panel .panel-heading {
     border-bottom: 1px solid #e3e3e3;
-    text-align: center;
+    padding: 2px 10px;
+ /*   text-align: center;*/
 }
+.theme-panel .panel-heading h4 a {
+    color: inherit;
+}
+/*
 .theme-panel .panel-heading .panel-title {
     font-size: 18px;
 }
+*/
 .feature-box {
     background-color: #fff;
     border: 1px solid #e3e3e3;

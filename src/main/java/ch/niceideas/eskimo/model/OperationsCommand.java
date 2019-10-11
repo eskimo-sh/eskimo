@@ -135,6 +135,32 @@ public class OperationsCommand {
         return retCommand;
     }
 
+    public static OperationsCommand createForRestartsOnly (
+            ServicesDefinition servicesDefinition,
+            NodeRangeResolver nodeRangeResolver,
+            String[] servicesToRestart,
+            NodesConfigWrapper rawNodesConfig)
+            throws JSONException, NodesConfigurationException {
+
+        OperationsCommand retCommand = new OperationsCommand(rawNodesConfig);
+
+        NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
+
+        for (String restartedService : Arrays.stream(servicesToRestart).sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
+            for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
+
+                if (nodeNumber > -1) {
+                    String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+
+                    retCommand.addRestart(restartedService, ipAddress);
+                }
+            }
+        }
+
+        return retCommand;
+
+    }
+
     OperationsCommand(NodesConfigWrapper rawNodesConfig) {
         this.rawNodesConfig = rawNodesConfig;
     }

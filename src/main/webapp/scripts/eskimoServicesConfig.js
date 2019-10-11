@@ -89,6 +89,51 @@ eskimo.ServicesConfig = function() {
 
     function saveServicesConfig() {
         alert ("TODO save");
+
+        var servicesConfigForm = $("form#services-config").serializeObject();
+
+        eskimoMain.getMessaging().showMessages();
+
+        eskimoMain.startOperationInProgress();
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            timeout: 1000 * 7200,
+            url: "apply-services-config",
+            data: JSON.stringify(servicesConfigForm),
+            success: function (data, status, jqXHR) {
+
+                // OK
+                console.log(data);
+                if (data && data.status) {
+                    if (data.status == "KO") {
+                        showServicesConfigMessage(data.error, false);
+                    } else {
+                        showServicesConfigMessage("Configuration applied successfully", true);
+                    }
+                } else {
+                    showServicesConfigMessage("No status received back from backend.", false);
+                }
+
+                if (data.error) {
+                    eskimoMain.scheduleStopOperationInProgress (false);
+                } else {
+                    eskimoMain.scheduleStopOperationInProgress (true);
+                }
+            },
+
+            error: function (jqXHR, status) {
+                // error handler
+                console.log(jqXHR);
+                console.log(status);
+                showServicesConfigMessage('fail : ' + status, false);
+
+                eskimoMain.scheduleStopOperationInProgress (false);
+                eskimoMain.hideProgressbar();
+            }
+        });
     }
 
     function showServicesConfig () {
@@ -113,7 +158,7 @@ eskimo.ServicesConfig = function() {
 
     function layoutServicesConfig() {
 
-        var servicesConfigContent = "";
+        var servicesConfigContent = '<div class="panel panel-default">';
 
         for (var i = 0; i < SERVICES_CONFIGURATION.length; i++) {
             var serviceEditableConfigs = SERVICES_CONFIGURATION[i];
@@ -122,8 +167,12 @@ eskimo.ServicesConfig = function() {
             if (serviceEditableConfigsArray.length > 0) {
 
                 servicesConfigContent = servicesConfigContent +
-                    '<div class="col-md-12 col-sd-12">' +
-                    '<h4>' + serviceName + '</h4>' +
+                    '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'">'+
+                    '<h4>' +
+                    '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
+                    serviceName +
+                    '</a>'+
+                    '</h4>' +
                     '</div>';
 
                 for (var j = 0; j < serviceEditableConfigsArray.length; j++) {
@@ -132,6 +181,8 @@ eskimo.ServicesConfig = function() {
                     console.log (serviceEditableConfig);
 
                     servicesConfigContent = servicesConfigContent +
+                        '<div id="collapse-'+serviceName+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
+                        '<div class="panel-body">'+
                         '<div class="col-md-12 col-sd-12">' +
                         '<h5><b>Configuration file</b> : ' + serviceEditableConfig.filename + '</h5>' +
                         '</div>';
@@ -144,7 +195,7 @@ eskimo.ServicesConfig = function() {
 
                         servicesConfigContent = servicesConfigContent +
                             '<div class="col-md-12 col-sd-12">\n' +
-                            '     <label class="col-md-12 control-label" id="label_storage">'+
+                            '     <label class="col-md-12 control-label">'+
                             '         <b>'+
                             property.name+
                             '         </b> : '+
@@ -162,10 +213,16 @@ eskimo.ServicesConfig = function() {
                             '</div>'
                     }
 
+                    servicesConfigContent = servicesConfigContent +
+                        '</div>' +
+                        '</div>';
+
                 }
 
             }
         }
+
+        servicesConfigContent += "</div>"
 
         $("#services-config-placeholder").html(servicesConfigContent)
     }

@@ -85,4 +85,20 @@ public class ServicesConfigController {
         }
     }
 
+    @PostMapping("/apply-services-config")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String saveAndApplyServicesConfig(@RequestBody String configFormAsString) {
+
+        logger.info("Got config : " + configFormAsString);
+
+        try {
+            return servicesConfigService.saveAndApplyServicesConfig(configFormAsString);
+
+        } catch (JSONException | FileException | SetupException | SystemException e) {
+            logger.error(e, e);
+            return ErrorStatusHelper.createErrorStatus (e);
+        }
+    }
+
 }

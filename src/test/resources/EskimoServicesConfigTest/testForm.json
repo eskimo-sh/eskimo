@@ -1,0 +1,19 @@
+{
+  "elasticsearch-bootstrap-memory_lock":"false",
+  "elasticsearch-action-destructive_requires_name":"true",
+  "kafka-num-network-threads":"3",
+  "kafka-num-io-threads":"8",
+  "kafka-socket-send-buffer-bytes":"102400",
+  "kafka-socket-receive-buffer-bytes":"102400",
+  "kafka-socket-request-max-bytes":"104857600",
+  "kafka-num-partitions":"1",
+  "kafka-log-retention-hours":"168",
+  "spark-executor-spark-driver-memory":"800m",
+  "spark-executor-spark-rpc-numRetries":"5",
+  "spark-executor-spark-rpc-retry-wait":"5s",
+  "spark-executor-spark-scheduler-mode":"FAIR",
+  "spark-executor-spark-locality-wait":"20s",
+  "spark-executor-spark-dynamicAllocation-executorIdleTimeout":"200s",
+  "spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout":"300s",
+  "spark-executor-spark-executor-memory":"[ESKIMO_DEFAULT]"
+}
