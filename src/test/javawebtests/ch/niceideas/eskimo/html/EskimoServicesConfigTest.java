@@ -76,15 +76,15 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
 
         // test a few input values
 
-        assertEquals ("true", page.executeJavaScript("$('#elasticsearch-action-destructive_requires_name').val()").getJavaScriptResult());
+        assertEquals ("false", page.executeJavaScript("$('#elasticsearch-action-destructive_requires_name').val()").getJavaScriptResult());
 
-        assertEquals ("102400", page.executeJavaScript("$('#kafka-socket-send-buffer-bytes').val()").getJavaScriptResult());
+        assertEquals ("", page.executeJavaScript("$('#kafka-socket-send-buffer-bytes').val()").getJavaScriptResult());
 
-        assertEquals ("1", page.executeJavaScript("$('#kafka-num-partitions').val()").getJavaScriptResult());
+        assertEquals ("3", page.executeJavaScript("$('#kafka-num-partitions').val()").getJavaScriptResult());
 
-        assertEquals ("5", page.executeJavaScript("$('#spark-executor-spark-rpc-numRetries').val()").getJavaScriptResult());
+        assertEquals ("", page.executeJavaScript("$('#spark-executor-spark-rpc-numRetries').val()").getJavaScriptResult());
 
-        assertEquals ("300s", page.executeJavaScript("$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()").getJavaScriptResult());
+        assertEquals ("", page.executeJavaScript("$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()").getJavaScriptResult());
 
     }
 

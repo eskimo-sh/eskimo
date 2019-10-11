@@ -95,4 +95,12 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
         fail ("To Be Implemented");
     }
 
+    @Test
+    public void testShellFramework() throws Exception {
+
+        // test the shell framrwork that injects variables
+
+        fail ("To Be Implemented");
+    }
+
 }

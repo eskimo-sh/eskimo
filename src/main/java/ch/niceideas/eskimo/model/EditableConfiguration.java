@@ -62,6 +62,9 @@ public class EditableConfiguration {
         return new JSONObject(new HashMap<String, Object>() {{
             put("service", service.getName());
             put("filename", getFilename());
+            put("propertyType", getPropertyType());
+            put("propertyFormat", getPropertyFormat());
+            put("commentPrefix", getCommentPrefix());
             put("properties", propertiesArray);
         }});
     }

@@ -1,0 +1,49 @@
+{
+  "filename": "spark-defaults.conf",
+  "propertyFormat": "{name}={value}",
+  "commentPrefix": "#",
+  "service": "spark-executor",
+  "properties": [
+    {
+      "name": "spark.driver.memory",
+      "defaultValue": "800m",
+      "comment": "Limiting the driver (client) memory"
+    },
+    {
+      "name": "spark.rpc.numRetries",
+      "defaultValue": "5",
+      "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number."
+    },
+    {
+      "name": "spark.rpc.retry.wait",
+      "defaultValue": "5s",
+      "comment": "Duration for an RPC ask operation to wait before retrying."
+    },
+    {
+      "name": "spark.scheduler.mode",
+      "defaultValue": "FAIR",
+      "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with mesos"
+    },
+    {
+      "name": "spark.locality.wait",
+      "defaultValue": "20s",
+      "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node."
+    },
+    {
+      "name": "spark.dynamicAllocation.executorIdleTimeout",
+      "defaultValue": "200s",
+      "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+    },
+    {
+      "name": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
+      "defaultValue": "300s",
+      "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+    },
+    {
+      "name": "spark.executor.memory",
+      "defaultValue": "[ESKIMO_DEFAULT]",
+      "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
+    }
+  ],
+  "propertyType": "VARIABLE"
+}

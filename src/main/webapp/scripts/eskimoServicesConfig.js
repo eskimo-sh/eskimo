@@ -167,13 +167,14 @@ eskimo.ServicesConfig = function() {
             if (serviceEditableConfigsArray.length > 0) {
 
                 servicesConfigContent = servicesConfigContent +
-                    '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'">'+
-                    '<h4>' +
                     '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
+                    '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
+                    '<td><img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" /></td>'+
+                    '<td><h5>' +
                     serviceName +
-                    '</a>'+
-                    '</h4>' +
-                    '</div>';
+                    '</h5></td>' +
+                    '</tr></table></div>'+
+                    '</a>';
 
                 for (var j = 0; j < serviceEditableConfigsArray.length; j++) {
 
@@ -202,11 +203,12 @@ eskimo.ServicesConfig = function() {
                             '     </label>\n' +
                             '     <div class="col-md-12">\n' +
                             property.comment.replace("\n", "<br>") +
+                            ' (default value : ' + property.defaultValue + ')'+
                             '     </div>'+
                             '     <div class="col-md-12" style="margin-bottom: 5px;">\n' +
                             '         <input id="' + inputName + '" name="' + inputName + '" type="text"\n' +
-                            '                placeholder="" class="form-control input-md"' +
-                            '                value="' + property.defaultValue + '"'+
+                            '                placeholder="' + property.defaultValue + '" class="form-control input-md"' +
+                            '                value="' + (property.value != null ? property.value : '') + '"'+
                             '         >\n' +
                             '     </div>\n' +
                             '     <br>\n' +

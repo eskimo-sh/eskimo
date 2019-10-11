@@ -39,17 +39,22 @@
     {
       "configs": [{
         "filename": "elasticsearch.yml",
+        "propertyFormat": "{name}: {value}",
+        "commentPrefix": "#",
         "service": "elasticsearch",
+        "propertyType": "VARIABLE",
         "properties": [
           {
             "defaultValue": "false",
             "name": "bootstrap.memory_lock",
-            "comment": "Lock the memory on startup"
+            "comment": "Lock the memory on startup",
+            "value": "true"
           },
           {
             "defaultValue": "true",
             "name": "action.destructive_requires_name",
-            "comment": "Require explicit names when deleting indices"
+            "comment": "Require explicit names when deleting indices",
+            "value": "false"
           }
         ]
       }],
@@ -66,7 +71,10 @@
     {
       "configs": [{
         "filename": "server.properties",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
         "service": "kafka",
+        "propertyType": "VARIABLE",
         "properties": [
           {
             "defaultValue": "3",
@@ -86,31 +94,52 @@
           {
             "defaultValue": "102400",
             "name": "socket.receive.buffer.bytes",
-            "comment": "The receive buffer (SO_RCVBUF) used by the socket server"
+            "comment": "The receive buffer (SO_RCVBUF) used by the socket server",
+            "value": "204800"
           },
           {
             "defaultValue": "104857600",
             "name": "socket.request.max.bytes",
-            "comment": "The maximum size of a request that the socket server will accept (protection against OOM)"
+            "comment": "The maximum size of a request that the socket server will accept (protection against OOM)",
+            "value": "128857600"
           },
           {
             "defaultValue": "1",
             "name": "num.partitions",
-            "comment": "The default number of log partitions per topic. More partitions allow greater parallelism for consumption, but this will also result in more files across the brokers."
+            "comment": "The default number of log partitions per topic. More partitions allow greater parallelism for consumption, but this will also result in more files across the brokers.",
+            "value": "3"
           },
           {
             "defaultValue": "168",
             "name": "log.retention.hours",
-            "comment": "The minimum age of a log file to be eligible for deletion due to age"
+            "comment": "The minimum age of a log file to be eligible for deletion due to age",
+            "value": "48"
           }
         ]
-      }],
+      },
+        {
+          "filename": "test.properties",
+          "service": "kafka",
+          "commentPrefix": "#",
+          "propertyType": "VARIABLE",
+          "propertyFormat": "{name}={value}",
+          "properties": [
+            {
+              "defaultValue": "3",
+              "name": "num.network.test",
+              "comment": "Just a test property"
+            }
+          ]
+        }],
       "name": "kafka"
     },
     {
       "configs": [{
         "filename": "spark-defaults.conf",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
         "service": "spark-executor",
+        "propertyType": "VARIABLE",
         "properties": [
           {
             "defaultValue": "800m",
@@ -135,12 +164,14 @@
           {
             "defaultValue": "20s",
             "name": "spark.locality.wait",
-            "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node."
+            "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node.",
+            "value": "40s"
           },
           {
             "defaultValue": "200s",
             "name": "spark.dynamicAllocation.executorIdleTimeout",
-            "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+            "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
+            "value": "300s"
           },
           {
             "defaultValue": "300s",
