@@ -48,11 +48,6 @@ rm -f /tmp/es_build_log
 echo " - Building image elasticsearch"
 build_image elasticsearch /tmp/es_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i elasticsearch mkdir -p /usr/share/man/man1/ >> /tmp/es_build_log 2>&1
-fail_if_error $? "/tmp/es_build_log" -2
-
 echo " - Installing the latest OpenJDK"
 docker exec -i elasticsearch apt-get install -y openjdk-8-jdk >> /tmp/es_build_log 2>&1
 fail_if_error $? "/tmp/es_build_log" -3

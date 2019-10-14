@@ -48,11 +48,6 @@ rm -f /tmp/logstash_build_log
 echo " - Building image logstash"
 build_image logstash /tmp/logstash_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i logstash mkdir -p /usr/share/man/man1/ >> /tmp/logstash_build_log 2>&1
-fail_if_error $? "/tmp/logstash_build_log" -2
-
 echo " - Installing the latest OpenJDK"
 docker exec -i logstash sudo apt-get install -y openjdk-8-jdk >> /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -2

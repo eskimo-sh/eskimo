@@ -125,101 +125,31 @@ elif [[ $package == "all_images" ]]; then
     echo "BUILDING ALL PACKAGES"
     set -e
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_base_eskimo.tar.gz ]]; then
-        bash -c "cd image_base_eskimo && bash build.sh"
-    else
-        echo "image base_eskimo already built"
-    fi
+    all_services='base_eskimo\
+        ntp\
+        zookeeper\
+        gluster\
+        gdash\
+        mesos-master\
+        prometheus\
+        grafana\
+        elasticsearch\
+        logstash\
+        cerebro\
+        kibana\
+        kafka\
+        kafka-manager\
+        spark\
+        zeppelin'
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_ntp.tar.gz ]]; then
-        bash -c "cd image_ntp && bash build.sh"
-    else
-        echo "image ntp already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_zookeeper.tar.gz ]]; then
-        bash -c "cd image_zookeeper && bash build.sh"
-    else
-        echo "image zookeeper already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_gluster.tar.gz ]]; then
-        bash -c "cd image_gluster && bash build.sh"
-    else
-        echo "image gluster already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_gdash.tar.gz ]]; then
-        bash -c "cd image_gdash && bash build.sh"
-    else
-        echo "image gdash already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_mesos-master.tar.gz ]]; then
-        bash -c "cd image_mesos-master && bash build.sh"
-    else
-        echo "image mesos-master already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_prometheus.tar.gz ]]; then
-        bash -c "cd image_prometheus && bash build.sh"
-    else
-        echo "image prometheus already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_grafana.tar.gz ]]; then
-        bash -c "cd image_grafana && bash build.sh"
-    else
-        echo "image grafana already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_elasticsearch.tar.gz ]]; then
-        bash -c "cd image_elasticsearch && bash build.sh"
-    else
-        echo "image elasticsearch already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_logstash.tar.gz ]]; then
-        bash -c "cd image_logstash && bash build.sh"
-    else
-        echo "image logstash already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_cerebro.tar.gz ]]; then
-        bash -c "cd image_cerebro && bash build.sh"
-    else
-        echo "image cerebro already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_kibana.tar.gz ]]; then
-        bash -c "cd image_kibana && bash build.sh"
-    else
-        echo "image kibana already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_kafka.tar.gz ]]; then
-        bash -c "cd image_kafka && bash build.sh"
-    else
-        echo "image kafka already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_kafka-manager.tar.gz ]]; then
-        bash -c "cd image_kafka-manager && bash build.sh"
-    else
-        echo "image kafka-manager already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_spark.tar.gz ]]; then
-        bash -c "cd image_spark && bash build.sh"
-    else
-        echo "image spark already built"
-    fi
-
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_zeppelin.tar.gz ]]; then
-        bash -c "cd image_zeppelin && bash build.sh"
-    else
-        echo "image zeppelin already built"
-    fi
+    IFS=$' '
+    for service in $all_services; do
+        if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_$service.tar.gz ]]; then
+            bash -c "cd image_$service && bash build.sh"
+        else
+            echo "image $service already built"
+        fi
+    done
 
 else
 

@@ -245,8 +245,9 @@ public class ServicesDefinition implements InitializingBean {
                     String propertyTypeAsString = conf.getString("propertyType");
                     EditablePropertyType propertyType = EditablePropertyType.valueOf(propertyTypeAsString.toUpperCase());
                     String propertyFormat = conf.getString("propertyFormat");
+                    String filesystemService = conf.getString("filesystemService");
 
-                    EditableConfiguration configuration = new EditableConfiguration(service, filename, propertyType, propertyFormat);
+                    EditableConfiguration configuration = new EditableConfiguration(service, filename, propertyType, propertyFormat, filesystemService);
 
                     if (conf.has("commentPrefix")) {
                         String commentPrefix = conf.getString("commentPrefix");

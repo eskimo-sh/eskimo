@@ -60,11 +60,6 @@ fi
 echo " - Building image gdash"
 build_image gdash /tmp/gdash_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i gdash mkdir -p /usr/share/man/man1/ >> /tmp/gdash_build_log 2>&1
-fail_if_error $? "/tmp/gdash_build_log" -3
-
 echo " - Installing gdash"
 docker exec -i gdash bash /scripts/installGdash.sh | tee -a /tmp/gdash_build_log 2>&1
 if [[ `tail -n 1 /tmp/gdash_build_log | grep " - In container install SUCCESS"` == "" ]]; then

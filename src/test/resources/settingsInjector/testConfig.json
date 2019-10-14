@@ -186,6 +186,12 @@
             "defaultValue": "[ESKIMO_DEFAULT]",
             "name": "spark.executor.memory",
             "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
+          },
+          {
+            "defaultValue": false,
+            "name": "spark.eskimo.isTest",
+            "comment": "Just a test config - unused by spark - for unit testing of settingsInjector.sh",
+            "value": true
           }
         ]
       }],

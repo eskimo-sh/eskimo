@@ -51,10 +51,6 @@ build_image gluster /tmp/gluster_build_log
 # connect to container
 #docker exec -i gluster bash
 
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i gluster mkdir -p /usr/share/man/man1/ >> /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" -2
-
 echo " - Installing python"
 docker exec -i gluster sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -5

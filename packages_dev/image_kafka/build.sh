@@ -48,11 +48,6 @@ rm -f /tmp/kafka_build_log
 echo " - Building image kafka"
 build_image kafka /tmp/kafka_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i kafka mkdir -p /usr/share/man/man1/ >> /tmp/kafka_build_log 2>&1
-fail_if_error $? "/tmp/kafka_build_log" -2
-
 echo " - Installing the latest OpenJDK"
 docker exec -i kafka sudo apt-get install -y openjdk-8-jdk >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -3

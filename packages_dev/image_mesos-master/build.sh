@@ -48,11 +48,6 @@ rm -f /tmp/mesos_build_log
 echo " - Building image mesos-master"
 build_image mesos-master /tmp/mesos_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i mesos-master mkdir -p /usr/share/man/man1/ >> /tmp/mesos_build_log 2>&1
-fail_if_error $? "/tmp/mesos_build_log" -2
-
 echo " - Installing mesos dependencies"
 docker exec -i mesos-master apt-get install -y \
             libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/mesos_build_log 2>&1

@@ -48,23 +48,6 @@ rm -f /tmp/grafana_build_log
 echo " - Building image grafana"
 build_image grafana /tmp/grafana_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i grafana mkdir -p /usr/share/man/man1/ >> /tmp/grafana_build_log 2>&1
-fail_if_error $? "/tmp/grafana_build_log" -2
-
-#echo " - Installing the latest OpenJDK"
-#docker exec -i grafana sudo apt-get install -y openjdk-8-jdk >> /tmp/grafana_build_log 2>&1
-#fail_if_error $? "/tmp/grafana_build_log" -3
-
-#echo " - Installing scala"
-#docker exec -i grafana apt-get install -y scala >> /tmp/grafana_build_log 2>&1
-#fail_if_error $? "/tmp/grafana_build_log" -4
-
-#echo " - Installing python"
-#docker exec -i grafana sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/grafana_build_log 2>&1
-#fail_if_error $? "/tmp/grafana_build_log" -5
-
 echo " - Installing Grafana dependencies"
 docker exec -i grafana sudo apt-get install -y adduser libfontconfig1 >> /tmp/grafana_build_log 2>&1
 fail_if_error $? "/tmp/grafana_build_log" -5

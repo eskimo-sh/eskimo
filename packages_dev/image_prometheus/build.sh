@@ -48,23 +48,6 @@ rm -f /tmp/prometheus_build_log
 echo " - Building image prometheus"
 build_image prometheus /tmp/prometheus_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i prometheus mkdir -p /usr/share/man/man1/ >> /tmp/prometheus_build_log 2>&1
-fail_if_error $? "/tmp/prometheus_build_log" -2
-
-#echo " - Installing the latest OpenJDK"
-#docker exec -i prometheus sudo apt-get install -y openjdk-8-jdk >> /tmp/prometheus_build_log 2>&1
-#fail_if_error $? "/tmp/prometheus_build_log" -3
-
-#echo " - Installing scala"
-#docker exec -i prometheus apt-get install -y scala >> /tmp/prometheus_build_log 2>&1
-#fail_if_error $? "/tmp/prometheus_build_log" -4
-
-#echo " - Installing python"
-#docker exec -i prometheus sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/prometheus_build_log 2>&1
-#fail_if_error $? "/tmp/prometheus_build_log" -5
-
 echo " - Installing prometheus"
 docker exec -i prometheus bash /scripts/installPrometheus.sh | tee -a /tmp/prometheus_build_log 2>&1
 if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then

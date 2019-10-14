@@ -16,14 +16,20 @@ public class EditableConfiguration {
     private final String filename;
     private final EditablePropertyType propertyType;
     private final String propertyFormat;
+    private final String filesystemService;
     private String commentPrefix = "";
     private final List<EditableProperty> properties = new ArrayList<>();
 
-    public EditableConfiguration(Service service, String filename, EditablePropertyType propertyType, String propertyFormat) {
+    public EditableConfiguration(Service service, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
+        this.filesystemService = filesystemService;
         this.service = service;
         this.filename = filename;
         this.propertyType = propertyType;
         this.propertyFormat = propertyFormat;
+    }
+
+    public String getFilesystemService() {
+        return filesystemService;
     }
 
     public String getFilename() {
@@ -61,6 +67,7 @@ public class EditableConfiguration {
         );
         return new JSONObject(new HashMap<String, Object>() {{
             put("service", service.getName());
+            put("filesystemService", getFilesystemService());
             put("filename", getFilename());
             put("propertyType", getPropertyType());
             put("propertyFormat", getPropertyFormat());

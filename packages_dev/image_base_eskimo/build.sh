@@ -66,6 +66,10 @@ fail_if_error $? "/tmp/base_image_build_log" -2
 # connect to conainter
 #docker exec -i base_eskimo bash
 
+echo " - (Hack) Creating missing directory /usr/share/man/man1/"
+docker exec -i base_eskimo mkdir -p /usr/share/man/man1/ >> /tmp/base_image_build_log 2>&1
+fail_if_error $? "/tmp/base_image_build_log" -2
+
 echo " - Updating the packages"
 docker exec -i base_eskimo apt-get update >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
@@ -74,8 +78,8 @@ echo " - Upgrading the appliance"
 docker exec -i -e DEBIAN_FRONTEND=noninteractive base_eskimo apt-get -yq upgrade >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
-echo " - Installing a few utility tools"
-docker exec -i base_eskimo apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools >> /tmp/base_image_build_log 2>&1
+echo " - Installing required utility tools for eskimo framework"
+docker exec -i base_eskimo apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 close_and_save_image base_eskimo /tmp/base_image_build_log

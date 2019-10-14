@@ -48,11 +48,6 @@ rm -f /tmp/kibana_build_log
 echo " - Building image kibana"
 build_image kibana /tmp/kibana_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i kibana mkdir -p /usr/share/man/man1/ >> /tmp/kibana_build_log 2>&1
-fail_if_error $? "/tmp/kibana_build_log" -2
-
 docker exec -i kibana bash /scripts/installKibana.sh | tee -a /tmp/kibana_build_log 2>&1
 if [[ `tail -n 1 /tmp/kibana_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"

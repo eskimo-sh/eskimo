@@ -48,11 +48,6 @@ rm -f /tmp/spark_build_log
 echo " - Building image spark"
 build_image spark /tmp/spark_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i spark mkdir -p /usr/share/man/man1/ >> /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -2
-
 echo " - Installing the latest OpenJDK"
 docker exec -i spark sudo apt-get install -y openjdk-8-jdk >> /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3

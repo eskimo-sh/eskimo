@@ -3,6 +3,8 @@
   "propertyFormat": "{name}={value}",
   "commentPrefix": "#",
   "service": "spark-executor",
+  "propertyType": "VARIABLE",
+  "filesystemService": "spark",
   "properties": [
     {
       "name": "spark.driver.memory",
@@ -44,6 +46,5 @@
       "defaultValue": "[ESKIMO_DEFAULT]",
       "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
     }
-  ],
-  "propertyType": "VARIABLE"
+  ]
 }

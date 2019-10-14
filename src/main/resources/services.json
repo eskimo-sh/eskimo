@@ -260,6 +260,7 @@
     "editableConfigurations": [
       {
         "filename": "server.properties",
+        "filesystemService": "kafka",
         "propertyType": "variable",
         "propertyFormat": "{name}={value}",
         "commentPrefix": "#",
@@ -413,6 +414,7 @@
         "propertyType": "variable",
         "propertyFormat": "{name}={value}",
         "commentPrefix": "#",
+        "filesystemService": "spark",
         "properties" : [
           {
             "name" :  "spark.driver.memory",
@@ -531,6 +533,7 @@
         "propertyType": "variable",
         "propertyFormat": "{name}: {value}",
         "commentPrefix": "#",
+        "filesystemService": "elasticsearch",
         "properties": [
           {
             "name": "bootstrap.memory_lock",

@@ -48,11 +48,6 @@ rm -f /tmp/ntp_build_log
 echo " - Building image ntp"
 build_image ntp /tmp/ntp_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i ntp mkdir -p /usr/share/man/man1/ >> /tmp/ntp_build_log 2>&1
-fail_if_error $? "/tmp/ntp_build_log" -2
-
 echo " - Installing ntp and cron"
 docker exec -i ntp apt-get install -y ntp cron ntpdate >> /tmp/ntp_build_log 2>&1
 fail_if_error $? "/tmp/ntp_build_log" -2

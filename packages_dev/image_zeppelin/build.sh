@@ -59,11 +59,6 @@ fi
 echo " - Building image zeppelin"
 build_image zeppelin /tmp/zeppelin_build_log
 
-
-echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i zeppelin mkdir -p /usr/share/man/man1/ >> /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -2
-
 echo " - Installing the latest OpenJDK"
 docker exec -i zeppelin apt-get install -y openjdk-8-jdk >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -3
