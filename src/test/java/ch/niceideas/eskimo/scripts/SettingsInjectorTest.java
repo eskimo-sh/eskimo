@@ -119,7 +119,7 @@ public class SettingsInjectorTest {
                     settingsFile.getCanonicalPath() +
                     " ; " +
                     "exit $?"}, true);
-        logger.info(result);
+        //logger.info(result);
 
         // ensure properties were found
         assertTrue(result.contains("= Found property spark.locality.wait : 40s"));
@@ -154,7 +154,7 @@ public class SettingsInjectorTest {
                         settingsFile.getCanonicalPath() +
                         " ; " +
                         "exit $?"}, true);
-        logger.info(result);
+        //logger.info(result);
 
         // ensure properties were found
         assertTrue(result.contains("= Found property bootstrap.memory_lock : true"));
@@ -169,6 +169,27 @@ public class SettingsInjectorTest {
 
         assertTrue (esFileContent.contains("action.destructive_requires_name: false"));
         assertFalse (esFileContent.contains("#action.destructive_requires_name: false"));
+
+    }
+
+    @Test
+    public void testServiceWithoutConfig() throws Exception {
+
+        String result = ProcessHelper.exec(new String[]{
+                "bash",
+                "-c",
+                "export SETTING_INJECTOR_DEBUG=1 && " +
+                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
+                        "bash " +
+                        settingsInjectorScriptFile.getCanonicalPath() +
+                        " ntp " +
+                        settingsFile.getCanonicalPath() +
+                        " ; " +
+                        "exit $?"}, true);
+        logger.info(result);
+
+        // ensure nothing's found
+        assertTrue(result.endsWith("== finding filenames\n"));
 
     }
 

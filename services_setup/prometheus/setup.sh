@@ -80,8 +80,8 @@ fi
 #echo " - TODO"
 #docker exec -it prometheus TODO
 
-echo " - Handling topology injection"
-handle_topology prometheus /tmp/prometheus_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings prometheus /tmp/prometheus_install_log
 
 echo " - Committing changes to local template and exiting container prometheus"
 commit_container prometheus /tmp/prometheus_install_log

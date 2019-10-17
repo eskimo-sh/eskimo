@@ -96,8 +96,8 @@ fi
 #echo " - TODO"
 #docker exec -it grafana TODO
 
-echo " - Handling topology injection"
-handle_topology grafana /tmp/grafana_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings grafana /tmp/grafana_install_log
 
 echo " - Committing changes to local template and exiting container grafana"
 commit_container grafana /tmp/grafana_install_log

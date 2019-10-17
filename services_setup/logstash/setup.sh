@@ -105,6 +105,13 @@ fi
 #echo " - TODO"
 #docker exec -it logstash TODO
 
+echo " - Copying settingsInjector.sh Script"
+docker cp $SCRIPT_DIR/../common/settingsInjector.sh logstash:/usr/local/sbin/settingsInjector.sh >> /tmp/logstash_install_log 2>&1
+fail_if_error $? /tmp/logstash_install_log -23
+
+docker exec --user root logstash bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/logstash_install_log 2>&1
+fail_if_error $? /tmp/logstash_install_log -24
+
 echo " - Committing changes to local template and exiting container logstash"
 commit_container logstash /tmp/logstash_install_log
 

@@ -39,5 +39,8 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector cerebro
+
 echo " - Starting service"
 /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0

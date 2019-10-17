@@ -39,5 +39,8 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector kibana
+
 echo " - Starting service"
 /usr/local/lib/kibana/bin/kibana

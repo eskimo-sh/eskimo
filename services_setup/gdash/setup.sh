@@ -84,8 +84,8 @@ if [[ `tail -n 1 /tmp/gdash_install_log` != " - In container config SUCCESS" ]];
     exit -100
 fi
 
-echo " - Handling topology injection"
-handle_topology gdash /tmp/gdash_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings gdash /tmp/gdash_install_log
 
 echo " - Committing changes to local template and exiting container gdash"
 commit_container gdash /tmp/gdash_install_log

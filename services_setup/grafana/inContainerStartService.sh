@@ -39,5 +39,8 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector grafana
+
 echo " - Starting service"
 /usr/local/lib/grafana/bin/grafana-server -homepath /usr/local/lib/grafana/

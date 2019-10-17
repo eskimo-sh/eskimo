@@ -128,8 +128,8 @@ fi
 #echo " - TODO"
 #docker exec -it zeppelin TODO
 
-echo " - Handling topology injection"
-handle_topology zeppelin /tmp/zeppelin_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings zeppelin /tmp/zeppelin_install_log
 
 echo " - Copying Topology Injection Script (Zeppelin)"
 docker cp $SCRIPT_DIR/inContainerInjectTopologyZeppelin.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyZeppelin.sh >> /tmp/zeppelin_install_log 2>&1

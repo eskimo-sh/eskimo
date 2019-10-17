@@ -100,8 +100,8 @@ if [[ `tail -n 1 /tmp/cerebro_install_log` != " - In container config SUCCESS" ]
     exit -100
 fi
 
-echo " - Handling topology injection"
-handle_topology cerebro /tmp/cerebro_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings cerebro /tmp/cerebro_install_log
 
 
 #echo " - TODO"

@@ -121,7 +121,9 @@ public class ServicesConfigService {
         //System.out.println (servicesConfig.getFormattedValue());
         String[] dirtyServices = fillInEditedConfigs(new JSONObject(configFormAsString), servicesConfig.getSubJSONArray("configs"));
 
-        System.out.println (servicesConfig.getFormattedValue());
+        //System.out.println (servicesConfig.getFormattedValue());
+
+        saveServicesConfig (servicesConfig);
 
         NodesConfigWrapper nodesConfig = null;
         try {

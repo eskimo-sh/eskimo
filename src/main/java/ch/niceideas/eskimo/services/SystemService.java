@@ -99,6 +99,9 @@ public class SystemService {
     @Autowired
     private SystemOperationService systemOperationService;
 
+    @Autowired
+    private ServicesConfigService servicesConfigService;
+
     @Value("${system.failedServicesTriggerCount}")
     private int failedServicesTriggerCount = 2;
 
@@ -414,8 +417,8 @@ public class SystemService {
 
                             // topology
                             if (!isInterrupted() && (error.get() == null)) {
-                                systemOperationService.applySystemOperation("Installation of Topology on " + ipAddress,
-                                        (builder) -> installTopology(nodesConfig, memoryModel, ipAddress, deadIps), null);
+                                systemOperationService.applySystemOperation("Installation of Topology and settings on " + ipAddress,
+                                        (builder) -> installTopologyAndSettings(nodesConfig, memoryModel, ipAddress, deadIps), null);
                             }
 
                             if (!isInterrupted() && (error.get() == null && !isInstalledOnNode("mesos", ipAddress))) {
@@ -879,28 +882,50 @@ public class SystemService {
     }
 
 
-    private String installTopology(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
+    private String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
             throws JSONException, SystemException, SSHCommandException, IOException {
 
         File tempTopologyFile = File.createTempFile("eskimo_topology", ".sh");
-        File topologyLocal = new File("/tmp/" + tempTopologyFile.getName());
         try {
-            FileUtils.delete(topologyLocal);
+            FileUtils.delete(tempTopologyFile);
         } catch (FileUtils.FileDeleteFailedException e) {
             logger.error (e, e);
             throw new SystemException(e);
         }
         try {
-            FileUtils.writeFile(topologyLocal, servicesDefinition
+            FileUtils.writeFile(tempTopologyFile, servicesDefinition
                     .getTopology(nodesConfig, deadIps)
                     .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (ipAddress)));
         } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
             logger.error (e, e);
             throw new SystemException(e);
         }
-        sshCommandService.copySCPFile(ipAddress, topologyLocal.getAbsolutePath());
+        sshCommandService.copySCPFile(ipAddress, tempTopologyFile.getAbsolutePath());
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempTopologyFile.getName(), "/etc/eskimo_topology.sh"});
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/etc/eskimo_topology.sh"});
+
+        try {
+            ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfig();
+
+            File tempServicesSettingsFile = File.createTempFile("eskimo_services-config", ".json");
+            try {
+                FileUtils.delete(tempServicesSettingsFile);
+            } catch (FileUtils.FileDeleteFailedException e) {
+                logger.error (e, e);
+                throw new SystemException(e);
+            }
+
+            FileUtils.writeFile(tempServicesSettingsFile, servicesConfig.getFormattedValue());
+
+            sshCommandService.copySCPFile(ipAddress, tempServicesSettingsFile.getAbsolutePath());
+            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-config.json"});
+            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/etc/eskimo_services-config.json"});
+
+
+        } catch (FileException | SetupException e) {
+            logger.error (e, e);
+            throw new SystemException(e);
+        }
 
         return null;
     }

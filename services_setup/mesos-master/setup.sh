@@ -118,8 +118,8 @@ fi
 #echo " - TODO"
 #docker exec -it mesos TODO
 
-echo " - Handling topology injection"
-handle_topology mesos-master /tmp/mesos_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings mesos-master /tmp/mesos_install_log
 
 echo " - Committing changes to local template and exiting container mesos"
 commit_container mesos-master /tmp/mesos_install_log

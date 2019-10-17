@@ -106,8 +106,8 @@ fi
 #echo " - TODO"
 #docker exec -it zookeeper TODO
 
-echo " - Handling topology injection"
-handle_topology zookeeper /tmp/zk_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings zookeeper /tmp/zk_install_log
 
 echo " - Committing changes to local template and exiting container zookeeper"
 commit_container zookeeper /tmp/zk_install_log

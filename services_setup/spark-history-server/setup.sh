@@ -118,8 +118,8 @@ fi
 #docker exec -it spark TODO
 
 
-echo " - Handling topology injection"
-handle_topology spark-history-server /tmp/spark_history_server_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings spark-history-server /tmp/spark_history_server_install_log
 
 echo " - Copying Topology Injection Script (Spark History)"
 docker cp $SCRIPT_DIR/inContainerInjectTopologySparkHistory.sh spark-history-server:/usr/local/sbin/inContainerInjectTopologySparkHistory.sh >> /tmp/spark_history_server_install_log 2>&1

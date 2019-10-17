@@ -119,7 +119,7 @@ if [[ `tail -n 1 /tmp/spark_executor_install_log` != " - In container config SUC
 fi
 
 #echo " - TODO"
-#docker exec -it spark TODO
+#docker exec -it spark TODO/tmp/logstash_install_log
 
 echo " - Copying Topology Injection Script (common)"
 docker cp $SCRIPT_DIR/inContainerInjectTopology.sh spark-executor:/usr/local/sbin/inContainerInjectTopology.sh >> /tmp/spark_executor_install_log 2>&1
@@ -127,6 +127,13 @@ fail_if_error $? "/tmp/spark_executor_install_log" -20
 
 docker exec --user root spark-executor bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> /tmp/spark_executor_install_log 2>&1
 fail_if_error $? "/tmp/spark_executor_install_log" -21
+
+echo " - Copying settingsInjector.sh Script"
+docker cp $SCRIPT_DIR/../common/settingsInjector.sh spark-executor:/usr/local/sbin/settingsInjector.sh >> /tmp/spark_executor_install_log 2>&1
+fail_if_error $? /tmp/spark_executor_install_log -23
+
+docker exec --user root spark-executor bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/spark_executor_install_log 2>&1
+fail_if_error $? /tmp/spark_executor_install_log -24
 
 
 echo " - Committing changes to local template and exiting container spark"

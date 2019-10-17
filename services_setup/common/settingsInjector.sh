@@ -87,8 +87,8 @@ function injectVariableProperty () {
         if [[ `grep "$searchedResult" $i` == "" ]]; then
 
             echoDebug "adding not found variable"
-            echoDebug "bash -c \"echo -e \\\"$searchedResult\\\"  >> $i\""
 
+            echoDebug "bash -c \"echo -e \\\"$searchedResult\\\"  >> $i\""
             bash -c "echo -e \"$searchedResult\"  >> $i"
 
         else
@@ -100,8 +100,8 @@ function injectVariableProperty () {
                 export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
 
                 echoDebug " removing comment"
-                echoDebug "sed -i s/\"$commentValue\"/\"$freeValue\"/g $i"
 
+                echoDebug "sed -i s/\"$commentValue\"/\"$freeValue\"/g $i"
                 sed -i s/"$commentValue"/"$freeValue"/g $i
             fi
 
@@ -150,9 +150,6 @@ for configFile in `jq -c  ".configs | .[] | .configs | .[] | select (.service==\
                 ;;
         esac
 
-
     done
-
-
 
 done

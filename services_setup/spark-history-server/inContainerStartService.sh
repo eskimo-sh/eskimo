@@ -42,6 +42,11 @@ echo " - Injecting topology"
 echo " - Injecting topology (Spark History)"
 . /usr/local/sbin/inContainerInjectTopologySparkHistory.sh
 
+echo " - Inject settings (spark-history-server)"
+/usr/local/sbin/settingsInjector spark-history-server
+
+echo " - Inject settings (spark-executor)"
+/usr/local/sbin/settingsInjector spark-executor
 
 echo " - Starting service"
 /usr/local/lib/spark/sbin/start-history-server-wrapper.sh

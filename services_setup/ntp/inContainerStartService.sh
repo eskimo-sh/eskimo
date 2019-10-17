@@ -39,6 +39,9 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector ntp
+
 echo " - Starting service cron"
 /etc/init.d/cron start
 

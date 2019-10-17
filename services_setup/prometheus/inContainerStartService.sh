@@ -39,6 +39,9 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector prometheus
+
 echo " - Starting service prometheus"
 /usr/local/lib/prometheus/prometheus \
     --config.file=/usr/local/lib/prometheus/prometheus.yml \

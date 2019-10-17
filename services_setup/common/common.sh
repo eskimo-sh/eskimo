@@ -37,11 +37,12 @@
 # This function installs the topology related scripts
 # - inContainerInjectTopology.sh
 # - inContainerStartService.sh
-# in the container passed as argument
+# - ../common/settingsInjector.sh
+# to the container passed as argument
 # Arguments are:
 # - $1 : the container to install the files to
 # - $2 - the log file in which to dump command outputs
-function handle_topology() {
+function handle_topology_settings() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
@@ -62,10 +63,17 @@ function handle_topology() {
 
     echo " - Copying Service Start Script"
     docker cp $SCRIPT_DIR/inContainerStartService.sh $1:/usr/local/sbin/inContainerStartService.sh >> $2 2>&1
-    fail_if_error $? $2 -20
+    fail_if_error $? $2 -22
 
     docker exec --user root $1 bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> $2 2>&1
-    fail_if_error $? $2 -21
+    fail_if_error $? $2 -24
+
+    echo " - Copying settingsInjector.sh Script"
+    docker cp $SCRIPT_DIR/../common/settingsInjector.sh $1:/usr/local/sbin/settingsInjector.sh >> $2 2>&1
+    fail_if_error $? $2 -23
+
+    docker exec --user root $1 bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> $2 2>&1
+    fail_if_error $? $2 -24
 }
 
 # This is used to load the topology definition file

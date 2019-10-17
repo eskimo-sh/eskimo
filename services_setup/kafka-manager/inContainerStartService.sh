@@ -39,6 +39,9 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector kafka-manager
+
 echo " - Starting service"
 /usr/local/lib/kafka-manager/bin/kafka-manager \
     -Dapplication.home=/usr/local/lib/kafka-manager/ \

@@ -39,8 +39,14 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
-echo " - Injecting topology (Spark History)"
+echo " - Injecting topology (Zeppelin)"
 . /usr/local/sbin/inContainerInjectTopologyZeppelin.sh
+
+echo " - Inject settings (Zeppelin)"
+/usr/local/sbin/settingsInjector zeppelin
+
+echo " - Inject settings (spark-executor)"
+/usr/local/sbin/settingsInjector spark-executor
 
 
 echo " - Starting service"

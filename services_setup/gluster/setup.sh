@@ -115,6 +115,15 @@ fail_if_error $? /tmp/gluster_install_log -20
 docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> /tmp/gluster_install_log 2>&1
 fail_if_error $? /tmp/gluster_install_log -21
 
+
+echo " - Copying settingsInjector.sh Script"
+docker cp $SCRIPT_DIR/../common/settingsInjector.sh gluster:/usr/local/sbin/settingsInjector.sh >> /tmp/gluster_install_log 2>&1
+fail_if_error $? /tmp/gluster_install_log -23
+
+docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/gluster_install_log 2>&1
+fail_if_error $? /tmp/gluster_install_log -24
+
+
 echo " - Committing changes to local template and exiting container gluster"
 commit_container gluster /tmp/gluster_install_log
 

@@ -39,5 +39,8 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector zookeeper
+
 echo " - Starting service"
 /usr/share/zookeeper/bin/zkServer.sh start-foreground

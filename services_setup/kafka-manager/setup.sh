@@ -113,8 +113,8 @@ fi
 #echo " - TODO"
 #docker exec -it kafka-manager TODO
 
-echo " - Handling topology injection"
-handle_topology kafka-manager /tmp/kafka_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings kafka-manager /tmp/kafka_install_log
 
 echo " - Committing changes to local template and exiting container kafka-manager"
 commit_container kafka-manager /tmp/kafka-manager_install_log

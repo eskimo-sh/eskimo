@@ -36,6 +36,9 @@
 
 set -e
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector gluster
+
 echo " - Starting gluster remote server"
 /usr/local/sbin/gluster_remote.sh &
 

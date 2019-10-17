@@ -89,8 +89,8 @@ fi
 #echo " - TODO"
 #docker exec -it ntp TODO
 
-echo " - Handling topology injection"
-handle_topology ntp /tmp/ntp_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings ntp /tmp/ntp_install_log
 
 echo " - Committing changes to local template and exiting container ntp"
 commit_container ntp /tmp/ntp_install_log

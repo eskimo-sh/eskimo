@@ -120,8 +120,8 @@ if [[ `tail -n 1 /tmp/es_install_log` != " - In container config SUCCESS" ]]; th
     exit -100
 fi
 
-echo " - Handling topology injection"
-handle_topology elasticsearch /tmp/cerebro_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings elasticsearch /tmp/cerebro_install_log
 
 #echo " - TODO"
 #docker exec -it elasticsearch TODO
