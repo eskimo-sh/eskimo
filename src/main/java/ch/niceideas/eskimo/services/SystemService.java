@@ -158,6 +158,9 @@ public class SystemService {
     void setSystemOperationService(SystemOperationService systemOperationService) {
         this.systemOperationService = systemOperationService;
     }
+    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
+        this.nodeRangeResolver = nodeRangeResolver;
+    }
 
     public boolean isProcessingPending() {
         return systemActionLock.isLocked();
@@ -905,7 +908,7 @@ public class SystemService {
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/etc/eskimo_topology.sh"});
 
         try {
-            ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfig();
+            ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfigNoLock();
 
             File tempServicesSettingsFile = File.createTempFile("eskimo_services-config", ".json");
             try {

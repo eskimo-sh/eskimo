@@ -115,9 +115,7 @@ public class ServicesController {
     public String getUIServicesStatusConfig() {
 
         Map<String, Object> uiServicesStatusConfig = new HashMap<>();
-        String[] serviceNames = servicesDefinition.getAllServices();
-
-        Arrays.stream(serviceNames)
+        servicesDefinition.getAllServices().stream()
                 .map(name -> servicesDefinition.getService(name))
                 .forEach(service -> uiServicesStatusConfig.put (service.getName(), service.toUiStatusConfigJSON()));
 
@@ -136,10 +134,9 @@ public class ServicesController {
     public String getServicesDependencies() {
 
         Map<String, Object> servicesDependencies = new HashMap<>();
-        String[] serviceNames = servicesDefinition.getAllServices();
 
         try {
-            Arrays.stream(serviceNames)
+            servicesDefinition.getAllServices().stream()
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesDependencies.put (service.getName(), service.toDependenciesJSON()));
 
@@ -157,10 +154,9 @@ public class ServicesController {
     public String getServicesConfigurations() {
 
         Map<String, Object> servicesConfigurations = new HashMap<>();
-        String[] serviceNames = servicesDefinition.getAllServices();
 
         try {
-            Arrays.stream(serviceNames)
+            servicesDefinition.getAllServices().stream()
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
@@ -179,9 +175,8 @@ public class ServicesController {
         try {
 
             Map<String, Object> servicesConfigurations = new HashMap<>();
-            String[] serviceNames = servicesDefinition.getAllServices();
 
-            Arrays.stream(serviceNames)
+            servicesDefinition.getAllServices().stream()
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 

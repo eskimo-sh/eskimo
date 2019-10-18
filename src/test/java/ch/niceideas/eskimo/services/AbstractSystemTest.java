@@ -37,8 +37,12 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class AbstractSystemTest {
 
@@ -57,6 +61,8 @@ public abstract class AbstractSystemTest {
     protected ServicesDefinition servicesDefinition = null;
 
     protected SystemOperationService systemOperationService = null;
+
+    protected NodeRangeResolver nodeRangeResolver = null;
 
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
@@ -80,20 +86,33 @@ public abstract class AbstractSystemTest {
                 return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster gdash spark-history-server";
             }
             @Override
-            public String[] getAllServices() {
-                return new String[] {"kafka zookeeper", "ntp", "mesos-master", "spark-executor", "kibana cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server"};
+            public List<String> getAllServices() {
+                return Arrays.asList(new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-executor", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server", "elasticsearch"});
             }
         };
         servicesDefinition.afterPropertiesSet();
 
+        nodeRangeResolver = new NodeRangeResolver();
+
         proxyManagerService = new ProxyManagerService();
         proxyManagerService.setServicesDefinition(servicesDefinition);
 
+        proxyManagerService.setConnectionManagerService(new ConnectionManagerService() {
+            public void recreateTunnels(String host) throws ConnectionManagerException {
+            }
+        });
+        proxyManagerService.setWebSocketProxyServer(new WebSocketProxyServer(proxyManagerService, servicesDefinition) {
+            public void removeForwarders(String serviceId) {
+            }
+        });
+
         setupService = new SetupService();
 
-        systemService = new SystemService();
+        systemService = createSystemService();
         systemService.setSetupService(setupService);
         systemService.setProxyManagerService(proxyManagerService);
+
+        systemService.setNodeRangeResolver(nodeRangeResolver);
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
@@ -125,6 +144,10 @@ public abstract class AbstractSystemTest {
         systemService.setSystemOperationService (systemOperationService);
 
         systemService.setServicesDefinition(servicesDefinition);
+    }
+
+    protected SystemService createSystemService() {
+        return new SystemService();
     }
 
     protected void clearCommandScript() {

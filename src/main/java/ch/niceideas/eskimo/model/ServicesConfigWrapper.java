@@ -61,7 +61,7 @@ public class ServicesConfigWrapper extends JsonWrapper {
 
     public static ServicesConfigWrapper initEmpty(ServicesDefinition def) throws JSONException{
 
-        List<JSONObject> allConfigurations = Arrays.stream(def.getAllServices())
+        List<JSONObject> allConfigurations = def.getAllServices().stream()
                 .map(serviceName -> def.getService(serviceName))
                 .map (service -> service.getEditableConfigurationsJSON())
                 .collect(Collectors.toList());

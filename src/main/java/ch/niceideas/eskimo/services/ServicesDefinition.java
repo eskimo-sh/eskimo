@@ -310,13 +310,14 @@ public class ServicesDefinition implements InitializingBean {
         return new JsonWrapper(FileUtils.readFile(envFile));
     }
 
-    public String[] getAllServices() {
+    public List<String> getAllServices() {
         return services.values().stream()
-                .map(Service::getName).toArray(String[]::new);
+                .map(Service::getName)
+                .collect(Collectors.toList());
     }
 
     public String getAllServicesString() {
-        String[] allServices = getAllServices();
+        String[] allServices = getAllServices().toArray(new String[0]);
         return String.join(" ", allServices);
     }
 

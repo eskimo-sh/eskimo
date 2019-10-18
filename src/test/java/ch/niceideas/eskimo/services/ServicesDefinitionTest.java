@@ -62,7 +62,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     @Test
     public void testAfterPropertiesSet() throws Exception {
-        assertEquals (17, def.getAllServices().length);
+        assertEquals (17, def.getAllServices().size());
     }
 
     @Test

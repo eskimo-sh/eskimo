@@ -40,12 +40,15 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
+import org.apache.xpath.operations.Operation;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
 
@@ -54,13 +57,17 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
     private static final Logger logger = Logger.getLogger(ServicesConfigServiceTest.class);
 
     private String jsonConfig = null;
+    private String testForm = null;
 
     private ServicesConfigService scs;
+
+    private AtomicReference<OperationsCommand> processedCommand = new AtomicReference<>();
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
+        testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testForm.json"));
 
         scs = new ServicesConfigService();
 
@@ -70,7 +77,18 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
 
         scs.setSetupService(setupService);
 
+        scs.setNodeRangeResolver(nodeRangeResolver);
+
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+    }
+
+    protected SystemService createSystemService() {
+        return new SystemService() {
+            public void applyNodesConfig(OperationsCommand command)
+                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+                processedCommand.set(command);
+            }
+        };
     }
 
     @Test
@@ -80,27 +98,100 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
 
         ServicesConfigWrapper newConfig = scs.loadServicesConfig();
 
-        // test a few configs
+        // test elasticsearch config
         assertEquals ("elasticsearch.yml", newConfig.getValueForPath("configs.9.configs.0.filename"));
         assertEquals ("elasticsearch", newConfig.getValueForPath("configs.9.configs.0.service"));
         assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("configs.9.configs.0.properties.0.name"));
 
+        // test kafka config
         assertEquals ("server.properties", newConfig.getValueForPath("configs.12.configs.0.filename"));
         assertEquals ("kafka", newConfig.getValueForPath("configs.12.configs.0.service"));
         assertEquals ("num.network.threads", newConfig.getValueForPath("configs.12.configs.0.properties.0.name"));
     }
 
     @Test
-    public void testInjectFormValues() throws Exception {
-        fail ("To Be Implemented");
-    }
+    public void testSaveAndApplyServicesConfig() throws Exception {
+        //fail ("To Be Implemented");
 
-    @Test
-    public void testShellFramework() throws Exception {
+        systemService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
 
-        // test the shell framrwork that injects variables
+        scs.saveServicesConfig(new ServicesConfigWrapper(jsonConfig));
 
-        fail ("To Be Implemented");
+        scs.saveAndApplyServicesConfig(testForm);
+
+        ServicesConfigWrapper newConfig = scs.loadServicesConfig();
+
+        // test elasticsearch config
+        assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("configs.9.configs.0.properties.0.name"));
+        assertEquals ("false", newConfig.getValueForPath("configs.9.configs.0.properties.0.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.9.configs.0.properties.0.value"));
+
+        assertEquals ("action.destructive_requires_name", newConfig.getValueForPath("configs.9.configs.0.properties.1.name"));
+        assertEquals ("true", newConfig.getValueForPath("configs.9.configs.0.properties.1.defaultValue"));
+        assertEquals ("false", newConfig.getValueForPath("configs.9.configs.0.properties.1.value"));
+
+        // test kafka config
+        assertEquals ("num.network.threads", newConfig.getValueForPath("configs.12.configs.0.properties.0.name"));
+        assertEquals ("3", newConfig.getValueForPath("configs.12.configs.0.properties.0.defaultValue"));
+        assertEquals ("5", newConfig.getValueForPath("configs.12.configs.0.properties.0.value"));
+
+        assertEquals ("num.io.threads", newConfig.getValueForPath("configs.12.configs.0.properties.1.name"));
+        assertEquals ("8", newConfig.getValueForPath("configs.12.configs.0.properties.1.defaultValue"));
+        assertEquals ("10", newConfig.getValueForPath("configs.12.configs.0.properties.1.value"));
+
+        assertEquals ("socket.send.buffer.bytes", newConfig.getValueForPath("configs.12.configs.0.properties.2.name"));
+        assertEquals ("102400", newConfig.getValueForPath("configs.12.configs.0.properties.2.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.12.configs.0.properties.2.value"));
+
+        assertEquals ("socket.receive.buffer.bytes", newConfig.getValueForPath("configs.12.configs.0.properties.3.name"));
+        assertEquals ("102400", newConfig.getValueForPath("configs.12.configs.0.properties.3.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.12.configs.0.properties.3.value"));
+
+        assertEquals ("socket.request.max.bytes", newConfig.getValueForPath("configs.12.configs.0.properties.4.name"));
+        assertEquals ("104857600", newConfig.getValueForPath("configs.12.configs.0.properties.4.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.12.configs.0.properties.4.value"));
+
+        assertEquals ("num.partitions", newConfig.getValueForPath("configs.12.configs.0.properties.5.name"));
+        assertEquals ("1", newConfig.getValueForPath("configs.12.configs.0.properties.5.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.12.configs.0.properties.5.value"));
+
+        assertEquals ("log.retention.hours", newConfig.getValueForPath("configs.12.configs.0.properties.6.name"));
+        assertEquals ("168", newConfig.getValueForPath("configs.12.configs.0.properties.6.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.12.configs.0.properties.6.value"));
+
+        // test spark config
+        assertEquals ("spark.driver.memory", newConfig.getValueForPath("configs.13.configs.0.properties.0.name"));
+        assertEquals ("800m", newConfig.getValueForPath("configs.13.configs.0.properties.0.defaultValue"));
+        assertEquals ("500m", newConfig.getValueForPath("configs.13.configs.0.properties.0.value"));
+
+        assertEquals ("spark.rpc.numRetries", newConfig.getValueForPath("configs.13.configs.0.properties.1.name"));
+        assertEquals ("5", newConfig.getValueForPath("configs.13.configs.0.properties.1.defaultValue"));
+        assertEquals ("10", newConfig.getValueForPath("configs.13.configs.0.properties.1.value"));
+
+        assertEquals ("spark.rpc.retry.wait", newConfig.getValueForPath("configs.13.configs.0.properties.2.name"));
+        assertEquals ("5s", newConfig.getValueForPath("configs.13.configs.0.properties.2.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.13.configs.0.properties.2.value"));
+
+        assertEquals ("spark.scheduler.mode", newConfig.getValueForPath("configs.13.configs.0.properties.3.name"));
+        assertEquals ("FAIR", newConfig.getValueForPath("configs.13.configs.0.properties.3.defaultValue"));
+        assertEquals ("FIFO", newConfig.getValueForPath("configs.13.configs.0.properties.3.value"));
+
+        assertEquals ("spark.locality.wait", newConfig.getValueForPath("configs.13.configs.0.properties.4.name"));
+        assertEquals ("20s", newConfig.getValueForPath("configs.13.configs.0.properties.4.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.13.configs.0.properties.4.value"));
+
+        assertEquals ("spark.dynamicAllocation.executorIdleTimeout", newConfig.getValueForPath("configs.13.configs.0.properties.5.name"));
+        assertEquals ("200s", newConfig.getValueForPath("configs.13.configs.0.properties.5.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.13.configs.0.properties.5.value"));
+
+        assertEquals ("spark.dynamicAllocation.cachedExecutorIdleTimeout", newConfig.getValueForPath("configs.13.configs.0.properties.6.name"));
+        assertEquals ("300s", newConfig.getValueForPath("configs.13.configs.0.properties.6.defaultValue"));
+        assertEquals ("400s", newConfig.getValueForPath("configs.13.configs.0.properties.6.value"));
+
+        assertEquals ("spark.executor.memory", newConfig.getValueForPath("configs.13.configs.0.properties.7.name"));
+        assertEquals ("[ESKIMO_DEFAULT]", newConfig.getValueForPath("configs.13.configs.0.properties.7.defaultValue"));
+        assertEquals (null, newConfig.getValueForPath("configs.13.configs.0.properties.7.value"));
+
     }
 
 }

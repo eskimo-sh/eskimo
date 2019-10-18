@@ -93,7 +93,11 @@ public class ServicesConfigController {
         logger.info("Got config : " + configFormAsString);
 
         try {
-            return servicesConfigService.saveAndApplyServicesConfig(configFormAsString);
+            servicesConfigService.saveAndApplyServicesConfig(configFormAsString);
+
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+            }}).toString(2);
 
         } catch (JSONException | FileException | SetupException | SystemException e) {
             logger.error(e, e);

@@ -88,7 +88,6 @@ eskimo.ServicesConfig = function() {
     };
 
     function saveServicesConfig() {
-        alert ("TODO save");
 
         var servicesConfigForm = $("form#services-config").serializeObject();
 

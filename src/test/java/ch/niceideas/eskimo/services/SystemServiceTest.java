@@ -128,7 +128,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair);
 
-        assertEquals(5, statusMap.size());
+        assertEquals(9, statusMap.size());
 
         assertEquals("NA", statusMap.get("service_kafka-manager_192-168-10-11"));
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));

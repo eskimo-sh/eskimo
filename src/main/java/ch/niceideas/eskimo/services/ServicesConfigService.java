@@ -114,45 +114,53 @@ public class ServicesConfigService {
         }
     }
 
-    public String saveAndApplyServicesConfig(String configFormAsString)  throws JSONException, FileException, SetupException, SystemException  {
+    public ServicesConfigWrapper loadServicesConfigNoLock() throws JSONException, FileException, SetupException {
+        String configStoragePath = setupService.getConfigStoragePath();
+        File statusFile = new File(configStoragePath + "/services-config.json");
+        if (!statusFile.exists()) {
+            return ServicesConfigWrapper.initEmpty(servicesDefinition);
+        }
 
-        // 1. load saved config (or initialized one)
-        ServicesConfigWrapper servicesConfig = loadServicesConfig();
+        return new ServicesConfigWrapper(statusFile);
+    }
 
-        //System.out.println (servicesConfig.getFormattedValue());
-        String[] dirtyServices = fillInEditedConfigs(new JSONObject(configFormAsString), servicesConfig.getSubJSONArray("configs"));
+    public void saveAndApplyServicesConfig(String configFormAsString)  throws JSONException, FileException, SetupException, SystemException  {
 
-        //System.out.println (servicesConfig.getFormattedValue());
-
-        saveServicesConfig (servicesConfig);
-
-        NodesConfigWrapper nodesConfig = null;
+        servicesConfigFileLock.lock();
         try {
-            nodesConfig = systemService.loadNodesConfig();
 
-            OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
-                    servicesDefinition,
-                    nodeRangeResolver,
-                    dirtyServices,
-                    nodesConfig);
 
-            systemService.applyNodesConfig(restartCommand);
+            // 1. load saved config (or initialized one)
+            ServicesConfigWrapper servicesConfig = loadServicesConfig();
+
+            //System.out.println (servicesConfig.getFormattedValue());
+            String[] dirtyServices = fillInEditedConfigs(new JSONObject(configFormAsString), servicesConfig.getSubJSONArray("configs"));
+
+            //System.out.println (servicesConfig.getFormattedValue());
+
+            saveServicesConfig (servicesConfig);
+
+
+            if (dirtyServices != null && dirtyServices.length > 0) {
+                NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
+
+                OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
+                        servicesDefinition,
+                        nodeRangeResolver,
+                        dirtyServices,
+                        nodesConfig);
+
+                systemService.applyNodesConfig(restartCommand);
+
+            }
 
         } catch (SystemException | NodesConfigurationException | ServiceDefinitionException e) {
             logger.error (e, e);
             throw new SystemException(e);
+
+        } finally {
+            servicesConfigFileLock.unlock();
         }
-
-        // TODO 1. Implement consistent unit tests
-
-        // TODO 2. Implement a framework for exploiting this and doing the replacement in shell scripts using jq
-        //  - install jq on eskimo base image !
-        //  - put this all in a shell script called from within injectTopology -> injectEditableConfig.sh spark
-        //  - make it bullet proof with unit tests - linux only, using command line from java !
-
-
-
-        return null;
     }
 
     String[] fillInEditedConfigs(JSONObject configForm, JSONArray configArrayForService) {
@@ -178,10 +186,6 @@ public class ServicesConfigService {
                         String serviceName = object.getString("name");
                         if (serviceName.equals(service)) {
 
-                            // FIXME Improve this, in the end I should detect changes by comparing with previous saved
-                            // value and not just assume changes
-                            dirtyServices.add(serviceName);
-
                             // iterate through all editableConfiguration
                             JSONArray editableConfigurations = object.getJSONArray("configs");
                             for (int j = 0; j < editableConfigurations.length(); j++) {
@@ -196,7 +200,18 @@ public class ServicesConfigService {
                                     if (propertyName.equals(propertyKey)) {
 
                                         String defaultValue = property.getString("defaultValue");
+                                        String previousValue = property.has("value") ? property.getString("value") : null;
 
+                                        // Handle service dirtyness
+                                        if (   (StringUtils.isBlank(previousValue) && StringUtils.isNotBlank(value))
+                                            || (StringUtils.isNotBlank(previousValue) && StringUtils.isBlank(value))
+                                            || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value)
+                                                && !previousValue.equals(value)
+                                                )) {
+                                            dirtyServices.add(serviceName);
+                                        }
+
+                                        // Handle value saving
                                         if (StringUtils.isBlank(value) || value.equals(defaultValue)) {
                                             property.remove("value");
                                         } else {
