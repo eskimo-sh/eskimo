@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector gdash
+/usr/local/sbin/settingsInjector.sh gdash
 
 echo " - Starting service"
 /usr/local/bin/launch-gdash.sh

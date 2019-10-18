@@ -51,7 +51,7 @@ function injectVariableProperty () {
     echoDebug "sedValue=$sedValue"
 
     # Search for $filename under /usr/local/lib/$SERVICE
-    for i in `find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename`; do
+    for i in `find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename `; do
         echo "     == processing $i"
 
         export searchedResult=""

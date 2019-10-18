@@ -62,6 +62,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         -v /var/run/elasticsearch:/var/run/elasticsearch \
         -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
         -e NODE_NAME=$HOSTNAME \
         eskimo:elasticsearch \
         /usr/local/sbin/inContainerStartService.sh"

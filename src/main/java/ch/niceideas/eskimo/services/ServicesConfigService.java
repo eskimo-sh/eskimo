@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesConfigWrapper;
@@ -171,17 +172,18 @@ public class ServicesConfigService {
                     String propertyKey = configKey.substring(service.length() + 1).replace("-", ".");
 
                     // now iterate through saved (existing) configs and update values
-                    main : for (int i = 0; i < configArrayForService.length(); i++) {
+                    main:
+                    for (int i = 0; i < configArrayForService.length(); i++) {
                         JSONObject object = configArrayForService.getJSONObject(i);
                         String serviceName = object.getString("name");
                         if (serviceName.equals(service)) {
 
-                            // FIXME Improve this, in the end I should detect changes by comparing with prefious saved
+                            // FIXME Improve this, in the end I should detect changes by comparing with previous saved
                             // value and not just assume changes
-                            dirtyServices.add (serviceName);
+                            dirtyServices.add(serviceName);
 
                             // iterate through all editableConfiguration
-                            JSONArray editableConfigurations =  object.getJSONArray("configs");
+                            JSONArray editableConfigurations = object.getJSONArray("configs");
                             for (int j = 0; j < editableConfigurations.length(); j++) {
                                 JSONObject editableConfiguration = editableConfigurations.getJSONObject(j);
 
@@ -195,7 +197,9 @@ public class ServicesConfigService {
 
                                         String defaultValue = property.getString("defaultValue");
 
-                                        if (!value.equals(defaultValue)) {
+                                        if (StringUtils.isBlank(value) || value.equals(defaultValue)) {
+                                            property.remove("value");
+                                        } else {
                                             property.put("value", value);
                                         }
                                         break main;
@@ -206,7 +210,6 @@ public class ServicesConfigService {
                     }
                 }
             }
-
         }
 
         return dirtyServices.toArray(new String[0]);

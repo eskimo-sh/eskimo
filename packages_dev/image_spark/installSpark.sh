@@ -83,6 +83,10 @@ sudo mv spark-$SPARK_VERSION-bin-hadoop2.7 /usr/local/lib/spark-$SPARK_VERSION
 echo " - symlinking /usr/local/lib/spark/ to /usr/local/lib/spark-$SPARK_VERSION"
 sudo ln -s /usr/local/lib/spark-$SPARK_VERSION /usr/local/lib/spark
 
+echo " - Removing Test infrastructure"
+sudo rm -Rf /usr/local/lib/spark/python/test_coverage
+sudo rm -Rf /usr/local/lib/spark/python/test_support
+
 echo " - Checking Spark Installation"
 /usr/local/lib/spark-$SPARK_VERSION/bin/run-example SparkPi 10 > /tmp/spark_run_log 2>&1 &
 fail_if_error $? "/tmp/spark_run_log" -3

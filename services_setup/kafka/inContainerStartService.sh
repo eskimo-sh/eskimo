@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector kafka
+/usr/local/sbin/settingsInjector.sh kafka
 
 echo " - Starting service"
 /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties

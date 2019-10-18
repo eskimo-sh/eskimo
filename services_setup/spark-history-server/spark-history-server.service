@@ -60,6 +60,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         -v /var/log/spark:/var/log/spark\
         -v /var/lib/spark:/var/lib/spark:rshared \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
          -e NODE_NAME=$HOSTNAME \
         eskimo:spark-history-server \
         /usr/local/sbin/inContainerStartService.sh"

@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector kibana
+/usr/local/sbin/settingsInjector.sh kibana
 
 echo " - Starting service"
 /usr/local/lib/kibana/bin/kibana

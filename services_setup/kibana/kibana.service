@@ -58,6 +58,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         -v /var/log/kibana:/var/log/kibana\
         -v /var/run/kibana:/var/run/kibana\
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
         -e NODE_NAME=$HOSTNAME \
         eskimo:kibana \
         /usr/local/sbin/inContainerStartService.sh"

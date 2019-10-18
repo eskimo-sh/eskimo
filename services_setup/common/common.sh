@@ -69,7 +69,7 @@ function handle_topology_settings() {
     fail_if_error $? $2 -24
 
     echo " - Copying settingsInjector.sh Script"
-    docker cp $SCRIPT_DIR/../common/settingsInjector.sh $1:/usr/local/sbin/settingsInjector.sh >> $2 2>&1
+    docker cp $SCRIPT_DIR/settingsInjector.sh $1:/usr/local/sbin/settingsInjector.sh >> $2 2>&1
     fail_if_error $? $2 -23
 
     docker exec --user root $1 bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> $2 2>&1

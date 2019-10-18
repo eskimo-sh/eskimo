@@ -136,6 +136,22 @@ eskimo.ServicesConfig = function() {
         });
     }
 
+    function showServicesConfigMessage(message, success) {
+        var servicesConfigWarning = $("#services-config-warning");
+        servicesConfigWarning.css("display", "inherit");
+        servicesConfigWarning.css("visibility", "inherit");
+
+        var servicesConfigWarningMessage = $("#services-config-warning-message");
+        servicesConfigWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
+        servicesConfigWarningMessage.html(message);
+
+        setTimeout(function() {
+            servicesConfigWarning.css("display", "none");
+            servicesConfigWarning.css("visibility", "hidden");
+        }, 5000);
+    }
+    this.showServicesConfigMessage = showServicesConfigMessage;
+
     function showServicesConfig () {
 
         if (!eskimoMain.isSetupDone()) {

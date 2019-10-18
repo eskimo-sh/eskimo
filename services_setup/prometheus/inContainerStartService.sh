@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector prometheus
+/usr/local/sbin/settingsInjector.sh prometheus
 
 echo " - Starting service prometheus"
 /usr/local/lib/prometheus/prometheus \

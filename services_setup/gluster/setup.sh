@@ -117,7 +117,7 @@ fail_if_error $? /tmp/gluster_install_log -21
 
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/../common/settingsInjector.sh gluster:/usr/local/sbin/settingsInjector.sh >> /tmp/gluster_install_log 2>&1
+docker cp $SCRIPT_DIR/settingsInjector.sh gluster:/usr/local/sbin/settingsInjector.sh >> /tmp/gluster_install_log 2>&1
 fail_if_error $? /tmp/gluster_install_log -23
 
 docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/gluster_install_log 2>&1

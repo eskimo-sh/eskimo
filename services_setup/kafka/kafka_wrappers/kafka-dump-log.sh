@@ -76,6 +76,7 @@ fi
         --user kafka \
         $DOCKER_VOLUMES_ARGS \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
         -e NODE_NAME=$HOSTNAME \
         eskimo:kafka \
         kafka-dump-log.sh "$@"

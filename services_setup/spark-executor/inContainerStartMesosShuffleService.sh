@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector spark-executor
+/usr/local/sbin/settingsInjector.sh spark-executor
 
 echo " - Injecting topology (Mesos Shuffle specific)"
 . /usr/local/sbin/inContainerInjectTopologyMesosShuffle.sh

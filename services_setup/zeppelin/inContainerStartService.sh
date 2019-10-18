@@ -43,10 +43,10 @@ echo " - Injecting topology (Zeppelin)"
 . /usr/local/sbin/inContainerInjectTopologyZeppelin.sh
 
 echo " - Inject settings (Zeppelin)"
-/usr/local/sbin/settingsInjector zeppelin
+/usr/local/sbin/settingsInjector.sh zeppelin
 
 echo " - Inject settings (spark-executor)"
-/usr/local/sbin/settingsInjector spark-executor
+/usr/local/sbin/settingsInjector.sh spark-executor
 
 
 echo " - Starting service"

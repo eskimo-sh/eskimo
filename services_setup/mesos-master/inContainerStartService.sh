@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector mesos-master
+/usr/local/sbin/settingsInjector.sh mesos-master
 
 echo " - Starting service"
 /usr/local/sbin/mesos-init-wrapper.sh master
