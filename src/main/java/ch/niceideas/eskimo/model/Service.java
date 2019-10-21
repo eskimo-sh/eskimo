@@ -52,6 +52,8 @@ public class Service {
     private final List<EditableConfiguration> editableConfigurations = new ArrayList<>();
 
     // configuration
+    private String imageName;
+
     private int configOrder = -1;
     private boolean unique = false;
 
@@ -70,6 +72,14 @@ public class Service {
     private MemoryConsumptionSize memoryConsumptionSize;
 
     private List<String> additionalmemoryServices = new ArrayList<>();
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
 
     public List<String> getAdditionalmemoryServices() {
         return additionalmemoryServices;

@@ -2,6 +2,7 @@
 
   "ntp" : {
     "config": {
+      "imageName" : "ntp",
       "order": 0,
       "mandatory": true,
       "name" : "NTP",
@@ -22,6 +23,7 @@
 
   "zookeeper": {
     "config": {
+      "imageName" : "zookeeper",
       "order": 1,
       "unique": true,
       "name" : "Zookeeper",
@@ -43,11 +45,12 @@
 
   "prometheus" : {
     "config": {
+      "imageName" : "prometheus",
       "order": 2,
       "mandatory": true,
       "group" : "Monitoring",
       "name" : "Prometheus",
-      "selectionLayout" : { "row" : 6, "col" : 2},
+      "selectionLayout" : { "row" : 7, "col" : 3},
       "memory": "neglectable"
     },
     "dependencies": [
@@ -65,6 +68,7 @@
 
   "grafana" : {
     "config": {
+      "imageName" : "grafana",
       "order": 3,
       "unique": true,
       "group" : "Monitoring",
@@ -104,6 +108,7 @@
 
   "gluster" : {
     "config": {
+      "imageName" : "gluster",
       "order": 4,
       "mandatory": true,
       "conditional": "MULTIPLE_NODES",
@@ -126,6 +131,7 @@
 
   "gdash" : {
     "config": {
+      "imageName" : "gdash",
       "order": 5,
       "unique": true,
       "group" : "Gluster",
@@ -160,6 +166,7 @@
 
   "mesos-master": {
     "config": {
+      "imageName" : "mesos-master",
       "order": 6,
       "unique": true,
       "group" : "Mesos",
@@ -203,10 +210,7 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
-    ],
-    "comment": {
-      "urlTemplate": "http://{NODE_ADDRESS}:5050/#/"
-    }
+    ]
   },
 
 
@@ -242,10 +246,11 @@
 
   "kafka" : {
     "config": {
+      "imageName" : "kafka",
       "order": 8,
       "group" : "Kafka",
       "name" : "Broker",
-      "selectionLayout" : { "row" : 5, "col" : 2},
+      "selectionLayout" : { "row" : 6, "col" : 3},
       "memory": "medium"
     },
     "dependencies": [
@@ -309,6 +314,7 @@
 
   "kafka-manager": {
     "config": {
+      "imageName" : "kafka-manager",
       "order": 9,
       "unique": true,
       "group" : "Kafka",
@@ -342,6 +348,7 @@
 
   "spark-history-server" : {
     "config": {
+      "imageName" : "spark",
       "order": 10,
       "unique": true,
       "group" : "Spark",
@@ -382,6 +389,7 @@
 
   "spark-executor" : {
     "config": {
+      "imageName" : "spark",
       "order": 11,
       "group" : "Spark",
       "name" : "Executor",
@@ -463,9 +471,89 @@
 
 
 
+  "flink-app-master" : {
+    "config": {
+      "imageName" : "flink",
+      "order": 12,
+      "unique": true,
+      "group": "Flink",
+      "name": "App Master",
+      "selectionLayout": { "col": 2, "row": 5  },
+      "memory": "neglectable"
+    },
+    "ui": {
+      "proxyTargetPort" : 8081,
+      "waitTime": 10000,
+      "title" : "Flink App Master",
+      "icon" : "images/flink-app-master-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "mesos-agent",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+
+
+  "flink-worker" : {
+    "config": {
+      "imageName" : "flink",
+      "order": 13,
+      "group": "Flink",
+      "name": "Worker",
+      "selectionLayout": { "col": 3, "row": 8  },
+      "memory": "medium"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "flink-app-master",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "mesos-agent",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+  },
+
+
+
   "logstash" : {
     "config": {
-      "order": 12,
+      "imageName" : "logstash",
+      "order": 14,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -485,7 +573,8 @@
 
   "cerebro" : {
     "config": {
-      "order": 13,
+      "imageName" : "cerebro",
+      "order": 15,
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
@@ -513,7 +602,8 @@
 
   "elasticsearch": {
     "config": {
-      "order": 14,
+      "imageName" : "elasticsearch",
+      "order": 16,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 3, "col" : 3},
@@ -554,7 +644,8 @@
 
   "kibana" : {
     "config": {
-      "order": 15,
+      "imageName" : "kibana",
+      "order": 17,
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
@@ -605,7 +696,8 @@
 
   "zeppelin" : {
     "config": {
-      "order": 16,
+      "imageName" : "zeppelin",
+      "order": 18,
       "unique": true,
       "name" : "Zeppelin",
       "selectionLayout" : { "row" : 4, "col" : 1},
@@ -614,7 +706,6 @@
       "memoryAdditional": ["spark-executor"]
     },
     "ui": {
-      "urlTemplateOLD": "http://{NODE_ADDRESS}:38080/",
       "proxyTargetPort" : 38080,
       "waitTime": 35000,
       "title" : "Zeppelin",

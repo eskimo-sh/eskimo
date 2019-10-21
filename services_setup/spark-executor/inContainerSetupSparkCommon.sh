@@ -61,7 +61,7 @@ set -e
 if [[ $spark_user_id == "" ]]; then
     useradd -u $SPARK_USER_ID spark
 elif [[ $spark_user_id != $SPARK_USER_ID ]]; then
-    echo "Docker ES USER ID is $spark_user_id while requested USER ID is $SPARK_USER_ID"
+    echo "Docker SPARK USER ID is $spark_user_id while requested USER ID is $SPARK_USER_ID"
     exit -2
 fi
 

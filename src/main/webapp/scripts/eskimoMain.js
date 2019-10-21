@@ -320,6 +320,30 @@ eskimo.Main = function() {
 
         isMenuMinimized = $('#hoeapp-container').hasClass("hoe-minimized-lpanel");
 
+        $(window).resize (function() {
+            // alert (window.innerHeight + " - " + window.innerWidth);
+
+            var actualMenuHeight = $("#menu-container").height();
+            var menuContainerHeight = $("#hoe-left-panel").height();
+
+            /*
+            alert ("Implement me : whenever menu is too small in height, dynmically render it (eskimoMain.js)");
+
+            # FIXME : only if menu is shown !
+                */
+
+            console.log (menuContainerHeight + " -  " + actualMenuHeight);
+
+            if (menuContainerHeight - 80 < actualMenuHeight) {
+                $("#menu-scroll-up").css ("display", "inherit");
+                $("#menu-scroll-down").css ("display", "inherit");
+                $("#menu-container").css ("top", "25px");
+            } else {
+                $("#menu-scroll-up").css ("display", "none");
+                $("#menu-scroll-down").css ("display", "none");
+                $("#menu-container").css ("top", "0px");
+            }
+        });
     };
 
     this.initialize();

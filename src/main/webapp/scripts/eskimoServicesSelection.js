@@ -326,6 +326,10 @@ eskimo.ServicesSelection = function() {
                             '    </label>' +
                             '</div>';
                     }
+                } else {
+                    rowHTML +=
+                        '<div class="col-md-4 no-padding">' +
+                        '</div>';
                 }
             }
 

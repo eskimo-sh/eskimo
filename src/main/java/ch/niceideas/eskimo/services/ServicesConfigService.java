@@ -151,7 +151,6 @@ public class ServicesConfigService {
                         nodesConfig);
 
                 systemService.applyNodesConfig(restartCommand);
-
             }
 
         } catch (SystemException | NodesConfigurationException | ServiceDefinitionException e) {

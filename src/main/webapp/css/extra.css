@@ -56,20 +56,56 @@ body.empty-page {
 }
 
 
+/** This was an attempt to have scrollable menu (vertically)
+But it breaks  the menu entry title overlay
 .left-panel-container {
     width: 100%;
     height: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
-    padding-right: 17px; /* Increase/decrease this value for cross-browser compatibility */
-    box-sizing: content-box; /* So the width will be 100% + 17px */
+    padding-right: 17px;
+    box-sizing: content-box;
 }
 #hoe-left-panel[hoe-position-type="absolute"] {
-    /*overflow-y: auto;*/
     overflow-y: hidden;
     overflow-x: visible;
 }
+ */
 
+.menu-scroll-button {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    height: 25px;
+    background: inherit;
+    background: #384b5f;
+    color: #ced4d7;
+    border-right: 1px solid #455769;
+    z-index: 10;
+}
+
+.menu-scroll-button:hover {
+    color: #FFF;
+    background: #2c3e50;
+}
+.left-panel-menu-container {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    z-index: 1;
+}
+.left-panel-container {
+    height: 100%
+}
+
+#menu-scroll-up {
+    top: 0px;
+    border-bottom: 1px solid #455769;
+}
+#menu-scroll-down {
+    border-top: 1px solid #455769;
+    bottom: 50px;
+}
 
 .last-menu,
 #hoe-left-panel .last-menu {

@@ -962,13 +962,13 @@ public class SystemService {
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
     }
 
-    private String proceedWithServiceUninstallation(StringBuilder sb, String ipAddress, String containerName)
+    private String proceedWithServiceUninstallation(StringBuilder sb, String ipAddress, String service)
             throws SSHCommandException, SystemException {
 
         // 1. Calling uninstall.sh script if it exists
-        File containerFolder = new File(servicesSetupPath + "/" + containerName);
+        File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
-            throw new SystemException("Folder " + servicesSetupPath + "/" + containerName + " doesn't exist !");
+            throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
         }
 
         File uninstallScriptFile = new File (containerFolder, "uninstall.sh");
@@ -979,19 +979,19 @@ public class SystemService {
 
         // 2. Stop service
         sb.append(" - Stopping Service\n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + containerName);
+        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + service);
 
         // 3. Uninstall systemd service file
         sb.append(" - Removing systemd Service File\n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + containerName + ".service");
+        sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
 
         // 4. Delete docker container
         sb.append(" - Removing docker container \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo docker rm -f " + containerName + " || true ");
+        sshCommandService.runSSHCommand(ipAddress, "sudo docker rm -f " + service + " || true ");
 
         // 5. Delete docker image
         sb.append(" - Removing docker image \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo docker image rm -f eskimo:" + containerName);
+        sshCommandService.runSSHCommand(ipAddress, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
 
         // 6. Reloading systemd daemon
         sb.append(" - Reloading systemd daemon \n");
@@ -1001,7 +1001,7 @@ public class SystemService {
         return sb.toString();
     }
 
-    private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String containerName)
+    private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String service)
             throws IOException, SystemException, SSHCommandException {
 
         sb.append("  - Creating archive and copying it over\n");
@@ -1009,17 +1009,17 @@ public class SystemService {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist
-        File containerFolder = new File(servicesSetupPath + "/" + containerName);
+        File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
-            throw new SystemException("Folder " + servicesSetupPath + "/" + containerName + " doesn't exist !");
+            throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
         }
 
         // 1.2 Create archive
-        File tmpArchiveFile = File.createTempFile(containerName, ".tgz");
-        FileUtils.createTarFile(servicesSetupPath + "/" + containerName, "/tmp/" + tmpArchiveFile.getName());
+        File tmpArchiveFile = File.createTempFile(service, ".tgz");
+        FileUtils.createTarFile(servicesSetupPath + "/" + service, "/tmp/" + tmpArchiveFile.getName());
         File archive = new File("/tmp/" +  tmpArchiveFile.getName());
         if (!archive.exists()) {
-            throw new SystemException("Could not create archive for service " + containerName + " : /tmp/" +  tmpArchiveFile.getName());
+            throw new SystemException("Could not create archive for service " + service + " : /tmp/" +  tmpArchiveFile.getName());
         }
 
         // 2. copy it over to target node and extract it
@@ -1027,50 +1027,49 @@ public class SystemService {
         // 2.1
         sshCommandService.copySCPFile(ipAddress, "/tmp/" +  tmpArchiveFile.getName());
 
-        exec(ipAddress, sb, "rm -Rf /tmp/" + containerName);
-        exec(ipAddress, sb, "rm -f /tmp/" + containerName + ".tgz");
-        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " /tmp/" + containerName + ".tgz");
-        exec(ipAddress, sb, "tar xfz /tmp/" + containerName + ".tgz --directory=/tmp/");
-        exec(ipAddress, sb, "chmod 755 /tmp/" + containerName + "/setup.sh");
+        exec(ipAddress, sb, "rm -Rf /tmp/" + service);
+        exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
+        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " /tmp/" + service + ".tgz");
+        exec(ipAddress, sb, "tar xfz /tmp/" + service + ".tgz --directory=/tmp/");
+        exec(ipAddress, sb, "chmod 755 /tmp/" + service + "/setup.sh");
 
         // 2.2 delete local archive
         try {
             FileUtils.delete(archive);
         } catch (FileUtils.FileDeleteFailedException e) {
             logger.error(e, e);
-            throw new SystemException("Could not delete archive /tmp/" + containerName + ".tgz");
+            throw new SystemException("Could not delete archive /tmp/" + service + ".tgz");
         }
 
         // 3. Copy container image there if any
-        // FIXME SOLVE THE SPARK HACK
+        // FIXME SOLVE THE SPARK AND FLINK HACK
+        String imageName = servicesDefinition.getService(service).getImageName();
         File containerFile = new File(packageDistributionPath+"/docker_template_" +
-                (containerName.startsWith("spark-") ? "spark" : containerName) +
-                ".tar.gz");
+                imageName + ".tar.gz");
         if (containerFile.exists()) {
             sshCommandService.copySCPFile(ipAddress, packageDistributionPath+"/docker_template_" +
-                    (containerName.startsWith("spark-") ? "spark" : containerName) +
-                    ".tar.gz");
+                    imageName + ".tar.gz");
 
             exec(ipAddress, sb, new String[]{"mv", "docker_template_" +
-                    (containerName.startsWith("spark-") ? "spark" : containerName) +
-                    ".tar.gz", "/tmp/" + containerName + "/"});
+                    imageName + ".tar.gz",
+                    "/tmp/" + service + "/"});
         } else {
-            sb.append(" - (no container found for ").append(containerName).append(" - will just invoke setup)");
+            sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
         }
 
         // 4. call setup script
-        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", "/tmp/" + containerName + "/setup.sh", ipAddress});//, dependencies);
+        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", "/tmp/" + service + "/setup.sh", ipAddress});//, dependencies);
         try {
             exec(ipAddress, sb, setupScript);
         } catch (SSHCommandException e) {
             logger.debug (e, e);
             sb.append(e.getMessage());
-            throw new SystemException ("Setup.sh script execution for " + containerName + " on node " + ipAddress + " failed.");
+            throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.");
         }
 
         // 5. cleanup
-        exec(ipAddress, sb, "rm -Rf /tmp/" + containerName);
-        exec(ipAddress, sb, "rm -f /tmp/" + containerName + ".tgz");
+        exec(ipAddress, sb, "rm -Rf /tmp/" + service);
+        exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
         try {
             FileUtils.delete (new File ("/tmp/" + tmpArchiveFile.getName() + ".tgz"));
         } catch (FileUtils.FileDeleteFailedException e) {

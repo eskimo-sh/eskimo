@@ -121,6 +121,9 @@ public class ServicesDefinition implements InitializingBean {
                 service.setConditional(ConditionalInstallation.NONE);
             }
 
+            String imageName = (String) servicesConfig.getValueForPath(serviceString+".config.imageName");
+            service.setImageName (imageName);
+
             String group = (String) servicesConfig.getValueForPath(serviceString+".config.group");
             String name = (String) servicesConfig.getValueForPath(serviceString+".config.name");
 

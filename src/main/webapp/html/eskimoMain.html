@@ -76,71 +76,71 @@ Software.
 <div id="hoeapp-container" hoe-color-type="lpanel-bg8" hoe-lpanel-effect="shrink">
     <aside id="hoe-left-panel" hoe-position-type="absolute">
         <div class="left-panel-container">
-        <!--
-        <div class="profile-box">
-            <div class="media">
-                <div class="media-body">
-                    <h5 class="media-heading">Eskimo <span>Platform</span></h5>
-                    <small>Admin</small>
-                </div>
+            <div id="menu-scroll-up" class="menu-scroll-button" style="display: none;">
+                <i class="fa fa-arrow-up">
+                </i>
             </div>
-        </div>
-        -->
-        <ul class="nav panel-list" id="mainFolderMenu">
-            <li id="mainFolderMenuAnchor" class="nav-level">Eskimo Services</li>
+            <div id="menu-container" class="left-panel-menu-container">
+                <ul class="nav panel-list" id="mainFolderMenu">
+                    <li id="mainFolderMenuAnchor" class="nav-level">Eskimo Services</li>
 
-            <li class="folder-menu-items disabled" id="folderMenuConsoles">
-                <a href="javascript:eskimoMain.getConsoles().showConsoles();">
-                    <i class="fa fa-terminal"></i>
-                    <span class="menu-text">SSH Terminals</span>
-                </a>
-            </li>
-            <li class="folder-menu-items disabled" id="folderMenuFileManagers">
-                <a href="javascript:eskimoMain.getFileManagers().showFileManagers();">
-                    <i class="fa fa-folder"></i>
-                    <span class="menu-text">SFTP File Manager</span>
-                </a>
-            </li>
-        </ul>
-        <ul class="nav panel-list last-menu">
-            <li id="adminTitle" class="nav-level" style="border-top: 2px solid #677889;">Platform Administration</li>
-            <li class="config-menu-items disabled">
-                <a href="javascript:eskimoMain.getSystemStatus().showStatus();">
-                    <i class="fa fa-server"></i>
-                    <span class="menu-text">Status</span>
-                </a>
-            </li>
-            <li class="config-menu-items disabled" id="menu-configure-setup">
-                <a href="javascript:eskimoMain.getSetup().showSetup();">
-                    <i class="fa fa-check-square"></i>
-                    <span class="menu-text">Setup</span>
-                </a>
-            </li>
-            <li class="config-menu-items disabled">
-                <a href="javascript:eskimoMain.getServicesConfig().showServicesConfig();">
-                    <i class="fa fa-cog"></i>
-                    <span class="menu-text">Configure Services</span>
-                </a>
-            </li>
-            <li class="config-menu-items disabled">
-                <a href="javascript:eskimoMain.getNodesConfig().showNodesConfig();">
-                    <i class="fa fa-cog"></i>
-                    <span class="menu-text">Configure Eskimo Nodes</span>
-                </a>
-            </li>
-            <li class="config-menu-items disabled"  id="menu-messages">
-                <a href="javascript:eskimoMain.getMessaging().showMessages();">
-                    <i class="fa fa-envelope"></i>
-                    <span class="menu-text">Backend messages</span>
-                </a>
-            </li>
-            <li class="config-menu-items disabled">
-                <a href="javascript:window.location='logout';">
-                    <i class="fa fa-sign-out"></i>
-                    <span class="menu-text">Logout</span>
-                </a>
-            </li>
-        </ul>
+                    <li class="folder-menu-items disabled" id="folderMenuConsoles">
+                        <a href="javascript:eskimoMain.getConsoles().showConsoles();">
+                            <i class="fa fa-terminal"></i>
+                            <span class="menu-text">SSH Terminals</span>
+                        </a>
+                    </li>
+                    <li class="folder-menu-items disabled" id="folderMenuFileManagers">
+                        <a href="javascript:eskimoMain.getFileManagers().showFileManagers();">
+                            <i class="fa fa-folder"></i>
+                            <span class="menu-text">SFTP File Manager</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav panel-list">
+                    <li id="adminTitle" class="nav-level" style="border-top: 2px solid #677889;">Platform Administration</li>
+                    <li class="config-menu-items disabled">
+                        <a href="javascript:eskimoMain.getSystemStatus().showStatus();">
+                            <i class="fa fa-server"></i>
+                            <span class="menu-text">Status</span>
+                        </a>
+                    </li>
+                    <li class="config-menu-items disabled" id="menu-configure-setup">
+                        <a href="javascript:eskimoMain.getSetup().showSetup();">
+                            <i class="fa fa-check-square"></i>
+                            <span class="menu-text">Setup</span>
+                        </a>
+                    </li>
+                    <li class="config-menu-items disabled">
+                        <a href="javascript:eskimoMain.getServicesConfig().showServicesConfig();">
+                            <i class="fa fa-cog"></i>
+                            <span class="menu-text">Configure Services</span>
+                        </a>
+                    </li>
+                    <li class="config-menu-items disabled">
+                        <a href="javascript:eskimoMain.getNodesConfig().showNodesConfig();">
+                            <i class="fa fa-cog"></i>
+                            <span class="menu-text">Configure Eskimo Nodes</span>
+                        </a>
+                    </li>
+                    <li class="config-menu-items disabled"  id="menu-messages">
+                        <a href="javascript:eskimoMain.getMessaging().showMessages();">
+                            <i class="fa fa-envelope"></i>
+                            <span class="menu-text">Backend messages</span>
+                        </a>
+                    </li>
+                    <li class="config-menu-items disabled">
+                        <a href="javascript:window.location='logout';">
+                            <i class="fa fa-sign-out"></i>
+                            <span class="menu-text">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div id="menu-scroll-down" class="menu-scroll-button" style="display: none;">
+                <i class="fa fa-arrow-down">
+                </i>
+            </div>
         </div>
     </aside>
     <section id="main-content">
