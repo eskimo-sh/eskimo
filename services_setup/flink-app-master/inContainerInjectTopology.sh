@@ -46,7 +46,7 @@ if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     exit -2
 fi
 
-# TODO
+# TODO find out which is to add and which is to replace (see file on desktop)
 
 # Specyfing mesos master
 mesos.master: zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos

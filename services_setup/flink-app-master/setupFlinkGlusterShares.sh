@@ -66,45 +66,45 @@ fi
 # Only if gluster is enabled
 if [[ $GLUSTER_AVAILABLE == 1 ]]; then
 
-    echo " - Proceeding with gluster mount /var/lib/spark/data"
-    /usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark `/usr/bin/id -u spark`
+    echo " - Proceeding with gluster mount /var/lib/flink/data"
+    /usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink `/usr/bin/id -u flink`
 
-    echo " - Proceeding with gluster mount /var/lib/spark/eventlog"
-    /usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/spark/eventlog spark `/usr/bin/id -u spark`
+    echo " - Proceeding with gluster mount /var/lib/flink/completed_jobs"
+    /usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink `/usr/bin/id -u flink`
 
 else
 
     echo " - Not mounting gluster shares since not working in cluster mode"
 
-    if [[ ! -d /var/lib/spark/data ]]; then
-        echo " - Creating /var/lib/spark/data"
-        mkdir -p /var/lib/spark/data
+    if [[ ! -d /var/lib/flink/data ]]; then
+        echo " - Creating /var/lib/flink/data"
+        mkdir -p /var/lib/flink/data
     fi
 
-    if [[ ! -d /var/lib/spark/eventlog ]]; then
-        echo " - Creating /var/lib/spark/eventlog"
-        mkdir -p /var/lib/spark/eventlog
+    if [[ ! -d /var/lib/flink/completed_jobs ]]; then
+        echo " - Creating /var/lib/flink/completed_jobs"
+        mkdir -p /var/lib/flink/completed_jobs
     fi
 
-    if [[ `stat -c '%U' /var/lib/spark/data` != "spark" ]]; then
-        echo " - Changing owner if /var/lib/spark/data"
-        chown -R spark /var/lib/spark/data
+    if [[ `stat -c '%U' /var/lib/flink/data` != "flink" ]]; then
+        echo " - Changing owner if /var/lib/flink/data"
+        chown -R flink /var/lib/flink/data
     fi
 
-    if [[ `stat -c '%U' /var/lib/spark/eventlog` != "spark" ]]; then
-        echo " - Changing owner if /var/lib/spark/eventlog"
-        chown -R spark /var/lib/spark/eventlog
+    if [[ `stat -c '%U' /var/lib/flink/completed_jobs` != "flink" ]]; then
+        echo " - Changing owner if /var/lib/flink/completed_jobs"
+        chown -R flink /var/lib/flink/completed_jobs
     fi
 
 
-    if [[ `ls -la /var/lib/spark/ | grep data | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of /var/lib/spark/data"
-        chmod -R 777 /var/lib/spark/data
+    if [[ `ls -la /var/lib/flink/ | grep data | grep drwxrwxrw` == "" ]]; then
+        echo " - Changing rights of /var/lib/flink/data"
+        chmod -R 777 /var/lib/flink/data
     fi
 
-    if [[ `ls -la /var/lib/spark/ | grep eventlog | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of /var/lib/spark/eventlog"
-        chmod -R 777 /var/lib/spark/eventlog
+    if [[ `ls -la /var/lib/flink/ | grep completed_jobs | grep drwxrwxrw` == "" ]]; then
+        echo " - Changing rights of /var/lib/flink/completed_jobs"
+        chmod -R 777 /var/lib/flink/completed_jobs
     fi
 fi
 

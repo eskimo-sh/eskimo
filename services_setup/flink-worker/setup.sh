@@ -65,7 +65,7 @@ else
 fi
 
 # reinitializing log
-sudo rm -f /tmp/flink_executor_install_log
+sudo rm -f /tmp/flink_worker_install_log
 
 # build
 
@@ -77,7 +77,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Building docker container for flink worker"
-build_container flink-worker flink /tmp/flink_executor_install_log
+build_container flink-worker flink /tmp/flink_worker_install_log
 
 # create and start container
 echo " - Running docker container to configure flink worker"
@@ -89,26 +89,26 @@ docker run \
         -v /var/lib/flink:/var/lib/flink \
         --name flink-worker \
         -i \
-        -t eskimo:flink-worker bash >> /tmp/flink_executor_install_log 2>&1
-fail_if_error $? "/tmp/flink_executor_install_log" -2
+        -t eskimo:flink-worker bash >> /tmp/flink_worker_install_log 2>&1
+fail_if_error $? "/tmp/flink_worker_install_log" -2
 
 # connect to container
 #docker exec -it flink-worker bash
 
 echo " - Configuring flink-worker container (config script)"
 docker exec flink-worker bash /scripts/inContainerSetupFlinkCommon.sh flink_user_id $SELF_IP_ADDRESS \
-        | tee -a /tmp/flink_executor_install_log 2>&1
-if [[ `tail -n 1 /tmp/flink_executor_install_log` != " - In container config SUCCESS" ]]; then
+        | tee -a /tmp/flink_worker_install_log 2>&1
+if [[ `tail -n 1 /tmp/flink_worker_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/flink_executor_install_log
+    cat /tmp/flink_worker_install_log
     exit -100
 fi
 
 echo " - Configuring flink-worker container"
-docker exec flink-worker bash /scripts/inContainerSetupFlinkWorker.sh | tee -a /tmp/flink_executor_install_log 2>&1
-if [[ `tail -n 1 /tmp/flink_executor_install_log` != " - In container config SUCCESS" ]]; then
+docker exec flink-worker bash /scripts/inContainerSetupFlinkWorker.sh | tee -a /tmp/flink_worker_install_log 2>&1
+if [[ `tail -n 1 /tmp/flink_worker_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/flink_executor_install_log
+    cat /tmp/flink_worker_install_log
     exit -101
 fi
 
@@ -116,22 +116,22 @@ fi
 #docker exec -it flink-worker TODO/tmp/logstash_install_log
 
 echo " - Copying Topology Injection Script (common)"
-docker cp $SCRIPT_DIR/inContainerInjectTopology.sh flink-worker:/usr/local/sbin/inContainerInjectTopology.sh >> /tmp/flink_executor_install_log 2>&1
-fail_if_error $? "/tmp/flink_executor_install_log" -20
+docker cp $SCRIPT_DIR/inContainerInjectTopology.sh flink-worker:/usr/local/sbin/inContainerInjectTopology.sh >> /tmp/flink_worker_install_log 2>&1
+fail_if_error $? "/tmp/flink_worker_install_log" -20
 
-docker exec --user root flink-worker bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> /tmp/flink_executor_install_log 2>&1
-fail_if_error $? "/tmp/flink_executor_install_log" -21
+docker exec --user root flink-worker bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> /tmp/flink_worker_install_log 2>&1
+fail_if_error $? "/tmp/flink_worker_install_log" -21
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh flink-worker:/usr/local/sbin/settingsInjector.sh >> /tmp/flink_executor_install_log 2>&1
-fail_if_error $? /tmp/flink_executor_install_log -23
+docker cp $SCRIPT_DIR/settingsInjector.sh flink-worker:/usr/local/sbin/settingsInjector.sh >> /tmp/flink_worker_install_log 2>&1
+fail_if_error $? /tmp/flink_worker_install_log -23
 
-docker exec --user root flink-worker bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/flink_executor_install_log 2>&1
-fail_if_error $? /tmp/flink_executor_install_log -24
+docker exec --user root flink-worker bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/flink_worker_install_log 2>&1
+fail_if_error $? /tmp/flink_worker_install_log -24
 
 
 echo " - Committing changes to local template and exiting container flink"
-commit_container flink-worker /tmp/flink_executor_install_log
+commit_container flink-worker /tmp/flink_worker_install_log
 
 # TODO
 #echo " - Copying flink command line programs docker wrappers to /usr/local/bin"

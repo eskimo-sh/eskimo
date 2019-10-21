@@ -40,7 +40,7 @@ echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Inject settings"
-/usr/local/sbin/settingsInjector.sh flink-worker
+/usr/local/sbin/settingsInjector.sh flink-app-master
 
 echo " - Starting service"
 bash # TODO

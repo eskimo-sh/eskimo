@@ -80,6 +80,10 @@ sudo rm -Rf /usr/local/lib/flink/log
 sudo ln -s /var/log/flink/log /usr/local/lib/flink/log
 
 
+
+# TODO find out which is to add and which is to replace (see file on desktop)
+
+
 # The external address of the host on which the JobManager runs and can be
 # reached by the TaskManagers and any clients which want to connect
 jobmanager.rpc.address: $SELF_IP_ADDRESS
@@ -88,48 +92,42 @@ jobmanager.rpc.address: $SELF_IP_ADDRESS
 mesos.resourcemanager.tasks.container.type: docker
 
 # specifying image name
-mesos.resourcemanager.tasks.container.image.name: image_name
+mesos.resourcemanager.tasks.container.image.name: eskimo:flink-worker
 
 # A comma separated list of [host_path:]container_path[:RO|RW].
 # This allows for mounting additional volumes into your container.
-mesos.resourcemanager.tasks.container.volumes
+mesos.resourcemanager.tasks.container.volumes: /var/lib/flink/data:/var/lib/flink/data:RW,/var/lib/flink/completed_jobs:/var/lib/flink/completed_jobs:RW
 
 # CPUs to assign to the Mesos workers.
-mesos.resourcemanager.tasks.cpus
+mesos.resourcemanager.tasks.cpus: 1
 
 # Memory to assign to the Mesos workers in MB.
-mesos.resourcemanager.tasks.mem
+mesos.resourcemanager.tasks.mem: 1024
 
 # The default directory used for storing the data files and meta data of checkpoints in a Flink supported
 # filesystem.
 # The storage path must be accessible from all participating processes/nodes(i.e. all TaskManagers and JobManagers).
-state.savepoints.dir
+state.savepoints.dir: /var/lib/flink/data/savepoints
 
 # The default directory for savepoints.
 # Used by the state backends that write savepoints to file systems (MemoryStateBackend, FsStateBackend, RocksDBStateBackend).
-state.checkpoints.dir
-# e.g. state.checkpoints.dir: hdfs:///checkpoints/
+state.checkpoints.dir: /var/lib/flink/data/ckeckpoints
 
 # JVM heap size for the JobManager.
-jobmanager.heap.size
-# "1024m"
+jobmanager.heap.size: 1024m
 
 # JVM heap size for the TaskManagers, which are the parallel workers of the system.
 # On YARN setups, this value is automatically configured to the size of the TaskManager's YARN container, minus a certain tolerance value.
-taskmanager.heap.size
-# "1024m"
+taskmanager.heap.size :  1024m
 
 # Default parallelism for jobs.
-parallelism.default
-#1
+parallelism.default: 1
 
 # Directory to upload completed jobs to.
-jobmanager.archive.fs.dir:
-# e.g. hdfs:///completed-jobs/
+jobmanager.archive.fs.dir: /var/lib/flink/completed_jobs
 
 # Comma separated list of directories to monitor for completed jobs.
-historyserver.archive.fs.dir:
-# e.g. hdfs:///completed-jobs/
+historyserver.archive.fs.dir: /var/lib/flink/completed_jobs
 
 
 
