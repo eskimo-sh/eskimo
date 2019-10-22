@@ -278,6 +278,8 @@ eskimo.Services = function () {
 
             $("#mainFolderMenuAnchor").after(menuEntry);
         }
+
+        eskimoMain.menuResize();
     }
 
     /** for tests */

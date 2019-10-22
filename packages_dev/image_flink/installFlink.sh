@@ -76,6 +76,26 @@ echo " - Extracting flink-$FLINK_VERSION"
 tar -xvf flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -2
 
+echo " - Downloading optional components"
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-avro/$FLINK_VERSION/flink-avro-$FLINK_VERSION.jar >> /tmp/flink_install_log 2>&1
+fail_if_error $? "/tmp/flink_install_log" -21
+
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-csv/$FLINK_VERSION/flink-csv-$FLINK_VERSION.jar >> /tmp/flink_install_log 2>&1
+fail_if_error $? "/tmp/flink_install_log" -22
+
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-json/$FLINK_VERSION/flink-json-$FLINK_VERSION.jar >> /tmp/flink_install_log 2>&1
+fail_if_error $? "/tmp/flink_install_log" -23
+
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/$FLINK_HADOOP_VERSION/flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar >> /tmp/flink_install_log 2>&1
+fail_if_error $? "/tmp/flink_install_log" -24
+
+echo " - Installing optional components"
+mv flink-avro-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
+mv flink-csv-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
+mv flink-json-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
+mv flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar flink-$FLINK_VERSION/lib/
+
+
 echo " - Installing flink"
 sudo chown root.staff -R flink-$FLINK_VERSION
 sudo mv flink-$FLINK_VERSION /usr/local/lib/flink-$FLINK_VERSION

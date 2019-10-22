@@ -36,6 +36,7 @@
 
 # Version of software to install
 export FLINK_VERSION=1.9.1
+export FLINK_HADOOP_VERSION=2.8.3-7.0
 export SPARK_VERSION=2.4.4
 export AMESOS_VERSION=1.8.1
 export ES_VERSION=6.8.3

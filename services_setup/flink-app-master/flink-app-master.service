@@ -62,10 +62,7 @@ ExecStart=/bin/bash -c ". /run/flink_mesos_environment && /usr/bin/docker run \
         -i \
         --name flink-app-master \
         --user flink \
-        -p 6123:6123 \
-        -p 6130:6130 \
-        -p 8081:8081 \
-        -p 8082:8082 \
+        --network host \
         -v /var/log/flink:/var/log/flink \
         -v /var/lib/flink:/var/lib/flink:rshared \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
@@ -75,6 +72,11 @@ ExecStart=/bin/bash -c ". /run/flink_mesos_environment && /usr/bin/docker run \
         -e NODE_NAME=$HOSTNAME \
         eskimo:flink-app-master \
         /usr/local/sbin/inContainerStartService.sh"
+
+#        -p 6123:6123 \
+#        -p 6130:6130 \
+#        -p 8081:8081 \
+#        -p 8082:8082 \
 
 ExecStop=/usr/bin/docker stop flink-app-master
 

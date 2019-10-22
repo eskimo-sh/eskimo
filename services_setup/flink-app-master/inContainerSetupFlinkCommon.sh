@@ -75,7 +75,7 @@ for i in `ls -1 /usr/local/lib/flink/bin`; do
     create_binary_wrapper /usr/local/lib/flink/bin/$i /usr/local/bin/$i
 done
 
-echo " - Simlinking flink logs to /var/log/"
+echo " - Simlinking flink log to /var/log/"
 sudo rm -Rf /usr/local/lib/flink/log
 sudo ln -s /var/log/flink/log /usr/local/lib/flink/log
 
@@ -86,52 +86,58 @@ sudo ln -s /var/log/flink/log /usr/local/lib/flink/log
 
 # The external address of the host on which the JobManager runs and can be
 # reached by the TaskManagers and any clients which want to connect
-jobmanager.rpc.address: $SELF_IP_ADDRESS
-
-# setting containierization type
-mesos.resourcemanager.tasks.container.type: docker
-
-# specifying image name
-mesos.resourcemanager.tasks.container.image.name: eskimo:flink-worker
-
-# A comma separated list of [host_path:]container_path[:RO|RW].
-# This allows for mounting additional volumes into your container.
-mesos.resourcemanager.tasks.container.volumes: /var/lib/flink/data:/var/lib/flink/data:RW,/var/lib/flink/completed_jobs:/var/lib/flink/completed_jobs:RW
-
-# CPUs to assign to the Mesos workers.
-mesos.resourcemanager.tasks.cpus: 1
-
-# Memory to assign to the Mesos workers in MB.
-mesos.resourcemanager.tasks.mem: 1024
+sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 # The default directory used for storing the data files and meta data of checkpoints in a Flink supported
 # filesystem.
 # The storage path must be accessible from all participating processes/nodes(i.e. all TaskManagers and JobManagers).
-state.savepoints.dir: /var/lib/flink/data/savepoints
+sed -i s/"# state.savepoints.dir: hdfs:\/\/namenode-host:port\/flink-checkpoints"/"state.savepoints.dir: file:\/\/\/var\/lib\/flink\/data\/savepoints"/g \
+        /usr/local/lib/flink/conf/flink-conf.yaml
 
 # The default directory for savepoints.
 # Used by the state backends that write savepoints to file systems (MemoryStateBackend, FsStateBackend, RocksDBStateBackend).
-state.checkpoints.dir: /var/lib/flink/data/ckeckpoints
-
-# JVM heap size for the JobManager.
-jobmanager.heap.size: 1024m
-
-# JVM heap size for the TaskManagers, which are the parallel workers of the system.
-# On YARN setups, this value is automatically configured to the size of the TaskManager's YARN container, minus a certain tolerance value.
-taskmanager.heap.size :  1024m
-
-# Default parallelism for jobs.
-parallelism.default: 1
+sed -i s/"# state.checkpoints.dir: hdfs:\/\/namenode-host:port\/flink-checkpoints"/"state.checkpoints.dir: file:\/\/\/var\/lib\/flink\/data\/ckeckpoints"/g \
+        /usr/local/lib/flink/conf/flink-conf.yaml
 
 # Directory to upload completed jobs to.
-jobmanager.archive.fs.dir: /var/lib/flink/completed_jobs
+sed -i s/"#jobmanager.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"jobmanager.archive.fs.dir: file:\/\/\/var\/lib\/flink\/completed_jobs\/"/g \
+        /usr/local/lib/flink/conf/flink-conf.yaml
 
 # Comma separated list of directories to monitor for completed jobs.
-historyserver.archive.fs.dir: /var/lib/flink/completed_jobs
+sed -i s/"#historyserver.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"historyserver.archive.fs.dir: file:\/\/\/var\/lib\/flink\/completed_jobs\/"/g \
+        /usr/local/lib/flink/conf/flink-conf.yaml
+
+# uncomment
+sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
+
+# uncomment
+sed -i s/"#rest.port: 8081"/"rest.port: 8081"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 
+sudo bash -c "echo -e \"\n\n\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"# Eskimo Mesos Configuration part \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+sudo bash -c "echo -e \"\n# setting containierization type \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.type: docker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+sudo bash -c "echo -e \"\n# specifying image name \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.image.name: eskimo:flink-worker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+sudo bash -c "echo -e \"\n# A comma separated list of [host_path:]container_path[:RO|RW]. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"# This allows for mounting additional volumes into your container.. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/lib/flink/data:/var/lib/flink/data:RW,/var/lib/flink/completed_jobs:/var/lib/flink/completed_jobs:RW\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+sudo bash -c "echo -e \"\n# CPUs to assign to the Mesos workers. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.cpus: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+sudo bash -c "echo -e \"\n# Memory to assign to the Mesos workers in MB. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.mem: 1024\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 
+echo " - Enabling flink to change configuration at runtime"
+chown -R flink. "/usr/local/lib/flink/conf/"
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

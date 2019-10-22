@@ -65,6 +65,8 @@ eskimo.Main = function() {
     var operationInProgress = false;
     var operationInProgressOwner = false;
 
+    var menuHidingPos = 0;
+
     this.isSetupLoaded = function() {
         return setupLoaded;
     };
@@ -320,30 +322,88 @@ eskimo.Main = function() {
 
         isMenuMinimized = $('#hoeapp-container').hasClass("hoe-minimized-lpanel");
 
-        $(window).resize (function() {
-            // alert (window.innerHeight + " - " + window.innerWidth);
+        $(window).resize (this.menuResize);
 
-            var actualMenuHeight = $("#menu-container").height();
-            var menuContainerHeight = $("#hoe-left-panel").height();
+        $("#menu-scroll-up").click(this.menuUp);
+        $("#menu-scroll-down").click(this.menuDown);
+    };
 
-            /*
-            alert ("Implement me : whenever menu is too small in height, dynmically render it (eskimoMain.js)");
+    this.menuResize = function() {
+        // alert (window.innerHeight + " - " + window.innerWidth);
 
-            # FIXME : only if menu is shown !
-                */
+        var actualMenuHeight = $("#menu-container").height();
+        var menuContainerHeight = $("#hoe-left-panel").height();
 
-            console.log (menuContainerHeight + " -  " + actualMenuHeight);
+        /*
+        alert ("Implement me : whenever menu is too small in height, dynmically render it (eskimoMain.js)");
 
-            if (menuContainerHeight - 80 < actualMenuHeight) {
-                $("#menu-scroll-up").css ("display", "inherit");
-                $("#menu-scroll-down").css ("display", "inherit");
-                $("#menu-container").css ("top", "25px");
-            } else {
-                $("#menu-scroll-up").css ("display", "none");
-                $("#menu-scroll-down").css ("display", "none");
-                $("#menu-container").css ("top", "0px");
-            }
+        # FIXME : only if menu is shown !
+            */
+
+        console.log (menuContainerHeight + " -  " + actualMenuHeight);
+
+        if (menuContainerHeight - 80 < actualMenuHeight) {
+            $("#menu-scroll-up").css ("display", "inherit");
+            $("#menu-scroll-down").css ("display", "inherit");
+            $("#menu-container").css ("top", "25px");
+            that.menuUp();
+        } else {
+            $("#menu-scroll-up").css ("display", "none");
+            $("#menu-scroll-down").css ("display", "none");
+            $("#menu-container").css ("top", "0px");
+        }
+
+        // reset visibility state
+        $("#menu-container > * > li").each(function(nbr, node) {
+            $(node).css("display", "");
         });
+        menuHidingPos = 0;
+    };
+
+    this.menuUp = function(e) {
+
+        if (menuHidingPos > 0) {
+
+            menuHidingPos--;
+
+            // browse both menu and unhide last hidden element
+            // and deincrement menuHidingPos
+            $("#menu-container > * > li").each(function(nbr, node) {
+                if (nbr == menuHidingPos) {
+                    $(node).css("display", "");
+                }
+            });
+        }
+
+        if (e != null) {
+            e.preventDefault();
+        }
+        return false;
+    };
+
+    this.menuDown = function(e) {
+
+        var actualMenuHeight = $("#menu-container").height();
+        var menuContainerHeight = $("#hoe-left-panel").height();
+
+        // IF AND ONLY IF size is not sufficient for current menu site, THEN
+        if (menuContainerHeight - 80 < actualMenuHeight) {
+
+            // hide first non-hidden li element from both menu
+            // and increment menuHidingPos
+            $("#menu-container > * > li").each(function(nbr, node) {
+                if (nbr == menuHidingPos) {
+                    $(node).css("display", "none");
+                }
+            });
+
+            menuHidingPos++;
+        }
+
+        if (e != null) {
+            e.preventDefault();
+        }
+        return false;
     };
 
     this.initialize();

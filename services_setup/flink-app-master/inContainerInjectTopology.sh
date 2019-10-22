@@ -48,5 +48,5 @@ fi
 
 # TODO find out which is to add and which is to replace (see file on desktop)
 
-# Specyfing mesos master
-mesos.master: zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos
+echo -e "\n# Specyfing mesos master"  >> /usr/local/lib/flink/conf/flink-conf.yaml
+echo -e "mesos.master: zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos"  >> /usr/local/lib/flink/conf/flink-conf.yaml

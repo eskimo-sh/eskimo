@@ -42,5 +42,8 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh flink-app-master
 
+# point to your libmesos.so if you use Mesos
+export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
+
 echo " - Starting service"
-bash # TODO
+/usr/local/lib/flink/bin/mesos-appmaster.sh

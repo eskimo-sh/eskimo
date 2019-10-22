@@ -655,9 +655,9 @@ eskimo.SystemStatus = function() {
 
         retActionsHtml +=
             '        <td class="' + tdClassName + '">\n' +
-            '            <a href="#" title="Show journal" ' +
+            '            <a href="javascript:void(0);" title="Show journal" ' +
             (!eskimoMain.isOperationInProgress() ?
-                'onclick="eskimoMain.getSystemStatus().showJournal(\'' + service + '\', \'' + nodeAddress + '\');"':
+                'onclick="eskimoMain.getSystemStatus().showJournal(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
                 'onclick="event.preventDefault(); return false;"') +
             '                >\n' +
             '                <span class="service-status-action service-status-action-journal ' +
@@ -669,9 +669,9 @@ eskimo.SystemStatus = function() {
         if (up) {
             retActionsHtml +=
                 '        <td class="'+tdClassName+'">\n' +
-                '            <a href="#" title="Stop Service" ' +
+                '            <a href="javascript:void(0);" title="Stop Service" ' +
                 (!eskimoMain.isOperationInProgress() ?
-                    'onclick="eskimoMain.getSystemStatus().stopService(\'' + service + '\', \'' + nodeAddress + '\');"':
+                    'onclick="eskimoMain.getSystemStatus().stopService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
                     'onclick="event.preventDefault(); return false;"') +
                 '                >\n' +
                 '                <span class="service-status-action service-status-action-stop ' +
@@ -682,9 +682,9 @@ eskimo.SystemStatus = function() {
         } else {
             retActionsHtml +=
                 '        <td class="' + tdClassName + '">\n' +
-                '            <a href="#" title="Start Service" ' +
+                '            <a href="javascript:void(0);" title="Start Service" ' +
                 (!eskimoMain.isOperationInProgress() ?
-                    'onclick="eskimoMain.getSystemStatus().startService(\'' + service + '\', \'' + nodeAddress + '\');"':
+                    'onclick="eskimoMain.getSystemStatus().startService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
                     'onclick="event.preventDefault(); return false;"') +
                 '                >\n' +
                 '                <span class="service-status-action service-status-action-start ' +
@@ -697,9 +697,9 @@ eskimo.SystemStatus = function() {
 
         retActionsHtml +=
             '        <td class="' + tdClassName + '">\n' +
-            '            <a href="#" title="Restart Service" ' +
+            '            <a href="javascript:void(0);" title="Restart Service" ' +
             (!eskimoMain.isOperationInProgress() ?
-                'onclick="eskimoMain.getSystemStatus().restartService(\'' + service + '\', \'' + nodeAddress + '\');"':
+                'onclick="eskimoMain.getSystemStatus().restartService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
                 'onclick="event.preventDefault(); return false;"') +
             '                >\n' +
             '                <span class="service-status-action service-status-action-restart ' +
@@ -708,9 +708,9 @@ eskimo.SystemStatus = function() {
             '            </a>\n' +
             '        </td>\n' +
             '        <td class="' + tdClassName + '">\n' +
-            '            <a href="#" title="Reinstall Service" ' +
+            '            <a href="javascript:void(0);" title="Reinstall Service" ' +
             (!eskimoMain.isOperationInProgress() ?
-                'onclick="eskimoMain.getSystemStatus().reinstallService(\'' + service + '\', \'' + nodeAddress + '\');"':
+                'onclick="eskimoMain.getSystemStatus().reinstallService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
                 'onclick="event.preventDefault(); return false;"') +
             '                >\n' +
             '                <span class="service-status-action service-status-action-reinstall ' +

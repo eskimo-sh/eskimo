@@ -506,6 +506,42 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
+    ],
+    "editableConfigurations": [
+      {
+        "filename": "flink-conf.yaml",
+        "propertyType": "variable",
+        "propertyFormat": "{name}: {value}",
+        "commentPrefix": "#",
+        "filesystemService": "flink-app-master",
+        "properties": [
+          {
+            "name": "jobmanager.heap.size",
+            "comment": "JVM heap size for the JobManager. Use [ESKIMO_DEFAULT] to use Eskimo computed memory.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name": "taskmanager.heap.size",
+            "comment": "JVM heap size for the TaskManager. Default value : 1024m.",
+            "defaultValue": "1024m"
+          },
+          {
+            "name": "parallelism.default",
+            "comment": "Default parallelism for jobs. Default value : 1.",
+            "defaultValue": "1"
+          },
+          {
+            "name": "mesos.resourcemanager.tasks.cpus",
+            "comment": "CPUs to assign to the Mesos workers. Default value : 1.",
+            "defaultValue": "1"
+          },
+          {
+            "name": "mesos.resourcemanager.tasks.mem",
+            "comment": "Memory to assign to the Mesos workers in MB. Default value : 1024.",
+            "defaultValue": "1024"
+          }
+        ]
+      }
     ]
   },
 
