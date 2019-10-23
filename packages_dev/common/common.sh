@@ -37,7 +37,9 @@
 # Version of software to install
 export FLINK_VERSION=1.9.1
 export FLINK_HADOOP_VERSION=2.8.3-7.0
+export HADOOP_MAJOR_VERSION=2.8
 export SPARK_VERSION=2.4.4
+export SPARK_VERSION_MAJOR=2.4
 export AMESOS_VERSION=1.8.1
 export ES_VERSION=6.8.3
 export CEREBRO_VERSION=0.8.4
@@ -46,7 +48,7 @@ export SCALA_VERSION=2.11
 export SPARK_STREAMING_KAFKA_CON_VERSION=0-10
 export SPARK_STREAMING_KAFKA_CLIENT_VERSION=2.0.0
 export KAFKA_MANAGER_VERSION=2.0.0.2
-export ZEPPELIN_VERSION=0.8.1
+export ZEPPELIN_VERSION=0.9.0
 export SPARK_UNUSED_VERSION=1.0.0
 export GRAFANA_VERSION=6.3.3
 export PROMETHEUS_VERSION=2.10.0
@@ -200,6 +202,8 @@ function build_image() {
     docker run \
             -v $PWD:/scripts \
             -v $PWD/../common:/common  \
+            -v /tmp:/tmp \
+            -v /data:/data \
             -d --name $1 \
             -i \
             -t eskimo:$1_template bash  >> $2 2>&1

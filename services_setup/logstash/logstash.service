@@ -43,7 +43,7 @@ Requires=docker.service
 TimeoutStartSec=0
 RemainAfterExit=false
 
-ExecStart=/bin/bash -c 'while [[ 1 ]]; do sleep 5 ; if [[ `docker image ls -a | grep eskimo | grep logstash_template` == "" ]]; then echo "BAD"; exit; fi; done'
+ExecStart=/bin/bash -c 'while [[ 1 ]]; do sleep 5 ; if [[ `docker image ls -a | grep eskimo | grep logstash ` == "" ]]; then echo "BAD"; exit; fi; done'
 
 Type=simple
 

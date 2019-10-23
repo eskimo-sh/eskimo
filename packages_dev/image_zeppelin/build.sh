@@ -59,13 +59,14 @@ fi
 echo " - Building image zeppelin"
 build_image zeppelin /tmp/zeppelin_build_log
 
-echo " - Installing the latest OpenJDK"
-docker exec -i zeppelin apt-get install -y openjdk-8-jdk >> /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -3
+# Got those from the spark image
+#echo " - Installing the latest OpenJDK"
+#docker exec -i zeppelin apt-get install -y openjdk-8-jdk >> /tmp/zeppelin_build_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_build_log" -3
 
-echo " - Installing scala"
-docker exec -i zeppelin apt-get install -y scala >> /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -4
+#echo " - Installing scala"
+#docker exec -i zeppelin apt-get install -y scala >> /tmp/zeppelin_build_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_build_log" -4
 
 echo " - Installing ZIP"
 docker exec -i zeppelin apt-get install -y zip >> /tmp/zeppelin_build_log 2>&1
@@ -79,6 +80,14 @@ echo " - Installing python packages for datascience"
 docker exec -i zeppelin pip install pandas scikit-learn matplotlib nltk plotly filelock >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
+echo " - Installing flink"
+docker exec -i zeppelin bash /scripts/installFlink.sh | tee -a /tmp/zeppelin_build_log 2>&1
+if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/zeppelin_build_log
+    exit -102
+fi
+
 echo " - Installing zeppelin"
 docker exec -i zeppelin bash /scripts/installZeppelin.sh | tee -a /tmp/zeppelin_build_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
@@ -89,6 +98,8 @@ fi
 
 #echo " - TODO"
 #docker exec -i zeppelin TODO
+
+#docker exec -it zeppelin bash
 
 echo " - Closing and saving image zeppelin"
 close_and_save_image zeppelin /tmp/zeppelin_build_log

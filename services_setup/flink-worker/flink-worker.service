@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -34,48 +32,32 @@
 # Software.
 #
 
-set -e
+[Unit]
+Description=Flink Worker Initializer and Availability checker
+Wants=network-online.target
+After=docker.service
+Requires=docker.service
 
-echo " - Loading Topology"
-. /etc/eskimo_topology.sh
+[Service]
+TimeoutStartSec=0
+RemainAfterExit=false
 
-export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
-if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
-    echo " - No zookeeper master found in topology"
-    exit -3
-fi
+# Run ExecStartPre with root-permissions
+PermissionsStartOnly=true
 
-export ESMASTER_IP_ADDRESS=`eval echo "\$"$(echo SELF_MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $ESMASTER_IP_ADDRESS == "" ]]; then
-    echo " - No ES master found in topology for $SELF_IP_ADDRESS"
-    exit -3
-fi
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupFlinkGlusterShares.sh
 
+ExecStart=/bin/bash -c 'while [[ 1 ]]; do sleep 5 ; if [[ `docker image ls -a | grep eskimo | grep flink-worker ` == "" ]]; then echo "BAD"; exit; fi; done'
 
-echo " - Adapting configuration files and scripts"
+Type=simple
 
-sed -i -n '1h;1!H;${;g;s/'\
-'          \"name\": \"elasticsearch.host\",\n'\
-'          \"value\": \"localhost\",'\
-'/'\
-'          \"name\": \"elasticsearch.host\",\n'\
-'          \"value\": \"'"$ESMASTER_IP_ADDRESS"'\",'\
-'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+Restart=always
+StartLimitBurst=3
+StartLimitInterval=30
 
-sed -i -n '1h;1!H;${;g;s/'\
-'          \"name\": \"master\",\n'\
-'          \"value\": \"local\[\*\]\",'\
-'/'\
-'          \"name\": \"master\",\n'\
-'          \"value\": \"'"mesos:\/\/zk:\/\/$ZOOKEEPER_IP_ADDRESS:2181\/mesos"'\",'\
-'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+StandardOutput=syslog
+StandardError=syslog
 
-sed -i -n '1h;1!H;${;g;s/'\
-'          \"name\": \"flink.execution.remote.host\",\n'\
-'          \"value\": \"\",'\
-'/'\
-'          \"name\": \"flink.execution.remote.host\",\n'\
-'          \"value\": \"'"$MASTER_FLINK_APP_MASTER_1"'\",'\
-'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
-
-
+[Install]
+WantedBy=multi-user.target

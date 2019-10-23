@@ -483,7 +483,7 @@
     },
     "ui": {
       "proxyTargetPort" : 8081,
-      "waitTime": 10000,
+      "waitTime": 15000,
       "title" : "Flink App Master",
       "icon" : "images/flink-app-master-icon.png"
     },
@@ -691,7 +691,7 @@
     "ui": {
       "urlTemplate": "./kibana/app/kibana",
       "proxyTargetPort" : 5601,
-      "waitTime": 45000,
+      "waitTime": 50000,
       "title" : "Kibana",
       "icon" : "images/kibana-icon.png",
       "applyStandardProxyReplacements": false,

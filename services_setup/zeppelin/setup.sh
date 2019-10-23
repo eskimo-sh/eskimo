@@ -118,7 +118,7 @@ if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" 
 fi
 
 echo " - Configuring zeppelin container"
-docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee -a /tmp/zeppelin_install_log 2>&1
+docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh $SELF_IP_ADDRESS | tee -a /tmp/zeppelin_install_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/zeppelin_install_log

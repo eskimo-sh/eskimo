@@ -96,7 +96,7 @@ fail_if_error $? "/tmp/flink_worker_install_log" -2
 #docker exec -it flink-worker bash
 
 echo " - Configuring flink-worker container (config script)"
-docker exec flink-worker bash /scripts/inContainerSetupFlinkCommon.sh flink_user_id $SELF_IP_ADDRESS \
+docker exec flink-worker bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $SELF_IP_ADDRESS \
         | tee -a /tmp/flink_worker_install_log 2>&1
 if [[ `tail -n 1 /tmp/flink_worker_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
@@ -140,6 +140,9 @@ commit_container flink-worker /tmp/flink_worker_install_log
 #    filename=`echo $i | cut -d '/' -f 3`
 #    sudo chmod 755 /usr/local/bin/$filename
 #done
+
+echo " - Installing and checking systemd service file"
+install_and_check_service_file flink-worker /tmp/flink_install_log
 
 echo " - Creating flink-workers containers cleaner"
 sudo bash -c 'echo "for i in \`docker ps -aq --no-trunc -f status=exited -f ancestor=eskimo:flink-worker\` ; do docker rm --force \$i; done" > /usr/local/sbin/clean-flink-worker-containers.sh'

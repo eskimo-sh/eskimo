@@ -1070,6 +1070,15 @@ public class SystemService {
         // 5. cleanup
         exec(ipAddress, sb, "rm -Rf /tmp/" + service);
         exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
+
+        try {
+            exec(ipAddress, sb, "docker image rm eskimo:" + imageName + "_template");
+        } catch (SSHCommandException e) {
+            logger.error (e, e);
+            sb.append (e.getMessage());
+            // ignroed any further
+        }
+
         try {
             FileUtils.delete (new File ("/tmp/" + tmpArchiveFile.getName() + ".tgz"));
         } catch (FileUtils.FileDeleteFailedException e) {

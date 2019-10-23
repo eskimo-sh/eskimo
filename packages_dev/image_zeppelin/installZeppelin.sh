@@ -58,79 +58,105 @@ cd /tmp/zeppelin_setup/
 echo " - Downloading zeppelin-$ZEPPELIN_VERSION"
 wget https://www-eu.apache.org/dist/zeppelin/zeppelin-$ZEPPELIN_VERSION/zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz > /tmp/zeppelin_install_log 2>&1
 if [[ $? != 0 ]]; then
-    echo " -> Failed to downolad cerebro-$CEREBRO_VERSION from apache. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz >> /tmp/zeppelin_install_log 2>&1
+    echo " -> Failed to downolad zeppelin-$ZEPPELIN_VERSION from apache. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz >> /tmp/zeppelin_install_log 2>&1
     fail_if_error $? "/tmp/zeppelin_install_log" -1
+    export FROM_COMPLETE="1"
 fi
 
 echo " - Extracting zeppelin-$ZEPPELIN_VERSION"
-tar -xvf zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz > /tmp/zeppelin_install_log 2>&1
+tar -xvf zeppelin-$ZEPPELIN_VERSION*gz > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
+rm -f zeppelin-$ZEPPELIN_VERSION*gz
+
 echo " - Installing Zeppelin"
-sudo chown root.staff -R zeppelin-$ZEPPELIN_VERSION-bin-netinst
-sudo mv zeppelin-$ZEPPELIN_VERSION-bin-netinst /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-bin-netinst
+sudo chown root.staff -R zeppelin-$ZEPPELIN_VERSION*
+sudo mv zeppelin-$ZEPPELIN_VERSION* /usr/local/lib/
 
-echo " - symlinking /usr/local/lib/zeppelin/ to /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-bin-netinst/"
-sudo ln -s /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-bin-netinst /usr/local/lib/zeppelin
+echo " - symlinking /usr/local/lib/zeppelin/ to /usr/local/lib/zeppelin-$ZEPPELIN_VERSION/"
+sudo ln -s /usr/local/lib/zeppelin-$ZEPPELIN_VERSION* /usr/local/lib/zeppelin
 
-echo " - Installing required interpreters"
-sudo /usr/local/lib/zeppelin/bin/install-interpreter.sh --name md,shell,jdbc,python,angular,elasticsearch >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
+if [[ $FROM_COMPLETE == "1" ]]; then
 
-# ZEPPELIN 0.8.1 FIXES
-# ----------------------------------------------------------------------------------------------------------------------
+    echo " - Removing unused interpreters"
+    rm -Rf /usr/local/lib/zeppelin/interpreter/alluxio
+    rm -Rf /usr/local/lib/zeppelin/interpreter/beam
+    rm -Rf /usr/local/lib/zeppelin/interpreter/bigquery
+    rm -Rf /usr/local/lib/zeppelin/interpreter/cassandra
+    rm -Rf /usr/local/lib/zeppelin/interpreter/geode
+    rm -Rf /usr/local/lib/zeppelin/interpreter/hazelcastjet
+    rm -Rf /usr/local/lib/zeppelin/interpreter/hbase
+    rm -Rf /usr/local/lib/zeppelin/interpreter/ignite
+    rm -Rf /usr/local/lib/zeppelin/interpreter/kylin
+    rm -Rf /usr/local/lib/zeppelin/interpreter/lens
+    rm -Rf /usr/local/lib/zeppelin/interpreter/livy
+    rm -Rf /usr/local/lib/zeppelin/interpreter/neo4j
+    rm -Rf /usr/local/lib/zeppelin/interpreter/pig
+    rm -Rf /usr/local/lib/zeppelin/interpreter/sap
+    rm -Rf /usr/local/lib/zeppelin/interpreter/scalding
+    rm -Rf /usr/local/lib/zeppelin/interpreter/scio
+    rm -Rf /usr/local/lib/zeppelin/interpreter/submarine
 
-echo " - FIX - Fixing shell interpreter issue"
-sudo bash -c "cd /usr/local/lib/zeppelin/interpreter && ln -s shell sh"
+else
+    echo " - Installing required interpreters"
+    sudo /usr/local/lib/zeppelin/bin/install-interpreter.sh --name md,shell,jdbc,python,angular,elasticsearch,flink >> /tmp/zeppelin_install_log 2>&1
+    fail_if_error $? "/tmp/zeppelin_install_log" -1
+fi
 
-echo " - FIX - Replacing zeppelin commes-lang3 version 3.4 by spark's version 3.5"
-for i in `find /usr/local/lib/zeppelin/ -name *lang3*3.4*.jar`; do
-  sudo rm -f $i
-  sudo ln -s /usr/local/lib/spark/jars/commons-lang3-3.5.jar $i
-done
-
-echo " - FIX - Replacing zeppelin commes-lang3 version 3.4 by spark's version 3.5 in spark interpreter archive"
-
-rm -Rf /tmp/working_zeppeling_fix
-mkdir /tmp/working_zeppelin_fix
-cd /tmp/working_zeppelin_fix/
-
-echo "   + copying spark interpreter"
-cp /usr/local/lib/zeppelin/interpreter/spark/spark-interpreter-0.8.1.jar . >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-echo "   + extracting spark interpreter"
-unzip spark-interpreter-0.8.1.jar  >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-rm -Rf spark-interpreter-0.8.1.jar
-
-echo "   + copying spark commons-lang3"
-cp /usr/local/lib/spark/jars/commons-lang3-3.5.jar . >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-echo "   + extracting spark commons-lang3"
-unzip -o commons-lang3-3.5.jar >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-rm commons-lang3-3.5.jar
-
-echo "   + recomposing archive"
-zip -r spark-interpreter-0.8.1.jar . >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-echo "   + deleting former spark interpreter"
-sudo rm -f /usr/local/lib/zeppelin/interpreter/spark/spark-interpreter-0.8.1.jar >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-echo "   + overwriting archive"
-mv spark-interpreter-0.8.1.jar /usr/local/lib/zeppelin/interpreter/spark/spark-interpreter-0.8.1.jar >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
-
-echo "   + cleanup"
-cd /tmp/zeppelin_setup/
-rm -Rf /tmp/working_zeppeling_fix
+# # ZEPPELIN 0.8.1 FIXES (keeping it for now for 0.8.2)
+# # ----------------------------------------------------------------------------------------------------------------------
+#
+# echo " - FIX - Fixing shell interpreter issue"
+# sudo bash -c "cd /usr/local/lib/zeppelin/interpreter && ln -s shell sh"
+#
+# echo " - FIX - Replacing zeppelin commes-lang3 version 3.4 by spark's version 3.5"
+# for i in `find /usr/local/lib/zeppelin/ -name *lang3*3.4*.jar`; do
+#   sudo rm -f $i
+#   sudo ln -s /usr/local/lib/spark/jars/commons-lang3-3.5.jar $i
+# done
+#
+# echo " - FIX - Replacing zeppelin commes-lang3 version 3.4 by spark's version 3.5 in spark interpreter archive"
+#
+# rm -Rf /tmp/working_zeppeling_fix
+# mkdir /tmp/working_zeppelin_fix
+# cd /tmp/working_zeppelin_fix/
+#
+# echo "   + copying spark interpreter"
+# cp /usr/local/lib/zeppelin/interpreter/spark/spark-interpreter-$ZEPPELIN_VERSION.jar . >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# echo "   + extracting spark interpreter"
+# unzip spark-interpreter-$ZEPPELIN_VERSION.jar  >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# rm -Rf spark-interpreter-$ZEPPELIN_VERSION.jar
+#
+# echo "   + copying spark commons-lang3"
+# cp /usr/local/lib/spark/jars/commons-lang3-3.5.jar . >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# echo "   + extracting spark commons-lang3"
+# unzip -o commons-lang3-3.5.jar >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# rm commons-lang3-3.5.jar
+#
+# echo "   + recomposing archive"
+# zip -r spark-interpreter-$ZEPPELIN_VERSION.jar . >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# echo "   + deleting former spark interpreter"
+# sudo rm -f /usr/local/lib/zeppelin/interpreter/spark/spark-interpreter-$ZEPPELIN_VERSION.jar >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# echo "   + overwriting archive"
+# mv spark-interpreter-$ZEPPELIN_VERSION.jar /usr/local/lib/zeppelin/interpreter/spark/spark-interpreter-$ZEPPELIN_VERSION.jar >> /tmp/zeppelin_install_log 2>&1
+# fail_if_error $? "/tmp/zeppelin_install_log" -1
+#
+# echo "   + cleanup"
+# cd /tmp/zeppelin_setup/
+# rm -Rf /tmp/working_zeppeling_fix
 
 # ----------------------------------------------------------------------------------------------------------------------
 # END OF ZEPPELIN 0.8.1 FIXES
@@ -153,7 +179,7 @@ echo " - Starting Zeppelin"
 export ZEPPELIN_PROC_ID=$!
 
 echo " - Checking Zeppelin startup"
-sleep 10
+sleep 30
 if [[ `ps -e | grep $ZEPPELIN_PROC_ID` == "" ]]; then
     echo " !! Failed to start Zeppelin !!"
     exit -8
@@ -163,10 +189,16 @@ echo " - Stopping Zeppelin"
 kill -15 $ZEPPELIN_PROC_ID
 export ZEPPELIN_PROC_ID=-1
 
+sleep 6
+
 returned_to_saved_dir
 sudo rm -Rf /tmp/zeppelin_setup/
 
 
+if [[ ! -f /usr/local/lib/zeppelin/conf/interpreter.json ]]; then
+   echo "PROBLEM : interpreter.json was not created !"
+   exit -50
+fi
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

@@ -39,12 +39,17 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
+SELF_IP_ADDRESS=$1
+if [[ SELF_IP_ADDRESS == "" ]]; then
+    echo " - Didn't get Self IP Address as argument"
+    exit -2
+fi
 
 echo "-- SETTING UP ZEPPELIN  ------------------------------------------------------"
 
 echo " - Changing owner of important folders"
 chown -R spark /usr/local/lib/zeppelin/conf/
-chown -R spark /usr/local/lib/zeppelin/webapps/
+#chown -R spark /usr/local/lib/zeppelin/webapps/
 chown -R spark /usr/local/lib/zeppelin/interpreter/
 chown spark /usr/local/lib/zeppelin/
 
@@ -59,6 +64,10 @@ cd $saved_dir
 echo " - Creating Zeppelin env file"
 cp /usr/local/lib/zeppelin/conf/zeppelin-env.sh.template /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
+sudo sed -i s/"# export ZEPPELIN_PORT"/"export ZEPPELIN_PORT=38080"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+sudo sed -i s/"# export ZEPPELIN_ADDR"/"export ZEPPELIN_ADDR=0.0.0.0"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+
+
 sudo sed -i s/"# export ZEPPELIN_LOG_DIR"/"export ZEPPELIN_LOG_DIR=\/var\/log\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 sudo sed -i s/"# export ZEPPELIN_PID_DIR"/"export ZEPPELIN_PID_DIR=\/var\/run\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 sudo sed -i s/"# export ZEPPELIN_NOTEBOOK_DIR"/"export ZEPPELIN_NOTEBOOK_DIR=\/var\/lib\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
@@ -67,10 +76,17 @@ sudo sed -i s/"# export ZEPPELIN_IDENT_STRING"/"export ZEPPELIN_IDENT_STRING=esk
 
 sudo sed -i s/"# export SPARK_HOME"/"export SPARK_HOME=\/usr\/local\/lib\/spark\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
+sudo bash -c 'echo -e "\n\nexport FLINK_HOME=/usr/local/lib/flink/" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
+
+
+
 echo " - Creating Zeppelin site file"
 cp /usr/local/lib/zeppelin/conf/zeppelin-site.xml.template /usr/local/lib/zeppelin/conf/zeppelin-site.xml
 
 sudo sed -i s/"<value>8080<\/value>"/"<value>38080<\/value>"/g /usr/local/lib/zeppelin/conf/zeppelin-site.xml
+
+sudo sed -i s/"<value>127.0.0.1<\/value>"/"<value>0.0.0.0<\/value>"/g /usr/local/lib/zeppelin/conf/zeppelin-site.xml
+
 
 echo " - Disabling same policy enforcement"
 sudo sed -i s/"<\/configuration>"/""/g /usr/local/lib/zeppelin/conf/zeppelin-site.xml
@@ -111,10 +127,42 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"9200\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+
+echo " - Configuring Flink interpreter"
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"flink.execution.remote.port\",\n'\
+'          \"value\": \"\",'\
+'/'\
+'          \"name\": \"flink.execution.remote.port\",\n'\
+'          \"value\": \"8081\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"flink.execution.mode\",\n'\
+'          \"value\": \"local\",'\
+'/'\
+'          \"name\": \"flink.execution.mode\",\n'\
+'          \"value\": \"remote\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'      \"group\": \"flink\",\n'\
+'      \"properties\": {\n'\
+'/'\
+'      \"group\": \"flink\",\n'\
+'      \"properties\": {\n'\
+'        \"FLINK_HOME\": {\n'\
+'          \"value\": \"\/usr\/local\/lib\/flink\/\",\n'\
+'          \"type\": \"string\"\n'\
+'        },\n'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+
 echo " - Enabling spark to change configuration at runtime"
 chown -R spark. "/usr/local/lib/zeppelin/conf/"
 
-
+#chown -R spark. "/usr/local/lib/zeppelin/local-repo/helium-registry-cache/"
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

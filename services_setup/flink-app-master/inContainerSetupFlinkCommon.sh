@@ -125,6 +125,9 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.type: docker\"  >>
 sudo bash -c "echo -e \"\n# specifying image name \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.image.name: eskimo:flink-worker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
+sudo bash -c "echo -e \"\n# specifying FLINK_HOME (workaround for https://github.com/mesosphere/dcos-flink-service/issues/54) \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.bootstrap-cmd: export FLINK_HOME=/usr/local/lib/flink/\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
 sudo bash -c "echo -e \"\n# A comma separated list of [host_path:]container_path[:RO|RW]. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"# This allows for mounting additional volumes into your container.. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/lib/flink/data:/var/lib/flink/data:RW,/var/lib/flink/completed_jobs:/var/lib/flink/completed_jobs:RW\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
