@@ -513,7 +513,7 @@
         "propertyType": "variable",
         "propertyFormat": "{name}: {value}",
         "commentPrefix": "#",
-        "filesystemService": "flink-app-master",
+        "filesystemService": "flink",
         "properties": [
           {
             "name": "jobmanager.heap.size",
@@ -539,6 +539,11 @@
             "name": "mesos.resourcemanager.tasks.mem",
             "comment": "Memory to assign to the Mesos workers in MB. Default value : 1024.",
             "defaultValue": "1024"
+          },
+          {
+            "name": "taskmanager.numberOfTaskSlots",
+            "comment": "The number of parallel operator or user function instances that a single TaskManager can run. Default value : 1.",
+            "defaultValue": "1"
           }
         ]
       }

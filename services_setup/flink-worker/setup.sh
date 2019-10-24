@@ -105,7 +105,7 @@ if [[ `tail -n 1 /tmp/flink_worker_install_log` != " - In container config SUCCE
 fi
 
 echo " - Configuring flink-worker container"
-docker exec flink-worker bash /scripts/inContainerSetupFlinkWorker.sh | tee -a /tmp/flink_worker_install_log 2>&1
+docker exec flink-worker bash /scripts/inContainerSetupFlinkWorker.sh  $SELF_IP_ADDRESS | tee -a /tmp/flink_worker_install_log 2>&1
 if [[ `tail -n 1 /tmp/flink_worker_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/flink_worker_install_log

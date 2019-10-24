@@ -38,7 +38,7 @@ set -e
 
 # silent
 #echo " - Loading Topology"
-. /etc/eskimo_topology.sh
+. /host_etc/eskimo_topology.sh
 
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
@@ -46,4 +46,8 @@ if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     exit -2
 fi
 
-# TODO
+
+# The external address of the host on which the JobManager runs and can be
+# reached by the TaskManagers and any clients which want to connect
+sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $MASTER_FLINK_APP_MASTER_1"/g /usr/local/lib/flink/conf/flink-conf.yaml
+

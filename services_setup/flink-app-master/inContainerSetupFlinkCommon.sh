@@ -46,7 +46,7 @@ if [[ $FLINK_USER_ID == "" ]]; then
 fi
 
 SELF_IP_ADDRESS=$2
-if [[ SELF_IP_ADDRESS == "" ]]; then
+if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - Didn't get Self IP Address as argument"
     exit -2
 fi
@@ -80,14 +80,6 @@ sudo rm -Rf /usr/local/lib/flink/log
 sudo ln -s /var/log/flink/log /usr/local/lib/flink/log
 
 
-
-# TODO find out which is to add and which is to replace (see file on desktop)
-
-
-# The external address of the host on which the JobManager runs and can be
-# reached by the TaskManagers and any clients which want to connect
-sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
 # The default directory used for storing the data files and meta data of checkpoints in a Flink supported
 # filesystem.
 # The storage path must be accessible from all participating processes/nodes(i.e. all TaskManagers and JobManagers).
@@ -106,7 +98,6 @@ sed -i s/"#jobmanager.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"jobmanager.a
 # Comma separated list of directories to monitor for completed jobs.
 sed -i s/"#historyserver.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"historyserver.archive.fs.dir: file:\/\/\/var\/lib\/flink\/completed_jobs\/"/g \
         /usr/local/lib/flink/conf/flink-conf.yaml
-
 # uncomment
 sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
@@ -130,13 +121,32 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.bootstrap-cmd: export FLINK_
 
 sudo bash -c "echo -e \"\n# A comma separated list of [host_path:]container_path[:RO|RW]. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"# This allows for mounting additional volumes into your container.. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/lib/flink/data:/var/lib/flink/data:RW,/var/lib/flink/completed_jobs:/var/lib/flink/completed_jobs:RW\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/flink:/var/log/flink:RW,/var/lib/flink:/var/lib/flink:RW,/etc:/host_etc:RO\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 sudo bash -c "echo -e \"\n# CPUs to assign to the Mesos workers. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.cpus: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 sudo bash -c "echo -e \"\n# Memory to assign to the Mesos workers in MB. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.mem: 1024\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+
+# FIXME temporary debug logs
+sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
+        /usr/local/lib/flink/conf/log4j.properties
+
+# temporary legacy mode
+#sudo bash -c "echo -e \"\n\n\n# TREMPORARY ENABLING LEGACY MODE\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"mode: legacy\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+# FIXME temporary increasing timeotu to workaround
+# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af
+# https://issues.apache.org/jira/browse/FLINK-14074
+
+sudo bash -c "echo -e \"\n# FIXME emporary increasing timeotu to workaround \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"\n# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"\n# https://issues.apache.org/jira/browse/FLINK-14074 \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
 
 
 echo " - Enabling flink to change configuration at runtime"

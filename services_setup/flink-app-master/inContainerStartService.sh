@@ -46,4 +46,47 @@ echo " - Inject settings"
 export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
 
 echo " - Starting service"
-/usr/local/lib/flink/bin/mesos-appmaster.sh
+/usr/local/lib/flink/bin/mesos-appmaster.sh &
+export APP_MASTER_PROC_ID=$!
+
+echo " - TEMPORARY HACK : monitoring task kill problem (FLINK-13241)"
+while [[ 1 ]]; do
+
+    sleep 30
+
+    # List frameworks
+    for i in `curl -XGET http://$MASTER_MESOS_MASTER_1:5050/master/frameworks 2>/dev/null | jq -r  ".frameworks | .[] | select (.name==\"Flink\") | .id"`; do
+
+        # Find active frameworks
+        ACTIVE=`curl -XGET http://$MASTER_MESOS_MASTER_1:5050/master/frameworks?framework_id=$i 2>/dev/null | jq -r " .frameworks | .[] | .active"`
+        if [[ $ACTIVE == "true" ]] ; then
+
+            echo " - Found active framework : $i"
+
+            # List framework tasks states
+            KILLED_FOUND="0"
+            for j in `curl -XGET http://$MASTER_MESOS_MASTER_1:5050/master/tasks?framework_id=$i 2>/dev/null | jq -r " .tasks | .[] |  .state"`; do
+                if [[ $j == "TASK_KILLED" ]]; then
+                    KILLED_FOUND="1"
+                fi
+            done
+
+            # If killed task is found, restart FLink app master
+            if [[ $KILLED_FOUND == "1" ]]; then
+                echo " - Killed task is found in framework $i, restarting App master"
+
+                echo " - Killing Mesos framework"
+                curl -XPOST http://$MASTER_MESOS_MASTER_1:5050/master/teardown -d "frameworkId=$i" 2>/dev/null
+
+                echo " - Flink App master"
+                kill -15 $APP_MASTER_PROC_ID
+                sleep 5
+
+                echo " - RE-Starting service"
+                /usr/local/lib/flink/bin/mesos-appmaster.sh &
+                export APP_MASTER_PROC_ID=$!
+            fi
+        fi
+    done
+done
+

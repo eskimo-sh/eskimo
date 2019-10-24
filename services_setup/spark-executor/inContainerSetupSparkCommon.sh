@@ -46,7 +46,7 @@ if [[ $SPARK_USER_ID == "" ]]; then
 fi
 
 SELF_IP_ADDRESS=$2
-if [[ SELF_IP_ADDRESS == "" ]]; then
+if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - Didn't get Self IP Address as argument"
     exit -2
 fi

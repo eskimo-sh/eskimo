@@ -40,7 +40,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 SELF_IP_ADDRESS=$1
-if [[ SELF_IP_ADDRESS == "" ]]; then
+if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - Didn't get Self IP Address as argument"
     exit -2
 fi

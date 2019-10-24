@@ -40,6 +40,13 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
+SELF_IP_ADDRESS=$1
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - Didn't get Self IP Address as argument"
+    exit -2
+fi
+
+
 echo " - Symlinking some RHEL mesos dependencies "
 saved_dir=`pwd`
 cd /usr/lib/x86_64-linux-gnu/
@@ -47,6 +54,12 @@ sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
 sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
 sudo ln -s libsasl2.so.2 libsasl2.so.3
 cd $saved_dir
+
+
+
+# The external address of the host on which the JobManager runs and can be
+# reached by the TaskManagers and any clients which want to connect
+sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

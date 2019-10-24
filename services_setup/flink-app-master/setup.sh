@@ -107,7 +107,7 @@ if [[ `tail -n 1 /tmp/flink_install_log` != " - In container config SUCCESS" ]];
 fi
 
 echo " - Configuring flink App Master container"
-docker exec flink-app-master bash /scripts/inContainerSetupFlinkAppMaster.sh | tee -a /tmp/flink_install_log 2>&1
+docker exec flink-app-master bash /scripts/inContainerSetupFlinkAppMaster.sh $SELF_IP_ADDRESS | tee -a /tmp/flink_install_log 2>&1
 if [[ `tail -n 1 /tmp/flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/flink_install_log
