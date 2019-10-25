@@ -39,9 +39,13 @@ Wants=network.target
 
 [Service]
 ExecStart=/usr/local/sbin/mesos-init-wrapper.sh slave
-KillMode=process
+KillMode=mixed
+
 Restart=always
-RestartSec=20
+RestartSec=40
+StartLimitBurst=3
+StartLimitInterval=30
+
 LimitNOFILE=16384
 CPUAccounting=true
 MemoryAccounting=true

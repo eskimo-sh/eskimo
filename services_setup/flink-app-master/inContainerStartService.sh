@@ -49,7 +49,7 @@ echo " - Starting service"
 /usr/local/lib/flink/bin/mesos-appmaster.sh &
 export APP_MASTER_PROC_ID=$!
 
-echo " - TEMPORARY HACK : monitoring task kill problem (FLINK-13241)"
+echo " - TEMPORARY HACK : monitoring task kill problem (FLINK-14074)"
 while [[ 1 ]]; do
 
     sleep 30

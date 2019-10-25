@@ -121,20 +121,37 @@ if [[ ! -f /usr/local/etc/mesos ]]; then
     sudo ln -s /usr/local/lib/mesos/etc/mesos /usr/local/etc/mesos
 fi
 
+set -e
 echo " - Simlinking mesos binaries to /usr/local/bin"
 for i in `ls -1 /usr/local/lib/mesos/bin`; do
     if [[ ! -f /usr/local/bin/$i ]]; then
-	    sudo ln -s /usr/local/lib/mesos/bin/$i /usr/local/bin/$i
+        cat > /tmp/tmp_$i <<- "EOF"
+#!/bin/bash
+export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/:/usr/local/lib/mesos/lib/python2.7/site-packages/
+/usr/local/lib/mesos/bin/__command__ "$@"
+EOF
+        sudo mv /tmp/tmp_$i /usr/local/bin/$i
+        sudo sed -i s/"__command__"/"$i"/g /usr/local/bin/$i
+        sudo chown root. /usr/local/bin/$i
+	    sudo chmod 755 /usr/local/bin/$i
 	fi
 done
 
 echo " - Simlinking mesos system binaries to /usr/local/sbin"
 for i in `ls -1 /usr/local/lib/mesos/sbin`; do
     if [[ ! -f /usr/local/sbin/$i ]]; then
-	    sudo ln -s /usr/local/lib/mesos/sbin/$i /usr/local/sbin/$i
+        cat > /tmp/tmp_$i <<- "EOF"
+#!/bin/bash
+export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/:/usr/local/lib/mesos/lib/python2.7/site-packages/
+/usr/local/lib/mesos/sbin/__command__ "$@"
+EOF
+        sudo mv /tmp/tmp_$i /usr/local/sbin/$i
+        sudo sed -i s/"__command__"/"$i"/g /usr/local/sbin/$i
+        sudo chown root. /usr/local/sbin/$i
+	    sudo chmod 755 /usr/local/sbin/$i
 	fi
 done
-
+set +e
 
 # installation tests
 
