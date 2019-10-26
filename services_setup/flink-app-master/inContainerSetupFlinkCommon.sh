@@ -129,6 +129,9 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.cpus: 1\"  >> /usr/local/lib
 sudo bash -c "echo -e \"\n# Memory to assign to the Mesos workers in MB. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.mem: 1024\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
+#sudo bash -c "echo -e \"\n#  The amount of memory (in megabytes) that the task manager reserves on-heap or off-heap (in MB). \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"taskmanager.memory.size: 800\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
 
 # FIXME temporary debug logs
 sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
@@ -142,7 +145,7 @@ sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
 # https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af
 # https://issues.apache.org/jira/browse/FLINK-14074
 
-sudo bash -c "echo -e \"\n# FIXME emporary increasing timeotu to workaround \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"\n# FIXME emporary increasing timeout to workaround \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"\n# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"\n# https://issues.apache.org/jira/browse/FLINK-14074 \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"

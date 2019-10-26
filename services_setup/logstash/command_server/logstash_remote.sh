@@ -34,47 +34,9 @@
 # Software.
 #
 
-# extract path arguments and create volume mount command part
-export DOCKER_VOLUMES_ARGS=""
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "-f" || $argument == "--path.config" || $argument == "-l" || $argument == "--path.data" || $argument == "--path.logs" || $argument == "--path.settings" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+while (true); do
+    /usr/bin/python $SCRIPT_DIR/logstash_remote.py | tee /var/log/logstash/logstash_remote.log
+    sleep 5
 done
-
-# Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/logstash:/var/lib/logstash:shared $DOCKER_VOLUMES_ARGS"
-fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/log/logstash:/var/log/logstash:shared $DOCKER_VOLUMES_ARGS"
-fi
-
-
-#echo $DOCKER_VOLUMES_ARGS
-
-# Don't pass -t or docker won't let us pipe input
-/usr/bin/docker run \
-        -i \
-        --rm \
-        --network host \
-        --user elasticsearch \
-        $DOCKER_VOLUMES_ARGS \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:logstash \
-        /usr/local/bin/logstash "$@"

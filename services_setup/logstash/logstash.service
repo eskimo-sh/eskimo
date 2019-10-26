@@ -40,10 +40,32 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-TimeoutStartSec=0
+TimeoutStartSec=180sec
 RemainAfterExit=false
 
-ExecStart=/bin/bash -c 'while [[ 1 ]]; do sleep 5 ; if [[ `docker image ls -a | grep eskimo | grep logstash ` == "" ]]; then echo "BAD"; exit; fi; done'
+# Run ExecStartPre with root-permissions
+PermissionsStartOnly=true
+
+ExecStartPre=-/usr/bin/docker kill logstash
+ExecStartPre=-/usr/bin/docker rm -f logstash
+
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupLogstashGlusterShares.sh
+
+ExecStart=/bin/bash -c "/usr/bin/docker run \
+        -i \
+        --name logstash \
+        --network host \
+        --user elasticsearch \
+        -v /var/lib/logstash:/var/lib/logstash \
+        -v /var/log/logstash:/var/log/logstash \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        -e NODE_NAME=$HOSTNAME \
+        eskimo:logstash \
+        /usr/local/sbin/inContainerStartService.sh"
+
+ExecStop=/usr/bin/docker stop logstash
 
 Type=simple
 

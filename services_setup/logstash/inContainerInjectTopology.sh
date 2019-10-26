@@ -34,47 +34,16 @@
 # Software.
 #
 
-# extract path arguments and create volume mount command part
-export DOCKER_VOLUMES_ARGS=""
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "-f" || $argument == "--path.config" || $argument == "-l" || $argument == "--path.data" || $argument == "--path.logs" || $argument == "--path.settings" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
-done
+set -e
 
-# Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/logstash:/var/lib/logstash:shared $DOCKER_VOLUMES_ARGS"
-fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/log/logstash:/var/log/logstash:shared $DOCKER_VOLUMES_ARGS"
+echo " - Loading Topology"
+. /etc/eskimo_topology.sh
+
+# Here topology just defines the variable $ELASTICSEARCH_MASTER before starting the command server
+export ELASTICSEARCH_MASTER=`eval echo "\$"$(echo SELF_MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
+if [[ $ELASTICSEARCH_MASTER == "" ]]; then
+    echo " - No ES master found in topology for $SELF_IP_ADDRESS"
+    exit -3
 fi
 
 
-#echo $DOCKER_VOLUMES_ARGS
-
-# Don't pass -t or docker won't let us pipe input
-/usr/bin/docker run \
-        -i \
-        --rm \
-        --network host \
-        --user elasticsearch \
-        $DOCKER_VOLUMES_ARGS \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:logstash \
-        /usr/local/bin/logstash "$@"

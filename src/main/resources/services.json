@@ -483,7 +483,7 @@
     },
     "ui": {
       "proxyTargetPort" : 8081,
-      "waitTime": 15000,
+      "waitTime": 20000,
       "title" : "Flink App Master",
       "icon" : "images/flink-app-master-icon.png"
     },

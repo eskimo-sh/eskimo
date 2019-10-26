@@ -34,47 +34,59 @@
 # Software.
 #
 
-# extract path arguments and create volume mount command part
-export DOCKER_VOLUMES_ARGS=""
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "-f" || $argument == "--path.config" || $argument == "-l" || $argument == "--path.data" || $argument == "--path.logs" || $argument == "--path.settings" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
-done
 
-# Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/logstash:/var/lib/logstash:shared $DOCKER_VOLUMES_ARGS"
+
+# Loading topology
+if [[ ! -f /etc/eskimo_topology.sh ]]; then
+    echo "  - ERROR : no topology file defined !"
+    exit -123
 fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/log/logstash:/var/log/logstash:shared $DOCKER_VOLUMES_ARGS"
+
+. /etc/eskimo_topology.sh
+
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit -1
+fi
+
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit -2
 fi
 
 
-#echo $DOCKER_VOLUMES_ARGS
+# find out if gluster is available
+if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
+    export GLUSTER_AVAILABLE=1
+else
+    export GLUSTER_AVAILABLE=0
+fi
 
-# Don't pass -t or docker won't let us pipe input
-/usr/bin/docker run \
-        -i \
-        --rm \
-        --network host \
-        --user elasticsearch \
-        $DOCKER_VOLUMES_ARGS \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:logstash \
-        /usr/local/bin/logstash "$@"
+# Only if gluster is enabled
+if [[ $GLUSTER_AVAILABLE == 1 ]]; then
+
+    echo " - Proceeding with gluster mount /var/lib/logstash/data"
+    /usr/local/sbin/gluster_mount.sh logstash_data /var/lib/logstash/data elasticsearch `/usr/bin/id -u elasticsearch`
+
+else
+
+    echo " - Not mounting gluster shares since not working in cluster mode"
+
+    if [[ ! -d /var/lib/logstash/data ]]; then
+        echo " - Creating /var/lib/logstash/data"
+        mkdir -p /var/lib/logstash/data
+    fi
+
+    if [[ `stat -c '%U' /var/lib/logstash/data` != "logstash" ]]; then
+        echo " - Changing owner if /var/lib/logstash/data"
+        chown -R elasticsearch /var/lib/logstash/data
+    fi
+
+    if [[ `ls -la /var/lib/logstash/ | grep data | grep drwxrwxrw` == "" ]]; then
+        echo " - Changing rights of /var/lib/logstash/data"
+        chmod -R 777 /var/lib/logstash/data
+    fi
+
+fi
+

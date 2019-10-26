@@ -34,47 +34,71 @@
 # Software.
 #
 
-# extract path arguments and create volume mount command part
-export DOCKER_VOLUMES_ARGS=""
+
+if [[ $@ == "" ]]; then
+    echo "Expected remote server as -target_host HOST"
+    exit -1;
+fi
+
+export REBUILD_ARGS=""
+export LOGSTASH_HOST=""
 export PROCESS_NEXT="0"
 for argument in "$@"; do
     if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "-f" || $argument == "--path.config" || $argument == "-l" || $argument == "--path.data" || $argument == "--path.logs" || $argument == "--path.settings" ]]; then
-        export PROCESS_NEXT="1"
-    else
+        LOGSTASH_HOST=$argument
         export PROCESS_NEXT="0"
+    else
+        if [[ $argument == "-target_host" || $argument == "--target_host" ]]; then
+            export PROCESS_NEXT="1"
+        else
+            export PROCESS_NEXT="0"
+            export REBUILD_ARGS="$REBUILD_ARGS $argument"
+        fi
     fi
 done
 
-# Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/logstash:/var/lib/logstash:shared $DOCKER_VOLUMES_ARGS"
-fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/logstash` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/log/logstash:/var/log/logstash:shared $DOCKER_VOLUMES_ARGS"
+if [[ $LOGSTASH_HOST == "" ]]; then
+    echo "Mandatory argument -target_host HOST is missing"
+    exit -2
 fi
 
+echo "--------------------------------------------------------------------------------"
+echo "This is a client command to a remote logstash running in a docker container."
+echo "This is not the actual logstash command"
+echo "CAUTION : ONLY /var/lib/logstash/data IS SHARED BETWEEN HOST AND CONTAINERS"
+echo "          -> data needs to be put in this folder"
+echo "Arguments will be passed to a call to logstash in the logstash container."
+echo " - Target host : $LOGSTASH_HOST"
+echo " - Arguments   : $REBUILD_ARGS"
+echo "--------------------------------------------------------------------------------"
 
-#echo $DOCKER_VOLUMES_ARGS
 
-# Don't pass -t or docker won't let us pipe input
-/usr/bin/docker run \
-        -i \
-        --rm \
-        --network host \
-        --user elasticsearch \
-        $DOCKER_VOLUMES_ARGS \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:logstash \
-        /usr/local/bin/logstash "$@"
+#echo $LOGSTASH_HOST
+#echo $REBUILD_ARGS
+
+rm -f /tmp/call_result.log
+rm -f /tmp/call_out.log
+rm -f /tmp/call_error.log
+
+curl -w "HTTP_CODE=%{http_code}" -XPOST  "http://$LOGSTASH_HOST:28999/" -d "$REBUILD_ARGS" \
+    -o /tmp/call_result.log \
+    >/tmp/call_out.log \
+    2>/tmp/call_error.log
+
+
+
+#cat /tmp/call_out.log | grep -v HTTP_CODE
+
+eval `cat /tmp/call_out.log | grep HTTP_CODE`
+if [[ $HTTP_CODE != "200" ]]; then
+    echo "!! logstash command server called failed !!"
+    echo "--------------------------------------------------------------------------------"
+    cat /tmp/call_error.log
+    cat /tmp/call_result.log
+    exit -1
+else
+    echo "- logstash command server called suceeded. Result displayed hereunder."
+    echo "--------------------------------------------------------------------------------"
+    cat /tmp/call_result.log
+    exit 0
+fi

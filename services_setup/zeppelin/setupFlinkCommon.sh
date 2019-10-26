@@ -1,0 +1,1 @@
+../flink-app-master/setupCommon.sh

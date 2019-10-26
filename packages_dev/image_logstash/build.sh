@@ -52,6 +52,18 @@ echo " - Installing the latest OpenJDK"
 docker exec -i logstash sudo apt-get install -y openjdk-8-jdk >> /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -2
 
+echo " - Installing ZIP"
+docker exec -i logstash apt-get install -y zip >> /tmp/logstash_build_log 2>&1
+fail_if_error $? "/tmp/logstash_build_log" -11
+
+echo " - Installing python"
+docker exec -i logstash sudo apt-get -y install  python-dev python-six python-virtualenv python-pip cython >> /tmp/logstash_build_log 2>&1
+fail_if_error $? "/tmp/logstash_build_log" -5
+
+echo " - Installing required python packages"
+docker exec -i logstash pip install filelock furl >> /tmp/logstash_build_log 2>&1
+fail_if_error $? "/tmp/logstash_build_log" -12
+
 echo " - Installing logstash"
 docker exec -i logstash bash /scripts/installLogstash.sh | tee -a /tmp/logstash_build_log 2>&1
 if [[ `tail -n 1 /tmp/logstash_build_log | grep " - In container install SUCCESS"` == "" ]]; then

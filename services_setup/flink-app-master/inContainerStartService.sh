@@ -46,10 +46,12 @@ echo " - Inject settings"
 export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
 
 echo " - Starting service"
+#/usr/local/lib/flink/bin/mesos-appmaster.sh
+
+echo " - TEMPORARY HACK : monitoring task kill problem (FLINK-14074)"
 /usr/local/lib/flink/bin/mesos-appmaster.sh &
 export APP_MASTER_PROC_ID=$!
 
-echo " - TEMPORARY HACK : monitoring task kill problem (FLINK-14074)"
 while [[ 1 ]]; do
 
     sleep 30

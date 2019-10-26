@@ -1072,7 +1072,8 @@ public class SystemService {
         exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
 
         try {
-            exec(ipAddress, sb, "docker image rm eskimo:" + imageName + "_template");
+            sb.append(" - Deleting docker template image");
+            exec(ipAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
         } catch (SSHCommandException e) {
             logger.error (e, e);
             sb.append (e.getMessage());

@@ -164,5 +164,8 @@ chown -R spark. "/usr/local/lib/zeppelin/conf/"
 
 #chown -R spark. "/usr/local/lib/zeppelin/local-repo/helium-registry-cache/"
 
+echo " - HACK to enable spark to change flink config as well"
+chmod -R 777 "/usr/local/lib/flink/conf/"
+
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

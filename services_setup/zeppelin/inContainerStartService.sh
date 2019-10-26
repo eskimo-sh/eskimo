@@ -36,8 +36,11 @@
 
 set -e
 
-echo " - Injecting topology"
-. /usr/local/sbin/inContainerInjectTopology.sh
+echo " - Injecting topology (Spark)"
+. /usr/local/sbin/inContainerInjectTopologySpark.sh
+
+echo " - Injecting topology (Flink)"
+. /usr/local/sbin/inContainerInjectTopologyFlink.sh
 
 echo " - Injecting topology (Zeppelin)"
 . /usr/local/sbin/inContainerInjectTopologyZeppelin.sh
@@ -48,6 +51,8 @@ echo " - Inject settings (Zeppelin)"
 echo " - Inject settings (spark-executor)"
 /usr/local/sbin/settingsInjector.sh spark-executor
 
+echo " - Inject settings (flink-app-master)"
+/usr/local/sbin/settingsInjector.sh flink-app-master
 
 echo " - Starting service"
 bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'

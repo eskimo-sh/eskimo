@@ -86,6 +86,16 @@ fail_if_error $? "/tmp/logstash_install_log" -2
 # connect to container
 #docker exec -it logstash bash
 
+echo " - Logstash Remote Server Scripts"
+for i in `find ./command_server`; do
+    if [[ -f $SCRIPT_DIR/$i ]]; then
+        filename=`basename $i`
+        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
+        docker exec logstash chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
+        fail_if_error $? /tmp/gluster_install_log -30
+    fi
+done
+
 echo " - Configuring logstash container (common part)"
 docker exec logstash bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a /tmp/logstash_install_log 2>&1
 if [[ `tail -n 1 /tmp/logstash_install_log` != " - In container config SUCCESS" ]]; then
@@ -105,12 +115,12 @@ fi
 #echo " - TODO"
 #docker exec -it logstash TODO
 
-echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh logstash:/usr/local/sbin/settingsInjector.sh >> /tmp/logstash_install_log 2>&1
-fail_if_error $? /tmp/logstash_install_log -23
+echo " - Handling topology and setting injection"
+handle_topology_settings logstash /tmp/logstash_install_log
 
-docker exec --user root logstash bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/logstash_install_log 2>&1
-fail_if_error $? /tmp/logstash_install_log -24
+echo " - Installing setupLogstashGlusterShares.sh to /usr/local/sbin"
+sudo cp setupLogstashGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupLogstashGlusterShares.sh
 
 echo " - Committing changes to local template and exiting container logstash"
 commit_container logstash /tmp/logstash_install_log
@@ -122,6 +132,9 @@ for i in `find ./logstash_wrappers -mindepth 1`; do
     sudo chmod 755 /usr/local/bin/$filename
 done
 
+echo " - Copy logstash remote client to /usr/local/bin"
+sudo cp command_server/logstash-cli /usr/local/bin
+sudo chmod 755 /usr/local/bin/logstash-cli
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file logstash /tmp/logstash_install_log
