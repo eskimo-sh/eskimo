@@ -329,6 +329,10 @@ eskimo.SystemStatus = function() {
         $("#system-information-version").html(systemStatus.buildVersion);
 
         $("#system-information-timestamp").html(systemStatus.buildTimestamp);
+
+        $("#system-information-user").html(systemStatus.sshUsername);
+
+        $("#system-information-start-timestamp").html (systemStatus.startTimestamp);
     };
 
     this.monitoringDashboardFrameTamper = function() {

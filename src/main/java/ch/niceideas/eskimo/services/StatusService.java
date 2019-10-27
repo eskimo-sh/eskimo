@@ -40,6 +40,8 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
+import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.SCPClient;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +53,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -67,6 +72,9 @@ public class StatusService {
 
     private static final Logger logger = Logger.getLogger(StatusService.class);
 
+    @Autowired
+    private SetupService setupService;
+
     @Value("${status.monitoringDashboardID}")
     private String monitoringDashboardId = null;
 
@@ -78,6 +86,8 @@ public class StatusService {
 
     @Value("${build.timestamp}")
     private String buildTimestamp = "LATEST DEV";
+
+    private ThreadLocal<SimpleDateFormat> localDateFormatter = new ThreadLocal<>();
 
     public JSONObject getStatus() {
 
@@ -91,6 +101,34 @@ public class StatusService {
         systemStatus.setValueForPath("buildVersion", buildVersion);
 
         systemStatus.setValueForPath("buildTimestamp", buildTimestamp);
+
+        try {
+            JsonWrapper systemConfig = new JsonWrapper(setupService.loadSetupConfig());
+            systemStatus.setValueForPath("sshUsername", systemConfig.getValueForPath("ssh_username"));
+        } catch (FileException e) {
+
+            logger.error (e, e);
+            systemStatus.setValueForPath("sshUsername", "(ERROR)");
+        } catch (SetupException e) {
+
+            logger.warn (e.getMessage());
+            logger.debug (e, e);
+            systemStatus.setValueForPath("sshUsername", "(Setup incomplete)");
+        }
+
+        // Get JVM's thread system bean
+        RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+        long startTime = bean.getStartTime();
+        Date startDate = new Date(startTime);
+
+        SimpleDateFormat df = localDateFormatter.get();
+        if (df == null) {
+            df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            localDateFormatter.set(df);
+        }
+
+        systemStatus.setValueForPath("startTimestamp", df.format(startDate));
+
 
         return systemStatus.getJSONObject();
     }
