@@ -19,4 +19,4 @@ providers:
   updateIntervalSeconds: 10
   options:
     # <string, required> path to dashboard files on disk. Required
-    path: /usr/local/lib/grafana/conf/provisioning/dashboards/individual-nodes-monitoring.json
+    path: /usr/local/lib/grafana/conf/provisioning/dashboards/nodes-monitoring.json

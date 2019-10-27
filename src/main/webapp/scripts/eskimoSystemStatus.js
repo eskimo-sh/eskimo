@@ -52,6 +52,8 @@ eskimo.SystemStatus = function() {
 
     var prevHidingMessageTimeout = null;
 
+    var monitoringDashboardFrameTamperTimeout = null;
+
     this.initialize = function () {
         // Initialize HTML Div from Template
         $("#inner-content-status").load("html/eskimoSystemStatus.html", function (responseTxt, statusTxt, jqXHR) {
@@ -291,6 +293,8 @@ eskimo.SystemStatus = function() {
             $("#status-monitoring-no-dashboard").css("display", "inherit");
             $("#status-monitoring-dashboard-frame").css("display", "none");
 
+            $("#status-monitoring-dashboard-frame").attr('src', "html/emptyPage.html");
+
         }
         // render iframe with refresh period (default 30s)
         else {
@@ -314,9 +318,23 @@ eskimo.SystemStatus = function() {
             var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
             if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
                 $("#status-monitoring-dashboard-frame").attr('src', url);
+
+                setTimeout (that.monitoringDashboardFrameTamper, 5000);
+
             }
         }
 
+        // B. Inject information
+
+        $("#system-information-version").html(systemStatus.buildVersion);
+
+        $("#system-information-timestamp").html(systemStatus.buildTimestamp);
+    };
+
+    this.monitoringDashboardFrameTamper = function() {
+        // remove widgets menus from iframe DOM
+        $("#status-monitoring-dashboard-frame").contents().find(".panel-menu").remove();
+        setTimeout (that.monitoringDashboardFrameTamper, 10000);
     };
 
     this.renderNodesStatus = function (nodeServicesStatus, blocking) {

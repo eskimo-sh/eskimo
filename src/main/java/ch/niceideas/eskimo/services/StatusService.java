@@ -73,6 +73,12 @@ public class StatusService {
     @Value("${status.monitoringDashboardRefreshPeriod}")
     private String monitoringDashboardRefreshPeriod = "30s";
 
+    @Value("${build.version}")
+    private String buildVersion = "DEV-SNAPSHOT";
+
+    @Value("${build.timestamp}")
+    private String buildTimestamp = "LATEST DEV";
+
     public JSONObject getStatus() {
 
         // 0. Build returned status
@@ -81,6 +87,10 @@ public class StatusService {
         systemStatus.setValueForPath("monitoringDashboardId", monitoringDashboardId);
 
         systemStatus.setValueForPath("monitoringDashboardRefreshPeriod", monitoringDashboardRefreshPeriod);
+
+        systemStatus.setValueForPath("buildVersion", buildVersion);
+
+        systemStatus.setValueForPath("buildTimestamp", buildTimestamp);
 
         return systemStatus.getJSONObject();
     }

@@ -62,7 +62,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     @Test
     public void testAfterPropertiesSet() throws Exception {
-        assertEquals (17, def.getAllServices().size());
+        assertEquals (19, def.getAllServices().size());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesOrderedByDependencies();
 
-        assertEquals(17, orderedServices.length);
+        assertEquals(19, orderedServices.length);
 
         assertTrue (orderedServices[0].equals("zookeeper")
                 || orderedServices[0].equals("ntp")
@@ -211,7 +211,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesInOrder();
 
-        assertEquals(17, orderedServices.length);
+        assertEquals(19, orderedServices.length);
 
         assertArrayEquals(new String[] {
                 "ntp",
@@ -226,6 +226,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "kafka-manager",
                 "spark-history-server",
                 "spark-executor",
+                "flink-app-master",
+                "flink-worker",
                 "logstash",
                 "cerebro",
                 "elasticsearch",
@@ -239,10 +241,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUniqueServices();
 
-        assertEquals(9, orderedServices.length);
+        assertEquals(10, orderedServices.length);
 
         assertArrayEquals(new String[] {
                 "cerebro",
+                "flink-app-master",
                 "gdash",
                 "grafana",
                 "kafka-manager",
@@ -259,7 +262,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUIServices();
 
-        assertEquals(8, orderedServices.length);
+        assertEquals(9, orderedServices.length);
 
         assertArrayEquals(new String[] {
                 "grafana",
@@ -267,6 +270,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "mesos-master",
                 "kafka-manager",
                 "spark-history-server",
+                "flink-app-master",
                 "cerebro",
                 "kibana",
                 "zeppelin"
@@ -278,10 +282,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listMultipleServices();
 
-        assertEquals(8, orderedServices.length);
+        assertEquals(9, orderedServices.length);
 
         assertArrayEquals(new String[] {
                 "elasticsearch",
+                "flink-worker",
                 "gluster",
                 "kafka",
                 "logstash",
@@ -306,9 +311,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         }, elasticsearchDep);
 
         String[] zookeeperDep = def.getDependentServices("zookeeper").toArray(new String[0]);
-        assertEquals(8, zookeeperDep.length);
+        assertEquals(10, zookeeperDep.length);
         assertArrayEquals(new String[] {
                 "zookeeper",
+                "flink-app-master",
+                "flink-worker",
                 "kafka",
                 "kafka-manager",
                 "mesos-master",

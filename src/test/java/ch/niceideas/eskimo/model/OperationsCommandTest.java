@@ -146,17 +146,16 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
         assertEquals(13, oc.getRestarts().size());
 
-        assertEquals ("[" +
-                "elasticsearch=192.168.10.11, " +
+        assertEquals ("[elasticsearch=192.168.10.11, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "cerebro=192.168.10.11, " +
-                "mesos-master=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
                 "kibana=192.168.10.11, " +
-                "kafka-manager=192.168.10.11, " +
                 "mesos-agent=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
                 "spark-history-server=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
                 "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));

@@ -48,12 +48,26 @@ Software.
                 <div class="panel panel-default">
                     <div class="panel-heading">Eskimo System Information</div>
                     <div class="panel-body" style="height: 400px; min-height: 400px;">
-                        Eskimo version : 0.2-SNAPSHOT<br>
-                        Eskimo build date : 2019-10-25<br>
-                        Eskimo installation : 2019-10-26<br>
-                        Eskimo SSH User : Eskimo<br>
-                        Nodes Status : OK<br>
-                        Services Status : OK
+                        <table class="system-information">
+                            <tr>
+                                <td class="info-label">Eskimo version</td><td> : <span id="system-information-version"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Eskimo build timestamp</td><td> : <span id="system-information-timestamp"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Eskimo installation</td><td> : 2019-10-26</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Eskimo SSH User</td><td> : Eskimo</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Nodes Status</td><td> : OK</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Services Status</td><td> : OK</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -71,57 +85,62 @@ Software.
             </div>
         </div>
 
-        <div class="col-xs-12">
-            <div class="col-md-12">
-                <h3>Eskimo Cluster Nodes Status</h3>
-            </div>
-        </div>
-
-        <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-empty" style="visibility: hidden;">
-            <div id="nodes-status-empty-content">
-                <div class="col-lg-4 col-md-6 col-sm-8 col-xs-12">
-                    <address>(No nodes / services configured yet)</address>
-                </div>
-            </div>
-            <div class="col-md-12 btn-toolbar">
-                <div class="btn-group">
-                    <a href="javascript:eskimoMain.getNodesConfig().showNodesConfig();">Configure Nodes</a>
-                </div>
-            </div>
-        </div>
-
         <div class="col-md-12">
-            <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-carousel"
-                 style="visibility: hidden;">
-                <div id="nodes-status-carousel-content">
-                </div>
-                <div class="col-md-12 btn-toolbar">
-                    <div class="btn-group">
-                        <button id="show-table-view-btn" name="show-table-view-btn" class="btn btn-primary">
-                            Show Table View
-                        </button>
+            <div class="col-xs-12 col-md-12">
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">Eskimo Cluster Nodes Status</div>
+                    <div class="panel-body" style="padding: 15px 5px 15px 5px;">
+
+
+                    <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-empty" style="visibility: hidden;">
+                        <div id="nodes-status-empty-content">
+                            <div class="col-lg-4 col-md-6 col-sm-8 col-xs-12">
+                                <address>(No nodes / services configured yet)</address>
+                            </div>
+                        </div>
+                        <div class="col-md-12 btn-toolbar">
+                            <div class="btn-group">
+                                <a href="javascript:eskimoMain.getNodesConfig().showNodesConfig();">Configure Nodes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-carousel"
+                             style="visibility: hidden;">
+                            <div id="nodes-status-carousel-content">
+                            </div>
+                            <div class="col-md-12 btn-toolbar">
+                                <div class="btn-group">
+                                    <button id="show-table-view-btn" name="show-table-view-btn" class="btn btn-primary">
+                                        Show Table View
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-table"
+                             style="visibility: hidden;">
+                            <div class="table-responsive status-table">
+                                <table id="status-node-table" class="table table-bordered table-hover">
+                                    <thead id="status-node-table-head">
+                                    </thead>
+                                    <tbody id="status-node-table-body">
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        <div class="col-md-12 btn-toolbar">
+                            <div class="btn-group">
+                                <button id="show-machine-view-btn" name="show-machine-view-btn" class="btn btn-primary">
+                                Show Node View
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-table"
-                 style="visibility: hidden;">
-                <div class="table-responsive status-table">
-                    <table id="status-node-table" class="table table-bordered table-hover">
-                        <thead id="status-node-table-head">
-                        </thead>
-                        <tbody id="status-node-table-body">
-
-                        </tbody>
-                    </table>
-                </div>
-
-            <div class="col-md-12 btn-toolbar">
-                <div class="btn-group">
-                    <button id="show-machine-view-btn" name="show-machine-view-btn" class="btn btn-primary">
-                    Show Node View
-                    </button>
-                </div>
             </div>
         </div>
     </div>

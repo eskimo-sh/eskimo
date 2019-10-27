@@ -325,6 +325,27 @@ li.disabled a .menu-text {
     color: #EEEEEE;
 }
 
+table.system-information {
+    padding: 0;
+    cellspacing: 0;
+    margin: 0;
+    border-collapse: collapse;
+    border: 0px none;
+}
+
+table.system-information tr td {
+    padding: 0;
+    cellspacing: 0;
+    margin: 0;
+    border-collapse: collapse;
+    border: 0px none;
+}
+
+table.system-information tr td.info-label {
+    width: 150px;
+    font-weight: bold;
+}
+
 .node-status-carousel-table {
     width: 100%;
 }
@@ -355,8 +376,8 @@ li.disabled a .menu-text {
     text-align: center;
 }
 .node-status-table tr td.nodes-status-actions {
-    width: 15px;
-    min-width: 15px;
+    width: 14px;
+    min-width: 14px;
     visibility: hidden;
 }
 .node-status-table:hover tr td.nodes-status-actions {

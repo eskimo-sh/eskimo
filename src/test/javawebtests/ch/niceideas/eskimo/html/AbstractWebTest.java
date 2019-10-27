@@ -79,6 +79,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
         page.executeJavaScript("eskimoMain.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
+        page.executeJavaScript("eskimoMain.menuResize = function () {};");
 
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
 
