@@ -72,11 +72,11 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderStatusFlat() throws Exception {
+    public void testRenderNodesStatusFlat() throws Exception {
 
         page.executeJavaScript("eskimoNodesStatus.setRenderInTable(false);");
 
-        page.executeJavaScript("eskimoNodesStatus.renderStatus(" + jsonStatus + ", false)");
+        page.executeJavaScript("eskimoNodesStatus.renderNodesStatus(" + jsonStatus + ", false)");
 
         String flatString = page.executeJavaScript("$('#nodes-status-carousel-content').html()").getJavaScriptResult().toString();
 
@@ -87,11 +87,11 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderStatusTable() throws Exception {
+    public void testRenderNodesStatusTable() throws Exception {
 
         page.executeJavaScript("eskimoNodesStatus.setRenderInTable(true);");
 
-        page.executeJavaScript("eskimoNodesStatus.renderStatus(" + jsonStatus + ", false)");
+        page.executeJavaScript("eskimoNodesStatus.renderNodesStatus(" + jsonStatus + ", false)");
 
         String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 

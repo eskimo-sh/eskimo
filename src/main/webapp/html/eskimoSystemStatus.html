@@ -38,8 +38,42 @@ Software.
     <div id="nodeContainer-status">
 
         <div class="col-xs-12">
-            <div class="col-md-12" id="status-message-title">
-                <h3>Eskimo Cluster System Status</h3>
+            <div class="col-md-12">
+                <h3>Eskimo System Status</h3>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="col-xs-12 col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Eskimo System Information</div>
+                    <div class="panel-body" style="height: 400px; min-height: 400px;">
+                        Eskimo version : 0.2-SNAPSHOT<br>
+                        Eskimo build date : 2019-10-25<br>
+                        Eskimo installation : 2019-10-26<br>
+                        Eskimo SSH User : Eskimo<br>
+                        Nodes Status : OK<br>
+                        Services Status : OK
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Eskimo Cluster Wide System Monitoring</div>
+                    <div class="panel-body status-monitoring-dashboard-panel">
+                        <div id="status-monitoring-no-dashboard">
+                            (Grafana not available ot no dashboard configured)
+                        </div>
+                        <iframe id="status-monitoring-dashboard-frame" src="html/emptyPage.html" style="display: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="col-md-12">
+                <h3>Eskimo Cluster Nodes Status</h3>
             </div>
         </div>
 
@@ -56,36 +90,41 @@ Software.
             </div>
         </div>
 
-        <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-carousel" style="visibility: hidden;">
-            <div id="nodes-status-carousel-content">
+        <div class="col-md-12">
+            <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-carousel"
+                 style="visibility: hidden;">
+                <div id="nodes-status-carousel-content">
+                </div>
+                <div class="col-md-12 btn-toolbar">
+                    <div class="btn-group">
+                        <button id="show-table-view-btn" name="show-table-view-btn" class="btn btn-primary">
+                            Show Table View
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-table"
+                 style="visibility: hidden;">
+                <div class="table-responsive status-table">
+                    <table id="status-node-table" class="table table-bordered table-hover">
+                        <thead id="status-node-table-head">
+                        </thead>
+                        <tbody id="status-node-table-body">
+
+                        </tbody>
+                    </table>
+                </div>
+
             <div class="col-md-12 btn-toolbar">
                 <div class="btn-group">
-                    <button id="show-table-view-btn" name="show-table-view-btn" class="btn btn-primary">
-                        Show Table View
+                    <button id="show-machine-view-btn" name="show-machine-view-btn" class="btn btn-primary">
+                    Show Node View
                     </button>
                 </div>
             </div>
         </div>
-
-        <div class="col-xs-12 col-md-12 status-render-options" id="status-node-container-table" style="visibility: hidden;">
-            <div class="table-responsive status-table" >
-            <table id="status-node-table" class="table table-bordered table-hover">
-            <thead id="status-node-table-head">
-            </thead>
-            <tbody id="status-node-table-body">
-
-            </tbody>
-            </table>
-        </div>
-        <div class="col-md-12 btn-toolbar">
-        <div class="btn-group">
-            <button id="show-machine-view-btn" name="show-machine-view-btn" class="btn btn-primary">
-            Show Node View
-            </button>
-        </div>
     </div>
-</div>
 </div>
 
 <div class="col-xs-12 col-md-12" id="service-status-warning" style="visibility: hidden; display: none;">

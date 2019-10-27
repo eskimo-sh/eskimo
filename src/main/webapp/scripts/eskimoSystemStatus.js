@@ -46,7 +46,7 @@ eskimo.SystemStatus = function() {
     var STATUS_SERVICES = [];
     var SERVICES_STATUS_CONFIG = {};
 
-    var renderInTable = false;
+    var renderInTable = true;
 
     var statusUpdateTimeoutHandler = null;
 
@@ -267,7 +267,59 @@ eskimo.SystemStatus = function() {
     }
     this.reinstallService = reinstallService;
 
-    this.renderStatus = function (servicesConfig, blocking) {
+    this.handleSystemStatus = function (nodeServicesStatus, systemStatus, blocking) {
+
+        // A. Handle Grafana Dashboard ID display
+
+        // A.1 Find out if grafana is available
+        var grafanaAvailable = false;
+        for (key in nodeServicesStatus) {
+            if (key.indexOf("service_grafana_") > -1) {
+                var grafanaStatus = nodeServicesStatus[key];
+                if (grafanaStatus == "OK") {
+                    grafanaAvailable = true;
+                }
+            }
+        }
+
+        var monitoringDashboardId = systemStatus.monitoringDashboardId;
+        var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
+
+        // no dashboard configured
+        if (!grafanaAvailable || monitoringDashboardId == null || monitoringDashboardId == "" || monitoringDashboardId == "null") {
+
+            $("#status-monitoring-no-dashboard").css("display", "inherit");
+            $("#status-monitoring-dashboard-frame").css("display", "none");
+
+        }
+        // render iframe with refresh period (default 30s)
+        else {
+
+            var forceRefresh = false;
+            if ($("#status-monitoring-dashboard-frame").css("display") == "none") {
+
+
+                setTimeout (function() {
+                    $("#status-monitoring-dashboard-frame").css("display", "inherit");
+                    $("#status-monitoring-no-dashboard").css("display", "none");
+                }, 500);
+
+                forceRefresh = true;
+            }
+
+
+            var url = "grafana/d/" + monitoringDashboardId + "/eskimo-system-wide-monitoring?orgId=1&&kiosk&refresh="
+                + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
+
+            var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
+            if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
+                $("#status-monitoring-dashboard-frame").attr('src', url);
+            }
+        }
+
+    };
+
+    this.renderNodesStatus = function (nodeServicesStatus, blocking) {
 
         var nodeNamesByNbr = [];
 
@@ -276,10 +328,10 @@ eskimo.SystemStatus = function() {
         var availableNodes = [];
 
         // loop on node nbrs and get Node Name + create table row
-        for (key in servicesConfig) {
+        for (key in nodeServicesStatus) {
             if (key.indexOf("node_nbr_") > -1) {
                 var nodeName = key.substring(9);
-                var nbr = servicesConfig[key];
+                var nbr = nodeServicesStatus[key];
                 nodeNamesByNbr [parseInt(nbr)] = nodeName;
             }
         }
@@ -288,8 +340,8 @@ eskimo.SystemStatus = function() {
 
             var nodeName = nodeNamesByNbr[nbr];
 
-            var nodeAddress = servicesConfig["node_address_" + nodeName];
-            var nodeAlive = servicesConfig["node_alive_" + nodeName];
+            var nodeAddress = nodeServicesStatus["node_address_" + nodeName];
+            var nodeAlive = nodeServicesStatus["node_alive_" + nodeName];
 
             // if at least one node is up, show the consoles menu
             if (nodeAlive == 'OK') {
@@ -305,7 +357,7 @@ eskimo.SystemStatus = function() {
                 var service = STATUS_SERVICES[sNb];
                 if (nodeAlive == 'OK') {
 
-                    var serviceStatus = servicesConfig["service_" + service + "_" + nodeName];
+                    var serviceStatus = nodeServicesStatus["service_" + service + "_" + nodeName];
 
                     if (serviceStatus) {
 
@@ -324,24 +376,24 @@ eskimo.SystemStatus = function() {
 
         if (nodeNamesByNbr.length == 0) {
 
-            this.renderStatusEmpty();
+            this.renderNodesStatusEmpty();
 
         } else {
 
             if (this.shouldRenderInTable()) {
 
-                this.renderStatusTable(servicesConfig, blocking, availableNodes, nodeNamesByNbr);
+                this.renderNodesStatusTable(nodeServicesStatus, blocking, availableNodes, nodeNamesByNbr);
 
             } else {
 
-                this.renderStatusCarousel(servicesConfig, blocking, availableNodes, nodeNamesByNbr);
+                this.renderNodesStatusCarousel(nodeServicesStatus, blocking, availableNodes, nodeNamesByNbr);
             }
         }
 
         eskimoMain.setAvailableNodes(availableNodes);
     };
 
-    this.renderStatusEmpty = function() {
+    this.renderNodesStatusEmpty = function() {
 
         var statusRenderOptions = $(".status-render-options");
         statusRenderOptions.css("visibility", "hidden");
@@ -352,7 +404,7 @@ eskimo.SystemStatus = function() {
         statusContainerEmpty.css("display", "inherit");
     };
 
-    this.renderStatusCarousel = function (data, blocking, availableNodes, nodeNamesByNbr) {
+    this.renderNodesStatusCarousel = function (data, blocking, availableNodes, nodeNamesByNbr) {
 
         var statusRenderOptions = $(".status-render-options");
         statusRenderOptions.css("visibility", "hidden");
@@ -535,7 +587,7 @@ eskimo.SystemStatus = function() {
         return tableHeaderHtml;
     };
 
-    this.renderStatusTable = function (data, blocking, availableNodes, nodeNamesByNbr) {
+    this.renderNodesStatusTable = function (data, blocking, availableNodes, nodeNamesByNbr) {
 
         var statusRenderOptions = $(".status-render-options");
         statusRenderOptions.css("visibility", "hidden");
@@ -770,7 +822,9 @@ eskimo.SystemStatus = function() {
 
                 if (!data.clear) {
 
-                    this.renderStatus (data.services, blocking);
+                    this.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
+
+                    this.renderNodesStatus (data.nodeServicesStatus, blocking);
 
                 } else if (data.clear == "setup"){
 
@@ -778,7 +832,7 @@ eskimo.SystemStatus = function() {
 
                 } else if (data.clear == "nodes"){
 
-                    this.renderStatusEmpty();
+                    this.renderNodesStatusEmpty();
                 }
 
                 if (data.processingPending) {  // if backend says there is some processing going on

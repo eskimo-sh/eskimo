@@ -247,7 +247,7 @@ public class SystemService {
         }
     }
 
-    public String getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
+    public JSONObject getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
 
         // 0. Build returned status
         SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
@@ -255,9 +255,8 @@ public class SystemService {
         // 1. Load Node Config
         NodesConfigWrapper rawNodesConfig = loadNodesConfig();
 
-        final AtomicBoolean clear = new AtomicBoolean(false);
         if (rawNodesConfig == null || rawNodesConfig.isEmpty()) {
-            clear.set(true);
+            return null;
 
         } else {
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
@@ -335,18 +334,7 @@ public class SystemService {
         handleStatusChanges (servicesInstallationStatus, systemStatus, liveIps);
 
         // 6. return result
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                if (clear.get()) {
-                    put("clear", "nodes");
-                }
-                put("processingPending", isProcessingPending());
-                put("services", systemStatus.getJSONObject());
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+        return systemStatus.getJSONObject();
     }
 
 

@@ -60,6 +60,9 @@ public class SystemStatusController {
     private SystemService systemService;
 
     @Autowired
+    private StatusService statusService;
+
+    @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
     @GetMapping("/get-last-operation-result")
@@ -82,7 +85,21 @@ public class SystemStatusController {
 
         try {
             setupService.ensureSetupCompleted();
-            return systemService.getStatus();
+
+            JSONObject nodeServicesStatus = systemService.getStatus();
+
+            JSONObject systemStatus = statusService.getStatus();
+
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                if (nodeServicesStatus == null) {
+                    put("clear", "nodes");
+                } else {
+                    put("nodeServicesStatus", nodeServicesStatus);
+                }
+                put ("systemStatus", systemStatus);
+                put("processingPending", systemService.isProcessingPending());
+            }}).toString(2);
 
         } catch (JSONException | FileException | SystemException | NodesConfigurationException | ConnectionManagerException e) {
             logger.error(e, e);

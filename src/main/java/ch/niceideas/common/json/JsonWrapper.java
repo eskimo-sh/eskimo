@@ -34,15 +34,14 @@
 
 package ch.niceideas.common.json;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.Logger;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is a wrapper around a JSON string which enables one to get the value at a specific node, change it, test if
@@ -58,6 +57,10 @@ public class JsonWrapper {
     private static final Logger logger = Logger.getLogger(JsonWrapper.class);
 
     private final JSONObject json;
+
+    public static JsonWrapper empty() throws JSONException{
+        return new JsonWrapper("{}");
+    }
 
     public JsonWrapper(JSONObject json) throws JSONException {
         this.json = json;

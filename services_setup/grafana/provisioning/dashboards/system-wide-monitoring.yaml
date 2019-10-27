@@ -12,11 +12,11 @@ providers:
   # <string, required> provider type. Required
   type: file
   # <bool> disable dashboard deletion
-  disableDeletion: false
+  disableDeletion: true
   # <bool> enable dashboard editing
-  editable: true
+  editable: false
   # <int> how often Grafana will scan for changed dashboards
   updateIntervalSeconds: 10
   options:
     # <string, required> path to dashboard files on disk. Required
-    path: /usr/local/lib/grafana/conf/provisioning/dashboards/node-exporter.json
+    path: /usr/local/lib/grafana/conf/provisioning/dashboards/system-wide-monitoring.json
