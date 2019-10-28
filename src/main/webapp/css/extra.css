@@ -343,6 +343,7 @@ table.system-information tr td {
 
 table.system-information tr td.info-label {
     width: 200px;
+    vertical-align: top;
     font-weight: bold;
 }
 

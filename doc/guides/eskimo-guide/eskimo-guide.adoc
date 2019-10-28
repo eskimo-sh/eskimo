@@ -825,22 +825,7 @@ Manager and Mesos Console.
 == Eskimo pre-Packaged services
 
 In the current version, eskimo provides pre-packaged docker images as well as services setup configurations for the
-following software components:
-
-* *ntp* : Network Time Protocol setup to synchronize all node clocks on the eskimo cluster
-* *Zookeeper* : a distributed configuration and election tool used to synchronize kafka and mesos nodes
-* *glusterFS* : to have a common distributed filesystem between eskimo cluster nodes
-* *GDASH* : GLuster Dashboard : to monitor gluster shares
-* *ElasticSearch* : a documented oriented real-time and distributed NoSQL database management system
-* *Cerebro* : to minitor elasticsearch nodes
-* *Kibana* : A data Visualization tool designed to plug on ElasticSearch
-* *Kafka* : A distributed and low-latency data distribution and processing framework
-* *Kafka-Manager* : to administer and monitor kafka nodes and topics
-* *Mesos* : to manage cluster nodes resources and distribute spark workload
-* *Spark* : a very versatile Big Data Processing engine
-* *Zeppelin* : a development tool and application to design Big Data Processing Jobs
-* *Prometheus* : a monitoring framework
-* *Grafana* : a Data visualization tool aimed at visualiting Prometheus raw data
+pre-packaged software components.
 
 Eskimo takes care of everything regarding the building of the docker images for these software components as well
 their setup, installation and operation on the eskimo cluster nodes.
@@ -848,14 +833,50 @@ their setup, installation and operation on the eskimo cluster nodes.
 This chapter gives some additional information related to these software components as well as present some design
 decisions regarding their operation.
 
-
 === Operation principles
 
 We won't go into all details of each and every of the list of software components packaged within eskimo.
 
 We are just describing hereunder, in a raw fashion, some important specificities for some of them.
 
-==== Gluster shares management
+==== Systemd system configuration files
+
+Eskimo used systemd to manage and operate services. Services themselves are docker container.
+
+This is how docker operations are mapped to systemctl commands :
+
+* `systemctl stop service`: kills and removed the service docker container
+* `systemctl start service`: creates and starts a new docker container from the reference image
+
+Since every restart of a service creates actually a new docker container, containers are inheritently not stateful and
+freshly restarted every time. +
+This is why the persistent data is stored under sub-folders if `/var/lib` which is mounted to the docker container.
+
+==== Commands wrappers for kafka, logstash and spark
+
+Commands such as kafka `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
+executor container.
+
+For this reason, eskimo provides host-level wrappers in `/usr/local/bin` and `/usr/local/sbin` for most important
+commands. +
+These wrappers take care of calling the corresponding command in the required container.
+
+=== Pre-packaged components and details
+
+==== NTP
+
+NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
+
+==== Zookeeper
+
+Zookeeper is a distributed configuration and election tool used to synchronize kafka and mesos nodes and processes.
+
+==== glusterFS
+
+GlusterFS is the common distributed filesystem used within eskimo. It is used to store business data and to
+synchronize eskimo cluster nodes.
+
+===== Gluster shares management
 
 Gluster shares are mounted using standard mount command (fuse filesystem).
 
@@ -880,6 +901,38 @@ The beauty of this script is that it takes care of everything:
 * Creating the volume in gluster if not already done
 * Registering the mount point in `/etc/fstab` and systemd for automatic remount
 
+==== GDASH
+
+GDASH is the GLuster Dashboard used to monitor gluster shares.
+
+==== ElasticSearch
+
+ElasticSearch is a document oriented real-time and distributed NoSQL database management system.
+
+==== Cerebro
+
+Cerebro is used to administer monitor elasticsearch nodes and activities.
+
+==== Elastic Kibana
+
+Kibana is a data Visualization tool designed to plug on ElasticSearch
+
+==== Apache Kafka
+
+Kafka is a distributed and low-latency data distribution and processing framework
+
+==== Kafka Manager
+
+Kafka Manager is used to administer and monitor kafka nodes and topics.
+
+==== Apache Mesos
+
+Mesos is used to manage cluster nodes resources and distribute spark workload.
+
+==== Apache Spark
+
+Spark is a very versatile Big Data Processing engine.
+
 ===== Gluster shares for Spark
 
 Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
@@ -890,27 +943,18 @@ executors as well
 * `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
 history server to monitor spark jobs.
 
-==== Systemd system configuration files
+==== Apache zeppelin
 
-Eskimo used systemd to manage and operate services. Services themselves are docker container.
+Zeppelin is a development tool and application to design Big Data Processing Jobs.
 
-This is how docker operations are mapped to systemctl commands :
+==== Prometheus
 
-* `systemctl stop service`: kills and removed the service docker container
-* `systemctl start service`: creates and starts a new docker container from the reference image
+Prometheus is a monitoring framework.
 
-Since every restart of a service creates actually a new docker container, containers are inheritently not stateful and
-freshly restarted every time. +
-This is why the persistent data is stored under sub-folders if `/var/lib` which is mounted to the docker container.
+==== Grafana
 
-==== Commands wrappers for kafka, logstash and spark
+Grafana is a Data visualization tool aimed at visualiting Prometheus raw data
 
-Commands such as kafka `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
-executor container.
-
-For this reason, eskimo provides host-level wrappers in `/usr/local/bin` and `/usr/local/sbin` for most important
-commands. +
-These wrappers take care of calling the corresponding command in the required container.
 
 
 [appendix]

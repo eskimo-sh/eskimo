@@ -333,6 +333,50 @@ eskimo.SystemStatus = function() {
         $("#system-information-user").html(systemStatus.sshUsername);
 
         $("#system-information-start-timestamp").html (systemStatus.startTimestamp);
+
+        // C. Cluster nodes and services
+        var nodesWithproblem = [];
+        for (key in nodeServicesStatus) {
+            if (key.indexOf("node_alive_") > -1) {
+                var nodeName = key.substring("node_alive_".length);
+                var nodeAlive = nodeServicesStatus[key];
+                if (nodeAlive != "OK") {
+                    nodesWithproblem.push(nodeName.replace(/-/g, "."));
+                }
+            }
+        }
+
+        if (nodesWithproblem.length == 0) {
+            $("#system-information-nodes-status").html("OK")
+        } else {
+            $("#system-information-nodes-status").html("Following nodes are reporting problems : " + nodesWithproblem.join(", "));
+        }
+
+        // find out about services status
+        var servicesWithproblem = [];
+        for (key in nodeServicesStatus) {
+            if (key.indexOf("service_") > -1) {
+                var serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
+                var serviceAlive = nodeServicesStatus[key];
+                if (serviceAlive != "OK") {
+                    if (!servicesWithproblem.includes(serviceName)) {
+                        servicesWithproblem.push(serviceName);
+                    }
+                }
+            }
+        }
+
+        if (servicesWithproblem.length == 0) {
+            if (nodesWithproblem.length == 0) {
+                $("#system-information-services-status").html("OK")
+            } else {
+                $("#system-information-services-status").html("-")
+            }
+        } else {
+            $("#system-information-services-status").html("Following services are reporting problems : " + servicesWithproblem.join(", "));
+        }
+
+
     };
 
     this.monitoringDashboardFrameTamper = function() {
@@ -352,7 +396,7 @@ eskimo.SystemStatus = function() {
         // loop on node nbrs and get Node Name + create table row
         for (key in nodeServicesStatus) {
             if (key.indexOf("node_nbr_") > -1) {
-                var nodeName = key.substring(9);
+                var nodeName = key.substring("node_nbr_".length);
                 var nbr = nodeServicesStatus[key];
                 nodeNamesByNbr [parseInt(nbr)] = nodeName;
             }
