@@ -127,7 +127,6 @@ In contrary to popular Hadoop-based and other Big Data Platforms, Eskimo is base
 * Mesos instead of Yarn
 * Docker instead of not native deployment
 * ElasticSearch instead of not HBase
-* Flink instead of not Storm
 
 These new generation Big Data components form together a Big Dats 2.0 stack, lightweight and efficient and leveraging
 on modern computing abilities (memory oriented vs. IO oriented). +
@@ -869,12 +868,30 @@ NTP - Network Time Protocol - is used within Eskimo to synchronize all node cloc
 
 ==== Zookeeper
 
+image::pngs/zookeeper-logo.png[50, 50, align="center"]
+
 Zookeeper is a distributed configuration and election tool used to synchronize kafka and mesos nodes and processes.
+
+It is an effort to develop and maintain an open-source server which enables highly reliable distributed coordination.
+
+ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed
+synchronization, and providing group services. All of these kinds of services are used in some form or another by
+distributed applications
+
+https://zookeeper.apache.org/
 
 ==== glusterFS
 
+image::pngs/gluster-logo.png[50, 50, align="center"]
+
+Gluster is a free and open source software scalable network filesystem.
+
+GlusterFS is a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming. GlusterFS is free and open source software and can utilize common off-the-shelf hardware.
+
 GlusterFS is the common distributed filesystem used within eskimo. It is used to store business data and to
 synchronize eskimo cluster nodes.
+
+https://www.gluster.org/
 
 ===== Gluster shares management
 
@@ -903,35 +920,125 @@ The beauty of this script is that it takes care of everything:
 
 ==== GDASH
 
+image::pngs/gluster-logo.png[50, 50, align="center"]
+
 GDASH is the GLuster Dashboard used to monitor gluster shares.
+
+https://github.com/aravindavk/gdash
+
+==== ELastic Logstash
+
+image::pngs/logstash-logo.png[50, 50, align="center"]
+
+Logstash is an open source, server-side data processing pipeline that ingests data from a multitude of sources simultaneously, transforms it, and then sends it to your favorite "stash."
+
+Logstash dynamically ingests, transforms, and ships your data regardless of format or complexity. Derive structure from unstructured data with grok, decipher geo coordinates from IP addresses, anonymize or exclude sensitive fields, and ease overall processing.
+
+https://www.elastic.co/products/logstash
+
 
 ==== ElasticSearch
 
+image::pngs/elasticsearch-logo.png[50, 50, align="center"]
+
 ElasticSearch is a document oriented real-time and distributed NoSQL database management system.
+
+It is a distributed, RESTful search and analytics engine capable of addressing a growing number of use cases. As the
+heart of the Elastic Stack, it centrally stores your data so you can discover the expected and uncover the unexpected.
+
+Elasticsearch lets you perform and combine many types of searches — structured, unstructured, geo, metric — any way
+you want. Start simple with one question and see where it takes you.
+
+https://www.elastic.co/products/elasticsearch
 
 ==== Cerebro
 
-Cerebro is used to administer monitor elasticsearch nodes and activities.
+image::pngs/cerebro-logo.png[50, 50, align="center"]
+
+Cerebro is used to administer monitor elasticsearch nodes and activities. It is an open source elasticsearch web admin
+tool.
+
+Monitoring the nodes here includes all indexes, all the data nodes, index size, total index size, etc
+
+https://github.com/lmenezes/cerebro
 
 ==== Elastic Kibana
 
-Kibana is a data Visualization tool designed to plug on ElasticSearch
+image::pngs/kibana-logo.png[50, 50, align="center"]
+
+Kibana lets you visualize your Elasticsearch data and navigate the Elastic Stack so you can do anything from tracking
+query load to understanding the way requests flow through your apps.
+
+Kibana gives you the freedom to select the way you give shape to your data. And you don’t always have to know what
+you’re looking for. With its interactive visualizations, start with one question and see where it leads you.
+
+https://www.elastic.co/products/kibana
 
 ==== Apache Kafka
 
-Kafka is a distributed and low-latency data distribution and processing framework
+image::pngs/kafka-logo.png[50, 50, align="center"]
+
+Kafka is a distributed and low-latency data distribution and processing framework. It is a  ditributed Streaming platform.
+
+Kafka is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant,
+wicked fast, and runs in production in thousands of companies.
+
+https://kafka.apache.org/
 
 ==== Kafka Manager
 
-Kafka Manager is used to administer and monitor kafka nodes and topics.
+image::pngs/kafka-logo.png[50, 50, align="center"]
+
+Kafka Manager is a tool for managing Apache Kafka.
+
+KafkaManager enables to manage multiples clusters, nodes, create and delete topics, run preferred replica election,
+generate partition assignments, monitor statistics, etc.
+
+https://github.com/lmenezes/cerebro
 
 ==== Apache Mesos
 
-Mesos is used to manage cluster nodes resources and distribute spark workload.
+image::pngs/mesos-master-logo.png[50, 50, align="center"]
+
+Apache Mesos abstracts CPU, memory, storage, and other compute resources away from machines (physical or virtual),
+enabling fault-tolerant and elastic distributed systems to easily be built and run effectively.
+
+Mesos is a distributed system kernel. Mesos is built using the same principles as the Linux kernel, only at a
+different level of abstraction. +
+The Mesos kernel runs on every machine and provides applications (e.g., Hadoop, Spark, Kafka, Elasticsearch) with
+API’s for resource management and scheduling across entire datacenter and cloud environments.
+
+http://mesos.apache.org/
 
 ==== Apache Spark
 
-Spark is a very versatile Big Data Processing engine.
+image::pngs/spark-executor-logo.png[50, 50, align="center"]
+
+Apache Spark is an open-source distributed general-purpose cluster-computing framework. Spark provides an interface
+for programming entire clusters with implicit data parallelism and fault tolerance.
+
+Spark provides high-level APIs and an optimized engine that supports general execution graphs. It also supports a rich
+set of higher-level tools including Spark SQL for SQL and structured data processing, MLlib for machine learning,
+GraphX for graph processing, and Spark Streaming.
+
+https://spark.apache.org/
+
+==== Apache Flink
+
+image::pngs/flink-app-master-logo.png[50, 50, align="center"]
+
+Apache Flink is an open-source stream-processing framework.
+
+Apache Flink is a framework and distributed processing engine for stateful computations over unbounded and bounded data
+streams. Flink has been designed to run in all common cluster environments, perform computations at in-memory speed and
+at any scale.
+
+Apache Flink's dataflow programming model provides event-at-a-time processing on both finite and infinite datasets. At
+a basic level, Flink programs consist of streams and transformations. Conceptually, a stream is a (potentially
+never-ending) flow of data records, and a transformation is an operation that takes one or more streams as input, and
+produces one or more output streams as a result.
+
+https://flink.apache.org
 
 ===== Gluster shares for Spark
 
@@ -945,16 +1052,45 @@ history server to monitor spark jobs.
 
 ==== Apache zeppelin
 
-Zeppelin is a development tool and application to design Big Data Processing Jobs.
+image::pngs/zeppelin-logo.png[50, 50, align="center"]
+
+Apache Zeppelin is a web-based notebook that enables data-driven, interactive data analytics and collaborative
+documents with SQL, Scala and more.
+
+Zeppelin is a multiple purpose notebook, the place for all your needs, from Data Discovery to High-end Data Analytics
+supporting a Multiple Language Backend.
+
+Within Eskimo, zeppelin can be used to run flink and spark jobs, discover data in ElasticSearch, manipulate files in
+Gluster, etc.
+
+https://zeppelin.apache.org/
 
 ==== Prometheus
 
-Prometheus is a monitoring framework.
+image::pngs/prometheus-logo.png[50, 50, align="center"]
+
+Prometheus is an open-source systems monitoring and alerting toolkit.
+
+Prometheus's main features are: a multi-dimensional data model with time series data identified by metric name and
+key/value pairs, PromQL - a flexible query language to leverage this dimensionality, automatic discovery of nodes and
+targets, etc.
+
+https://prometheus.io/
 
 ==== Grafana
 
-Grafana is a Data visualization tool aimed at visualiting Prometheus raw data
+image::pngs/grafana-logo.png[50, 50, align="center"]
 
+Grafana is the open source analytics & monitoring solution for every database.
+
+Within Eskimo, Grafana is meant as the data visualization tool for monitoring purposes on top of pometheus.
+
+One can use Grafana though for a whole range of other data visualization use cases.
+
+Within Eskimo, Grafana is mostly used as a Data visualization tool on Prometheus raw data, but it can very well be used
+to view ElasticSearch data, Spark results, etc.
+
+https://grafana.com/
 
 
 [appendix]
