@@ -32,6 +32,25 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
+var ESK_STRING_UPPER_CASE = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+var ESK_STRING_LOWER_CASE = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
+function getHyphenSeparated (string) {
+    var result = '';
+    for (var i = 0; i < string.length; i++) {
+        strChar = string.charAt(i);
+        var idx = ESK_STRING_UPPER_CASE.indexOf(strChar);
+        if (idx >= 0) {
+            if (i > 0) {
+                result += "-";
+            }
+            result += ESK_STRING_LOWER_CASE[idx] ;
+        } else {
+            result += strChar;
+        }
+    }
+    return result;
+}
 
 function getCamelCase(string) {
     return string.replace(/-([a-zA-Z])/g, function (m, w) {

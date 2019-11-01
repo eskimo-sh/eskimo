@@ -162,7 +162,9 @@ eskimo.Main = function() {
     function serviceMenuClear() {
 
         $(".folder-menu-items").each(function() {
-            $(this).attr("class", "folder-menu-items disabled");
+            if (!that.getServices().isServiceAvailable(this.id.substring('folderMenu'.length))) {
+                $(this).attr("class", "folder-menu-items disabled");
+            }
         });
     }
     this.serviceMenuClear = serviceMenuClear;

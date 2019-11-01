@@ -44,11 +44,15 @@ eskimo.Services = function () {
 
     var serviceInitialized = {};
 
+    var uiConfigsToRetry = [];
+
     EMPTY_FRAMETARGET = "html/emptyPage.html";
 
     this.initialize = function () {
 
         loadUIServicesConfig();
+
+        setTimeout(that.periodicRetryServices, 2000);
     };
 
     function loadUIServicesConfig() {
@@ -138,6 +142,29 @@ eskimo.Services = function () {
 
     }
 
+    this.isServiceAvailable = function (serviceForMenu) {
+
+        var service = getHyphenSeparated(serviceForMenu);
+
+        var uiConfig = UI_SERVICES_CONFIG[service];
+        if (uiConfig == null) {
+            //console.log ("service " + service + " - has not uiConfig (A)");
+            return false;
+        }
+
+        if (uiConfigsToRetry.includes(uiConfig)) {
+            //console.log ("service " + service + " - is pending retry (B)");
+            return false;
+        }
+
+        if (uiConfig.refreshWaiting) {
+            //console.log ("service " + service + " - is pending refresh (C)");
+            return false;
+        }
+
+        return true;
+    };
+
     this.refreshIframe = function (service) {
 
         var uiConfig = UI_SERVICES_CONFIG[service];
@@ -203,51 +230,111 @@ eskimo.Services = function () {
     /* For tests */
     this.shouldReinitialize = shouldReinitialize;
 
+    this.periodicRetryServices = function() {
+
+        console.log ("periodicRetryServices - " + uiConfigsToRetry.length);
+
+        for (var i = 0; i < uiConfigsToRetry.length; i++) {
+
+            var uiConfig = uiConfigsToRetry[i];
+
+            $.ajax({
+                type: "GET",
+                async: false,
+                url: uiConfig.targetUrl,
+                success: function (data, status, jqXHR) {
+
+                    console.log ("FOUND : " + uiConfig.service + " - " + uiConfig.targetUrl + " - " + uiConfig.targetWaitTime);
+
+                    // remove from retry list
+                    for (var j = 0; j < uiConfigsToRetry.length; j++) {
+                        if (uiConfigsToRetry[j] == uiConfig) {
+                            console.log("removing from retry " + uiConfigsToRetry[j].service);
+                            uiConfigsToRetry.splice(j, 1);
+                            break;
+                        }
+                    }
+
+                    // schedule usual refresh
+                    setTimeout(function (uiConfig) {
+
+                        // iframe
+                        uiConfig.actualUrl = uiConfig.targetUrl;
+                        $("#iframe-content-" + uiConfig.service).attr('src', uiConfig.actualUrl);
+                        uiConfig.refreshWaiting = false;
+
+                        // menu
+                        var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(uiConfig.service)));
+                        serviceMenu.attr("class", "folder-menu-items");
+
+                    }, uiConfig.targetWaitTime, uiConfig);
+
+                },
+                error: function (jqXHR, status) {
+                    // ignore
+                    console.log ("error : " + uiConfig.service + " - " + uiConfig.targetUrl);
+                }
+            });
+        }
+
+        setTimeout(that.periodicRetryServices, 3000);
+    };
+
+    this.handleServiceDisplay = function (service, uiConfig, nodeAddress, immediate) {
+
+        var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
+
+        var reinitialize = shouldReinitialize(service, nodeAddress);
+
+        var waitTime = immediate || !reinitialize ? 0 : uiConfig.waitTime;
+
+        //console.log ("service display : " + service + " - immediate ? " + immediate + " - reinitialize ? " + reinitialize + " - waitTime : " +  uiConfig.waitTime);
+
+        if ((!serviceInitialized[service] || reinitialize) && !uiConfig.refreshWaiting) {
+
+            uiConfig.targetUrl = buildUrl(uiConfig, nodeAddress);
+            uiConfig.service = service;
+            uiConfig.targetWaitTime = waitTime;
+
+
+            uiConfig.refreshWaiting = true;
+            serviceInitialized[uiConfig.service] = true;
+
+            if (!uiConfigsToRetry.includes(uiConfig)) {
+                uiConfigsToRetry.push(uiConfig);
+            }
+        }
+    };
+
+    this.handleServiceHiding = function (service, uiConfig) {
+
+        // menu
+        var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
+        serviceMenu.attr("class", "folder-menu-items disabled");
+
+        // iframe
+        if (serviceInitialized[service]) {
+            $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
+            serviceInitialized[service] = false;
+            uiConfig.actualUrl = null;
+        }
+    };
+
     function serviceMenuServiceFoundHook(nodeName, nodeAddress, service, found, immediate) {
 
         var uiConfig = UI_SERVICES_CONFIG[service];
 
         if (uiConfig != null) {
 
-            var reinitialize = shouldReinitialize(service, nodeAddress);
-
-            var waitTime = immediate || !reinitialize ? 0 : uiConfig.waitTime;
-
-            /*
-            console.log(service + " - " + found + " - " + immediate + " - " + reinitialize + " - " + uiConfig.waitTime);
-            console.log ((immediate || !reinitialize) + " - " + waitTime);
-            */
-
-            var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
-
             if (found) {
 
-                if (waitTime == 0) { // avoid setTimeout if not needed, it avoids the UI to blink
-                    serviceMenu.attr("class", "folder-menu-items");
-                } else {
-                    setTimeout(function () {
-                        serviceMenu.attr("class", "folder-menu-items");
-                    }, waitTime);
-                }
+                // handle iframe display
+                that.handleServiceDisplay(service, uiConfig, nodeAddress, immediate);
 
-                if ((!serviceInitialized[service] || reinitialize) && !uiConfig.refreshWaiting) {
-                    setTimeout(function () {
-                        uiConfig.actualUrl = buildUrl(uiConfig, nodeAddress);
-                        $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
-                        uiConfig.refreshWaiting = false;
-                    }, waitTime);
-                    uiConfig.refreshWaiting = true;
-                    serviceInitialized[service] = true;
-                }
             } else {
 
-                serviceMenu.attr("class", "folder-menu-items disabled");
-
-                if (serviceInitialized[service]) {
-                    $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
-                    serviceInitialized[service] = false;
-                    uiConfig.actualUrl = null;
-                }
+                // handle iframe hiding
+                that.handleServiceHiding(service, uiConfig);
 
                 // if service was displayed, show Status
                 if (eskimoMain.isCurrentDisplayedService(service)) {

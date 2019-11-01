@@ -78,7 +78,7 @@
     },
     "ui": {
       "proxyTargetPort" : 3000,
-      "waitTime": 10000,
+      "waitTime": 8000,
       "title" : "Grafana Monitoring",
       "icon" : "images/grafana-icon.png",
       "proxyReplacements" : [
@@ -141,7 +141,7 @@
     },
     "ui": {
       "proxyTargetPort" : 28180,
-      "waitTime": 8000,
+      "waitTime": 5000,
       "title" : "Gluster Dashboard",
       "icon" : "images/gdash-icon.png",
       "proxyReplacements" : [
@@ -199,7 +199,7 @@
           "target" : "return '/{PREFIX_PATH}';"
         }
       ],
-      "waitTime": 10000,
+      "waitTime": 8000,
       "title" : "Mesos Console",
       "icon" : "images/mesos-master-icon.png"
     },
@@ -324,7 +324,7 @@
     },
     "ui": {
       "proxyTargetPort" : 22080,
-      "waitTime": 30000,
+      "waitTime": 8000,
       "title" : "Kafka manager",
       "icon" : "images/kafka-manager-icon.png"
     },
@@ -358,7 +358,7 @@
     },
     "ui": {
       "proxyTargetPort" : 18080,
-      "waitTime": 24000,
+      "waitTime": 5000,
       "title" : "Spark Console",
       "icon" : "images/spark-icon.png",
       "proxyReplacements" : [
@@ -483,7 +483,7 @@
     },
     "ui": {
       "proxyTargetPort" : 8081,
-      "waitTime": 20000,
+      "waitTime": 8000,
       "title" : "Flink App Master",
       "icon" : "images/flink-app-master-icon.png"
     },
@@ -625,7 +625,7 @@
     "ui": {
       "urlTemplate": "./cerebro/#/overview?host=Eskimo",
       "proxyTargetPort" : 9000,
-      "waitTime": 10000,
+      "waitTime": 5000,
       "title" : "Cerebro",
       "icon" : "images/cerebro-icon.png"
     },
@@ -696,7 +696,7 @@
     "ui": {
       "urlTemplate": "./kibana/app/kibana",
       "proxyTargetPort" : 5601,
-      "waitTime": 50000,
+      "waitTime": 10000,
       "title" : "Kibana",
       "icon" : "images/kibana-icon.png",
       "applyStandardProxyReplacements": false,
@@ -748,7 +748,7 @@
     },
     "ui": {
       "proxyTargetPort" : 38080,
-      "waitTime": 35000,
+      "waitTime": 10000,
       "title" : "Zeppelin",
       "icon" : "images/zeppelin-icon.png",
       "proxyReplacements" : [

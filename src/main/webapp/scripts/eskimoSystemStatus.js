@@ -288,7 +288,13 @@ eskimo.SystemStatus = function() {
         var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
         // no dashboard configured
-        if (!grafanaAvailable || monitoringDashboardId == null || monitoringDashboardId == "" || monitoringDashboardId == "null") {
+        if (   !grafanaAvailable
+            || monitoringDashboardId == null
+            || monitoringDashboardId == ""
+            || monitoringDashboardId == "null"
+            // or service grafana not yet available
+            || !eskimoMain.getServices().isServiceAvailable("grafana")
+            ) {
 
             $("#status-monitoring-no-dashboard").css("display", "inherit");
             $("#status-monitoring-dashboard-frame").css("display", "none");
