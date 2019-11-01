@@ -44,10 +44,10 @@ Software.
         </div>
 
         <div class="col-md-12">
-            <div class="col-xs-12 col-md-4">
+            <div class="col-xs-12 col-sm-12 col-md-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">Eskimo System Information</div>
-                    <div class="panel-body" style="height: 400px; min-height: 400px;">
+                    <div class="panel-body status-monitoring-info">
                         <table class="system-information">
                             <tr>
                                 <td class="info-label">Eskimo version</td><td> : <span id="system-information-version"></span></td>
@@ -67,12 +67,19 @@ Software.
                             <tr>
                                 <td class="info-label">Services Status</td><td> : <span id="system-information-services-status"></span></td>
                             </tr>
+                            <tr>
+                                <td style="">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Actions from here</td><td> : </td>
+                            </tr>
                         </table>
+                        <div id="system-information-actions"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xs-12 col-md-8">
+            <div class="col-xs-12 col-sm-12 col-md-8">
                 <div class="panel panel-default">
                     <div class="panel-heading">Eskimo Cluster Wide System Monitoring</div>
                     <div class="panel-body status-monitoring-dashboard-panel">

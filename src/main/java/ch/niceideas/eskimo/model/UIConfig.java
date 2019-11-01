@@ -53,10 +53,19 @@ public class UIConfig {
     private String title;
     private String icon;
     private boolean applyStandardProxyReplacements = true;
+    private String statusPageLinkTitle;
     private List<ProxyReplacement> proxyReplacements = new ArrayList<>();
 
     public UIConfig (Service service) {
         this.service = service;
+    }
+
+    public String getStatusPageLinkTitle() {
+        return statusPageLinkTitle;
+    }
+
+    public void setStatusPageLinkTitle(String statusPageLinkTitle) {
+        this.statusPageLinkTitle = statusPageLinkTitle;
     }
 
     public boolean isApplyStandardProxyReplacements() {
@@ -109,6 +118,10 @@ public class UIConfig {
             put("icon", icon);
             put("unique", service.isUnique());
         }});
+    }
+
+    public String getServiceName() {
+        return service.getName();
     }
 
     public Integer getProxyTargetPort() {

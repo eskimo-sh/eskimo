@@ -172,6 +172,10 @@ public class ServicesDefinition implements InitializingBean {
                     uiConfig.setApplyStandardProxyReplacements((Boolean)servicesConfig.getValueForPath(serviceString+".ui.applyStandardProxyReplacements"));
                 }
 
+                if (servicesConfig.hasPath(serviceString+".ui.statusPageLinktitle")) {
+                    uiConfig.setStatusPageLinkTitle((String)servicesConfig.getValueForPath(serviceString+".ui.statusPageLinktitle"));
+                }
+
                 service.setUiConfig(uiConfig);
 
                 if (servicesConfig.hasPath(serviceString+".ui.proxyReplacements")) {
@@ -344,28 +348,40 @@ public class ServicesDefinition implements InitializingBean {
         return services.values().stream()
                 .filter(Service::isMandatory)
                 .map(Service::getName)
-                .sorted().toArray(String[]::new);
+                .sorted()
+                .toArray(String[]::new);
     }
 
     public String[] listUniqueServices() {
         return services.values().stream()
                 .filter(Service::isUnique)
                 .map(Service::getName)
-                .sorted().toArray(String[]::new);
+                .sorted()
+                .toArray(String[]::new);
     }
 
     public String[] listProxiedServices() {
         return services.values().stream()
                 .filter(it -> it.isProxied())
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(Service::getName).toArray(String[]::new);
+                .map(Service::getName)
+                .toArray(String[]::new);
+    }
+
+    public UIConfig[] listLinkServices() {
+        return services.values().stream()
+                .filter(it -> it.isLink())
+                .sorted(Comparator.comparingInt(Service::getConfigOrder))
+                .map(service -> service.getUiConfig())
+                .toArray(UIConfig[]::new);
     }
 
     public String[] listUIServices() {
         return services.values().stream()
                 .filter(it -> it.isUiService())
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(Service::getName).toArray(String[]::new);
+                .map(Service::getName)
+                .toArray(String[]::new);
     }
 
     public Map<String, UIConfig> getUIServicesConfig() {

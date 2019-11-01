@@ -353,9 +353,12 @@ eskimo.SystemStatus = function() {
         }
 
         if (nodesWithproblem.length == 0) {
-            $("#system-information-nodes-status").html("OK")
+            $("#system-information-nodes-status").html("<span style='color: darkgreen;'>OK</span>")
         } else {
-            $("#system-information-nodes-status").html("Following nodes are reporting problems : " + nodesWithproblem.join(", "));
+            $("#system-information-nodes-status").html(
+                "Following nodes are reporting problems : <span style='color: darkred;'>" +
+                nodesWithproblem.join(", ") +
+                "</span>");
         }
 
         // find out about services status
@@ -374,15 +377,41 @@ eskimo.SystemStatus = function() {
 
         if (servicesWithproblem.length == 0) {
             if (nodesWithproblem.length == 0) {
-                $("#system-information-services-status").html("OK")
+                $("#system-information-services-status").html("<span style='color: darkgreen;'>OK</span>")
             } else {
-                $("#system-information-services-status").html("-")
+                $("#system-information-services-status").html("<span style='color: darkred;'>-</span>")
             }
         } else {
             $("#system-information-services-status").html("Following services are reporting problems : " + servicesWithproblem.join(", "));
         }
 
+        // C. System Information Actions
 
+        var systemInformationActions = '';
+
+        if (systemStatus.links && systemStatus.links.length && systemStatus.links.length > 0) {
+            for (var i = 0; i < systemStatus.links.length; i++) {
+
+                var link = systemStatus.links[i];
+
+                if (eskimoMain.getServices().isServiceAvailable(link.service)) {
+                    systemInformationActions += '' +
+                        '<a href="javascript:eskimoMain.getServices().showServiceIFrame(\''+link.service+'\');">' +
+                        '<table class=".status-monitoring-action-table">' +
+                        '<tr>' +
+                        '<td>' +
+                        '<img class="control-logo-logo" src="images/'+link.service+'-logo.png"/>' +
+                        '</td><td>&nbsp;' +
+                        link.title +
+                        '</td>' +
+                        '</tr>' +
+                        '</table>' +
+                        '</a>';
+                }
+            }
+        }
+
+        $("#system-information-actions").html(systemInformationActions);
     };
 
     this.monitoringDashboardFrameTamper = function() {
@@ -737,7 +766,7 @@ eskimo.SystemStatus = function() {
 
                     } else {
 
-                        var color = "darkgreen;";
+                        var color = "darkgreen";
                         if (serviceStatus == "TD") {
                             color = "violet";
                         }

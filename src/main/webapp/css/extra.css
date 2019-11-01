@@ -368,6 +368,8 @@ table.system-information tr td.info-label {
     visibility: hidden;
 }
 
+
+
 .node-status-table {
     width: 100%;
     margin-top: 5px;
@@ -424,9 +426,27 @@ table.system-information tr td.info-label {
     margin-top: 5px;
     margin-bottom: 3px;
 }
+.status-monitoring-info {
+    height: 413px;
+    min-height: 413px;
+    overflow-y: auto;
+}
 .status-monitoring-dashboard-panel{
-    height: 400px;
-    min-height: 400px;
+    height: 413px;
+    min-height: 413px;
+}
+.status-monitoring-action-table {
+    padding: 0;
+    margin: 0;
+    border: 0px none;
+    border-collapse: collapse;
+}
+.status-monitoring-action-table tr td{
+    padding: 0;
+    margin: 0;
+    border: 0px none;
+    border-collapse: collapse;
+    vertical-align: middle;
 }
 #status-monitoring-dashboard-frame {
     position: relative;

@@ -279,4 +279,7 @@ public class Service {
         return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getTitle());
     }
 
+    public boolean isLink() {
+        return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getStatusPageLinkTitle());
+    }
 }

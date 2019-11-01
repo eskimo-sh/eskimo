@@ -144,6 +144,7 @@ public class ConnectionManagerService {
             // otherwise test it and attempt to recreate it if it is down or too old
             else {
 
+                ConnectionOperationWatchDog sg = null;
                 try {
 
                     Long connectionAge = connectionAges.get(ipAddress);
@@ -156,7 +157,7 @@ public class ConnectionManagerService {
                         return getConnection(ipAddress);
                     }
 
-                    ConnectionOperationWatchDog sg = new ConnectionOperationWatchDog(connection);
+                    sg = new ConnectionOperationWatchDog(connection);
                     //connection.ping(); // this is too buggy !!! Waits for the socket outputStream result like forever and seems impossible to kill
                     connection.sendIgnorePacket();
                     sg.close();
@@ -165,9 +166,10 @@ public class ConnectionManagerService {
                     connectionAges.put(ipAddress, System.currentTimeMillis());
 
                 } catch (IOException | IllegalStateException e) {
-                    logger.warn ("Previous connection to " + ipAddress + " got into problems. Recreating ...");
+                    logger.warn ("Previous connection to " + ipAddress + " got into problems ("+e.getMessage()+"). Recreating ...");
                     connectionMap.remove(ipAddress);
                     connectionAges.remove(ipAddress);
+                    sg.close();
                     return getConnection(ipAddress);
                 }
             }

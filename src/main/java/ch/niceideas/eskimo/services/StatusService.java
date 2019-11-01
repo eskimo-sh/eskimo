@@ -35,15 +35,10 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.*;
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
-import ch.niceideas.eskimo.utils.SystemStatusParser;
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.SCPClient;
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.UIConfig;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,20 +46,12 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -74,6 +61,10 @@ public class StatusService {
 
     @Autowired
     private SetupService setupService;
+
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
 
     @Value("${status.monitoringDashboardID}")
     private String monitoringDashboardId = null;
@@ -129,6 +120,18 @@ public class StatusService {
 
         systemStatus.setValueForPath("startTimestamp", df.format(startDate));
 
+        // 1. Get link status
+        UIConfig[] linkServices = servicesDefinition.listLinkServices();
+        JSONArray linkArray = new JSONArray(new ArrayList<JSONObject>(){{
+            for (UIConfig config : linkServices) {
+                add(new JSONObject(new HashMap<String, String>(){{
+                    put ("service", config.getServiceName());
+                    put ("title", config.getStatusPageLinkTitle());
+                }}));
+            }
+        }});
+
+        systemStatus.getJSONObject().put("links", linkArray);
 
         return systemStatus.getJSONObject();
     }

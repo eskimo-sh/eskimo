@@ -81,6 +81,7 @@
       "waitTime": 8000,
       "title" : "Grafana Monitoring",
       "icon" : "images/grafana-icon.png",
+      "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -176,6 +177,10 @@
     },
     "ui": {
       "proxyTargetPort" : 5050,
+      "waitTime": 8000,
+      "title" : "Mesos Console",
+      "icon" : "images/mesos-master-icon.png",
+      "statusPageLinktitle" : "Monitor Flink and Spark processes in Mesos",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -198,10 +203,7 @@
           "source" : "return '';",
           "target" : "return '/{PREFIX_PATH}';"
         }
-      ],
-      "waitTime": 8000,
-      "title" : "Mesos Console",
-      "icon" : "images/mesos-master-icon.png"
+      ]
     },
     "dependencies": [
       {
@@ -326,7 +328,8 @@
       "proxyTargetPort" : 22080,
       "waitTime": 8000,
       "title" : "Kafka manager",
-      "icon" : "images/kafka-manager-icon.png"
+      "icon" : "images/kafka-manager-icon.png",
+      "statusPageLinktitle" : "Administer your kafka topics"
     },
     "dependencies": [
       {
@@ -361,6 +364,7 @@
       "waitTime": 5000,
       "title" : "Spark Console",
       "icon" : "images/spark-icon.png",
+      "statusPageLinktitle" : "Monitor your Spark jobs",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -485,7 +489,8 @@
       "proxyTargetPort" : 8081,
       "waitTime": 8000,
       "title" : "Flink App Master",
-      "icon" : "images/flink-app-master-icon.png"
+      "icon" : "images/flink-app-master-icon.png",
+      "statusPageLinktitle" : "Monitor your Flink jobs"
     },
     "dependencies": [
       {
@@ -627,7 +632,8 @@
       "proxyTargetPort" : 9000,
       "waitTime": 5000,
       "title" : "Cerebro",
-      "icon" : "images/cerebro-icon.png"
+      "icon" : "images/cerebro-icon.png",
+      "statusPageLinktitle" : "Administer your data in Elasticsearch"
     },
     "dependencies": [
       {
@@ -700,6 +706,7 @@
       "title" : "Kibana",
       "icon" : "images/kibana-icon.png",
       "applyStandardProxyReplacements": false,
+      "statusPageLinktitle" : "Visualize your data in Elasticsearch",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -751,6 +758,7 @@
       "waitTime": 10000,
       "title" : "Zeppelin",
       "icon" : "images/zeppelin-icon.png",
+      "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
