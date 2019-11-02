@@ -269,23 +269,28 @@ eskimo.SystemStatus = function() {
     }
     this.reinstallService = reinstallService;
 
+    this.serviceIsUp = function (nodeServicesStatus, service) {
+        var serviceAvailable = false;
+        for (key in nodeServicesStatus) {
+            if (key.indexOf("service_"+service+"_") > -1) {
+                var serviceStatus = nodeServicesStatus[key];
+                if (serviceStatus == "OK") {
+                    serviceAvailable = true;
+                    break;
+                }
+            }
+        }
+        return serviceAvailable;
+    };
+
     this.handleSystemStatus = function (nodeServicesStatus, systemStatus, blocking) {
 
         // A. Handle Grafana Dashboard ID display
 
         // A.1 Find out if grafana is available
-        var grafanaAvailable = false;
-        for (key in nodeServicesStatus) {
-            if (key.indexOf("service_grafana_") > -1) {
-                var grafanaStatus = nodeServicesStatus[key];
-                if (grafanaStatus == "OK") {
-                    grafanaAvailable = true;
-                }
-            }
-        }
+        var grafanaAvailable = this.serviceIsUp (nodeServicesStatus, "grafana");
 
         var monitoringDashboardId = systemStatus.monitoringDashboardId;
-        var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
         // no dashboard configured
         if (   !grafanaAvailable
@@ -317,17 +322,22 @@ eskimo.SystemStatus = function() {
                 forceRefresh = true;
             }
 
+            var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
-            var url = "grafana/d/" + monitoringDashboardId + "/eskimo-system-wide-monitoring?orgId=1&&kiosk&refresh="
-                + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
+            setTimeout (function() {
 
-            var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
-            if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
-                $("#status-monitoring-dashboard-frame").attr('src', url);
+                var url = "grafana/d/" + monitoringDashboardId + "/eskimo-system-wide-monitoring?orgId=1&&kiosk&refresh="
+                    + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
 
-                setTimeout (that.monitoringDashboardFrameTamper, 5000);
+                var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
+                if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
+                    $("#status-monitoring-dashboard-frame").attr('src', url);
 
-            }
+                    setTimeout (that.monitoringDashboardFrameTamper, 4000);
+
+                }
+            }, 5000);
+
         }
 
         // B. Inject information
@@ -394,7 +404,8 @@ eskimo.SystemStatus = function() {
 
                 var link = systemStatus.links[i];
 
-                if (eskimoMain.getServices().isServiceAvailable(link.service)) {
+                if (eskimoMain.getServices().isServiceAvailable(link.service)
+                    && this.serviceIsUp (nodeServicesStatus, link.service)) {
                     systemInformationActions += '' +
                         '<a href="javascript:eskimoMain.getServices().showServiceIFrame(\''+link.service+'\');">' +
                         '<table class=".status-monitoring-action-table">' +
@@ -917,7 +928,7 @@ eskimo.SystemStatus = function() {
             url: "get-status",
             success: function (data, status, jqXHR) {
 
-                eskimoMain.serviceMenuClear();
+                eskimoMain.serviceMenuClear(data.nodeServicesStatus);
 
                 //console.log (data);
 

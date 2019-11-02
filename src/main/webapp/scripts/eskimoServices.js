@@ -37,6 +37,8 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.Services = function () {
 
+    var PERIODIC_RETRY_SERVICE_MS = 2000;
+
     var that = this;
 
     UI_SERVICES = [];
@@ -52,7 +54,7 @@ eskimo.Services = function () {
 
         loadUIServicesConfig();
 
-        setTimeout(that.periodicRetryServices, 2000);
+        setTimeout(that.periodicRetryServices, PERIODIC_RETRY_SERVICE_MS / 2);
     };
 
     function loadUIServicesConfig() {
@@ -142,9 +144,7 @@ eskimo.Services = function () {
 
     }
 
-    this.isServiceAvailable = function (serviceForMenu) {
-
-        var service = getHyphenSeparated(serviceForMenu);
+    this.isServiceAvailable = function (service) {
 
         var uiConfig = UI_SERVICES_CONFIG[service];
         if (uiConfig == null) {
@@ -162,7 +162,7 @@ eskimo.Services = function () {
             return false;
         }
 
-        return true;
+        return serviceInitialized[service];
     };
 
     this.refreshIframe = function (service) {
@@ -232,52 +232,55 @@ eskimo.Services = function () {
 
     this.periodicRetryServices = function() {
 
-        console.log ("periodicRetryServices - " + uiConfigsToRetry.length);
+        //console.log ("periodicRetryServices - " + uiConfigsToRetry.length);
 
         for (var i = 0; i < uiConfigsToRetry.length; i++) {
 
             var uiConfig = uiConfigsToRetry[i];
 
-            $.ajax({
-                type: "GET",
-                async: false,
-                url: uiConfig.targetUrl,
-                success: function (data, status, jqXHR) {
+            setTimeout (function (uiConfig) {
+                $.ajax({
+                    type: "GET",
+                    url: uiConfig.targetUrl,
+                    success: function (data, status, jqXHR) {
 
-                    console.log ("FOUND : " + uiConfig.service + " - " + uiConfig.targetUrl + " - " + uiConfig.targetWaitTime);
+                        console.log("FOUND : " + uiConfig.service + " - " + uiConfig.targetUrl + " - " + uiConfig.targetWaitTime);
 
-                    // remove from retry list
-                    for (var j = 0; j < uiConfigsToRetry.length; j++) {
-                        if (uiConfigsToRetry[j] == uiConfig) {
-                            console.log("removing from retry " + uiConfigsToRetry[j].service);
-                            uiConfigsToRetry.splice(j, 1);
-                            break;
+                        // remove from retry list
+                        for (var j = 0; j < uiConfigsToRetry.length; j++) {
+                            if (uiConfigsToRetry[j] == uiConfig) {
+                                console.log("removing from retry " + uiConfigsToRetry[j].service);
+                                uiConfigsToRetry.splice(j, 1);
+                                break;
+                            }
                         }
+
+                        // schedule usual refresh
+                        setTimeout(function (uiConfig) {
+
+                            // iframe
+                            uiConfig.actualUrl = uiConfig.targetUrl;
+                            $("#iframe-content-" + uiConfig.service).attr('src', uiConfig.actualUrl);
+                            uiConfig.refreshWaiting = false;
+
+                            /*
+                            // menu
+                            var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(uiConfig.service)));
+                            serviceMenu.attr("class", "folder-menu-items");
+                            */
+
+                        }, uiConfig.targetWaitTime, uiConfig);
+
+                    },
+                    error: function (jqXHR, status) {
+                        // ignore
+                        console.log("error : " + uiConfig.service + " - " + uiConfig.targetUrl);
                     }
-
-                    // schedule usual refresh
-                    setTimeout(function (uiConfig) {
-
-                        // iframe
-                        uiConfig.actualUrl = uiConfig.targetUrl;
-                        $("#iframe-content-" + uiConfig.service).attr('src', uiConfig.actualUrl);
-                        uiConfig.refreshWaiting = false;
-
-                        // menu
-                        var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(uiConfig.service)));
-                        serviceMenu.attr("class", "folder-menu-items");
-
-                    }, uiConfig.targetWaitTime, uiConfig);
-
-                },
-                error: function (jqXHR, status) {
-                    // ignore
-                    console.log ("error : " + uiConfig.service + " - " + uiConfig.targetUrl);
-                }
-            });
+                });
+            }, 0, uiConfig);
         }
 
-        setTimeout(that.periodicRetryServices, 3000);
+        setTimeout(that.periodicRetryServices, PERIODIC_RETRY_SERVICE_MS);
     };
 
     this.handleServiceDisplay = function (service, uiConfig, nodeAddress, immediate) {
@@ -308,9 +311,13 @@ eskimo.Services = function () {
 
     this.handleServiceHiding = function (service, uiConfig) {
 
+        console.log ("Hiding " + service);
+
+        /*
         // menu
         var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
         serviceMenu.attr("class", "folder-menu-items disabled");
+        */
 
         // iframe
         if (serviceInitialized[service]) {

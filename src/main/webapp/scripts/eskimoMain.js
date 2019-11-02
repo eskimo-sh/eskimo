@@ -159,13 +159,33 @@ eskimo.Main = function() {
         return displayedService == service;
     };
 
-    function serviceMenuClear() {
+    function serviceMenuClear(nodeServicesStatus) {
 
-        $(".folder-menu-items").each(function() {
-            if (!that.getServices().isServiceAvailable(this.id.substring('folderMenu'.length))) {
+        // remove all menu entries (cannot find out which service is here :-(
+        if (!nodeServicesStatus || nodeServicesStatus == null) {
+            $(".folder-menu-items").each(function () {
                 $(this).attr("class", "folder-menu-items disabled");
-            }
-        });
+            });
+
+        }
+        // else check with system status and nodeServiceStatus
+        else {
+
+            $(".folder-menu-items").each(function () {
+
+                var menuService = this.id.substring('folderMenu'.length);
+
+                var service = getHyphenSeparated(menuService);
+
+                var serviceUp = that.getSystemStatus().serviceIsUp(nodeServicesStatus, service);
+
+                if (!serviceUp || !that.getServices().isServiceAvailable(service)) {
+                    $(this).attr("class", "folder-menu-items disabled");
+                } else {
+                    $(this).attr("class", "folder-menu-items");
+                }
+            });
+        }
     }
     this.serviceMenuClear = serviceMenuClear;
 
