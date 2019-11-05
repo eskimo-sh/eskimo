@@ -764,7 +764,7 @@
       }
     }
   ],
-  "name":"/Tutorials/Spark SQL Demo",
+  "name":"/Spark SQL Demo",
   "id":"2ERM81WG6",
   "defaultInterpreterGroup":"spark",
   "version":"0.9.0-SNAPSHOT",
@@ -788,5 +788,5 @@
   "info":{
 
   },
-  "path":"/Tutorials/Spark SQL Demo"
+  "path":"/Spark SQL Demo"
 }

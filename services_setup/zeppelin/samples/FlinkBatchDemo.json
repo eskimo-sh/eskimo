@@ -313,7 +313,7 @@
       "$$hashKey":"object:285"
     }
   ],
-  "name":"/Tutorials/Flink Batch Demo",
+  "name":"Flink Batch Demo",
   "id":"2ESHF4X1X",
   "defaultInterpreterGroup":"flink",
   "version":"0.9.0-SNAPSHOT",
@@ -337,5 +337,5 @@
   "info":{
 
   },
-  "path":"/Tutorials/Flink Batch Demo"
+  "path":"/Flink Batch Demo"
 }

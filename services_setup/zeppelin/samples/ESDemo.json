@@ -1361,7 +1361,7 @@
       "$$hashKey":"object:14212"
     }
   ],
-  "name":"/Tutorials/ElasticSearch Demo (Queries)",
+  "name":"ElasticSearch Demo (Queries)",
   "id":"2ERQ917G8",
   "defaultInterpreterGroup":"spark",
   "version":"0.9.0-SNAPSHOT",
@@ -1385,5 +1385,5 @@
   "info":{
 
   },
-  "path":"/Tutorials/ElasticSearch Demo (Queries)"
+  "path":"/ElasticSearch Demo (Queries)"
 }

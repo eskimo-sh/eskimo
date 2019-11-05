@@ -1030,17 +1030,19 @@ public class SystemService {
         }
 
         // 3. Copy container image there if any
-        // FIXME SOLVE THE SPARK AND FLINK HACK
-        String imageName = servicesDefinition.getService(service).getImageName();
-        File containerFile = new File(packageDistributionPath+"/docker_template_" +
-                imageName + ".tar.gz");
-        if (containerFile.exists()) {
-            sshCommandService.copySCPFile(ipAddress, packageDistributionPath+"/docker_template_" +
-                    imageName + ".tar.gz");
 
-            exec(ipAddress, sb, new String[]{"mv", "docker_template_" +
-                    imageName + ".tar.gz",
-                    "/tmp/" + service + "/"});
+        String imageName = servicesDefinition.getService(service).getImageName();
+
+        String imageFileName = setupService.findLastPackageFile (imageName);
+
+        File containerFile = new File(packageDistributionPath + "/" + imageFileName);
+        if (containerFile.exists()) {
+            sshCommandService.copySCPFile(ipAddress, packageDistributionPath+"/"+imageFileName);
+
+            exec(ipAddress, sb, new String[]{"mv", imageFileName, "/tmp/" + service + "/"});
+
+            exec(ipAddress, sb, new String[]{"ln", "-s", "/tmp/" + service + "/" + imageFileName, "/tmp/" + service + "/docker_template_" + service + ".tar.gz" });
+
         } else {
             sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
         }

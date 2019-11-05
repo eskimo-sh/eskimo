@@ -163,8 +163,15 @@ eskimo.Main = function() {
 
         // remove all menu entries (cannot find out which service is here :-(
         if (!nodeServicesStatus || nodeServicesStatus == null) {
+
             $(".folder-menu-items").each(function () {
+
+                var menuService = this.id.substring('folderMenu'.length);
+
+                var service = getHyphenSeparated(menuService);
+
                 $(this).attr("class", "folder-menu-items disabled");
+
                 that.getServices().handleServiceHiding(service);
             });
 

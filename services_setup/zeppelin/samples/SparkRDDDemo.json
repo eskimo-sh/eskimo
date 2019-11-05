@@ -4826,7 +4826,7 @@
       "$$hashKey":"object:28972"
     }
   ],
-  "name":"/Tutorials/Spark RDD Demo",
+  "name":"/Spark RDD Demo",
   "id":"2ESBKWTE3",
   "defaultInterpreterGroup":"spark",
   "version":"0.9.0-SNAPSHOT",
@@ -4850,5 +4850,5 @@
   "info":{
 
   },
-  "path":"/Tutorials/Spark RDD Demo"
+  "path":"/Spark RDD Demo"
 }

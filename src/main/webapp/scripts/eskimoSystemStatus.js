@@ -858,7 +858,7 @@ eskimo.SystemStatus = function() {
                     } else if (serviceStatus == "KO") {
 
                         arrayRow +=
-                            '    <td class="status-node-cell"' +
+                            '    <td class="status-node-cell'+(eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
                             '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
                             '<span class="service-status-error">\n' +
                             '<table class="node-status-table">\n' +

@@ -53,7 +53,11 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -83,7 +87,7 @@ public class SetupService {
     private String packagesDevPath = "./packages_dev";
 
     @Value("${system.packagesToBuild}")
-    private String packagesToBuild = "base_eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
     @Value("${system.mesosPackages}")
     private String mesosPackages = "niceideas_mesos-debian-1.7.2.tar.gz,niceideas_mesos-redhat-1.7.2.tar.gz";
@@ -248,6 +252,62 @@ public class SetupService {
             return ErrorStatusHelper.createErrorStatus (e);
         }
     }
+
+    private Pattern imageFileNamePattern = Pattern.compile("docker_template_[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+
+    Pair<String,String> parseVersion(String name) {
+
+        Matcher matcher = imageFileNamePattern.matcher(name);
+        if (!matcher.matches()) {
+            logger.warn ("File " + name + " doesn't match expected packqage image file name pattern");
+            return null;
+        }
+
+        return new Pair<>(matcher.group(1), matcher.group(2));
+
+    }
+
+    public String findLastPackageFile(String imageName) {
+
+        File packagesDistribFolder = new File (packageDistributionPath);
+        if (!packagesDistribFolder.exists()) {
+            throw new IllegalStateException(packageDistributionPath + " doesn't exist");
+        }
+
+        List<File> imageFiles = Arrays.stream(packagesDistribFolder.listFiles())
+                .filter(file -> file.getName().contains("docker_template_") && file.getName().contains(imageName))
+                .collect(Collectors.toList());
+
+        File lastVersionFile = null;
+        Pair<String, String> lastFileVersion = null;
+        for (File imageFile : imageFiles) {
+            Pair<String, String> imageVersion = parseVersion (imageFile.getName());
+            if (imageVersion != null) {
+                if (lastVersionFile == null) {
+                    lastVersionFile = imageFile;
+                    lastFileVersion = imageVersion;
+                } else {
+                    if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) > 0) {
+                        lastVersionFile = imageFile;
+                        lastFileVersion = imageVersion;
+                    } else if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) == 0) {
+                        if (imageVersion.getValue().compareTo(lastFileVersion.getValue()) > 0) {
+                            lastVersionFile = imageFile;
+                            lastFileVersion = imageVersion;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (lastVersionFile == null) {
+            throw new IllegalStateException("No package image found for " + imageName);
+        }
+
+        return lastVersionFile.getName();
+    }
+
+
 
     private void applySetup(JsonWrapper setupConfig) throws SetupException, JSONException {
 

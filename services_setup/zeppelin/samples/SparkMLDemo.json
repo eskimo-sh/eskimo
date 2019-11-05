@@ -1053,7 +1053,7 @@
       "$$hashKey":"object:10848"
     }
   ],
-  "name":"/Tutorials/Spark ML Demo (Regression)",
+  "name":"/Spark ML Demo (Regression)",
   "id":"2ETPUCYVU",
   "defaultInterpreterGroup":"spark",
   "version":"0.9.0-SNAPSHOT",
@@ -1077,5 +1077,5 @@
   "info":{
 
   },
-  "path":"/Tutorials/Spark ML Demo (Regression)"
+  "path":"/Spark ML Demo (Regression)"
 }

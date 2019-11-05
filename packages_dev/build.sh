@@ -125,7 +125,7 @@ elif [[ $package == "all_images" ]]; then
     echo "BUILDING ALL PACKAGES"
     set -e
 
-    all_services='base_eskimo\
+    all_services='base-eskimo\
         ntp\
         zookeeper\
         gluster\

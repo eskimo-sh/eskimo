@@ -102,7 +102,7 @@ instance:
 
 .default `system.packagesToBuild` property
 ----
-system.packagesToBuild=base_eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin
+system.packagesToBuild=base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin
 ----
 
 Whenever one wants to implement a new package for a new service to be managed by eskimo, one needs to declare this new
@@ -116,7 +116,7 @@ software package within the image the way he wants and no specific requirement i
 However, adhering to some conventions eases a lot the maintenance and evolution of these images. +
 These standard conventions are as follows:
 
-* All docker images are based on the `base_eskimo` image which is itself based on a lightweight debian stretch image.
+* All docker images are based on the `base-eskimo` image which is itself based on a lightweight debian stretch image.
 * A software component named _X_ with _version Y_ should be installed in `/usr/local/lib/_x_-_y_` (if and only if it is
 not available in apt repositories and installed using standard debian `apt-get install x`).
 ** In this case, a simlink preventing the further *Services Installation framework* from the need to mess with version

@@ -48,38 +48,38 @@ rm -f /tmp/base_image_build_log
 
 
 echo " - Killing any previous containers"
-if [[ `docker ps -a -q -f name=base_eskimo` != "" ]]; then
-    docker stop base_eskimo > /dev/null 2>&1
-    docker container rm base_eskimo > /dev/null 2>&1
+if [[ `docker ps -a -q -f name=base-eskimo` != "" ]]; then
+    docker stop base-eskimo > /dev/null 2>&1
+    docker container rm base-eskimo > /dev/null 2>&1
 fi
 
 # build
 echo " - Building docker image"
-docker build --iidfile id_file --tag eskimo:base_eskimo_template . >> /tmp/base_image_build_log 2>&1
+docker build --iidfile id_file --tag eskimo:base-eskimo_template . >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 # create and start container
 echo " - Starting setup docker container"
-docker run -d --name base_eskimo -i -t eskimo:base_eskimo_template bash >> /tmp/base_image_build_log 2>&1
+docker run -d --name base-eskimo -i -t eskimo:base-eskimo_template bash >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 # connect to conainter
-#docker exec -i base_eskimo bash
+#docker exec -i base-eskimo bash
 
 echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i base_eskimo mkdir -p /usr/share/man/man1/ >> /tmp/base_image_build_log 2>&1
+docker exec -i base-eskimo mkdir -p /usr/share/man/man1/ >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 echo " - Updating the packages"
-docker exec -i base_eskimo apt-get update >> /tmp/base_image_build_log 2>&1
+docker exec -i base-eskimo apt-get update >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 echo " - Upgrading the appliance"
-docker exec -i -e DEBIAN_FRONTEND=noninteractive base_eskimo apt-get -yq upgrade >> /tmp/base_image_build_log 2>&1
+docker exec -i -e DEBIAN_FRONTEND=noninteractive base-eskimo apt-get -yq upgrade >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 echo " - Installing required utility tools for eskimo framework"
-docker exec -i base_eskimo apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq >> /tmp/base_image_build_log 2>&1
+docker exec -i base-eskimo apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
-close_and_save_image base_eskimo /tmp/base_image_build_log
+close_and_save_image base-eskimo /tmp/base_image_build_log

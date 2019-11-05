@@ -180,9 +180,9 @@ function build_image() {
     fi
 
     echo " - Checking if base eskimo image is available"
-    if [[ `docker images -q eskimo:base_eskimo_template 2>/dev/null` == "" ]]; then
+    if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
         echo " - Trying to loads base eskimo image"
-        gunzip -c ../../packages_distrib/docker_template_base_eskimo.tar.gz | docker load >> $2 2>&1
+        gunzip -c ../../packages_distrib/docker_template_base-eskimo.tar.gz | docker load >> $2 2>&1
         fail_if_error $? $2 -10
     fi
 
