@@ -285,7 +285,7 @@ eskimo.Services = function () {
 
     this.handleServiceDisplay = function (service, uiConfig, nodeAddress, immediate) {
 
-        var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
+        //var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
 
         var reinitialize = shouldReinitialize(service, nodeAddress);
 
@@ -311,6 +311,15 @@ eskimo.Services = function () {
 
     this.handleServiceHiding = function (service, uiConfig) {
 
+        if (!uiConfig || uiConfig == null) {
+            uiConfig = UI_SERVICES_CONFIG[service];
+        }
+
+        if (uiConfig == null) {
+            //console.error ("Couldn't find config for " + service);
+            return;
+        }
+
         console.log ("Hiding " + service);
 
         /*
@@ -324,6 +333,11 @@ eskimo.Services = function () {
             $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
             serviceInitialized[service] = false;
             uiConfig.actualUrl = null;
+        }
+
+        // if service was displayed, show Status
+        if (eskimoMain.isCurrentDisplayedService(service)) {
+            eskimoMain.getSystemStatus().showStatus();
         }
     };
 
@@ -342,12 +356,6 @@ eskimo.Services = function () {
 
                 // handle iframe hiding
                 that.handleServiceHiding(service, uiConfig);
-
-                // if service was displayed, show Status
-                if (eskimoMain.isCurrentDisplayedService(service)) {
-                    eskimoMain.getSystemStatus().showStatus();
-                }
-
             }
         }
     }

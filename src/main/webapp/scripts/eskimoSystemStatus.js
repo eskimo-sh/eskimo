@@ -72,11 +72,74 @@ eskimo.SystemStatus = function() {
                     showStatus(true);
                 }, this));
 
+                // initialize menu
+                var menuContent = '' +
+                    '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n' +
+                    '    <li class="divider"></li>'+
+                    '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
+                    '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
+                    '    <li class="divider"></li>'+
+                    '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
+                    '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n';
+
+                $("#serviceContextMenu").html(menuContent);
+
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });
+
+        // register menu handler on services
+        $.fn.serviceContextMenu = function (settings) {
+
+            return this.each(function () {
+
+                // Open context menu
+                $(this).on("click", function (e) {
+
+                    //open menu
+                    var $menu = $(settings.menuSelector)
+                        .data("invokedOn", $(e.target))
+                        .show()
+                        .css({
+                            position: "absolute",
+                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft') - $("#inner-content-status").offset().left,
+                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop') - $("#inner-content-status").offset().top
+                        })
+                        .off('click')
+                        .on('click', 'a', function (e) {
+                            $menu.hide();
+
+                            var $invokedOn = $menu.data("invokedOn");
+                            var $selectedMenu = $(e.target);
+
+                            settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+                        });
+
+                    return false;
+                });
+
+                //make sure menu closes on any click
+                $('body').click(function () {
+                    $(settings.menuSelector).hide();
+                });
+            });
+        };
+
     };
+
+    function getMenuPosition(settings, mouse, direction, scrollDir) {
+        var win = $("#inner-content-status")[direction](),
+            scroll = $("#inner-content-status")[scrollDir](),
+            menu = $(settings.menuSelector)[direction](),
+            position = mouse + scroll;
+
+        // opening menu would pass the side of the page
+        if (mouse + menu > win && menu < mouse)
+            position -= menu;
+
+        return position;
+    }
 
     function loadUIStatusServicesConfig() {
         $.ajax({
@@ -516,6 +579,38 @@ eskimo.SystemStatus = function() {
         statusContainerEmpty.css("display", "inherit");
     };
 
+    function registerMenu(selector, dataSelector) {
+        // register menu
+        $(selector).serviceContextMenu({
+            menuSelector: "#serviceContextMenu",
+            menuSelected: function (invokedOn, selectedMenu) {
+
+                var action = selectedMenu.attr('id');
+                var nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
+                var service = $(invokedOn).closest("td."+dataSelector).data('eskimo-service');
+
+                if (action == "show_journal") {
+                    eskimoMain.getSystemStatus().showJournal(service, nodeAddress);
+
+                } else if (action == "start") {
+                    eskimoMain.getSystemStatus().startService(service, nodeAddress);
+
+                } else if (action == "stop") {
+                    eskimoMain.getSystemStatus().stopService(service, nodeAddress);
+
+                } else if (action == "restart") {
+                    eskimoMain.getSystemStatus().restartService(service, nodeAddress);
+
+                } else if (action == "reinstall") {
+                    eskimoMain.getSystemStatus().reinstallService(service, nodeAddress);
+
+                } else {
+                    alert("Unknown action : " + action);
+                }
+            }
+        })
+    }
+
     this.renderNodesStatusCarousel = function (data, blocking, availableNodes, nodeNamesByNbr) {
 
         var statusRenderOptions = $(".status-render-options");
@@ -561,34 +656,36 @@ eskimo.SystemStatus = function() {
                         arrayRow +=
                             '<table class="node-status-carousel-table">\n' +
                             '    <tbody><tr>\n' +
-                            '        <td class="nodes-status-carousel-status"><span class="font-weight-bold">&nbsp;</span></td>\n' +
-                            '        <td class="nodes-status-carousel-actions">'+
-                            '</td></tr></tbody></table>';
+                            '        <td><span class="font-weight-bold">&nbsp;</span></td>\n' +
+                            '        </tr></tbody></table>';
 
                     } else if (serviceStatus == "NA") {
 
                         arrayRow +=
                             '<table class="node-status-carousel-table">\n' +
                             '    <tbody><tr>\n' +
-                            '        <td class="nodes-status-carousel-status"><span class="font-weight-bold service-status-error '+
+                            '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
+                            '            class="nodes-status-carousel-status-na">' +
+                            '            <span class="font-weight-bold service-status-error '+
                             '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '        ">' +
                             service +
                             '        </span></td>\n' +
-                            '        <td class="nodes-status-carousel-actions">'+
-                            '</td></tr></tbody></table>';
+                            '        </tr>' +
+                            '</tbody></table>';
 
                     } else if (serviceStatus == "KO") {
 
                         arrayRow +=
                             '<table class="node-status-carousel-table">\n' +
                             '    <tbody><tr>\n' +
-                            '        <td class="nodes-status-carousel-status"><span class="font-weight-bold service-status-error '+
+                            '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
+                            '            class="nodes-status-carousel-status'+(eskimoMain.isOperationInProgress() ? '-pending': '') +'">' +
+                            '             <span class="font-weight-bold service-status-error '+
                             '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '        ">' +
                             service +
                             '        </span></td>\n' +
-                            fillInActions (service, nodeAddress, false, "nodes-status-carousel-actions") +
                             '    </tr>\n' +
                             '</tbody></table>\n';
 
@@ -602,7 +699,8 @@ eskimo.SystemStatus = function() {
                         arrayRow +=
                             '<table class="node-status-carousel-table">\n' +
                             '    <tbody><tr>\n' +
-                            '        <td class="nodes-status-carousel-status"><span class="font-weight-bold '+
+                            '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
+                            '            class="nodes-status-carousel-status'+(eskimoMain.isOperationInProgress() ? '-pending': '') +'"><span class="font-weight-bold '+
                             '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '         " style="color: '+color+';">' +
                             '            <div class="status-service-icon">' +
@@ -612,7 +710,6 @@ eskimo.SystemStatus = function() {
                             '&nbsp;' + service +
                             '            </div>' +
                             '        </span></td>\n' +
-                            fillInActions (service, nodeAddress, true, "nodes-status-carousel-actions") +
                             '    </tr>\n' +
                             '</tbody></table>\n';
 
@@ -621,7 +718,7 @@ eskimo.SystemStatus = function() {
                     arrayRow +=
                         '<table class="node-status-carousel-table">\n' +
                         '    <tbody><tr>\n' +
-                        '        <td class="nodes-status-carousel-status"><span class="font-weight-bold">-</span></td>\n' +
+                        '        <td><span class="font-weight-bold">-</span></td>\n' +
                         '        <td class="nodes-status-carousel-actions">'+
                         '</td></tr></tbody></table>';
                 }
@@ -633,6 +730,8 @@ eskimo.SystemStatus = function() {
 
             carouselContent.append(newRow);
         }
+
+        registerMenu("#nodes-status-carousel-content td.nodes-status-carousel-status", "nodes-status-carousel-status");
 
     };
 
@@ -724,7 +823,7 @@ eskimo.SystemStatus = function() {
 
             var arrayRow = ' ' +
                 '<tr id="' + nodeName + '">\n' +
-                '    <td class="status-node-cell">\n';
+                '    <td class="status-node-cell-intro">\n';
 
             if (nodeAlive == 'OK') {
                 arrayRow +=
@@ -736,8 +835,8 @@ eskimo.SystemStatus = function() {
 
             arrayRow +=
                 '    </td>\n' +
-                '    <td class="status-node-cell">' + nbr + '</td>\n' +
-                '    <td class="status-node-cell">' + nodeAddress + '</td>\n';
+                '    <td class="status-node-cell-intro">' + nbr + '</td>\n' +
+                '    <td class="status-node-cell-intro">' + nodeAddress + '</td>\n';
 
             for (var sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
                 var service = STATUS_SERVICES[sNb];
@@ -747,28 +846,26 @@ eskimo.SystemStatus = function() {
                     //console.log ("For service '" + service + "' on node '" + nodeName + "' got '"+ serviceStatus + "'");
                     if (!serviceStatus) {
 
-                        arrayRow += '    <td class="status-node-cell"></td>\n'
+                        arrayRow += '    <td class="status-node-cell-empty"></td>\n'
 
                     } else if (serviceStatus == "NA") {
 
                         arrayRow +=
-                            '    <td class="status-node-cell"><span class="service-status-error '+
+                            '    <td class="status-node-cell-empty"><span class="service-status-error '+
                             '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '      ">NA</span></td>\n'
 
                     } else if (serviceStatus == "KO") {
 
                         arrayRow +=
-                            '    <td class="status-node-cell">' +
+                            '    <td class="status-node-cell"' +
+                            '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
                             '<span class="service-status-error">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold ' +
                             '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '        ">KO</span></td>\n' +
-                            '    </tr>\n' +
-                            '    <tr class="">\n' +
-                            fillInActions (service, nodeAddress, false, "nodes-status-actions") +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
                             '\n' +
@@ -783,16 +880,14 @@ eskimo.SystemStatus = function() {
                         }
 
                         arrayRow +=
-                            '    <td class="status-node-cell">' +
+                            '    <td class="status-node-cell'+(eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
+                            '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
                             '<span style="color: '+color+';">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold '+
                             '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '        ">OK</span></td>\n' +
-                            '    </tr>\n' +
-                            '    <tr>\n' +
-                            fillInActions (service, nodeAddress, true, "nodes-status-actions") +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
                             '\n' +
@@ -801,7 +896,7 @@ eskimo.SystemStatus = function() {
 
                     }
                 } else {
-                    arrayRow += '    <td class="status-node-cell">-</td>\n'
+                    arrayRow += '    <td class="status-node-cell-empty">-</td>\n'
                 }
             }
 
@@ -811,81 +906,9 @@ eskimo.SystemStatus = function() {
 
             statusContainerTableBody.append(newRow);
         }
+
+        registerMenu("#status-node-table-body td.status-node-cell", "status-node-cell");
     };
-
-    function fillInActions(service, nodeAddress, up, tdClassName) {
-
-        var retActionsHtml = '';
-
-        retActionsHtml +=
-            '        <td class="' + tdClassName + '">\n' +
-            '            <a href="javascript:void(0);" title="Show journal" ' +
-            (!eskimoMain.isOperationInProgress() ?
-                'onclick="eskimoMain.getSystemStatus().showJournal(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
-                'onclick="event.preventDefault(); return false;"') +
-            '                >\n' +
-            '                <span class="service-status-action service-status-action-journal ' +
-            '        '+(eskimoMain.isOperationInProgress() ? 'invisible disabled' : '') +
-            '                "><i class="fa fa-file"></i></span>\n' +
-            '            </a>\n' +
-            '        </td>\n';
-
-        if (up) {
-            retActionsHtml +=
-                '        <td class="'+tdClassName+'">\n' +
-                '            <a href="javascript:void(0);" title="Stop Service" ' +
-                (!eskimoMain.isOperationInProgress() ?
-                    'onclick="eskimoMain.getSystemStatus().stopService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
-                    'onclick="event.preventDefault(); return false;"') +
-                '                >\n' +
-                '                <span class="service-status-action service-status-action-stop ' +
-                '        '+(eskimoMain.isOperationInProgress() ? 'invisible disabled' : '') +
-                '                "><i class="fa fa-close"></i></span>\n' +
-                '            </a>\n' +
-                '        </td>\n';
-        } else {
-            retActionsHtml +=
-                '        <td class="' + tdClassName + '">\n' +
-                '            <a href="javascript:void(0);" title="Start Service" ' +
-                (!eskimoMain.isOperationInProgress() ?
-                    'onclick="eskimoMain.getSystemStatus().startService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
-                    'onclick="event.preventDefault(); return false;"') +
-                '                >\n' +
-                '                <span class="service-status-action service-status-action-start ' +
-                '        '+(eskimoMain.isOperationInProgress() ? 'invisible disabled' : '') +
-                '                "><i class="fa fa-play"></i></span>\n' +
-                '            </a>\n' +
-                '        </td>\n';
-
-        }
-
-        retActionsHtml +=
-            '        <td class="' + tdClassName + '">\n' +
-            '            <a href="javascript:void(0);" title="Restart Service" ' +
-            (!eskimoMain.isOperationInProgress() ?
-                'onclick="eskimoMain.getSystemStatus().restartService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
-                'onclick="event.preventDefault(); return false;"') +
-            '                >\n' +
-            '                <span class="service-status-action service-status-action-restart ' +
-            '        '+(eskimoMain.isOperationInProgress() ? 'invisible disabled' : '') +
-            '                "><i class="fa fa-refresh"></i></span>\n' +
-            '            </a>\n' +
-            '        </td>\n' +
-            '        <td class="' + tdClassName + '">\n' +
-            '            <a href="javascript:void(0);" title="Reinstall Service" ' +
-            (!eskimoMain.isOperationInProgress() ?
-                'onclick="eskimoMain.getSystemStatus().reinstallService(\'' + service + '\', \'' + nodeAddress + '\'); event.preventDefault(); return false;"':
-                'onclick="event.preventDefault(); return false;"') +
-            '                >\n' +
-            '                <span class="service-status-action service-status-action-reinstall ' +
-            '        '+(eskimoMain.isOperationInProgress() ? 'invisible disabled' : '') +
-            '                "><i class="fa fa-undo"></i></span>\n' +
-            '            </a>\n' +
-            '        </td>\n' +
-            '        <td></td>\n';
-
-        return retActionsHtml;
-    }
 
     this.fetchOperationResult = function() {
         $.ajax({

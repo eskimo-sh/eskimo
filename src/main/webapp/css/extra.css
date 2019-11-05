@@ -203,24 +203,6 @@ But it breaks  the menu entry title overlay
 .font-weight-bold {
     font-weight: bold;
 }
-.service-status-action {
-    font-size: smaller;
-}
-.service-status-action-journal {
-    color: lightblue;
-}
-.service-status-action-stop {
-    color: red;
-}
-.service-status-action-start {
-    color: lightgreen;
-}
-.service-status-action-reinstall {
-    color: violet;
-}
-.service-status-action-restart {
-    color: lightblue;
-}
 
 .service-status-error {
     color: red;
@@ -297,14 +279,32 @@ li.disabled a .menu-text {
     overflow-y: auto;
 }
 .table > thead > tr > td.status-node-cell,
+.table > thead > tr > td.status-node-cell-empty,
+.table > thead > tr > td.status-node-cell-intro,
 .table > tbody > tr > td.status-node-cell,
+.table > tbody > tr > td.status-node-cell-empty,
+.table > tbody > tr > td.status-node-cell-intro,
 .table > tfoot > tr > td.status-node-cell,
-.status-node-cell {
+.table > tfoot > tr > td.status-node-cell-empty,
+.table > tfoot > tr > td.status-node-cell-intro,
+.status-node-cell,
+.status-node-cell-empty,
+.status-node-cell-intro {
     padding: 2px 5px 2px 5px;
     text-align: center;
     vertical-align: middle;
 }
-.table > thead > tr > td.status-node-cell {
+
+.table > thead > tr > td.status-node-cell,
+.table > tbody > tr > td.status-node-cell,
+.table > tfoot > tr > td.status-node-cell,
+.status-node-cell {
+    cursor: pointer;
+}
+
+.table > thead > tr > td.status-node-cell,
+.table > thead > tr > td.status-node-cell-empty,
+.table > thead > tr > td.status-node-cell-intro {
     background-color: #F2F2F2;
     font-weight: bold;
 }
@@ -351,6 +351,12 @@ table.system-information tr td.info-label {
     width: 100%;
 }
 .nodes-status-carousel-status {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+.nodes-status-carousel-status-na,
+.nodes-status-carousel-status-pending {
     width: 100%;
     text-align: left;
 }

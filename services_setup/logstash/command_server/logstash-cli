@@ -66,7 +66,7 @@ echo "--------------------------------------------------------------------------
 echo "This is a client command to a remote logstash running in a docker container."
 echo "This is not the actual logstash command"
 echo "CAUTION : ONLY /var/lib/logstash/data IS SHARED BETWEEN HOST AND CONTAINERS"
-echo "          -> data needs to be put in this folder"
+echo "          -> data, configuration files, etc. need to be put in this folder"
 echo "Arguments will be passed to a call to logstash in the logstash container."
 echo " - Target host : $LOGSTASH_HOST"
 echo " - Arguments   : $REBUILD_ARGS"

@@ -165,6 +165,7 @@ eskimo.Main = function() {
         if (!nodeServicesStatus || nodeServicesStatus == null) {
             $(".folder-menu-items").each(function () {
                 $(this).attr("class", "folder-menu-items disabled");
+                that.getServices().handleServiceHiding(service);
             });
 
         }
@@ -181,6 +182,7 @@ eskimo.Main = function() {
 
                 if (!serviceUp || !that.getServices().isServiceAvailable(service)) {
                     $(this).attr("class", "folder-menu-items disabled");
+                    that.getServices().handleServiceHiding(service);
                 } else {
                     $(this).attr("class", "folder-menu-items");
                 }
