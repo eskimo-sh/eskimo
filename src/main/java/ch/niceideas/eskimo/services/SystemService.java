@@ -992,7 +992,7 @@ public class SystemService {
     private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String service)
             throws IOException, SystemException, SSHCommandException {
 
-        sb.append("  - Creating archive and copying it over\n");
+        sb.append(" - Creating archive and copying it over\n");
 
         // 1. Find container folder, archive and copy there
 
@@ -1032,19 +1032,22 @@ public class SystemService {
         // 3. Copy container image there if any
 
         String imageName = servicesDefinition.getService(service).getImageName();
+        if (StringUtils.isNotBlank(imageName)) {
+            String imageFileName = setupService.findLastPackageFile(imageName);
 
-        String imageFileName = setupService.findLastPackageFile (imageName);
+            File containerFile = new File(packageDistributionPath + "/" + imageFileName);
+            if (containerFile.exists()) {
 
-        File containerFile = new File(packageDistributionPath + "/" + imageFileName);
-        if (containerFile.exists()) {
-            sshCommandService.copySCPFile(ipAddress, packageDistributionPath+"/"+imageFileName);
+                sb.append(" - Copying over docker image " + imageFileName + "\n");
+                sshCommandService.copySCPFile(ipAddress, packageDistributionPath + "/" + imageFileName);
 
-            exec(ipAddress, sb, new String[]{"mv", imageFileName, "/tmp/" + service + "/"});
+                exec(ipAddress, sb, new String[]{"mv", imageFileName, "/tmp/" + service + "/"});
 
-            exec(ipAddress, sb, new String[]{"ln", "-s", "/tmp/" + service + "/" + imageFileName, "/tmp/" + service + "/docker_template_" + service + ".tar.gz" });
+                exec(ipAddress, sb, new String[]{"ln", "-s", "/tmp/" + service + "/" + imageFileName, "/tmp/" + service + "/docker_template_" + imageName + ".tar.gz"});
 
-        } else {
-            sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
+            } else {
+                sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
+            }
         }
 
         // 4. call setup script
@@ -1061,13 +1064,15 @@ public class SystemService {
         exec(ipAddress, sb, "rm -Rf /tmp/" + service);
         exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
 
-        try {
-            sb.append(" - Deleting docker template image");
-            exec(ipAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
-        } catch (SSHCommandException e) {
-            logger.error (e, e);
-            sb.append (e.getMessage());
-            // ignroed any further
+        if (StringUtils.isNotBlank(imageName)) {
+            try {
+                sb.append(" - Deleting docker template image");
+                exec(ipAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
+            } catch (SSHCommandException e) {
+                logger.error(e, e);
+                sb.append(e.getMessage());
+                // ignroed any further
+            }
         }
 
         try {
