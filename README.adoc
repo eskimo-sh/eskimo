@@ -43,7 +43,9 @@ Software.
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
 *Big Data 2.0* clusters using *Docker* and *Mesos*.
 
-Eskimo is in a certain way the Operating System of your Big Data Cluster:
+image::doc/guides/eskimo-guide/pngs/eskimo-status.png[800, 800, align="center"]
+
+Eskimo is in a certain way the *Operating System* of your Big Data Cluster:
 
 * an Administration Application aimed at drastically simplifying the deployment, administration and operation of your
   Big Data Cluster
@@ -52,6 +54,9 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
   Kafka-Manager, Grafana and Prometheus*.
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
+
+Eskimo Packages all the componentds above and takes care of all the nuts and bolts required to make them work together
+smoothly and without the user or administrator needing to take care of anything.
 
 image::doc/guides/eskimo-guide/pngs/eskimo_platform.png[800, 800, align="center"]
 
