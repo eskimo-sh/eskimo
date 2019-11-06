@@ -65,4 +65,4 @@ fail_if_error $? "/tmp/gluster_build_log" -3
 
 
 echo " - Closing and saving image gluster"
-close_and_save_image gluster /tmp/gluster_build_log
+close_and_save_image gluster /tmp/gluster_build_log $DEBIAN_VERSION

@@ -56,4 +56,4 @@ fail_if_error $? "/tmp/zookeeper_build_log" -3
 #docker exec -i zookeeper TODO
 
 echo " - Closing and saving image zookeeper"
-close_and_save_image zookeeper /tmp/zookeeper_build_log
+close_and_save_image zookeeper /tmp/zookeeper_build_log $DEBIAN_VERSION

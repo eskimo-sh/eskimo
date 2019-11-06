@@ -65,4 +65,4 @@ fi
 
 
 echo " - Closing and saving image grafana"
-close_and_save_image grafana /tmp/grafana_build_log
+close_and_save_image grafana /tmp/grafana_build_log $GRAFANA_VERSION

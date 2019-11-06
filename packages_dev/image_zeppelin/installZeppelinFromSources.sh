@@ -39,6 +39,18 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "-- INSTALLING ZEPPELIN ---------------------------------------------------------"
 
+if [ -z "$1" ]; then
+   echo "Expecting local user name to use for build as argument"
+   exit 1
+fi
+export USER_TO_USE=$1
+
+if [ -z "$2" ]; then
+   echo "Expecting local user ID to use for build as argument"
+   exit 1
+fi
+export UID_TO_USE=$2
+
 if [ -z "$ZEPPELIN_VERSION" ]; then
     echo "Need to set ZEPPELIN_VERSION environment variable before calling this script !"
     exit 1
@@ -59,9 +71,6 @@ if [ -z "$HADOOP_MAJOR_VERSION" ]; then
     exit 1
 fi
 
-echo " !!! Needs to install flink first"
-exit -1
-
 saved_dir=`pwd`
 function returned_to_saved_dir() {
      cd $saved_dir
@@ -74,7 +83,7 @@ mkdir -p /tmp/zeppelin_build/
 cd /tmp/zeppelin_build/
 
 echo " - Install missing dependencies to build zeppelin sources"
-sudo apt-get install libfontconfig1 r-base-dev r-cran-evaluate apt-transport-https lsb-release > /tmp/zeppelin_install_log 2>&1
+sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install libfontconfig1 r-base-dev r-cran-evaluate apt-transport-https lsb-release > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -11
 
 echo " - Adding node and NPM source"
@@ -82,46 +91,59 @@ sudo bash -c "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -" >
 fail_if_error $? "/tmp/zeppelin_install_log" -12
 
 echo " - Installing node JS"
-sudo apt-get install -y nodejs > /tmp/zeppelin_install_log 2>&1
+sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install nodejs > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -13
 
 
-# FIXME
-echo "badtrash:x:1000:1000:badtrash,,,:/home/badtrash:/bin/bash" >> /etc/passwd
+echo " - Creating local build user"
+echo "$USER_TO_USE:x:$UID_TO_USE:$UID_TO_USE:$USER_TO_USE,,,:/home/$USER_TO_USE:/bin/bash" >> /etc/passwd
 
-# FIXME
-su badtrash
+echo " - Creating home folder for local build user"
+mkdir /home/$USER_TO_USE
+chown -R $USER_TO_USE /home/$USER_TO_USE
 
-
+echo " - Allowing local build user to use build folder"
+chmod -R 777 .
 
 echo " - Checking Zeppelin git repository out"
-git clone https://github.com/apache/zeppelin.git > /tmp/zeppelin_install_log 2>&1
+rm -Rf zeppelin
+git clone https://github.com/apache/zeppelin.git zeppelin > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -1
 
-cd zeppelin/
+echo " - Changing build folder owner"
+chown -R $USER_TO_USE zeppelin
+fail_if_error $? "/tmp/zeppelin_install_log" -1
 
 echo " - update all pom.xml to use scala $SCALA_VERSION"
-./dev/change_scala_version.sh $SCALA_VERSION  > /tmp/zeppelin_install_log 2>&1
+cd zeppelin/
+su $USER_TO_USE -c "./dev/change_scala_version.sh $SCALA_VERSION"  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 echo " - build zeppelin with all interpreters"
-mvn clean install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
-# One error is expected
+for i in `seq 1 5`; do
+    echo "   + attempt $i"
+    su $USER_TO_USE -c "mvn clean install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
+    if [[ $? == 0 ]]; then
+        echo "   + succeeded !"
+        break
+    else
+        if [[ $i == 5 ]]; then
+            cat "/tmp/zeppelin_install_log"
+            exit -10
+        fi
+    fi
+done
 
-echo " - build zeppelin with all interpreters (sevcond launch to address phantomJS failure)"
-mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -5
 
-
-echo " - Changing to temp directory"
+echo " - Creating setup temp directory"
 mkdir -p /tmp/zeppelin_setup/
 
+echo " - Copy Zeppelin sources to temp directory"
 cp zeppelin-distribution/target/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz /tmp/zeppelin_setup/  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -6
 
+echo " - Changing to setup temp directory"
 cd /tmp/zeppelin_setup/
-
-
 
 echo " - Extracting zeppelin-$ZEPPELIN_VERSION"
 tar -xvf zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz > /tmp/zeppelin_install_log 2>&1
@@ -167,7 +189,21 @@ echo " - Stopping Zeppelin"
 kill -15 $ZEPPELIN_PROC_ID
 export ZEPPELIN_PROC_ID=-1
 
+echo " - Cleaning up"
 returned_to_saved_dir
 sudo rm -Rf /tmp/zeppelin_setup
 sudo rm -Rf /tmp/zeppelin_build
+sudo rm -Rf /home/$USER_TO_USE
+
+
+
+if [[ ! -f /usr/local/lib/zeppelin/conf/interpreter.json ]]; then
+   echo "PROBLEM : interpreter.json was not created !"
+   exit -50
+fi
+
+
+# Caution : the in container setup script must mandatorily finish with this log"
+echo " - In container install SUCCESS"
+
 

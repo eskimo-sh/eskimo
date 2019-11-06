@@ -73,4 +73,4 @@ fi
 
 
 echo " - Closing and saving image kafka"
-close_and_save_image kafka /tmp/kafka_build_log
+close_and_save_image kafka /tmp/kafka_build_log $KAFKA_VERSION

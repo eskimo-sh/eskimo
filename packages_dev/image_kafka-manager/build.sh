@@ -69,4 +69,4 @@ fi
 
 
 echo " - Closing and saving image kafka-manager"
-close_and_save_image kafka-manager /tmp/kafkamanager_build_log
+close_and_save_image kafka-manager /tmp/kafkamanager_build_log $KAFKA_MANAGER_VERSION

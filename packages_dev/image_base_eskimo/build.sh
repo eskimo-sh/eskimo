@@ -82,4 +82,4 @@ echo " - Installing required utility tools for eskimo framework"
 docker exec -i base-eskimo apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq >> /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
-close_and_save_image base-eskimo /tmp/base_image_build_log
+close_and_save_image base-eskimo /tmp/base_image_build_log $ESKIMO_VERSION

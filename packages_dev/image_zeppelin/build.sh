@@ -48,12 +48,15 @@ rm -f /tmp/zeppelin_build_log
 echo " - Checking if spark eskimo image is available"
 if [[ `docker images -q eskimo:spark_template 2>/dev/null` == "" ]]; then
     echo " - Trying to loads spark image"
-    gunzip -c ../../packages_distrib/docker_template_spark.tar.gz | docker load >> /tmp/zeppelin_build_log 2>&1
-    if [[ $? != 0 ]]; then
-        echo "Could not load base image eskimo:spark_template"
-        cat /tmp/zeppelin_build_log
-        exit -1
-    fi
+    for i in `ls -rt ../../packages_distrib/docker_template_spark*.tar.gz | tail -1`; do
+        echo "   + loading image $i"
+        gunzip -c $i | docker load >> /tmp/zeppelin_build_log 2>&1
+        if [[ $? != 0 ]]; then
+            echo "Could not load base image eskimo:spark_template"
+            cat /tmp/zeppelin_build_log
+            exit -1
+        fi
+    done
 fi
 
 echo " - Building image zeppelin"
@@ -89,7 +92,11 @@ if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS
 fi
 
 echo " - Installing zeppelin"
-docker exec -i zeppelin bash /scripts/installZeppelin.sh | tee -a /tmp/zeppelin_build_log 2>&1
+if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
+    docker exec -i zeppelin bash /scripts/installZeppelinFromSources.sh $USER $UID | tee -a /tmp/zeppelin_build_log 2>&1
+else
+    docker exec -i zeppelin bash /scripts/installZeppelin.sh | tee -a /tmp/zeppelin_build_log 2>&1
+fi
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/zeppelin_build_log
@@ -102,4 +109,4 @@ fi
 #docker exec -it zeppelin bash
 
 echo " - Closing and saving image zeppelin"
-close_and_save_image zeppelin /tmp/zeppelin_build_log
+close_and_save_image zeppelin /tmp/zeppelin_build_log $ZEPPELIN_VERSION

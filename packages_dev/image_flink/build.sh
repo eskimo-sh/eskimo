@@ -99,4 +99,4 @@ echo " - TODO"
 
 
 echo " - Closing and saving image flink"
-close_and_save_image flink /tmp/flink_build_log
+close_and_save_image flink /tmp/flink_build_log $FLINK_VERSION

@@ -59,4 +59,4 @@ echo " - Note : mesos-master is actually not installed in this container. It wil
 #docker exec -i mesos-master TODO
 
 echo " - Closing and saving image mesos-master"
-close_and_save_image mesos-master /tmp/mesos_build_log
+close_and_save_image mesos-master /tmp/mesos_build_log $AMESOS_VERSION

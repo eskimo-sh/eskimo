@@ -35,6 +35,9 @@
 #
 
 # Version of software to install
+export ESKIMO_VERSION=0.2
+export DEBIAN_VERSION=debian_09_stretch
+
 export FLINK_VERSION=1.9.1
 export FLINK_HADOOP_VERSION=2.8.3-7.0
 export HADOOP_MAJOR_VERSION=2.8
@@ -48,12 +51,16 @@ export SCALA_VERSION=2.11
 export SPARK_STREAMING_KAFKA_CON_VERSION=0-10
 export SPARK_STREAMING_KAFKA_CLIENT_VERSION=2.0.0
 export KAFKA_MANAGER_VERSION=2.0.0.2
-export ZEPPELIN_VERSION=0.9.0
 export SPARK_UNUSED_VERSION=1.0.0
 export GRAFANA_VERSION=6.3.3
+export GDASH_VERSION=0.0.1
 export PROMETHEUS_VERSION=2.10.0
 export PROMETHEUS_NODE_EXPORTER_VERSION=0.18.1
 export PROMETHEUS_PUSHGATEWAY_VERSION=0.8.0
+
+# Zeppelin
+export ZEPPELIN_VERSION=0.9.0
+export ZEPPELIN_IS_SNAPSHOT="false" # Caution current builld of zeppelin MASTER is broken
 
 # This functions ensures that internet is available on host machine (the one running eskimo)
 # Internet is indeed required to download source packages for services.
@@ -129,6 +136,11 @@ function close_and_save_image() {
         echo "Log file needs to be passed in argument"
         exit -2
     fi
+
+    if [[ $3 == "" ]]; then
+        echo "Software version needs to be passed in argument"
+        exit -3
+    fi
 	
     echo " - Cleaning apt cache"
     docker exec -i $1 apt-get clean -q >> $2 2>&1
@@ -153,8 +165,16 @@ function close_and_save_image() {
     # save base image
     echo " - Saving image $1_template"
 	set -e
-    docker save eskimo:$1_template | gzip > ../../packages_distrib/docker_template_$1.tar.gz
+    docker save eskimo:$1_template | gzip > /tmp/docker_template_$1_TEMP.tar.gz
     set +e
+
+    echo " - versioning image"
+    for i in `seq 1 100`; do
+        if [[ ! -f "../../packages_distrib/docker_template_$1_$3_$i.tar.gz" ]]; then
+            mv /tmp/docker_template_$1_TEMP.tar.gz ../../packages_distrib/docker_template_$1_$3_$i.tar.gz
+            break;
+        fi
+    done
 
     #docker image rm `cat id_file`
     echo " - removing image $1_template"
@@ -182,8 +202,11 @@ function build_image() {
     echo " - Checking if base eskimo image is available"
     if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
         echo " - Trying to loads base eskimo image"
-        gunzip -c ../../packages_distrib/docker_template_base-eskimo.tar.gz | docker load >> $2 2>&1
-        fail_if_error $? $2 -10
+        for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
+            echo "   + loading image $i"
+            gunzip -c $i | docker load >> $2 2>&1
+            fail_if_error $? $2 -10
+        done
     fi
 
     echo " - Deleting any previous containers"

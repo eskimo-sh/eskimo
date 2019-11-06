@@ -64,4 +64,4 @@ fi
 #docker exec -i elasticsearch TODO
 
 echo " - Closing and saving image elasticsearch"
-close_and_save_image elasticsearch /tmp/es_build_log
+close_and_save_image elasticsearch /tmp/es_build_log $ES_VERSION

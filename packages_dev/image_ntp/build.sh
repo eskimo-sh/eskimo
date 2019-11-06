@@ -57,4 +57,4 @@ fail_if_error $? "/tmp/ntp_build_log" -2
 
 
 echo " - Closing and saving image ntp"
-close_and_save_image ntp /tmp/ntp_build_log
+close_and_save_image ntp /tmp/ntp_build_log $DEBIAN_VERSION

@@ -97,4 +97,4 @@ fi
 
 
 echo " - Closing and saving image spark"
-close_and_save_image spark /tmp/spark_build_log
+close_and_save_image spark /tmp/spark_build_log $SPARK_VERSION

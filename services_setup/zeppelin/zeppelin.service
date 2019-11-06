@@ -86,7 +86,7 @@ Type=simple
 #        --cap-add NET_RAW \
 
 Restart=always
-StartLimitBurst=5
+StartLimitBurst=3
 StartLimitInterval=60
 
 StandardOutput=syslog

@@ -78,4 +78,4 @@ fi
 
 
 echo " - Closing and saving image prometheus"
-close_and_save_image prometheus /tmp/prometheus_build_log
+close_and_save_image prometheus /tmp/prometheus_build_log $PROMETHEUS_VERSION

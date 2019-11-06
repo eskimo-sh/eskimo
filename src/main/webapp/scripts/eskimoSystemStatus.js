@@ -78,8 +78,8 @@ eskimo.SystemStatus = function() {
                     '    <li class="divider"></li>'+
                     '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
                     '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
-                    '    <li class="divider"></li>'+
                     '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
+                    '    <li class="divider"></li>'+
                     '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n';
 
                 $("#serviceContextMenu").html(menuContent);

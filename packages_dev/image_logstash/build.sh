@@ -76,4 +76,4 @@ fi
 #docker exec -i logstash TODO
 
 echo " - Closing and saving image logstash"
-close_and_save_image logstash /tmp/logstash_build_log
+close_and_save_image logstash /tmp/logstash_build_log $ES_VERSION

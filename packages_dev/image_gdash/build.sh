@@ -49,12 +49,15 @@ echo " - Building image elasticsearch"
 echo " - Checking if gluster image is available"
 if [[ `docker images -q eskimo:gluster_template 2>/dev/null` == "" ]]; then
     echo " - Trying to loads gluster image"
-    gunzip -c ../../packages_distrib/docker_template_gluster.tar.gz | docker load >> /tmp/gdash_build_log 2>&1
-    if [[ $? != 0 ]]; then
-        echo "Could not load base image eskimo:gluster_template"
-        cat /tmp/gdash_build_log
-        exit -1
-    fi
+    for i in `ls -rt ../../packages_distrib/docker_template_gluster*.tar.gz | tail -1`; do
+        echo "   + loading image $i"
+        gunzip -c $i | docker load >> /tmp/gdash_build_log 2>&1
+        if [[ $? != 0 ]]; then
+            echo "Could not load base image eskimo:gluster_template"
+            cat /tmp/gdash_build_log
+            exit -1
+        fi
+    done
 fi
 
 echo " - Building image gdash"
@@ -73,4 +76,4 @@ fi
 
 
 echo " - Closing and saving image gdash"
-close_and_save_image gdash /tmp/gdash_build_log
+close_and_save_image gdash /tmp/gdash_build_log $GDASH_VERSION

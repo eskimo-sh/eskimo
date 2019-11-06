@@ -76,4 +76,4 @@ fi
 #docker exec -i cerebro TODO
 
 echo " - Closing and saving image cerebro"
-close_and_save_image cerebro /tmp/cerebro_build_log
+close_and_save_image cerebro /tmp/cerebro_build_log $CEREBRO_VERSION

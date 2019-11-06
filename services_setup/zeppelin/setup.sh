@@ -193,26 +193,50 @@ echo " - Installing and checking systemd service file"
 install_and_check_service_file zeppelin /tmp/zeppelin_install_log
 
 echo " - Waiting for Zeppelin availability"
-for i in `seq 0 1 60`; do
-    sleep 2
-    eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
-    if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
-        echo " - Zeppelin is available."
-        break
-    fi
-done
+function wait_forZeppelin() {
+    for i in `seq 0 1 60`; do
+        sleep 2
+        eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
+        if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
+            echo " - Zeppelin is available."
+            break
+        fi
+    done
+}
 
-echo " - Importing Zeppelin Sample notebooks"
-sleep 5 # wait a little more
-for i in `find ./samples/`; do
-    if [[ ! -d $i ]]; then
-        echo "   + importing $i"
-        curl -XPOST -H "Content-Type: application/json" \
-                http://localhost:38080/api/notebook/import \
-                -d @"$i" >> /tmp/zeppelin_install_log 2>&1
-        fail_if_error $? "/tmp/zeppelin_install_log" -21
-    fi
-done
+wait_forZeppelin
 
+## FIXME . temporary hack replacing the API import below by an raw import of the samples to address the bug in zeppelin
+## import in 0.9-SNAPSHOT
+#echo " - Importing Zeppelin Sample notebooks"
+#sleep 5 # wait a little more
+#for i in `find ./samples/`; do
+#    if [[ ! -d $i ]]; then
+#        echo "   + importing $i"
+#        curl -XPOST -H "Content-Type: application/json" \
+#                http://localhost:38080/api/notebook/import \
+#                -d @"$i" >> /tmp/zeppelin_install_log 2>&1
+#        fail_if_error $? "/tmp/zeppelin_install_log" -21
+#    fi
+#done
+
+echo " - HACK stopping zeppellin"
+sudo systemctl stop zeppelin >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? /tmp/zeppelin_install_log -30
+
+sleep 5
+
+echo " - HACK raw import of samples"
+sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/zeppelin/
+cd /var/lib/zeppelin/
+
+echo " - HACK extract of samples"
+sudo tar xvfz eskimo_samples.tgz
+sudo chown -R spark.spark *
+sudo rm -Rf /eskimo_samples.tgz
+
+echo " - HACK restarting zeppellin"
+sudo systemctl start zeppelin >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? /tmp/zeppelin_install_log -31
 
 

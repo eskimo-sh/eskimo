@@ -59,4 +59,4 @@ fi
 #docker exec -i kibana TODO
 
 echo " - Closing and saving image kibana"
-close_and_save_image kibana /tmp/kibana_build_log
+close_and_save_image kibana /tmp/kibana_build_log $ES_VERSION
