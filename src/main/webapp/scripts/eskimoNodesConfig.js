@@ -572,19 +572,33 @@ eskimo.NodesConfig = function() {
             $(nodes[i]["field"]).attr("id", "field" + (i + 1));
             $(nodes[i]["input"]).attr("name", "action_id" + (i + 1));
             $(nodes[i]["input"]).attr("id", "action_id" + (i + 1));
+            $(nodes[i]["configure"]).attr("id", "configure" + (i + 1));
             $(nodes[i]["remove"]).attr("id", "remove" + (i + 1));
             $(nodes[i]["label"]).html(getNodeTitle(nodes[i]["type"] == "range") + '<div class="server-title-text">' + (i + 1) + '</div>');
             $(nodes[i]["label"]).attr("id", "label" + (i + 1));
-            for (var j = 0; j < CONFIGURED_SERVICES.length; j++) {
+            for (var j = 0; j < UNIQUE_SERVICES.length; j++) {
 
-                $(nodes[i][CONFIGURED_SERVICES[j]]).attr("value", (i + 1));
+                $(nodes[i][UNIQUE_SERVICES[j]]).attr("value", (i + 1));
 
                 // keep this last
-                $(nodes[i][CONFIGURED_SERVICES[j]]).attr("id", CONFIGURED_SERVICES[j] + (i + 1));
+                $(nodes[i][UNIQUE_SERVICES[j]]).attr("id", UNIQUE_SERVICES[j] + (i + 1));
+            }
+
+            for (var j = 0; j < MULTIPLE_SERVICES.length; j++) {
+
+                $(nodes[i][MULTIPLE_SERVICES[j]]).attr("value", (i + 1));
+
+                // need to rewrite name as well for multiple services
+                $(nodes[i][MULTIPLE_SERVICES[j]]).attr("name", MULTIPLE_SERVICES[j] + (i + 1));
+
+                // keep this last
+                $(nodes[i][MULTIPLE_SERVICES[j]]).attr("id", MULTIPLE_SERVICES[j] + (i + 1));
+
             }
 
             nodes[i]["field"] = "#field"+(i + 1);
             nodes[i]["input"] = "#action_id"+(i + 1);
+            nodes[i]["configure"] = "#configure"+(i + 1);
             nodes[i]["remove"] = "#remove"+(i + 1);
             nodes[i]["label"] = "#label"+(i + 1);
             for (var j = 0; j < CONFIGURED_SERVICES.length; j++) {
@@ -624,6 +638,19 @@ eskimo.NodesConfig = function() {
         }
     }
 
+    this.showServiceSelection = function(e) {
+
+        var configureButtonId = $(e.target).attr("id");
+        var nodeNbr = configureButtonId.substring("configure".length);
+
+        var isRange = $(e.target).data("is-range");
+
+        //console.log (nodeNbr + " - " + isRange);
+
+        eskimoMain.getServicesSelection().showServiceSelection(nodeNbr, eskimoMain.getNodesConfig().onServicesSelectedForNode, isRange == "true");
+
+    };
+
     function addNewElement (isRange) {
 
         if (nodes.length == 0) {
@@ -661,7 +688,7 @@ eskimo.NodesConfig = function() {
         multipleServicesDiv = multipleServicesDiv + "</div>";
 
         var newIn = ' '+
-            '<div id="field'+ next +'" name="field'+ next +'" class="form-group col-md-12 node-config-element" >'+
+            '<div id="field'+ next +'" class="form-group col-md-12 node-config-element" >'+
             '    <div class="col-md-12 node-config-element-wrapper"> '+
             '        <label class="col-md-3 control-label" id="label'+next+'">'+getNodeTitle(isRange)+' <div class="server-title-text">' + next + '</div></label> '+
             '        <div class="col-md-6"> '+
@@ -671,8 +698,8 @@ eskimo.NodesConfig = function() {
             '        </div>'+
             '        <div class="btn-toolbar col-md-3">'+
             '            <div class="btn-group">'+
-            '                <button id="configure' + next + '" class="btn btn-primary" '+
-            '                     onclick="javascript:eskimoMain.getServicesSelection().showServiceSelection(\'' + next + '\', eskimoMain.getNodesConfig().onServicesSelectedForNode, ' + isRange + '); event.preventDefault(); return false;" >Configure</button>'+
+            '                <button data-is-range="' + isRange + '" id="configure' + next + '" class="btn btn-primary" '+
+            '                     onclick="javascript:eskimoMain.getNodesConfig().showServiceSelection(event); event.preventDefault(); return false;" >Configure</button>'+
             '            </div>'+
             '            <div class="btn-group">'+
             '                <button id="remove' + next + '" class="btn btn-danger remove-me" >Remove</button>'+
@@ -694,6 +721,7 @@ eskimo.NodesConfig = function() {
         nodes[next-1]["field"] = "#field"+next;
         nodes[next-1]["input"] = "#action_id"+next;
         nodes[next-1]["remove"] = "#remove"+next;
+        nodes[next-1]["configure"] = "#configure"+next;
         nodes[next-1]["label"] = "#label"+next;
 
         for (var j = 0; j < CONFIGURED_SERVICES.length; j++) {
