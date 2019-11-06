@@ -53,7 +53,7 @@ echo " - Building container cerebro"
 build_container cerebro cerebro /tmp/cerebro_install_log
 
 echo " - Configuring host elasticsearch config part"
-. ./setupCommon.sh
+. ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20

@@ -218,6 +218,7 @@ public class FileUtils {
                 tarOs.close();
             } catch (IOException e) {
                 logger.error (e, e);
+                logger.warn ("An error here is often an indication that there is an unresolved symbolic link in folder to archive.");
                 throw new IOException(e);
             }
         }
