@@ -586,8 +586,6 @@ eskimo.NodesConfig = function() {
 
             for (var j = 0; j < MULTIPLE_SERVICES.length; j++) {
 
-                $(nodes[i][MULTIPLE_SERVICES[j]]).attr("value", (i + 1));
-
                 // need to rewrite name as well for multiple services
                 $(nodes[i][MULTIPLE_SERVICES[j]]).attr("name", MULTIPLE_SERVICES[j] + (i + 1));
 
