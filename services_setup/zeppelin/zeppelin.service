@@ -54,6 +54,8 @@ ExecStartPre=-/usr/bin/docker rm -f zeppelin
 # attempt to recreate  / remount gluster shares
 ExecStartPre=/bin/bash /usr/local/sbin/setupSparkGlusterShares.sh
 ExecStartPre=/bin/bash /usr/local/sbin/setupFlinkGlusterShares.sh
+ExecStartPre=/bin/bash /usr/local/sbin/setupLogstashGlusterShares.sh
+ExecStartPre=/bin/bash /usr/local/sbin/setupZeppelinGlusterShares.sh
 
 # Find out about version of mesos available
 ExecStartPre=/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
@@ -66,9 +68,10 @@ ExecStart=/bin/bash -c ". /run/zeppelin_mesos_environment && /usr/bin/docker run
         --network host \
         -v /var/log/zeppelin:/var/log/zeppelin \
         -v /var/run/zeppelin:/var/run/zeppelin \
-        -v /var/lib/zeppelin:/var/lib/zeppelin \
+        -v /var/lib/zeppelin:/var/lib/zeppelin:rshared \
         -v /var/log/spark:/var/log/spark\
         -v /var/lib/spark:/var/lib/spark:rshared \
+        -v /var/lib/logstash:/var/lib/logstash:rshared \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
@@ -87,7 +90,7 @@ Type=simple
 
 Restart=always
 StartLimitBurst=3
-StartLimitInterval=60
+StartLimitInterval=60setupSparkZeppelinShares
 
 StandardOutput=syslog
 StandardError=syslog

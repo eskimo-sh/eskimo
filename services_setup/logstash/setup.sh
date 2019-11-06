@@ -52,23 +52,22 @@ sudo rm -f /tmp/logstash_install_log
 # build
 
 echo " - Configuring host elasticsearch config part"
-. ./setupCommon.sh
+. ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20
 fi
 
+echo " - Configuring host logstash config part"
+. ./setupLogstashCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+if [[ $? != 0 ]]; then
+    echo "Logstash Common configuration part failed !"
+    exit -21
+fi
+
 
 echo " - Building docker container for logstash"
 build_container logstash logstash /tmp/logstash_install_log
-
-echo " - Creating shared directory"
-sudo mkdir -p /var/lib/logstash
-sudo chown -R elasticsearch /var/lib/logstash
-sudo mkdir -p /var/run/logstash
-sudo chown -R elasticsearch /var/run/logstash
-sudo mkdir -p /var/log/logstash
-sudo chown -R elasticsearch /var/log/logstash
 
 # create and start container
 echo " - Running docker container to configure logstash executor"
@@ -90,9 +89,9 @@ echo " - Logstash Remote Server Scripts"
 for i in `find ./command_server`; do
     if [[ -f $SCRIPT_DIR/$i ]]; then
         filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        docker exec logstash chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        fail_if_error $? /tmp/gluster_install_log -30
+        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> /tmp/logstash_install_log 2>&1
+        docker exec logstash chmod 755 /usr/local/sbin/$filename >> /tmp/logstash_install_log 2>&1
+        fail_if_error $? /tmp/logstash_install_log -30
     fi
 done
 
@@ -117,10 +116,6 @@ fi
 
 echo " - Handling topology and setting injection"
 handle_topology_settings logstash /tmp/logstash_install_log
-
-echo " - Installing setupLogstashGlusterShares.sh to /usr/local/sbin"
-sudo cp setupLogstashGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupLogstashGlusterShares.sh
 
 echo " - Committing changes to local template and exiting container logstash"
 commit_container logstash /tmp/logstash_install_log

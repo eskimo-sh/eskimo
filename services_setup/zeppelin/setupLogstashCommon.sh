@@ -1,0 +1,1 @@
+../logstash/setupLogstashCommon.sh

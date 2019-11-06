@@ -70,7 +70,7 @@ sudo sed -i s/"# export ZEPPELIN_ADDR"/"export ZEPPELIN_ADDR=0.0.0.0"/g /usr/loc
 
 sudo sed -i s/"# export ZEPPELIN_LOG_DIR"/"export ZEPPELIN_LOG_DIR=\/var\/log\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 sudo sed -i s/"# export ZEPPELIN_PID_DIR"/"export ZEPPELIN_PID_DIR=\/var\/run\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
-sudo sed -i s/"# export ZEPPELIN_NOTEBOOK_DIR"/"export ZEPPELIN_NOTEBOOK_DIR=\/var\/lib\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+sudo sed -i s/"# export ZEPPELIN_NOTEBOOK_DIR"/"export ZEPPELIN_NOTEBOOK_DIR=\/var\/lib\/zeppelin\/notebooks\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
 sudo sed -i s/"# export ZEPPELIN_IDENT_STRING"/"export ZEPPELIN_IDENT_STRING=eskimo"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 

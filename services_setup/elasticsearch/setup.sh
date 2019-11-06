@@ -69,7 +69,7 @@ echo " - Building container elasticsearch"
 build_container elasticsearch elasticsearch /tmp/es_install_log
 
 echo " - Configuring host elasticsearch common part"
-. ./setupCommon.sh
+. ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20

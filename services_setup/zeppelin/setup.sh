@@ -81,6 +81,26 @@ if [[ $? != 0 ]]; then
     exit -20
 fi
 
+echo " - Configuring host ElasticSearch config part"
+. ./setupESCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+if [[ $? != 0 ]]; then
+    echo "ES Common configuration part failed !"
+    exit -20
+fi
+
+echo " - Configuring host logstash config part"
+. ./setupLogstashCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+if [[ $? != 0 ]]; then
+    echo "Logstash Common configuration part failed !"
+    exit -20
+fi
+
+
+echo " - Installing setupZeppelinGlusterShares.sh to /usr/local/sbin"
+sudo cp setupZeppelinGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupZeppelinGlusterShares.sh
+
+
 echo " - Building container zeppelin"
 build_container zeppelin zeppelin /tmp/zeppelin_install_log
 
@@ -90,6 +110,8 @@ sudo chown -R spark /var/run/zeppelin
 sudo mkdir -p /var/log/zeppelin
 sudo chown -R spark /var/log/zeppelin
 sudo mkdir -p /var/lib/zeppelin
+sudo mkdir -p /var/lib/zeppelin/notebooks
+sudo mkdir -p /var/lib/zeppelin/data
 sudo chown -R spark /var/lib/zeppelin
 
 #sudo mkdir -p /usr/local/etc/zeppelin
@@ -227,13 +249,13 @@ fail_if_error $? /tmp/zeppelin_install_log -30
 sleep 5
 
 echo " - HACK raw import of samples"
-sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/zeppelin/
-cd /var/lib/zeppelin/
+sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/zeppelin/notebooks/
+cd /var/lib/zeppelin/notebooks/
 
 echo " - HACK extract of samples"
 sudo tar xvfz eskimo_samples.tgz
 sudo chown -R spark.spark *
-sudo rm -Rf /eskimo_samples.tgz
+sudo rm -Rf eskimo_samples.tgz
 
 echo " - HACK restarting zeppellin"
 sudo systemctl start zeppelin >> /tmp/zeppelin_install_log 2>&1
