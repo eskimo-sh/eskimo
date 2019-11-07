@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -53,6 +54,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     private static final Logger logger = Logger.getLogger(SystemServiceTest.class);
 
     @Test
+    @Ignore
     public void testInstallService() throws Exception {
 
         setupService.setConfigStoragePathInternal(createTempStoragePath());
