@@ -65,6 +65,24 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
 
         if [[ `echo $poolListResult | grep $SELF_IP_ADDRESS` != "" ]]; then
 
+            echo " - Removing bricks from node"
+            for i in `sudo /usr/local/sbin/gluster volume info | grep Brick | grep / | cut -d ' ' -f 2 | grep $SELF_IP_ADDRESS`; do
+                echo "   + removing brick $i"
+
+                # FIXME I should add a replica on another node
+                # Then compute nzmber ore replica and remove 1 from it to use in the command below
+
+                # get filename
+                share_name=$(basename `echo "192.168.10.13:/var/lib/gluster/volume_bricks/spark_data" | cut -d ':' -f 2`)
+
+                echo "y" | sudo /usr/local/sbin/gluster volume remove-brick $share_name replica 1 $i force
+                if [[ $? != 0 ]]; then
+                    echo " -> Failed to remove brick $i!"
+                    exit -3
+                fi
+            done
+
+
             echo " - Removing local gluster node from master pool list"
             docker exec -i gluster bash -c "/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer detach $SELF_IP_ADDRESS"
             if [[ $? != 0 ]]; then

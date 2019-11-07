@@ -787,6 +787,12 @@
         "mandatory": false
       },
       {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "logstash",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
         "masterElectionStrategy": "RANDOM",
         "masterService": "spark-executor",
         "numberOfMasters": 1,

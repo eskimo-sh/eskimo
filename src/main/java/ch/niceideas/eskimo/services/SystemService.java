@@ -959,10 +959,16 @@ public class SystemService {
             throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
         }
 
-        File uninstallScriptFile = new File (containerFolder, "uninstall.sh");
-        if (uninstallScriptFile.exists()) {
-            sb.append(" - Calling uninstall script\n");
-            sb.append (sshCommandService.runSSHScriptPath(ipAddress, uninstallScriptFile.getAbsolutePath()));
+        try {
+            File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
+            if (uninstallScriptFile.exists()) {
+                sb.append(" - Calling uninstall script\n");
+
+                sb.append(sshCommandService.runSSHScriptPath(ipAddress, uninstallScriptFile.getAbsolutePath()));
+            }
+        } catch (SSHCommandException e) {
+            logger.warn (e, e);
+            sb.append (e.getMessage());
         }
 
         // 2. Stop service

@@ -89,7 +89,10 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("192.168.10.13", oc.getInstallations().get(0).getValue());
 
         assertEquals(0, oc.getUninstallations().size());
-        assertEquals(0, oc.getRestarts().size());
+
+        assertEquals(1, oc.getRestarts().size());
+        assertEquals("zeppelin", oc.getRestarts().get(0).getKey());
+        assertEquals("192.168.10.13", oc.getRestarts().get(0).getValue());
     }
 
     @Test
@@ -108,7 +111,9 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("logstash", oc.getUninstallations().get(0).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(0).getValue());
 
-        assertEquals(0, oc.getRestarts().size());
+        assertEquals(1, oc.getRestarts().size());
+        assertEquals("zeppelin", oc.getRestarts().get(0).getKey());
+        assertEquals("192.168.10.13", oc.getRestarts().get(0).getValue());
     }
 
     @Test
