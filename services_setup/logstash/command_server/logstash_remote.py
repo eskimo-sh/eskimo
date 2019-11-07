@@ -84,13 +84,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         f = furl(self.path)
         fullArgs = self.rfile.read(int(self.headers['Content-Length']))
 
+        stdin_file = self.headers['stdin_file'];
+
         command_line = "/usr/local/lib/logstash/bin/logstash {0} ".format(fullArgs)
         LOG.info('Command Line : %s', command_line)
 
         # execute command
         try:
             # stdout = subprocess.PIPE lets you redirect the output
-            res = subprocess.Popen(command_line.strip().split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if stdin_file == None or stdin_file == "":
+                res = subprocess.Popen(command_line.strip().split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            else:
+                infile = open(stdin_file)
+                res = subprocess.Popen(command_line.strip().split(), stdin=infile, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
             res.wait() # wait for process to finish; this also sets the returncode variable inside 'res'
 

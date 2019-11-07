@@ -42,20 +42,31 @@ fi
 
 export REBUILD_ARGS=""
 export LOGSTASH_HOST=""
-export PROCESS_NEXT="0"
+export STDIN=""
+export PROCESS_NEXT_HOST="0"
+export PROCESS_NEXT_STDIN="0"
 for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
+    if [[ $PROCESS_NEXT_HOST == "1" ]]; then
         LOGSTASH_HOST=$argument
-        export PROCESS_NEXT="0"
+        export PROCESS_NEXT_HOST="0"
+        export PROCESS_NEXT_STDIN="0"
+    elif [[ $PROCESS_NEXT_STDIN == "1" ]]; then
+        STDIN=$argument
+        export PROCESS_NEXT_HOST="0"
+        export PROCESS_NEXT_STDIN="0"
     else
         if [[ $argument == "-target_host" || $argument == "--target_host" ]]; then
-            export PROCESS_NEXT="1"
+            export PROCESS_NEXT_HOST="1"
+        elif [[ $argument == "-std_in" || $argument == "--std_in" ]]; then
+            export PROCESS_NEXT_STDIN="1"
         else
-            export PROCESS_NEXT="0"
+            export PROCESS_NEXT_HOST="0"
+            export PROCESS_NEXT_STDIN="0"
             export REBUILD_ARGS="$REBUILD_ARGS $argument"
         fi
     fi
 done
+
 
 if [[ $LOGSTASH_HOST == "" ]]; then
     echo "Mandatory argument -target_host HOST is missing"
@@ -65,10 +76,16 @@ fi
 echo "--------------------------------------------------------------------------------"
 echo "This is a client command to a remote logstash running in a docker container."
 echo "This is not the actual logstash command"
+echo ""
 echo "CAUTION : ONLY /var/lib/logstash/data IS SHARED BETWEEN HOST AND CONTAINERS"
 echo "          -> data, configuration files, etc. need to be put in this folder"
+echo ""
+echo "CAUTION : stdin piping is implemented using the -std_in argument where a file"
+echo "needs to be passed"
+echo ""
 echo "Arguments will be passed to a call to logstash in the logstash container."
 echo " - Target host : $LOGSTASH_HOST"
+echo " - STDIN : $STDIN"
 echo " - Arguments   : $REBUILD_ARGS"
 echo "--------------------------------------------------------------------------------"
 
@@ -80,11 +97,17 @@ rm -f /tmp/call_result.log
 rm -f /tmp/call_out.log
 rm -f /tmp/call_error.log
 
-curl -w "HTTP_CODE=%{http_code}" -XPOST  "http://$LOGSTASH_HOST:28999/" -d "$REBUILD_ARGS" \
-    -o /tmp/call_result.log \
-    >/tmp/call_out.log \
-    2>/tmp/call_error.log
-
+if [[ $STDIN == "" ]]; then
+    curl -w "HTTP_CODE=%{http_code}" -XPOST "http://$LOGSTASH_HOST:28999/" -d "$REBUILD_ARGS" \
+        -o /tmp/call_result.log \
+        >/tmp/call_out.log \
+        2>/tmp/call_error.log
+else
+    curl -w "HTTP_CODE=%{http_code}" -H "stdin_file: $STDIN"  -XPOST "http://$LOGSTASH_HOST:28999/" -d "$REBUILD_ARGS" \
+        -o /tmp/call_result.log \
+        >/tmp/call_out.log \
+        2>/tmp/call_error.log
+fi
 
 
 #cat /tmp/call_out.log | grep -v HTTP_CODE
