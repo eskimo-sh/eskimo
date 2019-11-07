@@ -35,76 +35,9 @@
 #
 
 
+# Handling /var/lib/spark/data
+/usr/local/sbin/handle_gluster_share.sh spark_data /var/lib/spark/data spark
 
-# Loading topology
-if [[ ! -f /etc/eskimo_topology.sh ]]; then
-    echo "  - ERROR : no topology file defined !"
-    exit -123
-fi
-
-. /etc/eskimo_topology.sh
-
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit -1
-fi
-
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
-fi
-
-
-# find out if gluster is available
-if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
-    export GLUSTER_AVAILABLE=1
-else
-    export GLUSTER_AVAILABLE=0
-fi
-
-# Only if gluster is enabled
-if [[ $GLUSTER_AVAILABLE == 1 ]]; then
-
-    echo " - Proceeding with gluster mount /var/lib/spark/data"
-    /usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark `/usr/bin/id -u spark`
-
-    echo " - Proceeding with gluster mount /var/lib/spark/eventlog"
-    /usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/spark/eventlog spark `/usr/bin/id -u spark`
-
-else
-
-    echo " - Not mounting gluster shares since not working in cluster mode"
-
-    if [[ ! -d /var/lib/spark/data ]]; then
-        echo " - Creating /var/lib/spark/data"
-        mkdir -p /var/lib/spark/data
-    fi
-
-    if [[ ! -d /var/lib/spark/eventlog ]]; then
-        echo " - Creating /var/lib/spark/eventlog"
-        mkdir -p /var/lib/spark/eventlog
-    fi
-
-    if [[ `stat -c '%U' /var/lib/spark/data` != "spark" ]]; then
-        echo " - Changing owner if /var/lib/spark/data"
-        chown -R spark /var/lib/spark/data
-    fi
-
-    if [[ `stat -c '%U' /var/lib/spark/eventlog` != "spark" ]]; then
-        echo " - Changing owner if /var/lib/spark/eventlog"
-        chown -R spark /var/lib/spark/eventlog
-    fi
-
-
-    if [[ `ls -la /var/lib/spark/ | grep data | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of /var/lib/spark/data"
-        chmod -R 777 /var/lib/spark/data
-    fi
-
-    if [[ `ls -la /var/lib/spark/ | grep eventlog | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of /var/lib/spark/eventlog"
-        chmod -R 777 /var/lib/spark/eventlog
-    fi
-fi
+# Handling /var/lib/spark/eventlog
+/usr/local/sbin/handle_gluster_share.sh spark_eventlog /var/lib/spark/eventlog spark
 

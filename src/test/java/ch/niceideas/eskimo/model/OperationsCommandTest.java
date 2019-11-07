@@ -151,15 +151,16 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
         assertEquals(13, oc.getRestarts().size());
 
-        assertEquals ("[elasticsearch=192.168.10.11, " +
+        assertEquals ("[" +
+                "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "logstash=192.168.10.11, " +
-                "logstash=192.168.10.13, " +
                 "cerebro=192.168.10.11, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
                 "kibana=192.168.10.11, " +
                 "mesos-agent=192.168.10.13, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
                 "kafka-manager=192.168.10.11, " +
                 "spark-history-server=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
@@ -188,9 +189,9 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals(3, oc.getInstallations().size());
         assertEquals("elasticsearch", oc.getInstallations().get(0).getKey());
         assertEquals("192.168.10.13", oc.getInstallations().get(0).getValue());
-        assertEquals("logstash", oc.getInstallations().get(1).getKey());
+        assertEquals("cerebro", oc.getInstallations().get(1).getKey());
         assertEquals("192.168.10.13", oc.getInstallations().get(1).getValue());
-        assertEquals("cerebro", oc.getInstallations().get(2).getKey());
+        assertEquals("logstash", oc.getInstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getInstallations().get(2).getValue());
 
         assertEquals(3, oc.getUninstallations().size());

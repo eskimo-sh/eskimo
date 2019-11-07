@@ -76,11 +76,11 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         OperationsCommand oc = OperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
 
-        List<Pair<String, String>>[] orderedInstall = sio.orderInstallation (oc.getInstallations(), nodesConfig, new HashSet<>());
+        List<Pair<String, String>>[] orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig, new HashSet<>());
 
         assertNotNull(orderedInstall);
 
-        assertEquals(14, orderedInstall.length);
+        assertEquals(13, orderedInstall.length);
 
         // Test first, third and last group
         List<Pair<String, String>> group1 = orderedInstall[0];
@@ -96,10 +96,10 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         assertEquals("192.168.10.11", group3.get(0).getValue());
         assertEquals("gluster", group3.get(1).getKey());
 
-        List<Pair<String, String>> group14 = orderedInstall[13];
-        assertEquals(1, group14.size());
-        assertEquals("zeppelin", group14.get(0).getKey());
-        assertEquals("192.168.10.13", group14.get(0).getValue());
+        List<Pair<String, String>> group13 = orderedInstall[12];
+        assertEquals(1, group13.size());
+        assertEquals("zeppelin", group13.get(0).getKey());
+        assertEquals("192.168.10.13", group13.get(0).getValue());
 
 
     }

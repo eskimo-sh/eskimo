@@ -611,6 +611,12 @@
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
       }
     ]
   },

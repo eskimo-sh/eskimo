@@ -76,6 +76,7 @@ ExecStart=/bin/bash -c ". /run/zeppelin_mesos_environment && /usr/bin/docker run
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        --mount type=bind,source=/usr/local/bin/logstash-cli,target=/usr/local/bin/logstash-cli \
         -e NODE_NAME=$HOSTNAME \
         eskimo:zeppelin \
         /usr/local/sbin/inContainerStartService.sh"

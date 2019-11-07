@@ -426,7 +426,7 @@ public class SystemService {
 
 
             // Installation in batches (groups following dependencies)
-            for (List<Pair<String, String>> installations : servicesInstallationSorter.orderInstallation (command.getInstallations(), nodesConfig, deadIps)) {
+            for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (command.getInstallations(), nodesConfig, deadIps)) {
 
                 performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimout,
                         (operation, error) -> {
@@ -439,32 +439,41 @@ public class SystemService {
             }
 
             // uninstallations
-            performPooledOperation (command.getUninstallations(), parallelismInstallThreadCount, operationWaitTimout,
-                    (operation, error) -> {
-                        String service = operation.getKey();
-                        String ipAddress = operation.getValue();
-                        if (!deadIps.contains(ipAddress)) {
-                            uninstallService(service, ipAddress);
-                        } else {
-                            if (!liveIps.contains(ipAddress)) {
-                                // this means that the node has been de-configured
-                                // (since if it is neither dead nor alive then it just hasn't been tested since it's not
-                                // in the config anymore)
-                                // just consider it uninstalled
-                                uninstallServiceNoOp(service, ipAddress);
+            List<Pair<String, String>>[] invertedUninstallations =  servicesInstallationSorter.orderOperations (command.getUninstallations(), nodesConfig, deadIps);
+
+            List<List<Pair<String, String>>> orderedUninstallations = Arrays.asList(invertedUninstallations);
+            Collections.reverse(orderedUninstallations);
+
+            for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
+                performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimout,
+                        (operation, error) -> {
+                            String service = operation.getKey();
+                            String ipAddress = operation.getValue();
+                            if (!deadIps.contains(ipAddress)) {
+                                uninstallService(service, ipAddress);
+                            } else {
+                                if (!liveIps.contains(ipAddress)) {
+                                    // this means that the node has been de-configured
+                                    // (since if it is neither dead nor alive then it just hasn't been tested since it's not
+                                    // in the config anymore)
+                                    // just consider it uninstalled
+                                    uninstallServiceNoOp(service, ipAddress);
+                                }
                             }
-                        }
-                    });
+                        });
+            }
 
             // restarts
-            performPooledOperation (command.getRestarts(), parallelismInstallThreadCount, operationWaitTimout,
-                    (operation, error) -> {
-                        String service = operation.getKey();
-                        String ipAddress = operation.getValue();
-                        if (liveIps.contains(ipAddress)) {
-                            restartServiceForSystem(service, ipAddress);
-                        }
-                    });
+            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
+                performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimout,
+                        (operation, error) -> {
+                            String service = operation.getKey();
+                            String ipAddress = operation.getValue();
+                            if (liveIps.contains(ipAddress)) {
+                                restartServiceForSystem(service, ipAddress);
+                            }
+                        });
+            }
 
             if (!isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getIpAddresses()))) {
                 throw new SystemException("At least one configured node was found dead");

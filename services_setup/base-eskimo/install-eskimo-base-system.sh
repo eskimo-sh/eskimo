@@ -352,6 +352,80 @@ if [[ -f /etc/selinux/config ]]; then
     sudo setenforce 0 2>/dev/null # ignoring errors
 fi
 
+echo " - Creating gluster shares (or not) manipulation commodity script"
+
+cat > /tmp/handle_gluster_share.sh <<- "EOF"
+#!/bin/bash
+if [[ $1 == "" ]]; then
+    echo "Expecting Gluster share name as first argument"
+    exit -1
+fi
+export SHARE_NAME=$1
+
+if [[ $2 == "" ]]; then
+    echo "Expecting share full path as second argument"
+    exit -2
+fi
+export SHARE_PATH=$2
+
+if [[ $3 == "" ]]; then
+    echo "Expecting share user name as third argument"
+    exit -3
+fi
+export SHARE_USER=$3
+
+# find out if gluster is available
+if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
+    export GLUSTER_AVAILABLE=1
+else
+    export GLUSTER_AVAILABLE=0
+fi
+
+# Only if gluster is enabled
+if [[ $GLUSTER_AVAILABLE == 1 ]]; then
+
+    echo " - Proceeding with gluster mount of $SHARE_PATH"
+    /usr/local/sbin/gluster_mount.sh $SHARE_NAME $SHARE_PATH $SHARE_USER `/usr/bin/id -u $SHARE_USER`
+    
+else
+
+    echo " - Not mounting gluster shares since not working in cluster mode"
+
+    echo " - Getting rid of former gluster mount of $SHARE_PATH if any"
+
+    if [[ `grep $SHARE_NAME /etc/mtab` != "" ]]; then
+        echo "   + umounting gluster $SHARE_NAME"
+        sudo umount $SHARE_PATH
+    fi
+
+    if [[ `grep $SHARE_NAME /etc/fstab` != "" ]]; then
+        echo "   + removing gluster $SHARE_NAME from /etc/fstab"
+        sudo sed -i "/$SHARE_NAME/d" /etc/fstab
+    fi
+
+    if [[ ! -d $SHARE_PATH ]]; then
+        echo " - Creating $SHARE_PATH"
+        mkdir -p $SHARE_PATH
+    fi
+
+    if [[ `stat -c '%U' $SHARE_PATH` != "$SHARE_USER" ]]; then
+        echo " - Changing owner of $SHARE_PATH"
+        chown -R $SHARE_USER $SHARE_PATH
+    fi
+
+    export SHARE_PATH_DIR=`dirname $SHARE_PATH`
+    export SHARE_PATH_FILE=`basename $SHARE_PATH`
+    if [[ `ls -la $SHARE_PATH_DIR | grep $SHARE_PATH_FILE | grep drwxrwxrw` == "" ]]; then
+        echo " - Changing rights of $SHARE_PATH"
+        chmod -R 777 $SHARE_PATH
+    fi   
+
+fi
+EOF
+
+sudo mv /tmp/handle_gluster_share.sh /usr/local/sbin/handle_gluster_share.sh
+sudo chmod 755 /usr/local/sbin/handle_gluster_share.sh
+
 
 # Make sur some required packages are installed
 #echo "  - checking some key packages"

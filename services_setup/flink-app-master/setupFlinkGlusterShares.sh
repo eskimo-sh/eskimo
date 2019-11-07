@@ -35,76 +35,9 @@
 #
 
 
+# Handling /var/lib/flink/data
+/usr/local/sbin/handle_gluster_share.sh flink_data /var/lib/flink/data flink
 
-# Loading topology
-if [[ ! -f /etc/eskimo_topology.sh ]]; then
-    echo "  - ERROR : no topology file defined !"
-    exit -123
-fi
-
-. /etc/eskimo_topology.sh
-
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit -1
-fi
-
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
-fi
-
-
-# find out if gluster is available
-if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
-    export GLUSTER_AVAILABLE=1
-else
-    export GLUSTER_AVAILABLE=0
-fi
-
-# Only if gluster is enabled
-if [[ $GLUSTER_AVAILABLE == 1 ]]; then
-
-    echo " - Proceeding with gluster mount /var/lib/flink/data"
-    /usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink `/usr/bin/id -u flink`
-
-    echo " - Proceeding with gluster mount /var/lib/flink/completed_jobs"
-    /usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink `/usr/bin/id -u flink`
-
-else
-
-    echo " - Not mounting gluster shares since not working in cluster mode"
-
-    if [[ ! -d /var/lib/flink/data ]]; then
-        echo " - Creating /var/lib/flink/data"
-        mkdir -p /var/lib/flink/data
-    fi
-
-    if [[ ! -d /var/lib/flink/completed_jobs ]]; then
-        echo " - Creating /var/lib/flink/completed_jobs"
-        mkdir -p /var/lib/flink/completed_jobs
-    fi
-
-    if [[ `stat -c '%U' /var/lib/flink/data` != "flink" ]]; then
-        echo " - Changing owner if /var/lib/flink/data"
-        chown -R flink /var/lib/flink/data
-    fi
-
-    if [[ `stat -c '%U' /var/lib/flink/completed_jobs` != "flink" ]]; then
-        echo " - Changing owner if /var/lib/flink/completed_jobs"
-        chown -R flink /var/lib/flink/completed_jobs
-    fi
-
-
-    if [[ `ls -la /var/lib/flink/ | grep data | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of /var/lib/flink/data"
-        chmod -R 777 /var/lib/flink/data
-    fi
-
-    if [[ `ls -la /var/lib/flink/ | grep completed_jobs | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of /var/lib/flink/completed_jobs"
-        chmod -R 777 /var/lib/flink/completed_jobs
-    fi
-fi
+# Handling /var/lib/flink/completed_jobs
+/usr/local/sbin/handle_gluster_share.sh flink_completed_jobs /var/lib/flink/completed_jobs flink
 

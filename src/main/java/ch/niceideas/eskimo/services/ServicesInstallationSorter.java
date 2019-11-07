@@ -62,36 +62,36 @@ public class ServicesInstallationSorter {
 
     private static final Logger logger = Logger.getLogger(ServicesInstallationSorter.class);
 
-    public List<Pair<String, String>>[] orderInstallation(
-            List<Pair<String, String>> installations,
+    public List<Pair<String, String>>[] orderOperations(
+            List<Pair<String, String>> operations,
             NodesConfigWrapper nodesConfig,
             Set<String> deadIps) throws NodesConfigurationException, ServiceDefinitionException {
 
 
         // 1. group services togethers
-        Map<String, List<Pair<String, String>>> groupedInstallations = new HashMap<>();
-        for (Pair<String, String> installation : installations) {
+        Map<String, List<Pair<String, String>>> groupedOperations = new HashMap<>();
+        for (Pair<String, String> operation : operations) {
 
-            String service = installation.getKey();
+            String service = operation.getKey();
 
-            List<Pair<String, String>> installationForService = groupedInstallations.computeIfAbsent(service, k -> new ArrayList<>());
+            List<Pair<String, String>> operationForService = groupedOperations.computeIfAbsent(service, k -> new ArrayList<>());
 
-            installationForService.add(installation);
+            operationForService.add(operation);
         }
 
         // 2. Order by depencencies
-        List<Service> services = groupedInstallations.keySet().stream()
+        List<Service> services = groupedOperations.keySet().stream()
                 .sorted((one, other) -> servicesDefinition.compareServices(one, other))
                 .map(service -> servicesDefinition.getService(service))
                 .collect(Collectors.toList());
 
 
         // 3. Reprocess and separate master installation
-        List<List<Pair<String, String>>> orderedInstallationSteps = new ArrayList<>();
+        List<List<Pair<String, String>>> orderedOperationsSteps = new ArrayList<>();
 
         for (Service service : services) {
 
-            List<Pair<String, String>> group = groupedInstallations.get(service.getName());
+            List<Pair<String, String>> group = groupedOperations.get(service.getName());
 
             // If service has it's own in dependency, this is where we have an issue
             // then it depends on the type of dependency:
@@ -109,40 +109,40 @@ public class ServicesInstallationSorter {
                 for (String master : masters) {
 
                     List<Pair<String, String>> newGroup = new ArrayList<>();
-                    for (Pair<String, String> installation : group) {
+                    for (Pair<String, String> operation : group) {
 
-                        if (installation.getValue().equals(master)) {
+                        if (operation.getValue().equals(master)) {
 
                             // create ad'hoc single group for master
                             List<Pair<String, String>> singleGroup = new ArrayList<>();
-                            singleGroup.add(installation);
-                            orderedInstallationSteps.add(singleGroup);
+                            singleGroup.add(operation);
+                            orderedOperationsSteps.add(singleGroup);
 
                         } else {
 
-                            newGroup.add(installation);
+                            newGroup.add(operation);
                         }
                     }
                     group = newGroup;
                 }
 
                 if (group.size() > 0) { // there may well be none left
-                    orderedInstallationSteps.add(group);
+                    orderedOperationsSteps.add(group);
                 }
 
             } else {
 
-                orderedInstallationSteps.add(group);
+                orderedOperationsSteps.add(group);
             }
         }
 
         // 4. loop back through groups and merge down those that have no dependencies with the former one
         //    but don't allow multiple installations on same node in //
-        for (int i = orderedInstallationSteps.size() - 1 ; i >= 0 ; i--) {
+        for (int i = orderedOperationsSteps.size() - 1 ; i >= 0 ; i--) {
 
-            List<Pair<String, String>> current = orderedInstallationSteps.get(i);
+            List<Pair<String, String>> current = orderedOperationsSteps.get(i);
             if (i > 0) {
-                List<Pair<String, String>> prev = orderedInstallationSteps.get(i - 1);
+                List<Pair<String, String>> prev = orderedOperationsSteps.get(i - 1);
 
                 // Does any service in curent have any dependency on any servic in prev ?
                 Set<Service> currentServices = new HashSet<>();
@@ -179,11 +179,11 @@ public class ServicesInstallationSorter {
 
                 if (!hasDependency && !hasSameNode) {
                     prev.addAll(current);
-                    orderedInstallationSteps.remove(i);
+                    orderedOperationsSteps.remove(i);
                 }
             }
         }
 
-        return orderedInstallationSteps.toArray(new List[0]);
+        return orderedOperationsSteps.toArray(new List[0]);
     }
 }

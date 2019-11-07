@@ -73,7 +73,7 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
                 # Then compute nzmber ore replica and remove 1 from it to use in the command below
 
                 # get filename
-                share_name=$(basename `echo "192.168.10.13:/var/lib/gluster/volume_bricks/spark_data" | cut -d ':' -f 2`)
+                share_name=$(basename `echo "$i" | cut -d ':' -f 2`)
 
                 echo "y" | sudo /usr/local/sbin/gluster volume remove-brick $share_name replica 1 $i force
                 if [[ $? != 0 ]]; then
@@ -98,6 +98,7 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
 fi
 
 echo " - Removing gluster wrappers"
-sudo rm -Rf /usr/local/sbin/*gluster*
+sudo rm -Rf /usr/local/sbin/gluster*
+sudo rm -Rf /usr/local/sbin/__gluster*
 
 
