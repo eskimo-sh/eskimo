@@ -127,7 +127,7 @@ function install_and_check_service_file() {
     fail_if_error $? "$2" -7
 
     echo " - Testing systemd startup - Checking startup"
-    sleep 10
+    sleep 12
     sudo systemctl status $1 >> $2 2>&1
     fail_if_error $? "$2" -8
 
@@ -137,17 +137,17 @@ function install_and_check_service_file() {
         exit -13
     fi
 
-    echo " - Testing systemd startup - stopping $1"
-    sudo systemctl stop $1 >> $2 2>&1
-    fail_if_error $? "$2" -9
+    #echo " - Testing systemd startup - stopping $1"
+    #sudo systemctl stop $1 >> $2 2>&1
+    #fail_if_error $? "$2" -9
 
     echo " - Enabling $1 on startup"
     sudo systemctl enable $1 >> $2 2>&1
     fail_if_error $? "$2" -10
 
-    echo " - Testing systemd startup - starting $1 (again)"
-    sudo systemctl start $1 >> $2 2>&1
-    fail_if_error $? "$2" -11
+    #echo " - Testing systemd startup - starting $1 (again)"
+    #sudo systemctl start $1 >> $2 2>&1
+    #fail_if_error $? "$2" -11
 }
 
 # Commit the container in the docker image and remove container

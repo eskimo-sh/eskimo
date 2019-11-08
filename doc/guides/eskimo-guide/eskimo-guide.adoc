@@ -866,6 +866,9 @@ These wrappers take care of calling the corresponding command in the required co
 
 NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
 
+Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
+considered slaves and synchronize to this NTP master.
+
 ==== Zookeeper
 
 image::pngs/zookeeper-logo.png[50, 50, align="center"]
@@ -880,6 +883,8 @@ distributed applications
 
 https://zookeeper.apache.org/
 
+Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
+
 ==== glusterFS
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
@@ -893,13 +898,28 @@ synchronize eskimo cluster nodes.
 
 https://www.gluster.org/
 
+==== Gluster Infrastructure
+
+Eskimo approaches gluster shares manmagement in a specific way. +
+Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
+scripts and tools to manipulated gluster shares.
+
+The architecture can be depicted as follows:
+
+image::pngs/gluster_infrastructure.png[800, 800, align="center"]
+
+Where:
+
+* The command server and client are internal tools. Eskimo end users and administrators do not need to be aware of them
+* The script `gluster_mount.sh` takes care of everything and is intended for usage by end users.
+
 ===== Gluster shares management
 
-Gluster shares are mounted using standard mount command (fuse filesystem).
+Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
 
-However eskimo provides wrapper that takes care of all the burden of managing shared folders with gluster.
+However eskimo provides _Toolbox script_ that takes care of all the burden of managing shared folders with gluster.
 
-The entry point to this wrapper is the following script: `/usr/local/sbin/gluster_mount.sh`. +
+This _Toolbox script_ is the available at : `/usr/local/sbin/gluster_mount.sh`. +
 This script is called as follows:
 
 .calling /usr/local/sbin/gluster_mount.sh

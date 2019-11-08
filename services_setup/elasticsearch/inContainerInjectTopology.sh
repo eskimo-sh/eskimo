@@ -67,8 +67,6 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
     sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$MASTER_IP_ADDRESS\", \"$SELF_IP_ADDRESS\"\]"/g \
         /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
-
-
 else
 
     # ES 7.x
@@ -77,6 +75,43 @@ else
 
 fi
 
+# Compute number of elasticsearch nodes and set minimum master nodes for discovery
+number_of_es_nodes=`cat /etc/eskimo_topology.sh | grep "export MASTER_ELASTICSEARCH_" | cut -d '_' -f 3 | cut -d '=' -f 1 | uniq | wc -l`
+
+if [ $number_of_es_nodes -gt 2 ]; then
+    number_of_master_nodes=$((number_of_es_nodes / 2 + 1))
+
+    echo " - Setting discovery.zen.minimum_master_nodes to $number_of_master_nodes"
+
+    # ES 6.x
+    sed -i s/"#discovery.zen.minimum_master_nodes: 3"/"discovery.zen.minimum_master_nodes: $number_of_master_nodes"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    # other variant
+    sed -i s/"#discovery.zen.minimum_master_nodes: "/"discovery.zen.minimum_master_nodes: $number_of_master_nodes"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+    # ES 7.x
+    sed -i s/"#gateway.recover_after_nodes: 3"/"gateway.recover_after_nodes: $number_of_master_nodes"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    # other variant
+    sed -i s/"#gateway.recover_after_nodes: "/"gateway.recover_after_nodes: $number_of_master_nodes"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+else
+
+    echo " - Setting discovery.zen.minimum_master_nodes to 1"
+
+    # ES 6.x
+    sed -i s/"#discovery.zen.minimum_master_nodes: 3"/"discovery.zen.minimum_master_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    # other variant
+    sed -i s/"#discovery.zen.minimum_master_nodes: "/"discovery.zen.minimum_master_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+    # ES 7.x
+    sed -i s/"#gateway.recover_after_nodes: 3"/"gateway.recover_after_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    # other variant
+    sed -i s/"#gateway.recover_after_nodes: "/"gateway.recover_after_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+fi
+
+echo " - Addressing issue with multiple interfaces but only one global"
+bash -c "echo -e \"\n# If you set a network.host that results in multiple bind addresses yet rely on a specific address\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+bash -c "echo \"# for node-to-node communication, you should explicitly set network.publish_host.\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 bash -c "echo \"network.publish_host: $SELF_IP_ADDRESS\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
 
