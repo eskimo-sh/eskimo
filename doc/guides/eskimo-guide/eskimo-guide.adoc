@@ -1073,6 +1073,16 @@ GraphX for graph processing, and Spark Streaming.
 
 https://spark.apache.org/
 
+===== Gluster shares for Spark
+
+Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
+gluster shares created and mounted:
+
+* `/var/lib/spark/data` where spark stores its own data but the user can store his own data to be used accross spark
+executors as well
+* `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
+history server to monitor spark jobs.
+
 ==== Apache Flink
 
 image::pngs/flink-app-master-logo.png[50, 50, align="center"]
@@ -1090,15 +1100,14 @@ produces one or more output streams as a result.
 
 https://flink.apache.org
 
-===== Gluster shares for Spark
+===== Gluster shares for Flink
 
-Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
+Nodes where Flink is installed (either Flink App Master, Flink worker or Zeppelin) automatically have the following
 gluster shares created and mounted:
 
-* `/var/lib/spark/data` where spark stores its own data but the user can store his own data to be used accross spark
-executors as well
-* `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
-history server to monitor spark jobs.
+* `/var/lib/flink/data flink` used to store data to be shared amoung flink workers.
+* `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
+
 
 ==== Apache zeppelin
 
@@ -1114,6 +1123,52 @@ Within Eskimo, zeppelin can be used to run flink and spark jobs, discover data i
 Gluster, etc.
 
 https://zeppelin.apache.org/
+
+===== Zeppelin specificities within Eskimo
+
+Within Eskimo, Zeppelin runs from within a docker container. +
+Command wrappers and custom command clients are available to enable it to use other services, running themselves as
+docker containers under eskimo.
+
+* Elasticsearch, flink and spark are called by using their dedicated intepreter
+* Logstash is called by using the `logstash-cli` script from the shell interpreter
+
+In addition, zeppelin has access to shared folders used by the different services in order to be able to share data
+with them. +
+Following shares are mounted within the Zeppelin container:
+
+* Logstash shared folder:
+** `/var/lib/logstash/data`
+* Spark shares:
+** `/var/lib/spark/data`
+** `/var/lib/spark/eventlog`
+* Flink shares:
+** `/var/lib/flink/data flink`
+** `/var/lib/flink/completed_jobs`
+
+These shared folders are automatically shared among the different nodes of the cluster using GlusterFS.
+
+An additional share exist in order to be able to share data to the zeppelin docker container:
+
+** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
+gluster when deploying in cluster mode).
+
+===== Zeppelin 0.9-SNAPSHOT bugs and workarounds
+
+In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin 0.9 since Zeppelin 0.9 is not released yet and
+the fodmer 0.8 version is incompatible with most software versions packages within Eskimo.
+
+Unfortunately this SNAPSHOT version is a development versions and some bugs exist.
+
+These bugs and workarounds are reported hereunder:
+
+====== REST API for notebook export is broken.
+
+* *Problem* : after importing a notebook using the REST API, the notebook is not properly saved, it only exists in
+memory. +
+Restarting zeppelin would loose it.
+* *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
+it is saved for real.
 
 ==== Prometheus
 
