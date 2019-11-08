@@ -866,6 +866,9 @@ These wrappers take care of calling the corresponding command in the required co
 
 NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
 
+Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
+considered slaves and synchronize to this NTP master.
+
 ==== Zookeeper
 
 image::pngs/zookeeper-logo.png[50, 50, align="center"]
@@ -880,6 +883,8 @@ distributed applications
 
 https://zookeeper.apache.org/
 
+Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
+
 ==== glusterFS
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
@@ -893,13 +898,28 @@ synchronize eskimo cluster nodes.
 
 https://www.gluster.org/
 
+==== Gluster Infrastructure
+
+Eskimo approaches gluster shares manmagement in a specific way. +
+Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
+scripts and tools to manipulated gluster shares.
+
+The architecture can be depicted as follows:
+
+image::pngs/gluster_infrastructure.png[800, 800, align="center"]
+
+Where:
+
+* The command server and client are internal tools. Eskimo end users and administrators do not need to be aware of them
+* The script `gluster_mount.sh` takes care of everything and is intended for usage by end users.
+
 ===== Gluster shares management
 
-Gluster shares are mounted using standard mount command (fuse filesystem).
+Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
 
-However eskimo provides wrapper that takes care of all the burden of managing shared folders with gluster.
+However eskimo provides _Toolbox script_ that takes care of all the burden of managing shared folders with gluster.
 
-The entry point to this wrapper is the following script: `/usr/local/sbin/gluster_mount.sh`. +
+This _Toolbox script_ is the available at : `/usr/local/sbin/gluster_mount.sh`. +
 This script is called as follows:
 
 .calling /usr/local/sbin/gluster_mount.sh
@@ -922,20 +942,50 @@ The beauty of this script is that it takes care of everything:
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
-GDASH is the GLuster Dashboard used to monitor gluster shares.
+GDASH is the Gluster DASHboard used to monitor gluster shares.
 
 https://github.com/aravindavk/gdash
 
-==== ELastic Logstash
+==== Elastic Logstash
 
 image::pngs/logstash-logo.png[50, 50, align="center"]
 
-Logstash is an open source, server-side data processing pipeline that ingests data from a multitude of sources simultaneously, transforms it, and then sends it to your favorite "stash."
+Logstash is an open source, server-side data processing pipeline that ingests data from a multitude of sources
+simultaneously, transforms it, and then sends it to your favorite "stash."
 
-Logstash dynamically ingests, transforms, and ships your data regardless of format or complexity. Derive structure from unstructured data with grok, decipher geo coordinates from IP addresses, anonymize or exclude sensitive fields, and ease overall processing.
+Logstash dynamically ingests, transforms, and ships your data regardless of format or complexity. Derive structure from
+unstructured data with grok, decipher geo coordinates from IP addresses, anonymize or exclude sensitive fields, and
+ease overall processing.
 
 https://www.elastic.co/products/logstash
 
+===== Logstash specificities within Eskimo
+
+With Eskimo, logstash runs in a docker container ans as such it is pretty isolated from the host Operating System but
+also from other containers. +
+This can be a problem whenever one wants to call logstash form the host machine or even worst, from another container.
+
+Eskimo provides two key features to circumvent this problem:
+
+1. First, the folder `/var/lib/logstash/data` is shared between the host, the zeppelin container and the logstash
+containers. As such, `/var/lib/logstash/data` can be used to pass data to logstash. +
+In a cluster environment, `/var/lib/logstash/data` is shared among cluster nodes using Gluster.
+
+2. Eskimo provides a command `/usr/local/bin/logstash-cli` that acts as a command line client to the logstash server
+container. +
+Whenever one calls `logstash-cli`, this client command invokes logstash in the logstash container (potentially remotely
+on another node) and passes the arguments is has been given to the logstash instance.
+
+`logstash-cli` supports all logstash arguments which are passed through to the invoked logstash instance within the
+logstash container. +
+In addition, it supports two non standard arguments that are specific to eskimo:
+
+* `-target_host XXX.XXX.XXX.XXX` which is used to identify the cluster node on which to invoke logstash. Within the
+Zeppelin container, this can safely be set to `localhost` since there is mandatorily a logstash container available on
+the node(s) running Zeppelin.
+* `-std_in /path/to/file` which is used to pass the given file as STDIN to the invoked logstash instance. This is
+unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
+supported yet.
 
 ==== ElasticSearch
 

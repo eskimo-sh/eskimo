@@ -395,12 +395,15 @@ else
 
     if [[ `grep $SHARE_NAME /etc/mtab` != "" ]]; then
         echo "   + umounting gluster $SHARE_NAME"
-        sudo umount $SHARE_PATH
+        umount $SHARE_PATH
+        if [[ $? != 0 ]]; then
+            umount -l $SHARE_PATH
+        fi
     fi
 
     if [[ `grep $SHARE_NAME /etc/fstab` != "" ]]; then
         echo "   + removing gluster $SHARE_NAME from /etc/fstab"
-        sudo sed -i "/$SHARE_NAME/d" /etc/fstab
+        sed -i "/$SHARE_NAME/d" /etc/fstab
     fi
 
     if [[ ! -d $SHARE_PATH ]]; then
@@ -413,9 +416,7 @@ else
         chown -R $SHARE_USER $SHARE_PATH
     fi
 
-    export SHARE_PATH_DIR=`dirname $SHARE_PATH`
-    export SHARE_PATH_FILE=`basename $SHARE_PATH`
-    if [[ `ls -la $SHARE_PATH_DIR | grep $SHARE_PATH_FILE | grep drwxrwxrw` == "" ]]; then
+    if [[ `ls -ld $SHARE_PATH | grep drwxrwxrw` == "" ]]; then
         echo " - Changing rights of $SHARE_PATH"
         chmod -R 777 $SHARE_PATH
     fi   

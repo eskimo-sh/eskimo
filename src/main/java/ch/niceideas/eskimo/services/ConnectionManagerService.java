@@ -224,7 +224,7 @@ public class ConnectionManagerService {
     }
 
 
-    protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+    protected void dropTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
 
         // Find out about declared forwarders to be handled
         List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
@@ -244,6 +244,16 @@ public class ConnectionManagerService {
             logger.warn(e.getMessage());
             logger.debug(e, e);
         }
+    }
+
+    protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+
+        final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
+
+        dropTunnels (connection, ipAddress);
+
+        // Find out about declared forwarders to be handled
+        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
 
         // recreate those that need to be recreated
         List<ProxyTunnelConfig> toBeCreated = tunnelConfigs.stream()
@@ -275,6 +285,13 @@ public class ConnectionManagerService {
 
     public void recreateTunnels(String host) throws ConnectionManagerException {
         recreateTunnels(getConnection(host), host);
+    }
+
+    public void dropTunnels (String host) throws ConnectionManagerException {
+        Connection connection = connectionMap.get(host);
+        if (connection != null) {
+            dropTunnels(connection, host);
+        }
     }
 
     private class ConnectionOperationWatchDog {

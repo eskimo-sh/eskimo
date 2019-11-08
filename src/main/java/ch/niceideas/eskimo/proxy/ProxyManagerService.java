@@ -159,7 +159,7 @@ public class ProxyManagerService {
         if (prevConfig != null) {
 
             proxyTunnelConfigs.remove(serviceId);
-            connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
+            connectionManagerService.dropTunnels (prevConfig.getRemoteAddress());
             webSocketProxyServer.removeForwarders (serviceId);
         }
 

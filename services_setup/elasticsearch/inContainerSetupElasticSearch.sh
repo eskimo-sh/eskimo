@@ -76,18 +76,14 @@ sed -i s/"#path.logs: \/path\/to\/logs"/"path.logs: \/usr\/local\/lib\/elasticse
 sed -i s/"#bootstrap.memory_lock: true"/"bootstrap.memory_lock: false"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 sed -i s/"#network.host: 192.168.0.1"/"network.host: 0.0.0.0"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
-# FIXME take into account cluster size here
-
-# ES 6.x
-sed -i s/"#discovery.zen.minimum_master_nodes: 3"/"discovery.zen.minimum_master_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
-
-# ES 7.x
-sed -i s/"#gateway.recover_after_nodes: 3"/"gateway.recover_after_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
-
+echo " - Creating eskimo specific configurations"
+bash -c "echo -e \"\n# ------------------------------- Eskimo specific ------------------------------\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
 echo " - Addressing issue with multiple interfaces but only one global"
-bash -c "echo -e \"\n#If you set a network.host that results in multiple bind addresses yet rely on a specific address\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
-bash -c "echo \"#for node-to-node communication, you should explicitly set network.publish_host.\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+bash -c "echo -e \"\n# The following settings control the fault detection process\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+bash -c "echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+bash -c "echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+bash -c "echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
 echo " - Adapting configuration in file jvm.options"
 sed -i s/"-Xms2g"/"-Xms1000m"/g /usr/local/lib/elasticsearch/config/jvm.options
