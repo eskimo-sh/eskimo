@@ -922,20 +922,50 @@ The beauty of this script is that it takes care of everything:
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
-GDASH is the GLuster Dashboard used to monitor gluster shares.
+GDASH is the Gluster DASHboard used to monitor gluster shares.
 
 https://github.com/aravindavk/gdash
 
-==== ELastic Logstash
+==== Elastic Logstash
 
 image::pngs/logstash-logo.png[50, 50, align="center"]
 
-Logstash is an open source, server-side data processing pipeline that ingests data from a multitude of sources simultaneously, transforms it, and then sends it to your favorite "stash."
+Logstash is an open source, server-side data processing pipeline that ingests data from a multitude of sources
+simultaneously, transforms it, and then sends it to your favorite "stash."
 
-Logstash dynamically ingests, transforms, and ships your data regardless of format or complexity. Derive structure from unstructured data with grok, decipher geo coordinates from IP addresses, anonymize or exclude sensitive fields, and ease overall processing.
+Logstash dynamically ingests, transforms, and ships your data regardless of format or complexity. Derive structure from
+unstructured data with grok, decipher geo coordinates from IP addresses, anonymize or exclude sensitive fields, and
+ease overall processing.
 
 https://www.elastic.co/products/logstash
 
+===== Logstash specificities within Eskimo
+
+With Eskimo, logstash runs in a docker container ans as such it is pretty isolated from the host Operating System but
+also from other containers. +
+This can be a problem whenever one wants to call logstash form the host machine or even worst, from another container.
+
+Eskimo provides two key features to circumvent this problem:
+
+1. First, the folder `/var/lib/logstash/data` is shared between the host, the zeppelin container and the logstash
+containers. As such, `/var/lib/logstash/data` can be used to pass data to logstash. +
+In a cluster environment, `/var/lib/logstash/data` is shared among cluster nodes using Gluster.
+
+2. Eskimo provides a command `/usr/local/bin/logstash-cli` that acts as a command line client to the logstash server
+container. +
+Whenever one calls `logstash-cli`, this client command invokes logstash in the logstash container (potentially remotely
+on another node) and passes the arguments is has been given to the logstash instance.
+
+`logstash-cli` supports all logstash arguments which are passed through to the invoked logstash instance within the
+logstash container. +
+In addition, it supports two non standard arguments that are specific to eskimo:
+
+* `-target_host XXX.XXX.XXX.XXX` which is used to identify the cluster node on which to invoke logstash. Within the
+Zeppelin container, this can safely be set to `localhost` since there is mandatorily a logstash container available on
+the node(s) running Zeppelin.
+* `-std_in /path/to/file` which is used to pass the given file as STDIN to the invoked logstash instance. This is
+unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
+supported yet.
 
 ==== ElasticSearch
 
