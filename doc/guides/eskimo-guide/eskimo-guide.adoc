@@ -875,16 +875,16 @@ For this reason, eskimo provides host-level wrappers in `/usr/local/bin` and `/u
 commands. +
 These wrappers take care of calling the corresponding command in the required container.
 
-=== Pre-packaged components and details
+The remaining of this chapter presents each and every pre-packaged service:
 
-==== NTP
+=== NTP
 
 NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
 
 Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
 considered slaves and synchronize to this NTP master.
 
-==== Zookeeper
+=== Zookeeper
 
 image::pngs/zookeeper-logo.png[50, 50, align="center"]
 
@@ -900,7 +900,7 @@ https://zookeeper.apache.org/
 
 Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
 
-==== glusterFS
+=== glusterFS
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
@@ -913,7 +913,7 @@ synchronize eskimo cluster nodes.
 
 https://www.gluster.org/
 
-==== Gluster Infrastructure
+=== Gluster Infrastructure
 
 Eskimo approaches gluster shares manmagement in a specific way. +
 Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
@@ -928,7 +928,7 @@ Where:
 * The command server and client are internal tools. Eskimo end users and administrators do not need to be aware of them
 * The script `gluster_mount.sh` takes care of everything and is intended for usage by end users.
 
-===== Gluster shares management
+==== Gluster shares management
 
 Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
 
@@ -953,7 +953,7 @@ The beauty of this script is that it takes care of everything:
 * Creating the volume in gluster if not already done
 * Registering the mount point in `/etc/fstab` and systemd for automatic remount
 
-==== GDASH
+=== GDASH
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
@@ -961,7 +961,7 @@ GDASH is the Gluster DASHboard used to monitor gluster shares.
 
 https://github.com/aravindavk/gdash
 
-==== Elastic Logstash
+=== Elastic Logstash
 
 image::pngs/logstash-logo.png[50, 50, align="center"]
 
@@ -974,7 +974,7 @@ ease overall processing.
 
 https://www.elastic.co/products/logstash
 
-===== Logstash specificities within Eskimo
+==== Logstash specificities within Eskimo
 
 With Eskimo, logstash runs in a docker container ans as such it is pretty isolated from the host Operating System but
 also from other containers. +
@@ -1002,7 +1002,7 @@ the node(s) running Zeppelin.
 unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
 supported yet.
 
-==== ElasticSearch
+=== ElasticSearch
 
 image::pngs/elasticsearch-logo.png[50, 50, align="center"]
 
@@ -1016,7 +1016,7 @@ you want. Start simple with one question and see where it takes you.
 
 https://www.elastic.co/products/elasticsearch
 
-==== Cerebro
+=== Cerebro
 
 image::pngs/cerebro-logo.png[50, 50, align="center"]
 
@@ -1027,7 +1027,7 @@ Monitoring the nodes here includes all indexes, all the data nodes, index size, 
 
 https://github.com/lmenezes/cerebro
 
-==== Elastic Kibana
+=== Elastic Kibana
 
 image::pngs/kibana-logo.png[50, 50, align="center"]
 
@@ -1039,7 +1039,7 @@ you’re looking for. With its interactive visualizations, start with one questi
 
 https://www.elastic.co/products/kibana
 
-==== Apache Kafka
+=== Apache Kafka
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
 
@@ -1050,7 +1050,7 @@ wicked fast, and runs in production in thousands of companies.
 
 https://kafka.apache.org/
 
-==== Kafka Manager
+=== Kafka Manager
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
 
@@ -1061,7 +1061,7 @@ generate partition assignments, monitor statistics, etc.
 
 https://github.com/lmenezes/cerebro
 
-==== Apache Mesos
+=== Apache Mesos
 
 image::pngs/mesos-master-logo.png[50, 50, align="center"]
 
@@ -1075,7 +1075,7 @@ API’s for resource management and scheduling across entire datacenter and clou
 
 http://mesos.apache.org/
 
-==== Apache Spark
+=== Apache Spark
 
 image::pngs/spark-executor-logo.png[50, 50, align="center"]
 
@@ -1088,7 +1088,7 @@ GraphX for graph processing, and Spark Streaming.
 
 https://spark.apache.org/
 
-===== Gluster shares for Spark
+==== Gluster shares for Spark
 
 Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
 gluster shares created and mounted:
@@ -1098,7 +1098,7 @@ executors as well
 * `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
 history server to monitor spark jobs.
 
-==== Apache Flink
+=== Apache Flink
 
 image::pngs/flink-app-master-logo.png[50, 50, align="center"]
 
@@ -1115,7 +1115,7 @@ produces one or more output streams as a result.
 
 https://flink.apache.org
 
-===== Gluster shares for Flink
+==== Gluster shares for Flink
 
 Nodes where Flink is installed (either Flink App Master, Flink worker or Zeppelin) automatically have the following
 gluster shares created and mounted:
@@ -1124,7 +1124,7 @@ gluster shares created and mounted:
 * `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
 
 
-==== Apache zeppelin
+=== Apache zeppelin
 
 image::pngs/zeppelin-logo.png[50, 50, align="center"]
 
@@ -1139,7 +1139,7 @@ Gluster, etc.
 
 https://zeppelin.apache.org/
 
-===== Zeppelin specificities within Eskimo
+==== Zeppelin specificities within Eskimo
 
 Within Eskimo, Zeppelin runs from within a docker container. +
 Command wrappers and custom command clients are available to enable it to use other services, running themselves as
@@ -1168,7 +1168,7 @@ An additional share exist in order to be able to share data to the zeppelin dock
 ** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
 gluster when deploying in cluster mode).
 
-===== Zeppelin 0.9-SNAPSHOT bugs and workarounds
+==== Zeppelin 0.9-SNAPSHOT bugs and workarounds
 
 In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin 0.9 since Zeppelin 0.9 is not released yet and
 the fodmer 0.8 version is incompatible with most software versions packages within Eskimo.
@@ -1177,7 +1177,7 @@ Unfortunately this SNAPSHOT version is a development versions and some bugs exis
 
 These bugs and workarounds are reported hereunder:
 
-====== REST API for notebook export is broken.
+===== REST API for notebook export is broken.
 
 * *Problem* : after importing a notebook using the REST API, the notebook is not properly saved, it only exists in
 memory. +
@@ -1185,7 +1185,7 @@ Restarting zeppelin would loose it.
 * *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
 it is saved for real.
 
-==== Prometheus
+=== Prometheus
 
 image::pngs/prometheus-logo.png[50, 50, align="center"]
 
@@ -1197,7 +1197,7 @@ targets, etc.
 
 https://prometheus.io/
 
-==== Grafana
+=== Grafana
 
 image::pngs/grafana-logo.png[50, 50, align="center"]
 

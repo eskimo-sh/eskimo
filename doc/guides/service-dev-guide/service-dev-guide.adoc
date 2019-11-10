@@ -45,18 +45,19 @@ Software.
 === Eskimo
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
-*Big Data 2.0* clusters using *Docker* and *Mesos*.
+*Big Data 2.0* clusters using *Docker*, *SystemD* and *Mesos*.
 
 image::pngs/eskimo.jpg[50, 50, align="center"]
 
 Eskimo is in a certain way the Operating System of your Big Data Cluster:
 
-* an Administration Application aimed at drastically simplifying the deployment, administration and operation of your
-  Big Data Cluster
-* a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Spark,
-  Kafka and ElasticSearch* with all the required tools and consoles to manage them such as *Cerebro, Kibana, Zeppelin,
-  Kafka-Manager, Grafana and Prometheus*.
-* a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
+* a *Web Based Administration Application* aimed at drastically simplifying the deployment, administration and
+  operation of your Big Data Cluster
+* a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Zookeeper, Spark,
+  Kafka, Flink and ElasticSearch* with all the required tools and consoles required to use and  manage them such
+  as *Cerebro, Kibana, Zeppelin, Kafka-Manager, Grafana and Prometheus*.
+* a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
+  all the _nuts and bolds_ required to make them work well together.
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
 
 image::pngs/eskimo_platform.png[800, 800, align="center"]
@@ -73,13 +74,14 @@ Just define where you want to run which services and let eskimo take care of eve
 
 Move services between nodes or install new services in just a few clicks.
 
-Don’t bother remembering where you installed Web consoles and UI applications, Eskimo wraps them all in a single UI.
+Don’t bother remembering where you installed Web consoles and UI applications, Eskimo wraps them all in a single and
+consistent UI.
 
 a|image::pngs/console.jpg[60, 60]| *Eskimo Web Console*
 
 Eskimo’s tip of the iceberg is its flagship web console.
 
-The Eskimo Console is the single and entry point to all your cluster operations, from services installation to
+The Eskimo Console is the single and only entry point to all your cluster operations, from services installation to
 accessing Kibana, Zeppelin and other UI applications.
 
 The Eskimo Console also provides SSH consoles, File browser access and monitoring to your cluster.
@@ -88,25 +90,24 @@ a|image::pngs/framework.jpg[60, 60]| *Services Framework*
 
 Eskimo is a Big Data Components service development and integration framework based on Docker and Systemd.
 
-Eskimo provides out of the box ready-to use components such as Spark, ElasticSearch, Kafka, Mesos, Zeppelin, etc.
+Eskimo provides out of the box ready-to use components such as Spark, Flink, ElasticSearch, Kafka, Mesos, Zeppelin, etc.
 
 Eskimo also enables the user to develop his own services very easily.
 |===
 
 === The Service Developer Guide
 
-This documentation is related to the last of the key features presented above : The
-Services Framework. +
-It presents everything a developer needs to understand and know to develop his own
-services and let eskimo distribute and operate them, or extend current services.
+This documentation is related to the last of the key features presented above : The Services Framework. +
+It presents everything a developer needs to understand and know to develop his own services and let eskimo distribute
+and operate them, or extend current services.
 
 == Introducing the Service Development Framework
 
 The *Service Development framework* is actually composed by two distinct parts:
 
-* The <<docker_images_development_framework>> which is used to build the docker images deployed on the eskimo cluster
+* The <<docker_images_development_framework>> which is used to *build* the docker images deployed on the eskimo cluster
 nodes
-* The <<services_installation_framework>> which is used to install these images as services on the eskimo cluster nodes.
+* The <<services_installation_framework>> which is used to *install and setup* these images as services on the eskimo cluster nodes.
 
 
 === Core principles
@@ -115,11 +116,13 @@ The core principles on which both the _Docker Images Development Framework_ and 
 are built are as follows:
 
 * A service is eventually two things
-** a docker image packaging the software component and
-** the set of scripts and systemd configuration required to install it, set it up and operate it
+** a docker image packaging the software component and its dependencies
+** a set of shell scripts aimed at installing and setting up the service
+** a systemd unit configuration file aimed at operate it
 * Everything - from building the docker image to installing it on cluster nodes - is done using simple shell scripts.
-With Eskimo a system administrator desiring to leverage on eskimo to implement his own services doesn't need to learn
-any new and fancy technology, just plain old shell scripting, docker and systemd. Period.
+With Eskimo a system administrator desiring to leverage on eskimo to implement his own services in order to integrate
+additional software components on Eskimo doesn't need to learn any new and fancy technology, just plain old shell
+scripting, docker and systemd. Period.
 * Eskimo leverages on unix standards. Software components are installed in `/usr/local`, log files are in sub-folders of
 `/var/log`, persistent data is in sub-folders of `/var/lib`, etc.
 
@@ -127,13 +130,13 @@ any new and fancy technology, just plain old shell scripting, docker and systemd
 
 // included package developer README
 
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..220]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..230]
 
 
 
 // included service developer README
 
-include::../../../services_setup/README.adoc[leveloffset=0,lines=60..450]
+include::../../../services_setup/README.adoc[leveloffset=0,lines=60..460]
 
 
 
