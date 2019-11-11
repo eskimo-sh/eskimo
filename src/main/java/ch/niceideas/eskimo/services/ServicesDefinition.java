@@ -147,6 +147,8 @@ public class ServicesDefinition implements InitializingBean {
                     MemoryConsumptionSize.NEGLECTABLE :
                     MemoryConsumptionSize.valueOf(memoryConsumptionString.toUpperCase()));
 
+            service.setLogo((String) servicesConfig.getValueForPath(serviceString+".config.logo"));
+
             if (servicesConfig.hasPath(serviceString+".config.memoryAdditional")) {
                 JSONArray memAdditionalArray = servicesConfig.getSubJSONObject(serviceString).getJSONObject("config").getJSONArray("memoryAdditional");
                 for (int i = 0; i < memAdditionalArray.length(); i++) {

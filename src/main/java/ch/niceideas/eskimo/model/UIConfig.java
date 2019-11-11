@@ -52,6 +52,7 @@ public class UIConfig {
     private int waitTime;
     private String title;
     private String icon;
+
     private boolean applyStandardProxyReplacements = true;
     private String statusPageLinkTitle;
     private List<ProxyReplacement> proxyReplacements = new ArrayList<>();
@@ -83,7 +84,6 @@ public class UIConfig {
     public void setIcon(String icon) {
         this.icon = icon;
     }
-
 
     public String getTitle() {
         return title;

@@ -189,7 +189,7 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [optional] name of the group to associate it in the status table
     "group" : "{group name}",
 
-    ## [mandatory] name of the service. miust be consistend with service under
+    ## [mandatory] name of the service. miust be consistent with service under
     ## 'service_setup'
     "name" : "{service name},
 
@@ -200,13 +200,22 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     },
 
     ## memory to allocate to the service
-    "memory": "[neglectable|small|medium|large]"
+    "memory": "[neglectable|small|medium|large]",
+
+    ## [mandatory] The logo to use whenever displaying the service in the UI is
+    ##     required
+    ## Use "images/{logo_file_name}" for resources packaged within eskimo web app
+    ## Use "static_images/{logo_file_name}" for resources put in the eskimo
+    ##    distribution folder "static_images"
+    ## (static_images is configurable in eskimo.properties with property
+    ##    eskimo.externalLogoAndIconFolder)
+    "logo" : "[images|static_images]/{logo_file_name}"
   },
 
   ## [optional] configuration of the serice web console (if anym)
   "ui": {
 
-    ## optional] (A) either URL template should be configured ...
+    ## [optional] (A) either URL template should be configured ...
     "urlTemplate": "http://{NODE_ADDRESS}:{PORT}/",
 
     ## [optional] (B) .... or proxy configuration in case the service has
@@ -220,8 +229,13 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [mandatory] the name of the menu entry
     "title" : "{menu name}",
 
-    ## [optional] the icon to use (must be available)
-    "icon" : "{path relative to web context}"
+    ## [mandatory] The icon to use ine the menu for the service
+    ## Use "images/{icon_file_name}" for resources packaged within eskimo web app
+    ## Use "static_images/{icon_file_name}" for resources put in the eskimo
+    ##    distribution folder "static_images"
+    ## (static_images is configurable in eskimo.properties with property
+    ##    eskimo.externalLogoAndIconFolder)
+    "icon" : "[images|static_images]/{icon_file_name}"
 
     ## [optional] Whether standard rewrite rules need to be applied to this service
     ## (default is true)

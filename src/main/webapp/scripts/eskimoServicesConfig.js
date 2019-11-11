@@ -184,7 +184,7 @@ eskimo.ServicesConfig = function() {
                 servicesConfigContent = servicesConfigContent +
                     '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
                     '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
-                    '<td><img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" /></td>'+
+                    '<td><img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" /></td>'+
                     '<td><h5>' +
                     serviceName +
                     '</h5></td>' +

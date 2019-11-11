@@ -138,6 +138,16 @@ eskimo.NodesConfig = function() {
         });
     }
 
+    this.getServiceLogoPath = function (service) {
+        var serviceConfig = SERVICES_CONFIGURATION[service];
+        if (serviceConfig == null) {
+            console.error ("Could not find logo for service " + service);
+            return "undefined";
+        }
+        return serviceConfig.logo;
+    };
+
+
     this.getConfiguredServices = function() {
         return CONFIGURED_SERVICES;
     };
@@ -240,7 +250,7 @@ eskimo.NodesConfig = function() {
                                 var placeHolder = $("#field"+nbr).find(".configured-multiple-services-placeholder");
                                 placeHolder.html(placeHolder.html() +
                                     '<div class="nodes-config-entry">' +
-                                    '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                                    '<img class="nodes-config-logo" src="'+ eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
                                     serviceName +
                                     '<br>' +
                                     '</div>');
@@ -252,7 +262,7 @@ eskimo.NodesConfig = function() {
                                 var placeHolder = $("#field"+nbr).find(".configured-unique-services-placeholder");
                                 placeHolder.html(placeHolder.html() +
                                     '<div class="nodes-config-entry">' +
-                                    '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                                    '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
                                     serviceName +
                                     '<br>' +
                                     '</div>');
@@ -332,7 +342,7 @@ eskimo.NodesConfig = function() {
                     if ($('#' + serviceName + i).get(0).checked) {
                         placeHolderUs.html(placeHolderUs.html() +
                             '<div class="nodes-config-entry">' +
-                            '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                            '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
                             serviceName +
                             '<br>' +
                             '</div>');
@@ -347,7 +357,7 @@ eskimo.NodesConfig = function() {
                     if ($('#'+serviceName+i).get(0).checked) {
                         placeHolderMs.html(placeHolderMs.html() +
                             '<div class="nodes-config-entry">' +
-                            '<img class="nodes-config-logo" src="images/' + serviceName + '-logo.png" />'+
+                            '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
                             serviceName +
                             '<br>' +
                             '</div>');
