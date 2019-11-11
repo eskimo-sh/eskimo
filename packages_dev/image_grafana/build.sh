@@ -49,7 +49,7 @@ echo " - Building image grafana"
 build_image grafana /tmp/grafana_build_log
 
 echo " - Installing Grafana dependencies"
-docker exec -i grafana sudo apt-get install -y adduser libfontconfig1 >> /tmp/grafana_build_log 2>&1
+docker exec -i grafana apt-get install -y adduser libfontconfig1 >> /tmp/grafana_build_log 2>&1
 fail_if_error $? "/tmp/grafana_build_log" -5
 
 echo " - Installing grafana"

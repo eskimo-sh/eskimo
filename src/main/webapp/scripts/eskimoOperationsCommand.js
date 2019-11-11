@@ -61,8 +61,8 @@ eskimo.OperationsCommand = function() {
         for (var service in operation) {
             var ipAddress = operation[service];
 
-            commandDescription = commandDescription
-                + service + " on " + ipAddress + "<br>";
+            commandDescription = commandDescription +
+                '<i class="fa fa-arrow-right"></i>&nbsp;' + service + " on " + ipAddress + "<br>";
         }
 
         return commandDescription;

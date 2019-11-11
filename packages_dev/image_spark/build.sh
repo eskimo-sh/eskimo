@@ -49,7 +49,7 @@ echo " - Building image spark"
 build_image spark /tmp/spark_build_log
 
 echo " - Installing the latest OpenJDK"
-docker exec -i spark sudo apt-get install -y openjdk-8-jdk >> /tmp/spark_build_log 2>&1
+docker exec -i spark apt-get install -y openjdk-8-jdk >> /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3
 
 echo " - Installing scala"
@@ -57,15 +57,15 @@ docker exec -i spark apt-get install -y scala >> /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -4
 
 echo " - Installing python"
-docker exec -i spark sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/spark_build_log 2>&1
+docker exec -i spark apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -5
 
 echo " - Installing python elasticsearch and kafka clients and other utilities"
-docker exec -i spark sudo pip install elasticsearch kafka-python >> /tmp/spark_build_log 2>&1
+docker exec -i spark pip install elasticsearch kafka-python >> /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -6
 
 echo " - Installing other python packages"
-docker exec -i spark sudo pip install requests filelock >> /tmp/spark_build_log 2>&1
+docker exec -i spark pip install requests filelock >> /tmp/spark_build_log 2>&1
 
 echo " - Installing spark"
 docker exec -i spark bash /scripts/installSpark.sh | tee -a /tmp/spark_build_log 2>&1

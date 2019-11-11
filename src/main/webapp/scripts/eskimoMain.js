@@ -61,6 +61,7 @@ eskimo.Main = function() {
     var eskimoServicesConfig = null;
     var eskimoFileManagers = null;
     var eskimoOperationsCommand = null;
+    var eskimoSetupCommand = null;
 
     var operationInProgress = false;
     var operationInProgressOwner = false;
@@ -297,6 +298,9 @@ eskimo.Main = function() {
     this.getOperationsCommand = function() {
         return eskimoOperationsCommand;
     };
+    this.getSetupCommand = function() {
+        return eskimoSetupCommand;
+    };
 
     this.initialize = function() {
 
@@ -330,6 +334,9 @@ eskimo.Main = function() {
         // loadServicesConfig -> load-services-config
 
         eskimoOperationsCommand = new eskimo.OperationsCommand();
+        // (nothing)
+
+        eskimoSetupCommand = new eskimo.SetupCommand();
         // (nothing)
 
         eskimoFileManagers = new eskimo.FileManagers();

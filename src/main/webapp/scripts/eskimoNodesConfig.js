@@ -749,7 +749,7 @@ eskimo.NodesConfig = function() {
         $.ajax({
             type: "POST",
             dataType: "json",
-            timeout: 1000 * 3600,
+            timeout: 1000 * 120,
             contentType: "application/json; charset=utf-8",
             url: reinstall ? "reinstall-nodes-config" : "save-nodes-config",
             data: JSON.stringify(model),

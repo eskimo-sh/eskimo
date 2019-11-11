@@ -37,7 +37,7 @@ Software.
 :authors: eskimo.sh / https://www.eskimo.sh / 2019
 :copyright: eskimo.sh / https://www.eskimo.sh / 2019
 
-= Eskimo User Guide
+= Eskimo User and Administration Guide
 
 [[chap-introduction]]
 == Eskimo Introduction
