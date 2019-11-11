@@ -42,6 +42,8 @@ eskimo.Setup = function() {
     // constants
     var MESSAGES_POLLING_STOP_DELAY = 10000;
 
+    var MESSAGE_SHOW_DURATION = 10000;
+
     // Initialize HTML Div from Template
     this.initialize = function() {
         $("#inner-content-setup").load("html/eskimoSetup.html", function (responseTxt, statusTxt, jqXHR) {
@@ -190,7 +192,7 @@ eskimo.Setup = function() {
         setTimeout(function() {
             setupWarning.css("display", "none");
             setupWarning.css("visibility", "hidden");
-        }, 5000);
+        }, MESSAGE_SHOW_DURATION);
     }
     this.showSetupMessage = showSetupMessage;
 

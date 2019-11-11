@@ -215,7 +215,7 @@ eskimo.SystemStatus = function() {
         } else {
             if (!eskimoMain.isSetupDone()) {
 
-                showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
+                eskimoMain.showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
 
                 // Still initialize the status update timeer (also used for notifications)
                 updateStatus(false);
@@ -774,8 +774,8 @@ eskimo.SystemStatus = function() {
 
                 tableHeaderHtml +=
                     '<td class="status-node-cell" rowspan="2">' +
-                    '   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
-                    '   "/><br>' +
+                    //'   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
+                    //'   "/><br>' +
                     serviceStatusConfig.name +
                     '</td>\n';
             }
@@ -794,8 +794,8 @@ eskimo.SystemStatus = function() {
             if (serviceStatusConfig.group && serviceStatusConfig.group != null && serviceStatusConfig.group != "") {
                 tableHeaderHtml = tableHeaderHtml +
                     '<td class="status-node-cell">' +
-                    '   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
-                    '   "/><br>' +
+                    //'   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
+                    //'   "/><br>' +
                     serviceStatusConfig.name + '</td>\n';
             }
         }
@@ -971,6 +971,11 @@ eskimo.SystemStatus = function() {
                 } else if (data.clear == "setup"){
 
                     eskimoMain.handleSetupNotCompleted();
+
+                    if (   !eskimoMain.isCurrentDisplayedService("setup")
+                        && !eskimoMain.isCurrentDisplayedService("pending")) {
+                        eskimoMain.showSetupNotDone();
+                    }
 
                 } else if (data.clear == "nodes"){
 

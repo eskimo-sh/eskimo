@@ -154,7 +154,7 @@ eskimo.ServicesConfig = function() {
     function showServicesConfig () {
 
         if (!eskimoMain.isSetupDone()) {
-            showSetupNotDone("Cannot configure nodes as long as initial setup is not completed");
+            eskimoMain.showSetupNotDone("Cannot configure nodes as long as initial setup is not completed");
             return;
         }
 

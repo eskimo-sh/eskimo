@@ -124,7 +124,7 @@ eskimo.Services = function () {
 
         if (!eskimoMain.isSetupDone()) {
 
-            showSetupNotDone("Service " + service + " is not available at this stage.");
+            eskimoMain.showSetupNotDone("Service " + service + " is not available at this stage.");
 
         } else {
 

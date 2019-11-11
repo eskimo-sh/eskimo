@@ -424,16 +424,17 @@ public class SetupService {
             }
 
             String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
+
+            Set<String> missingServices = new HashSet<>();
+            findMissingServices(packagesDistribFolder, missingServices);
+
             if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
 
-                for (String image : packagesToBuild.split(",")) {
-                    buildPackage(image);
+                for (String packageName : missingServices) {
+                    buildPackage(packageName);
                 }
 
             } else {
-
-                Set<String> missingServices = new HashSet<>();
-                findMissingServices(packagesDistribFolder, missingServices);
 
                 JsonWrapper packagesVersion = null;
                 try {
@@ -448,71 +449,26 @@ public class SetupService {
                     String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
                     String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
 
-                    if (!systemService.isInterrupted()) {
-                        try {
-                            systemOperationService.applySystemOperation("Downloading of package " + packageName,
-                                    (builder) -> {
+                    String fileName = "docker_template_" + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
 
-                                        String fileName = "docker_template_" + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
-
-                                        File targetFile = new File(packageDistributionPath + "/" + fileName);
-
-                                        if (targetFile.exists()) {
-                                            builder.append(packageName);
-                                            builder.append(" is already downloaded");
-                                        } else {
-
-                                            File tempFile = new File(targetFile.getAbsolutePath() + "__temp_download");
-
-                                            URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + fileName);
-
-                                            dowloadFile(builder, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
-
-                                            FileUtils.delete(targetFile);
-                                            tempFile.renameTo(targetFile);
-                                        }
-                                    }, null);
-                        } catch (SystemException e) {
-                            logger.error(e, e);
-                            throw new SetupException(e);
-                        }
-                    }
-
+                    downloadPackage(fileName);
                 }
 
             }
 
             // 2. Then focus on mesos
+
+            Set<String> missingMesosPackages = new HashSet<>();
+            findMissingMesos(packagesDistribFolder, missingMesosPackages);
+
             String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
             if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
 
-                for (String mesosPackage : mesosPackages.split(",")) {
+                for (String mesosPackageName : missingMesosPackages) {
+                    for (String mesosPackage : mesosPackages.split(",")) {
 
-                    if (!systemService.isInterrupted()) {
-                        try {
-                            systemOperationService.applySystemOperation("Downloading of package " + mesosPackage,
-                                    (builder) -> {
-
-                                        File targetFile = new File(packageDistributionPath + "/" + mesosPackage);
-
-                                        if (targetFile.exists()) {
-                                            builder.append(mesosPackage);
-                                            builder.append(" is already downloaded");
-                                        } else {
-
-                                            File tempFile = new File(targetFile.getAbsolutePath() + "__temp_download");
-
-                                            URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + mesosPackage);
-
-                                            dowloadFile(builder, tempFile, downloadUrl, "Downloading image "+ mesosPackage + " ...");
-
-                                            FileUtils.delete(targetFile);
-                                            tempFile.renameTo(targetFile);
-                                        }
-                                    }, null);
-                        } catch (SystemException e) {
-                            logger.error(e, e);
-                            throw new SetupException(e);
+                        if (mesosPackage.contains(mesosPackageName)) {
+                            downloadPackage(mesosPackage);
                         }
                     }
                 }
@@ -536,6 +492,37 @@ public class SetupService {
         } finally {
             systemService.setLastOperationSuccess (success);
             systemService.releaseProcessingPending();
+        }
+    }
+
+    void downloadPackage(String fileName) throws SetupException {
+        if (!systemService.isInterrupted()) {
+            try {
+                systemOperationService.applySystemOperation("Downloading of package " + fileName,
+                        (builder) -> {
+
+                            File targetFile = new File(packageDistributionPath + "/" + fileName);
+
+                            String downloadUrlString = packagesDownloadUrlRoot + "/" + fileName;
+                            URL downloadUrl = new URL(downloadUrlString);
+
+                            File tempFile = new File(targetFile.getAbsolutePath() + "__temp_download");
+
+                            if (targetFile.exists()) {
+                                builder.append(fileName);
+                                builder.append(" is already downloaded");
+                            } else {
+
+                                dowloadFile(builder, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
+
+                                FileUtils.delete(targetFile);
+                                tempFile.renameTo(targetFile);
+                            }
+                        }, null);
+            } catch (SystemException e) {
+                logger.error(e, e);
+                throw new SetupException(e);
+            }
         }
     }
 

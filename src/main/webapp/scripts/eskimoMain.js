@@ -148,7 +148,7 @@ eskimo.Main = function() {
         var displayService;
         $(".inner-content").each(function (nbr, innerContent) {
             if ($(innerContent).css("visibility") == "visible") {
-                displayService = $(innerContent).attr('id').substring(14);
+                displayService = $(innerContent).attr('id').substring("inner-content-".length);
             }
         });
         return displayService;
