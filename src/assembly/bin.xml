@@ -109,6 +109,13 @@ Software.
                 <include>*.pdf</include>
             </includes>
         </fileSet>
+        <!-- Create empty directory for static_images  -->
+        <fileSet>
+            <outputDirectory>static_images</outputDirectory>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
     </fileSets>
     <files>
         <file>

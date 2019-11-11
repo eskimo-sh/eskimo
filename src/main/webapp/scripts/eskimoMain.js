@@ -61,6 +61,7 @@ eskimo.Main = function() {
     var eskimoServicesConfig = null;
     var eskimoFileManagers = null;
     var eskimoOperationsCommand = null;
+    var eskimoSetupCommand = null;
 
     var operationInProgress = false;
     var operationInProgressOwner = false;
@@ -147,7 +148,7 @@ eskimo.Main = function() {
         var displayService;
         $(".inner-content").each(function (nbr, innerContent) {
             if ($(innerContent).css("visibility") == "visible") {
-                displayService = $(innerContent).attr('id').substring(14);
+                displayService = $(innerContent).attr('id').substring("inner-content-".length);
             }
         });
         return displayService;
@@ -297,6 +298,9 @@ eskimo.Main = function() {
     this.getOperationsCommand = function() {
         return eskimoOperationsCommand;
     };
+    this.getSetupCommand = function() {
+        return eskimoSetupCommand;
+    };
 
     this.initialize = function() {
 
@@ -330,6 +334,9 @@ eskimo.Main = function() {
         // loadServicesConfig -> load-services-config
 
         eskimoOperationsCommand = new eskimo.OperationsCommand();
+        // (nothing)
+
+        eskimoSetupCommand = new eskimo.SetupCommand();
         // (nothing)
 
         eskimoFileManagers = new eskimo.FileManagers();

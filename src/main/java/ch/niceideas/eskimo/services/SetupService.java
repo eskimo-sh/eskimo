@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -64,6 +66,7 @@ import java.util.stream.Collectors;
 public class SetupService {
 
     private static final Logger logger = Logger.getLogger(SetupService.class);
+    public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -114,6 +117,9 @@ public class SetupService {
         return configStoragePathInternal;
     }
 
+    public String getPackagesDownloadUrlRoot() {
+        return packagesDownloadUrlRoot;
+    }
 
     private String readConfigStoragePath() {
         // First read config storage path
@@ -159,25 +165,43 @@ public class SetupService {
         }
 
         Set<String> missingServices = new HashSet<>();
-        for (String service : packagesToBuild.split(",")) {
-            if (Arrays.stream(packagesDistribFolder.listFiles())
-                    .noneMatch(file -> file.getName().contains("docker_template") && file.getName().contains(service))) {
-                missingServices.add(service);
-            }
-        }
+
+        findMissingServices(packagesDistribFolder, missingServices);
 
         // 4. Ensure mesos is properly downloaded / built
-        if (Arrays.stream(packagesDistribFolder.listFiles())
-                .noneMatch(file -> file.getName().contains("mesos") && file.getName().contains("debian"))) {
-            missingServices.add("mesos_debian");
-        }
-        if (Arrays.stream(packagesDistribFolder.listFiles())
-                .noneMatch(file -> file.getName().contains("mesos") && file.getName().contains("redhat"))) {
-            missingServices.add("mesos_redhat");
-        }
+        findMissingMesos(packagesDistribFolder, missingServices);
 
         if (!missingServices.isEmpty()) {
             throw new SetupException ("Following services are missing and need to be downloaded or built " + String.join(", ", missingServices));
+        }
+    }
+
+    void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
+        if (Arrays.stream(packagesDistribFolder.listFiles())
+                .noneMatch(file ->
+                        file.getName().contains("_mesos-")
+                                && file.getName().contains("debian")
+                                && !file.getName().contains("__temp_download"))) {
+            missingServices.add("mesos-debian");
+        }
+        if (Arrays.stream(packagesDistribFolder.listFiles())
+                .noneMatch(file ->
+                        file.getName().contains("_mesos-")
+                                && file.getName().contains("redhat")
+                                && !file.getName().contains("__temp_download"))) {
+            missingServices.add("mesos-redhat");
+        }
+    }
+
+    void findMissingServices(File packagesDistribFolder, Set<String> missingServices) {
+        for (String service : packagesToBuild.split(",")) {
+            if (Arrays.stream(packagesDistribFolder.listFiles())
+                    .noneMatch(file ->
+                            file.getName().contains("docker_template")
+                                    && file.getName().contains("_"+service+"_")
+                                    && !file.getName().contains("__temp_download"))) {
+                missingServices.add(service);
+            }
         }
     }
 
@@ -191,7 +215,7 @@ public class SetupService {
         return FileUtils.readFile(configFile);
     }
 
-    public String saveAndApplySetup(String configAsString) throws SetupException {
+    public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
 
         logger.info("Got config : " + configAsString);
 
@@ -215,17 +239,17 @@ public class SetupService {
                 storagePath.mkdirs();
 
                 if (!storagePath.exists()) {
-                    return ErrorStatusHelper.createErrorStatus("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");
+                    throw new SetupException("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");
                 }
             }
             if (!storagePath.canWrite()) {
                 String username = System.getProperty("user.name");
-                return ErrorStatusHelper.createErrorStatus ("User " + username + " cannot write in path " + getConfigStoragePath() + " doesn't exist.");
+                throw new SetupException("User " + username + " cannot write in path " + getConfigStoragePath() + " doesn't exist.");
             }
 
             String sshKeyContent = (String) setupConfigJSON.getValueForPath("content-ssh-key");
             if (StringUtils.isBlank(sshKeyContent)) {
-                return ErrorStatusHelper.createErrorStatus ("Provided SSH key is empty");
+                throw new SetupException("Provided SSH key is empty");
             }
 
             // save config
@@ -241,15 +265,13 @@ public class SetupService {
             File configFile = new File(getConfigStoragePath() + "/config.json");
             FileUtils.writeFile(configFile, configAsString);
 
-            applySetup(setupConfigJSON);
-
-            return "{\"status\": \"OK\"}";
+            return SetupCommand.create(setupConfigJSON, systemService, this);
 
         } catch (JSONException | FileException e) {
             logger.error(e, e);
             messagingService.addLines("\nerror : "
                     + e.getMessage());
-            return ErrorStatusHelper.createErrorStatus (e);
+            throw new SetupException(e);
         }
     }
 
@@ -308,8 +330,81 @@ public class SetupService {
     }
 
 
+    public void prepareSetup (
+            JsonWrapper setupConfig,
+            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos)
+            throws JSONException, SetupException {
 
-    private void applySetup(JsonWrapper setupConfig) throws SetupException, JSONException {
+        File packagesDistribFolder = new File (packageDistributionPath);
+        if (!packagesDistribFolder.exists()) {
+            packagesDistribFolder.mkdirs();
+        }
+
+        String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
+        if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
+
+            findMissingServices(packagesDistribFolder, buildPackage);
+
+        } else {
+
+            Set<String> missingServices = new HashSet<>();
+            findMissingServices(packagesDistribFolder, missingServices);
+
+            try {
+
+                JsonWrapper packagesVersion = loadRemotePackagesVersionFile();
+
+                for (String packageName : missingServices) {
+
+                    String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
+                    String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
+
+                    downloadPackages.add(packageName+"_"+softwareVersion+"_"+distributionVersion);
+                }
+
+            } catch (IOException | FileException e) {
+                logger.error (e, e);
+                throw new SetupException(e);
+            }
+        }
+
+        String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
+        if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
+
+            Set<String> missingServices = new HashSet<>();
+
+            findMissingMesos(packagesDistribFolder, missingServices);
+
+            for (String mesosPackageName : missingServices) {
+                for (String mesosPackage : mesosPackages.split(",")) {
+
+                    if (mesosPackage.contains(mesosPackageName)) {
+                        downloadMesos.add(mesosPackage);
+                    }
+                }
+            }
+
+        } else {
+
+            findMissingMesos(packagesDistribFolder, buildMesos);
+        }
+
+    }
+
+    JsonWrapper loadRemotePackagesVersionFile() throws IOException, FileException {
+        File tempPackagesVersionFile = new File("eskimo_packages_versions.json__temp_download");
+
+        URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
+
+        dowloadFile(new StringBuilder(), tempPackagesVersionFile, downloadUrl, "");
+
+        JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
+        tempPackagesVersionFile.delete();
+        return packagesVersion;
+    }
+
+
+    public String applySetup(JsonWrapper setupConfig) throws SetupException, JSONException {
 
         boolean success = false;
         systemService.setProcessingPending();
@@ -329,59 +424,51 @@ public class SetupService {
             }
 
             String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
+
+            Set<String> missingServices = new HashSet<>();
+            findMissingServices(packagesDistribFolder, missingServices);
+
             if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
 
-                for (String image : packagesToBuild.split(",")) {
-                    buildPackage(image);
+                for (String packageName : missingServices) {
+                    buildPackage(packageName);
                 }
 
             } else {
 
-                // download mesos using full java solution (don't want dependency on system script for this)
-                // FIXME Implement me
-                throw new SetupException("Downloading services is not supported in this version of Eskimo unfortunately. Will be in the next version.");
+                JsonWrapper packagesVersion = null;
+                try {
+                    packagesVersion = loadRemotePackagesVersionFile();
+                } catch (IOException | FileException e) {
+                    logger.error (e, e);
+                    throw new SetupException(e);
+                }
+
+                for (String packageName : missingServices) {
+
+                    String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
+                    String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
+
+                    String fileName = "docker_template_" + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+
+                    downloadPackage(fileName);
+                }
 
             }
 
             // 2. Then focus on mesos
+
+            Set<String> missingMesosPackages = new HashSet<>();
+            findMissingMesos(packagesDistribFolder, missingMesosPackages);
+
             String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
             if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
 
-                for (String mesosPackage : mesosPackages.split(",")) {
+                for (String mesosPackageName : missingMesosPackages) {
+                    for (String mesosPackage : mesosPackages.split(",")) {
 
-                    if (!systemService.isInterrupted()) {
-                        try {
-                            systemOperationService.applySystemOperation("Building of package " + mesosPackage,
-                                    (builder) -> {
-
-                                        File targetFile = new File(packageDistributionPath + "/" + mesosPackage);
-
-                                        if (targetFile.exists()) {
-                                            builder.append(mesosPackage);
-                                            builder.append(" is already downloaded");
-                                        } else {
-
-                                            File tempFile = new File(targetFile.getAbsolutePath() + "__temp_download");
-
-                                            // download mesos using full java solution, no script (don't want dependency on system script for this)
-                                            ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(packagesDownloadUrlRoot + "/" + mesosPackage).openStream());
-
-                                            FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-                                            FileChannel fileChannel = fileOutputStream.getChannel();
-
-                                            builder.append("Downloading image ");
-                                            builder.append(mesosPackage);
-                                            builder.append(" ...");
-                                            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-                                            fileChannel.close();
-
-                                            FileUtils.delete(targetFile);
-                                            tempFile.renameTo(targetFile);
-                                        }
-                                    }, null);
-                        } catch (SystemException e) {
-                            logger.error(e, e);
-                            throw new SetupException(e);
+                        if (mesosPackage.contains(mesosPackageName)) {
+                            downloadPackage(mesosPackage);
                         }
                     }
                 }
@@ -394,11 +481,62 @@ public class SetupService {
             }
 
             success = true;
+            return "{\"status\": \"OK\"}";
+
+        } catch (JSONException | SetupException e) {
+            logger.error(e, e);
+            messagingService.addLines("\nerror : "
+                    + e.getMessage());
+            return ErrorStatusHelper.createErrorStatus (e);
 
         } finally {
             systemService.setLastOperationSuccess (success);
             systemService.releaseProcessingPending();
         }
+    }
+
+    void downloadPackage(String fileName) throws SetupException {
+        if (!systemService.isInterrupted()) {
+            try {
+                systemOperationService.applySystemOperation("Downloading of package " + fileName,
+                        (builder) -> {
+
+                            File targetFile = new File(packageDistributionPath + "/" + fileName);
+
+                            String downloadUrlString = packagesDownloadUrlRoot + "/" + fileName;
+                            URL downloadUrl = new URL(downloadUrlString);
+
+                            File tempFile = new File(targetFile.getAbsolutePath() + "__temp_download");
+
+                            if (targetFile.exists()) {
+                                builder.append(fileName);
+                                builder.append(" is already downloaded");
+                            } else {
+
+                                dowloadFile(builder, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
+
+                                FileUtils.delete(targetFile);
+                                tempFile.renameTo(targetFile);
+                            }
+                        }, null);
+            } catch (SystemException e) {
+                logger.error(e, e);
+                throw new SetupException(e);
+            }
+        }
+    }
+
+    void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+        // download mesos using full java solution, no script (don't want dependency on system script for this)
+        ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream());
+
+        FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+        FileChannel fileChannel = fileOutputStream.getChannel();
+
+        builder.append(message);
+
+        fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+        fileChannel.close();
     }
 
     private void buildPackage(String image) throws SetupException {

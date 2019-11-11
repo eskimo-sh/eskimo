@@ -215,7 +215,7 @@ eskimo.SystemStatus = function() {
         } else {
             if (!eskimoMain.isSetupDone()) {
 
-                showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
+                eskimoMain.showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
 
                 // Still initialize the status update timeer (also used for notifications)
                 updateStatus(false);
@@ -704,7 +704,7 @@ eskimo.SystemStatus = function() {
                             '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '         " style="color: '+color+';">' +
                             '            <div class="status-service-icon">' +
-                            '                <img class="status-service-icon-image" src="images/' + service + '-icon.png"/> ' +
+                            '                <img class="status-service-icon-image" src="' + eskimoMain.getServices().getServiceIcon(service) + '"/> ' +
                             '            </div>' +
                             '            <div class="status-service-text">' +
                             '&nbsp;' + service +
@@ -773,7 +773,11 @@ eskimo.SystemStatus = function() {
             } else {
 
                 tableHeaderHtml +=
-                    '<td class="status-node-cell" rowspan="2">' + serviceStatusConfig.name + '</td>\n';
+                    '<td class="status-node-cell" rowspan="2">' +
+                    //'   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
+                    //'   "/><br>' +
+                    serviceStatusConfig.name +
+                    '</td>\n';
             }
         }
 
@@ -781,7 +785,7 @@ eskimo.SystemStatus = function() {
                 '</tr>\n' +
                 '<tr id="header_2" class="status-node-table-header">\n';
 
-        // Phase 1 : render first row
+        // Phase 2 : render second row
         for (var i = 0; i < STATUS_SERVICES.length; i++) {
 
             var serviceName = STATUS_SERVICES[i];
@@ -789,7 +793,10 @@ eskimo.SystemStatus = function() {
 
             if (serviceStatusConfig.group && serviceStatusConfig.group != null && serviceStatusConfig.group != "") {
                 tableHeaderHtml = tableHeaderHtml +
-                    '<td class="status-node-cell">' + serviceStatusConfig.name + '</td>\n';
+                    '<td class="status-node-cell">' +
+                    //'   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
+                    //'   "/><br>' +
+                    serviceStatusConfig.name + '</td>\n';
             }
         }
 
@@ -964,6 +971,11 @@ eskimo.SystemStatus = function() {
                 } else if (data.clear == "setup"){
 
                     eskimoMain.handleSetupNotCompleted();
+
+                    if (   !eskimoMain.isCurrentDisplayedService("setup")
+                        && !eskimoMain.isCurrentDisplayedService("pending")) {
+                        eskimoMain.showSetupNotDone();
+                    }
 
                 } else if (data.clear == "nodes"){
 

@@ -48,11 +48,11 @@ Reach http://www.eskimo.sh for more information on Eskimo or look at the documen
 
 The *Service Development framework* is actually composed by two distinct parts:
 
-* The *Docker Images Development Framework* which is used to build the docker images deployed on the eskimo cluster
+1. The *Docker Images Development Framework* which is used to build the docker images deployed on the eskimo cluster
 nodes
-* The *Services Installation Framework* which is used to install these images as services on the eskimo cluster nodes.
+2. The *Services Installation Framework* which is used to install these images as services on the eskimo cluster nodes.
 
-
+This document presents "2. The *Services Installation Framework*"
 
 
 
@@ -61,12 +61,13 @@ nodes
 [[services_installation_framework]]
 == Services Installation Framework
 
-This document presents the Services Installation framework.
-
 The Services Installation Framework provides tools and standards to install the packaged docker images containing the
 target software component on the eskimo cluster nodes.
 
 Eskimo is leveraging on both docker and systemd to deploy the services on the cluster nodes and to operate them.
+
+* An eskimo package has to be a docker image
+* An eskimo package has to provide a systemd unit configuration file to enable eskimo to operate the component on the cluster.
 
 The Eskimo Nodes Configuration process takes care of installing the services defined in the _services.json_
 configuration file and and copies them over to the nodes where they are intended to run. After the proper installation,
@@ -97,6 +98,10 @@ These standard conventions are as follows (illustrated for a service called `ser
 * Services should put their persistent data (to be persisted between two docker container restart) in `/var/lib/serviceX`
 * Services should put their log files in `/var/log/serviceX`.
 * If the service required a file to track its PID, that file should be stored under `/var/run/serviceX`
+* Whenever a service `serviceX` requires a subfolder of `/var/log/serviceX` to be shared among cluster nodes, a script
+`setupServiceXGlusterSares.sh` should be defined that calls the common helper script (define at eskimo base system
+installation on every node) `/usr/local/sbin/handle_gluster_share.sh` in the following way, for instance to define
+ the _flink data_ share : `/usr/local/sbin/handle_gluster_share.sh flink_data /var/lib/flink/data flink`
 
 At the end of the day, it's really plain old Unix standards. The only challenge comes from the use of docker which
 requires to play with docker mounts a little. +
@@ -118,7 +123,7 @@ The goal is to address situations where, for instance,  master services are move
 applying the master setup configuration at service startup time instead of statically enables to simply restart a slave
 service whenever the master node is moved to another node instead of requiring to entirely re-configure them.
 
-The build process thus typically looks this way:
+The install and setup process thus typically looks this way:
 
 1. From outside the container:
 * Perform required configurations on host OS (create `/var/lib` subfolder, required system user, etc.)
@@ -184,7 +189,7 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [optional] name of the group to associate it in the status table
     "group" : "{group name}",
 
-    ## [mandatory] name of the service. miust be consistend with service under
+    ## [mandatory] name of the service. miust be consistent with service under
     ## 'service_setup'
     "name" : "{service name},
 
@@ -195,13 +200,22 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     },
 
     ## memory to allocate to the service
-    "memory": "[neglectable|small|medium|large]"
+    "memory": "[neglectable|small|medium|large]",
+
+    ## [mandatory] The logo to use whenever displaying the service in the UI is
+    ##     required
+    ## Use "images/{logo_file_name}" for resources packaged within eskimo web app
+    ## Use "static_images/{logo_file_name}" for resources put in the eskimo
+    ##    distribution folder "static_images"
+    ## (static_images is configurable in eskimo.properties with property
+    ##    eskimo.externalLogoAndIconFolder)
+    "logo" : "[images|static_images]/{logo_file_name}"
   },
 
   ## [optional] configuration of the serice web console (if anym)
   "ui": {
 
-    ## optional] (A) either URL template should be configured ...
+    ## [optional] (A) either URL template should be configured ...
     "urlTemplate": "http://{NODE_ADDRESS}:{PORT}/",
 
     ## [optional] (B) .... or proxy configuration in case the service has
@@ -215,8 +229,13 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [mandatory] the name of the menu entry
     "title" : "{menu name}",
 
-    ## [optional] the icon to use (must be available)
-    "icon" : "{path relative to web context}"
+    ## [mandatory] The icon to use ine the menu for the service
+    ## Use "images/{icon_file_name}" for resources packaged within eskimo web app
+    ## Use "static_images/{icon_file_name}" for resources put in the eskimo
+    ##    distribution folder "static_images"
+    ## (static_images is configurable in eskimo.properties with property
+    ##    eskimo.externalLogoAndIconFolder)
+    "icon" : "[images|static_images]/{icon_file_name}"
 
     ## [optional] Whether standard rewrite rules need to be applied to this service
     ## (default is true)
@@ -300,9 +319,11 @@ any node of the cluster where the second service is installed.
 * `RANDOM_NODE_AFTER` : This is used to define a simple dependency on another service. In addition, `RANDOM_NODE_AFTER`
 indicates that the first service wants to know about at least one node where that other service is available. That other
 node should be any node of the cluster where the second service is installed yet with a *node number* (internal eskimo
-node configuration) greater than the current node where the first service is installed.
+node configuration) greater than the current node where the first service is installed. +
+This is usefull to define a chain of dependencies where every node instance depends on another node instance in a
+circular way (pretty nifty for instance for elasticsearch discovery).)
 * `SAME_NODE` : This means that the other service is expected to be available on the same node than the first
-service, otherwise eskimo will report an error during node configuration.
+service, otherwise eskimo will report an error during service installation.
 
 ==== Memory allocation
 
@@ -350,7 +371,7 @@ used by all eskimo pre-packaged services and web consoles.
 
 Proxying works as explained  in the User Guide in the section "SSH Tunelling".
 
-Proxying is however much more complicated to set up since eskimo needs to perform a lot of rewriting on the text
+Proxying is however a little more complicated to set up since eskimo needs to perform a lot of rewriting on the text
 resources (javascript, html and json) served by the proxied web console to rewrite served URLs to make them pass
 through the proxy.
 
@@ -361,7 +382,7 @@ as presented above.
 
 Proxying web consoles HTTP flow means that a lot of the text resources served by the individual target web consoles
 need to be processed in such a way that absolute URLs are rewritten.
-This is unfortunately tricky and mayn different situation occurs, from URL build dynamically in javascript to static
+This is unfortunately tricky and many different situations can occur, from URL build dynamically in javascript to static
 resources URLs in CSS files for instance.
 
 An eskimo service developer needs to analyze the application, debug it and understand every pattern that needs to be
@@ -447,7 +468,10 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-// marker for exclusion : line 450
+
+
+
+// marker for exclusion : line 460
 
 
 

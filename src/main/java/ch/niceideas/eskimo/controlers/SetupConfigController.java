@@ -36,12 +36,16 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.SetupCommand;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
@@ -50,6 +54,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 
 
 @Controller
@@ -62,6 +69,7 @@ public class SetupConfigController {
 
     @Autowired
     private SystemService systemService;
+
 
     @GetMapping("/load-setup")
     @ResponseBody
@@ -104,15 +112,58 @@ public class SetupConfigController {
     }
 
 
-    @PostMapping("/apply-setup")
+    @PostMapping("/save-setup")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String saveAndApplySetup(@RequestBody String configAsString) {
+    public String saveSetup(@RequestBody String configAsString, HttpSession session) {
 
         logger.info("Got config : " + configAsString);
 
         try {
-            return setupService.saveAndApplySetup(configAsString);
+
+            // Create SetupCommand
+            SetupCommand command = setupService.saveAndPrepareSetup(configAsString);
+
+            // store command and config in HTTP Session
+            session.setAttribute("PENDING_SETUP_COMMAND", command);
+
+            return returnCommand (command);
+
+        } catch (SetupException e) {
+            logger.error(e, e);
+            return ErrorStatusHelper.createErrorStatus (e);
+        }
+    }
+
+    private String returnCommand(SetupCommand command) {
+        try {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("command", command.toJSON());
+            }}).toString(2);
+        } catch (JSONException e) {
+            return ErrorStatusHelper.createErrorStatus(e);
+        }
+    }
+
+    @PostMapping("/apply-setup")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String applySetup(HttpSession session) {
+
+        try {
+
+            if (systemService.isProcessingPending()) {
+                return new JSONObject(new HashMap<String, Object>() {{
+                    put("status", "OK");
+                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                }}).toString(2);
+            }
+
+            SetupCommand command = (SetupCommand) session.getAttribute("PENDING_SETUP_COMMAND");
+            session.removeAttribute("PENDING_SETUP_COMMAND");
+
+            return setupService.applySetup(command.getRawSetup());
 
         } catch (SetupException e) {
             logger.error(e, e);

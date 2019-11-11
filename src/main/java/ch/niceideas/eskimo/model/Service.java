@@ -73,6 +73,16 @@ public class Service {
 
     private List<String> additionalmemoryServices = new ArrayList<>();
 
+    private String logo;
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
     public String getImageName() {
         return imageName;
     }
@@ -225,6 +235,7 @@ public class Service {
             put("title", (StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() + " " : "") + getStatusName().replaceAll("-", ""));
             put("row", getSelectionLayoutRow());
             put("col", getSelectionLayoutCol());
+            put("logo", getLogo());
         }});
     }
 

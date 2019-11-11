@@ -202,8 +202,11 @@ public class NodesConfigController {
             }
 
             OperationsCommand command = (OperationsCommand) session.getAttribute("PENDING_OPERATIONS_COMMAND");
+            session.removeAttribute("PENDING_OPERATIONS_COMMAND");
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
+            session.removeAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
+
             // newNodesStatus is null in case of nodes config change (as opposed to forced reinstall)
             if (newServicesInstallationStatus != null) {
                 systemService.saveServicesInstallationStatus(newServicesInstallationStatus);

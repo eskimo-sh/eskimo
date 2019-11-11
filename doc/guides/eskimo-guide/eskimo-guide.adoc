@@ -37,24 +37,25 @@ Software.
 :authors: eskimo.sh / https://www.eskimo.sh / 2019
 :copyright: eskimo.sh / https://www.eskimo.sh / 2019
 
-= Eskimo User Guide
+= Eskimo User and Administration Guide
 
 [[chap-introduction]]
 == Eskimo Introduction
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
-*Big Data 2.0* clusters using *Docker* and *Mesos*.
+*Big Data 2.0* clusters using *Docker*, *SystemD* and *Mesos*.
 
 image::pngs/eskimo.jpg[50, 50, align="center"]
 
 Eskimo is in a certain way the Operating System of your Big Data Cluster:
 
-* an Administration Application aimed at drastically simplifying the deployment, administration and operation of your
-  Big Data Cluster
-* a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Spark,
-  Kafka, Flink and ElasticSearch* with all the required tools and consoles to manage them such as *Cerebro, Kibana,
-  Zeppelin, Kafka-Manager, Grafana and Prometheus*.
-* a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
+* a *Web Based Administration Application* aimed at drastically simplifying the deployment, administration and
+  operation of your Big Data Cluster
+* a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Zookeeper, Spark,
+  Kafka, Flink and ElasticSearch* with all the required tools and consoles required to use and  manage them such
+  as *Cerebro, Kibana, Zeppelin, Kafka-Manager, Grafana and Prometheus*.
+* a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
+  all the _nuts and bolds_ required to make them work well together.
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
 
 image::pngs/eskimo_platform.png[800, 800, align="center"]
@@ -95,7 +96,7 @@ Eskimo also enables the user to develop his own services very easily.
 === Why is Eskimo cool ?
 
 * *Taking care of it !* +
-Making Mesos, Kafka, ElasticSearch, Flink, Spark, etc. work perfectly together is difficult and tedious. +
+Making Zookeeper, Mesos, Kafka, ElasticSearch, Flink, Spark, etc. work perfectly together is difficult and tedious. +
 Eskimo takes care of everything.
 
 * *Big Data 2.0* +
@@ -105,28 +106,39 @@ Eskimo is based on Mesos, ElasticSearch, Kafka and Spark,
 cutting edge components from a newer generation.
 
 * *Leveraging on docker* +
-Most if not all private-cloud Big Data Platform such as Hortonworks, Cloudera, MapR, etc. install components natively,
-thus having strong requirements and impacts on  underlying nodes. +
-Eskimo uses docker to isolates Eskimo components from underlying hosts and vice versa.
+Most if not all private-cloud Big Data Platform such as those mentionned above would install components natively,
+thus having strong requirements and impacts on underlying nodes. +
+Eskimo uses docker to isolates Eskimo components from the underlying host OS and vice versa.
 
 * *Eskimo is an open platform.* +
-Eskimo works out of the box but users can customize and extend the way they like, the way they decide
+Eskimo works out of the box but users can customize and extend it the way they like, the way they decide
 
 
 === Eskimo's DNA
 
 [cols=">.^20%,80%"]
 |===
+a|image::pngs/big_data_scientist.png[80, 80] a| *Big Data Scientist*
+
+
+With eskimo, Big Data Scientists can prototype and run their analytics use cases on a thousand nodes cluster should they
+need it.
+
+With Flink ML and Spark ML natively available on Flink and Spark and usable from within Zeppelin, Data Scientists can
+bring their mission to the next level: the big data way.
+
+SciKit Learn and TensorFlow are also available from within Zeppelin of course.
+
 a|image::pngs/big_data.jpg[80, 80] a| *Big Data 2.0*
 
 In contrary to popular Hadoop-based and other Big Data Platforms, Eskimo is based on cutting-edge technologies:
 
 * GlusterFS instead of HDFS
-* Spark instead of Hive and Pig
+* Spark instead of Hive or Pig
 * Flink instead of Storm
 * Mesos instead of Yarn
 * Docker instead of not native deployment
-* ElasticSearch instead of not HBase
+* ElasticSearch instead of HBase or Hive
 
 These new generation Big Data components form together a Big Dats 2.0 stack, lightweight and efficient and leveraging
 on modern computing abilities (memory oriented vs. IO oriented). +
@@ -228,7 +240,7 @@ The processing layer makes the following services available:
 abilities (ppeline computations, aggregations, etc.)
 * logstash : used for data processing and ingestion
 
-Spark and Flink are operated by mesos to achieve cluster resources booking and negotiation.
+Spark and Flink are operated by mesos to achieve optimal cluster resources booking and negotiation.
 
 The user layer is intended for data / result visualizations and platform administration with the following components:
 
@@ -254,7 +266,7 @@ image::pngs/system_architecture.png[800, 800, align="center"]
 The Eskimo application itself can be deployed on any of the cluster nodes or on another machine, as in the example
 above.
 
-
+[[ssh-tunneling]]
 === SSH Tunelling
 
 One of the most important feature of the Eskimo Web Console is its ability to provide in a single and consistent
@@ -278,11 +290,9 @@ distribution*.
 [[chap-installation]]
 == Eskimo Installation
 
-WARNING: Currently, in this early stage, Eskimo runs only on Linux since it has dependencies on shell scripts and docker
-to build package images. In the next version (within a few weeks), the possibility to download pre-built packages will
-be added to eskimo and make it possible to run eskimo on Windows. +
-Aside from this dependency on shell scripts and docker to build images, eskimo runs runs theoretically perfectly on
-MS Windows. One may want to give cygwin a try regarding this shell dependency.
+WARNING: Eskimo cluster nodes support only the Linux operating system and have to be running a Linux distribution. +
+The eskimo application itself can very well run on windows though. However, running the Eskimo application on Windows
+prevents the user from building his own containers, he may only download pre-built containers for use with Eskimo.
 
 === Prerequisites
 
@@ -303,9 +313,9 @@ export JAVA_HOME=/usr/local/lib/jdk-9
 export PATH=$JAVA_HOME/bin:$PATH
 ----
 
-(You might want to put above commands in your `/etc/profile` or `/etc/bash.bashrc`)
+(You might want to put the commands above in your `/etc/profile` or `/etc/bash.bashrc`)
 
-And for instance the following commands on Windows
+Use for instance the following commands on Windows:
 
 .Put java in PATH on Windows
 ----
@@ -316,7 +326,7 @@ set PATH=%JAVA_HOME%\bin;%PATH%
 
 ==== Prerequisites on eskimo cluster nodes
 
-Linux distributions successfully tested with Eskimo and officially supprted are the following:
+Linux distributions successfully tested with Eskimo and officially supoprted are the following:
 
 * Debian Stretch and greater
 * Ubuntu Xenial and greater
@@ -326,7 +336,8 @@ Linux distributions successfully tested with Eskimo and officially supprted are 
 ===== Firewall open ports on eskimo nodes
 
 In case a firewall (firewalld or simple iptables configuration) is installed on eskimo cluster nodes, then
-the following port numbers need to be explicitly open (for both UDP and TCP) for inside eskimo cluster communications:
+the following port numbers need to be explicitly open (for both UDP and TCP) on every single node for inside eskimo
+cluster communications to work properly:
 
 * [cerebro] : 9000
 * [elasticsearch] : 9200, 9300
@@ -347,8 +358,7 @@ the following port numbers need to be explicitly open (for both UDP and TCP) for
 * [zookeeper] : 2181, 2888, 3888
 
 Again, most of these ports need to be opened only for internal eskimo cluster node communications. +
-But many of these service need to be acceses from the outside world as well so all in all administrators would be well
-advised to open them externally as well.
+Exteral access is performed through SSH proxying - see <<ssh-tunneling>> - a flagship feature provided by eskimo.
 
 ===== Eskimo system user
 
@@ -422,6 +432,8 @@ yum install -y net-tools anacron
 yum -y install glusterfs glusterfs-fuse
 ----
 
+*Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding packages
+before you can use your nodes within eskimo.*
 
 === Extract archive.
 
@@ -741,7 +753,7 @@ node in a range is not answering. +
 Should you have holdes in your range of IP addresses, you are expected to define multiple ranges, getting rid of the
 holes in your range of IPs.
 
-WARNING: In its current version (0.1 at the time of writing this document), eskimo *requires at all cost* nodes to be
+WARNING: In its current version (0.2 at the time of writing this document), eskimo *requires at all cost* nodes to be
 defined using IP addresses and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
 adresses are supported, period. +
 Unfortunately with big data technologies and especially spark and mesos, supporting DNS or hostnames is significantly
@@ -787,6 +799,9 @@ parallel.
 *One should note that this configuration can be changed at will ! Master services can be moved back and forth between
 nodes, slave services can be removed from nodes or added at will after the initial configuration has been applied,
 Eskimo takes care of everything !*
+
+As a sidenote, _Eskimo Community Edition_ doesn't support high availability for master services, one needs to acquire
+_Eskimo Enterprise Edition_ for high availability.
 
 === SSH and SFTP Client
 
@@ -854,22 +869,22 @@ This is why the persistent data is stored under sub-folders if `/var/lib` which 
 ==== Commands wrappers for kafka, logstash and spark
 
 Commands such as kafka `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
-executor container.
+executor docker containers.
 
 For this reason, eskimo provides host-level wrappers in `/usr/local/bin` and `/usr/local/sbin` for most important
 commands. +
 These wrappers take care of calling the corresponding command in the required container.
 
-=== Pre-packaged components and details
+The remaining of this chapter presents each and every pre-packaged service:
 
-==== NTP
+=== NTP
 
 NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
 
 Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
 considered slaves and synchronize to this NTP master.
 
-==== Zookeeper
+=== Zookeeper
 
 image::pngs/zookeeper-logo.png[50, 50, align="center"]
 
@@ -885,7 +900,7 @@ https://zookeeper.apache.org/
 
 Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
 
-==== glusterFS
+=== glusterFS
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
@@ -898,7 +913,7 @@ synchronize eskimo cluster nodes.
 
 https://www.gluster.org/
 
-==== Gluster Infrastructure
+=== Gluster Infrastructure
 
 Eskimo approaches gluster shares manmagement in a specific way. +
 Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
@@ -913,7 +928,7 @@ Where:
 * The command server and client are internal tools. Eskimo end users and administrators do not need to be aware of them
 * The script `gluster_mount.sh` takes care of everything and is intended for usage by end users.
 
-===== Gluster shares management
+==== Gluster shares management
 
 Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
 
@@ -938,7 +953,7 @@ The beauty of this script is that it takes care of everything:
 * Creating the volume in gluster if not already done
 * Registering the mount point in `/etc/fstab` and systemd for automatic remount
 
-==== GDASH
+=== GDASH
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
@@ -946,7 +961,7 @@ GDASH is the Gluster DASHboard used to monitor gluster shares.
 
 https://github.com/aravindavk/gdash
 
-==== Elastic Logstash
+=== Elastic Logstash
 
 image::pngs/logstash-logo.png[50, 50, align="center"]
 
@@ -959,7 +974,7 @@ ease overall processing.
 
 https://www.elastic.co/products/logstash
 
-===== Logstash specificities within Eskimo
+==== Logstash specificities within Eskimo
 
 With Eskimo, logstash runs in a docker container ans as such it is pretty isolated from the host Operating System but
 also from other containers. +
@@ -987,7 +1002,7 @@ the node(s) running Zeppelin.
 unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
 supported yet.
 
-==== ElasticSearch
+=== ElasticSearch
 
 image::pngs/elasticsearch-logo.png[50, 50, align="center"]
 
@@ -1001,7 +1016,7 @@ you want. Start simple with one question and see where it takes you.
 
 https://www.elastic.co/products/elasticsearch
 
-==== Cerebro
+=== Cerebro
 
 image::pngs/cerebro-logo.png[50, 50, align="center"]
 
@@ -1012,7 +1027,7 @@ Monitoring the nodes here includes all indexes, all the data nodes, index size, 
 
 https://github.com/lmenezes/cerebro
 
-==== Elastic Kibana
+=== Elastic Kibana
 
 image::pngs/kibana-logo.png[50, 50, align="center"]
 
@@ -1024,7 +1039,7 @@ you’re looking for. With its interactive visualizations, start with one questi
 
 https://www.elastic.co/products/kibana
 
-==== Apache Kafka
+=== Apache Kafka
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
 
@@ -1035,7 +1050,7 @@ wicked fast, and runs in production in thousands of companies.
 
 https://kafka.apache.org/
 
-==== Kafka Manager
+=== Kafka Manager
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
 
@@ -1046,7 +1061,7 @@ generate partition assignments, monitor statistics, etc.
 
 https://github.com/lmenezes/cerebro
 
-==== Apache Mesos
+=== Apache Mesos
 
 image::pngs/mesos-master-logo.png[50, 50, align="center"]
 
@@ -1060,7 +1075,7 @@ API’s for resource management and scheduling across entire datacenter and clou
 
 http://mesos.apache.org/
 
-==== Apache Spark
+=== Apache Spark
 
 image::pngs/spark-executor-logo.png[50, 50, align="center"]
 
@@ -1073,7 +1088,17 @@ GraphX for graph processing, and Spark Streaming.
 
 https://spark.apache.org/
 
-==== Apache Flink
+==== Gluster shares for Spark
+
+Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
+gluster shares created and mounted:
+
+* `/var/lib/spark/data` where spark stores its own data but the user can store his own data to be used accross spark
+executors as well
+* `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
+history server to monitor spark jobs.
+
+=== Apache Flink
 
 image::pngs/flink-app-master-logo.png[50, 50, align="center"]
 
@@ -1090,17 +1115,16 @@ produces one or more output streams as a result.
 
 https://flink.apache.org
 
-===== Gluster shares for Spark
+==== Gluster shares for Flink
 
-Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
+Nodes where Flink is installed (either Flink App Master, Flink worker or Zeppelin) automatically have the following
 gluster shares created and mounted:
 
-* `/var/lib/spark/data` where spark stores its own data but the user can store his own data to be used accross spark
-executors as well
-* `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
-history server to monitor spark jobs.
+* `/var/lib/flink/data flink` used to store data to be shared amoung flink workers.
+* `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
 
-==== Apache zeppelin
+
+=== Apache zeppelin
 
 image::pngs/zeppelin-logo.png[50, 50, align="center"]
 
@@ -1115,7 +1139,53 @@ Gluster, etc.
 
 https://zeppelin.apache.org/
 
-==== Prometheus
+==== Zeppelin specificities within Eskimo
+
+Within Eskimo, Zeppelin runs from within a docker container. +
+Command wrappers and custom command clients are available to enable it to use other services, running themselves as
+docker containers under eskimo.
+
+* Elasticsearch, flink and spark are called by using their dedicated intepreter
+* Logstash is called by using the `logstash-cli` script from the shell interpreter
+
+In addition, zeppelin has access to shared folders used by the different services in order to be able to share data
+with them. +
+Following shares are mounted within the Zeppelin container:
+
+* Logstash shared folder:
+** `/var/lib/logstash/data`
+* Spark shares:
+** `/var/lib/spark/data`
+** `/var/lib/spark/eventlog`
+* Flink shares:
+** `/var/lib/flink/data flink`
+** `/var/lib/flink/completed_jobs`
+
+These shared folders are automatically shared among the different nodes of the cluster using GlusterFS.
+
+An additional share exist in order to be able to share data to the zeppelin docker container:
+
+** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
+gluster when deploying in cluster mode).
+
+==== Zeppelin 0.9-SNAPSHOT bugs and workarounds
+
+In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin 0.9 since Zeppelin 0.9 is not released yet and
+the fodmer 0.8 version is incompatible with most software versions packages within Eskimo.
+
+Unfortunately this SNAPSHOT version is a development versions and some bugs exist.
+
+These bugs and workarounds are reported hereunder:
+
+===== REST API for notebook export is broken.
+
+* *Problem* : after importing a notebook using the REST API, the notebook is not properly saved, it only exists in
+memory. +
+Restarting zeppelin would loose it.
+* *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
+it is saved for real.
+
+=== Prometheus
 
 image::pngs/prometheus-logo.png[50, 50, align="center"]
 
@@ -1127,7 +1197,7 @@ targets, etc.
 
 https://prometheus.io/
 
-==== Grafana
+=== Grafana
 
 image::pngs/grafana-logo.png[50, 50, align="center"]
 

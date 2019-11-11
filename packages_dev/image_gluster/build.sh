@@ -52,11 +52,11 @@ build_image gluster /tmp/gluster_build_log
 #docker exec -i gluster bash
 
 echo " - Installing python"
-docker exec -i gluster sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -5
 
 echo " - Installing required python packages"
-docker exec -i gluster sudo pip install furl >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster pip install furl >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -5
 
 echo " - Installing gluster"

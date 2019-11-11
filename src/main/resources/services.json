@@ -7,7 +7,8 @@
       "mandatory": true,
       "name" : "NTP",
       "selectionLayout" : { "row" : 1, "col" : 2},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/ntp-logo.png"
     },
     "dependencies": [
       {
@@ -28,7 +29,8 @@
       "unique": true,
       "name" : "Zookeeper",
       "selectionLayout" : { "row" : 2, "col" : 2},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/zookeeper-logo.png"
     },
     "dependencies": [
       {
@@ -51,7 +53,8 @@
       "group" : "Monitoring",
       "name" : "Prometheus",
       "selectionLayout" : { "row" : 7, "col" : 3},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/prometheus-logo.png"
     },
     "dependencies": [
       {
@@ -74,7 +77,8 @@
       "group" : "Monitoring",
       "name" : "Grafana",
       "selectionLayout" : { "row" : 6, "col" : 1},
-      "memory": "small"
+      "memory": "small",
+      "logo" : "images/grafana-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 3000,
@@ -116,7 +120,8 @@
       "group" : "Gluster",
       "name" : "FS",
       "selectionLayout" : { "row" : 1, "col" : 3},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/gluster-logo.png"
     },
     "dependencies": [
       {
@@ -136,9 +141,10 @@
       "order": 5,
       "unique": true,
       "group" : "Gluster",
-      "name" : "Dash-board",
+      "name" : "Dashboard",
       "selectionLayout" : { "row" : 4, "col" : 2},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/gdash-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 28180,
@@ -173,7 +179,8 @@
       "group" : "Mesos",
       "name" : "Master",
       "selectionLayout" : { "row" : 3, "col" : 2},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/mesos-master-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 5050,
@@ -223,7 +230,8 @@
       "group" : "Mesos",
       "name" : "Agent",
       "selectionLayout" : { "row" : 2, "col" : 3},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/mesos-agent-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 5051
@@ -253,7 +261,8 @@
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 6, "col" : 3},
-      "memory": "medium"
+      "memory": "medium",
+      "logo" : "images/kafka-logo.png"
     },
     "dependencies": [
       {
@@ -322,7 +331,8 @@
       "group" : "Kafka",
       "name" : "Manager",
       "selectionLayout" : { "row" : 5, "col" : 1},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/kafka-manager-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 22080,
@@ -355,9 +365,10 @@
       "order": 10,
       "unique": true,
       "group" : "Spark",
-      "name" : "History Server",
+      "name" : "Console",
       "selectionLayout" : { "row" : 1, "col" : 1},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/spark-history-server-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 18080,
@@ -398,7 +409,8 @@
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 4, "col" : 3},
-      "memory": "large"
+      "memory": "large",
+      "logo" : "images/spark-executor-logo.png"
     },
     "dependencies": [
       {
@@ -483,7 +495,8 @@
       "group": "Flink",
       "name": "App Master",
       "selectionLayout": { "col": 2, "row": 5  },
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/flink-app-master-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 8081,
@@ -564,7 +577,8 @@
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "col": 3, "row": 8  },
-      "memory": "medium"
+      "memory": "medium",
+      "logo" : "images/flink-worker-logo.png"
     },
     "dependencies": [
       {
@@ -603,7 +617,8 @@
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 5, "col" : 3},
-      "memory": "small"
+      "memory": "small",
+      "logo" : "images/logstash-logo.png"
     },
     "dependencies": [
       {
@@ -631,7 +646,8 @@
       "group" : "Elastic Stack",
       "name" : "Cerebro",
       "selectionLayout" : { "row" : 2, "col" : 1},
-      "memory": "neglectable"
+      "memory": "neglectable",
+      "logo" : "images/cerebro-logo.png"
     },
     "ui": {
       "urlTemplate": "./cerebro/#/overview?host=Eskimo",
@@ -660,7 +676,8 @@
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 3, "col" : 3},
-      "memory": "large"
+      "memory": "large",
+      "logo" : "images/elasticsearch-logo.png"
     },
     "dependencies": [
       {
@@ -703,7 +720,8 @@
       "group" : "Elastic Stack",
       "name" : "Kibana",
       "selectionLayout" : { "row" : 3, "col" : 1},
-      "memory": "small"
+      "memory": "small",
+      "logo" : "images/kibana-logo.png"
     },
     "ui": {
       "urlTemplate": "./kibana/app/kibana",
@@ -757,7 +775,8 @@
       "selectionLayout" : { "row" : 4, "col" : 1},
       "memory": "small",
       "____comment": "We need to know about the spark executor memory to set",
-      "memoryAdditional": ["spark-executor"]
+      "memoryAdditional": ["spark-executor"],
+      "logo" : "images/zeppelin-logo.png"
     },
     "ui": {
       "proxyTargetPort" : 38080,

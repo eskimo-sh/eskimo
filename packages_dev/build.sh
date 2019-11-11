@@ -138,13 +138,14 @@ elif [[ $package == "all_images" ]]; then
         cerebro\
         kibana\
         kafka\
+        flink\
         kafka-manager\
         spark\
         zeppelin'
 
     IFS=$' '
     for service in $all_services; do
-        if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_$service.tar.gz ]]; then
+        if [[ $DONT_OVERWRITE == 0 || `ls -1 ../packages_distrib/ | grep docker_template_"$service"_` == "" ]]; then
             bash -c "cd image_$service && bash build.sh"
         else
             echo "image $service already built"
@@ -159,7 +160,10 @@ else
     else
         check_for_docker
 
-        if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/docker_template_$package.tar.gz ]]; then
+        #echo "Building $package"
+        #echo "(overwrite is disabled ? $DONT_OVERWRITE)"
+        #echo "(Package is existing ?"`ls ../packages_distrib/ | grep docker_template_"$package"_`
+        if [[ $DONT_OVERWRITE == 0 || `ls ../packages_distrib/ | grep docker_template_"$package"_` == "" ]]; then
             echo "BUILDING PACKAGE $package"
             set -e
             bash -c "cd image_$package && bash build.sh"

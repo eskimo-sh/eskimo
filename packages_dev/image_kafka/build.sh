@@ -49,7 +49,7 @@ echo " - Building image kafka"
 build_image kafka /tmp/kafka_build_log
 
 echo " - Installing the latest OpenJDK"
-docker exec -i kafka sudo apt-get install -y openjdk-8-jdk >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka apt-get install -y openjdk-8-jdk >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -3
 
 echo " - Installing scala"
@@ -57,7 +57,7 @@ docker exec -i kafka apt-get install -y scala >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -4
 
 echo " - Installing python"
-docker exec -i kafka sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -5
 
 echo " - Installing kafka"

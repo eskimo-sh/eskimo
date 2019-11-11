@@ -59,6 +59,7 @@ public abstract class AbstractWebTest {
         // create mock functions
         page.executeJavaScript("var eskimoServices = {};");
         page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook = function (){};");
+        page.executeJavaScript("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
 
         page.executeJavaScript("var eskimoConsoles = {}");
         page.executeJavaScript("eskimoConsoles.setAvailableNodes = function () {};");
@@ -70,6 +71,9 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var eskimoFileManagers = {};");
         page.executeJavaScript("eskimoFileManagers.setAvailableNodes = function() {};");
 
+        page.executeJavaScript("var nodesConfig = {};");
+        page.executeJavaScript("nodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
+
 
         page.executeJavaScript("var eskimoMain = {};");
         page.executeJavaScript("eskimoMain.handleSetupCompleted = function (){};");
@@ -77,6 +81,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
         page.executeJavaScript("eskimoMain.getFileManagers = function (){ return eskimoFileManagers; };");
         page.executeJavaScript("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
+        page.executeJavaScript("eskimoMain.getNodesConfig = function () { return nodesConfig; };");
         page.executeJavaScript("eskimoMain.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
         page.executeJavaScript("eskimoMain.menuResize = function () {};");

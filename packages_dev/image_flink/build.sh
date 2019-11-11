@@ -49,7 +49,7 @@ echo " - Building image flink"
 build_image flink /tmp/flink_build_log
 
 echo " - Installing the latest OpenJDK"
-docker exec -i flink sudo apt-get install -y openjdk-8-jdk >> /tmp/flink_build_log 2>&1
+docker exec -i flink apt-get install -y openjdk-8-jdk >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -3
 
 echo " - Installing scala"
@@ -57,15 +57,15 @@ docker exec -i flink apt-get install -y scala >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -4
 
 echo " - Installing python"
-docker exec -i flink sudo apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/flink_build_log 2>&1
+docker exec -i flink apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing python elasticsearch and kafka clients and other utilities"
-docker exec -i flink sudo pip install elasticsearch kafka-python >> /tmp/flink_build_log 2>&1
+docker exec -i flink pip install elasticsearch kafka-python >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -6
 
 echo " - Installing other python packages"
-docker exec -i flink sudo pip install requests filelock >> /tmp/flink_build_log 2>&1
+docker exec -i flink pip install requests filelock >> /tmp/flink_build_log 2>&1
 
 echo " - Installing flink"
 docker exec -i flink bash /scripts/installFlink.sh | tee -a /tmp/flink_build_log 2>&1

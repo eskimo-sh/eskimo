@@ -111,11 +111,20 @@ eskimo.Services = function () {
         UI_SERVICES_CONFIG = uiServicesConfig;
     };
 
+    this.getServiceIconPath = function (service) {
+        var uiConfig = UI_SERVICES_CONFIG[service];
+        if (uiConfig == null) {
+            console.error ("Could not find icon for service " + service);
+            return "undefined";
+        }
+        return uiConfig.icon;
+    };
+
     function showServiceIFrame(service) {
 
         if (!eskimoMain.isSetupDone()) {
 
-            showSetupNotDone("Service " + service + " is not available at this stage.");
+            eskimoMain.showSetupNotDone("Service " + service + " is not available at this stage.");
 
         } else {
 

@@ -42,6 +42,8 @@ eskimo.Setup = function() {
     // constants
     var MESSAGES_POLLING_STOP_DELAY = 10000;
 
+    var MESSAGE_SHOW_DURATION = 10000;
+
     // Initialize HTML Div from Template
     this.initialize = function() {
         $("#inner-content-setup").load("html/eskimoSetup.html", function (responseTxt, statusTxt, jqXHR) {
@@ -190,7 +192,7 @@ eskimo.Setup = function() {
         setTimeout(function() {
             setupWarning.css("display", "none");
             setupWarning.css("visibility", "hidden");
-        }, 5000);
+        }, MESSAGE_SHOW_DURATION);
     }
     this.showSetupMessage = showSetupMessage;
 
@@ -215,9 +217,11 @@ eskimo.Setup = function() {
             return false;
         }
 
+        /*
         eskimoMain.getMessaging().showMessages();
 
         eskimoMain.startOperationInProgress();
+        */
 
         var setupConfig = $("form#setup-config").serializeObject();
 
@@ -225,11 +229,37 @@ eskimo.Setup = function() {
             type: "POST",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            timeout: 1000 * 7200,
-            url: "apply-setup",
+            timeout: 1000 * 120,
+            url: "save-setup",
             data: JSON.stringify(setupConfig),
             success: function (data, status, jqXHR) {
 
+
+                // OK
+                console.log(data);
+                var success = false;
+
+                if (!data || data.error) {
+                    console.error(atob(data.error));
+                    alert(atob(data.error));
+                    showSetupMessage(data.error, false);
+                } else {
+
+                    if (!data.command) {
+                        alert ("Expected pending operations command but got none !");
+                    } else {
+
+                        if (!data.command.none) {
+                            eskimoMain.getSetupCommand().showCommand(data.command);
+
+                        } else {
+                            showSetupMessage("Configuration applied successfully", true);
+                            eskimoMain.handleSetupCompleted();
+                        }
+                    }
+                }
+
+                /*
                 // OK
                 console.log(data);
                 if (data && data.status) {
@@ -248,8 +278,10 @@ eskimo.Setup = function() {
                 } else {
                     eskimoMain.scheduleStopOperationInProgress (true);
                 }
+                */
             },
 
+            /*
             error: function (jqXHR, status) {
                 // error handler
                 console.log(jqXHR);
@@ -259,6 +291,7 @@ eskimo.Setup = function() {
                 eskimoMain.scheduleStopOperationInProgress (false);
                 eskimoMain.hideProgressbar();
             }
+            */
         });
     }
     this.saveSetup = saveSetup;

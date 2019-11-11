@@ -83,7 +83,7 @@ eskimo.FileManagers = function() {
 
         if (!eskimoMain.isSetupDone()) {
 
-            showSetupNotDone ("Consoles are not available at this stage.");
+            eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
 
         } else {
 
