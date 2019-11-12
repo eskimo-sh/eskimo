@@ -139,7 +139,7 @@ if [[ -f "$SCRIPT_DIR/../../packages_distrib/niceideas_mesos-debian-$AMESOS_VERS
 fi
 
 echo " - Copying Mesos archive to distribution folder"
-mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-debian-$AMESOS_VERSION.tar.gz
+mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-debian_"$AMESOS_VERSION"_1.tar.gz
 
 echo " - Destroying build VM"
 vagrant destroy --force deb-build-node  >> /tmp/build-mesos-debian-log 2>&1

@@ -90,7 +90,7 @@ public class SetupService {
     private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
     @Value("${system.mesosPackages}")
-    private String mesosPackages = "niceideas_mesos-debian-1.7.2.tar.gz,niceideas_mesos-redhat-1.7.2.tar.gz";
+    private String mesosPackages = "mesos-debian,mesos-redhat";
 
     @Value("${system.packagesDownloadUrlRoot}")
     private String packagesDownloadUrlRoot = "https://niceideas.ch/eskimo/";
@@ -188,19 +188,13 @@ public class SetupService {
     }
 
     void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
-        if (Arrays.stream(packagesDistribFolder.listFiles())
-                .noneMatch(file ->
-                        file.getName().contains("_mesos-")
-                                && file.getName().contains("debian")
-                                && !file.getName().contains("__temp_download"))) {
-            missingServices.add("mesos-debian");
-        }
-        if (Arrays.stream(packagesDistribFolder.listFiles())
-                .noneMatch(file ->
-                        file.getName().contains("_mesos-")
-                                && file.getName().contains("redhat")
-                                && !file.getName().contains("__temp_download"))) {
-            missingServices.add("mesos-redhat");
+        for (String mesosPackage : mesosPackages.split(",")) {
+            if (Arrays.stream(packagesDistribFolder.listFiles())
+                    .noneMatch(file ->
+                            file.getName().contains(mesosPackage)
+                                    && !file.getName().contains("__temp_download"))) {
+                missingServices.add(mesosPackage);
+            }
         }
     }
 
@@ -286,7 +280,7 @@ public class SetupService {
         }
     }
 
-    private Pattern imageFileNamePattern = Pattern.compile("docker_template_[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+    private Pattern imageFileNamePattern = Pattern.compile("(docker_template_|niceideas_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
 
     Pair<String,String> parseVersion(String name) {
 
@@ -296,11 +290,11 @@ public class SetupService {
             return null;
         }
 
-        return new Pair<>(matcher.group(1), matcher.group(2));
+        return new Pair<>(matcher.group(2), matcher.group(3));
 
     }
 
-    public String findLastPackageFile(String imageName) {
+    public String findLastPackageFile(String prefix, String packageName) {
 
         File packagesDistribFolder = new File (packageDistributionPath);
         if (!packagesDistribFolder.exists()) {
@@ -308,7 +302,7 @@ public class SetupService {
         }
 
         List<File> imageFiles = Arrays.stream(packagesDistribFolder.listFiles())
-                .filter(file -> file.getName().contains("docker_template_") && file.getName().contains(imageName))
+                .filter(file -> file.getName().contains(prefix) && file.getName().contains(packageName))
                 .collect(Collectors.toList());
 
         File lastVersionFile = null;
@@ -334,7 +328,7 @@ public class SetupService {
         }
 
         if (lastVersionFile == null) {
-            throw new IllegalStateException("No package image found for " + imageName);
+            throw new IllegalStateException("No package image found for " + packageName);
         }
 
         return lastVersionFile.getName();
@@ -351,6 +345,8 @@ public class SetupService {
             packagesDistribFolder.mkdirs();
         }
 
+        JsonWrapper packagesVersion = null;
+
         String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
         if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
 
@@ -361,22 +357,12 @@ public class SetupService {
             Set<String> missingServices = new HashSet<>();
             findMissingServices(packagesDistribFolder, missingServices);
 
-            try {
-
-                JsonWrapper packagesVersion = loadRemotePackagesVersionFile();
-
-                for (String packageName : missingServices) {
-
-                    String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
-                    String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
-
-                    downloadPackages.add(packageName+"_"+softwareVersion+"_"+distributionVersion);
-                }
-
-            } catch (IOException | FileException e) {
-                logger.error (e, e);
-                throw new SetupException(e);
+            if (packagesVersion == null) {
+                packagesVersion = loadRemotePackagesVersionFile();
             }
+
+            fillInMissingPackages(downloadPackages, packagesVersion, missingServices);
+
         }
 
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
@@ -386,14 +372,11 @@ public class SetupService {
 
             findMissingMesos(packagesDistribFolder, missingServices);
 
-            for (String mesosPackageName : missingServices) {
-                for (String mesosPackage : mesosPackages.split(",")) {
-
-                    if (mesosPackage.contains(mesosPackageName)) {
-                        downloadMesos.add(mesosPackage);
-                    }
-                }
+            if (packagesVersion == null) {
+                packagesVersion = loadRemotePackagesVersionFile();
             }
+
+            fillInMissingPackages(downloadMesos, packagesVersion, missingServices);
 
         } else {
 
@@ -402,16 +385,31 @@ public class SetupService {
 
     }
 
-    protected JsonWrapper loadRemotePackagesVersionFile() throws IOException, FileException {
-        File tempPackagesVersionFile = File.createTempFile("eskimo_packages_versions.json", "temp_download");
+    void fillInMissingPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
+        for (String packageName : missingServices) {
 
-        URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
+            String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
+            String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
 
-        dowloadFile(new StringBuilder(), tempPackagesVersionFile, downloadUrl, "");
+            downloadPackages.add(packageName+"_"+softwareVersion+"_"+distributionVersion);
+        }
+    }
 
-        JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
-        tempPackagesVersionFile.delete();
-        return packagesVersion;
+    protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException{
+        try {
+            File tempPackagesVersionFile = File.createTempFile("eskimo_packages_versions.json", "temp_download");
+
+            URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
+
+            dowloadFile(new StringBuilder(), tempPackagesVersionFile, downloadUrl, "");
+
+            JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
+            tempPackagesVersionFile.delete();
+            return packagesVersion;
+        } catch (IOException | FileException e) {
+            logger.error (e, e);
+            throw new SetupException(e);
+        }
     }
 
 
@@ -439,32 +437,31 @@ public class SetupService {
             Set<String> missingServices = new HashSet<>();
             findMissingServices(packagesDistribFolder, missingServices);
 
-            if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
+            JsonWrapper packagesVersion = null;
 
-                for (String packageName : missingServices) {
-                    buildPackage(packageName);
+            if (missingServices.size() > 0) {
+                if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
+
+                    for (String packageName : missingServices) {
+                        buildPackage(packageName);
+                    }
+
+                } else {
+
+                    if (packagesVersion == null) {
+                        packagesVersion = loadRemotePackagesVersionFile();
+                    }
+
+                    for (String packageName : missingServices) {
+
+                        String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
+                        String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
+
+                        String fileName = "docker_template_" + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+
+                        downloadPackage(fileName);
+                    }
                 }
-
-            } else {
-
-                JsonWrapper packagesVersion = null;
-                try {
-                    packagesVersion = loadRemotePackagesVersionFile();
-                } catch (IOException | FileException e) {
-                    logger.error (e, e);
-                    throw new SetupException(e);
-                }
-
-                for (String packageName : missingServices) {
-
-                    String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
-                    String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
-
-                    String fileName = "docker_template_" + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
-
-                    downloadPackage(fileName);
-                }
-
             }
 
             // 2. Then focus on mesos
@@ -473,22 +470,31 @@ public class SetupService {
             findMissingMesos(packagesDistribFolder, missingMesosPackages);
 
             String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
-            if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
 
-                for (String mesosPackageName : missingMesosPackages) {
-                    for (String mesosPackage : mesosPackages.split(",")) {
+            if (missingMesosPackages.size() > 0) {
+                if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
 
-                        if (mesosPackage.contains(mesosPackageName)) {
-                            downloadPackage(mesosPackage);
-                        }
+                    if (packagesVersion == null) {
+                        packagesVersion = loadRemotePackagesVersionFile();
+                    }
+
+                    for (String mesosPackageName : missingMesosPackages) {
+
+                        String softwareVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".software");
+                        String distributionVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".distribution");
+
+                        String fileName = "niceideas_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+
+                        downloadPackage(fileName);
+                    }
+
+                } else {
+
+                    // call script
+                    for (String mesosPackageName : missingMesosPackages) {
+                        buildPackage(mesosPackageName);
                     }
                 }
-
-            } else {
-
-                // call script
-                buildPackage("mesos-debian");
-                buildPackage("mesos-rhel");
             }
 
             success = true;

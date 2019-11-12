@@ -66,6 +66,14 @@
   "zookeeper": {
     "software": "debian_09_stretch",
     "distribution": "1"
+  },
+  "mesos-redhat": {
+    "software": "1.8.1",
+    "distribution": "1"
+  },
+  "mesos-debian": {
+    "software": "1.8.1",
+    "distribution": "1"
   }
 
 }

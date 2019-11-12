@@ -65,7 +65,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
-    private String mesosPackages = "niceideas_mesos-debian-1.7.2.tar.gz,niceideas_mesos-redhat-1.7.2.tar.gz";
+    private String mesosPackages = "mesos-debian,mesos-redhat";
 
     @Before
     public void setUp() throws Exception {
@@ -190,7 +190,7 @@ public class SetupServiceTest extends AbstractSystemTest {
             protected void downloadPackage(String fileName) throws SetupException {
                 downloadPackageList.add (fileName);
             }
-            protected JsonWrapper loadRemotePackagesVersionFile() throws IOException, FileException {
+            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
                 return new JsonWrapper(packagesVersionFile);
             }
         });
@@ -211,7 +211,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                         "docker_template_mesos-master_1.8.1_1.tar.gz, docker_template_ntp_debian_09_stretch_1.tar.gz, " +
                         "docker_template_prometheus_2.10.0_1.tar.gz, docker_template_spark_2.4.4_1.tar.gz, " +
                         "docker_template_zeppelin_0.9.0_1.tar.gz, docker_template_zookeeper_debian_09_stretch_1.tar.gz, " +
-                        "niceideas_mesos-debian-1.7.2.tar.gz, niceideas_mesos-redhat-1.7.2.tar.gz",
+                        "niceideas_mesos-debian_1.8.1_1.tar.gz, niceideas_mesos-redhat_1.8.1_1.tar.gz",
                 String.join(", ", downloadPackageList));
 
 

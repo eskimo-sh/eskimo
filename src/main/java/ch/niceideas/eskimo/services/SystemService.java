@@ -936,18 +936,14 @@ public class SystemService {
 
         // Find out if debian or RHEL
         String rawVersion = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-        String version = rawVersion.contains("debian") ? "mesos-debian" :  "mesos-redhat";
+        String flavour = rawVersion.contains("debian") ? "mesos-debian" :  "mesos-redhat";
         File packageDistributionDir = new File (packageDistributionPath);
-        File[] mesosDistrib = packageDistributionDir.listFiles((dir, name) -> name.contains(version) && name.endsWith(".tar.gz"));
-        assert mesosDistrib != null;
-        Arrays.stream (mesosDistrib)
-                .forEach(file -> {
-                    try {
-                        sshCommandService.copySCPFile(ipAddress, file.getAbsolutePath());
-                    } catch (SSHCommandException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        //File[] mesosDistrib = packageDistributionDir.listFiles((dir, name) -> name.contains(flavour) && name.endsWith(".tar.gz"));
+
+        String mesosFileName = setupService.findLastPackageFile("_", flavour);
+        File mesosDistrib = new File (packageDistributionDir, mesosFileName);
+
+        sshCommandService.copySCPFile(ipAddress, mesosDistrib.getAbsolutePath());
     }
 
     private String installMesos(String ipAddress) throws SSHCommandException {
@@ -1048,7 +1044,7 @@ public class SystemService {
 
         String imageName = servicesDefinition.getService(service).getImageName();
         if (StringUtils.isNotBlank(imageName)) {
-            String imageFileName = setupService.findLastPackageFile(imageName);
+            String imageFileName = setupService.findLastPackageFile("docker_template_", imageName);
 
             File containerFile = new File(packageDistributionPath + "/" + imageFileName);
             if (containerFile.exists()) {
