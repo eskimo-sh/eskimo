@@ -53,10 +53,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -103,6 +100,18 @@ public class SetupService {
     /** For tests */
     void setConfigStoragePathInternal(String configStoragePathInternal) {
         this.configStoragePathInternal = configStoragePathInternal;
+    }
+    void setPackageDistributionPath(String packageDistributionPath) {
+        this.packageDistributionPath = packageDistributionPath;
+    }
+    void setPackagesToBuild (String packagesToBuild) {
+        this.packagesToBuild = packagesToBuild;
+    }
+    void setMesosPackages (String mesosPackages) {
+        this.mesosPackages = mesosPackages;
+    }
+    void setSystemService (SystemService systemService) {
+        this.systemService = systemService;
     }
 
     @PostConstruct
@@ -172,7 +181,9 @@ public class SetupService {
         findMissingMesos(packagesDistribFolder, missingServices);
 
         if (!missingServices.isEmpty()) {
-            throw new SetupException ("Following services are missing and need to be downloaded or built " + String.join(", ", missingServices));
+            List<String> missingServicesList = new ArrayList<String>(missingServices);
+            Collections.sort(missingServicesList);
+            throw new SetupException ("Following services are missing and need to be downloaded or built " + String.join(", ", missingServicesList));
         }
     }
 
@@ -391,8 +402,8 @@ public class SetupService {
 
     }
 
-    JsonWrapper loadRemotePackagesVersionFile() throws IOException, FileException {
-        File tempPackagesVersionFile = new File("eskimo_packages_versions.json__temp_download");
+    protected JsonWrapper loadRemotePackagesVersionFile() throws IOException, FileException {
+        File tempPackagesVersionFile = File.createTempFile("eskimo_packages_versions.json", "temp_download");
 
         URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
 
@@ -495,7 +506,7 @@ public class SetupService {
         }
     }
 
-    void downloadPackage(String fileName) throws SetupException {
+    protected void downloadPackage(String fileName) throws SetupException {
         if (!systemService.isInterrupted()) {
             try {
                 systemOperationService.applySystemOperation("Downloading of package " + fileName,
@@ -526,7 +537,7 @@ public class SetupService {
         }
     }
 
-    void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+    protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
         // download mesos using full java solution, no script (don't want dependency on system script for this)
         ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream());
 
@@ -539,7 +550,7 @@ public class SetupService {
         fileChannel.close();
     }
 
-    private void buildPackage(String image) throws SetupException {
+    protected void buildPackage(String image) throws SetupException {
 
         if (!systemService.isInterrupted()) {
 
