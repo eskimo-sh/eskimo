@@ -48,7 +48,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -304,6 +303,16 @@ public class SetupService {
             throw new IllegalStateException(packageDistributionPath + " doesn't exist");
         }
 
+        Pair<File, Pair<String, String>> lastVersion = findLastVersion(prefix, packageName, packagesDistribFolder);
+
+        if (lastVersion.getKey() == null) {
+            throw new IllegalStateException("No package image found for " + packageName);
+        }
+
+        return lastVersion.getKey().getName();
+    }
+
+    Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
         List<File> imageFiles = Arrays.stream(packagesDistribFolder.listFiles())
                 .filter(file -> file.getName().contains(prefix) && file.getName().contains(packageName))
                 .collect(Collectors.toList());
@@ -330,17 +339,13 @@ public class SetupService {
             }
         }
 
-        if (lastVersionFile == null) {
-            throw new IllegalStateException("No package image found for " + packageName);
-        }
-
-        return lastVersionFile.getName();
+        return new Pair<>(lastVersionFile, lastFileVersion);
     }
 
 
     public void prepareSetup (
             JsonWrapper setupConfig,
-            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos)
+            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos, Set<String> packageUpdate)
             throws JSONException, SetupException {
 
         File packagesDistribFolder = new File (packageDistributionPath);
@@ -348,8 +353,9 @@ public class SetupService {
             packagesDistribFolder.mkdirs();
         }
 
-        JsonWrapper packagesVersion = null;
+        JsonWrapper packagesVersion = loadRemotePackagesVersionFile();
 
+        // 1. Find out about missing packages
         String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
         if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
 
@@ -360,14 +366,11 @@ public class SetupService {
             Set<String> missingServices = new HashSet<>();
             findMissingServices(packagesDistribFolder, missingServices);
 
-            if (packagesVersion == null) {
-                packagesVersion = loadRemotePackagesVersionFile();
-            }
-
-            fillInMissingPackages(downloadPackages, packagesVersion, missingServices);
+            fillInPackages(downloadPackages, packagesVersion, missingServices);
 
         }
 
+        // 2. Find out about missing mesos distrib
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
         if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
 
@@ -375,20 +378,35 @@ public class SetupService {
 
             findMissingMesos(packagesDistribFolder, missingServices);
 
-            if (packagesVersion == null) {
-                packagesVersion = loadRemotePackagesVersionFile();
-            }
-
-            fillInMissingPackages(downloadMesos, packagesVersion, missingServices);
+            fillInPackages(downloadMesos, packagesVersion, missingServices);
 
         } else {
-
             findMissingMesos(packagesDistribFolder, buildMesos);
         }
 
+        // 3. Find out about upgrades
+        Set<String> updates = new HashSet<>();
+        for (String imageName : packagesToBuild.split(",")) {
+
+            Pair<File, Pair<String, String>> lastVersion = findLastVersion("docker_template_", imageName, packagesDistribFolder);
+            Pair<String, String> lastVersionValues = lastVersion.getValue();
+
+            if (lastVersionValues != null) {
+
+                String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName+".software");
+                String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName+".distribution");
+
+                if (newSoftwareVersion.compareTo(lastVersionValues.getKey()) > 0
+                    || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
+                        && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
+                    updates.add (imageName);
+                }
+            }
+        }
+        fillInPackages (packageUpdate, packagesVersion, updates);
     }
 
-    void fillInMissingPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
+    void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
         for (String packageName : missingServices) {
 
             String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
@@ -496,6 +514,33 @@ public class SetupService {
                     // call script
                     for (String mesosPackageName : missingMesosPackages) {
                         buildPackage(mesosPackageName);
+                    }
+                }
+            }
+
+            // 3. Handle updates
+            if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("download")) { // for mesos default is download
+                for (String imageName : packagesToBuild.split(",")) {
+
+                    Pair<File, Pair<String, String>> lastVersion = findLastVersion("docker_template_", imageName, packagesDistribFolder);
+                    Pair<String, String> lastVersionValues = lastVersion.getValue();
+
+                    if (lastVersionValues != null) {
+
+                        if (packagesVersion == null) {
+                            packagesVersion = loadRemotePackagesVersionFile();
+                        }
+
+                        String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
+                        String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
+
+                        if (newSoftwareVersion.compareTo(lastVersionValues.getKey()) > 0
+                                || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
+                                && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
+
+                            String fileName = "docker_template_" + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + ".tar.gz";
+                            downloadPackage(fileName);
+                        }
                     }
                 }
             }
