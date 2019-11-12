@@ -80,6 +80,8 @@ public class SetupService {
     @Autowired
     private SystemOperationService systemOperationService;
 
+    private String storagePathConfDir = System.getProperty("user.dir");
+
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
@@ -113,6 +115,9 @@ public class SetupService {
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
     }
+    void setStoragePathConfDir (String storagePathConfDir) {
+        this.storagePathConfDir = storagePathConfDir;
+    }
 
     @PostConstruct
     public void init() {
@@ -132,8 +137,7 @@ public class SetupService {
 
     private String readConfigStoragePath() {
         // First read config storage path
-        String currentDir = System.getProperty("user.dir");
-        File entryFile = new File(currentDir + "/storagePath.conf");
+        File entryFile = new File(storagePathConfDir + "/storagePath.conf");
         if (!entryFile.exists()) {
             logger.warn ("Application is not initialized properly. Missing file 'storagePath.conf' in backend working directory.");
             return null;
@@ -234,8 +238,7 @@ public class SetupService {
             }
             configStoragePathInternal = configStoragePath;
 
-            String currentDir = System.getProperty("user.dir");
-            File entryFile = new File(currentDir + "/storagePath.conf");
+            File entryFile = new File(storagePathConfDir + "/storagePath.conf");
             FileUtils.writeFile(entryFile, configStoragePathInternal);
 
             File storagePath = new File(configStoragePathInternal);
