@@ -145,7 +145,7 @@ if [[ -f "$SCRIPT_DIR/../../packages_distrib/niceideas_mesos-redhat-$AMESOS_VERS
 fi
 
 echo " - Copying Mesos archive to distribution folder"
-mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-redhat-$AMESOS_VERSION.tar.gz
+mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-redhat_"$AMESOS_VERSION"_1.tar.gz
 
 echo " - Destroying build VM"
 vagrant destroy --force rhel-build-node  >> /tmp/build-mesos-redhat-log 2>&1

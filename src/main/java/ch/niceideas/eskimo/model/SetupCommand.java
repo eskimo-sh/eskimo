@@ -103,4 +103,19 @@ public class SetupCommand {
         return rawSetup;
     }
 
+    public Set<String> getDownloadPackages() {
+        return downloadPackages;
+    }
+
+    public Set<String> getBuildPackage() {
+        return buildPackage;
+    }
+
+    public Set<String> getDownloadMesos() {
+        return downloadMesos;
+    }
+
+    public Set<String> getBuildMesos() {
+        return buildMesos;
+    }
 }
