@@ -1075,6 +1075,15 @@ API’s for resource management and scheduling across entire datacenter and clou
 
 http://mesos.apache.org/
 
+==== mesos-cli
+
+Eskimo provides a specific command line tool for manipulating mesos frameworks: `/usr/local/bin/mesos-cli.sh` installed
+on all nodes of the eskimo cluster. +
+This tool can be used to list running frameworks, force kill them in a reliable way, etc.
+
+
+
+
 === Apache Spark
 
 image::pngs/spark-executor-logo.png[50, 50, align="center"]

@@ -952,6 +952,17 @@ public class SystemService {
 
     private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
         sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
+
+        sb.append(" - Copying jq program");
+        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/jq-1.6-linux64");
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "jq-1.6-linux64", "/usr/local/bin/jq"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/jq"});
+
+        sb.append(" - Copying mesos-cli script");
+        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/mesos-cli.sh");
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "mesos-cli.sh", "/usr/local/bin/mesos-cli.sh"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/mesos-cli.sh"});
+
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
     }
 
