@@ -934,9 +934,16 @@ public class SystemService {
 
         messagingService.addLines(" - Uploading mesos distribution");
 
-        // Find out if debian or RHEL
-        String rawVersion = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-        String flavour = rawVersion.contains("debian") ? "mesos-debian" :  "mesos-redhat";
+        // Find out if debian or RHEL or SUSE
+        String flavour = null;
+        String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
+        if (rawIsDebian.contains("debian")) {
+            flavour =  "mesos-debian";
+        } else {
+            String rawIsRHEL = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
+            flavour = rawIsRHEL.contains("redhat") ? "mesos-redhat" :  "mesos-suse";
+        }
+
         File packageDistributionDir = new File (packageDistributionPath);
         //File[] mesosDistrib = packageDistributionDir.listFiles((dir, name) -> name.contains(flavour) && name.endsWith(".tar.gz"));
 
@@ -953,14 +960,16 @@ public class SystemService {
     private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
         sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
-        sb.append(" - Copying jq program");
+        sb.append(" - Copying jq program\n");
         sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/jq-1.6-linux64");
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "jq-1.6-linux64", "/usr/local/bin/jq"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", "/usr/local/bin/jq"});
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/jq"});
 
-        sb.append(" - Copying mesos-cli script");
+        sb.append(" - Copying mesos-cli script\n");
         sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/mesos-cli.sh");
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "mesos-cli.sh", "/usr/local/bin/mesos-cli.sh"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", "/usr/local/bin/mesos-cli.sh"});
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/mesos-cli.sh"});
 
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed

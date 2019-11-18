@@ -42,13 +42,13 @@ cd $SCRIPT_DIR
 package=""  # Default to empty package
 
 export DONT_OVERWRITE=0
-export USE_VIRTUALBOX=0
+export USE_VIRTUALBOX=1 # Changing default to virtualbox again
 
 echo_usage() {
       echo "Usage:"
       echo "    build.sh -h                    Display this help message."
       echo "    build.sh [-n] <package>        Build <package>."
-      echo "        where package in [mesos-rhel, mesos-deb, mesos-all, <image>, all_images]"
+      echo "        where package in [mesos-rhel, mesos-deb, mesos-suse, mesos-all, <image>, all_images]"
       echo "        and <image> any docker image such as eg, kafka, mesos-master, "
       echo "                                                 ntp, spark, etc."
       echo "        Options:"
@@ -102,6 +102,16 @@ elif [[ $package == "mesos-deb" ]] ; then
         echo "Debian Mesos package already built"
     fi
 
+elif [[ $package == "mesos-suse" ]] ; then
+
+    check_for_vagrant
+
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
+        bash -c "cd binary_mesos && bash build-for-suse.sh"
+    else
+        echo "Suse Mesos package already built"
+    fi
+
 elif [[ $package == "mesos-all" ]] ; then
 
     check_for_vagrant
@@ -116,6 +126,12 @@ elif [[ $package == "mesos-all" ]] ; then
         bash -c "cd binary_mesos && bash build-for-redhat.sh"
     else
         echo "RedHat Mesos package already built"
+    fi
+
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
+        bash -c "cd binary_mesos && bash build-for-suse.sh"
+    else
+        echo "Suse Mesos package already built"
     fi
 
 elif [[ $package == "all_images" ]]; then

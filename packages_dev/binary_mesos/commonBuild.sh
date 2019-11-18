@@ -82,8 +82,9 @@ end
 
 # Define build-nodes
 nodes = [
-  { :hostname => 'deb-build-node', :box => 'generic/debian8', :ip => '192.168.10.101', :ram => 16000},
-  { :hostname => 'rhel-build-node', :box => 'centos/7',  :ip => '192.168.10.103', :ram => 16000},
+  { :hostname => 'deb-build-node', :box => 'generic/debian8', :ip => '192.168.10.101', :ram => 18000},
+  { :hostname => 'rhel-build-node', :box => 'centos/7',  :ip => '192.168.10.103', :ram => 18000},
+  { :hostname => 'suse-build-node', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.10.105', :ram => 18000},
 ]
 
 Vagrant.configure("2") do |config|
@@ -123,9 +124,9 @@ Vagrant.configure("2") do |config|
           ssh_pub_key = File.readlines("ssh_key.pub").first.strip
           s.inline = <<-SHELL
             if [[ -f "/etc/debian_version" ]]; then
-                useradd -m -G root,sudo,users,staff eskimo
+                useradd -U -m -G root,sudo,users,staff eskimo
             else
-                useradd -m -G root,wheel,users eskimo
+                useradd -U -m -G root,wheel,users eskimo
             fi
             echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
             sudo mkdir -p /root/.ssh/

@@ -109,9 +109,9 @@ Vagrant.configure("2") do |config|
           ssh_pub_key = File.readlines("ssh_key.pub").first.strip
           s.inline = <<-SHELL
             if [[ -f "/etc/debian_version" ]]; then
-                useradd -m -G root,sudo,users,staff eskimo
+                useradd -U -m -G root,sudo,users,staff eskimo
             else
-                useradd -m -G root,wheel,users eskimo
+                useradd -U -m -G root,wheel,users eskimo
             fi
             echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
             sudo mkdir -p /root/.ssh/
