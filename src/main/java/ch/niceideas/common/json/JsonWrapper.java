@@ -105,6 +105,15 @@ public class JsonWrapper {
         return json.getJSONArray(key);
     }
 
+    public boolean isEmpty() {
+        try {
+            return getFormattedValue().trim().length() <= 3;
+        } catch (JSONException e) {
+            logger.error (e, e);
+            return true;
+        }
+    }
+
     /**
      * Get the value at the desired path as a string.
      * 

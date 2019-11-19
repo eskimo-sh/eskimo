@@ -59,7 +59,7 @@ nodes = [
   { :hostname => 'deb-node2', :box => 'ubuntu/xenial64',  :ip => '192.168.10.12', :ram => 6000 },
   { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.10.13', :ram => 6000},
   { :hostname => 'cent-node2', :box => 'fedora/29-cloud-base', :ip => '192.168.10.14', :ram => 6000 },
-  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.10.15', :ram => 6000}
+  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.10.15', :ram => 10000}
 ]
 
 # All Vagrant configuration is done here. The most common configuration

@@ -79,7 +79,11 @@ public class ServicesProxyServlet extends ProxyServlet {
     private String getServiceName(HttpServletRequest servletRequest) {
         String uri = servletRequest.getRequestURI();
         if (StringUtils.isBlank(configuredContextPath)) {
-            return uri.substring(1, uri.indexOf("/", 2));
+            int indexOfSlash = uri.indexOf("/", 2);
+            if (indexOfSlash < 0) {
+                throw new IllegalArgumentException("No / found in URI " + uri);
+            }
+            return uri.substring(1, indexOfSlash);
         } else {
             int indexOfContextPath = uri.indexOf(configuredContextPath);
             int startIndex = indexOfContextPath + configuredContextPath.length();

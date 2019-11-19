@@ -97,9 +97,13 @@ if [[ -f "/etc/debian_version" ]]; then
 elif [[ -f "/etc/redhat-release" ]]; then
     mv niceideas_mesos-redhat_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
 
+elif [[ -f "/etc/SUSE-brand" ]]; then
+    mv niceideas_mesos-suse_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+
 else
-   # assuming SUSE (for now)
-   mv niceideas_mesos-suse_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101
 fi
 
 cd /tmp/mesos_setup

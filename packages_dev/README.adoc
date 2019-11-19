@@ -197,8 +197,8 @@ As such, Mesos is build natively and mesos packages are tarballs (`tar.gz`) to b
 node.
 
 In this very folder (`packages_dev`) eskimo provides a build framework for Mesos. +
-Currently Mesos is built for two targets : RHEL based (RHEL, CentOS, Fedora, etc.) and Debian based (Debian, Ubuntu,
-etc.).
+Currently Mesos is built for three targets : RHEL based (RHEL, CentOS, Fedora, etc.) and Debian based (Debian, Ubuntu,
+etc.) and SUSE.
 
 
 ==== Building Mesos
@@ -209,8 +209,8 @@ and creates installable packages.
 
 .For instance, toBuild Mesos package for Debian
 ----
-..../packages_dev$ ./build.sh mesos-deb # for building with libvirt
-..../packages_dev$ ./build.sh -b mesos-deb # for building with VirtualBox
+..../packages_dev$ ./build.sh mesos-deb # for building mesos debian distrib with libvirt
+..../packages_dev$ ./build.sh -b mesos-deb # for building mesos debian distrib with VirtualBox
 ----
 
 These both commands require vagrant and VirtualBox, respectively libvirt, kvm and the libvirt vagrant provider properly

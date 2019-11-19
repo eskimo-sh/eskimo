@@ -247,7 +247,7 @@ public class SystemService {
         }
     }
 
-    public JSONObject getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
+    public SystemStatusWrapper getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
 
         // 0. Build returned status
         SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
@@ -255,10 +255,8 @@ public class SystemService {
         // 1. Load Node Config
         NodesConfigWrapper rawNodesConfig = loadNodesConfig();
 
-        if (rawNodesConfig == null || rawNodesConfig.isEmpty()) {
-            return null;
+        if (rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
 
-        } else {
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
             // 2. Build merged status
@@ -334,7 +332,7 @@ public class SystemService {
         handleStatusChanges (servicesInstallationStatus, systemStatus, liveIps);
 
         // 6. return result
-        return systemStatus.getJSONObject();
+        return systemStatus;
     }
 
 
@@ -520,7 +518,7 @@ public class SystemService {
         }
 
         if (error.get() != null) {
-            throw new SystemException(error.get());
+            throw new SystemException(error.get().getMessage(), error.get());
         }
     }
 
@@ -930,27 +928,48 @@ public class SystemService {
         return null;
     }
 
-    private void uploadMesos(String ipAddress) throws SSHCommandException {
+    private void uploadMesos(String ipAddress) throws SSHCommandException, SystemException {
 
         messagingService.addLines(" - Uploading mesos distribution");
-
-        // Find out if debian or RHEL or SUSE
-        String flavour = null;
-        String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-        if (rawIsDebian.contains("debian")) {
-            flavour =  "mesos-debian";
-        } else {
-            String rawIsRHEL = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
-            flavour = rawIsRHEL.contains("redhat") ? "mesos-redhat" :  "mesos-suse";
-        }
+        String mesosFlavour = "mesos-" + getNodeFlavour(ipAddress);
 
         File packageDistributionDir = new File (packageDistributionPath);
         //File[] mesosDistrib = packageDistributionDir.listFiles((dir, name) -> name.contains(flavour) && name.endsWith(".tar.gz"));
 
-        String mesosFileName = setupService.findLastPackageFile("_", flavour);
+        String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
         File mesosDistrib = new File (packageDistributionDir, mesosFileName);
 
         sshCommandService.copySCPFile(ipAddress, mesosDistrib.getAbsolutePath());
+    }
+
+    private String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
+        // Find out if debian or RHEL or SUSE
+        String flavour = null;
+        if (flavour == null) {
+            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
+            if (rawIsDebian.contains("debian")) {
+                flavour = "debian";
+            }
+        }
+
+        if (flavour == null) {
+            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
+            if (rawIsDebian.contains("redhat")) {
+                flavour = "redhat";
+            }
+        }
+
+        if (flavour == null) {
+            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
+            if (rawIsDebian.contains("suse")) {
+                flavour = "suse";
+            }
+        }
+
+        if (flavour == null) {
+            throw new SystemException ("Unknown OS flavour. None of the known OS type marker files has been found.");
+        }
+        return flavour;
     }
 
     private String installMesos(String ipAddress) throws SSHCommandException {

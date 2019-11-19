@@ -161,14 +161,6 @@ function install_docker_debian_based() {
 
     rm -Rf /tmp/install_docker
 
-    echo "  - updating apt package index"
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to update apt package index"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
-
     echo "  - install packages to allow apt to use a repository over HTTPS"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install \
             apt-transport-https \
@@ -284,15 +276,31 @@ if [[ $? != 0 ]]; then
     elif [[ -f "/etc/redhat-release" ]]; then
 
         install_docker_redhat_based
+
+    elif [[ -f "/etc/SUSE-brand" ]]; then
+
+        install_docker_suse_based
     else
 
-        # assuming suse
-        install_docker_suse_based
+        echo " - !! ERROR : Could not find any brand marker file "
+        echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+        exit -101
+
     fi
 fi
 
-echo "  - installing some required dependencies"
+
 if [[ -f "/etc/debian_version" ]]; then
+
+    echo "  - updating apt package index"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to update apt package index"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
+    echo "  - installing some required dependencies"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install net-tools >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -300,6 +308,12 @@ if [[ -f "/etc/debian_version" ]]; then
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install attr >> /tmp/setup_log 2>&1
 
 elif [[ -f "/etc/redhat-release" ]]; then
+
+    echo "  - updating apt package index"
+    sudo yum -y update >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+    echo "  - installing some required dependencies"
     sudo yum install -y net-tools anacron >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -310,9 +324,13 @@ elif [[ -f "/etc/redhat-release" ]]; then
     sudo systemctl start crond >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-else
+elif [[ -f "/etc/SUSE-brand" ]]; then
 
-    # assuming suse
+    echo "  - updating zypper package index"
+    sudo bash -c "zypper --non-interactive refresh | echo 'a'" >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+    echo "  - installing some required dependencies"
     sudo zypper install -y net-tools cron >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -322,6 +340,12 @@ else
 
     sudo systemctl start cron >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
+
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101
+
 fi
 
 
@@ -330,8 +354,12 @@ if [[ -f "/etc/debian_version" ]]; then
     install_debian_mesos_dependencies
 elif [[ -f "/etc/redhat-release" ]]; then
     install_redhat_mesos_dependencies
-else
+elif [[ -f "/etc/SUSE-brand" ]]; then
     install_suse_mesos_dependencies
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101
 fi
 
 
@@ -344,10 +372,14 @@ elif [[ -f "/etc/redhat-release" ]]; then
     sudo yum -y install glusterfs glusterfs-fuse >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-else
+elif [[ -f "/etc/SUSE-brand" ]]; then
     sudo zypper install -y glusterfs  >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101    
 fi
 
 

@@ -82,15 +82,6 @@ public class NodesConfigWrapper extends JsonWrapper {
         }
     }
 
-    public boolean isEmpty() {
-        try {
-            return getFormattedValue().trim().length() <= 3;
-        } catch (JSONException e) {
-            logger.error (e, e);
-            return true;
-        }
-    }
-
     public List<String> getIpAddressKeys() {
         return getRootKeys().stream()
                 .filter(key -> key.startsWith("action_id"))

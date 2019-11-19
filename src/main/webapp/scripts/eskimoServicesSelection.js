@@ -281,6 +281,7 @@ eskimo.ServicesSelection = function() {
     }
     this.getService = getService;
 
+
     function initModalServicesConfig() {
 
         var newIn = '<form id="services-selection-form">';
@@ -309,8 +310,7 @@ eskimo.ServicesSelection = function() {
                         rowHTML +=
                             '<div class="radio col-md-4 text-right no-padding">' +
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>'+
-                            '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' +
-                                eskimoMain.getNodesConfig().getServiceLogoPath(serviceConfig.name)+'"/></label>'+
+                            '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="radio-inline">' +
                             '        <input  type="radio" ' +
                             '                onmousedown="javascript:eskimoMain.getServicesSelection().servicesSelectionRadioMouseDown(this);" ' +
@@ -321,8 +321,7 @@ eskimo.ServicesSelection = function() {
                         rowHTML +=
                             '<div class="checkbox col-md-4 text-right no-padding">' +
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>' +
-                            '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' +
-                                eskimoMain.getNodesConfig().getServiceLogoPath(serviceConfig.name)+'"/></label>'+
+                            '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="checkbox-inline">' +
                             '        <input  type="checkbox" class="input-md" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice"></input>' +
                             '    </label>' +

@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
@@ -86,16 +87,16 @@ public class SystemStatusController {
         try {
             setupService.ensureSetupCompleted();
 
-            JSONObject nodeServicesStatus = systemService.getStatus();
+            SystemStatusWrapper nodeServicesStatus = systemService.getStatus();
 
             JSONObject systemStatus = statusService.getStatus();
 
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
-                if (nodeServicesStatus == null) {
+                if (nodeServicesStatus == null || nodeServicesStatus.isEmpty()) {
                     put("clear", "nodes");
                 } else {
-                    put("nodeServicesStatus", nodeServicesStatus);
+                    put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
                 }
                 put ("systemStatus", systemStatus);
                 put("processingPending", systemService.isProcessingPending());
