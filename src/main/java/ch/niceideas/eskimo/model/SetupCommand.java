@@ -58,6 +58,7 @@ public class SetupCommand {
     private final Set<String> buildPackage;
     private final Set<String> downloadMesos;
     private final Set<String> buildMesos;
+    private final Set<String> packageUpdates;
 
     public static SetupCommand create (
             JsonWrapper rawSetup,
@@ -69,23 +70,30 @@ public class SetupCommand {
         Set<String> buildPackage = new HashSet<String>();
         Set<String> downloadMesos = new HashSet<String>();
         Set<String> buildMesos = new HashSet<String>();
+        Set<String> packageUpdates = new HashSet<String>();
 
-        setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadMesos, buildMesos);
+        setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
 
         SetupCommand retCommand = new SetupCommand(rawSetup, setupService.getPackagesDownloadUrlRoot(),
-                downloadPackages, buildPackage, downloadMesos, buildMesos);
+                downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
 
         return retCommand;
 
     }
 
-    SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl, Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos) {
+    SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl,
+                 Set<String> downloadPackages,
+                 Set<String> buildPackage,
+                 Set<String> downloadMesos,
+                 Set<String> buildMesos,
+                 Set<String> packageUpdates) {
         this.rawSetup = rawSetup;
         this.packageDownloadUrl = packageDownloadUrl;
         this.downloadPackages = downloadPackages;
         this.buildPackage = buildPackage;
         this.downloadMesos = downloadMesos;
         this.buildMesos = buildMesos;
+        this.packageUpdates = packageUpdates;
     }
 
     public JSONObject toJSON () {
@@ -95,7 +103,8 @@ public class SetupCommand {
             put("buildPackage", new JSONArray(buildPackage));
             put("downloadMesos", new JSONArray(downloadMesos));
             put("buildMesos", new JSONArray(buildMesos));
-            put("none", buildMesos.size() + downloadMesos.size() + buildPackage.size() + downloadPackages.size() <= 0);
+            put("packageUpdates", new JSONArray(packageUpdates));
+            put("none", buildMesos.size() + downloadMesos.size() + buildPackage.size() + downloadPackages.size() + packageUpdates.size() <= 0);
         }});
     }
 
@@ -117,5 +126,9 @@ public class SetupCommand {
 
     public Set<String> getBuildMesos() {
         return buildMesos;
+    }
+
+    public Set<String> getPackageUpdates() {
+        return packageUpdates;
     }
 }

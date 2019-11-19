@@ -116,7 +116,7 @@ public class SSHCommandService {
             ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
             ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 
-            Connection connection = connectionManagerService.getConnection(hostAddress);
+            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
             session = connection.openSession();
             session.execCommand("bash --login -s");
@@ -177,7 +177,7 @@ public class SSHCommandService {
 
     public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getConnection(hostAddress);
+            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int retValue = connection.exec(command, baos);
@@ -185,7 +185,7 @@ public class SSHCommandService {
             if (retValue == 0) {
                 return baos.toString();
             } else {
-                throw new SSHCommandException(baos.toString());
+                throw new SSHCommandException("Command exited with return code " + retValue + "\n" + baos.toString());
             }
 
         } catch (ConnectionManagerException | InterruptedException | IOException e) {
@@ -200,7 +200,7 @@ public class SSHCommandService {
 
             JsonWrapper systemConfig = new JsonWrapper(setupService.loadSetupConfig());
 
-            Connection connection = connectionManagerService.getConnection(hostAddress);
+            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
             SCPClient scp = new SCPClient(connection);
 

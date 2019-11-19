@@ -83,18 +83,18 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertNotNull (sshd);
 
         // create a connection to localhost
-        Connection connection = cm.getConnection("localhost");
+        Connection connection = cm.getSharedConnection("localhost");
         assertNotNull(connection);
 
         // get a second connection and make sure it matches
-        Connection second = cm.getConnection("localhost");
+        Connection second = cm.getSharedConnection("localhost");
         assertNotNull(second);
         assertTrue(connection == second);
 
         // close connection and make sure it gets properly recreated
         second.close();
 
-        Connection newOne = cm.getConnection("localhost");
+        Connection newOne = cm.getSharedConnection("localhost");
         assertNotNull(newOne);
         assertTrue (newOne != second);
     }

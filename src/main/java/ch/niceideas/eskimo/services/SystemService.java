@@ -247,7 +247,7 @@ public class SystemService {
         }
     }
 
-    public JSONObject getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
+    public SystemStatusWrapper getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
 
         // 0. Build returned status
         SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
@@ -255,10 +255,8 @@ public class SystemService {
         // 1. Load Node Config
         NodesConfigWrapper rawNodesConfig = loadNodesConfig();
 
-        if (rawNodesConfig == null || rawNodesConfig.isEmpty()) {
-            return null;
+        if (rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
 
-        } else {
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
             // 2. Build merged status
@@ -334,7 +332,7 @@ public class SystemService {
         handleStatusChanges (servicesInstallationStatus, systemStatus, liveIps);
 
         // 6. return result
-        return systemStatus.getJSONObject();
+        return systemStatus;
     }
 
 
@@ -520,7 +518,7 @@ public class SystemService {
         }
 
         if (error.get() != null) {
-            throw new SystemException(error.get());
+            throw new SystemException(error.get().getMessage(), error.get());
         }
     }
 
@@ -930,20 +928,48 @@ public class SystemService {
         return null;
     }
 
-    private void uploadMesos(String ipAddress) throws SSHCommandException {
+    private void uploadMesos(String ipAddress) throws SSHCommandException, SystemException {
 
         messagingService.addLines(" - Uploading mesos distribution");
+        String mesosFlavour = "mesos-" + getNodeFlavour(ipAddress);
 
-        // Find out if debian or RHEL
-        String rawVersion = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-        String flavour = rawVersion.contains("debian") ? "mesos-debian" :  "mesos-redhat";
         File packageDistributionDir = new File (packageDistributionPath);
         //File[] mesosDistrib = packageDistributionDir.listFiles((dir, name) -> name.contains(flavour) && name.endsWith(".tar.gz"));
 
-        String mesosFileName = setupService.findLastPackageFile("_", flavour);
+        String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
         File mesosDistrib = new File (packageDistributionDir, mesosFileName);
 
         sshCommandService.copySCPFile(ipAddress, mesosDistrib.getAbsolutePath());
+    }
+
+    private String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
+        // Find out if debian or RHEL or SUSE
+        String flavour = null;
+        if (flavour == null) {
+            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
+            if (rawIsDebian.contains("debian")) {
+                flavour = "debian";
+            }
+        }
+
+        if (flavour == null) {
+            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
+            if (rawIsDebian.contains("redhat")) {
+                flavour = "redhat";
+            }
+        }
+
+        if (flavour == null) {
+            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
+            if (rawIsDebian.contains("suse")) {
+                flavour = "suse";
+            }
+        }
+
+        if (flavour == null) {
+            throw new SystemException ("Unknown OS flavour. None of the known OS type marker files has been found.");
+        }
+        return flavour;
     }
 
     private String installMesos(String ipAddress) throws SSHCommandException {
@@ -952,6 +978,19 @@ public class SystemService {
 
     private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
         sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
+
+        sb.append(" - Copying jq program\n");
+        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/jq-1.6-linux64");
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "jq-1.6-linux64", "/usr/local/bin/jq"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", "/usr/local/bin/jq"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/jq"});
+
+        sb.append(" - Copying mesos-cli script\n");
+        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/mesos-cli.sh");
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "mesos-cli.sh", "/usr/local/bin/mesos-cli.sh"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", "/usr/local/bin/mesos-cli.sh"});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/mesos-cli.sh"});
+
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
     }
 
@@ -982,7 +1021,13 @@ public class SystemService {
 
         // 3. Uninstall systemd service file
         sb.append(" - Removing systemd Service File\n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
+        // Find systemd unit config files directory
+        String foundStandardFlag = sshCommandService.runSSHScript(ipAddress, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
+        if (foundStandardFlag.contains("found_standard")) {
+            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
+        } else {
+            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");
+        }
 
         // 4. Delete docker container
         sb.append(" - Removing docker container \n");

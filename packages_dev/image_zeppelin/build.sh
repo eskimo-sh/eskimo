@@ -80,7 +80,7 @@ docker exec -i zeppelin apt-get -y install  python-dev python-six python-virtual
 fail_if_error $? "/tmp/zeppelin_build_log" -5
 
 echo " - Installing python packages for datascience"
-docker exec -i zeppelin pip install pandas scikit-learn matplotlib nltk plotly filelock >> /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin pip install pandas scikit-learn matplotlib nltk plotly filelock py4j >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
 echo " - Installing flink"

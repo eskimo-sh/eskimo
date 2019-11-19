@@ -103,9 +103,18 @@ function install_and_check_service_file() {
         exit -3
     fi
 
+    if [[ -d /lib/systemd/system/ ]]; then
+        export systemd_units_dir=/lib/systemd/system/
+    elif [[ -d /usr/lib/systemd/system/ ]]; then
+        export systemd_units_dir=/usr/lib/systemd/system/
+    else
+        echo "Couldn't find systemd unit files directory"
+        exit -10
+    fi
+
     echo " - Copying $1 systemd file"
-    sudo cp $SCRIPT_DIR/$1.service /lib/systemd/system/
-    sudo chmod 644 /lib/systemd/system/$1.service
+    sudo cp $SCRIPT_DIR/$1.service $systemd_units_dir
+    sudo chmod 644 $systemd_units_dir/$1.service
 
     echo " - Reloading systemd config"
     sudo systemctl daemon-reload >> $2 2>&1

@@ -64,11 +64,56 @@ if [[ -f "/etc/debian_version" ]]; then
         exit -101
     fi
 else
+    # works for both suse and RHEL
     if [[ ! `$pidof_command /usr/lib/systemd/systemd` ]]; then
         echoerr "Systemd is not running on node !"
         exit -101
     fi
 fi
+
+
+function enable_docker() {
+
+    echo "  - Enabling docker service"
+    sudo systemctl enable docker >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to enable docker"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
+    echo "  - Starting docker service"
+    sudo systemctl start docker >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to start docker"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
+    echo "  - Adding current user to docker group"
+    sudo usermod -a -G docker $USER >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to add user $USER to docker"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
+}
+
+function install_docker_suse_based() {
+
+    rm -Rf /tmp/install_docker
+
+    sudo zypper install -y docker >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to install required packages"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
+    enable_docker
+}
+
 
 
 function install_docker_redhat_based() {
@@ -109,42 +154,12 @@ function install_docker_redhat_based() {
         exit -1
     fi
 
-    echo "  - Enabling docker service"
-    sudo systemctl enable docker >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to enable docker"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
-
-    echo "  - Starting docker service"
-    sudo systemctl start docker >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to start docker"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
-
-    echo "  - Adding current user to docker group"
-    sudo usermod -a -G docker $USER >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to add user $USER to docker"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
+    enable_docker
 }
 
 function install_docker_debian_based() {
 
     rm -Rf /tmp/install_docker
-
-    echo "  - updating apt package index"
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to update apt package index"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
 
     echo "  - install packages to allow apt to use a repository over HTTPS"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install \
@@ -198,29 +213,19 @@ function install_docker_debian_based() {
         exit -1
     fi
 
-    echo "  - Enabling docker service"
-    sudo systemctl enable docker >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to enable docker"
-        cat /tmp/install_docker 1>&2
+    enable_docker
+}
+
+function install_suse_mesos_dependencies() {
+
+    echo " - Installing other Mesos dependencies"
+    sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+     if [[ $? != 0 ]]; then
+        echoerr "Unable to install mesos dependencies"
+        cat /tmp/setup_log 1>&2
         exit -1
     fi
 
-    echo "  - Starting docker service"
-    sudo systemctl start docker >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to start docker"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
-
-    echo "  - Adding current user to docker group"
-    sudo usermod -a -G docker $USER >>/tmp/install_docker 2>&1
-    if [[ $? != 0 ]]; then
-        echoerr "Unable to add user $USER to docker"
-        cat /tmp/install_docker 1>&2
-        exit -1
-    fi
 }
 
 function install_redhat_mesos_dependencies() {
@@ -267,20 +272,48 @@ if [[ $? != 0 ]]; then
     echo "  - docker is not installed. attempting installation"
     if [[ -f "/etc/debian_version" ]]; then
         install_docker_debian_based
-    else
+
+    elif [[ -f "/etc/redhat-release" ]]; then
+
         install_docker_redhat_based
+
+    elif [[ -f "/etc/SUSE-brand" ]]; then
+
+        install_docker_suse_based
+    else
+
+        echo " - !! ERROR : Could not find any brand marker file "
+        echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+        exit -101
+
     fi
 fi
 
-echo "  - installing some required dependencies"
+
 if [[ -f "/etc/debian_version" ]]; then
+
+    echo "  - updating apt package index"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to update apt package index"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
+    echo "  - installing some required dependencies"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install net-tools >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
     # ignore this one if it fails
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install attr >> /tmp/setup_log 2>&1
 
-else
+elif [[ -f "/etc/redhat-release" ]]; then
+
+    echo "  - updating apt package index"
+    sudo yum -y update >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+    echo "  - installing some required dependencies"
     sudo yum install -y net-tools anacron >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -291,14 +324,42 @@ else
     sudo systemctl start crond >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
+elif [[ -f "/etc/SUSE-brand" ]]; then
+
+    echo "  - updating zypper package index"
+    sudo bash -c "zypper --non-interactive refresh | echo 'a'" >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+    echo "  - installing some required dependencies"
+    sudo zypper install -y net-tools cron >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+    echo "  - enabling cron"
+    sudo systemctl enable cron >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+    sudo systemctl start cron >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101
+
 fi
 
 
 echo "  - installing mesos dependencies"
 if [[ -f "/etc/debian_version" ]]; then
     install_debian_mesos_dependencies
-else
+elif [[ -f "/etc/redhat-release" ]]; then
     install_redhat_mesos_dependencies
+elif [[ -f "/etc/SUSE-brand" ]]; then
+    install_suse_mesos_dependencies
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101
 fi
 
 
@@ -306,9 +367,19 @@ echo " - Installing gluster client"
 if [[ -f "/etc/debian_version" ]]; then
     sudo apt-get -y install glusterfs-client >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
-else
+
+elif [[ -f "/etc/redhat-release" ]]; then
     sudo yum -y install glusterfs glusterfs-fuse >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
+
+elif [[ -f "/etc/SUSE-brand" ]]; then
+    sudo zypper install -y glusterfs  >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
+
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101    
 fi
 
 

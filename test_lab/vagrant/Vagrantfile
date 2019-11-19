@@ -59,7 +59,7 @@ nodes = [
   { :hostname => 'deb-node2', :box => 'ubuntu/xenial64',  :ip => '192.168.10.12', :ram => 6000 },
   { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.10.13', :ram => 6000},
   { :hostname => 'cent-node2', :box => 'fedora/29-cloud-base', :ip => '192.168.10.14', :ram => 6000 },
-  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.10.15', :ram => 6000}
+  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.10.15', :ram => 10000}
 ]
 
 # All Vagrant configuration is done here. The most common configuration
@@ -109,9 +109,9 @@ Vagrant.configure("2") do |config|
           ssh_pub_key = File.readlines("ssh_key.pub").first.strip
           s.inline = <<-SHELL
             if [[ -f "/etc/debian_version" ]]; then
-                useradd -m -G root,sudo,users,staff eskimo
+                useradd -U -m -G root,sudo,users,staff eskimo
             else
-                useradd -m -G root,wheel,users eskimo
+                useradd -U -m -G root,wheel,users eskimo
             fi
             echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
             sudo mkdir -p /root/.ssh/

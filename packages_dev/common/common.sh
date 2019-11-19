@@ -113,6 +113,7 @@ check_for_virtualbox() {
                 exit -2
             fi
         else
+            # workds for both RHEL and suse
             if [[ `rpm -qa | grep 'virtualbox'` == "" ]]; then
                 echo "This setup requires VirtualBox installed and ready on the host machine"
                 exit -3

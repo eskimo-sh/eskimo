@@ -90,11 +90,22 @@ trap returned_to_saved_dir EXIT
 echo " - Changing to temp directory"
 sudo rm -Rf /tmp/mesos_setup > /tmp/mesos_install_log 2>&1
 mkdir -p /tmp/mesos_setup
+
 if [[ -f "/etc/debian_version" ]]; then
     mv niceideas_mesos-debian_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
-else
+
+elif [[ -f "/etc/redhat-release" ]]; then
     mv niceideas_mesos-redhat_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+
+elif [[ -f "/etc/SUSE-brand" ]]; then
+    mv niceideas_mesos-suse_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+
+else
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit -101
 fi
+
 cd /tmp/mesos_setup
 
 
@@ -116,12 +127,14 @@ sudo ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos
 echo " - BUGFIXING mesos-tail "
 sudo sed -i s/"master_state"/"state"/g /usr/local/lib/mesos-$AMESOS_VERSION/bin/mesos-tail
 
+set -e
+
 echo " - Simlinking mesos config to /usr/local/etc/mesos"
+sudo mkdir -p /usr/local/etc/
 if [[ ! -f /usr/local/etc/mesos ]]; then
     sudo ln -s /usr/local/lib/mesos/etc/mesos /usr/local/etc/mesos
 fi
 
-set -e
 echo " - Simlinking mesos binaries to /usr/local/bin"
 for i in `ls -1 /usr/local/lib/mesos/bin`; do
     if [[ ! -f /usr/local/bin/$i ]]; then

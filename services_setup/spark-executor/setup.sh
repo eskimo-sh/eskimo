@@ -121,6 +121,20 @@ fi
 #echo " - TODO"
 #docker exec -it spark TODO/tmp/logstash_install_log
 
+# Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
+# https://github.com/moby/moby/issues/38252
+if [[ `cat /etc/fstab | grep ' / ' | grep 'btrfs'` != "" ]]; then
+    echo " - Hack for BTRFS : need to unmount gluster shares before copying files to container"
+    if [[ `grep /var/lib/spark/data /etc/mtab` != "" ]]; then
+        echo "   + umounting /var/lib/spark/data"
+        sudo umount /var/lib/spark/data
+    fi
+    if [[ `grep /var/lib/spark/eventlog /etc/mtab` != "" ]]; then
+        echo "   + umounting /var/lib/spark/eventlog"
+        sudo umount /var/lib/spark/eventlog
+    fi
+fi
+
 echo " - Copying Topology Injection Script (common)"
 docker cp $SCRIPT_DIR/inContainerInjectTopology.sh spark-executor:/usr/local/sbin/inContainerInjectTopology.sh >> /tmp/spark_executor_install_log 2>&1
 fail_if_error $? "/tmp/spark_executor_install_log" -20

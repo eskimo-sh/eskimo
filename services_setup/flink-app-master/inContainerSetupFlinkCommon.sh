@@ -137,9 +137,6 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.mem: 1024\"  >> /usr/local/l
 sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
         /usr/local/lib/flink/conf/log4j.properties
 
-# temporary legacy mode
-#sudo bash -c "echo -e \"\n\n\n# TREMPORARY ENABLING LEGACY MODE\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-#sudo bash -c "echo -e \"mode: legacy\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 # FIXME temporary increasing timeotu to workaround
 # https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af

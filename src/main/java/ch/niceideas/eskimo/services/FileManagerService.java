@@ -149,7 +149,6 @@ public class FileManagerService {
 
             return navigateFileManager (hostAddress, folder, ".");
 
-
         } catch (IOException | ConnectionManagerException | JSONException e) {
             logger.error (e, e);
             throw new IOException(e.getMessage(), e);
@@ -331,7 +330,7 @@ public class FileManagerService {
 
         if (client == null) {
 
-            Connection con = connectionManagerService.getConnection(hostAddress);
+            Connection con = connectionManagerService.getSharedConnection(hostAddress);
             client = new SFTPv3Client (con);
 
             sftpClients.put(hostAddress, client);

@@ -194,7 +194,7 @@ Eskimo is exhaustively built on top of Docker.
 Only mesos agents need to be compiled and adapted to the host linux OS running your cluster nodes. +
 All the other components - from kafka to zeppelin through spark - run on docker
 
-Eskimo is successfully tested on Ubuntu, Debian, CentOS and Fedora nodes so far ... more are coming.
+Eskimo is successfully tested on Ubuntu, Debian, CentOS, Fedora and OpenSUSE nodes so far ... more are coming.
 
 a|image::pngs/simplicity.jpg[80, 80] a| *Simplicity as a core value*
 
@@ -326,12 +326,15 @@ set PATH=%JAVA_HOME%\bin;%PATH%
 
 ==== Prerequisites on eskimo cluster nodes
 
-Linux distributions successfully tested with Eskimo and officially supoprted are the following:
+Linux distributions successfully tested with Eskimo and officially supported are the following:
 
 * Debian Stretch and greater
 * Ubuntu Xenial and greater
 * CentOS 7.x and 8.x
 * Fedora 29 and greater
+* OpenSUSE 15.1 and greater
+
+Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far.
 
 ===== Firewall open ports on eskimo nodes
 
@@ -413,7 +416,7 @@ Following commands are executed on a redhat-based node:
 .redhat based node setup
 ----
 # system update
-yum update
+sudo yum -y update
 
 # docker dependencies
 yum install -y yum-utils device-mapper-persistent-data lvm2
@@ -431,6 +434,27 @@ yum install -y net-tools anacron
 # glusterfs client
 yum -y install glusterfs glusterfs-fuse
 ----
+
+Following commands are executed on a SUSE node:
+
+.suse node setup
+----
+# system update
+sudo zypper --non-interactive refresh | echo 'a'
+
+# install docker
+sudo zypper install -y docker
+
+# mesos dependencies
+sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel
+
+# other dependencies
+sudo zypper install -y net-tools cron
+
+# glusterfs client
+sudo zypper install -y glusterfs
+----
+
 
 *Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding packages
 before you can use your nodes within eskimo.*
@@ -1074,6 +1098,15 @@ The Mesos kernel runs on every machine and provides applications (e.g., Hadoop, 
 API’s for resource management and scheduling across entire datacenter and cloud environments.
 
 http://mesos.apache.org/
+
+==== mesos-cli
+
+Eskimo provides a specific command line tool for manipulating mesos frameworks: `/usr/local/bin/mesos-cli.sh` installed
+on all nodes of the eskimo cluster. +
+This tool can be used to list running frameworks, force kill them in a reliable way, etc.
+
+
+
 
 === Apache Spark
 

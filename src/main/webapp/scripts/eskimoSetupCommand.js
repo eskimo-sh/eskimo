@@ -132,6 +132,20 @@ eskimo.SetupCommand = function() {
             none = false;
         }
 
+        // Package Updates
+        if (command.packageUpdates != null && command.packageUpdates.length > 0) {
+
+            commandDescription += '<br><br><b>Following packages updates are available:</b>' +
+                '<br>';
+
+
+            for (var i = 0; i < command.packageUpdates.length; i++) {
+                commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.packageUpdates[i] + '</b><br>';
+            }
+
+            none = false;
+        }
+
         $("#setup-command-body").html(commandDescription);
 
         $('#setup-command-modal').modal("show");

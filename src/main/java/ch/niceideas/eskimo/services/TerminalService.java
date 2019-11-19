@@ -50,7 +50,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -66,11 +66,37 @@ public class TerminalService {
     @Value("${terminal.defaultSessionHeight}")
     private int defaultSessionWHeight = 30;
 
+    @Value("${terminal.idleTimeoutSeconds}")
+    private int idleTimeoutSeconds = 600;
+
     @Autowired
     private ConnectionManagerService connectionManagerService;
 
     /* Controlers are singleton */
     private Map<String, Session> sessions = new ConcurrentHashMap<>();
+
+    private final Timer timer;
+
+    public TerminalService () {
+
+        this.timer = new Timer(true);
+
+        timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    for (String sessionId : new ArrayList<String>(sessions.keySet())) {
+                        Session session = sessions.get (sessionId);
+                        if (System.currentTimeMillis() - session.getLastAccess() > idleTimeoutSeconds * 1000) {
+                            try {
+                                removeTerminal(sessionId);
+                            } catch (IOException e) {
+                                logger.debug (e, e);
+                            }
+                        }
+                    }
+                }
+            }, idleTimeoutSeconds / 10 * 1000, idleTimeoutSeconds / 10 * 1000);
+    }
 
     /** For tests */
     void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
@@ -94,6 +120,9 @@ public class TerminalService {
             throw new IOException(e.getMessage(), e);
         } finally {
             session.getChildProcess().destroy();
+
+            // Closing private connection
+            session.getConnection().close();
         }
     }
 
@@ -132,14 +161,14 @@ public class TerminalService {
 
             String node = extractArgument (terminalBody, "node");
 
-            Connection con = connectionManagerService.getConnection(node);
+            Connection con = connectionManagerService.getPrivateConnection(node);
 
             com.trilead.ssh2.Session innerSession = con.openSession();
 
             innerSession.requestPTY(Session.getAjaxTerm(), sessionWidth, sessionHeight, 0, 0, null);
             innerSession.startShell();
 
-            session = new Session(sessionWidth, sessionHeight, new SshProcessWithPty(innerSession));
+            session = new Session(con, sessionWidth, sessionHeight, new SshProcessWithPty(innerSession));
 
             sessions.put(sessionId, session);
 
@@ -152,6 +181,7 @@ public class TerminalService {
                 logger.warn ("Session got into problems. Recreating");
                 logger.warn (e.getMessage());
                 logger.debug (e, e);
+
                 try {
                     removeTerminal(sessionId);
                 } catch (IOException ignored) {}

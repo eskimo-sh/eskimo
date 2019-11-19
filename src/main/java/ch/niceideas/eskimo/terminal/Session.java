@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.terminal;
 
+import com.trilead.ssh2.Connection;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Closeable;
@@ -55,6 +57,8 @@ import java.util.logging.Logger;
  *
  */
 public final class Session extends Thread {
+
+    private final Connection connection;
 
     private final ProcessWithPty childProcess;
 
@@ -80,7 +84,8 @@ public final class Session extends Thread {
      *      A child process forked with pty as its stdin/stdout..
      *      Make sure to set the correct terminal name in its environment variable.
      */
-    public Session(int width, int height, ProcessWithPty childProcessWithTty) throws IOException {
+    public Session(Connection connection, int width, int height, ProcessWithPty childProcessWithTty) throws IOException {
+        this.connection = connection;
         this.terminal = new Terminal(width,height);
         this.childProcess = childProcessWithTty;
         childProcess.setWindowSize(width,height);
@@ -187,6 +192,10 @@ public final class Session extends Thread {
 
     public Process getChildProcess() {
         return childProcess;
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     /**
