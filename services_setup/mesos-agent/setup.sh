@@ -89,8 +89,16 @@ sudo mkdir -p /var/lib/mesos/slave
 sudo chmod 755 /var/lib/mesos/slave
 
 echo " - Copying mesos-agent systemd file"
-sudo cp $SCRIPT_DIR/mesos-agent.service /lib/systemd/system/
-sudo chmod 644 /lib/systemd/system/mesos-agent.service
+if [[ -d /lib/systemd/system/ ]]; then
+    export systemd_units_dir=/lib/systemd/system/
+elif [[ -d /usr/lib/systemd/system/ ]]; then
+    export systemd_units_dir=/usr/lib/systemd/system/
+else
+    echo "Couldn't find systemd unit files directory"
+    exit -10
+fi
+sudo cp $SCRIPT_DIR/mesos-agent.service $systemd_units_dir
+sudo chmod 644 $systemd_units_dir/mesos-agent.service
 
 echo " - Creating mesos slave environment file"
 sudo rm -Rf /usr/local/etc/mesos/mesos-slave-env.sh

@@ -1002,7 +1002,13 @@ public class SystemService {
 
         // 3. Uninstall systemd service file
         sb.append(" - Removing systemd Service File\n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
+        // Find systemd unit config files directory
+        String foundStandardFlag = sshCommandService.runSSHScript(ipAddress, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
+        if (foundStandardFlag.contains("found_standard")) {
+            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
+        } else {
+            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");
+        }
 
         // 4. Delete docker container
         sb.append(" - Removing docker container \n");
