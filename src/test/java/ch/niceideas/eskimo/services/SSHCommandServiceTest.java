@@ -111,7 +111,8 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
             fail ("Exception expected");
         } catch (SSHCommandException e) {
             assertNotNull(e);
-            assertEquals ("/bin/bash: /bin/tada: No such file or directory\n", e.getMessage());
+            assertEquals ("Command exited with return code 127\n" +
+                    "/bin/bash: /bin/tada: No such file or directory\n", e.getMessage());
         }
     }
 
