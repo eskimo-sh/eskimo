@@ -88,6 +88,7 @@ public class TerminalService {
                         Session session = sessions.get (sessionId);
                         if (System.currentTimeMillis() - session.getLastAccess() > idleTimeoutSeconds * 1000) {
                             try {
+                                logger.info("Closing session with ID " + sessionId + " (idle tineout)");
                                 removeTerminal(sessionId);
                             } catch (IOException e) {
                                 logger.debug (e, e);

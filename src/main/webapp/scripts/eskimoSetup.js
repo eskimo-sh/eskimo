@@ -244,8 +244,8 @@ eskimo.Setup = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    alert(atob(data.error));
-                    showSetupMessage(data.error, false);
+                    //alert(atob(data.error));
+                    showSetupMessage(atob(data.error), false);
                 } else {
 
                     if (!data.command) {

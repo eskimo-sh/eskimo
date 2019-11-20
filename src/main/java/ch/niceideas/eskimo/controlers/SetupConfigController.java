@@ -131,7 +131,7 @@ public class SetupConfigController {
 
         } catch (SetupException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus (e);
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
@@ -142,7 +142,7 @@ public class SetupConfigController {
                 put("command", command.toJSON());
             }}).toString(2);
         } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
