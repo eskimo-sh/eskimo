@@ -223,6 +223,8 @@ eskimo.Setup = function() {
         eskimoMain.startOperationInProgress();
         */
 
+        eskimoMain.showProgressbar();
+
         var setupConfig = $("form#setup-config").serializeObject();
 
         $.ajax({
@@ -234,6 +236,7 @@ eskimo.Setup = function() {
             data: JSON.stringify(setupConfig),
             success: function (data, status, jqXHR) {
 
+                eskimoMain.hideProgressbar();
 
                 // OK
                 console.log(data);
@@ -259,39 +262,12 @@ eskimo.Setup = function() {
                     }
                 }
 
-                /*
-                // OK
-                console.log(data);
-                if (data && data.status) {
-                    if (data.status == "KO") {
-                        showSetupMessage(data.error, false);
-                    } else {
-                        showSetupMessage("Configuration applied successfully", true);
-                        eskimoMain.handleSetupCompleted();
-                    }
-                } else {
-                    showSetupMessage("No status received back from backend.", false);
-                }
-
-                if (data.error) {
-                    eskimoMain.scheduleStopOperationInProgress (false);
-                } else {
-                    eskimoMain.scheduleStopOperationInProgress (true);
-                }
-                */
             },
 
-            /*
             error: function (jqXHR, status) {
-                // error handler
-                console.log(jqXHR);
-                console.log(status);
-                showSetupMessage('fail : ' + status, false);
-
-                eskimoMain.scheduleStopOperationInProgress (false);
                 eskimoMain.hideProgressbar();
+                errorHandler (jqXHR, status);
             }
-            */
         });
     }
     this.saveSetup = saveSetup;

@@ -193,6 +193,69 @@ eskimo.Consoles = function() {
     }
     this.showNextTab = showNextTab;
 
+    this.closeConsole = function (nodeName, terminalToClose) {
+
+        console.log (terminalToClose);
+
+        // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+        var nodeToClose = null;
+        for (var i = 0; i < availableNodes.length; i++) {
+            if (availableNodes[i].nodeName == terminalToClose) {
+                nodeToClose = availableNodes[i];
+                break;
+            }
+        }
+        if (nodeToClose == null) {
+            alert ("Node " + nodeToClose + " not found");
+        } else {
+
+            // remove from open console
+            var openedConsole = null;
+            var closedConsoleNbr = -1;
+            for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
+                if (openedConsoles[closedConsoleNbr].nodeName == terminalToClose) {
+                    openedConsole = openedConsoles[closedConsoleNbr];
+                    openedConsoles.splice(closedConsoleNbr, 1);
+                    break;
+                }
+            }
+
+            // remove menu
+            $("#console_" + nodeName).remove();
+
+            // remove div
+            $("#consoles-console-" + nodeName).remove();
+
+            // close session on backend
+            console.log(openedConsole.terminal);
+            if (openedConsole == null) {
+                alert("Console " + nodeToClose + " not found");
+            } else {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
+                    success: function (data, status, jqXHR) {
+                        console.log(data);
+                        //alert(data);
+                    },
+                    error: errorHandler
+                });
+
+                openedConsole.terminal.close();
+            }
+
+            // show another console if available
+            if (openedConsoles.length > 0) {
+                if (closedConsoleNbr < openedConsoles.length) {
+                    selectConsole(openedConsoles[closedConsoleNbr].nodeAddress, openedConsoles[closedConsoleNbr].nodeName);
+                } else {
+                    selectConsole(openedConsoles[closedConsoleNbr - 1].nodeAddress, openedConsoles[closedConsoleNbr - 1].nodeName);
+                }
+            }
+        }
+    };
+
     function openConsole (nodeAddress, nodeName) {
 
         // add tab entry
@@ -208,7 +271,7 @@ eskimo.Consoles = function() {
             // Add tab entry
             consoleTabList.append($(''+
                 '<li id="console_' + nodeName + '">'+
-                '<a href="javascript:eskimoMain.getConsoles().selectConsole("' + nodeAddress + '", "' + nodeName + "');>" + nodeAddress +
+                '<a href="javascript:eskimoMain.getConsoles().selectConsole(\'' + nodeAddress + '\', \'' + nodeName + '\');">' + nodeAddress +
                 '</a></li>'));
 
             var consoleContent = '<div class="col-md-12 ajaxterminal" id="consoles-console-' + nodeName + '">\n' +
@@ -223,65 +286,7 @@ eskimo.Consoles = function() {
 
             $("#console-close-" + nodeName).click(function () {
                 var terminalToClose = this.id.substring("console-close-".length);
-                console.log (terminalToClose);
-                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-                var nodeToClose = null;
-                for (var i = 0; i < availableNodes.length; i++) {
-                    if (availableNodes[i].nodeName == terminalToClose) {
-                        nodeToClose = availableNodes[i];
-                        break;
-                    }
-                }
-                if (nodeToClose == null) {
-                    alert ("Node " + nodeToClose + " not found");
-                } else {
-
-                    // remove from open console
-                    var openedConsole = null;
-                    var closedConsoleNbr = -1;
-                    for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
-                        if (openedConsoles[closedConsoleNbr].nodeName == terminalToClose) {
-                            openedConsole = openedConsoles[closedConsoleNbr];
-                            openedConsoles.splice(closedConsoleNbr, 1);
-                            break;
-                        }
-                    }
-
-                    // remove menu
-                    $("#console_" + nodeName).remove();
-
-                    // remove div
-                    $("#consoles-console-" + nodeName).remove();
-
-                    // close session on backend
-                    console.log (openedConsole.terminal);
-                    if (openedConsole == null) {
-                        alert ("Console " + nodeToClose + " not found");
-                    } else {
-                        $.ajax({
-                            type: "GET",
-                            dataType: "json",
-                            url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
-                            success: function (data, status, jqXHR) {
-                                console.log (data);
-                                //alert(data);
-                            },
-                            error: errorHandler
-                        });
-
-                        openedConsole.terminal.close();
-                    }
-
-                    // show another console if available
-                    if (openedConsoles.length > 0) {
-                        if (closedConsoleNbr < openedConsoles.length) {
-                            selectConsole(openedConsoles[closedConsoleNbr].nodeAddress, openedConsoles[closedConsoleNbr].nodeName);
-                        } else {
-                            selectConsole(openedConsoles[closedConsoleNbr - 1].nodeAddress, openedConsoles[closedConsoleNbr - 1].nodeName);
-                        }
-                    }
-                }
-
+                that.closeConsole (nodeName, terminalToClose);
             });
 
             t = new ajaxterm.Terminal("term_"+nodeName, {

@@ -236,9 +236,9 @@ public class ConnectionManagerService {
     }
 
     private Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
-        Connection connection;
+
         logger.info ("Creating connection to " + ipAddress);
-        connection = new Connection(ipAddress, sshPort);
+        Connection connection = new Connection(ipAddress, sshPort);
         connection.setTCPNoDelay(true);
         connection.connect(null, tcpConnectionTimeout, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 

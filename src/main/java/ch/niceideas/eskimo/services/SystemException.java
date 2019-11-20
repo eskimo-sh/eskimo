@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.services;
 
+import java.lang.reflect.Constructor;
+
 public class SystemException extends Exception {
 
     static final long serialVersionUID = -3387516993124229248L;

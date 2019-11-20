@@ -745,6 +745,8 @@ eskimo.NodesConfig = function() {
 
     function proceedWithInstallation(reinstall, model) {
 
+        eskimoMain.showProgressbar();
+
         // 1 hour timeout
         $.ajax({
             type: "POST",
@@ -754,6 +756,8 @@ eskimo.NodesConfig = function() {
             url: reinstall ? "reinstall-nodes-config" : "save-nodes-config",
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {
+
+                eskimoMain.hideProgressbar();
 
                 // OK
                 console.log(data);
@@ -773,6 +777,7 @@ eskimo.NodesConfig = function() {
             },
 
             error: function (jqXHR, status) {
+                eskimoMain.hideProgressbar();
                 errorHandler (jqXHR, status);
             }
         });
