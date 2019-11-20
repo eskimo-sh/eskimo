@@ -225,7 +225,6 @@ docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/settingsInje
 fail_if_error $? /tmp/zeppelin_install_log -24
 
 
-
 echo " - Copying Topology Injection Script (Zeppelin)"
 docker cp $SCRIPT_DIR/inContainerInjectTopologyZeppelin.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyZeppelin.sh >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -20
@@ -234,8 +233,16 @@ docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerI
 fail_if_error $? "/tmp/zeppelin_install_log" -21
 
 
-# TODO : if /usr/local/lib/bin/logstash-cli is found, then copy it to container
-# FIXME
+# if /usr/local/bin/logstash-cli is found, then copy it to container
+if [[ -f /usr/local/bin/logstash-cli ]]; then
+
+    echo " - Copying logstash command client to zeppelin container"
+    docker cp /usr/local/bin/logstash-cli zeppelin:/usr/local/bin/logstash-cli >> /tmp/zeppelin_install_log 2>&1
+    fail_if_error $? /tmp/zeppelin_install_log -31
+
+    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/logstash-cli" >> /tmp/zeppelin_install_log 2>&1
+    fail_if_error $? /tmp/zeppelin_install_log -24
+fi
 
 
 echo " - Committing changes to local template and exiting container zeppelin"

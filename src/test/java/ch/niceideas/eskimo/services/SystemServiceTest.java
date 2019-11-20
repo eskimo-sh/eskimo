@@ -54,7 +54,6 @@ public class SystemServiceTest extends AbstractSystemTest {
     private static final Logger logger = Logger.getLogger(SystemServiceTest.class);
 
     @Test
-    @Ignore
     public void testInstallService() throws Exception {
 
         setupService.setConfigStoragePathInternal(createTempStoragePath());
