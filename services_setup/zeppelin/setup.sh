@@ -168,33 +168,12 @@ fi
 
 # Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
 # https://github.com/moby/moby/issues/38252
-if [[ `cat /etc/fstab | grep ' / ' | grep 'btrfs'` != "" ]]; then
-    echo " - Hack for BTRFS : need to unmount gluster shares before copying files to container"
-    if [[ `grep /var/lib/spark/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/spark/data"
-        sudo umount /var/lib/spark/data
-    fi
-    if [[ `grep /var/lib/spark/eventlog /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/spark/eventlog"
-        sudo umount /var/lib/spark/eventlog
-    fi
-    if [[ `grep /var/lib/flink/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/flink/data"
-        sudo umount /var/lib/flink/data
-    fi
-    if [[ `grep /var/lib/flink/completed_jobs /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/flink/completed_jobs"
-        sudo umount /var/lib/flink/completed_jobs
-    fi
-    if [[ `grep /var/lib/logstash/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/logstash/data"
-        sudo umount /var/lib/logstash/data
-    fi
-    if [[ `grep /var/lib/zeppelin/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/zeppelin/data"
-        sudo umount /var/lib/zeppelin/data
-    fi
-fi
+BTFRS_hack_unmount_gluster_share /var/lib/spark/eventlog
+BTFRS_hack_unmount_gluster_share /var/lib/spark/data
+BTFRS_hack_unmount_gluster_share /var/lib/flink/data
+BTFRS_hack_unmount_gluster_share /var/lib/flink/completed_jobs
+BTFRS_hack_unmount_gluster_share /var/lib/logstash/data
+BTFRS_hack_unmount_gluster_share /var/lib/zeppelin/data
 
 echo " - Copying Topology Injection Script (Spark)"
 docker cp $SCRIPT_DIR/inContainerInjectTopologySpark.sh zeppelin:/usr/local/sbin/inContainerInjectTopologySpark.sh >> /tmp/zeppelin_install_log 2>&1

@@ -35,22 +35,51 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.services.ConnectionManagerException;
+import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class ProxyManagerServiceTest {
 
     private ProxyManagerService pms;
     private ServicesDefinition sd;
 
+    private AtomicBoolean recreateTunnelsCalled = new AtomicBoolean(false);
+    private AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
+
     @Before
     public void setUp() throws Exception {
         pms = new ProxyManagerService();
         sd = new ServicesDefinition();
+        pms.setServicesDefinition(sd);
+        sd.afterPropertiesSet();
+        pms.setConnectionManagerService(new ConnectionManagerService() {
+            public void recreateTunnels(String host) throws ConnectionManagerException {
+                recreateTunnelsCalled.set(true);
+            }
+        });
+        pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
+            public void removeForwarders(String serviceId) {
+                removeForwardersCalled.set(true);
+            }
+        });
+    }
 
+    @Test
+    public void testGetServerURI() throws Exception {
+        pms.updateServerForService("zeppelin", "192.168.10.11");
+
+        assertEquals("http://localhost:"+pms.getTunnelConfig("zeppelin").getLocalPort()+"/", pms.getServerURI("zeppelin", "/localhost:8080/zeppelin"));
+        assertEquals("http://localhost:"+pms.getTunnelConfig("zeppelin").getLocalPort()+"/", pms.getServerURI("zeppelin", "/localhost:8080/zeppelin/tugudu"));
     }
 
     @Test
@@ -58,5 +87,31 @@ public class ProxyManagerServiceTest {
         assertEquals("192-168-10-11", pms.extractHostFromPathInfo("192-168-10-11//slave(1)/monitor/statistics"));
         assertEquals("192-168-10-11", pms.extractHostFromPathInfo("/192-168-10-11//slave(1)/monitor/statistics"));
         assertEquals("192-168-10-11", pms.extractHostFromPathInfo("/192-168-10-11"));
+    }
+
+    @Test
+    public void testServerForServiceManagemement() throws Exception {
+
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+
+        pms.updateServerForService("kibana", "192.168.10.11");
+
+        assertTrue(recreateTunnelsCalled.get());
+        assertTrue(removeForwardersCalled.get());
+
+        recreateTunnelsCalled.set(false);
+        removeForwardersCalled.set(false);
+
+        pms.updateServerForService("kibana", "192.168.10.11");
+
+        // should not have been recreated
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+
+        pms.updateServerForService("kibana", "192.168.10.13");
+
+        assertTrue(recreateTunnelsCalled.get());
+        assertTrue(removeForwardersCalled.get());
     }
 }

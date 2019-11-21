@@ -75,24 +75,6 @@ if [[ `tail -n 1 /tmp/flink_build_log | grep " - In container install SUCCESS"` 
     exit -102
 fi
 
-echo " - Installing FLink ElasticSearch connector"
-echo " - TODO"
-#docker exec -i flink bash /scripts/installElasticSearchConnector.sh | tee -a /tmp/flink_build_log 2>&1
-#if [[ `tail -n 1 /tmp/flink_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-#    echo " - In container install script ended up in error"
-#    cat /tmp/flink_build_log
-#    exit -102
-#fi
-
-echo " - Installing Flink-Kafka connector"
-echo " - TODO"
-#docker exec -i flink bash /scripts/installFlinkKafkaConnector.sh  | tee -a /tmp/flink_build_log 2>&1
-#if [[ `tail -n 1 /tmp/flink_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-#    echo " - In container install script ended up in error"
-#    cat /tmp/flink_build_log
-#    exit -102
-#fi
-
 
 #echo " - TODO"
 #docker exec -i flink TODO

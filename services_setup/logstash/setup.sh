@@ -116,13 +116,7 @@ fi
 
 # Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
 # https://github.com/moby/moby/issues/38252
-if [[ `cat /etc/fstab | grep ' / ' | grep 'btrfs'` != "" ]]; then
-    echo " - Hack for BTRFS : need to unmount gluster shares before copying files to container"
-    if [[ `grep /var/lib/logstash/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/logstash/data"
-        sudo umount /var/lib/logstash/data
-    fi
-fi
+BTFRS_hack_unmount_gluster_share /var/lib/logstash/data
 
 echo " - Handling topology and setting injection"
 handle_topology_settings logstash /tmp/logstash_install_log

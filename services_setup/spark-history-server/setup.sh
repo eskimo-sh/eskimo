@@ -119,17 +119,8 @@ fi
 
 # Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
 # https://github.com/moby/moby/issues/38252
-if [[ `cat /etc/fstab | grep ' / ' | grep 'btrfs'` != "" ]]; then
-    echo " - Hack for BTRFS : need to unmount gluster shares before copying files to container"
-    if [[ `grep /var/lib/spark/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/spark/data"
-        sudo umount /var/lib/spark/data
-    fi
-    if [[ `grep /var/lib/spark/eventlog /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/spark/eventlog"
-        sudo umount /var/lib/spark/eventlog
-    fi
-fi
+BTFRS_hack_unmount_gluster_share /var/lib/spark/eventlog
+BTFRS_hack_unmount_gluster_share /var/lib/spark/data
 
 
 echo " - Handling topology and setting injection"

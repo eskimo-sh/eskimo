@@ -119,17 +119,8 @@ fi
 
 # Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
 # https://github.com/moby/moby/issues/38252
-if [[ `cat /etc/fstab | grep ' / ' | grep 'btrfs'` != "" ]]; then
-    echo " - Hack for BTRFS : need to unmount gluster shares before copying files to container"
-    if [[ `grep /var/lib/flink/data /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/flink/data"
-        sudo umount /var/lib/flink/data
-    fi
-    if [[ `grep /var/lib/flink/completed_jobs /etc/mtab` != "" ]]; then
-        echo "   + umounting /var/lib/flink/completed_jobs"
-        sudo umount /var/lib/flink/completed_jobs
-    fi
-fi
+BTFRS_hack_unmount_gluster_share /var/lib/flink/data
+BTFRS_hack_unmount_gluster_share /var/lib/flink/completed_jobs
 
 echo " - Handling topology and setting injection"
 handle_topology_settings flink-app-master /tmp/flink_install_log

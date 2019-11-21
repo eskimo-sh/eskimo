@@ -100,6 +100,50 @@ mv flink-csv-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
 mv flink-json-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
 mv flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar flink-$FLINK_VERSION/lib/
 
+echo " - Creating a dummy pom.xml to proceed with downloading kafka and elasticsearch connectors"
+mkdir /tmp/flink_download_connectors
+cd /tmp/flink_download_connectors
+echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
+         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ch.niceideas.flink</groupId>
+    <artifactId>connecorsDownloadProject</artifactId>
+    <version>$FLINK_VERSION</version>
+    <packaging>jar</packaging>
+    <name>minimal-pom</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka_2.11</artifactId>
+            <version>$FLINK_VERSION</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR"_2.11</artifactId>
+            <version>$FLINK_VERSION</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>" > pom.xml
+
+echo " - Proceeding with download of connectors and dependencies"
+mvn dependency:copy-dependencies >> /tmp/flink_install_log 2>&1
+fail_if_error $? "/tmp/flink_install_log" -25
+
+echo " - Copying connectors with dependencies to flink distribution folder"
+cd target/dependency/
+cp * /tmp/flink_setup/flink-$FLINK_VERSION/lib/
+
+echo " - Changing directory back to flink setup"
+cd /tmp/flink_setup
 
 echo " - Installing flink"
 sudo chown root.staff -R flink-$FLINK_VERSION
