@@ -81,6 +81,8 @@ public class MemoryComputer {
     @Value("${system.reservedMemoryOnNodes}")
     private long reservedMemoryMb = 1000;
 
+
+
     public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, Set<String> deadIps) throws JSONException, SystemException {
         return new MemoryModel(computeMemory(nodesConfig, deadIps));
     }

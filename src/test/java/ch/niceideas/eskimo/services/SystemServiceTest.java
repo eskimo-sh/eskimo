@@ -36,7 +36,10 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import org.apache.log4j.Logger;
@@ -45,6 +48,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Target;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -53,10 +58,29 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     private static final Logger logger = Logger.getLogger(SystemServiceTest.class);
 
+    private String testRunUUID = UUID.randomUUID().toString();
+
+    @Test
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        setupService.setConfigStoragePathInternal(createTempStoragePath());
+    }
+
+    @Override
+    protected SystemService createSystemService() {
+        return new SystemService() {
+            @Override
+            protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
+                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
+                retFile.createNewFile();
+                return retFile;
+            }
+        };
+    }
+
     @Test
     public void testInstallService() throws Exception {
-
-        setupService.setConfigStoragePathInternal(createTempStoragePath());
 
         ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
                 put("mesos_installed_on_IP_192-168-10-11", "OK");
@@ -141,8 +165,6 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testCheckServiceDisappearance() throws Exception {
 
-        setupService.setConfigStoragePathInternal(createTempStoragePath());
-
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
 
@@ -175,8 +197,6 @@ public class SystemServiceTest extends AbstractSystemTest {
             add("192.168.10.11");
             add("192.168.10.13");
         }};
-
-        setupService.setConfigStoragePathInternal(createTempStoragePath());
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         systemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
@@ -213,8 +233,6 @@ public class SystemServiceTest extends AbstractSystemTest {
         // if it is still referenced by status, then it is checked for services and services are removed from it
         // if they are down
         // IMPORTANT : they should be kept if they are still there to be properly uninstalled indeed !
-
-        setupService.setConfigStoragePathInternal(createTempStoragePath());
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         logger.debug (systemStatus.getIpAddresses());
@@ -273,8 +291,6 @@ public class SystemServiceTest extends AbstractSystemTest {
         // if it is down, all services are removed without checking them
         // IMPORTANT : they should be kept if they are still there to be properly uninstalled indeed !
 
-        setupService.setConfigStoragePathInternal(createTempStoragePath());
-
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         logger.debug (systemStatus.getIpAddresses());
 
@@ -318,4 +334,68 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 
+    @Test
+    public void testApplyNodesConfig() throws Exception {
+
+        OperationsCommand command = OperationsCommand.create(
+                servicesDefinition,
+                nodeRangeResolver,
+                new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8")),
+                new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"))
+        );
+
+        SSHCommandService sshCommandService = new SSHCommandService() {
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                testSSHCommandScript.append(script).append("\n");
+                if (script.equals("echo OK")) {
+                    return "OK";
+                }
+                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                    return "debian";
+                }
+                if (script.equals("sudo cat /proc/meminfo | grep MemTotal")) {
+                    return "MemTotal:        9982656 kB";
+                }
+
+                return testSSHCommandResultBuilder.toString();
+            }
+            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+                testSSHCommandScript.append(command + "\n");
+                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
+                    return "OK";
+                }
+
+                return testSSHCommandResultBuilder.toString();
+            }
+            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+                // just do nothing
+            }
+        };
+
+        systemService.setSshCommandService(sshCommandService);
+
+        memoryComputer.setSshCommandService(sshCommandService);
+
+        systemService.applyNodesConfig(command);
+
+
+        String expectedCommandStart = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsStart.txt"), "UTF-8");
+        expectedCommandStart = expectedCommandStart.replace("{UUID}", testRunUUID);
+
+        String expectedCommandEnd = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsEnd.txt"), "UTF-8");
+        expectedCommandEnd = expectedCommandEnd.replace("{UUID}", testRunUUID);
+
+        String commandString = testSSHCommandScript.toString();
+
+        //System.err.println (commandString);
+
+        for (String commandStart : expectedCommandStart.split("\n")) {
+            assertTrue (commandStart + "\nis contained", commandString.contains(commandStart));
+        }
+
+        for (String commandEnd : expectedCommandEnd.split("\n")) {
+            assertTrue (commandEnd + "\nis contained", commandString.contains(commandEnd));
+        }
+
+    }
 }

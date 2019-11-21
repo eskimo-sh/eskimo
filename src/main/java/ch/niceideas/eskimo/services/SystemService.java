@@ -161,6 +161,16 @@ public class SystemService {
     void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
     }
+    void setMemoryComputer (MemoryComputer memoryComputer) {
+        this.memoryComputer = memoryComputer;
+    }
+    void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
+        this.servicesInstallationSorter = servicesInstallationSorter;
+    }
+    void setServicesConfigService (ServicesConfigService servicesConfigService) {
+        this.servicesConfigService = servicesConfigService;
+    }
+
 
     public boolean isProcessingPending() {
         return systemActionLock.isLocked();
@@ -883,7 +893,7 @@ public class SystemService {
     private String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
             throws JSONException, SystemException, SSHCommandException, IOException {
 
-        File tempTopologyFile = File.createTempFile("eskimo_topology", ".sh");
+        File tempTopologyFile = createTempFile("eskimo_topology", ipAddress, ".sh");
         try {
             FileUtils.delete(tempTopologyFile);
         } catch (FileUtils.FileDeleteFailedException e) {
@@ -905,7 +915,7 @@ public class SystemService {
         try {
             ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfigNoLock();
 
-            File tempServicesSettingsFile = File.createTempFile("eskimo_services-config", ".json");
+            File tempServicesSettingsFile = createTempFile("eskimo_services-config", ipAddress, ".json");
             try {
                 FileUtils.delete(tempServicesSettingsFile);
             } catch (FileUtils.FileDeleteFailedException e) {
@@ -1059,7 +1069,7 @@ public class SystemService {
         }
 
         // 1.2 Create archive
-        File tmpArchiveFile = File.createTempFile(service, ".tgz");
+        File tmpArchiveFile = createTempFile(service, ipAddress, ".tgz");
         FileUtils.createTarFile(servicesSetupPath + "/" + service, "/tmp/" + tmpArchiveFile.getName());
         File archive = new File("/tmp/" +  tmpArchiveFile.getName());
         if (!archive.exists()) {
@@ -1137,6 +1147,10 @@ public class SystemService {
             logger.error (e, e);
             throw new SystemException(e);
         }
+    }
+
+    protected File createTempFile(String service, String ipAddress, String extension) throws IOException {
+        return File.createTempFile(service, extension);
     }
 
     private void exec(String ipAddress, StringBuilder sb, String[] setupScript) throws SSHCommandException {

@@ -36,13 +36,18 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.MemoryModel;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
+import com.sun.jna.Memory;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.junit.Before;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractSystemTest {
 
@@ -64,11 +69,18 @@ public abstract class AbstractSystemTest {
 
     protected NodeRangeResolver nodeRangeResolver = null;
 
+    protected ServicesInstallationSorter servicesInstallationSorter = null;
+
+    protected ServicesConfigService servicesConfigService = null;
+
+    protected MemoryComputer memoryComputer = null;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
     protected String systemStatusTest = null;
     protected String expectedPrevStatus = null;
+
 
     @Before
     public void setUp() throws Exception {
@@ -107,6 +119,7 @@ public abstract class AbstractSystemTest {
         });
 
         setupService = new SetupService();
+        servicesDefinition.setSetupService(setupService);
 
         systemService = createSystemService();
         systemService.setSetupService(setupService);
@@ -114,7 +127,7 @@ public abstract class AbstractSystemTest {
 
         systemService.setNodeRangeResolver(nodeRangeResolver);
 
-        systemService.setSshCommandService(new SSHCommandService() {
+        SSHCommandService sshCommandService = new SSHCommandService() {
             @Override
             public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
                 testSSHCommandScript.append(script + "\n");
@@ -129,7 +142,8 @@ public abstract class AbstractSystemTest {
             public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
                 // just do nothing
             }
-        });
+        };
+        systemService.setSshCommandService(sshCommandService);
 
         messagingService = new MessagingService();
         systemService.setMessagingService(messagingService);
@@ -144,6 +158,27 @@ public abstract class AbstractSystemTest {
         systemService.setSystemOperationService (systemOperationService);
 
         systemService.setServicesDefinition(servicesDefinition);
+
+        memoryComputer = new MemoryComputer() {
+            public MemoryModel buildMemoryModel(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws JSONException, SystemException {
+                return new MemoryModel(computeMemory(nodesConfig, deadIps));
+            }
+        };
+        memoryComputer.setServicesDefinition(servicesDefinition);
+        memoryComputer.setSshCommandService(sshCommandService);
+        systemService.setMemoryComputer(memoryComputer);
+
+        servicesInstallationSorter = new ServicesInstallationSorter ();
+        servicesInstallationSorter.setServicesDefinition(servicesDefinition);
+        systemService.setServicesInstallationSorter(servicesInstallationSorter);
+
+        servicesConfigService = new ServicesConfigService();
+        servicesConfigService.setNodeRangeResolver(nodeRangeResolver);
+        servicesConfigService.setSetupService(setupService);
+        servicesConfigService.setSystemService(systemService);
+        servicesConfigService.setServicesDefinition(servicesDefinition);
+
+        systemService.setServicesConfigService(servicesConfigService);
     }
 
     protected SystemService createSystemService() {

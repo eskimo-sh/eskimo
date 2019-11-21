@@ -1,0 +1,95 @@
+
+sudo bash -c "echo OK > /etc/eskimo_flag_mesos_installed"
+rm -Rf /tmp/elasticsearch
+rm -f /tmp/elasticsearch.tgz
+mv elasticsearch-{UUID}-192.168.10.13.tgz /tmp/elasticsearch.tgz
+tar xfz /tmp/elasticsearch.tgz --directory=/tmp/
+chmod 755 /tmp/elasticsearch/setup.sh
+rm -Rf /tmp/elasticsearch
+rm -f /tmp/elasticsearch.tgz
+mv elasticsearch-{UUID}-192.168.10.15.tgz /tmp/elasticsearch.tgz
+tar xfz /tmp/elasticsearch.tgz --directory=/tmp/
+chmod 755 /tmp/elasticsearch/setup.sh
+
+bash /tmp/elasticsearch/setup.sh 192.168.10.13 
+rm -Rf /tmp/elasticsearch
+rm -f /tmp/elasticsearch.tgz
+docker image rm eskimo:elasticsearch_template
+
+bash /tmp/elasticsearch/setup.sh 192.168.10.15 
+rm -Rf /tmp/elasticsearch
+rm -f /tmp/elasticsearch.tgz
+docker image rm eskimo:elasticsearch_template
+rm -Rf /tmp/mesos-master
+rm -f /tmp/mesos-master.tgz
+mv mesos-master-{UUID}-192.168.10.15.tgz /tmp/mesos-master.tgz
+tar xfz /tmp/mesos-master.tgz --directory=/tmp/
+chmod 755 /tmp/mesos-master/setup.sh
+
+bash /tmp/mesos-master/setup.sh 192.168.10.15 
+rm -Rf /tmp/mesos-master
+rm -f /tmp/mesos-master.tgz
+docker image rm eskimo:mesos-master_template
+rm -Rf /tmp/spark-history-server
+rm -f /tmp/spark-history-server.tgz
+mv spark-history-server-{UUID}-192.168.10.15.tgz /tmp/spark-history-server.tgz
+tar xfz /tmp/spark-history-server.tgz --directory=/tmp/
+chmod 755 /tmp/spark-history-server/setup.sh
+
+bash /tmp/spark-history-server/setup.sh 192.168.10.15 
+rm -Rf /tmp/spark-history-server
+rm -f /tmp/spark-history-server.tgz
+docker image rm eskimo:spark_template
+rm -Rf /tmp/mesos-agent
+rm -f /tmp/mesos-agent.tgz
+mv mesos-agent-{UUID}-192.168.10.13.tgz /tmp/mesos-agent.tgz
+tar xfz /tmp/mesos-agent.tgz --directory=/tmp/
+chmod 755 /tmp/mesos-agent/setup.sh
+bash /tmp/mesos-agent/setup.sh 192.168.10.13 
+rm -Rf /tmp/mesos-agent
+rm -f /tmp/mesos-agent.tgz
+rm -Rf /tmp/mesos-agent
+rm -f /tmp/mesos-agent.tgz
+mv mesos-agent-{UUID}-192.168.10.15.tgz /tmp/mesos-agent.tgz
+tar xfz /tmp/mesos-agent.tgz --directory=/tmp/
+chmod 755 /tmp/mesos-agent/setup.sh
+bash /tmp/mesos-agent/setup.sh 192.168.10.15 
+rm -Rf /tmp/mesos-agent
+rm -f /tmp/mesos-agent.tgz
+rm -Rf /tmp/spark-executor
+rm -f /tmp/spark-executor.tgz
+mv spark-executor-{UUID}-192.168.10.13.tgz /tmp/spark-executor.tgz
+tar xfz /tmp/spark-executor.tgz --directory=/tmp/
+chmod 755 /tmp/spark-executor/setup.sh
+
+bash /tmp/spark-executor/setup.sh 192.168.10.13 
+rm -Rf /tmp/spark-executor
+rm -f /tmp/spark-executor.tgz
+docker image rm eskimo:spark_template
+rm -Rf /tmp/spark-executor
+rm -f /tmp/spark-executor.tgz
+mv spark-executor-{UUID}-192.168.10.15.tgz /tmp/spark-executor.tgz
+tar xfz /tmp/spark-executor.tgz --directory=/tmp/
+chmod 755 /tmp/spark-executor/setup.sh
+
+bash /tmp/spark-executor/setup.sh 192.168.10.15 
+rm -Rf /tmp/spark-executor
+rm -f /tmp/spark-executor.tgz
+docker image rm eskimo:spark_template
+rm -Rf /tmp/zeppelin
+rm -f /tmp/zeppelin.tgz
+mv zeppelin-{UUID}-192.168.10.15.tgz /tmp/zeppelin.tgz
+tar xfz /tmp/zeppelin.tgz --directory=/tmp/
+chmod 755 /tmp/zeppelin/setup.sh
+
+bash /tmp/zeppelin/setup.sh 192.168.10.15 
+rm -Rf /tmp/zeppelin
+rm -f /tmp/zeppelin.tgz
+docker image rm eskimo:zeppelin_template
+sudo systemctl restart cerebro
+sudo systemctl restart kibana
+sudo systemctl restart logstash
+sudo systemctl restart logstash
+sudo systemctl restart flink-app-master
+sudo systemctl restart flink-worker
+sudo systemctl restart flink-worker

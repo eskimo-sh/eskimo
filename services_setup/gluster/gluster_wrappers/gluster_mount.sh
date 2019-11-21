@@ -216,12 +216,13 @@ fi
 
 
 # give it a little time to actually connect the transport
-sleep 2
+sleep 3
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
     echo " - Changing owner and rights of $MOUNT_POINT"
     chown -R $OWNER $MOUNT_POINT
-    chmod -R 777 $MOUNT_POINT
 fi
+
+chmod -R 777 $MOUNT_POINT
 
 rm /var/lib/gluster/volume_management_lock_$VOLUME
