@@ -704,7 +704,7 @@ eskimo.SystemStatus = function() {
                             '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '         " style="color: '+color+';">' +
                             '            <div class="status-service-icon">' +
-                            '                <img class="status-service-icon-image" src="' + eskimoMain.getServices().getServiceIcon(service) + '"/> ' +
+                            '                <img class="status-service-icon-image" src="' + eskimoMain.getServices().getServiceIconPath(service) + '"/> ' +
                             '            </div>' +
                             '            <div class="status-service-text">' +
                             '&nbsp;' + service +
