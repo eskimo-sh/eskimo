@@ -71,8 +71,8 @@ build_image zeppelin /tmp/zeppelin_build_log
 #docker exec -i zeppelin apt-get install -y scala >> /tmp/zeppelin_build_log 2>&1
 #fail_if_error $? "/tmp/zeppelin_build_log" -4
 
-echo " - Installing ZIP"
-docker exec -i zeppelin apt-get install -y zip >> /tmp/zeppelin_build_log 2>&1
+echo " - Installing a few utilities"
+docker exec -i zeppelin apt-get install -y zip netcat >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -11
 
 echo " - Installing python"

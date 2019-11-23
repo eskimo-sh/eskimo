@@ -1,0 +1,498 @@
+{
+  "paragraphs":[
+    {
+      "text":"%md\n\n## 1. First Streaming example : a simple word count on a file on the filesystem\n\nIn this simple example in scala, we'll use flink to get a DataStream on a file on the filesystem and compute a word count.\nThe different words and the number of their occurence are then printed on stdout.\n\n*Caution : stdout is relative to the flink worker process.*\nIn order to see the stdout, one needs to use the mesos console to find the task manager execution process on the mesos agent.\nThen one can use the mesos console to see the stdout file on that mesos-agent.\n\nThis program starts, reads the file, dumps the counts on stdout and stops (there is no need to stop it form Flink App Master)",
+      "user":"anonymous",
+      "dateUpdated":"2019-11-22T16:33:03+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h2>1. First Streaming example : a simple word count on a file on the filesystem</h2>\n<p>In this simple example in scala, we&rsquo;ll use flink to get a DataStream on a file on the filesystem and compute a word count.<br />\nThe different words and the number of their occurence are then printed on stdout.</p>\n<p><em>Caution : stdout is relative to the flink worker process.</em><br />\nIn order to see the stdout, one needs to use the mesos console to find the task manager execution process on the mesos agent.<br />\nThen one can use the mesos console to see the stdout file on that mesos-agent.</p>\n<p>This program starts, reads the file, dumps the counts on stdout and stops (there is no need to stop it form Flink App Master)</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574438061438_1476363734",
+      "id":"paragraph_1574438061438_1476363734",
+      "dateCreated":"2019-11-22T15:54:21+0000",
+      "dateStarted":"2019-11-22T16:33:03+0000",
+      "dateFinished":"2019-11-22T16:33:03+0000",
+      "status":"FINISHED",
+      "focus":true,
+      "$$hashKey":"object:2582"
+    },
+    {
+      "text":"%flink\n\nimport org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;\nimport org.apache.flink.api.java.utils.ParameterTool\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.api.scala.DataStreamUtils\nimport scala.collection.JavaConverters.asScalaIteratorConverter\n\nsenv.setParallelism(1);\n\n// get input data\nval text = senv.readTextFile(\"/etc/profile\")\n\n//val counts: DataStream[(String, Int)] = text\nval counts: DataStream[(String, Int)] = text\n    .flatMap(_.toLowerCase.split(\"\\\\W+\"))\n    .filter(_.nonEmpty)\n    .map((_, 1))\n    .keyBy(0) // group by the tuple field \"0\" and sum up tuple field \"1\"\n    .sum(1)\n\n// CAUTION : look at your mesos-slave task-manager console stdout to find this output !\ncounts.print()\n\n// execute program\nsenv.execute(\"Streaming WordCount\")\n\nSystem.out.println (\"Look at stdout on the mesos-agent task manager process to see the output\")",
+      "user":"anonymous",
+      "config":{
+        "tableHide":true,
+        "editorSetting":{
+          "language":"scala",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/scala",
+        "fontSize":9,
+        "editorHide":false,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction\nimport org.apache.flink.api.java.utils.ParameterTool\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.api.scala.DataStreamUtils\nimport scala.collection.JavaConverters.asScalaIteratorConverter\n\u001b[1m\u001b[34mtext\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.streaming.api.scala.DataStream[String]\u001b[0m = org.apache.flink.streaming.api.scala.DataStream@2423fdeb\n\u001b[1m\u001b[34mcounts\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.streaming.api.scala.DataStream[(String, Int)]\u001b[0m = org.apache.flink.streaming.api.scala.DataStream@3d4f36ad\n\u001b[1m\u001b[34mres12\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.streaming.api.datastream.DataStreamSink[(String, Int)]\u001b[0m = org.apache.flink.streaming.api.datastream.DataStreamSink@6620f5ad\n\u001b[1m\u001b[34mres14\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.api.common.JobExecutionResult\u001b[0m = org.apache.flink.api.common.JobExecutionResult@6dffe871\nLook at the stdount on the mesos-agent task manager process to see the output\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574438249993_-368265077",
+      "id":"paragraph_1574438249993_-368265077",
+      "dateCreated":"2019-11-22T17:07:21+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:2583",
+      "runtimeInfos":{
+
+      }
+    },
+    {
+      "text":"%md \n\n## 2. Second streaming example : reading a stream from a socket\n\nIn this simple example, we’ll use flink to read a DataStream from a socket and compute a word count from this stream.\nIt is very similar to the example abobe except that we'll make it a little more elaborated by typing the Stream data with a custom class.\nThe word count will be dumped on stdout just as above. (Caution : stdout is relative to the flink worker process, use mesos console to show stdout of mesos-agent task manager process)\n\n**The next paragraph** starts a netcat that servces on the configured process and sends the passed string.\n**The paragraph after** starts the flink program which will be running forever and reading on the server socket created by netcat.\n\n**IMPORtANT NOTES:**\n\n- **One needs to use flink app master to kill the foreever running flink streaming process**\n- **One needs to replace _192.168.10.15_ by the external IP address of the host or docker container**",
+      "user":"anonymous",
+      "dateUpdated":"2019-11-22T16:59:21+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h2>2. Second streaming example : reading a stream from a socket</h2>\n<p>In this simple example, we’ll use flink to read a DataStream from a socket and compute a word count from this stream.<br />\nIt is very similar to the example abobe except that we&rsquo;ll make it a little more elaborated by typing the Stream data with a custom class.<br />\nThe word count will be dumped on stdout just as above. (Caution : stdout is relative to the flink worker process, use mesos console to show stdout of mesos-agent task manager process)</p>\n<p><strong>The next paragraph</strong> starts a netcat that servces on the configured process and sends the passed string.<br />\n<strong>The paragraph after</strong> starts the flink program which will be running forever and reading on the server socket created by netcat.</p>\n<p><strong>IMPORtANT NOTES:</strong></p>\n<ul>\n<li><strong>One needs to use flink app master to kill the foreever running flink streaming process</strong></li>\n<li><strong>One needs to replace <em>192.168.10.15</em> by the external IP address of the host or docker container</strong></li>\n</ul>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574438280346_-2132319253",
+      "id":"paragraph_1574438280346_-2132319253",
+      "dateCreated":"2019-11-22T15:58:00+0000",
+      "dateStarted":"2019-11-22T16:59:21+0000",
+      "dateFinished":"2019-11-22T16:59:21+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:2584"
+    },
+    {
+      "text":"%sh\nrm /tmp/output\n\necho \"Testing just a few words to see what we get. Adding one sentence to get a few more words\" > /tmp/output\n\n# use killall netcat in another sh paragraph if you need to kill this\ncat /tmp/output | netcat -s 192.168.10.15 -l -p 19876 ",
+      "user":"anonymous",
+      "config":{
+        "tableHide":true,
+        "editorSetting":{
+          "language":"sh",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/sh",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"INCOMPLETE",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"Paragraph received a SIGTERM\nExitValue: 143"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574440108016_12953121",
+      "id":"paragraph_1574440108016_12953121",
+      "dateCreated":"2019-11-22T17:06:46+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:2585",
+      "runtimeInfos":{
+
+      }
+    },
+    {
+      "text":"%flink\n\nimport org.apache.flink.streaming.api.windowing.time.Time;\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.api.windowing.windows.Window\nimport org.apache.flink.streaming.api.windowing.windows.TimeWindow\nimport org.apache.flink.util.Collector\n\n\n/** Data type for words with count */\nclass WordWithCount2(var word: String, var count: Long) extends Comparable[WordWithCount2] {\n    def compareTo(other: WordWithCount2) = word compareTo other.word\n}\n\n\nsenv.setParallelism(1);\n\n//SocketWindowWordCount.main(Array())\n\n// the host and the port to connect to\nvar hostname: String = \"192.168.10.15\"\nvar port: Int = 19876\n\n// get input data by connecting to the socket\nval text: DataStream[String] = senv.socketTextStream(hostname, port, '\\n')\n\n// parse the data, group it, window it, and aggregate the counts\nval windowCounts: DataStream[WordWithCount2] = text\n      .flatMap { w => w.split(\"\\\\s\") }\n      .map { w => new WordWithCount2(w, 1) }\n      .keyBy(w => w.word)\n      .timeWindow(Time.seconds(5))\n      .apply {\n            (\n                key: String,\n                window: TimeWindow,\n                allWordWithCount: Iterable[WordWithCount2],\n                out: Collector[WordWithCount2]\n            ) => {\n                var sum: Long = 0\n                for (wwc <- allWordWithCount) {\n                    sum += wwc.count;\n                }\n                out.collect (new WordWithCount2(key, sum))\n            }\n       }\n\n// print the results with a single thread, rather than in parallel\nwindowCounts.print()\n\nsenv.execute(\"Socket Window WordCount\")",
+      "user":"anonymous",
+      "dateUpdated":"2019-11-22T16:53:43+0000",
+      "config":{
+        "editorSetting":{
+          "language":"scala",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/scala",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true,
+        "tableHide":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"ERROR",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"import org.apache.flink.streaming.api.windowing.time.Time\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.api.windowing.windows.Window\nimport org.apache.flink.streaming.api.windowing.windows.TimeWindow\nimport org.apache.flink.util.Collector\ndefined class WordWithCount2\n\u001b[1m\u001b[34mhostname\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m = 192.168.10.15\n\u001b[1m\u001b[34mport\u001b[0m: \u001b[1m\u001b[32mInt\u001b[0m = 19876\n\u001b[1m\u001b[34mtext\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.streaming.api.scala.DataStream[String]\u001b[0m = org.apache.flink.streaming.api.scala.DataStream@550971bd\n\u001b[1m\u001b[34mwindowCounts\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.streaming.api.scala.DataStream[WordWithCount2]\u001b[0m = org.apache.flink.streaming.api.scala.DataStream@5bfbf78\n\u001b[1m\u001b[34mres78\u001b[0m: \u001b[1m\u001b[32morg.apache.flink.streaming.api.datastream.DataStreamSink[WordWithCount2]\u001b[0m = org.apache.flink.streaming.api.datastream.DataStreamSink@f535d04\norg.apache.flink.client.program.ProgramInvocationException: Job failed. (JobID: 734055584dc0e96ccbe62ec0a126a181)\n  at org.apache.flink.client.program.rest.RestClusterClient.submitJob(RestClusterClient.java:262)\n  at org.apache.flink.client.program.ClusterClient.run(ClusterClient.java:338)\n  at org.apache.flink.streaming.api.environment.RemoteStreamEnvironment.executeRemotely(RemoteStreamEnvironment.java:284)\n  at org.apache.flink.streaming.api.environment.RemoteStreamEnvironment.executeRemotely(RemoteStreamEnvironment.java:322)\n  at org.apache.flink.api.java.ScalaShellRemoteStreamEnvironment.executeRemotely(ScalaShellRemoteStreamEnvironment.java:94)\n  at org.apache.flink.streaming.api.environment.RemoteStreamEnvironment.execute(RemoteStreamEnvironment.java:307)\n  at org.apache.flink.streaming.api.environment.StreamExecutionEnvironment.execute(StreamExecutionEnvironment.java:1507)\n  at org.apache.flink.streaming.api.scala.StreamExecutionEnvironment.execute(StreamExecutionEnvironment.scala:654)\n  ... 64 elided\nCaused by: org.apache.flink.runtime.client.JobCancellationException: Job was cancelled.\n  at org.apache.flink.runtime.jobmaster.JobResult.toJobExecutionResult(JobResult.java:148)\n  at org.apache.flink.client.program.rest.RestClusterClient.submitJob(RestClusterClient.java:259)\n  ... 71 more\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574439353003_390362073",
+      "id":"paragraph_1574439353003_390362073",
+      "dateCreated":"2019-11-22T16:15:53+0000",
+      "dateStarted":"2019-11-22T16:51:48+0000",
+      "dateFinished":"2019-11-22T16:53:30+0000",
+      "status":"ERROR",
+      "$$hashKey":"object:2586"
+    },
+    {
+      "text":"%sh\n\n# Stop the netcat program from first paragraph\nkillall netcat\n\n# Notes :\n# - the flink streaming process needs to be stopped from Flink App Master\n# - the netcat program from first paragraph can be tested with netcat 192.168.10.15 19876",
+      "user":"anonymous",
+      "dateUpdated":"2019-11-22T16:54:57+0000",
+      "config":{
+        "editorSetting":{
+          "language":"sh",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/sh",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574440172704_-1385401400",
+      "id":"paragraph_1574440172704_-1385401400",
+      "dateCreated":"2019-11-22T16:29:32+0000",
+      "dateStarted":"2019-11-22T16:51:34+0000",
+      "dateFinished":"2019-11-22T16:51:34+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:2587"
+    },
+    {
+      "text":"%sh\n\nnetcat 192.168.10.15 19876\n",
+      "user":"anonymous",
+      "config":{
+        "tableHide":true,
+        "editorSetting":{
+          "language":"sh",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/sh",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"Testing just a few words to see what we get. Adding one sentence to get a few more words\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574440444877_-763678973",
+      "id":"paragraph_1574440444877_-763678973",
+      "dateCreated":"2019-11-22T17:06:56+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:2588",
+      "runtimeInfos":{
+
+      }
+    },
+    {
+      "text":"%md\n\n## 3. Third Streaming Example : a complete application simulating Stock Quotes Processing\n\nThis third example is a rather complete application where we're going to use Flink Streaming ro process Stock Quotes and compute statistics.\n\nThis program first defined a custom SourceFunction class that generates random stock quotes periodically.\nThe program then registers a processing logic on this feed of stock quotes to compute the average quote for each stock per period of 5 seconds.\n\n**IMPORtANT NOTES:**\n\n- **One needs to use flink app master to kill the foreever running flink streaming process**\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-11-22T16:59:30+0000",
+      "config":{
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "results":{
+
+        },
+        "enabled":true,
+        "editorHide":true,
+        "tableHide":false,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h2>3. Third Streaming Example : a complete application simulating Stock Quotes Processing</h2>\n<p>This third example is a rather complete application where we&rsquo;re going to use Flink Streaming ro process Stock Quotes and compute statistics.</p>\n<p>This program first defined a custom SourceFunction class that generates random stock quotes periodically.<br />\nThe program then registers a processing logic on this feed of stock quotes to compute the average quote for each stock per period of 5 seconds.</p>\n<p><strong>IMPORtANT NOTES:</strong></p>\n<ul>\n<li><strong>One needs to use flink app master to kill the foreever running flink streaming process</strong></li>\n</ul>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574441148828_-630387092",
+      "id":"paragraph_1574441148828_-630387092",
+      "dateCreated":"2019-11-22T16:45:48+0000",
+      "dateStarted":"2019-11-22T16:59:30+0000",
+      "dateFinished":"2019-11-22T16:59:30+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:2589"
+    },
+    {
+      "text":"%flink\n\nimport scala.util.Random\n\nimport org.apache.flink.streaming.api.scala._\n\nimport org.apache.flink.api.common.typeinfo.TypeInformation\nimport org.apache.flink.streaming.api.functions.source.SourceFunction\nimport org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext\n\nimport org.apache.flink.streaming.api.windowing.windows.Window\nimport org.apache.flink.streaming.api.windowing.windows.TimeWindow\nimport org.apache.flink.streaming.api.windowing.time.Time;\n\nimport org.apache.flink.streaming.api.functions.sink.SocketClientSink\nimport org.apache.flink.streaming.util.serialization.{SimpleStringSchema, SerializationSchema}\nimport org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows\n\nimport org.apache.flink.streaming.api.TimeCharacteristic\n\nimport org.apache.flink.util.Collector\n\nimport java.beans.Transient\nimport java.util.concurrent.TimeUnit\nimport java.util.concurrent.TimeUnit._\n\n\ncase class StockPrice(symbol: String, price: Double, eventTime: Long) extends Serializable\n\nclass StockSourceFunction(symbol: String, basePrice: Double, sigma: Int) extends SourceFunction[StockPrice]() with Serializable{\n    var price = basePrice\n    @Transient lazy val rand = new Random()\n\n    var isRunning:Boolean = true\n\n    override def run(ctx: SourceContext[StockPrice]) = {\n        while (isRunning) {\n            val rnd = Random.nextGaussian\n\n            price = if(price + rnd * sigma < 0)\n                price + rnd * sigma * -1 // Make it positive as we don't want any negative prices :-)\n            else\n                price + rnd * sigma\n\n            Thread.sleep(Random.nextInt(200))\n\n            val stock = StockPrice(symbol, price, System.currentTimeMillis)\n\n            ctx.collect(stock)\n        }\n    }\n\n    override def cancel(): Unit = isRunning = false\n}\n\nclass StockDemo extends Serializable {\n\n    val zeppelin = \"zeppelin\"\n    val NEWLINE = 0x0A.toByte\n    val TAB = 0x09.toByte\n\n    val symbols = List(\"SPX\", \"FTSE\", \"DJI\", \"DJT\", \"BUX\", \"DAX\", \"GOOG\", \"AAPL\", \"FB\")\n\n    def sumTuple(x: (Double, Int), y: (Double, Int)): (Double, Int) = (x._1 + y._1, x._2 + y._2)\n\n    implicit val typeInfoStockPrice = TypeInformation.of(classOf[StockPrice])\n    implicit val typeInfoString = TypeInformation.of(classOf[String])\n\n    @Transient lazy val stockStream = senv.addSource(new StockSourceFunction(\"SPX\", 20, 10)).union(\n        senv.addSource(new StockSourceFunction(\"FTSE\", 50, 20)),\n        senv.addSource(new StockSourceFunction(\"GOOG\", 100, 30)),\n        senv.addSource(new StockSourceFunction(\"FB\", 42, 22)),\n        senv.addSource(new StockSourceFunction(\"AAPL\", 140, 40))\n    ).assignAscendingTimestamps( _.eventTime )\n\n    @Transient lazy val schema: SerializationSchema[StockPrice] = new SerializationSchema[StockPrice]() {\n        override def serialize(sp: StockPrice): Array[Byte] = {\n            val tempString = sp.symbol + \"\\t\" + sp.eventTime.toString + \"\\t\" + sp.price.toString + \"\\n\"\n            tempString.getBytes()\n        }\n    }\n\n    def main(args: Array[String]) {\n\n        senv.setParallelism(1);\n\n        senv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);\n\n        // Let0s compute the average of the stock prices per period of 5 seconds\n        stockStream\n            .keyBy(_.symbol)\n            .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)))\n            .apply {\n                (\n                    key: String,\n                    window: TimeWindow,\n                    stockPrices: Iterable[StockPrice],\n                    out: Collector[StockPrice]\n                ) => {\n                    val (total, count) = stockPrices.map(sp => (sp.price, 1)).reduceLeft(sumTuple)\n                    out.collect( StockPrice(key, total / count.toDouble, window.getEnd ) )\n                }\n               }\n            .print()\n\n        // -- alternatively, instead of .print() above, one could use :\n        //    .writeToSocket(zeppelin, 4444, schema)\n        // -- in which case you might want to run the following code in another paragraph:\n        //    in order to get the result back to zeppelin\n        /*\n            %sh\n            rm /tmp/output\n            echo -e 'Symbol\\tRecieved\\tValue\\n' > /tmp/output\n            netcat -l -p 4444 >> /tmp/output\n        */\n\n        senv.execute(\"SimpleStockStreamer\")\n\n    }\n\n}\n\nnew StockDemo().main(Array())\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-11-22T17:01:31+0000",
+      "config":{
+        "editorSetting":{
+          "language":"scala",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/scala",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true,
+        "tableHide":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"ERROR",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"import scala.util.Random\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.api.common.typeinfo.TypeInformation\nimport org.apache.flink.streaming.api.functions.source.SourceFunction\nimport org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext\nimport org.apache.flink.streaming.api.windowing.windows.Window\nimport org.apache.flink.streaming.api.windowing.windows.TimeWindow\nimport org.apache.flink.streaming.api.windowing.time.Time\nimport org.apache.flink.streaming.api.functions.sink.SocketClientSink\nimport org.apache.flink.streaming.util.serialization.{SimpleStringSchema, SerializationSchema}\nimport org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows\nimport org.apache.flink.streaming.api.TimeCharacteristic\nimport org.apache.flink.util.Collector\nimport java.beans.Transient\nimport java.util.concurrent.TimeUnit\nimport java.util.concurrent.TimeUnit._\ndefined class StockPrice\ndefined class StockSourceFunction\n\u001b[33mwarning: \u001b[0mthere were two deprecation warnings; re-run with -deprecation for details\ndefined class StockDemo\norg.apache.flink.client.program.ProgramInvocationException: Job failed. (JobID: b7adaad02963cc2c44f2ee60fcfd7d1f)\n  at org.apache.flink.client.program.rest.RestClusterClient.submitJob(RestClusterClient.java:262)\n  at org.apache.flink.client.program.ClusterClient.run(ClusterClient.java:338)\n  at org.apache.flink.streaming.api.environment.RemoteStreamEnvironment.executeRemotely(RemoteStreamEnvironment.java:284)\n  at org.apache.flink.streaming.api.environment.RemoteStreamEnvironment.executeRemotely(RemoteStreamEnvironment.java:322)\n  at org.apache.flink.api.java.ScalaShellRemoteStreamEnvironment.executeRemotely(ScalaShellRemoteStreamEnvironment.java:94)\n  at org.apache.flink.streaming.api.environment.RemoteStreamEnvironment.execute(RemoteStreamEnvironment.java:307)\n  at org.apache.flink.streaming.api.environment.StreamExecutionEnvironment.execute(StreamExecutionEnvironment.java:1507)\n  at org.apache.flink.streaming.api.scala.StreamExecutionEnvironment.execute(StreamExecutionEnvironment.scala:654)\n  at StockDemo.main(<console>:77)\n  ... 68 elided\nCaused by: org.apache.flink.runtime.client.JobCancellationException: Job was cancelled.\n  at org.apache.flink.runtime.jobmaster.JobResult.toJobExecutionResult(JobResult.java:148)\n  at org.apache.flink.client.program.rest.RestClusterClient.submitJob(RestClusterClient.java:259)\n  ... 76 more\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1574441970213_-314054068",
+      "id":"paragraph_1574441970213_-314054068",
+      "dateCreated":"2019-11-22T16:59:30+0000",
+      "dateStarted":"2019-11-22T16:59:54+0000",
+      "dateFinished":"2019-11-22T17:00:20+0000",
+      "status":"ERROR",
+      "$$hashKey":"object:2590"
+    }
+  ],
+  "name":"Flink Streaming Demo",
+  "id":"2EWADUKS5",
+  "defaultInterpreterGroup":"spark",
+  "version":"0.9.0-SNAPSHOT",
+  "permissions":{
+
+  },
+  "noteParams":{
+
+  },
+  "noteForms":{
+
+  },
+  "angularObjects":{
+
+  },
+  "config":{
+    "isZeppelinNotebookCronEnable":false,
+    "looknfeel":"default",
+    "personalizedMode":"false"
+  },
+  "info":{
+
+  },
+  "path":"/Flink Streaming Demo"
+}
