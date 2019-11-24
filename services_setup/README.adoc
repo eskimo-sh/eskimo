@@ -210,6 +210,14 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## (static_images is configurable in eskimo.properties with property
     ##    eskimo.externalLogoAndIconFolder)
     "logo" : "[images|static_images]/{logo_file_name}"
+
+    ## [mandatory] The icon to use ine the menu for the service
+    ## Use "images/{icon_file_name}" for resources packaged within eskimo web app
+    ## Use "static_images/{icon_file_name}" for resources put in the eskimo
+    ##    distribution folder "static_images"
+    ## (static_images is configurable in eskimo.properties with property
+    ##    eskimo.externalLogoAndIconFolder)
+    "icon" : "[images|static_images]/{icon_file_name}"
   },
 
   ## [optional] configuration of the serice web console (if anym)
@@ -229,15 +237,8 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [mandatory] the name of the menu entry
     "title" : "{menu name}",
 
-    ## [mandatory] The icon to use ine the menu for the service
-    ## Use "images/{icon_file_name}" for resources packaged within eskimo web app
-    ## Use "static_images/{icon_file_name}" for resources put in the eskimo
-    ##    distribution folder "static_images"
-    ## (static_images is configurable in eskimo.properties with property
-    ##    eskimo.externalLogoAndIconFolder)
-    "icon" : "[images|static_images]/{icon_file_name}"
-
     ## [optional] Whether standard rewrite rules need to be applied to this service
+    ## (Standard rewrite rules are documented hereunder)
     ## (default is true)
     "applyStandardProxyReplacements": [true|false],
 

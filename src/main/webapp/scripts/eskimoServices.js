@@ -116,7 +116,9 @@ eskimo.Services = function () {
         if (!eskimoMain.isSetupDone()) {
 
             eskimoMain.showSetupNotDone("Service " + service + " is not available at this stage.");
+        } else  if (eskimoMain.getSystemStatus().isDisconnected()) {
 
+            eskimoMain.showStatus();
         } else {
 
             if (serviceInitialized[service]) {

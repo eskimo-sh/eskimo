@@ -48,6 +48,8 @@ eskimo.SystemStatus = function() {
 
     var renderInTable = true;
 
+    var disconnectedFlag = true;
+
     var statusUpdateTimeoutHandler = null;
 
     var prevHidingMessageTimeout = null;
@@ -126,6 +128,10 @@ eskimo.SystemStatus = function() {
             });
         };
 
+    };
+
+    this.isDisconnected = function() {
+        return disconnectedFlag;
     };
 
     function getMenuPosition(settings, mouse, direction, scrollDir) {
@@ -233,7 +239,7 @@ eskimo.SystemStatus = function() {
     }
     this.showStatus = showStatus;
 
-    function showMessage (message) {
+    function showStatusMessage (message, error) {
 
         if (prevHidingMessageTimeout != null) {
             clearTimeout(prevHidingMessageTimeout);
@@ -245,16 +251,22 @@ eskimo.SystemStatus = function() {
 
         $("#service-status-warning-message").html(message);
 
+        if (error) {
+            $("#service-status-warning-message").attr('class', "alert alert-danger");
+        } else {
+            $("#service-status-warning-message").attr('class', "alert alert-warning");
+        }
+
         prevHidingMessageTimeout = setTimeout(function () {
             serviceStatusWarning.css("display", "none");
             serviceStatusWarning.css("visibility", "hidden");
         }, 5000);
 
     }
-    this.showMessage = showMessage;
+    this.showStatusMessage = showStatusMessage;
 
     function showStatusWhenServiceUnavailable (service) {
-        showMessage (service + " is not up and running");
+        showStatusMessage (service + " is not up and running");
     }
     this.showStatusWhenServiceUnavailable = showStatusWhenServiceUnavailable;
 
@@ -284,7 +296,7 @@ eskimo.SystemStatus = function() {
                     eskimoMain.scheduleStopOperationInProgress (true);
 
                     if (data.message != null) {
-                        showMessage (data.message);
+                        showStatusMessage (data.message);
                     }
                 }
             },
@@ -958,6 +970,8 @@ eskimo.SystemStatus = function() {
             url: "get-status",
             success: function (data, status, jqXHR) {
 
+                disconnectedFlag = false;
+
                 eskimoMain.serviceMenuClear(data.nodeServicesStatus);
 
                 //console.log (data);
@@ -1014,7 +1028,13 @@ eskimo.SystemStatus = function() {
                     alert('fail : ' + status);
 
                     eskimoMain.hideProgressbar();
+
+                } else {
+
+                    showStatusMessage("Couldn't fetch latest status from Eskimo Backend. Shown status is the latest known status. ", true)
                 }
+
+                disconnectedFlag = true;
 
                 // reschedule updateStatus
                 statusUpdateTimeoutHandler = setTimeout(updateStatus, STATUS_UPDATE_INTERVAL);
@@ -1027,7 +1047,7 @@ eskimo.SystemStatus = function() {
 
         // show a message on status page if there is some operations in progress pending
         if (eskimoMain.isOperationInProgress()) {
-            showMessage("Pending operations in progress on backend. See 'Backend Messages' for more information.");
+            showStatusMessage("Pending operations in progress on backend. See 'Backend Messages' for more information.");
         }
     }
     this.updateStatus = updateStatus;

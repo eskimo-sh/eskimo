@@ -62,6 +62,7 @@ eskimo.Main = function() {
     var eskimoFileManagers = null;
     var eskimoOperationsCommand = null;
     var eskimoSetupCommand = null;
+    var eskimoAbout = null;
 
     var operationInProgress = false;
     var operationInProgressOwner = false;
@@ -301,6 +302,9 @@ eskimo.Main = function() {
     this.getSetupCommand = function() {
         return eskimoSetupCommand;
     };
+    this.getAbout = function() {
+        return eskimoAbout;
+    };
 
     this.initialize = function() {
 
@@ -358,6 +362,8 @@ eskimo.Main = function() {
         //       - if initializationTime
         //         + eskimoMain.getSystemStatus().showStatus(true);
         //     + PROCESSING PENDING DETECTION LOGIC
+
+        eskimoAbout = new eskimo.About();
 
         isMenuMinimized = $('#hoeapp-container').hasClass("hoe-minimized-lpanel");
 
