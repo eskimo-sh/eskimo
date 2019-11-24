@@ -148,6 +148,7 @@ public class ServicesDefinition implements InitializingBean {
                     MemoryConsumptionSize.valueOf(memoryConsumptionString.toUpperCase()));
 
             service.setLogo((String) servicesConfig.getValueForPath(serviceString+".config.logo"));
+            service.setIcon((String) servicesConfig.getValueForPath(serviceString+".config.icon"));
 
             if (servicesConfig.hasPath(serviceString+".config.memoryAdditional")) {
                 JSONArray memAdditionalArray = servicesConfig.getSubJSONObject(serviceString).getJSONObject("config").getJSONArray("memoryAdditional");
@@ -168,7 +169,6 @@ public class ServicesDefinition implements InitializingBean {
                 }
                 uiConfig.setProxyTargetPort((Integer) servicesConfig.getValueForPath(serviceString+".ui.proxyTargetPort"));
                 uiConfig.setTitle((String) servicesConfig.getValueForPath(serviceString+".ui.title"));
-                uiConfig.setIcon((String) servicesConfig.getValueForPath(serviceString+".ui.icon"));
 
                 if (servicesConfig.hasPath(serviceString+".ui.applyStandardProxyReplacements")) {
                     uiConfig.setApplyStandardProxyReplacements((Boolean)servicesConfig.getValueForPath(serviceString+".ui.applyStandardProxyReplacements"));

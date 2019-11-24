@@ -130,6 +130,8 @@ eskimo.NodesConfig = function() {
 
                     SERVICES_CONFIGURATION = data.servicesConfigurations;
 
+                    eskimoMain.getServices().initialize();
+
                 } else {
                     alert(data.error);
                 }
@@ -145,6 +147,15 @@ eskimo.NodesConfig = function() {
             return "undefined";
         }
         return serviceConfig.logo;
+    };
+
+    this.getServiceIconPath = function (service) {
+        var serviceConfig = SERVICES_CONFIGURATION[service];
+        if (serviceConfig == null) {
+            console.error ("Could not find icon for service " + service);
+            return "undefined";
+        }
+        return serviceConfig.icon;
     };
 
 

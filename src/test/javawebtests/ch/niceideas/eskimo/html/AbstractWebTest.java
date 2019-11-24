@@ -73,6 +73,7 @@ public abstract class AbstractWebTest {
 
         page.executeJavaScript("var nodesConfig = {};");
         page.executeJavaScript("nodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
+        page.executeJavaScript("nodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
 
 
         page.executeJavaScript("var eskimoMain = {};");

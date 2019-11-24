@@ -75,6 +75,16 @@ public class Service {
 
     private String logo;
 
+    private String icon;
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
     public String getLogo() {
         return logo;
     }
@@ -236,6 +246,7 @@ public class Service {
             put("row", getSelectionLayoutRow());
             put("col", getSelectionLayoutCol());
             put("logo", getLogo());
+            put("icon", getIcon());
         }});
     }
 

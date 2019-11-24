@@ -40,15 +40,23 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class MessagingService extends AbstractInformationService<String, String> {
 
+    private static final int MAX_HISTORY_SIZE = 10000;
+
     @Override
-    protected String buildFetchedData(Integer lastLine) {
+    protected int getMaxHistorySize() {
+        return MAX_HISTORY_SIZE;
+    }
+
+    @Override
+    protected String buildFetchedData(int lastLine) {
         StringBuilder ret = new StringBuilder();
-        for (String line : elements.subList(lastLine, elements.size())) {
+        for (String line : getSubList(lastLine)) {
             ret.append (line);
             ret.append ("\n");
         }

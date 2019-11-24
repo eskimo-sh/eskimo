@@ -48,11 +48,18 @@ import java.util.List;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class NotificationService extends AbstractInformationService<JSONObject, List<JSONObject>> {
 
+    private static final int MAX_HISTORY_SIZE = 100;
+
+    @Override
+    protected int getMaxHistorySize() {
+        return MAX_HISTORY_SIZE;
+    }
+
     private static final Logger logger = Logger.getLogger(NotificationService.class);
 
     @Override
-    protected List<JSONObject> buildFetchedData(Integer lastLine) {
-        return elements.subList(lastLine, elements.size());
+    protected List<JSONObject> buildFetchedData(int lastLine) {
+        return getSubList(lastLine);
     }
 
     @Transactional

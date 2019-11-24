@@ -85,7 +85,6 @@ public abstract class AbstractSystemTest {
     @Before
     public void setUp() throws Exception {
 
-
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), "UTF-8");
         expectedPrevStatus  = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatus.json"), "UTF-8");
 

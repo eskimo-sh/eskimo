@@ -74,7 +74,8 @@ public class NotificationServiceTest extends TestCase {
         Pair<Integer, List<JSONObject>> result = ns.fetchElements(20);
 
         assertEquals(2, (int) result.getKey());
-        assertEquals(0, result.getValue().size());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Test\"}", result.getValue().get(0).toString());
+        assertEquals("{\"type\":\"Info\",\"message\":\"Test2\"}", result.getValue().get(1).toString());
     }
 
     @Test

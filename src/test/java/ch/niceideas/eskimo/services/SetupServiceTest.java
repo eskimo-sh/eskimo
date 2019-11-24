@@ -77,7 +77,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         tempConfigStoragePath = File.createTempFile("test_setup_service", "folder");
         tempConfigStoragePath.delete();
 
-        tempPackagesDistribPath = File.createTempFile("test_setup_service", "folder");
+        tempPackagesDistribPath = File.createTempFile("test_setup_service_distrib", "folder");
         tempPackagesDistribPath.delete();
     }
 
@@ -107,11 +107,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         SetupService setupService = createSetupService(new SetupService());
 
-        File storagePathConfDir = File.createTempFile("eskimo_storage", "");
-        storagePathConfDir.delete();
-
         SetupCommand command = setupService.saveAndPrepareSetup(setupConfig);
-        setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
 
         JsonWrapper setupConfigWrapper = new JsonWrapper(setupService.loadSetupConfig());
 
@@ -132,6 +128,11 @@ public class SetupServiceTest extends AbstractSystemTest {
     }
 
     SetupService createSetupService(SetupService setupService) throws IOException {
+
+        File storagePathConfDir = File.createTempFile("eskimo_storage", "");
+        storagePathConfDir.delete();
+        storagePathConfDir.mkdirs();
+        setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
 
         setupService.setConfigStoragePathInternal(tempConfigStoragePath.getCanonicalPath());
         setupService.setPackageDistributionPath(tempPackagesDistribPath.getCanonicalPath());

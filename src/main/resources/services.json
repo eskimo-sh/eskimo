@@ -8,7 +8,8 @@
       "name" : "NTP",
       "selectionLayout" : { "row" : 1, "col" : 2},
       "memory": "neglectable",
-      "logo" : "images/ntp-logo.png"
+      "logo" : "images/ntp-logo.png",
+      "icon" : "images/ntp-icon.png"
     },
     "dependencies": [
       {
@@ -30,7 +31,8 @@
       "name" : "Zookeeper",
       "selectionLayout" : { "row" : 2, "col" : 2},
       "memory": "neglectable",
-      "logo" : "images/zookeeper-logo.png"
+      "logo" : "images/zookeeper-logo.png",
+      "icon" : "images/zookeeper-icon.png"
     },
     "dependencies": [
       {
@@ -54,7 +56,8 @@
       "name" : "Prometheus",
       "selectionLayout" : { "row" : 7, "col" : 3},
       "memory": "neglectable",
-      "logo" : "images/prometheus-logo.png"
+      "logo" : "images/prometheus-logo.png",
+      "icon" : "images/prometheus-icon.png"
     },
     "dependencies": [
       {
@@ -78,13 +81,13 @@
       "name" : "Grafana",
       "selectionLayout" : { "row" : 6, "col" : 1},
       "memory": "small",
-      "logo" : "images/grafana-logo.png"
+      "logo" : "images/grafana-logo.png",
+      "icon" : "images/grafana-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 3000,
       "waitTime": 8000,
       "title" : "Grafana Monitoring",
-      "icon" : "images/grafana-icon.png",
       "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
       "proxyReplacements" : [
         {
@@ -121,7 +124,8 @@
       "name" : "FS",
       "selectionLayout" : { "row" : 1, "col" : 3},
       "memory": "neglectable",
-      "logo" : "images/gluster-logo.png"
+      "logo" : "images/gluster-logo.png",
+      "icon" : "images/gluster-icon.png"
     },
     "dependencies": [
       {
@@ -144,13 +148,14 @@
       "name" : "Dashboard",
       "selectionLayout" : { "row" : 4, "col" : 2},
       "memory": "neglectable",
-      "logo" : "images/gdash-logo.png"
+      "logo" : "images/gdash-logo.png",
+      "icon" : "images/gdash-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 28180,
       "waitTime": 5000,
       "title" : "Gluster Dashboard",
-      "icon" : "images/gdash-icon.png",
+
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -180,13 +185,13 @@
       "name" : "Master",
       "selectionLayout" : { "row" : 3, "col" : 2},
       "memory": "neglectable",
-      "logo" : "images/mesos-master-logo.png"
+      "logo" : "images/mesos-master-logo.png",
+      "icon" : "images/mesos-master-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 5050,
       "waitTime": 8000,
       "title" : "Mesos Console",
-      "icon" : "images/mesos-master-icon.png",
       "statusPageLinktitle" : "Monitor Flink and Spark processes in Mesos",
       "proxyReplacements" : [
         {
@@ -231,7 +236,8 @@
       "name" : "Agent",
       "selectionLayout" : { "row" : 2, "col" : 3},
       "memory": "neglectable",
-      "logo" : "images/mesos-agent-logo.png"
+      "logo" : "images/mesos-agent-logo.png",
+      "icon" : "images/mesos-agent-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 5051
@@ -262,7 +268,8 @@
       "name" : "Broker",
       "selectionLayout" : { "row" : 6, "col" : 3},
       "memory": "medium",
-      "logo" : "images/kafka-logo.png"
+      "logo" : "images/kafka-logo.png",
+      "icon" : "images/kafka-icon.png"
     },
     "dependencies": [
       {
@@ -332,13 +339,13 @@
       "name" : "Manager",
       "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "neglectable",
-      "logo" : "images/kafka-manager-logo.png"
+      "logo" : "images/kafka-manager-logo.png",
+      "icon" : "images/kafka-manager-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 22080,
       "waitTime": 8000,
       "title" : "Kafka manager",
-      "icon" : "images/kafka-manager-icon.png",
       "statusPageLinktitle" : "Administer your kafka topics"
     },
     "dependencies": [
@@ -368,13 +375,13 @@
       "name" : "Console",
       "selectionLayout" : { "row" : 1, "col" : 1},
       "memory": "neglectable",
-      "logo" : "images/spark-history-server-logo.png"
+      "logo" : "images/spark-history-server-logo.png",
+      "icon" : "images/spark-history-server-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 18080,
       "waitTime": 5000,
       "title" : "Spark Console",
-      "icon" : "images/spark-icon.png",
       "statusPageLinktitle" : "Monitor your Spark jobs",
       "proxyReplacements" : [
         {
@@ -410,7 +417,8 @@
       "name" : "Executor",
       "selectionLayout" : { "row" : 4, "col" : 3},
       "memory": "large",
-      "logo" : "images/spark-executor-logo.png"
+      "logo" : "images/spark-executor-logo.png",
+      "icon" : "images/spark-executor-icon.png"
     },
     "dependencies": [
       {
@@ -496,13 +504,13 @@
       "name": "App Master",
       "selectionLayout": { "col": 2, "row": 5  },
       "memory": "neglectable",
-      "logo" : "images/flink-app-master-logo.png"
+      "logo" : "images/flink-app-master-logo.png",
+      "icon" : "images/flink-app-master-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 8081,
       "waitTime": 8000,
       "title" : "Flink App Master",
-      "icon" : "images/flink-app-master-icon.png",
       "statusPageLinktitle" : "Monitor your Flink jobs"
     },
     "dependencies": [
@@ -578,7 +586,8 @@
       "name": "Worker",
       "selectionLayout": { "col": 3, "row": 8  },
       "memory": "medium",
-      "logo" : "images/flink-worker-logo.png"
+      "logo" : "images/flink-worker-logo.png",
+      "icon" : "images/flink-worker-icon.png"
     },
     "dependencies": [
       {
@@ -618,7 +627,8 @@
       "name" : "Logstash",
       "selectionLayout" : { "row" : 5, "col" : 3},
       "memory": "small",
-      "logo" : "images/logstash-logo.png"
+      "logo" : "images/logstash-logo.png",
+      "icon" : "images/logstash-icon.png"
     },
     "dependencies": [
       {
@@ -647,14 +657,14 @@
       "name" : "Cerebro",
       "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "neglectable",
-      "logo" : "images/cerebro-logo.png"
+      "logo" : "images/cerebro-logo.png",
+      "icon" : "images/cerebro-icon.png"
     },
     "ui": {
       "urlTemplate": "./cerebro/#/overview?host=Eskimo",
       "proxyTargetPort" : 9000,
       "waitTime": 5000,
       "title" : "Cerebro",
-      "icon" : "images/cerebro-icon.png",
       "statusPageLinktitle" : "Administer your data in Elasticsearch"
     },
     "dependencies": [
@@ -677,7 +687,8 @@
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 3, "col" : 3},
       "memory": "large",
-      "logo" : "images/elasticsearch-logo.png"
+      "logo" : "images/elasticsearch-logo.png",
+      "icon" : "images/elasticsearch-icon.png"
     },
     "dependencies": [
       {
@@ -721,14 +732,14 @@
       "name" : "Kibana",
       "selectionLayout" : { "row" : 3, "col" : 1},
       "memory": "small",
-      "logo" : "images/kibana-logo.png"
+      "logo" : "images/kibana-logo.png",
+      "icon" : "images/kibana-icon.png"
     },
     "ui": {
       "urlTemplate": "./kibana/app/kibana",
       "proxyTargetPort" : 5601,
       "waitTime": 10000,
       "title" : "Kibana",
-      "icon" : "images/kibana-icon.png",
       "applyStandardProxyReplacements": false,
       "statusPageLinktitle" : "Visualize your data in Elasticsearch",
       "proxyReplacements" : [
@@ -776,13 +787,13 @@
       "memory": "small",
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional": ["spark-executor"],
-      "logo" : "images/zeppelin-logo.png"
+      "logo" : "images/zeppelin-logo.png",
+      "icon" : "images/zeppelin-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 38080,
       "waitTime": 10000,
       "title" : "Zeppelin",
-      "icon" : "images/zeppelin-icon.png",
       "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",
       "proxyReplacements" : [
         {

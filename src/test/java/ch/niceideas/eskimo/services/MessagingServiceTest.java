@@ -63,6 +63,11 @@ public class MessagingServiceTest extends TestCase {
         assertEquals(3, (int) result2.getKey());
         assertEquals("", result2.getValue());
 
+        Pair<Integer,String> result3 = ms.fetchElements(3);
+
+        assertEquals(3, (int) result3.getKey());
+        assertEquals("", result3.getValue());
+
     }
 
     @Test
@@ -71,7 +76,12 @@ public class MessagingServiceTest extends TestCase {
         Pair<Integer,String> result = ms.fetchElements(20);
 
         assertEquals(3, (int) result.getKey());
-        assertEquals("", result.getValue());
+        assertEquals("Test\nTest1\nTest2\n", result.getValue());
+    }
+
+    @Test
+    public void testFetchLastMessagesBack() throws Exception {
+
     }
 
     @Test
@@ -83,5 +93,71 @@ public class MessagingServiceTest extends TestCase {
 
         assertEquals(0, (int) result.getKey());
         assertEquals("", result.getValue());
+    }
+
+    @Test
+    public void testMultipleUsers() throws Exception {
+
+        ms.clear();
+
+        int lastLineUser1 = 0;
+        int lastLineUser2 = 0;
+
+        ms.addLines(new String[] {"1", "2", "3"});
+
+        Pair<Integer,String> result1_1 = ms.fetchElements(lastLineUser1);
+
+        assertEquals(3, (int) result1_1.getKey());
+        assertEquals("1\n2\n3\n", result1_1.getValue());
+        lastLineUser1 = result1_1.getKey();
+
+        ms.addLines(new String[] {"4", "5", "6"});
+
+        Pair<Integer,String> result1_2 = ms.fetchElements(lastLineUser1);
+
+        assertEquals(6, (int) result1_2.getKey());
+        assertEquals("4\n5\n6\n", result1_2.getValue());
+        lastLineUser1 = result1_2.getKey();
+
+        Pair<Integer,String> result2_1 = ms.fetchElements(lastLineUser2);
+
+        assertEquals(6, (int) result2_1.getKey());
+        assertEquals("1\n2\n3\n4\n5\n6\n", result2_1.getValue());
+        lastLineUser2 = result2_1.getKey();
+
+        // first user clears
+        ms.clear();
+        lastLineUser1 = 0;
+
+        ms.addLines(new String[] {"A", "B", "C"});
+
+        Pair<Integer,String> result1_3 = ms.fetchElements(lastLineUser1);
+
+        assertEquals(3, (int) result1_3.getKey());
+        assertEquals("A\nB\nC\n", result1_3.getValue());
+        lastLineUser1 = result1_3.getKey();
+
+        Pair<Integer,String> result2_2 = ms.fetchElements(lastLineUser2);
+
+        assertEquals(3, (int) result2_2.getKey());
+        assertEquals("A\nB\nC\n", result2_2.getValue());
+        lastLineUser2 = result2_2.getKey();
+
+        // server is restarted
+        ms = new MessagingService();
+
+        Pair<Integer,String> result1_4 = ms.fetchElements(lastLineUser1);
+
+        assertEquals(0, (int) result1_4.getKey());
+        assertEquals("", result1_4.getValue());
+        lastLineUser1 = result1_4.getKey();
+
+        Pair<Integer,String> result2_3 = ms.fetchElements(lastLineUser2);
+
+        assertEquals(0, (int) result2_3.getKey());
+        assertEquals("", result2_3.getValue());
+        lastLineUser2 = result2_3.getKey();
+
+
     }
 }

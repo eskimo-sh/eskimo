@@ -111,15 +111,6 @@ eskimo.Services = function () {
         UI_SERVICES_CONFIG = uiServicesConfig;
     };
 
-    this.getServiceIconPath = function (service) {
-        var uiConfig = UI_SERVICES_CONFIG[service];
-        if (uiConfig == null) {
-            console.error ("Could not find icon for service " + service);
-            return "undefined";
-        }
-        return uiConfig.icon;
-    };
-
     function showServiceIFrame(service) {
 
         if (!eskimoMain.isSetupDone()) {
@@ -382,7 +373,7 @@ eskimo.Services = function () {
             var menuEntry = '' +
                 '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                 '    <a href="javascript:eskimoMain.getServices().showServiceIFrame(\'' + service + '\');">\n' +
-                '        <img src="' + uiConfig.icon + '"></img>\n' +
+                '        <img src="' + eskimoMain.getNodesConfig().getServiceIconPath(service) + '"></img>\n' +
                 '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
                 '    </a>\n' +
                 '</li>';
@@ -421,9 +412,5 @@ eskimo.Services = function () {
 
     /** for tests */
     this.createServicesIFrames = createServicesIFrames;
-
-
-    // call constructor
-    this.initialize();
 };
 

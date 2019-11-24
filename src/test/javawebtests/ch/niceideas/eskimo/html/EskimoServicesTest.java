@@ -63,11 +63,11 @@ public class EskimoServicesTest extends AbstractWebTest {
         page.executeJavaScript("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"] );");
 
         page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
-                "\"cerebro\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/cerebro', 'icon' : 'testIcon', 'title' : 'cerebro' }, " +
-                "\"kibana\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/kibana', 'icon' : 'testIcon', 'title' : 'kibana' }, " +
-                "\"gdash\": {'urlTemplate': 'http://{NODE_ADDRESS}:9999/gdash', 'icon' : 'testIcon', 'title' : 'gdash' }, " +
-                "\"spark-history-server\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/spark-histo', 'icon' : 'testIcon', 'title' : 'spark-histo' }, " +
-                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin' }" +
+                "\"cerebro\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro' }, " +
+                "\"kibana\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana' }, " +
+                "\"gdash\": {'urlTemplate': 'http://{NODE_ADDRESS}:9999/gdash', 'title' : 'gdash' }, " +
+                "\"spark-history-server\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo' }, " +
+                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin' }" +
                 "});");
     }
 
@@ -85,7 +85,7 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertEquals (1.0, page.executeJavaScript("$( \"#folderMenuZeppelin\" ).length").getJavaScriptResult());
 
         // test zeppelin menu entry
-        assertEquals ("testIcon", page.executeJavaScript("$('#folderMenuZeppelin').find('a > img').attr('src')").getJavaScriptResult());
+        assertEquals ("zeppelin-icon.png", page.executeJavaScript("$('#folderMenuZeppelin').find('a > img').attr('src')").getJavaScriptResult());
         assertEquals ("zeppelin", page.executeJavaScript("$('#folderMenuZeppelin').find('a > span').html()").getJavaScriptResult());
     }
 

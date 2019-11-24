@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.UnboundList;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -43,17 +44,24 @@ import java.util.List;
 
 public abstract class AbstractInformationService<T, R> {
 
-    protected List<T> elements = Collections.synchronizedList(new ArrayList<>());
+    protected List<T> elements = Collections.synchronizedList(new UnboundList<>(getMaxHistorySize()));
 
     @Transactional
-    public Pair<Integer, R> fetchElements(Integer lastLine) {
-        if (lastLine > elements.size()) {
-            lastLine = elements.size();
+    public Pair<Integer, R> fetchElements(int lastLine) {
+        if (lastLine > elements.size()) { // this means that a call to clear has been performed
+            // need to refetch everything from scratch !
+            lastLine = 0;
         }
         return new Pair<>(elements.size(), buildFetchedData(lastLine));
     }
 
-    protected abstract R buildFetchedData(Integer lastLine);
+    protected abstract int getMaxHistorySize();
+
+    protected final List<T> getSubList(int lastLine) {
+        return elements.subList(lastLine, elements.size());
+    }
+
+    protected abstract R buildFetchedData(int lastLine);
 
     @Transactional
     protected void addElement (T element) {
@@ -71,7 +79,7 @@ public abstract class AbstractInformationService<T, R> {
     }
 
     @Transactional
-    public Integer getLastElement() {
+    public final Integer getLastElement() {
         return elements.size();
     }
 }

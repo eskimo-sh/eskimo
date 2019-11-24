@@ -51,7 +51,6 @@ public class UIConfig {
     private Integer proxyTargetPort;
     private int waitTime;
     private String title;
-    private String icon;
 
     private boolean applyStandardProxyReplacements = true;
     private String statusPageLinkTitle;
@@ -75,14 +74,6 @@ public class UIConfig {
 
     public void setApplyStandardProxyReplacements(boolean applyStandardProxyReplacements) {
         this.applyStandardProxyReplacements = applyStandardProxyReplacements;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
     }
 
     public String getTitle() {
@@ -115,7 +106,6 @@ public class UIConfig {
             put("proxyContext", "./"+service.getName()+"/");
             put("waitTime", waitTime);
             put("title", title);
-            put("icon", icon);
             put("unique", service.isUnique());
         }});
     }

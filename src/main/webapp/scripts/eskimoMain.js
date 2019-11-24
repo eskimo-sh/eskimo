@@ -309,6 +309,7 @@ eskimo.Main = function() {
 
         eskimoNodesConfig = new eskimo.NodesConfig();
         // loadConfigServices -> get-services-dependencies
+        // - calls eskimoServices.initialize()
         // loadServiceDependencies -> list-config-services
 
         eskimoNotifications = new eskimo.Notifications();
