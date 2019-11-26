@@ -242,6 +242,9 @@ set +e
 # 3 attempts (to address concurrency issues coming from parallel installations)
 for i in 1 2 3 ; do
     if [[ `gluster volume list | grep $VOL_NAME` == "" ]]; then
+
+        rm -Rf /var/lib/gluster/volume_bricks/$VOL_NAME
+
         gluster volume create $VOL_NAME replica 2 transport tcp \
                $SELF_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME \
                $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME

@@ -117,11 +117,12 @@ public class SystemServiceTest extends AbstractSystemTest {
         return configStoragePathFile.getAbsolutePath();
     }
 
-
     @Test
     public void testFetchNodeStatus() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
 
         Map<String, String> statusMap = new HashMap<>();
 
@@ -151,7 +152,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         });
 
 
-        systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair);
+        systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
 
         assertEquals(9, statusMap.size());
 
@@ -159,6 +160,54 @@ public class SystemServiceTest extends AbstractSystemTest {
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_spark-executor_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
+        assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
+    }
+
+    @Test
+    public void testFetchNodeStatusWithRestarts() throws Exception {
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+
+        Map<String, String> statusMap = new HashMap<>();
+
+        int nodeNbr = 1;
+        String ipAddress = "192.168.10.11";
+
+        Pair<String, String> nbrAndPair = new Pair<>(""+nodeNbr, ipAddress);
+
+        systemService.setSshCommandService(new SSHCommandService() {
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                testSSHCommandScript.append(script).append("\n");
+                if (script.equals("echo OK")) {
+                    return "OK";
+                }
+                if (script.startsWith("sudo systemctl status --no-pager -al")) {
+                    return systemStatusTest;
+                }
+                return testSSHCommandResultBuilder.toString();
+            }
+            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+                testSSHCommandScript.append(command + "\n");
+                return testSSHCommandResultBuilder.toString();
+            }
+            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+                // just do nothing
+            }
+        });
+
+        servicesInstallStatus.setValueForPath("spark-executor_installed_on_IP_192-168-10-11", "restart");
+        servicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "restart");
+
+        systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
+
+        assertEquals(9, statusMap.size());
+
+        assertEquals("NA", statusMap.get("service_kafka-manager_192-168-10-11"));
+        assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
+        assertEquals("restart", statusMap.get("service_spark-executor_192-168-10-11"));
+        assertEquals("restart", statusMap.get("service_gluster_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
     }
 
@@ -176,6 +225,39 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
         systemStatus.setValueForPath("service_cerebro_192-168-10-11", "NA");
         systemStatus.setValueForPath("service_kibana_192-168-10-11", "KO");
+
+        systemService.checkServiceDisappearance (systemStatus);
+
+        Pair<Integer, List<JSONObject>> notifications = notificationService.fetchElements(0);
+
+        assertNotNull (notifications);
+
+        assertEquals(2, notifications.getKey().intValue());
+
+        assertEquals("{\"type\":\"error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
+
+        assertEquals("{\"type\":\"error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
+    }
+
+    @Test
+    public void testCheckServiceDisappearanceWithRestarts() throws Exception {
+
+        SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
+
+        File prevStatusFile = new File(setupService.getConfigStoragePath() + "/nodes-status-check-previous.json");
+        FileUtils.writeFile(prevStatusFile, prevSystemStatus.getFormattedValue());
+
+        // we'll make it so that kibana and cerebro seem to have disappeared
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        systemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
+        systemStatus.setValueForPath("service_cerebro_192-168-10-11", "NA");
+        systemStatus.setValueForPath("service_kibana_192-168-10-11", "KO");
+
+        // flag a few services as restart => shoiuld not be reported as in issue
+        systemStatus.setValueForPath("service_kafka_192-168-10-11", "restart");
+        systemStatus.setValueForPath("service_kafka_192-168-10-13", "restart");
+        systemStatus.setValueForPath("service_kafka-manager_192-168-10-11", "restart");
 
         systemService.checkServiceDisappearance (systemStatus);
 
@@ -396,6 +478,5 @@ public class SystemServiceTest extends AbstractSystemTest {
         for (String commandEnd : expectedCommandEnd.split("\n")) {
             assertTrue (commandEnd + "\nis contained", commandString.contains(commandEnd));
         }
-
     }
 }

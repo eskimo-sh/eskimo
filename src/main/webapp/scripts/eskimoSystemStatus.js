@@ -417,6 +417,8 @@ eskimo.SystemStatus = function() {
 
         // B. Inject information
 
+        $("#eskimo-flavour").html()
+
         $("#system-information-version").html(systemStatus.buildVersion);
 
         $("#system-information-timestamp").html(systemStatus.buildTimestamp);
@@ -706,6 +708,8 @@ eskimo.SystemStatus = function() {
                         var color = "#EEEEEE;";
                         if (serviceStatus == "TD") {
                             color = "violet";
+                        } else if (serviceStatus == "restart") {
+                            color= "#CB4335"
                         }
 
                         arrayRow +=
@@ -896,6 +900,8 @@ eskimo.SystemStatus = function() {
                         var color = "darkgreen";
                         if (serviceStatus == "TD") {
                             color = "violet";
+                        } else if (serviceStatus == "restart") {
+                            color = "#CB4335";
                         }
 
                         arrayRow +=

@@ -281,9 +281,9 @@ function get_ip_address(){
     export IP_ADDRESS="`/sbin/ifconfig  | grep inet | grep broadcast | cut -d ' ' -f 10`"
 }
 
-function BTFRS_hack_unmount_gluster_share () {
-    if [[ `cat /etc/fstab | grep ' / ' | grep 'btrfs'` != "" ]]; then
-        echo " - Hack for BTRFS : need to unmount gluster share $1 before copying files to container"
+function preinstall_unmount_gluster_share () {
+    if [[ `grep $1 /etc/mtab` != "" ]]; then
+        echo " - preinstallation : need to unmount gluster share $1 before proceeding with installation"
         i=0
         while [[ `grep $1 /etc/mtab` != "" ]]; do
             sudo umount $1

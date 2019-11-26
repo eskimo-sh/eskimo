@@ -70,6 +70,14 @@ sudo rm -f /tmp/spark_history_server_install_log
 
 # build
 
+# Initially this was a Hack for BTRFS support :
+#   - need to unmount gluster shares otherwise cp command goes nuts
+#   - https://github.com/moby/moby/issues/38252
+# But eventually I need to do this in anyway to make sure everything is preoperly re-installed
+# I need to make sure I'm doing this before attempting to recreate the directories
+preinstall_unmount_gluster_share /var/lib/spark/eventlog
+preinstall_unmount_gluster_share /var/lib/spark/data
+
 echo " - Configuring host spark config part"
 . ./setupCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
 if [[ $? != 0 ]]; then
@@ -116,11 +124,6 @@ fi
 
 #echo " - TODO"
 #docker exec -it spark TODO
-
-# Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
-# https://github.com/moby/moby/issues/38252
-BTFRS_hack_unmount_gluster_share /var/lib/spark/eventlog
-BTFRS_hack_unmount_gluster_share /var/lib/spark/data
 
 
 echo " - Handling topology and setting injection"

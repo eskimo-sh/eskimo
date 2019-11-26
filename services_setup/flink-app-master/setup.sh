@@ -67,6 +67,14 @@ fi
 # reinitializing log
 sudo rm -f /tmp/flink_install_log
 
+# Initially this was a Hack for BTRFS support :
+#   - need to unmount gluster shares otherwise cp command goes nuts
+#   - https://github.com/moby/moby/issues/38252
+# But eventually I need to do this in anyway to make sure everything is preoperly re-installed
+# I need to make sure I'm doing this before attempting to recreate the directories
+preinstall_unmount_gluster_share /var/lib/flink/data
+preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
+
 echo " - Configuring host spark config part"
 . ./setupCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
 if [[ $? != 0 ]]; then
@@ -117,10 +125,6 @@ fi
 #echo " - TODO"
 #docker exec -it flink TODO
 
-# Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
-# https://github.com/moby/moby/issues/38252
-BTFRS_hack_unmount_gluster_share /var/lib/flink/data
-BTFRS_hack_unmount_gluster_share /var/lib/flink/completed_jobs
 
 echo " - Handling topology and setting injection"
 handle_topology_settings flink-app-master /tmp/flink_install_log

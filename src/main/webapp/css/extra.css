@@ -247,6 +247,10 @@ But it breaks  the menu entry title overlay
     max-height: 700px;
 }
 
+#about-modal-dialog {
+    width: 800px;
+}
+
 #services-selection-modal-dialog {
     width: 850px;
     max-width: 100%;

@@ -69,6 +69,14 @@ sudo rm -f /tmp/spark_executor_install_log
 
 # build
 
+# Initially this was a Hack for BTRFS support :
+#   - need to unmount gluster shares otherwise cp command goes nuts
+#   - https://github.com/moby/moby/issues/38252
+# But eventually I need to do this in anyway to make sure everything is preoperly re-installed
+# I need to make sure I'm doing this before attempting to recreate the directories
+preinstall_unmount_gluster_share /var/lib/spark/eventlog
+preinstall_unmount_gluster_share /var/lib/spark/data
+
 echo " - Configuring host spark common part"
 . ./setupCommon.sh $SELF_IP_ADDRESS
 if [[ $? != 0 ]]; then
@@ -121,10 +129,6 @@ fi
 #echo " - TODO"
 #docker exec -it spark TODO/tmp/logstash_install_log
 
-# Hack for btrfs support : need to unmount gluster shares otherwise cp command goes nuts
-# https://github.com/moby/moby/issues/38252
-BTFRS_hack_unmount_gluster_share /var/lib/spark/eventlog
-BTFRS_hack_unmount_gluster_share /var/lib/spark/data
 
 echo " - Copying Topology Injection Script (common)"
 docker cp $SCRIPT_DIR/inContainerInjectTopology.sh spark-executor:/usr/local/sbin/inContainerInjectTopology.sh >> /tmp/spark_executor_install_log 2>&1

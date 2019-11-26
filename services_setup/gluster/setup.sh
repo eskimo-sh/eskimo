@@ -62,7 +62,13 @@ sudo rm -f /tmp/gluster_install_log
 
 echo " - Creating required folders"
 sudo systemctl stop gluster 2>/dev/null
+
+# The problem here if I remove that folder is that the existing gluster bricks shared are destroyed
+# and lost for good.
+# This is lieky better that the chances to lead to bricks being unrecoverable in anyway and hence gluster refusing
+# to dtart. I am hence keeping it for now.
 sudo rm -Rf /var/lib/gluster
+
 sudo mkdir -p /var/lib/gluster
 
 

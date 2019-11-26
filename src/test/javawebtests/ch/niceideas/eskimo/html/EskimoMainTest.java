@@ -60,6 +60,7 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimo.SetupCommand = function(){};");
         page.executeJavaScript("eskimo.FileManagers = function(){};");
         page.executeJavaScript("eskimo.Setup = function(){};");
+        page.executeJavaScript("eskimo.About = function(){};");
 
         // instantiate test object
         page.executeJavaScript("eskimoMain = new eskimo.Main();");

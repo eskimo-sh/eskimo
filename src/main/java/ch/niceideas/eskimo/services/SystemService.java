@@ -265,6 +265,10 @@ public class SystemService {
         // 1. Load Node Config
         NodesConfigWrapper rawNodesConfig = loadNodesConfig();
 
+        // 1.1. Load Node status
+        ServicesInstallStatusWrapper servicesInstallationStatus = loadServicesInstallationStatus();
+
+        // 1.2 flag services needing restart
         if (rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
 
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
@@ -284,7 +288,7 @@ public class SystemService {
 
                 threadPool.execute(() -> {
                     try {
-                        fetchNodeStatus(nodesConfig, statusMap, nbrAndPair);
+                        fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);
                     } catch (SystemException e) {
                         logger.error(e, e);
                         throw new RuntimeException(e);
@@ -315,10 +319,7 @@ public class SystemService {
 
         // 5. Handle status update if a service seem to have disappeared
 
-        // 5.1. Load Node status
-        ServicesInstallStatusWrapper servicesInstallationStatus = loadServicesInstallationStatus();
-
-        // 5.2 Test if any additional node should be check for being live
+        // 5.1 Test if any additional node should be check for being live
         Set<String> systemStatusIpAddresses = systemStatus.getIpAddresses();
         Set<String> additionalIpToTests = servicesInstallationStatus.getIpAddresses().stream()
                 .filter(ip -> !systemStatusIpAddresses.contains(ip))
@@ -432,6 +433,22 @@ public class SystemService {
                         }
                     });
 
+            // first thing first, flag nodes that need to be restared as needing to be restarted
+            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
+                for (Pair<String, String> operation : restarts) {
+                    try {
+                        updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
+                            String service = operation.getKey();
+                            String ipAddress = operation.getValue();
+                            String nodeName = ipAddress.replaceAll("\\.", "-");
+                            servicesInstallationStatus.setValueForPath(service + "_installed_on_IP_" + nodeName, "restart");
+                        });
+                    } catch (FileException | SetupException e) {
+                        logger.error (e, e);
+                        throw new SystemException(e);
+                    }
+                }
+            }
 
             // Installation in batches (groups following dependencies)
             for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (command.getInstallations(), nodesConfig, deadIps)) {
@@ -560,9 +577,10 @@ public class SystemService {
     }
 
     void restartServiceForSystem(String service, String ipAddress) throws JSONException, SystemException {
+        String nodeName = ipAddress.replaceAll("\\.", "-");
         systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
                 (builder) -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
-                status -> {});
+                status -> status.setValueForPath(service + "_installed_on_IP_" + nodeName, "OK"));
     }
 
     void uninstallService(String service, String ipAddress)
@@ -657,8 +675,9 @@ public class SystemService {
     }
 
     void fetchNodeStatus
-            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<String, String> nbrAndPair)
-            throws SystemException {
+            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<String, String> nbrAndPair,
+             ServicesInstallStatusWrapper servicesInstallationStatus)
+                throws SystemException {
 
         int nodeNbr = Integer.valueOf(nbrAndPair.getKey());
         String ipAddress = nbrAndPair.getValue();
@@ -714,7 +733,12 @@ public class SystemService {
                                 statusMap.put("service_" + service + "_" + nodeName, "KO");
 
                             } else {
-                                statusMap.put("service_" + service + "_" + nodeName, "OK");
+
+                                if (servicesInstallationStatus.isServiceOK(service,nodeName)) {
+                                    statusMap.put("service_" + service + "_" + nodeName, "OK");
+                                } else {
+                                    statusMap.put("service_" + service + "_" + nodeName, "restart");
+                                }
 
                                 // configure proxy if required
                                 proxyManagerService.updateServerForService(service, ipAddress);

@@ -251,6 +251,311 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
         // new installations on .15, .16, .17, .18
         assertEquals(32, oc.getInstallations().size());
-
     }
+
+
+    @Test
+    public void testRecoverUninstallationWhenNodeDownMiddleUninstall() throws Exception {
+
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
+
+        // 1. some services are uninstalled from a node, one service is moved
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.getJSONObject().remove("mesos-agent1");
+        nodesConfig.getJSONObject().remove("spark-executor1");
+
+        nodesConfig.setValueForPath("zookeeper", "1");
+
+        OperationsCommand oc = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(2, oc.getInstallations().size());
+
+        assertEquals("zookeeper", oc.getInstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc.getInstallations().get(0).getValue());
+
+        assertEquals("elasticsearch", oc.getInstallations().get(1).getKey());
+        assertEquals("192.168.10.13", oc.getInstallations().get(1).getValue());
+
+        assertEquals(3, oc.getUninstallations().size());
+
+        assertEquals("mesos-agent", oc.getUninstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(0).getValue());
+
+        assertEquals("spark-executor", oc.getUninstallations().get(1).getKey());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(1).getValue());
+
+        assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
+        assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
+
+        assertEquals(13, oc.getRestarts().size());
+
+        assertEquals ("[" +
+                "elasticsearch=192.168.10.11, " +
+                "mesos-master=192.168.10.13, " +
+                "cerebro=192.168.10.11, " +
+                "kafka=192.168.10.11, " +
+                "kafka=192.168.10.13, " +
+                "kibana=192.168.10.11, " +
+                "mesos-agent=192.168.10.13, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
+                "spark-history-server=192.168.10.13, " +
+                "spark-executor=192.168.10.13, " +
+                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+
+        // node vanished
+        // uninstallation fails in the middle (after zookeeper)
+        savedServicesInstallStatus.setValueForPath("zookeeper_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.getJSONObject().remove("zookeeper_installed_on_IP_192-168-10-13");
+        
+        // flag all restarts
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("mesos-master_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cerebro_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("kibana_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("mesos-agent_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka-manager_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("spark-history-server_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("spark-executor_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("zeppelin_installed_on_IP_192-168-10-13", "restart");
+
+        OperationsCommand oc2 = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(0, oc2.getInstallations().size());
+
+        assertEquals(2, oc2.getUninstallations().size());
+
+        assertEquals("mesos-agent", oc2.getUninstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc2.getUninstallations().get(0).getValue());
+
+        assertEquals("spark-executor", oc2.getUninstallations().get(1).getKey());
+        assertEquals("192.168.10.11", oc2.getUninstallations().get(1).getValue());
+
+        assertEquals(14, oc2.getRestarts().size());
+
+        assertEquals ("[" +
+                "elasticsearch=192.168.10.11, " +
+                "elasticsearch=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
+                "cerebro=192.168.10.11, " +
+                "kafka=192.168.10.11, " +
+                "kafka=192.168.10.13, " +
+                "kibana=192.168.10.11, " +
+                "mesos-agent=192.168.10.13, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
+                "spark-history-server=192.168.10.13, " +
+                "spark-executor=192.168.10.13, " +
+                "zeppelin=192.168.10.13]", Arrays.toString(oc2.getRestarts().toArray()));
+    }
+
+    @Test
+    public void testRecoverUninstallationWhenNodeDownAfterUninstall() throws Exception {
+
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
+
+        // 1. some services are uninstalled from a node, one service is moved
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.getJSONObject().remove("mesos-agent1");
+        nodesConfig.getJSONObject().remove("spark-executor1");
+
+        nodesConfig.setValueForPath("zookeeper", "1");
+
+        OperationsCommand oc = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(2, oc.getInstallations().size());
+
+        assertEquals("zookeeper", oc.getInstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc.getInstallations().get(0).getValue());
+
+        assertEquals("elasticsearch", oc.getInstallations().get(1).getKey());
+        assertEquals("192.168.10.13", oc.getInstallations().get(1).getValue());
+
+        assertEquals(3, oc.getUninstallations().size());
+
+        assertEquals("mesos-agent", oc.getUninstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(0).getValue());
+
+        assertEquals("spark-executor", oc.getUninstallations().get(1).getKey());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(1).getValue());
+
+        assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
+        assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
+
+        assertEquals(13, oc.getRestarts().size());
+
+        assertEquals ("[" +
+                "elasticsearch=192.168.10.11, " +
+                "mesos-master=192.168.10.13, " +
+                "cerebro=192.168.10.11, " +
+                "kafka=192.168.10.11, " +
+                "kafka=192.168.10.13, " +
+                "kibana=192.168.10.11, " +
+                "mesos-agent=192.168.10.13, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
+                "spark-history-server=192.168.10.13, " +
+                "spark-executor=192.168.10.13, " +
+                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+
+        // node vanished
+        // uninstallation fails in the middle (after zookeeper)
+        savedServicesInstallStatus.setValueForPath("zookeeper_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.getJSONObject().remove("zookeeper_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("mesos-agent_installed_on_IP_192-168-10-11");
+        savedServicesInstallStatus.getJSONObject().remove("spark-executor_installed_on_IP_192-168-10-11");
+
+        // flag all restarts
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("mesos-master_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cerebro_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("kibana_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("mesos-agent_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka-manager_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("spark-history-server_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("spark-executor_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("zeppelin_installed_on_IP_192-168-10-13", "restart");
+
+        OperationsCommand oc2 = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(0, oc2.getInstallations().size());
+
+        assertEquals(0, oc2.getUninstallations().size());
+
+        assertEquals(14, oc2.getRestarts().size());
+
+        assertEquals ("[" +
+                "elasticsearch=192.168.10.11, " +
+                "elasticsearch=192.168.10.13, " +
+                "cerebro=192.168.10.11, " +
+                "mesos-master=192.168.10.13, " +
+                "kafka=192.168.10.11, " +
+                "kafka=192.168.10.13, " +
+                "kibana=192.168.10.11, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
+                "mesos-agent=192.168.10.13, " +
+                "spark-history-server=192.168.10.13, " +
+                "spark-executor=192.168.10.13, " +
+                "zeppelin=192.168.10.13]", Arrays.toString(oc2.getRestarts().toArray()));
+    }
+
+
+    @Test
+    public void testRecoverUninstallationWhenNodeDownMiddéleRestart() throws Exception {
+
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
+
+        // 1. some services are uninstalled from a node, one service is moved
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.getJSONObject().remove("mesos-agent1");
+        nodesConfig.getJSONObject().remove("spark-executor1");
+
+        nodesConfig.setValueForPath("zookeeper", "1");
+
+        OperationsCommand oc = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(2, oc.getInstallations().size());
+
+        assertEquals("zookeeper", oc.getInstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc.getInstallations().get(0).getValue());
+
+        assertEquals("elasticsearch", oc.getInstallations().get(1).getKey());
+        assertEquals("192.168.10.13", oc.getInstallations().get(1).getValue());
+
+        assertEquals(3, oc.getUninstallations().size());
+
+        assertEquals("mesos-agent", oc.getUninstallations().get(0).getKey());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(0).getValue());
+
+        assertEquals("spark-executor", oc.getUninstallations().get(1).getKey());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(1).getValue());
+
+        assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
+        assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
+
+        assertEquals(13, oc.getRestarts().size());
+
+        assertEquals ("[" +
+                "elasticsearch=192.168.10.11, " +
+                "mesos-master=192.168.10.13, " +
+                "cerebro=192.168.10.11, " +
+                "kafka=192.168.10.11, " +
+                "kafka=192.168.10.13, " +
+                "kibana=192.168.10.11, " +
+                "mesos-agent=192.168.10.13, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
+                "spark-history-server=192.168.10.13, " +
+                "spark-executor=192.168.10.13, " +
+                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+
+        // node vanished
+        // uninstallation fails in the middle (after zookeeper)
+        savedServicesInstallStatus.setValueForPath("zookeeper_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.getJSONObject().remove("zookeeper_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("mesos-agent_installed_on_IP_192-168-10-11");
+        savedServicesInstallStatus.getJSONObject().remove("spark-executor_installed_on_IP_192-168-10-11");
+
+        // flag all restarts
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("mesos-master_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cerebro_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("kibana_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("mesos-agent_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("kafka-manager_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("spark-history-server_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("spark-executor_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("zeppelin_installed_on_IP_192-168-10-13", "restart");
+
+        // some restartes done
+        savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("mesos-master_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.setValueForPath("cerebro_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("kafka_installed_on_IP_192-168-10-13", "OK");
+
+        OperationsCommand oc2 = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(0, oc2.getInstallations().size());
+
+        assertEquals(0, oc2.getUninstallations().size());
+
+        assertEquals(8, oc2.getRestarts().size());
+
+        assertEquals ("[" +
+                "kibana=192.168.10.11, " +
+                "logstash=192.168.10.11, " +
+                "logstash=192.168.10.13, " +
+                "kafka-manager=192.168.10.11, " +
+                "mesos-agent=192.168.10.13, " +
+                "spark-history-server=192.168.10.13, " +
+                "spark-executor=192.168.10.13, " +
+                "zeppelin=192.168.10.13]", Arrays.toString(oc2.getRestarts().toArray()));
+    }
+
+
 }

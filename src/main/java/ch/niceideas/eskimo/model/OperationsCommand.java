@@ -73,7 +73,7 @@ public class OperationsCommand {
                     String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
                     String nodeName = ipAddress.replaceAll("\\.", "-");
 
-                    if (!servicesInstallStatus.isServiceOK(service, nodeName)) {
+                    if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
 
                         retCommand.addInstallation(service, ipAddress);
                     }
@@ -120,6 +120,15 @@ public class OperationsCommand {
 
         Set<String> restartedServices = new HashSet<>();
         changedServices.forEach(service -> restartedServices.addAll (servicesDefinition.getDependentServices(service)));
+
+        // also add servicres simply flagged as needed restart previously
+        servicesInstallStatus.getRootKeys().stream().forEach(installStatus -> {
+            String installedService = installStatus.substring(0, installStatus.indexOf("_installed_on_IP_"));
+            String status = (String) servicesInstallStatus.getValueForPath(installStatus);
+            if (status.equals("restart")) {
+                restartedServices.add (installedService);
+            }
+        });
 
         for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
             for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {

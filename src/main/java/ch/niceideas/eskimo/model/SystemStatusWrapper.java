@@ -87,7 +87,9 @@ public class SystemStatusWrapper extends JsonWrapper {
 
     public boolean isServiceOK(String service) {
         try {
-            return getValueForPath(service) != null && getValueForPath(service).equals("OK");
+            return getValueForPath(service) != null
+                    && (getValueForPath(service).equals("OK")
+                    || getValueForPath(service).equals("restart"));
         } catch (JSONException e) {
             logger.debug (e, e);
             return false;

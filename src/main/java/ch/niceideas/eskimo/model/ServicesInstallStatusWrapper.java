@@ -81,6 +81,16 @@ public class ServicesInstallStatusWrapper extends JsonWrapper {
         }
     }
 
+    public boolean isServiceInstalled(String service, String nodeName) {
+        try {
+            return ("OK".equals(getValueForPath(service + "_installed_on_IP_" + nodeName))
+                 || "restart".equals(getValueForPath(service + "_installed_on_IP_" + nodeName)));
+        } catch (JSONException e) {
+            logger.error(e, e);
+            return false;
+        }
+    }
+
     public void copyFrom(String flag, ServicesInstallStatusWrapper other) throws JSONException {
         this.setValueForPath(flag, other.getValueForPath(flag));
     }
