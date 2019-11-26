@@ -511,10 +511,12 @@ version of the file can successfully be created.
 [[user_configuration]]
 === First run and initial setup
 
-Upon first run, eskimo needs to be setup. Only the setup page is accessible until setup is properly given and service
-docker images have been downloaded or built
-*(Note: only building services - except Mesos - is possible in this version, downloading pre-built packages is not
-implemented yet)*
+Upon first run, eskimo needs to be setup before it can be used.
+
+Right after its first start, one single screen is available : *the setup page*. +
+It is the only accessible page as long as initial setup is not properly comèpleted and service
+docker images (plus mesos paclkages) have not been either downloaded or built.
+
 
 The setup page is as follows:
 
@@ -528,16 +530,23 @@ access to. The dynamic configuration and state persistence of eskimo will be sto
 managed by eskimo needs to have granted access using SSH Public Key authentication to this user.
 * *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
 in regards to how to generate this key : <<ssh_key_authentication>>
-* *Mesos Origin* : the user needs to choose whether Mesos needs to be built locally (on eskimo host node) or
-whether a pre-built version needs to be downloaded from https://www.niceideas.ch. Both options are already supported in
-the current version of eskimo.
-* *Docker Images Origin* : the user needs to choose whether service package images needs to be built locally or whether
-they need to be downloaded from https://www.niceideas.ch. *Unfortunately, in this early version, only building locally
-is supported.*
+* *Mesos Origin* : the user needs to choose whether Mesos packages need to be *built locally* (on eskimo host node) or
+whether pre-built versions shall be *downloaded* from https://www.niceideas.ch.
+* *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
+they need to be *downloaded* from https://www.niceideas.ch.
 
 Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
 and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
 connection and/or the eskimp host machine processing abilities.
+
+Rgerading the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
+to enable eskimo to reach the cluster nodes.
+
+==== Checking for updates
+
+At any time after initial setup - and if any only if the chosen installation method is *downloading* packages, the user
+can _apply setup_ again to check on the paclages server (by default https://www.niceideas.ch) if updates are available
+for service docker images or mesos packages.
 
 [[ssh_key_authentication]]
 === Setting up SSH Public Key Authentication
@@ -715,15 +724,23 @@ On the example above, all services are in _white_, which indicates that they are
 
 Services can be in:
 
-* white : the service is working alright
-* [red]#red# : the service is down or in error
-* [purple]#violet# : the service is running but pending removal from the node.
+* [green]#OK# - (green) : the service is working alright
+* [red]#OK# - (red) : the service is working alright although it needs to be restarted following some dependencies
+  updates or re-installation.
+* [purple]#OK# : the service is running but pending removal from the node.
+* [red]#KO# : the service is reporting errors
+* [red]#NA# : the service should be available but cannot be found
 
 The user can choose between the node view (default) as above or the table view which is more suited to monitor large
 clusters with hundred of nodes.
 
 When _mouse-over_'ing a service on a node - both in the node view and in the table view - the user has access to the
 service context menu which he can use to stop / start / restart a service or even force its full reinstallation.
+
+=== Acting on services reporting errors
+
+Most of the time when a service is reporting an error, a first step is to try to reapply the configuration. +
+See <<apply_configuration>>
 
 ==== The menu
 
@@ -750,7 +767,7 @@ Setting up a cluster with eskimo usually boils down to these 2 phases :
 * Adding nodes to the eskimo cluster - using the _Add Node_ buttong or ranges of nodes using the _Add Range_ button.
 * Selecting the services that should be deployed and operated and the configured nodes
 
-Below is an example of a small cluster with three nodes setup:
+Below is an example of a tiny cluster with two nodes setup:
 
 image::pngs/eskimo-nodes-config.png[800, 800, align="center"]
 
@@ -811,7 +828,7 @@ These "_Slave Services_" - considered multiple - can be configured at will:
 
 image::pngs/multiple-services.png[600, 600, align="center"]
 
-
+[[apply_configuration]]
 ==== Applying nodes configuration
 
 Once al nodes are properly configured with their desired set of services, clicking on "_Apply Configuration_" will
@@ -826,6 +843,21 @@ Eskimo takes care of everything !*
 
 As a sidenote, _Eskimo Community Edition_ doesn't support high availability for master services, one needs to acquire
 _Eskimo Enterprise Edition_ for high availability.
+
+*Applying configuration* is also useful when a service is reporting an error for instance such as needed restart or
+being reported as vanished. +
+In such cases a first step to resolve the problem is getting to the _"Configure Eskimo Nodes"_ screen and re-applying
+configuration.
+
+Finally, whenever an installation or another operation fails, after fixing the problem (most of the timecorrecting the
+service installation scripts in the service installation framework), the installation or other operation process can be
+recovered fro mwhere it failed by simply re-applying the configuration from here.
+
+==== Forcing re-installation of a service.
+
+The button "Force reinstall" enables the user to select services that will be reinstalled on every node from the
+latest service docker image available. +
+Dependent services will be properly restarted.
 
 === SSH and SFTP Client
 
@@ -1217,6 +1249,16 @@ memory. +
 Restarting zeppelin would loose it.
 * *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
 it is saved for real.
+
+===== Importing a note from the UI is broken
+
+* *Problem* : Importing a note from the UI is broken. The UI always reports that the file is exceeding maximum size
+regardless of actual size.
+* *Workaround* : Use the REST API to importe note. +
+For instance if your have a note `test.json`that you want to import, go in its folder and type following command: +
+`curl -XPOST -H "Content-Type: application/json" http://localhost:38080/api/notebook/import -d @test.json` +
+(replace localhost by the IP address of the node running zeppelin) +
+(See above note about REST API import workaround)
 
 === Prometheus
 
