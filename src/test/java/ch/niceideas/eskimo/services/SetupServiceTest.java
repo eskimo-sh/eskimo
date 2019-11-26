@@ -65,7 +65,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
-    private String mesosPackages = "mesos-debian,mesos-redhat";
+    private String mesosPackages = "mesos-debian,mesos-redhat,mesos-suse";
 
     @Before
     public void setUp() throws Exception {
@@ -114,16 +114,16 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
         assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
-        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-mesos-origin"));
-        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
+        assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-mesos-origin"));
+        assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
 
         assertNotNull(command);
 
-        assertEquals(0, command.getBuildMesos().size());
-        assertEquals(0, command.getBuildPackage().size());
+        assertEquals(3, command.getBuildMesos().size());
+        assertEquals(16, command.getBuildPackage().size());
 
-        assertEquals(2, command.getDownloadMesos().size());
-        assertEquals(16, command.getDownloadPackages().size());
+        assertEquals(0, command.getDownloadMesos().size());
+        assertEquals(0, command.getDownloadPackages().size());
 
     }
 
@@ -157,7 +157,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(
                     "Following services are missing and need to be downloaded or built base-eskimo, cerebro, " +
                     "elasticsearch, gdash, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
-                    "mesos-master, mesos-redhat, ntp, prometheus, spark, zeppelin, zookeeper",
+                    "mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
                 exception.getMessage());
 
         // Create docker images packages
@@ -169,7 +169,7 @@ public class SetupServiceTest extends AbstractSystemTest {
             setupService.ensureSetupCompleted();
         });
         assertEquals(
-                "Following services are missing and need to be downloaded or built mesos-debian, mesos-redhat",
+                "Following services are missing and need to be downloaded or built mesos-debian, mesos-redhat, mesos-suse",
                 exception.getMessage());
 
         // Create mesos packages
@@ -203,21 +203,14 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.applySetup(new JsonWrapper(setupConfig));
 
-        assertEquals(0, builtPackageList.size());
-        assertEquals(18, downloadPackageList.size());
+        assertEquals(19, builtPackageList.size());
+        assertEquals(0, downloadPackageList.size());
 
-        Collections.sort(downloadPackageList);
+        Collections.sort(builtPackageList);
         assertEquals(
-                "docker_template_base-eskimo_0.2_1.tar.gz, docker_template_cerebro_0.8.4_1.tar.gz, " +
-                        "docker_template_elasticsearch_6.8.3_1.tar.gz, docker_template_gdash_0.0.1_1.tar.gz, " +
-                        "docker_template_gluster_debian_09_stretch_1.tar.gz, docker_template_grafana_6.3.3_1.tar.gz, " +
-                        "docker_template_kafka-manager_2.0.0.2_1.tar.gz, docker_template_kafka_2.2.0_1.tar.gz, " +
-                        "docker_template_kibana_6.8.3_1.tar.gz, docker_template_logstash_6.8.3_1.tar.gz, " +
-                        "docker_template_mesos-master_1.8.1_1.tar.gz, docker_template_ntp_debian_09_stretch_1.tar.gz, " +
-                        "docker_template_prometheus_2.10.0_1.tar.gz, docker_template_spark_2.4.4_1.tar.gz, " +
-                        "docker_template_zeppelin_0.9.0_1.tar.gz, docker_template_zookeeper_debian_09_stretch_1.tar.gz, " +
-                        "niceideas_mesos-debian_1.8.1_1.tar.gz, niceideas_mesos-redhat_1.8.1_1.tar.gz",
-                String.join(", ", downloadPackageList));
+                    "base-eskimo, cerebro, elasticsearch, gdash, gluster, grafana, kafka, kafka-manager, kibana, " +
+                    "logstash, mesos-debian, mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
+                String.join(", ", builtPackageList));
 
 
     }

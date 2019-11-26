@@ -353,7 +353,13 @@ public class SetupService {
             packagesDistribFolder.mkdirs();
         }
 
-        JsonWrapper packagesVersion = loadRemotePackagesVersionFile();
+        JsonWrapper packagesVersion = null;
+        try {
+            packagesVersion = loadRemotePackagesVersionFile();
+        } catch (SetupException e) {
+            logger.warn (e.getMessage());
+            logger.debug(e, e);
+        }
 
         // 1. Find out about missing packages
         String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
@@ -362,6 +368,10 @@ public class SetupService {
             findMissingServices(packagesDistribFolder, buildPackage);
 
         } else {
+
+            if (packagesVersion == null) {
+                throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
+            }
 
             Set<String> missingServices = new HashSet<>();
             findMissingServices(packagesDistribFolder, missingServices);
@@ -374,6 +384,10 @@ public class SetupService {
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
         if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
 
+            if (packagesVersion == null) {
+                throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
+            }
+
             Set<String> missingServices = new HashSet<>();
 
             findMissingMesos(packagesDistribFolder, missingServices);
@@ -385,25 +399,29 @@ public class SetupService {
         }
 
         // 3. Find out about upgrades
-        Set<String> updates = new HashSet<>();
-        for (String imageName : packagesToBuild.split(",")) {
+        if (packagesVersion != null) {
+            Set<String> updates = new HashSet<>();
 
-            Pair<File, Pair<String, String>> lastVersion = findLastVersion("docker_template_", imageName, packagesDistribFolder);
-            Pair<String, String> lastVersionValues = lastVersion.getValue();
+            for (String imageName : packagesToBuild.split(",")) {
 
-            if (lastVersionValues != null) {
+                Pair<File, Pair<String, String>> lastVersion = findLastVersion("docker_template_", imageName, packagesDistribFolder);
+                Pair<String, String> lastVersionValues = lastVersion.getValue();
 
-                String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName+".software");
-                String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName+".distribution");
+                if (lastVersionValues != null) {
 
-                if (newSoftwareVersion.compareTo(lastVersionValues.getKey()) > 0
-                    || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
-                        && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
-                    updates.add (imageName);
+                    String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
+                    String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
+
+                    if (newSoftwareVersion.compareTo(lastVersionValues.getKey()) > 0
+                            || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
+                            && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
+                        updates.add(imageName);
+                    }
                 }
             }
+            fillInPackages (packageUpdate, packagesVersion, updates);
         }
-        fillInPackages (packageUpdate, packagesVersion, updates);
+
     }
 
     void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
