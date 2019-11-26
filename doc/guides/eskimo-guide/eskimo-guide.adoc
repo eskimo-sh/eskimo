@@ -531,9 +531,9 @@ managed by eskimo needs to have granted access using SSH Public Key authenticati
 * *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
 in regards to how to generate this key : <<ssh_key_authentication>>
 * *Mesos Origin* : the user needs to choose whether Mesos packages need to be *built locally* (on eskimo host node) or
-whether pre-built versions shall be *downloaded* from https://www.niceideas.ch.
+whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
 * *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
-they need to be *downloaded* from https://www.niceideas.ch.
+they need to be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
 
 Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
 and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
@@ -541,6 +541,11 @@ connection and/or the eskimp host machine processing abilities.
 
 Rgerading the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
 to enable eskimo to reach the cluster nodes.
+
+The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
+the nuts and bolts required in setting up a remote packages repository. +
+The remote repository URL is configuren in `eskimo.properties` using the configuration property : +
+`system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
 
 ==== Checking for updates
 

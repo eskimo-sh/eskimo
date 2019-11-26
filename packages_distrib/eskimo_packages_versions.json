@@ -74,7 +74,9 @@
   "mesos-debian": {
     "software": "1.8.1",
     "distribution": "1"
+  },
+  "mesos-suse": {
+    "software": "1.8.1",
+    "distribution": "1"
   }
-
-
 }

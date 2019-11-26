@@ -130,7 +130,7 @@ scripting, docker and systemd. Period.
 
 // included package developer README
 
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..230]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..310]
 
 
 

@@ -144,13 +144,13 @@ chmod 700 ssh_key
 chmod 700 ssh_key.pub
 scp -o StrictHostKeyChecking=no -i ssh_key vagrant@192.168.10.105:/vagrant/mesos-$AMESOS_VERSION.tar.gz . >> /tmp/build-mesos-debian-log 2>&1
 
-if [[ -f "$SCRIPT_DIR/../../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz" ]]; then
-    echo " - renaming previous niceideas_mesos-suse-$AMESOS_VERSION.tar.gz"
-    mv $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz.old
+if [[ -f "$SCRIPT_DIR/../../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz" ]]; then
+    echo " - renaming previous eskimo_mesos-suse-$AMESOS_VERSION.tar.gz"
+    mv $SCRIPT_DIR/../../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz.old
 fi
 
 echo " - Copying Mesos archive to distribution folder"
-mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/niceideas_mesos-suse_"$AMESOS_VERSION"_1.tar.gz
+mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_mesos-suse_"$AMESOS_VERSION"_1.tar.gz
 
 echo " - Destroying build VM"
 vagrant destroy --force suse-build-node  >> /tmp/build-mesos-suse-log 2>&1

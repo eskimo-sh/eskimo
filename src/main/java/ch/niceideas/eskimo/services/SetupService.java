@@ -282,7 +282,7 @@ public class SetupService {
         }
     }
 
-    private Pattern imageFileNamePattern = Pattern.compile("(docker_template_|niceideas_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+    private Pattern imageFileNamePattern = Pattern.compile("(docker_template_|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
 
     Pair<String,String> parseVersion(String name) {
 
@@ -522,7 +522,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".distribution");
 
-                        String fileName = "niceideas_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+                        String fileName = "eskimo_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
 
                         downloadPackage(fileName);
                     }

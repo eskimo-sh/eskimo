@@ -217,6 +217,82 @@ These both commands require vagrant and VirtualBox, respectively libvirt, kvm an
 installed.
 
 
+=== Setting up a remote packages repository
+
+When runnign eskimo, software packages - either service docker images or mesos binary packages - can be either built
+or downloaded from a *remote packages repository*.
+
+Setting up a remote packages repository is extremely simple:
+
+* The software packages need to be downloadable from internet at a specific URL using either HTTP or HTTPS.
+* at the same location where packages are downloaded, a meta-data file should be downloadable and present the various
+available packages.
+
+For instance the following layout should be available from internet or the local network:
+
+* *https://www.niceideas.ch/eskimo/eskimo_packages_versions.json*
+* https://www.niceideas.ch/eskimo/docker_template_base-eskimo_0.2_1.tar.gz
+* https://www.niceideas.ch/eskimo/docker_template_cerebro_0.8.4_1.tar.gz
+* https://www.niceideas.ch/eskimo/docker_template_elasticsearch_6.8.3_1.tar.gz
+* https://www.niceideas.ch/eskimo/docker_template_flink_1.9.1_2.tar.gz
+* https://www.niceideas.ch/eskimo/docker_template_gdash_0.0.1_1.tar.gz
+* https://www.niceideas.ch/eskimo/docker_template_gluster_debian_09_stretch_1.tar.gz
+* etc.
+* https://www.niceideas.ch/eskimo/eskimo_mesos-debian_1.8.1_1.tar.gz
+* https://www.niceideas.ch/eskimo/eskimo_mesos-redhat_1.8.1_1.tar.gz
+* etc.
+
+A software package should be named as follows:
+
+* `docker_template_[software]\_[software_version]_[eskimo_version].tar.gz` for service docker images
+* `eskimo_mesos-[platform]\_[software_version]_[eskimo_version].tar.gz` for service mesos packages
+
+The file `eskimo_packages_versions.json` describes the repository of packages and the available packages.
+
+.Example eskimo_packages_versions.json
+----
+{
+  "base-eskimo" : {
+    "software" : "0.2",
+    "distribution" : "1"
+  },
+  "cerebro": {
+    "software": "0.8.4",
+    "distribution": "1"
+  },
+  "elasticsearch" : {
+    "software": "6.8.3",
+    "distribution": "1"
+  },
+  "flink" : {
+    "software" : "1.9.1",
+    "distribution": "1"
+  },
+  "gdash": {
+    "software" : "0.0.1",
+    "distribution": "1"
+  },
+  "gluster": {
+    "software" : "debian_09_stretch",
+    "distribution": "1"
+  },
+  ...
+  "mesos-redhat": {
+    "software": "1.8.1",
+    "distribution": "1"
+  },
+  "mesos-debian": {
+    "software": "1.8.1",
+    "distribution": "1"
+  },
+  ...
+}
+----
+
+It's content should be aligned with the followin properties from the configuration file `eskimo.properties`:
+
+* `system.packagesToBuild` giving the set of docker images for packages to be or downloaded
+* `system.mesosPackages` giving the name of the mesos packages to built or downloaded
 
 
 
@@ -227,7 +303,11 @@ installed.
 
 
 
-// marker for exclusion : line 230
+
+
+
+
+// marker for exclusion : line 310
 
 [appendix]
 == Copyright and License

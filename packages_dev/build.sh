@@ -86,7 +86,7 @@ if [[ $package == "mesos-rhel" ]] ; then
 
     check_for_vagrant
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-redhat.sh"
     else
         echo "RedHat Mesos package already built"
@@ -96,7 +96,7 @@ elif [[ $package == "mesos-deb" ]] ; then
 
     check_for_vagrant
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-debian.sh"
     else
         echo "Debian Mesos package already built"
@@ -106,7 +106,7 @@ elif [[ $package == "mesos-suse" ]] ; then
 
     check_for_vagrant
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-suse.sh"
     else
         echo "Suse Mesos package already built"
@@ -116,19 +116,19 @@ elif [[ $package == "mesos-all" ]] ; then
 
     check_for_vagrant
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-debian.sh"
     else
         echo "Debian Mesos package already built"
     fi
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-redhat.sh"
     else
         echo "RedHat Mesos package already built"
     fi
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/niceideas_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-suse.sh"
     else
         echo "Suse Mesos package already built"

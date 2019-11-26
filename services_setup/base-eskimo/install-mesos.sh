@@ -92,13 +92,13 @@ sudo rm -Rf /tmp/mesos_setup > /tmp/mesos_install_log 2>&1
 mkdir -p /tmp/mesos_setup
 
 if [[ -f "/etc/debian_version" ]]; then
-    mv niceideas_mesos-debian_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+    mv eskimo_mesos-debian_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/eskimo_mesos_$AMESOS_VERSION.tar.gz
 
 elif [[ -f "/etc/redhat-release" ]]; then
-    mv niceideas_mesos-redhat_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+    mv eskimo_mesos-redhat_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/eskimo_mesos_$AMESOS_VERSION.tar.gz
 
 elif [[ -f "/etc/SUSE-brand" ]]; then
-    mv niceideas_mesos-suse_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/niceideas_mesos_$AMESOS_VERSION.tar.gz
+    mv eskimo_mesos-suse_$AMESOS_VERSION*.tar.gz /tmp/mesos_setup/eskimo_mesos_$AMESOS_VERSION.tar.gz
 
 else
     echo " - !! ERROR : Could not find any brand marker file "
@@ -110,7 +110,7 @@ cd /tmp/mesos_setup
 
 
 echo " - Extracting mesos-$AMESOS_VERSION"
-tar -zxf niceideas_mesos_$AMESOS_VERSION.tar.gz > /tmp/mesos_install_log 2>&1
+tar -zxf eskimo_mesos_$AMESOS_VERSION.tar.gz > /tmp/mesos_install_log 2>&1
 fail_if_error $? "/tmp/mesos_install_log" -2
 
 echo " - Removing any previous mesos installation"
