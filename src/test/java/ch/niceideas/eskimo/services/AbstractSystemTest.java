@@ -117,7 +117,7 @@ public abstract class AbstractSystemTest {
             }
         });
 
-        setupService = new SetupService();
+        setupService = createSetupService();
         servicesDefinition.setSetupService(setupService);
 
         systemService = createSystemService();
@@ -178,6 +178,10 @@ public abstract class AbstractSystemTest {
         servicesConfigService.setServicesDefinition(servicesDefinition);
 
         systemService.setServicesConfigService(servicesConfigService);
+    }
+
+    protected SetupService createSetupService() {
+        return new SetupService();
     }
 
     protected SystemService createSystemService() {

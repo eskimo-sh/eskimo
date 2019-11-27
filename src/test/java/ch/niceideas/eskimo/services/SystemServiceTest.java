@@ -79,6 +79,16 @@ public class SystemServiceTest extends AbstractSystemTest {
         };
     }
 
+    @Override
+    protected SetupService createSetupService() {
+        return new SetupService() {
+            @Override
+            public String findLastPackageFile(String prefix, String packageName) {
+                return prefix+"_"+packageName+"_dummy_1.dummy";
+            }
+        };
+    }
+
     @Test
     public void testInstallService() throws Exception {
 
