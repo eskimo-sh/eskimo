@@ -300,26 +300,28 @@ eskimo.FileManagers = function() {
     };
 
     this.deletePath = function (nodeAddress, nodeName, currentFolder, file) {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            context: this,
-            contentType: "application/json; charset=utf-8",
-            url: "file-manager-delete?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file ,
-            success: function (data, status, jqXHR) {
+        if (confirm("Are you sure you want to delete file " + file + "?")) {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                context: this,
+                contentType: "application/json; charset=utf-8",
+                url: "file-manager-delete?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file,
+                success: function (data, status, jqXHR) {
 
-                if (data.status == "OK") {
+                    if (data.status == "OK") {
 
-                    this.openFolder (nodeAddress, nodeName, currentFolder, ".");
+                        this.openFolder(nodeAddress, nodeName, currentFolder, ".");
 
-                } else {
-                    alert(data.error);
+                    } else {
+                        alert(data.error);
 
-                    // FIXME Close File Manager or make disabled
-                }
-            },
-            error: errorHandler
-        });
+                        // FIXME Close File Manager or make disabled
+                    }
+                },
+                error: errorHandler
+            });
+        }
     };
 
     this.showRoot = function (nodeAddress, nodeName) {

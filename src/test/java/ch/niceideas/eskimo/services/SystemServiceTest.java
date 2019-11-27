@@ -469,7 +469,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         String commandString = testSSHCommandScript.toString();
 
-        //System.err.println (commandString);
+        System.err.println (commandString);
 
         for (String commandStart : expectedCommandStart.split("\n")) {
             assertTrue (commandStart + "\nis contained", commandString.contains(commandStart));
