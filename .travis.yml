@@ -6,7 +6,7 @@ addons:
   sonarcloud:
     organization: "eskimo-sh-sonarqube-key"
     token:
-      secure: "travis encrypt b7a81d906a69022208baa4aec9b3746454758298" 
+      secure: "travis encrypt b7a81d906a69022208baa4aec9b3746454758298"
 
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
