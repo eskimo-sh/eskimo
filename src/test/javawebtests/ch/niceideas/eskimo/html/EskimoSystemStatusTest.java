@@ -34,14 +34,13 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EskimoSystemStatusTest extends AbstractWebTest {
 
@@ -51,8 +50,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
-        jsonStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoNodesStatusTest/testStatus.json"));
-        jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoNodesStatusTest/testStatusConfig.json"));
+        jsonStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatus.json"));
+        jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"));
 
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
         page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoSystemStatus.js')");
@@ -62,21 +61,21 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         page.executeJavaScript("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
 
         // instantiate test object
-        page.executeJavaScript("eskimoNodesStatus = new eskimo.SystemStatus();");
+        page.executeJavaScript("eskimoSystemStatus = new eskimo.SystemStatus();");
 
         waitForElementIdinDOM("service-status-warning");
 
         // set services for tests
-        page.executeJavaScript("eskimoNodesStatus.setStatusServices (STATUS_SERVICES);");
-        page.executeJavaScript("eskimoNodesStatus.setServicesStatusConfig (SERVICES_STATUS_CONFIG);");
+        page.executeJavaScript("eskimoSystemStatus.setStatusServices (STATUS_SERVICES);");
+        page.executeJavaScript("eskimoSystemStatus.setServicesStatusConfig (SERVICES_STATUS_CONFIG);");
     }
 
     @Test
     public void testRenderNodesStatusFlat() throws Exception {
 
-        page.executeJavaScript("eskimoNodesStatus.setRenderInTable(false);");
+        page.executeJavaScript("eskimoSystemStatus.setRenderInTable(false);");
 
-        page.executeJavaScript("eskimoNodesStatus.renderNodesStatus(" + jsonStatus + ", false)");
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonStatus + ", false)");
 
         String flatString = page.executeJavaScript("$('#nodes-status-carousel-content').html()").getJavaScriptResult().toString();
 
@@ -89,9 +88,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testRenderNodesStatusTable() throws Exception {
 
-        page.executeJavaScript("eskimoNodesStatus.setRenderInTable(true);");
+        page.executeJavaScript("eskimoSystemStatus.setRenderInTable(true);");
 
-        page.executeJavaScript("eskimoNodesStatus.renderNodesStatus(" + jsonStatus + ", false)");
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonStatus + ", false)");
 
         String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
@@ -99,6 +98,44 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         assertTrue (tableString.contains("192.168.10.11"));
         assertTrue (tableString.contains("192.168.10.13"));
+
+    }
+
+    @Test
+    public void testRenderNodesStatusTableFiltering() throws Exception {
+
+        page.executeJavaScript("eskimoSystemStatus.setRenderInTable(true);");
+
+        JsonWrapper statusWrapper = new JsonWrapper(jsonStatus);
+        statusWrapper.setValueForPath("service_kafka_192-168-10-13", "NA");
+        statusWrapper.setValueForPath("service_logstash_192-168-10-13", "KO");
+
+        page.executeJavaScript("eskimoSystemStatus.setNodeFilter(\"\")");
+
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
+
+        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        assertNotNull (tableString);
+        assertTrue (tableString.contains("192.168.10.11"));
+        assertTrue (tableString.contains("192.168.10.13"));
+
+        page.executeJavaScript("eskimoSystemStatus.setNodeFilter(\"issues\")");
+
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
+
+        tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        assertNotNull (tableString);
+        assertFalse (tableString.contains("192.168.10.11"));
+        assertTrue (tableString.contains("192.168.10.13"));
+
+        page.executeJavaScript("eskimoSystemStatus.setNodeFilter(\"master\")");
+
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
+
+        tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        assertNotNull (tableString);
+        assertTrue (tableString.contains("192.168.10.11"));
+        assertFalse (tableString.contains("192.168.10.13"));
 
     }
 }

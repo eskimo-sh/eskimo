@@ -74,6 +74,18 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var nodesConfig = {};");
         page.executeJavaScript("nodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
         page.executeJavaScript("nodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
+        page.executeJavaScript("nodesConfig.isServiceUnique = function (serviceName){ " +
+                "return (serviceName == 'mesos-master' " +
+                "    || serviceName == 'zookeeper' " +
+                "    || serviceName == 'grafana' " +
+                "    || serviceName == 'gdash' " +
+                "    || serviceName == 'kafka-manager' " +
+                "    || serviceName == 'spark-history-server' " +
+                "    || serviceName == 'flink-app-master' " +
+                "    || serviceName == 'cerebro' " +
+                "    || serviceName == 'kibana' " +
+                "    || serviceName == 'zeppelin' ); " +
+                "};");
 
 
         page.executeJavaScript("var eskimoMain = {};");

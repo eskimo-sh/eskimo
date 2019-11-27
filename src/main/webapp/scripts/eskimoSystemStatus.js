@@ -47,6 +47,7 @@ eskimo.SystemStatus = function() {
     var SERVICES_STATUS_CONFIG = {};
 
     var renderInTable = true;
+    var nodeFilter = "";
 
     var disconnectedFlag = true;
 
@@ -71,6 +72,26 @@ eskimo.SystemStatus = function() {
 
                 $('#show-table-view-btn').click($.proxy (function () {
                     setRenderInTable (true);
+                    showStatus(true);
+                }, this));
+
+                $('#show-all-nodes-btn').click($.proxy (function () {
+                    $(".filter-btn").attr("class", "btn btn-default filter-btn");
+                    setNodeFilter (null);
+                    showStatus(true);
+                }, this));
+
+                $('#show-master-services-btn').click($.proxy (function () {
+                    $(".filter-btn").attr("class", "btn btn-default filter-btn");
+                    $("#show-master-services-btn").attr("class", "btn filter-btn btn-success");
+                    setNodeFilter ("master");
+                    showStatus(true);
+                }, this));
+
+                $('#show-issues-btn').click($.proxy (function () {
+                    $(".filter-btn").attr("class", "btn btn-default filter-btn");
+                    $("#show-issues-btn").attr("class", "btn filter-btn btn-success");
+                    setNodeFilter ("issues");
                     showStatus(true);
                 }, this));
 
@@ -200,6 +221,11 @@ eskimo.SystemStatus = function() {
         renderInTable = doTable;
     }
     this.setRenderInTable = setRenderInTable;
+
+    function setNodeFilter (doNodeFilter) {
+        nodeFilter = doNodeFilter;
+    }
+    this.setNodeFilter = setNodeFilter;
 
     /** For tests */
     this.setStatusServices = function (statusServices) {
@@ -839,6 +865,9 @@ eskimo.SystemStatus = function() {
 
         for (var nbr = 1; nbr < nodeNamesByNbr.length; nbr++) { // 0 is empty
 
+            var nodeHasIssues = false;
+            var nodeHasMasters = false;
+
             var nodeName = nodeNamesByNbr[nbr];
 
             var nodeAddress = data["node_address_" + nodeName];
@@ -854,6 +883,7 @@ eskimo.SystemStatus = function() {
             } else {
                 arrayRow +=
                     '        <image src="images/node-icon-red.png" class="status-node-image"></image>\n';
+                nodeHasIssues = true;
             }
 
             arrayRow +=
@@ -862,7 +892,9 @@ eskimo.SystemStatus = function() {
                 '    <td class="status-node-cell-intro">' + nodeAddress + '</td>\n';
 
             for (var sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
+
                 var service = STATUS_SERVICES[sNb];
+
                 if (nodeAlive == 'OK') {
 
                     var serviceStatus = data["service_" + service + "_" + nodeName];
@@ -873,12 +905,21 @@ eskimo.SystemStatus = function() {
 
                     } else if (serviceStatus == "NA") {
 
+                        if (eskimoMain.getNodesConfig().isServiceUnique(service)) {
+                            nodeHasMasters = true;
+                        }
+
                         arrayRow +=
                             '    <td class="status-node-cell-empty"><span class="service-status-error '+
                             '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
-                            '      ">NA</span></td>\n'
+                            '      ">NA</span></td>\n';
+                        nodeHasIssues = true;
 
                     } else if (serviceStatus == "KO") {
+
+                        if (eskimoMain.getNodesConfig().isServiceUnique(service)) {
+                            nodeHasMasters = true;
+                        }
 
                         arrayRow +=
                             '    <td class="status-node-cell'+(eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
@@ -893,15 +934,21 @@ eskimo.SystemStatus = function() {
                             '</tbody></table>\n' +
                             '\n' +
                             '</span>' +
-                            '</td>\n'
+                            '</td>\n';
+                        nodeHasIssues = true;
 
                     } else {
+
+                        if (eskimoMain.getNodesConfig().isServiceUnique(service)) {
+                            nodeHasMasters = true;
+                        }
 
                         var color = "darkgreen";
                         if (serviceStatus == "TD") {
                             color = "violet";
                         } else if (serviceStatus == "restart") {
                             color = "#CB4335";
+                            nodeHasIssues = true;
                         }
 
                         arrayRow +=
@@ -929,7 +976,16 @@ eskimo.SystemStatus = function() {
 
             var newRow = $(arrayRow);
 
-            statusContainerTableBody.append(newRow);
+            // filtering
+            if (!nodeFilter || nodeFilter == null) {
+                statusContainerTableBody.append(newRow);
+
+            } else if ((nodeFilter == "master") && nodeHasMasters) {
+                statusContainerTableBody.append(newRow);
+
+            } else if ((nodeFilter == "issues") && nodeHasIssues) {
+                statusContainerTableBody.append(newRow);
+            }
         }
 
         registerMenu("#status-node-table-body td.status-node-cell", "status-node-cell");

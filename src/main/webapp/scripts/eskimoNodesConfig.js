@@ -158,6 +158,14 @@ eskimo.NodesConfig = function() {
         return serviceConfig.icon;
     };
 
+    this.isServiceUnique = function (service) {
+        var serviceConfig = SERVICES_CONFIGURATION[service];
+        if (serviceConfig == null) {
+            console.error ("Could not definition for service " + service);
+            return false;
+        }
+        return serviceConfig.unique;
+    };
 
     this.getConfiguredServices = function() {
         return CONFIGURED_SERVICES;
