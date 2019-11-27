@@ -448,29 +448,56 @@ eskimo.FileManagers = function() {
 
     function submitFormFileUpload (e, nodeName, nodeAddress) {
         $("#file-manager-upload-form-"+nodeName).on('submit',(function(e) {
+
+            // reset modal
+            $('#file-upload-progress-bar').attr('aria-valuenow', "1%").css('width', "1%");
+            $('#file-upload-progress-bar').html("1%");
+            $('#file-upload-progress-modal').modal("show");
+
+            completeCallback = function (data) {
+
+                $('#file-upload-progress-modal').modal("hide");
+
+                if(data) {
+
+                    if (data.status == "KO") {
+                        alert (data.error);
+                    } else {
+                        refreshFolder (nodeAddress, nodeName);
+                    }
+
+                } else {
+                    alert ("No result obtained from backend. This is an unexpected error.")
+                }
+            };
+
             e.preventDefault();
             $.ajax({
                 url: "file-manager-upload?address=" + nodeAddress+ "&nodeName=" + nodeName,
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total;
+                            console.log(percentComplete);
+                            var newProgress = Math.ceil(percentComplete * 100);
+                            $('#file-upload-progress-bar').attr('aria-valuenow', newProgress+"%").css('width', newProgress+"%");
+                            $('#file-upload-progress-bar').html(newProgress+"%");
+                        }
+                    }, false);
+                    return xhr;
+                },
                 type: "POST",
                 dataType: "json",
                 data:  new FormData(this),
                 contentType: false,//"application/json; charset=utf-8",
                 cache: false,
                 processData:false,
-                success: function(data) {
-                    if(data) {
-
-                        if (data.status == "KO") {
-                            alert (data.error);
-                        } else {
-                            refreshFolder (nodeAddress, nodeName);
-                        }
-
-                    } else {
-                        alert ("No result obtained from backend. This is an unexpected error.")
-                    }
-                },
-                error: errorHandler
+                success: completeCallback,
+                error: function (jqXHR, status) {
+                    errorHandler(jqXHR, status);
+                    $('#file-upload-progress-modal').modal("hide");
+                }
             });
         }));
     }

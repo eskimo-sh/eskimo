@@ -87,7 +87,11 @@ function errorHandler (jqXHR, status) {
         window.location = "login.html";
     }
 
-    alert('fail : ' + status);
+    if (jqXHR && jqXHR.responseJSON  && jqXHR.responseJSON.message) {
+        alert('fail : ' + jqXHR.responseJSON.message);
+    } else {
+        alert('fail : ' + status);
+    }
 }
 
 function isFunction(functionToCheck) {
