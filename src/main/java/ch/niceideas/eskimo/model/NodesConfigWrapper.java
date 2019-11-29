@@ -45,10 +45,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NodesConfigWrapper extends JsonWrapper {
+public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
 

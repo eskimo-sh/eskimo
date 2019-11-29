@@ -59,6 +59,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ServicesConfigService {
 
     private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
+    public static final String SERVICES_CONFIG_JSON_FILE = "/services-config.json";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -93,7 +94,7 @@ public class ServicesConfigService {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + "/services-config.json"), status.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + SERVICES_CONFIG_JSON_FILE), status.getFormattedValue());
         } finally {
             servicesConfigFileLock.unlock();
         }
@@ -103,7 +104,7 @@ public class ServicesConfigService {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + "/services-config.json");
+            File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_FILE);
             if (!statusFile.exists()) {
                 return ServicesConfigWrapper.initEmpty(servicesDefinition);
             }
@@ -116,7 +117,7 @@ public class ServicesConfigService {
 
     public ServicesConfigWrapper loadServicesConfigNoLock() throws JSONException, FileException, SetupException {
         String configStoragePath = setupService.getConfigStoragePath();
-        File statusFile = new File(configStoragePath + "/services-config.json");
+        File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_FILE);
         if (!statusFile.exists()) {
             return ServicesConfigWrapper.initEmpty(servicesDefinition);
         }

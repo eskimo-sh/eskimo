@@ -139,8 +139,8 @@ public abstract class AbstractBaseSSHTest {
             throw new RuntimeException(e);
         }
 
-        privateKeyContent = privateKeyRaw.replaceAll("\\n", "").replace("-----BEGIN RSA PRIVATE KEY-----", "").replace("-----END RSA PRIVATE KEY-----", "");
-        publicKeyContent = publicKeyRaw.replaceAll("\\n", "").replace("-----BEGIN RSA PUBLIC KEY-----", "").replace("-----END RSA PUBLIC KEY-----", "");
+        privateKeyContent = privateKeyRaw.replace("\\n", "").replace("-----BEGIN RSA PRIVATE KEY-----", "").replace("-----END RSA PRIVATE KEY-----", "");
+        publicKeyContent = publicKeyRaw.replace("\\n", "").replace("-----BEGIN RSA PUBLIC KEY-----", "").replace("-----END RSA PUBLIC KEY-----", "");
 
         privateKeyBytes = Base64.decodeBase64(privateKeyContent);
         publicKeyBytes = Base64.decodeBase64(publicKeyContent);

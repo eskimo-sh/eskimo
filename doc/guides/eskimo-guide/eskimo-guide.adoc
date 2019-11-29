@@ -323,6 +323,13 @@ set JAVA_HOME=C:\programs\jdk-9
 set PATH=%JAVA_HOME%\bin;%PATH%
 ----
 
+==== System requirements
+
+In order to run eskimo, one needs to have
+
+* At least 8Gb of disk storage space on the machine running Eskimo
+* At least one linux machine available on the network (can be the same machine than the one running Eskimo). See next
+section regarding requirements for that node.
 
 ==== Prerequisites on eskimo cluster nodes
 
@@ -373,7 +380,7 @@ see <<ssh_key_authentication>>.
 *In addition, that user needs to have sudo access without requiring to enter a password!*
 
 
-==== Internet access on cluster nodes
+==== Required packages installation and Internet access on cluster nodes
 
 Eskimo performs some initial setup operations on every node of the cluster it needs to operate. Some of these
 operations require Internet access to download dependencies (either RPM or DEB packages).

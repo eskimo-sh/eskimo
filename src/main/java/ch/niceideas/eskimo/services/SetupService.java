@@ -63,6 +63,7 @@ public class SetupService {
 
     private static final Logger logger = Logger.getLogger(SetupService.class);
     public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
+    public static final String TEMP_DOWNLOAD_SUFFIX = "__temp_download";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -141,19 +142,12 @@ public class SetupService {
             logger.warn ("Application is not initialized properly. Missing file 'storagePath.conf' in backend working directory.");
             return null;
         }
-        BufferedReader reader =null;
-        try {
-            reader = new BufferedReader(new FileReader(entryFile));
+        try (BufferedReader reader = new BufferedReader(new FileReader(entryFile))) {
             return reader.readLine();
+
         } catch (IOException e) {
             logger.error(e, e);
             return null;
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ignored) {}; // ignored
-            }
         }
     }
 
@@ -195,7 +189,7 @@ public class SetupService {
             if (Arrays.stream(packagesDistribFolder.listFiles())
                     .noneMatch(file ->
                             file.getName().contains(mesosPackage)
-                                    && !file.getName().contains("__temp_download"))) {
+                                    && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX))) {
                 missingServices.add(mesosPackage);
             }
         }
@@ -207,7 +201,7 @@ public class SetupService {
                     .noneMatch(file ->
                             file.getName().contains("docker_template")
                                     && file.getName().contains("_"+service+"_")
-                                    && !file.getName().contains("__temp_download"))) {
+                                    && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX))) {
                 missingServices.add(service);
             }
         }
@@ -589,7 +583,7 @@ public class SetupService {
                             String downloadUrlString = packagesDownloadUrlRoot + "/" + fileName;
                             URL downloadUrl = new URL(downloadUrlString);
 
-                            File tempFile = new File(targetFile.getAbsolutePath() + "__temp_download");
+                            File tempFile = new File(targetFile.getAbsolutePath() + TEMP_DOWNLOAD_SUFFIX);
 
                             if (targetFile.exists()) {
                                 builder.append(fileName);
@@ -613,13 +607,14 @@ public class SetupService {
         // download mesos using full java solution, no script (don't want dependency on system script for this)
         ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream());
 
-        FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
-        FileChannel fileChannel = fileOutputStream.getChannel();
+        try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
+            FileChannel fileChannel = fileOutputStream.getChannel();
 
-        builder.append(message);
+            builder.append(message);
 
-        fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-        fileChannel.close();
+            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            fileChannel.close();
+        }
     }
 
     protected void buildPackage(String image) throws SetupException {

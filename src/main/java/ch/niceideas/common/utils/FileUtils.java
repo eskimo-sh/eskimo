@@ -69,31 +69,28 @@ public class FileUtils {
             // directory is empty, then delete it
             if (file.list().length == 0) {
 
-                file.delete();
+                if (file.delete()) {
+                    logger.debug("Directory is deleted : " + file.getAbsolutePath());
+                } else {
+                    throw new FileDeleteFailedException ("Could not delete directory " + file.getAbsolutePath());
+                }
                 logger.debug ("Directory is deleted : " + file.getAbsolutePath());
 
             } else {
 
-                // list all the directory contents
-                String files[] = file.list();
-
-                for (String temp : files) {
-                    // construct the file structure
-                    File fileDelete = new File(file, temp);
+                for (File underFile : file.listFiles()) {
 
                     // recursive delete
-                    delete(fileDelete);
+                    delete(underFile);
                 }
 
                 // check the directory again, if empty then delete it
-                if (file.list().length == 0) {
-                    if (file.delete()) {
-                        logger.debug("File is deleted : " + file.getAbsolutePath());
-                    } else {
-                        throw new FileDeleteFailedException ("Could not delete directory " + file.getAbsolutePath());
-                    }
-                    logger.debug ("Directory is deleted : " + file.getAbsolutePath());
+                if (file.list().length > 0) {
+                    throw new FileDeleteFailedException ("Could not delete all files from directory " + file.getAbsolutePath());
                 }
+
+                // try delete once more
+                delete (file);
             }
 
         } else {
@@ -144,29 +141,19 @@ public class FileUtils {
 
     public static void writeFile (File file, String content) throws FileException {
 
-        BufferedWriter filerite = null;
-        try {
-            filerite = new BufferedWriter(new FileWriter(file));
-            filerite.write(content);
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file))) { ;
+            fileWriter.write(content);
 
         } catch (IOException e) {
             logger.error(e, e);
             throw new FileException(e.getMessage(), e);
-        } finally {
-            if (filerite != null) {
-                try {
-                    filerite.close();
-                } catch (IOException ignored) {}
-            }
         }
     }
 
     public static String readFile (File file) throws FileException {
 
         StringBuilder resultBuilder = new StringBuilder();
-        BufferedReader fileReader  = null;
-        try {
-            fileReader = new BufferedReader(new FileReader(file));
+        try (BufferedReader fileReader= new BufferedReader(new FileReader(file));) {
             String line = null;
 
             boolean first = true;
@@ -182,12 +169,6 @@ public class FileUtils {
         } catch (IOException e) {
             logger.error(e, e);
             throw new FileException(e.getMessage(), e);
-        } finally {
-            if (fileReader != null) {
-                try {
-                    fileReader.close();
-                } catch (IOException ignored) {}
-            }
         }
 
         return resultBuilder.toString();
@@ -200,12 +181,13 @@ public class FileUtils {
      * @param targetFileName the archive name
      */
     public static void createTarFile(String sourceFolder, String targetFileName) throws IOException {
-        TarArchiveOutputStream tarOs = null;
+        File targetFile = new File (targetFileName);
+        boolean success = true;
         try {
             // Using input name to create output name
-            FileOutputStream fos = new FileOutputStream(targetFileName);
+            FileOutputStream fos = new FileOutputStream(targetFile);
             GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
-            tarOs = new TarArchiveOutputStream(gos);
+            TarArchiveOutputStream tarOs = new TarArchiveOutputStream(gos);
             File folder = new File(sourceFolder);
             File[] fileNames = folder.listFiles();
             assert fileNames != null;
@@ -213,13 +195,21 @@ public class FileUtils {
                 addFilesToTarGZ(folder.getName() + "/" + file.getName(), file, tarOs);
             }
 
+            tarOs.close();
+
+        } catch (IOException e) {
+            logger.error (e, e);
+            logger.warn ("An error here is often an indication that there is an unresolved symbolic link in folder to archive.");
+            success = false;
+            throw new IOException(e);
+
         } finally {
-            try {
-                tarOs.close();
-            } catch (IOException e) {
-                logger.error (e, e);
-                logger.warn ("An error here is often an indication that there is an unresolved symbolic link in folder to archive.");
-                throw new IOException(e);
+
+            if (!success) {
+                logger.warn ("Creating tar file " + targetFileName + " ended up in error. Trying to clean file");
+                if (targetFile.delete()) {
+                    logger.debug ("Cleaned file");
+                }
             }
         }
     }
@@ -229,18 +219,18 @@ public class FileUtils {
             throws IOException{
         // New TarArchiveEntry
         tos.putArchiveEntry(new TarArchiveEntry(file, fileName));
-        if(file.isFile()){
+        if (file.isFile()){
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
             // Write content of the file
             IOUtils.copy(bis, tos);
             tos.closeArchiveEntry();
             fis.close();
-        }else if(file.isDirectory()){
+        } else if (file.isDirectory()){
             // no need to copy any content since it is
             // a directory, just close the outputstream
             tos.closeArchiveEntry();
-            for(File cFile : file.listFiles()){
+            for (File cFile : file.listFiles()){
                 // recursively call the method for all the subfolders
                 addFilesToTarGZ(fileName + "/" + cFile.getName(), cFile, tos);
 

@@ -34,31 +34,14 @@
 
 package ch.niceideas.common.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import org.apache.log4j.Logger;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -532,42 +515,6 @@ public abstract class StringUtils {
     }
 
     /**
-     * Return the first line of a message
-     * 
-     * @param str The string to cut at first eol
-     * @return the cut string (possibly the same one)
-     */
-    static public String firstLine(String str) {
-        // We lookup for the first of \n or start of local eol sequence
-        // or <cr>
-
-        // find the first character of the EOL sequence
-        int lf = str.indexOf(EOL_CHAR); // -1 if not found
-
-        // If needed, look for \n
-        if (EOL_CHAR != '\n') {
-            int commonLf = str.indexOf('\n');
-            // Update it only if previous not valid or current smaller
-            if ((lf == -1) || (commonLf != -1 && commonLf < lf)) {
-                lf = commonLf;
-            }
-        }
-        // If needed, look for \r
-        if (EOL_CHAR != '\r') {
-            int commonLf = str.indexOf('\r');
-            // Update it only if previous not valid or current smaller
-            if ((lf == -1) || (commonLf != -1 && commonLf < lf)) {
-                lf = commonLf;
-            }
-        }
-        if (lf == -1) {
-            return str; // Single line string
-        } else {
-            return str.substring(0, lf);
-        }
-    }
-
-    /**
      * Replace all occurences of a substring within a string with another string.
      * 
      * @param inString String to examine
@@ -598,128 +545,12 @@ public abstract class StringUtils {
     }
 
     /**
-     * Take a String which is a delimited list and convert it to a String array.
-     * <p>
-     * A single delimiter can consists of more than one character: It will still be considered as single delimiter
-     * string, rather than as bunch of potential delimiter characters - in contrast to
-     * <code>tokenizeToStringArray</code>.
-     * 
-     * @param str the input String
-     * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual
-     *            delimiter characters)
-     * @return an array of the tokens in the list
-     */
-    public static String[] delimitedListToStringArray(String str, String delimiter) {
-        return delimitedListToStringArray(str, delimiter, null);
-    }
-
-    /**
-     * Take a String which is a delimited list and convert it to a String array.
-     * <p>
-     * A single delimiter can consists of more than one character: It will still be considered as single delimiter
-     * string, rather than as bunch of potential delimiter characters - in contrast to
-     * <code>tokenizeToStringArray</code>.
-     * 
-     * @param str the input String
-     * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual
-     *            delimiter characters)
-     * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f"
-     *            will delete all new lines and line feeds in a String.
-     * @return an array of the tokens in the list
-     */
-    public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
-        if (str == null) {
-            return new String[0];
-        }
-        if (delimiter == null) {
-            return new String[] { str };
-        }
-        List<String> result = new ArrayList<String>();
-        if ("".equals(delimiter)) {
-            for (int i = 0; i < str.length(); i++) {
-                result.add(deleteAny(str.substring(i, i + 1), charsToDelete));
-            }
-        } else {
-            int pos = 0;
-            int delPos = 0;
-            while ((delPos = str.indexOf(delimiter, pos)) != -1) {
-                result.add(deleteAny(str.substring(pos, delPos), charsToDelete));
-                pos = delPos + delimiter.length();
-            }
-            if (str.length() > 0 && pos <= str.length()) {
-                // Add rest of String, but not in case of empty input.
-                result.add(deleteAny(str.substring(pos), charsToDelete));
-            }
-        }
-        return toStringArray(result);
-    }
-
-    /**
-     * Delete any character in a given String.
-     * 
-     * @param inString the original String
-     * @param charsToDelete a set of characters to delete. E.g. "az\n" will delete 'a's, 'z's and new lines.
-     * @return the resulting String
-     */
-    public static String deleteAny(String inString, String charsToDelete) {
-        if (inString == null || inString.length() == 0 || charsToDelete == null || charsToDelete.length() == 0) {
-            return inString;
-        }
-        StringBuilder out = new StringBuilder();
-        for (int i = 0; i < inString.length(); i++) {
-            char c = inString.charAt(i);
-            if (charsToDelete.indexOf(c) == -1) {
-                out.append(c);
-            }
-        }
-        return out.toString();
-    }
-
-    /**
-     * Copy the given Collection into a String array. The Collection must contain String elements only.
-     * 
-     * @param collection the Collection to copy
-     * @return the String array (<code>null</code> if the passed-in Collection was <code>null</code>)
-     */
-    public static String[] toStringArray(Collection<String> collection) {
-        if (collection == null) {
-            return null;
-        }
-        return collection.toArray(new String[collection.size()]);
-    }
-
-    /**
-     * Convenience method to return a Collection as a delimited (e.g. CSV) String. E.g. useful for
-     * <code>toString()</code> implementations.
-     * 
-     * @param coll the Collection to display
-     * @param delim the delimiter to use (probably a ",")
-     * @param prefix the String to start each element with
-     * @param suffix the String to end each element with
-     * @return the delimited String
-     */
-    public static String collectionToDelimitedString(Collection<String> coll, String delim, String prefix, String suffix) {
-        if (coll == null || coll.size() == 0) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        Iterator<String> it = coll.iterator();
-        while (it.hasNext()) {
-            sb.append(prefix).append(it.next()).append(suffix);
-            if (it.hasNext()) {
-                sb.append(delim);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
      * 
      * @param source
      * @param searches
      * @return
      */
-    static public int[] multipleSearch (String source, String[] searches) {
+    public static int[] multipleSearch (String source, String[] searches) {
         int[] ret = new int[searches.length]; 
         int[] temp  = new int[searches.length]; 
         for (int j = 0; j < searches.length; j++) {
@@ -761,13 +592,4 @@ public abstract class StringUtils {
     	}
     	return source;
     }
-
-	public static String repeat(String string, int counter) {
-		StringBuilder retBuilder = new StringBuilder();
-		for (int i = 0; i < counter; i++) {
-			retBuilder.append (string);
-		}
-		return retBuilder.toString();
-	}
-
 }

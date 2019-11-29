@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.UnboundList;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,12 +64,10 @@ public abstract class AbstractInformationService<T, R> {
 
     protected abstract R buildFetchedData(int lastLine);
 
-    @Transactional
     protected void addElement (T element) {
         elements.add(element);
     }
 
-    @Transactional
     protected void addAllElements(List<T> newElements) {
         elements.addAll(newElements);
     }
@@ -79,7 +78,7 @@ public abstract class AbstractInformationService<T, R> {
     }
 
     @Transactional
-    public final Integer getLastElement() {
+    public Integer getLastElement() {
         return elements.size();
     }
 }

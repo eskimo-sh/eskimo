@@ -47,11 +47,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class ServicesConfigWrapper extends JsonWrapper {
+public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ServicesConfigWrapper.class);
 

@@ -42,12 +42,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ServicesInstallStatusWrapper extends JsonWrapper {
+public class ServicesInstallStatusWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ServicesInstallStatusWrapper.class);
     private List<String> installedServices;
@@ -74,7 +75,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper {
 
     public boolean isServiceOK(String service, String nodeName) {
         try {
-            return ("OK".equals(getValueForPath(service + "_installed_on_IP_" + nodeName)));
+            return ("OK".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName)));
         } catch (JSONException e) {
             logger.error(e, e);
             return false;
@@ -83,8 +84,8 @@ public class ServicesInstallStatusWrapper extends JsonWrapper {
 
     public boolean isServiceInstalled(String service, String nodeName) {
         try {
-            return ("OK".equals(getValueForPath(service + "_installed_on_IP_" + nodeName))
-                 || "restart".equals(getValueForPath(service + "_installed_on_IP_" + nodeName)));
+            return ("OK".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName))
+                 || "restart".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName)));
         } catch (JSONException e) {
             logger.error(e, e);
             return false;
@@ -115,9 +116,9 @@ public class ServicesInstallStatusWrapper extends JsonWrapper {
 
     public Set<String> getIpAddresses() {
         return getRootKeys().stream()
-                .filter(key -> key.contains("_installed_on_IP_"))
-                .map(key -> key.substring(key.indexOf("_installed_on_IP_") + "_installed_on_IP_".length()))
-                .map(key -> key.replaceAll("-", "."))
+                .filter(key -> key.contains(OperationsCommand.INSTALLED_ON_IP_FLAG))
+                .map(key -> key.substring(key.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length()))
+                .map(key -> key.replace("-", "."))
                 .collect(Collectors.toSet());
     }
 }

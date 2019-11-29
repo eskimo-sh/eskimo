@@ -43,13 +43,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SystemStatusWrapper extends JsonWrapper {
+public class SystemStatusWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(SystemStatusWrapper.class);
+    public static final String NODE_ALIVE_FLAG = "node_alive_";
 
     public SystemStatusWrapper(File statusFile) throws FileException, JSONException {
         super(FileUtils.readFile(statusFile));
@@ -74,12 +76,14 @@ public class SystemStatusWrapper extends JsonWrapper {
     public Boolean isNodeAlive(String nodeName) {
         String nodeAliveFlag = null;
         try {
-            nodeAliveFlag = (String) getValueForPath("node_alive_" + nodeName);
+            nodeAliveFlag = (String) getValueForPath(NODE_ALIVE_FLAG + nodeName);
         } catch (JSONException e) {
             logger.debug (e, e);
+            // NOSONAR
             return null;
         }
         if (StringUtils.isBlank(nodeAliveFlag)) {
+            // NOSONAR
             return null;
         }
         return nodeAliveFlag.equals("OK") ? Boolean.TRUE : Boolean.FALSE;
@@ -98,9 +102,9 @@ public class SystemStatusWrapper extends JsonWrapper {
 
     public Set<String> getIpAddresses() {
         return getRootKeys().stream()
-                .filter(key -> key.contains("node_alive_"))
-                .map(key -> key.substring(key.indexOf("node_alive_") + "node_alive_".length()))
-                .map(key -> key.replaceAll("-", "."))
+                .filter(key -> key.contains(NODE_ALIVE_FLAG))
+                .map(key -> key.substring(key.indexOf(NODE_ALIVE_FLAG) + NODE_ALIVE_FLAG.length()))
+                .map(key -> key.replace("-", "."))
                 .collect(Collectors.toSet());
     }
 }

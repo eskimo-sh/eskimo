@@ -53,6 +53,10 @@ public class Topology {
 
     private static final Logger logger = Logger.getLogger(Topology.class);
 
+    public static final String MASTER_PREFIX = "MASTER_";
+    public static final String SELF_MASTER_PREFIX = "SELF_MASTER_";
+    public static final String NODE_NBR_PREFIX = "NODE_NBR_";
+
     private static Pattern serviceParser = Pattern.compile("([a-zA-Z_\\-]+)([0-9]*)");
 
     private final Map<String, String> definedMasters = new HashMap<>();
@@ -130,7 +134,7 @@ public class Topology {
 
                 servicesDefinition.executeInEnvironmentLock(persistentEnvironment -> {
 
-                    String variableName = "NODE_NBR_" + service.getName().toUpperCase().toUpperCase()+"_"+ipAddress.replaceAll("\\.", "");
+                    String variableName = NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase()+"_"+ipAddress.replace(".", "");
 
                     String varValue = (String) persistentEnvironment.getValueForPath(variableName);
                     if (StringUtils.isBlank(varValue)) {
@@ -141,7 +145,7 @@ public class Topology {
                         do {
                             boolean alreadyTaken = false;
                             for (String key : persistentEnvironment.getRootKeys()) {
-                                if (key.startsWith("NODE_NBR_" + service.getName().toUpperCase().toUpperCase() + "_")) {
+                                if (key.startsWith(NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase() + "_")) {
                                     int value = Integer.parseInt((String)persistentEnvironment.getValueForPath(key));
                                     if (value >= counter) {
                                         alreadyTaken = true;
@@ -205,7 +209,7 @@ public class Topology {
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     String masterIp = findFirstOtherServiceIP(nodesConfig, deadIps, dep.getMasterService(), otherMasters);
                     masterIp = handleMissingMaster(dep, service, masterIp, i);
-                    definedMasters.put("MASTER_" + getVariableName(dep) +"_"+i, masterIp);
+                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) +"_"+i, masterIp);
                     otherMasters.add(masterIp);
                 }
                 break;
@@ -217,15 +221,15 @@ public class Topology {
 
                 String multiServiceValue = (String) nodesConfig.getValueForPath(dep.getMasterService() + nodeNbr);
                 if (StringUtils.isNotBlank(multiServiceValue)) {
-                    definedMasters.put("SELF_MASTER_" + getVariableName(dep)+"_"+ipAddress.replaceAll("\\.", ""), ipAddress);
+                    definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), ipAddress);
                 } else {
                     String uniqueServiceNbrString = (String) nodesConfig.getValueForPath(dep.getMasterService());
                     if (StringUtils.isNotBlank(uniqueServiceNbrString)) {
-                        definedMasters.put("SELF_MASTER_" + getVariableName(dep)+"_"+ipAddress.replaceAll("\\.", ""), ipAddress);
+                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), ipAddress);
                     } else {
                         String masterIp = findFirstServiceIP(nodesConfig, deadIps, dep.getMasterService());
                         masterIp = handleMissingMaster(dep, service, masterIp);
-                        definedMasters.put("SELF_MASTER_" + getVariableName(dep)+"_"+ipAddress.replaceAll("\\.", ""), masterIp);
+                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), masterIp);
                     }
                 }
                 break;
@@ -234,7 +238,7 @@ public class Topology {
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     String masterIp = findRandomOtherServiceIP(nodesConfig, deadIps, dep.getMasterService(), otherMasters);
                     masterIp = handleMissingMaster(dep, service, masterIp, i);
-                    definedMasters.put("MASTER_" + getVariableName(dep)+"_"+i, masterIp);
+                    definedMasters.put(MASTER_PREFIX + getVariableName(dep)+"_"+i, masterIp);
                     otherMasters.add(masterIp);
                 }
                 break;
@@ -246,11 +250,12 @@ public class Topology {
 
                 String masterIp = findRandomServiceIPAfter(nodesConfig, deadIps, dep.getMasterService(), nodeNbr);
                 masterIp = handleMissingMaster(dep, service, masterIp);
-                definedMasters.put("MASTER_" + getVariableName(dep)+"_"+ipAddress.replaceAll("\\.", ""), masterIp);
+                definedMasters.put(MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), masterIp);
 
                 break;
 
             case SAME_NODE:
+            default:
                 // do nothing here. WIll be enforced by checker.
                 break;
         }
@@ -258,7 +263,7 @@ public class Topology {
     }
 
     String getVariableName(Dependency dep) {
-        return dep.getMasterService().toUpperCase().replaceAll("-", "_");
+        return dep.getMasterService().toUpperCase().replace("-", "_");
     }
 
     private String handleMissingMaster(Dependency dep, Service service, String masterIp, int countOfMaster) throws NodesConfigurationException {
@@ -374,11 +379,11 @@ public class Topology {
 
     public String[] getMasters(Service service) {
 
-        String variableName = service.getName().toUpperCase().replaceAll("-", "_");
+        String variableName = service.getName().toUpperCase().replace("-", "_");
 
         List<String> retMasters = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            String ipAddress = definedMasters.get("MASTER_" + variableName + "_" + i);
+            String ipAddress = definedMasters.get(MASTER_PREFIX + variableName + "_" + i);
             if (StringUtils.isNotBlank(ipAddress)) {
                 retMasters.add(ipAddress);
             }
@@ -461,7 +466,7 @@ public class Topology {
             for (String service : memoryList) {
                 sb.append("export ");
                 sb.append("MEMORY_");
-                sb.append(service.toUpperCase().replaceAll("-", "_"));
+                sb.append(service.toUpperCase().replace("-", "_"));
                 sb.append("=");
                 sb.append(memorySettings.get(service));
                 sb.append("\n");

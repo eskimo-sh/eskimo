@@ -43,7 +43,7 @@ body.empty-page {
 body.empty-page-white {
     width: 100%;
     flex-grow: 1;;
-    background-color: #white;
+    background-color: white;
 }
 
 .eskimo-panel-heading,
@@ -331,7 +331,7 @@ li.disabled a .menu-text {
 
 table.system-information {
     padding: 0;
-    cellspacing: 0;
+    border-spacing: 0;
     margin: 0;
     border-collapse: collapse;
     border: 0px none;
@@ -339,7 +339,7 @@ table.system-information {
 
 table.system-information tr td {
     padding: 0;
-    cellspacing: 0;
+    border-spacing: 0;
     margin: 0;
     border-collapse: collapse;
     border: 0px none;
@@ -675,7 +675,6 @@ table.system-information tr td.info-label {
     top: 5px;
     right: -230px;
     z-index: 9999;
-    height: auto;
     -webkit-transition: 0.5s;
     transition: 0.5s;
 }

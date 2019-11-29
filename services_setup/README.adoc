@@ -306,25 +306,104 @@ Let's start by introducing what are the supported values for this `masterElectio
 
 * `NONE` : This is the simplest case. This enables a service to define as requiring another service without
 bothering where it should be installed. It just has to be present somewhere on the cluster and the first service
-doesn't care where.
+doesn't care where. +
+It however enforces the presence of that dependency service somewhere and refuses to validate the installation if the
+dependency is not available somewhere on the eskimo nodes cluster.
 * `FIRST_NODE` : This is used to define a simple dependency on another service. In addition, `FIRST_NODE` indicates that
-the first service wants to know about at least one node where that other service is available. That other node
-should be the _first node_ found where that other service is available.
-* `SAME_NODE_OR_RANDOM` : This is used to define a simple dependency on another service. In addition,
-`SAME_NODE_OR_RANDOM` indicates that the first service wants to know about at least one node where that other service is
-available. That other node should be the same node if that other service is available on the same node than the
-first service or any random one if that is not the case.
-* `RANDOM` : This is used to define a simple dependency on another service. In addition, `RANDOM` indicates that the
-first service wants to know about at least one node where that other service is available. That other node should be
-any node of the cluster where the second service is installed.
-* `RANDOM_NODE_AFTER` : This is used to define a simple dependency on another service. In addition, `RANDOM_NODE_AFTER`
-indicates that the first service wants to know about at least one node where that other service is available. That other
-node should be any node of the cluster where the second service is installed yet with a *node number* (internal eskimo
-node configuration) greater than the current node where the first service is installed. +
+the service where it is declared wants to know about at least one node where the dependency service is available. +
+That other node should be the _first node_ found where that dependency service is available. +
+_First_ node means that the nodes are processed by their order of declaration. The first node than runs the dependency
+service will be given as dependency to the declaring service.
+* `SAME_NODE_OR_RANDOM` : This is used to define a simple dependency on another service. In details,
+`SAME_NODE_OR_RANDOM` indicates that the first service wants to know about at least one node where the dependency
+service is available. +
+In the case of `SAME_NODE_OR_RANDOM`, eskimo tries to find the depencency service on the very same node than
+the one running the declaring service if that dependent service is available on that very same node. +
+If no instance of the dependency service is not running on the very same node, then any other random node running the
+dependency service is used as dependency.
+* `RANDOM` : This is used to define a simple dependency on another service. In details, `RANDOM` indicates that the
+first service wants to know about at least one node where the dependency service is available. That other node can be
+any other node of the cluster where the dependency service is installed.
+* `RANDOM_NODE_AFTER` : This is used to define a simple dependency on another service. In details, `RANDOM_NODE_AFTER`
+indicates that the first service wants to know about at least one node where that dependency service is available. +
+That other node should be any node of the cluster where the second service is installed yet with a *node number*
+(internal eskimo node declaration order) greater than the current node where the first service is installed. +
 This is usefull to define a chain of dependencies where every node instance depends on another node instance in a
-circular way (pretty nifty for instance for elasticsearch discovery).)
-* `SAME_NODE` : This means that the other service is expected to be available on the same node than the first
+circular way (pretty nifty for instance for elasticsearch discovery configuration).
+* `SAME_NODE` : This means that the dependency service is expected to be available on the same node than the first
 service, otherwise eskimo will report an error during service installation.
+
+*The best way to understand this is to look at the exanples in eskimo pre-packaged services declared in the bundled
+`services.json`.*
+
+For instance:
+
+* Cerebro tries to use the co-located instance of elasticsearch if it is available or any random one otherwise for
+instance by using the following dependency declaration:
+
+.cerebro dependency on elasticsearch
+----
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ]
+----
+
+* elasticsearch instances on the different nodes search for each other in a round robin fashion by declating the
+following dependencies (mandatory false ise used to support single node deployments):
+
+.elasticsearch dependency on next elasticsearch instance
+----
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM_NODE_AFTER",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": false
+      }
+    ],
+----
+
+* logstash needs both elasticsearch and gluster. In contrary to elasticsearch, gluster is required on every node in a
+multi-node cluster setup. Hence the following dependencies declaration for gluster:
+
+.gluster dependencies definition
+----
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "elasticsearch",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      }
+----
+
+* kafka uses zookeeper on the first node (in the order of declaration of nodes in the eskimo cluster) on which zookeeper
+is available:
+
+.kafka dependency on zookeeper
+----
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+----
+
+
+Look at other examples to get inspired.
 
 ==== Memory allocation
 
@@ -468,11 +547,7 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-
-
-
-
-// marker for exclusion : line 460
+// marker for exclusion : line 550
 
 
 

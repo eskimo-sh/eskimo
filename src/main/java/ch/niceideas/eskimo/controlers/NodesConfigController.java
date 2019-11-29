@@ -59,6 +59,9 @@ public class NodesConfigController {
 
     private static final Logger logger = Logger.getLogger(NodesConfigController.class);
 
+    public static final String PENDING_OPERATIONS_STATUS_OVERRIDE = "PENDING_OPERATIONS_STATUS_OVERRIDE";
+    public static final String PENDING_OPERATIONS_COMMAND = "PENDING_OPERATIONS_COMMAND";
+
     @Resource
     private MessagingService messagingService;
 
@@ -132,8 +135,8 @@ public class NodesConfigController {
             OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, newServicesInstallStatus, nodesConfig);
 
             // store command and config in HTTP Session
-            session.setAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE", newServicesInstallStatus);
-            session.setAttribute("PENDING_OPERATIONS_COMMAND", command);
+            session.setAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
+            session.setAttribute(PENDING_OPERATIONS_COMMAND, command);
 
             return returnCommand (command);
 
@@ -174,8 +177,8 @@ public class NodesConfigController {
             OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
 
             // store command and config in HTTP Session
-            session.removeAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
-            session.setAttribute("PENDING_OPERATIONS_COMMAND", command);
+            session.removeAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);
+            session.setAttribute(PENDING_OPERATIONS_COMMAND, command);
 
             return returnCommand (command);
 
@@ -201,11 +204,11 @@ public class NodesConfigController {
                 }}).toString(2);
             }
 
-            OperationsCommand command = (OperationsCommand) session.getAttribute("PENDING_OPERATIONS_COMMAND");
-            session.removeAttribute("PENDING_OPERATIONS_COMMAND");
+            OperationsCommand command = (OperationsCommand) session.getAttribute(PENDING_OPERATIONS_COMMAND);
+            session.removeAttribute(PENDING_OPERATIONS_COMMAND);
 
-            ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
-            session.removeAttribute("PENDING_OPERATIONS_STATUS_OVERRIDE");
+            ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);
+            session.removeAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);
 
             // newNodesStatus is null in case of nodes config change (as opposed to forced reinstall)
             if (newServicesInstallationStatus != null) {

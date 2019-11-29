@@ -367,6 +367,7 @@ public class Terminal {
     }
 
     @Esc({"\u0005","\u001B[c","\u001B[0c","\u001BZ"})
+    //NOSONAR
     public void esc_da() {
         outbuf = "\u001B[?6c";
     }
@@ -375,6 +376,7 @@ public class Terminal {
      * Backspace.
      */
     @Esc("\u0008")
+    //NOSONAR
     public void esc_0x08() {
         cx = max(0,cx-1);
     }
@@ -383,6 +385,7 @@ public class Terminal {
      * Tab.
      */
     @Esc("\u0009")
+    //NOSONAR
     public void esc_0x09() {
         cx = (((cx/8)+1)*8)%width;
     }
@@ -391,6 +394,7 @@ public class Terminal {
      * Carriage return
      */
     @Esc("\r")
+    //NOSONAR
     public void esc_0x0d() {
         cl=false;
         cx=0;
@@ -416,25 +420,30 @@ public class Terminal {
     }
 
     @Esc("\u001BM")
+    //NOSONAR
     public void escRi() {
         cy = max(st,cy-1);
         if(cy==st)
             scrollDown(st,sb);
     }
 
+    //NOSONAR
     public void csi_A(int[] i) {
         cy = max(st,cy-defaultsTo(i,1));
     }
 
+    //NOSONAR
     public void csi_B(int[] i) {
         cy = min(sb,cy+defaultsTo(i,1));
     }
 
+    //NOSONAR
     public void csi_C(int[] i) {
         cx = min(width-1,cx+defaultsTo(i,1));
         cl = false;
     }
 
+    //NOSONAR
     public void csi_D(int[] i) {
         cx = max(0,cx-defaultsTo(i,1));
         cl = false;
@@ -447,22 +456,26 @@ public class Terminal {
         return (args.length==0) ? defaultValue : args[0];
     }
 
+    //NOSONAR
     public void csi_E(int[] i) {
         csi_B(i);
         cx = 0;
         cl = false;
     }
 
+    //NOSONAR
     public void csi_F(int[] i) {
         csi_A(i);
         cx = 0;
         cl = false;
     }
 
+    //NOSONAR
     public void csi_G(int[] i) {
         cx = min(width,i[0])-1;
     }
 
+    //NOSONAR
     public void csi_H(int[] i) {
         if(i.length<2)  i=new int[]{1,1};
         cx = min(width,i[1])-1;
@@ -470,6 +483,7 @@ public class Terminal {
         cl = false;
     }
 
+    //NOSONAR
     public void csi_J(int[] i) {
         switch (defaultsTo(i,0)) {
         case 0: zero(cy,cx,height,0);return;
@@ -478,6 +492,7 @@ public class Terminal {
         }
     }
 
+    //NOSONAR
     public void csi_K(int... i) {
         switch (defaultsTo(i,0)) {
         case 0: zero(cy,cx,cy,width);return;
@@ -489,6 +504,7 @@ public class Terminal {
     /**
      * Insert lines.
      */
+    //NOSONAR
     public void csi_L(int[] args) {
         for(int i=0;i<defaultsTo(args,1);i++)
             if(cy<sb)
@@ -498,6 +514,7 @@ public class Terminal {
     /**
      * Delete lines.
      */
+    //NOSONAR
     public void csi_M(int[] args) {
         if(cy>=st && cy<=sb)
             for(int i=0;i<defaultsTo(args,1);i++)
@@ -507,6 +524,7 @@ public class Terminal {
     /**
      * Delete n chars
      */
+    //NOSONAR
     public void csi_P(int[] args) {
         int _cy=cy,_cx=cx;
         String end = peek(cy,cx,cy,width);
@@ -514,30 +532,37 @@ public class Terminal {
         poke(_cy,_cx,end.substring(defaultsTo(args,1)));
     }
 
+    //NOSONAR
     public void csi_X(int[] args) {
         zero(cy,cx,cy,cx+args[0]);
     }
 
+    //NOSONAR
     public void csi_a(int[] args) {
         csi_C(args);
     }
 
+    //NOSONAR
     public void csi_c(int[] args) {
         // noop
     }
 
+    //NOSONAR
     public void csi_d(int[] args) {
         cy = min(height,args[0])-1;
     }
 
+    //NOSONAR
     public void csi_e(int[] args) {
         csi_B(args);
     }
 
+    //NOSONAR
     public void csi_f(int[] args) {
         csi_H(args);
     }
 
+    //NOSONAR
     public void csi_h(int[] args) {
         switch(args[0]) {
         case 25:
@@ -546,6 +571,7 @@ public class Terminal {
         }
     }
 
+    //NOSONAR
     public void csi_l(int[] args) {
         switch(args[0]) {
         case 25:
@@ -554,6 +580,7 @@ public class Terminal {
         }
     }
 
+    //NOSONAR
     public void csi_m(int[] args) {
         if (args.length==0) {
             sgr = 0x0700;
@@ -574,6 +601,7 @@ public class Terminal {
        }
     }
 
+    //NOSONAR
     public void csi_r(int[] args) {
         if(args.length<2)   args=new int[]{0,height};
         st=min(height,args[0])-1;
@@ -581,16 +609,18 @@ public class Terminal {
         sb=max(sb,st);
     }
 
+    //NOSONAR
     public void csi_s(int[] args) {
         sb=max(sb,st);
         saveCursor();
     }
 
+    //NOSONAR
     public void csi_u(int[] args) {
         restoreCursor();
     }
 
-    private static interface EscapeSequence {
+    private interface EscapeSequence {
         void handle(Terminal t, String s, Matcher m);
     }
 

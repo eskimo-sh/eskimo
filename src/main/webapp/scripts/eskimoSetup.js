@@ -32,6 +32,7 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
+
 if (typeof eskimo === "undefined" || eskimo == null) {
     eskimo = {}
 }

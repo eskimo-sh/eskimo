@@ -79,10 +79,12 @@ public class MessagingServiceTest extends TestCase {
         assertEquals("Test\nTest1\nTest2\n", result.getValue());
     }
 
+    /*
     @Test
     public void testFetchLastMessagesBack() throws Exception {
-
+        fail ("To Be Implemented");
     }
+    */
 
     @Test
     public void testClear() throws Exception {

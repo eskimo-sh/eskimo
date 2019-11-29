@@ -32,7 +32,8 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
-ajaxterm={};
+var ajaxterm={};
+
 ajaxterm.Terminal=function(id,options) {
     // options
     var width  = options.width || 80; // dimension of the terminal
@@ -129,6 +130,7 @@ ajaxterm.Terminal=function(id,options) {
 	}
 	function mozilla_clipboard() {
 		 // mozilla sucks
+        var err;
 		if ((err=is_mozilla_clipboard_support()) != '') {
 			debug(err);
 			return undefined;

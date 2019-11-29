@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class EskimoConsolesTest extends AbstractWebTest {
@@ -70,9 +71,14 @@ public class EskimoConsolesTest extends AbstractWebTest {
 
     @Test
     public void testNominal() throws Exception {
-        page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
 
-        // Honestly if this ends up without an error, we're good
+        try {
+            page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
+
+            // Honestly if this ends up without an error, we're good
+        } catch (Throwable e) {
+            fail ("No error expected ");
+        }
     }
 
     @Test

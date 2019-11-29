@@ -64,6 +64,8 @@ public class SetupConfigController {
 
     private static final Logger logger = Logger.getLogger(SetupConfigController.class);
 
+    public static final String PENDING_SETUP_COMMAND = "PENDING_SETUP_COMMAND";
+
     @Autowired
     private SetupService setupService;
 
@@ -125,7 +127,7 @@ public class SetupConfigController {
             SetupCommand command = setupService.saveAndPrepareSetup(configAsString);
 
             // store command and config in HTTP Session
-            session.setAttribute("PENDING_SETUP_COMMAND", command);
+            session.setAttribute(PENDING_SETUP_COMMAND, command);
 
             return returnCommand (command);
 
@@ -160,8 +162,8 @@ public class SetupConfigController {
                 }}).toString(2);
             }
 
-            SetupCommand command = (SetupCommand) session.getAttribute("PENDING_SETUP_COMMAND");
-            session.removeAttribute("PENDING_SETUP_COMMAND");
+            SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
+            session.removeAttribute(PENDING_SETUP_COMMAND);
 
             return setupService.applySetup(command.getRawSetup());
 

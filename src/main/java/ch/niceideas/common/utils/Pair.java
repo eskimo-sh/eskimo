@@ -36,7 +36,7 @@ package ch.niceideas.common.utils;
 
 import java.io.Serializable;
 
-public class Pair<K,V> implements Serializable {
+public class Pair<K, V> {
 
     /**
      * Key of this <code>Pair</code>.

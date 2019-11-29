@@ -41,13 +41,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OperationsCommand {
+public class OperationsCommand implements Serializable {
 
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
+
+    public static final String INSTALLED_ON_IP_FLAG = "_installed_on_IP_";
 
     private final NodesConfigWrapper rawNodesConfig;
 
@@ -84,9 +87,9 @@ public class OperationsCommand {
         // 2. Find out about services that need to be uninstalled
         for (String installation : servicesInstallStatus.getRootKeys()) {
 
-            String installedService = installation.substring(0, installation.indexOf("_installed_on_IP_"));
+            String installedService = installation.substring(0, installation.indexOf(INSTALLED_ON_IP_FLAG));
 
-            String nodeName =  installation.substring(installation.indexOf("_installed_on_IP_") + "_installed_on_IP_".length());
+            String nodeName =  installation.substring(installation.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length());
             String ipAddress = nodeName.replaceAll("-", "\\.");
 
             try {
@@ -123,7 +126,7 @@ public class OperationsCommand {
 
         // also add servicres simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().stream().forEach(installStatus -> {
-            String installedService = installStatus.substring(0, installStatus.indexOf("_installed_on_IP_"));
+            String installedService = installStatus.substring(0, installStatus.indexOf(INSTALLED_ON_IP_FLAG));
             String status = (String) servicesInstallStatus.getValueForPath(installStatus);
             if (status.equals("restart")) {
                 restartedServices.add (installedService);

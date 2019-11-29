@@ -281,7 +281,7 @@ public class SystemService {
 
                 int nodeNbr = Integer.valueOf(nbrAndPair.getKey());
                 String ipAddress = nbrAndPair.getValue();
-                String nodeName = ipAddress.replaceAll("\\.", "-");
+                String nodeName = ipAddress.replace(".", "-");
 
                 statusMap.put(("node_nbr_" + nodeName), "" + nodeNbr);
                 statusMap.put(("node_address_" + nodeName), ipAddress);
@@ -440,8 +440,8 @@ public class SystemService {
                         updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
-                            String nodeName = ipAddress.replaceAll("\\.", "-");
-                            servicesInstallationStatus.setValueForPath(service + "_installed_on_IP_" + nodeName, "restart");
+                            String nodeName = ipAddress.replace(".", "-");
+                            servicesInstallationStatus.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "restart");
                         });
                     } catch (FileException | SetupException e) {
                         logger.error (e, e);
@@ -577,36 +577,36 @@ public class SystemService {
     }
 
     void restartServiceForSystem(String service, String ipAddress) throws JSONException, SystemException {
-        String nodeName = ipAddress.replaceAll("\\.", "-");
+        String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
                 (builder) -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
-                status -> status.setValueForPath(service + "_installed_on_IP_" + nodeName, "OK"));
+                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
     void uninstallService(String service, String ipAddress)
             throws SystemException, JSONException, ConnectionManagerException {
-        String nodeName = ipAddress.replaceAll("\\.", "-");
+        String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 (builder) -> proceedWithServiceUninstallation(builder, ipAddress, service),
-                status -> status.removeRootKey(service + "_installed_on_IP_" + nodeName));
+                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
     void uninstallServiceNoOp(String service, String ipAddress)
             throws SystemException, JSONException, ConnectionManagerException {
-        String nodeName = ipAddress.replaceAll("\\.", "-");
+        String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 (builder) -> {},
-                status -> status.removeRootKey(service + "_installed_on_IP_" + nodeName));
+                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
     void installService(String service, String ipAddress)
             throws SystemException, JSONException {
-        String nodeName = ipAddress.replaceAll("\\.", "-");
+        String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("installation of " + service + " on " + ipAddress,
                 (builder) -> proceedWithServiceInstallation(builder, ipAddress, service),
-                status -> status.setValueForPath(service + "_installed_on_IP_" + nodeName, "OK"));
+                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
     void updateAndSaveServicesInstallationStatus(StatusUpdater statusUpdater) throws FileException, JSONException, SetupException {
@@ -681,7 +681,7 @@ public class SystemService {
 
         int nodeNbr = Integer.valueOf(nbrAndPair.getKey());
         String ipAddress = nbrAndPair.getValue();
-        String nodeName = ipAddress.replaceAll("\\.", "-");
+        String nodeName = ipAddress.replace(".", "-");
 
         // 3.1 Node answers
         try {
@@ -770,7 +770,7 @@ public class SystemService {
 
                 for (String serviceStatusFullString : servicesInstallationStatus.getRootKeys()) {
 
-                    String searchedPattern = "_installed_on_IP_";
+                    String searchedPattern = OperationsCommand.INSTALLED_ON_IP_FLAG;
                     int index = serviceStatusFullString.indexOf(searchedPattern);
                     if (index > -1) {
 
@@ -784,7 +784,7 @@ public class SystemService {
 
                             // => we want to consider removing services in any case if not is not only not configured anymore but down
                             // so if node is down in addition to being not configured anymore, we remove all services from saved install stazus
-                            String nodeIp = nodeName.replaceAll("-", ".");
+                            String nodeIp = nodeName.replace("-", ".");
                             if (!liveIps.contains(nodeIp)) {
                                 if (countErrorAndRemoveServices(servicesInstallationStatus, serviceStatusFullString, savedService, nodeName)) {
                                     changes = true;
@@ -862,7 +862,7 @@ public class SystemService {
                 notificationService.addEvent("error", "Service " + savedService + " on " + nodeName + " vanished!");
 
                 // unconfigure proxy if required
-                proxyManagerService.removeServerForService(savedService, nodeName.replaceAll("-", "."));
+                proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
 
                 changes = true;
 

@@ -34,6 +34,8 @@
 
 package ch.niceideas.common.utils;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,11 +44,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import org.apache.log4j.Logger;
-
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.StringUtils;
 
 public abstract class ResourceUtils {
 
@@ -78,6 +75,7 @@ public abstract class ResourceUtils {
 
     /** Separator between JAR URL and file path within the JAR */
     public static final String JAR_URL_SEPARATOR = "!/";
+    public static final String RESOURCE_LOCATION_MUST_NOT_BE_NULL = "Resource location must not be null";
 
     /**
      * Return whether the given resource location is a URL: either a special "classpath" pseudo URL or a standard
@@ -116,7 +114,7 @@ public abstract class ResourceUtils {
      */
     public static URL getURL(String resourceLocation) throws FileNotFoundException {
         if (resourceLocation == null) {
-            throw new IllegalArgumentException("Resource location must not be null");
+            throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }
         if (resourceLocation.startsWith(CLASSPATH_URL_PREFIX)) {
             String path = resourceLocation.substring(CLASSPATH_URL_PREFIX.length());
@@ -161,11 +159,11 @@ public abstract class ResourceUtils {
      */
     public static File getFile(String resourceLocation) throws FileNotFoundException {
         if (resourceLocation == null) {
-            throw new IllegalArgumentException("Resource location must not be null");
+            throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }
         if (resourceLocation.startsWith(CLASSPATH_URL_PREFIX)) {
             String path = resourceLocation.substring(CLASSPATH_URL_PREFIX.length());
-            String description = "class path resource [" + path + "]";
+
             URL url = ClassLoader.getSystemClassLoader().getResource(path);
             if (url == null) {
 
@@ -174,12 +172,12 @@ public abstract class ResourceUtils {
                     url = Thread.currentThread().getContextClassLoader().getResource(path);
 
                     if (url == null) {
-                        throw new FileNotFoundException(description + " cannot be resolved to absolute file path "
+                        throw new FileNotFoundException(resourceLocation + " cannot be resolved to absolute file path "
                                 + "because it does not reside in the file system");
                     }
                 }
             }
-            return getFile(url, description);
+            return getFile(url);
         }
         try {
             // try URL
@@ -198,21 +196,9 @@ public abstract class ResourceUtils {
      * @throws FileNotFoundException if the URL cannot be resolved to a file in the file system
      */
     public static File getFile(URL resourceUrl) throws FileNotFoundException {
-        return getFile(resourceUrl, "URL");
-    }
 
-    /**
-     * Resolve the given resource URL to a <code>java.io.File</code>, i.e. to a file in the file system.
-     * 
-     * @param resourceUrl the resource URL to resolve
-     * @param description a description of the original resource that the URL was created for (for example, a class
-     *            path location)
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the URL cannot be resolved to a file in the file system
-     */
-    public static File getFile(URL resourceUrl, String description) throws FileNotFoundException {
         if (resourceUrl == null) {
-            throw new IllegalArgumentException("Resource location must not be null");
+            throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }
         
         if (URL_PROTOCOL_JAR.equals(resourceUrl.getProtocol())) {
@@ -220,7 +206,7 @@ public abstract class ResourceUtils {
         }
         
         if (!URL_PROTOCOL_FILE.equals(resourceUrl.getProtocol())) {        
-            throw new FileNotFoundException(description + " cannot be resolved to absolute file path "
+            throw new FileNotFoundException(resourceUrl + " cannot be resolved to absolute file path "
                     + "because it does not reside in the file system: " + resourceUrl);
         }
         try {
@@ -305,59 +291,13 @@ public abstract class ResourceUtils {
      */
     public static File getFile(URI resourceUri, String description) throws FileNotFoundException {
         if (resourceUri == null) {
-            throw new IllegalArgumentException("Resource location must not be null");
+            throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }
         if (!URL_PROTOCOL_FILE.equals(resourceUri.getScheme())) {
             throw new FileNotFoundException(description + " cannot be resolved to absolute file path "
                     + "because it does not reside in the file system: " + resourceUri);
         }
         return new File(resourceUri.getSchemeSpecificPart());
-    }
-
-    /**
-     * Determine whether the given URL points to a resource in a jar file, that is, has protocol "jar", "zip",
-     * "wsjar" or "code-source".
-     * <p>
-     * "zip" and "wsjar" are used by BEA WebLogic Server and IBM WebSphere, respectively, but can be treated like
-     * jar files. The same applies to "code-source" URLs on Oracle OC4J, provided that the path contains a jar
-     * separator.
-     * 
-     * @param url the URL to check
-     * @return whether the URL has been identified as a JAR URL
-     */
-    public static boolean isJarURL(URL url) {
-        String protocol = url.getProtocol();
-        return (URL_PROTOCOL_JAR.equals(protocol) || URL_PROTOCOL_ZIP.equals(protocol)
-                || URL_PROTOCOL_VFSZIP.equals(protocol) || URL_PROTOCOL_WSJAR.equals(protocol)
-                || (URL_PROTOCOL_CODE_SOURCE.equals(protocol) && url.getPath().contains(JAR_URL_SEPARATOR)));
-    }
-
-    /**
-     * Extract the URL for the actual jar file from the given URL (which may point to a resource in a jar file or to
-     * a jar file itself).
-     * 
-     * @param jarUrl the original URL
-     * @return the URL for the actual jar file
-     * @throws MalformedURLException if no valid jar file URL could be extracted
-     */
-    public static URL extractJarFileURL(URL jarUrl) throws MalformedURLException {
-        String urlFile = jarUrl.getFile();
-        int separatorIndex = urlFile.indexOf(JAR_URL_SEPARATOR);
-        if (separatorIndex != -1) {
-            String jarFile = urlFile.substring(0, separatorIndex);
-            try {
-                return new URL(jarFile);
-            } catch (MalformedURLException ex) {
-                // Probably no protocol in original jar URL, like "jar:C:/mypath/myjar.jar".
-                // This usually indicates that the jar file resides in the file system.
-                if (!jarFile.startsWith("/")) {
-                    jarFile = "/" + jarFile;
-                }
-                return new URL(FILE_URL_PREFIX + jarFile);
-            }
-        } else {
-            return jarUrl;
-        }
     }
 
     /**

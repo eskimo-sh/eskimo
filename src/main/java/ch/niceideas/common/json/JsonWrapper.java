@@ -40,6 +40,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,11 +56,12 @@ import java.util.stream.Collectors;
  * For instance. If the root node contains an object "aaa" which contains an array "bbb", one can get the value at
  * the third position of this array by using the following path: <code>aaa.bbb.3</code>.
  */
-public class JsonWrapper {
+public class JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JsonWrapper.class);
+    public static final String NOT_FOUND = "not found.";
 
-    private final JSONObject json;
+    private JSONObject json;
 
     public static JsonWrapper empty() throws JSONException{
         return new JsonWrapper("{}");
@@ -81,6 +86,22 @@ public class JsonWrapper {
             logger.error(e, e);
             throw new JSONException (e.getMessage(), e);
         }
+    }
+
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
+    {
+        String serializedString = aInputStream.readUTF();
+        try {
+            json = new JSONObject(serializedString);
+        } catch (JSONException e) {
+            logger.error(e, e);
+            throw new IOException (e.getMessage(), e);
+        }
+    }
+
+    private void writeObject(ObjectOutputStream aOutputStream) throws IOException
+    {
+        aOutputStream.writeUTF(getFormattedValue());
     }
 
     public List<String> getRootKeys() {
@@ -153,7 +174,7 @@ public class JsonWrapper {
 
             } catch (JSONException e) {
 
-                if (e.getMessage().contains("not found.")) {
+                if (exceptionsIsNotFound(e)) {
                     //logger.debug(e, e);
                     return null;
                 }
@@ -163,6 +184,10 @@ public class JsonWrapper {
         }
 
         return current;
+    }
+
+    boolean exceptionsIsNotFound(JSONException e) {
+        return e.getMessage().contains(NOT_FOUND);
     }
 
     /**
@@ -192,42 +217,11 @@ public class JsonWrapper {
 
                 if (current instanceof JSONArray) {
 
-                    int index = -1;
-                    if (Character.isDigit(nextPath.charAt(0))) {
-                        index = Integer.valueOf(nextPath);
-                    } else {
-                        throw new JSONException ("Path " + path
-                                + " contains an array but the concerned path is not an integer");
-                    }
-
-                    try {
-                        current = ((JSONArray) current).get(index);
-                    } catch (JSONException e) {
-                        current = null;
-                        if (!e.getMessage().contains("not found.")) {
-                            logger.error(e, e);
-                            throw new JSONException (e.getMessage(), e);
-                        }
-                    }
+                    current = setValueJSONArray(path, current, nextPath);
 
                 } else if (current instanceof JSONObject) {
 
-                    if (Character.isDigit(nextPath.charAt(0))) {
-                        throw new JSONException (
-                                "Path "
-                                        + path
-                                        + " contains contains an element which is not an array but asked next path is an integer");
-                    } else {
-                        try {
-                            current = ((JSONObject) current).get(nextPath);
-                        } catch (JSONException e) {
-                            current = null;
-                            if (!e.getMessage().contains("not found.")) {
-                                logger.error(e, e);
-                                throw new JSONException (e.getMessage(), e);
-                            }
-                        }
-                    }
+                    current = setValueJSONObject(path, current, nextPath);
 
                 }
 
@@ -253,6 +247,45 @@ public class JsonWrapper {
         }
     }
 
+    private Object setValueJSONObject(String path, Object current, String nextPath) {
+        if (Character.isDigit(nextPath.charAt(0))) {
+            throw new JSONException(
+                    path + " contains contains an element which is not an array but asked next path is an integer");
+        } else {
+            try {
+                current = ((JSONObject) current).get(nextPath);
+            } catch (JSONException e) {
+                current = null;
+                if (!exceptionsIsNotFound(e)) {
+                    logger.error(e, e);
+                    throw new JSONException (e.getMessage(), e);
+                }
+            }
+        }
+        return current;
+    }
+
+    private Object setValueJSONArray(String path, Object current, String nextPath) {
+        int index = -1;
+        if (Character.isDigit(nextPath.charAt(0))) {
+            index = Integer.valueOf(nextPath);
+        } else {
+            throw new JSONException(path
+                    + " contains an array but the concerned path is not an integer");
+        }
+
+        try {
+            current = ((JSONArray) current).get(index);
+        } catch (JSONException e) {
+            current = null;
+            if (!exceptionsIsNotFound(e)) {
+                logger.error(e, e);
+                throw new JSONException (e.getMessage(), e);
+            }
+        }
+        return current;
+    }
+
     private Object createMissingCurrent(Object parent, String parentPath, String nextPath) throws JSONException {
         Object current;
         if (Character.isDigit(nextPath.charAt(0))) {
@@ -273,7 +306,7 @@ public class JsonWrapper {
             JSONException {
         if (current instanceof JSONObject) {
             if (Character.isDigit(path.charAt(0))) {
-                throw new JSONException ("Path element " + path
+                throw new JSONException (path
                         + " contains contains an element which is not an array but asked next path is an integer");
             } else {
                 ((JSONObject) current).put(path, value);
@@ -285,8 +318,7 @@ public class JsonWrapper {
                 int index = Integer.valueOf(path);
                 ((JSONArray) current).put(index, value);
             } else {
-                throw new JSONException ("Path element " + path
-                        + " contains an array but the concerned path is not an integer");
+                throw new JSONException (path + " contains an array but the concerned path is not an integer");
             }
 
         }
@@ -330,7 +362,7 @@ public class JsonWrapper {
 
             } catch (JSONException e) {
 
-                if (e.getMessage().contains("not found.")) {
+                if (exceptionsIsNotFound(e)) {
                     //logger.debug(e, e);
                     return false;
                 }
@@ -349,8 +381,7 @@ public class JsonWrapper {
             if (Character.isDigit(nextPath.charAt(0))) {
                 index = Integer.valueOf(nextPath);
             } else {
-                throw new JSONException ("Path " + path
-                        + " contains an array but the concerned path is not an integer");
+                throw new JSONException (path + " contains an array but the concerned path is not an integer");
             }
 
             current = ((JSONArray) current).get(index);
@@ -359,9 +390,7 @@ public class JsonWrapper {
 
             if (Character.isDigit(nextPath.charAt(0))) {
                 throw new JSONException (
-                        "Path "
-                                + path
-                                + " contains contains an element which is not an array but asked next path is an integer");
+                        path + " contains contains an element which is not an array but asked next path is an integer");
             } else {
                 current = ((JSONObject) current).get(nextPath);
             }

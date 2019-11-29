@@ -192,7 +192,6 @@ public class ConnectionManagerService {
             // otherwise test it and attempt to recreate it if it is down or too old
             else {
 
-                ConnectionOperationWatchDog sg = null;
                 try {
 
                     Long connectionAge = connectionAges.get(ipAddress);
@@ -205,10 +204,10 @@ public class ConnectionManagerService {
                         return getConnectionInternal(ipAddress);
                     }
 
-                    sg = new ConnectionOperationWatchDog(connection);
-                    //connection.ping(); // this is too buggy !!! Waits for the socket outputStream result like forever and seems impossible to kill
-                    connection.sendIgnorePacket();
-                    sg.close();
+                    try (ConnectionOperationWatchDog sg = new ConnectionOperationWatchDog(connection)) {
+                        //connection.ping(); // this is too buggy !!! Waits for the socket outputStream result like forever and seems impossible to kill
+                        connection.sendIgnorePacket();
+                    }
 
                     // update connection age
                     connectionAges.put(ipAddress, System.currentTimeMillis());
@@ -217,7 +216,6 @@ public class ConnectionManagerService {
                     logger.warn ("Previous connection to " + ipAddress + " got into problems ("+e.getMessage()+"). Recreating ...");
                     connectionMap.remove(ipAddress);
                     connectionAges.remove(ipAddress);
-                    sg.close();
                     return getConnectionInternal(ipAddress);
                 }
             }
@@ -333,7 +331,7 @@ public class ConnectionManagerService {
         return !tunnelConfigs.stream().anyMatch(config -> forwarder.matches(config));
     }
 
-    private class ConnectionOperationWatchDog {
+    private class ConnectionOperationWatchDog implements AutoCloseable{
 
         private final Timer timer;
 

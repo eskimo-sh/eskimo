@@ -41,14 +41,14 @@ eskimo.Services = function () {
 
     var that = this;
 
-    UI_SERVICES = [];
-    UI_SERVICES_CONFIG = {};
+    var UI_SERVICES = [];
+    var UI_SERVICES_CONFIG = {};
 
     var serviceInitialized = {};
 
     var uiConfigsToRetry = [];
 
-    EMPTY_FRAMETARGET = "html/emptyPage.html";
+    var EMPTY_FRAMETARGET = "html/emptyPage.html";
 
     this.initialize = function () {
 

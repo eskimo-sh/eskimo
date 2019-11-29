@@ -268,14 +268,20 @@ You can find pre-built packages of Eskimo on https://www.eskimo.sh.
 
 This section gives instructions about running eskimo.
 
-WARNING: Currently, in this early stage, Eskimo runs only on Linux since it has dependencies on shell scripts and docker
-to build package images. In the next version (within a few weeks), the possibility to download pre-built packages will
-be added to eskimo and make it possible to run eskimo on Windows. +
-Aside from this dependency on shell scripts and docker to build images, eskimo runs runs theoretically perfectly on
-MS Windows. +
-(Sidenote : one may want to give cygwin a try regarding this shell dependency.)
+Eskimo itself can run on any Operating System supporting a JVM (Linux, Windows, Mac OSX) but cluster nodes are only
+supported running Linux.
 
-=== Prerequisites : Put Java in PATH
+=== Prerequisites
+
+==== System requirements
+
+In order to run eskimo, one needs to have
+
+* At least 8Gb of disk storage space on the machine running Eskimo
+* At least one linux machine available on the network (can be the same machine than the one running Eskimo) with either
+  a debian-based (Ubuntu, Debian, etc.), red-hat-based (CentOS, Fedora, etc.) or OpenSUSE Operating System.
+
+==== Available JVM with Java in PATH
 
 In order to run eskimo, one needs to have `java` in the path.
 

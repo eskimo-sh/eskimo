@@ -34,19 +34,10 @@
 
 package ch.niceideas.common.utils;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.Charset;
-
 import org.apache.log4j.Logger;
 
-import ch.niceideas.common.utils.FileUtils;
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Various utility methods aimed at helping with stream handling.
@@ -64,6 +55,9 @@ public abstract class StreamUtils {
      * Copies information from the input stream to the output stream using the specified buffer size
      */
     public static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+        if (output == null) {
+            throw new IOException ("Passed output stream is null");
+        }
         if (input != null) {
             byte[] buf = new byte[bufferSize];
             int bytesRead = input.read(buf);
@@ -118,6 +112,12 @@ public abstract class StreamUtils {
      * Copies information between specified streams and then closes both of the streams.
      */
     public static void copyThenClose(InputStream input, OutputStream output) throws IOException {
+        if (input == null) {
+            throw new IOException ("Passed input stream is null");
+        }
+        if (output == null) {
+            throw new IOException ("Passed output stream is null");
+        }
         copy(input, output);
         input.close();
         output.close();

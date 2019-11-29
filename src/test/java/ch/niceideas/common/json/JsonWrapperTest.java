@@ -41,9 +41,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.InputStream;
+import java.io.*;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 
@@ -71,7 +73,7 @@ public class JsonWrapperTest {
     }
 
     @Test
-    public void testFullSerializeDeserialize() throws Exception {
+    public void testArtificialSerializeDeserialize() throws Exception {
 
         JsonWrapper inpWrapper = new JsonWrapper(sourceJSONInput);
 
@@ -103,6 +105,8 @@ public class JsonWrapperTest {
 
         assertEquals("132'456.789", parser.getValueForPath("dto.contentObject.netAmount.amount.formattedValue"));
 
+        assertNull(parser.getValueForPath("dto.contentObject.netAmount.amount.sarace"));
+
         assertEquals(null, parser.getValueForPath("dto.identifier.a.b.c.d"));
     }
 
@@ -116,6 +120,10 @@ public class JsonWrapperTest {
         parser.setValueForPath("context.operation", "TUGUDU");
 
         assertEquals("TUGUDU", parser.getValueForPath("context.operation"));
+
+        parser.setValueForPath("context.operation2.newProp", "tada");
+
+        assertEquals("tada", parser.getValueForPath("context.operation2.newProp"));
     }
 
     @Test
@@ -128,6 +136,12 @@ public class JsonWrapperTest {
         parser.setValueForPath("a.firstObject.internalArray1.1", "TUGUDU");
 
         assertEquals("TUGUDU", parser.getValueForPath("a.firstObject.internalArray1.1"));
+
+        assertNull(parser.getValueForPath("a.firstObject.internalArray1.2.newProp"));
+
+        parser.setValueForPath("a.firstObject.internalArray1.2.newProp", "tada");
+
+        assertEquals("tada", parser.getValueForPath("a.firstObject.internalArray1.2.newProp"));
     }
 
     @Test
@@ -136,6 +150,36 @@ public class JsonWrapperTest {
         JsonWrapper parser = new JsonWrapper(sourceJSONSearchYahoo);
 
         assertEquals (jsonYahooExpectedMap, parser.toMap().toString());
+    }
+
+    @Test
+    public void testIsEmpty() throws Exception {
+        assertTrue(new JsonWrapper("{}").isEmpty());
+        assertFalse(new JsonWrapper("{\"abc\" : \"test\"}").isEmpty());
+    }
+
+    @Test
+    public void testFullSerializeDeserialize() throws Exception {
+
+        JsonWrapper inpWrapper = new JsonWrapper(sourceJSONInput);
+
+        byte[] serial = serialize(inpWrapper);
+        JsonWrapper inpWrapper2 = (JsonWrapper) deserialize(serial);
+
+        assertEquals(inpWrapper.getFormattedValue(), inpWrapper2.getFormattedValue());
+    }
+
+    private static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = new ObjectOutputStream(b);
+        o.writeObject(obj);
+        return b.toByteArray();
+    }
+
+    private static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+        ObjectInputStream o = new ObjectInputStream(b);
+        return o.readObject();
     }
 
 }

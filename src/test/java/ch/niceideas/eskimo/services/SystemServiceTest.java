@@ -34,16 +34,15 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -60,7 +59,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     private String testRunUUID = UUID.randomUUID().toString();
 
-    @Test
+    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -118,7 +117,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "rm -f /tmp/zookeeper.tgz\n"));
     }
 
-    static String createTempStoragePath() throws Exception {
+   public static String createTempStoragePath() throws Exception {
         File dtempFileName = File.createTempFile("test_systemservice_", "config_storage");
         FileUtils.delete (dtempFileName); // delete file to create directory below
 

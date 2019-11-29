@@ -118,34 +118,6 @@ public class ProcessHelper {
         }
     }
 
-    public static String execAndWrite(String cmd, String write) {
-        try {
-            return execAndWrite(new String[] {cmd}, write, false);
-        } catch (ProcessHelperException e) {
-            logger.error(e, e);
-        }
-        return "";
-    }
-
-    public static String execAndWrite(String cmd[], String write, boolean throwExceptions)
-            throws ProcessHelperException {
-        try {
-
-            Process proc = Runtime.getRuntime().exec(cmd);
-            if (write != null) {
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
-
-                out.write(write);
-                out.close();
-            }
-
-            return execProc (proc, throwExceptions);
-
-        } catch (Exception e) {
-            throw new ProcessHelperException (e.getMessage(), e);
-        }
-    }
-
     public static class ProcessHelperException extends Exception {
 
         private static final long serialVersionUID = 100537626321527736L;
