@@ -59,7 +59,10 @@ import java.util.stream.Collectors;
 public class JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JsonWrapper.class);
+
     public static final String NOT_FOUND = "not found.";
+    public static final String ELEMENT_NOT_ARRAY = " contains contains an element which is not an array but asked next path is an integer";
+    public static final String PATH_NOT_INTEGER = " contains an array but the concerned path is not an integer";
 
     private JSONObject json;
 
@@ -249,8 +252,7 @@ public class JsonWrapper implements Serializable {
 
     private Object setValueJSONObject(String path, Object current, String nextPath) {
         if (Character.isDigit(nextPath.charAt(0))) {
-            throw new JSONException(
-                    path + " contains contains an element which is not an array but asked next path is an integer");
+            throw new JSONException(path + ELEMENT_NOT_ARRAY);
         } else {
             try {
                 current = ((JSONObject) current).get(nextPath);
@@ -270,8 +272,7 @@ public class JsonWrapper implements Serializable {
         if (Character.isDigit(nextPath.charAt(0))) {
             index = Integer.valueOf(nextPath);
         } else {
-            throw new JSONException(path
-                    + " contains an array but the concerned path is not an integer");
+            throw new JSONException(path + PATH_NOT_INTEGER);
         }
 
         try {
@@ -306,8 +307,7 @@ public class JsonWrapper implements Serializable {
             JSONException {
         if (current instanceof JSONObject) {
             if (Character.isDigit(path.charAt(0))) {
-                throw new JSONException (path
-                        + " contains contains an element which is not an array but asked next path is an integer");
+                throw new JSONException (path + ELEMENT_NOT_ARRAY);
             } else {
                 ((JSONObject) current).put(path, value);
             }
@@ -318,7 +318,7 @@ public class JsonWrapper implements Serializable {
                 int index = Integer.valueOf(path);
                 ((JSONArray) current).put(index, value);
             } else {
-                throw new JSONException (path + " contains an array but the concerned path is not an integer");
+                throw new JSONException (path + PATH_NOT_INTEGER);
             }
 
         }
@@ -381,7 +381,7 @@ public class JsonWrapper implements Serializable {
             if (Character.isDigit(nextPath.charAt(0))) {
                 index = Integer.valueOf(nextPath);
             } else {
-                throw new JSONException (path + " contains an array but the concerned path is not an integer");
+                throw new JSONException (path + PATH_NOT_INTEGER);
             }
 
             current = ((JSONArray) current).get(index);
@@ -389,8 +389,7 @@ public class JsonWrapper implements Serializable {
         } else if (current instanceof JSONObject) {
 
             if (Character.isDigit(nextPath.charAt(0))) {
-                throw new JSONException (
-                        path + " contains contains an element which is not an array but asked next path is an integer");
+                throw new JSONException (path + ELEMENT_NOT_ARRAY);
             } else {
                 current = ((JSONObject) current).get(nextPath);
             }

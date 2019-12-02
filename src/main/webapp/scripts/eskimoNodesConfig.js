@@ -33,7 +33,7 @@ Software.
 */
 
 if (typeof eskimo === "undefined" || eskimo == null) {
-    eskimo = {}
+    window.eskimo = {}
 }
 eskimo.NodesConfig = function() {
 
@@ -329,7 +329,7 @@ eskimo.NodesConfig = function() {
             $('#'+CONFIGURED_SERVICES[i]+nodeNbr).get(0).checked = false;
         }
 
-        for (key in model) {
+        for (var key in model) {
             var re = /([a-zA-Z\-_]+)([0-9]*)/;
             var match = key.match(re);
 

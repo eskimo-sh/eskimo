@@ -233,7 +233,7 @@ public class ConnectionManagerService {
 
     }
 
-    private Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
+    protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
 
         logger.info ("Creating connection to " + ipAddress);
         Connection connection = new Connection(ipAddress, sshPort);
@@ -375,7 +375,9 @@ public class ConnectionManagerService {
         public void close() {
             try {
                 logger.info ("CLOSING tunnel from " + localPort + " to " + targetHost + ":" + targetPort);
-                forwarder.close();
+                if (forwarder != null) {
+                    forwarder.close();
+                }
             } catch (IOException e) {
                 logger.warn (e.getMessage());
                 logger.debug (e, e);

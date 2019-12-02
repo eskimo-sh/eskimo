@@ -34,17 +34,25 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
+import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.LocalPortForwarder;
+import com.trilead.ssh2.channel.ChannelManager;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
@@ -97,5 +105,80 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         Connection newOne = cm.getSharedConnection("localhost");
         assertNotNull(newOne);
         assertTrue (newOne != second);
+    }
+
+    @Test
+    public void testLocalPortForwarderWrapper() throws Exception {
+
+        final List<ProxyTunnelConfig> forwarderConfig = new ArrayList<ProxyTunnelConfig>(){{
+            add (new ProxyTunnelConfig(6123, "localhost", 123));
+            add (new ProxyTunnelConfig(6124, "localhost", 124));
+            add (new ProxyTunnelConfig(6125, "localhost", 125));
+        }};
+
+        final List<String> createCalledFor = new ArrayList<>();
+        final List<String> dropCalledFor = new ArrayList<>();
+
+        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT) {
+            protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
+                return new Connection(ipAddress, SSH_PORT) {
+                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
+                        createCalledFor.add(""+port_to_connect);
+                        return null;
+                    }
+                    public synchronized void sendIgnorePacket() throws IOException {
+                        // NO-OP
+                    }
+                };
+            }
+            protected void dropTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+                super.dropTunnels(connection, ipAddress);
+                dropCalledFor.add(ipAddress);
+            }
+        };
+        cm.setSetupService (setupService);
+
+        ProxyManagerService pms = new ProxyManagerService() {
+            public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
+                return forwarderConfig;
+            }
+        };
+        pms.setConnectionManagerService(cm);
+        cm.setProxyManagerService(pms);
+        pms.setConnectionManagerService(cm);
+
+        Connection connection = cm.getSharedConnection("localhost");
+
+        assertEquals(3, createCalledFor.size());
+        assertEquals("123,124,125", String.join(",", createCalledFor));
+
+        assertEquals(1, dropCalledFor.size());
+
+        assertNotNull(connection);
+
+        createCalledFor.clear();
+        dropCalledFor.clear();
+
+        cm.recreateTunnels("localhost");
+
+        // nothing actually recreated since nothing changed
+        assertEquals(0, createCalledFor.size());
+        assertEquals(1, dropCalledFor.size());
+
+        forwarderConfig.clear();
+        forwarderConfig.add (new ProxyTunnelConfig(20123, "localhost", 11123));
+        forwarderConfig.add (new ProxyTunnelConfig(20124, "localhost", 11124));
+        forwarderConfig.add (new ProxyTunnelConfig(20125, "localhost", 11125));
+
+        createCalledFor.clear();
+        dropCalledFor.clear();
+
+        cm.recreateTunnels("localhost");
+
+        assertEquals(3, createCalledFor.size());
+
+
+        assertEquals(1, dropCalledFor.size());
+
     }
 }

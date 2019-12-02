@@ -38,7 +38,7 @@ var ESK_STRING_LOWER_CASE = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '
 function getHyphenSeparated (string) {
     var result = '';
     for (var i = 0; i < string.length; i++) {
-        strChar = string.charAt(i);
+        var strChar = string.charAt(i);
         var idx = ESK_STRING_UPPER_CASE.indexOf(strChar);
         if (idx >= 0) {
             if (i > 0) {

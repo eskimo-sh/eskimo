@@ -33,7 +33,7 @@ Software.
 */
 
 if (typeof eskimo === "undefined" || eskimo == null) {
-    eskimo = {}
+    window.eskimo = {}
 }
 eskimo.SystemStatus = function() {
 
@@ -372,7 +372,7 @@ eskimo.SystemStatus = function() {
 
     this.serviceIsUp = function (nodeServicesStatus, service) {
         var serviceAvailable = false;
-        for (key in nodeServicesStatus) {
+        for (var key in nodeServicesStatus) {
             if (key.indexOf("service_"+service+"_") > -1) {
                 var serviceStatus = nodeServicesStatus[key];
                 if (serviceStatus == "OK") {

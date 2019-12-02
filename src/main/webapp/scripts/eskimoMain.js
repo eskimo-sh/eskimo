@@ -34,7 +34,7 @@ Software.
 
 
 if (typeof eskimo === "undefined" || eskimo == null) {
-    eskimo = {}
+    window.eskimo = {}
 }
 eskimo.Main = function() {
 

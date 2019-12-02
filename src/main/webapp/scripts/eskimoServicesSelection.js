@@ -33,7 +33,7 @@ Software.
 */
 
 if (typeof eskimo === "undefined" || eskimo == null) {
-    eskimo = {}
+    window.eskimo = {}
 }
 eskimo.ServicesSelection = function() {
 
@@ -155,7 +155,7 @@ eskimo.ServicesSelection = function() {
             // enabling node ntp to nake it selectaBLE
             var setupConfig = $("form#nodes-config").serializeObject();
 
-            for (key in setupConfig) {
+            for (var key in setupConfig) {
                 //var re = /([a-zA-Z\-_]+)([0-9]+)/;
                 var re = /([a-zA-Z\-_]+)([0-9]*)/;
                 var match = key.match(re);

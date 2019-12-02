@@ -185,17 +185,14 @@ public class FileUtils {
         boolean success = true;
         try {
             // Using input name to create output name
-            FileOutputStream fos = new FileOutputStream(targetFile);
-            GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
-            TarArchiveOutputStream tarOs = new TarArchiveOutputStream(gos);
-            File folder = new File(sourceFolder);
-            File[] fileNames = folder.listFiles();
-            assert fileNames != null;
-            for(File file : fileNames){
-                addFilesToTarGZ(folder.getName() + "/" + file.getName(), file, tarOs);
+            try (TarArchiveOutputStream tarOs = new TarArchiveOutputStream(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile))))) {
+                File folder = new File(sourceFolder);
+                File[] fileNames = folder.listFiles();
+                assert fileNames != null;
+                for (File file : fileNames) {
+                    addFilesToTarGZ(folder.getName() + "/" + file.getName(), file, tarOs);
+                }
             }
-
-            tarOs.close();
 
         } catch (IOException e) {
             logger.error (e, e);

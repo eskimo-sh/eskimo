@@ -33,7 +33,7 @@ Software.
 */
 
 if (typeof eskimo === "undefined" || eskimo == null) {
-    eskimo = {}
+    window.eskimo = {}
 }
 eskimo.Consoles = function() {
 
@@ -289,7 +289,7 @@ eskimo.Consoles = function() {
                 that.closeConsole (nodeName, terminalToClose);
             });
 
-            t = new ajaxterm.Terminal("term_"+nodeName, {
+            var t = new ajaxterm.Terminal("term_"+nodeName, {
                 width: 80,
                 height: 25,
                 endpoint: "./terminal?node="+nodeAddress

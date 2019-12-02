@@ -34,7 +34,7 @@ Software.
 
 
 if (typeof eskimo === "undefined" || eskimo == null) {
-    eskimo = {}
+    window.eskimo = {}
 }
 eskimo.FileManagers = function() {
 
@@ -456,7 +456,7 @@ eskimo.FileManagers = function() {
             $('#file-upload-progress-bar').html("1%");
             $('#file-upload-progress-modal').modal("show");
 
-            completeCallback = function (data) {
+            var completeCallback = function (data) {
 
                 $('#file-upload-progress-modal').modal("hide");
 
