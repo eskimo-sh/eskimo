@@ -58,7 +58,6 @@ public final class ScreenImage implements Serializable {
 
     public final int cursorX, cursorY, screenX, screenY;
 
-
     ScreenImage(int timestamp, String screen, Terminal t) {
         this.timestamp = timestamp;
         this.screen = screen;

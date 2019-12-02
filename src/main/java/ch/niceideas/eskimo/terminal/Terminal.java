@@ -52,6 +52,143 @@ import java.lang.reflect.InvocationTargetException;
  *
  */
 public class Terminal {
+
+    private interface EscapeSequence {
+        void handle(Terminal t, String s, Matcher m);
+    }
+
+    private static final EscapeSequence NONE = new EscapeSequence() {
+        public void handle(Terminal t, String s, Matcher m) {
+        }
+    };
+
+    private static final Map<String,EscapeSequence> ESCAPE_SEQUENCES = new HashMap<String,EscapeSequence>();
+
+    private static final Map<Pattern,EscapeSequence> REGEXP_ESCAPE_SEQUENCES = new HashMap<Pattern,EscapeSequence>();
+
+    private static abstract class CsiSequence {
+        final int arg2; // ?
+
+        protected CsiSequence(int arg2) {
+            this.arg2 = arg2;
+        }
+
+        abstract void handle(Terminal t, int[] args);
+    }
+
+    private static final Map<Character,CsiSequence> CSI_SEQUENCE = new HashMap<Character,CsiSequence>();
+
+    private static final String HTML_TABLE, LATEN1_TABLE;
+
+    static {
+        for( final Method m : Terminal.class.getDeclaredMethods() ) {
+            Esc esc = m.getAnnotation(Esc.class);
+            if(esc!=null) {
+                for( String s : esc.value() ) {
+                    ESCAPE_SEQUENCES.put(s,new EscapeSequence() {
+                        public void handle(Terminal t, String s, Matcher matcher) {
+                            try {
+                                m.invoke(t);
+                            } catch (IllegalAccessException e) {
+                                throw new IllegalAccessError();
+                            } catch (InvocationTargetException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+                }
+            }
+            // FIXME : handle differentiated names here !
+            if(m.getName().startsWith("csi_") && m.getName().length()=="csi_".length()+1) {
+                CSI_SEQUENCE.put(m.getName().charAt("csi_".length()),new CsiSequence(1) {
+                    void handle(Terminal t, int[] args) {
+                        try {
+                            m.invoke(t,new Object[]{args});
+                        } catch (IllegalAccessException e) {
+                            throw new IllegalAccessError();
+                        } catch (InvocationTargetException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+            if(m.getName().startsWith("csi_Lower") && m.getName().length()=="csi_Lower".length() + 1) {
+                CSI_SEQUENCE.put(m.getName().toLowerCase().charAt("csi_Lower".length()),new CsiSequence(1) {
+                    void handle(Terminal t, int[] args) {
+                        try {
+                            m.invoke(t,new Object[]{args});
+                        } catch (IllegalAccessException e) {
+                            throw new IllegalAccessError();
+                        } catch (InvocationTargetException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+        }
+
+        REGEXP_ESCAPE_SEQUENCES.put(
+                Pattern.compile("\u001B\\[\\??([0-9;]*)([@ABCDEFGHJKLMPXacdefghlmnqrstu`])"),
+                new EscapeSequence() {
+                    public void handle(Terminal t, String ignored, Matcher m) {
+                        String s = m.group(1);
+                        CsiSequence seq = CSI_SEQUENCE.get(m.group(2).charAt(0));
+                        if(seq!=null) {
+                            String[] tokens = s.split(";");
+                            if (s.length()==0)
+                                tokens = EMPTY_STRING_ARRAY;
+                            int[] n = new int[tokens.length];
+                            for (int i = 0; i < n.length; i++)
+                                try {
+                                    n[i] = Integer.parseInt(tokens[i]);
+                                } catch (NumberFormatException e) {
+                                    n[i] = 0;
+                                }
+                            seq.handle(t,n);
+                        }
+                    }
+                });
+        REGEXP_ESCAPE_SEQUENCES.put(
+                Pattern.compile("\u001C([^\u0007]+)\u0007"),
+                NONE);
+
+        CSI_SEQUENCE.put('@',new CsiSequence(1) {
+            @Override
+            void handle(Terminal t, int[] args) {
+                for( int i=0; i<args[0]; i++)
+                    t.scrollRight(t.cy,t.cx);
+            }
+        });
+
+        StringBuffer html = new StringBuffer(256);
+        StringBuffer lat1 = new StringBuffer(256);
+        for( int i=0; i<256; i++) {
+            if(i<32) {
+                lat1.append(' ');
+                if(i==0x0A)
+                    html.append('\n');
+                else
+                    html.append('\u00A0'); // &nbsp;
+            } else
+            if(i<127 || 160<i) {
+                lat1.append((char)i);
+                html.append((char)i);
+            } else {
+                lat1.append('?');
+                html.append('?');
+            }
+        }
+        HTML_TABLE = html.toString();
+        LATEN1_TABLE = lat1.toString();
+    }
+
+    private static final char EMPTY_CH = '\u0700'; // back=0,fore=7,char=0
+
+    private static final Logger LOGGER = Logger.getLogger(Terminal.class.getName());
+
+    private static final String NO_CHANGE = "<idem/>";
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     /**
      * This is typed as 'char' but it's not character that's stored.
      * The lower 8 bit is the character code, and upper 8 bit are back/fore color.
@@ -63,7 +200,7 @@ public class Terminal {
      *   |
      *   +--- foreground color code
      */
-    public char[] scr;
+    private char[] scr;
     /**
      * Screen width and height.
      */
@@ -133,6 +270,14 @@ public class Terminal {
         return cy;
     }
 
+    int getSb() {
+        return sb;
+    }
+
+    int getSt() {
+        return st;
+    }
+
     @Esc("\u001Bc")
     public void reset() {
         scr = new char[width*height];
@@ -148,60 +293,64 @@ public class Terminal {
         timestamp += 1000;
     }
 
+    int getSgr() {
+        return sgr;
+    }
+
     private int $(int y, int x) {
         return y*width+x;
     }
 
-    public String peek(int y1, int y2) {
+    String peek(int y1, int y2) {
         return peek(y1,0,y2,width);
     }
 
-    public String peek(int y1, int x1, int y2, int x2) {
+    String peek(int y1, int x1, int y2, int x2) {
         int s = $(y1,x1);
         return new String(scr,s,$(y2,x2)-s);
     }
 
-    public void poke(int y, int x, String s) {
+    void poke(int y, int x, String s) {
         // TODO: i18n
         char[] chars = s.toCharArray();
         int destPos = $(y, x);
         System.arraycopy(chars,0,scr, destPos, min(chars.length, scr.length - destPos));
     }
 
-    public void poke(int y, String s) {
+    void poke(int y, String s) {
         poke(y,0,s);
     }
 
-    public void zero(int y1, int x1, int y2, int x2) {
+    void zero(int y1, int x1, int y2, int x2) {
         int e = $(y2,x2);
         for( int i= $(y1,x1); i<e; i++ )
             scr[i] = EMPTY_CH;
     }
 
-    public void zero(int y1, int y2) {
+    void zero(int y1, int y2) {
         zero(y1, 0, y2, width);
     }
 
     /**
      * Scroll the (y1+1,y2) region up one line to (y1,y2-1) 
      */
-    public void scrollUp(int y1, int y2) {
+    void scrollUp(int y1, int y2) {
         poke(y1,peek(y1+1,y2));
         zero(y2,y2);
     }
 
-    public void scrollDown(int y1, int y2) {
+    void scrollDown(int y1, int y2) {
         poke(y1+1,peek(y1,y2-1));
         zero(y1,y1);
     }
 
-    public void scrollRight(int y, int x) {
+    void scrollRight(int y, int x) {
         poke(y,x+1,peek(y,x,y,width));
         zero(y,x,y,x);
     }
 
     @Esc({"\n","\u000B","\u000C"})
-    public void cursorDown() {
+    void cursorDown() {
         if(cy>=st && cy<=sb) {
             cl=false;
             int q = (cy+1)/(sb+1);
@@ -214,14 +363,14 @@ public class Terminal {
         }
     }
 
-    public void cursorRight() {
+    void cursorRight() {
         if((cx+1)>=width)
             cl=true;
         else
             cx = (cx+1)%width;
     }
 
-    public void echo(char c) {
+    void echo(char c) {
         if(cl) {
             cursorDown();
             cx = 0;
@@ -230,7 +379,7 @@ public class Terminal {
         cursorRight();
     }
 
-    public void escape() {
+    void escape() {
         if(buf.length()>32) {
             // error
             if(LOGGER.isLoggable(Level.FINE))
@@ -368,7 +517,7 @@ public class Terminal {
 
     @Esc({"\u0005","\u001B[c","\u001B[0c","\u001BZ"})
     //NOSONAR
-    public void esc_da() {
+    void esc_da() {
         outbuf = "\u001B[?6c";
     }
 
@@ -377,7 +526,7 @@ public class Terminal {
      */
     @Esc("\u0008")
     //NOSONAR
-    public void esc_0x08() {
+    void esc_0x08() {
         cx = max(0,cx-1);
     }
 
@@ -386,7 +535,7 @@ public class Terminal {
      */
     @Esc("\u0009")
     //NOSONAR
-    public void esc_0x09() {
+    void esc_0x09() {
         cx = (((cx/8)+1)*8)%width;
     }
 
@@ -395,7 +544,7 @@ public class Terminal {
      */
     @Esc("\r")
     //NOSONAR
-    public void esc_0x0d() {
+    void esc_0x0d() {
         cl=false;
         cx=0;
     }
@@ -404,47 +553,47 @@ public class Terminal {
           "\u001B=","\u001B>","\u001B(0","\u001B(A",
           "\u001B(B","\u001B]R","\u001BD","\u001BE","\u001BH",
           "\u001BN","\u001BO","\u001Ba","\u001Bn","\u001Bo"})
-    public void noOp() {
+    void noOp() {
     }
 
     @Esc("\u001B7")
-    public void saveCursor() {
+    void saveCursor() {
         cx_bak = cx;
         cy_bak = cy;
     }
 
     @Esc("\u001B8")
-    public void restoreCursor() {
+    void restoreCursor() {
         cx = cx_bak;
         cy = cy_bak;
     }
 
     @Esc("\u001BM")
     //NOSONAR
-    public void escRi() {
+    void escRi() {
         cy = max(st,cy-1);
         if(cy==st)
             scrollDown(st,sb);
     }
 
     //NOSONAR
-    public void csi_A(int[] i) {
+    void csi_A(int[] i) {
         cy = max(st,cy-defaultsTo(i,1));
     }
 
     //NOSONAR
-    public void csi_B(int[] i) {
+    void csi_B(int[] i) {
         cy = min(sb,cy+defaultsTo(i,1));
     }
 
     //NOSONAR
-    public void csi_C(int[] i) {
+    void csi_C(int[] i) {
         cx = min(width-1,cx+defaultsTo(i,1));
         cl = false;
     }
 
     //NOSONAR
-    public void csi_D(int[] i) {
+    void csi_D(int[] i) {
         cx = max(0,cx-defaultsTo(i,1));
         cl = false;
     }
@@ -457,26 +606,26 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_E(int[] i) {
+    void csi_E(int[] i) {
         csi_B(i);
         cx = 0;
         cl = false;
     }
 
     //NOSONAR
-    public void csi_F(int[] i) {
+    void csi_F(int[] i) {
         csi_A(i);
         cx = 0;
         cl = false;
     }
 
     //NOSONAR
-    public void csi_G(int[] i) {
+    void csi_G(int[] i) {
         cx = min(width,i[0])-1;
     }
 
     //NOSONAR
-    public void csi_H(int[] i) {
+    void csi_H(int[] i) {
         if(i.length<2)  i=new int[]{1,1};
         cx = min(width,i[1])-1;
         cy = min(height,i[0])-1;
@@ -484,7 +633,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_J(int[] i) {
+    void csi_J(int[] i) {
         switch (defaultsTo(i,0)) {
         case 0: zero(cy,cx,height,0);return;
         case 1: zero(0,0,cx,cy);return;
@@ -493,7 +642,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_K(int... i) {
+    void csi_K(int... i) {
         switch (defaultsTo(i,0)) {
         case 0: zero(cy,cx,cy,width);return;
         case 1: zero(cy,0,cy,cx);return;
@@ -505,7 +654,7 @@ public class Terminal {
      * Insert lines.
      */
     //NOSONAR
-    public void csi_L(int[] args) {
+    void csi_L(int[] args) {
         for(int i=0;i<defaultsTo(args,1);i++)
             if(cy<sb)
                 scrollDown(cy,sb);
@@ -515,7 +664,7 @@ public class Terminal {
      * Delete lines.
      */
     //NOSONAR
-    public void csi_M(int[] args) {
+    void csi_M(int[] args) {
         if(cy>=st && cy<=sb)
             for(int i=0;i<defaultsTo(args,1);i++)
                 scrollUp(cy,sb);
@@ -525,7 +674,7 @@ public class Terminal {
      * Delete n chars
      */
     //NOSONAR
-    public void csi_P(int[] args) {
+    void csi_P(int[] args) {
         int _cy=cy,_cx=cx;
         String end = peek(cy,cx,cy,width);
         csi_K(0);
@@ -533,37 +682,37 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_X(int[] args) {
+    void csi_X(int[] args) {
         zero(cy,cx,cy,cx+args[0]);
     }
 
     //NOSONAR
-    public void csi_a(int[] args) {
+    void csi_LowerA(int[] args) {
         csi_C(args);
     }
 
     //NOSONAR
-    public void csi_c(int[] args) {
+    void csi_LowerC(int[] args) {
         // noop
     }
 
     //NOSONAR
-    public void csi_d(int[] args) {
+    void csi_LowerD(int[] args) {
         cy = min(height,args[0])-1;
     }
 
     //NOSONAR
-    public void csi_e(int[] args) {
+    void csi_LowerE(int[] args) {
         csi_B(args);
     }
 
     //NOSONAR
-    public void csi_f(int[] args) {
+    void csi_LowerF(int[] args) {
         csi_H(args);
     }
 
     //NOSONAR
-    public void csi_h(int[] args) {
+    void csi_LowerH(int[] args) {
         switch(args[0]) {
         case 25:
             showCursor = true;
@@ -572,7 +721,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_l(int[] args) {
+    void csi_LowerL(int[] args) {
         switch(args[0]) {
         case 25:
             showCursor = false;
@@ -581,7 +730,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_m(int[] args) {
+    void csi_LowerM(int[] args) {
         if (args.length==0) {
             sgr = 0x0700;
             return;
@@ -602,7 +751,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_r(int[] args) {
+    void csi_LowerR(int[] args) {
         if(args.length<2)   args=new int[]{0,height};
         st=min(height,args[0])-1;
         sb=min(height,args[1])-1;
@@ -610,135 +759,14 @@ public class Terminal {
     }
 
     //NOSONAR
-    public void csi_s(int[] args) {
+    void csi_LowerS(int[] args) {
         sb=max(sb,st);
         saveCursor();
     }
 
     //NOSONAR
-    public void csi_u(int[] args) {
+    void csi_LowerU(int[] args) {
         restoreCursor();
     }
 
-    private interface EscapeSequence {
-        void handle(Terminal t, String s, Matcher m);
-    }
-
-    private static final EscapeSequence NONE = new EscapeSequence() {
-        public void handle(Terminal t, String s, Matcher m) {
-        }
-    };
-
-    private static final Map<String,EscapeSequence> ESCAPE_SEQUENCES = new HashMap<String,EscapeSequence>();
-
-    private static final Map<Pattern,EscapeSequence> REGEXP_ESCAPE_SEQUENCES = new HashMap<Pattern,EscapeSequence>();
-
-    private static abstract class CsiSequence {
-        final int arg2; // ?
-
-        protected CsiSequence(int arg2) {
-            this.arg2 = arg2;
-        }
-
-        abstract void handle(Terminal t, int[] args);
-    }
-
-    private static final Map<Character,CsiSequence> CSI_SEQUENCE = new HashMap<Character,CsiSequence>();
-
-    private static final String HTML_TABLE, LATEN1_TABLE;
-
-    static {
-        for( final Method m : Terminal.class.getMethods() ) {
-            Esc esc = m.getAnnotation(Esc.class);
-            if(esc!=null) {
-                for( String s : esc.value() ) {
-                    ESCAPE_SEQUENCES.put(s,new EscapeSequence() {
-                        public void handle(Terminal t, String s, Matcher matcher) {
-                            try {
-                                m.invoke(t);
-                            } catch (IllegalAccessException e) {
-                                throw new IllegalAccessError();
-                            } catch (InvocationTargetException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    });
-                }
-            }
-            if(m.getName().startsWith("csi_") && m.getName().length()==5) {
-                CSI_SEQUENCE.put(m.getName().charAt(4),new CsiSequence(1) {
-                    void handle(Terminal t, int[] args) {
-                        try {
-                            m.invoke(t,new Object[]{args});
-                        } catch (IllegalAccessException e) {
-                            throw new IllegalAccessError();
-                        } catch (InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
-            }
-        }
-
-        REGEXP_ESCAPE_SEQUENCES.put(
-            Pattern.compile("\u001B\\[\\??([0-9;]*)([@ABCDEFGHJKLMPXacdefghlmnqrstu`])"),
-            new EscapeSequence() {
-                public void handle(Terminal t, String ignored, Matcher m) {
-                    String s = m.group(1);
-                    CsiSequence seq = CSI_SEQUENCE.get(m.group(2).charAt(0));
-                    if(seq!=null) {
-                        String[] tokens = s.split(";");
-                        if (s.length()==0)
-                            tokens = EMPTY_STRING_ARRAY;
-                        int[] n = new int[tokens.length];
-                        for (int i = 0; i < n.length; i++)
-                            try {
-                                n[i] = Integer.parseInt(tokens[i]);
-                            } catch (NumberFormatException e) {
-                                n[i] = 0;
-                            }
-                        seq.handle(t,n);
-                    }
-                }
-            });
-        REGEXP_ESCAPE_SEQUENCES.put(
-            Pattern.compile("\u001C([^\u0007]+)\u0007"),
-            NONE);
-
-        CSI_SEQUENCE.put('@',new CsiSequence(1) {
-            @Override
-            void handle(Terminal t, int[] args) {
-                for( int i=0; i<args[0]; i++)
-                    t.scrollRight(t.cy,t.cx);
-            }
-        });
-
-        StringBuffer html = new StringBuffer(256);
-        StringBuffer lat1 = new StringBuffer(256);
-        for( int i=0; i<256; i++) {
-            if(i<32) {
-                lat1.append(' ');
-                if(i==0x0A)
-                    html.append('\n');
-                else
-                    html.append('\u00A0'); // &nbsp;
-            } else
-            if(i<127 || 160<i) {
-                lat1.append((char)i);
-                html.append((char)i);
-            } else {
-                lat1.append('?');
-                html.append('?');
-            }
-        }
-        HTML_TABLE = html.toString();
-        LATEN1_TABLE = lat1.toString();
-    }
-
-    private static final char EMPTY_CH = '\u0700'; // back=0,fore=7,char=0
-
-    private static final Logger LOGGER = Logger.getLogger(Terminal.class.getName());
-
-    private static final String NO_CHANGE = "<idem/>";
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 }
