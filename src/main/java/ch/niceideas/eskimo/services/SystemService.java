@@ -66,6 +66,8 @@ public class SystemService {
 
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
+    public static final String NODES_STATUS_JSON_PATH = "/nodes-status.json";
+
     @Autowired
     private ProxyManagerService proxyManagerService;
 
@@ -615,7 +617,7 @@ public class SystemService {
             ServicesInstallStatusWrapper status = loadServicesInstallationStatus();
             statusUpdater.updateStatus(status);
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + "/nodes-status.json"), status.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + NODES_STATUS_JSON_PATH), status.getFormattedValue());
         } finally {
             statusFileLock.unlock();
         }
@@ -625,7 +627,7 @@ public class SystemService {
         statusFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + "/nodes-status.json"), status.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + NODES_STATUS_JSON_PATH), status.getFormattedValue());
         } finally {
             statusFileLock.unlock();
         }
@@ -635,7 +637,7 @@ public class SystemService {
         statusFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + "/nodes-status.json");
+            File statusFile = new File(configStoragePath + NODES_STATUS_JSON_PATH);
             if (!statusFile.exists()) {
                 return ServicesInstallStatusWrapper.empty();
             }
@@ -1123,7 +1125,7 @@ public class SystemService {
 
         String imageName = servicesDefinition.getService(service).getImageName();
         if (StringUtils.isNotBlank(imageName)) {
-            String imageFileName = setupService.findLastPackageFile("docker_template_", imageName);
+            String imageFileName = setupService.findLastPackageFile(SetupService.DOCKER_TEMPLATE_PREFIX, imageName);
 
             File containerFile = new File(packageDistributionPath + "/" + imageFileName);
             if (containerFile.exists()) {
@@ -1133,7 +1135,7 @@ public class SystemService {
 
                 exec(ipAddress, sb, new String[]{"mv", imageFileName, "/tmp/" + service + "/"});
 
-                exec(ipAddress, sb, new String[]{"ln", "-s", "/tmp/" + service + "/" + imageFileName, "/tmp/" + service + "/docker_template_" + imageName + ".tar.gz"});
+                exec(ipAddress, sb, new String[]{"ln", "-s", "/tmp/" + service + "/" + imageFileName, "/tmp/" + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
 
             } else {
                 sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");

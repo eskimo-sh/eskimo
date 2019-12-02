@@ -176,7 +176,7 @@ public class FileManagerService {
                     put ("content", result.getValue());
                 }});
 
-            } if (fileMimeType.contains("no read permission")) {
+            } else if (fileMimeType.contains("no read permission")) {
 
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
@@ -209,8 +209,8 @@ public class FileManagerService {
                         put("fileViewable", false);
                     }});
                 }
-            }
-            else {
+
+            } else {
 
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");

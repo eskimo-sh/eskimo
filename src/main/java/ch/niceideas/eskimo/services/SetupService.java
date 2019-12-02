@@ -62,8 +62,10 @@ import java.util.stream.Collectors;
 public class SetupService {
 
     private static final Logger logger = Logger.getLogger(SetupService.class);
+
     public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
     public static final String TEMP_DOWNLOAD_SUFFIX = "__temp_download";
+    public static final String DOCKER_TEMPLATE_PREFIX = "docker_template_";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -276,7 +278,7 @@ public class SetupService {
         }
     }
 
-    private Pattern imageFileNamePattern = Pattern.compile("(docker_template_|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+    private Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
 
     Pair<String,String> parseVersion(String name) {
 
@@ -398,7 +400,7 @@ public class SetupService {
 
             for (String imageName : packagesToBuild.split(",")) {
 
-                Pair<File, Pair<String, String>> lastVersion = findLastVersion("docker_template_", imageName, packagesDistribFolder);
+                Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);
                 Pair<String, String> lastVersionValues = lastVersion.getValue();
 
                 if (lastVersionValues != null) {
@@ -430,7 +432,7 @@ public class SetupService {
 
     protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException{
         try {
-            File tempPackagesVersionFile = File.createTempFile("eskimo_packages_versions.json", "temp_download");
+            File tempPackagesVersionFile = File.createTempFile(ESKIMO_PACKAGES_VERSIONS_JSON, "temp_download");
 
             URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
 
@@ -490,7 +492,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
 
-                        String fileName = "docker_template_" + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+                        String fileName = DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
 
                         downloadPackage(fileName);
                     }
@@ -534,7 +536,7 @@ public class SetupService {
             if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("download")) { // for mesos default is download
                 for (String imageName : packagesToBuild.split(",")) {
 
-                    Pair<File, Pair<String, String>> lastVersion = findLastVersion("docker_template_", imageName, packagesDistribFolder);
+                    Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);
                     Pair<String, String> lastVersionValues = lastVersion.getValue();
 
                     if (lastVersionValues != null) {
@@ -550,7 +552,7 @@ public class SetupService {
                                 || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
                                 && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
 
-                            String fileName = "docker_template_" + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + ".tar.gz";
+                            String fileName = DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + ".tar.gz";
                             downloadPackage(fileName);
                         }
                     }

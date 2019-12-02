@@ -38,7 +38,6 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.terminal.Session;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.log4j.Logger;

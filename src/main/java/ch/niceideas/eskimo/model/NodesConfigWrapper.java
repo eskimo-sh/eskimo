@@ -53,6 +53,8 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
 
+    public static final String ACTION_ID_FIELD = "action_id";
+
     public NodesConfigWrapper(File statusFile) throws FileException, JSONException {
         super(FileUtils.readFile(statusFile));
     }
@@ -85,18 +87,18 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     public List<String> getIpAddressKeys() {
         return getRootKeys().stream()
-                .filter(key -> key.startsWith("action_id"))
+                .filter(key -> key.startsWith(ACTION_ID_FIELD))
                 .collect(Collectors.toList());
     }
 
     public List<String> getServiceKeys() {
         return getRootKeys().stream()
-                .filter(key -> !key.contains("action_id"))
+                .filter(key -> !key.contains(ACTION_ID_FIELD))
                 .collect(Collectors.toList());
     }
 
     public String getNodeAddress(int nodeNbr) throws JSONException {
-        return (String) getValueForPath("action_id" + nodeNbr);
+        return (String) getValueForPath(ACTION_ID_FIELD + nodeNbr);
     }
 
     public List<String> getAllNodeAddressesWithService(String serviceName) {
@@ -129,7 +131,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
         getIpAddressKeys()
                 .forEach(key -> {
                     try {
-                        retList.add(new Pair<>(key.substring("action_id".length()), (String) getValueForPath(key)));
+                        retList.add(new Pair<>(key.substring(ACTION_ID_FIELD.length()), (String) getValueForPath(key)));
                     } catch (JSONException e) {
                         throw new RuntimeException();
                     }
@@ -160,11 +162,11 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     public int getNodeNumber(String ipAddress) throws SystemException {
         for (String key : getRootKeys()) {
-            if (key.startsWith("action_id")) {
+            if (key.startsWith(ACTION_ID_FIELD)) {
 
                 try {
                     if (getValueForPath(key).equals(ipAddress)) {
-                        return Integer.parseInt(key.substring("action_id".length()));
+                        return Integer.parseInt(key.substring(ACTION_ID_FIELD.length()));
                     }
                 } catch (JSONException e) {
                     logger.error (e, e);

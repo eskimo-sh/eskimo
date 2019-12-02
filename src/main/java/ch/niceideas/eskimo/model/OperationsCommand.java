@@ -74,7 +74,7 @@ public class OperationsCommand implements Serializable {
             for (int nodeNumber : nodesConfig.getNodeNumbers(service)) {
                 if (nodeNumber > -1) {
                     String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
-                    String nodeName = ipAddress.replaceAll("\\.", "-");
+                    String nodeName = ipAddress.replace(".", "-");
 
                     if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
 
@@ -90,7 +90,7 @@ public class OperationsCommand implements Serializable {
             String installedService = installation.substring(0, installation.indexOf(INSTALLED_ON_IP_FLAG));
 
             String nodeName =  installation.substring(installation.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length());
-            String ipAddress = nodeName.replaceAll("-", "\\.");
+            String ipAddress = nodeName.replace("-", ".");
 
             try {
                 int nodeNbr = nodesConfig.getNodeNumber(ipAddress);

@@ -242,7 +242,7 @@ public class Service {
             put("mandatory", isMandatory());
             put("conditional", getConditional().name());
             put("configOrder", configOrder);
-            put("title", (StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() + " " : "") + getStatusName().replaceAll("-", ""));
+            put("title", (StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() + " " : "") + getStatusName().replace("-", ""));
             put("row", getSelectionLayoutRow());
             put("col", getSelectionLayoutCol());
             put("logo", getLogo());
@@ -293,7 +293,7 @@ public class Service {
         if (isUnique()) {
             return name;
         } else {
-            return name + "/" + host.replaceAll("\\.", "-");
+            return name + "/" + host.replace(".", "-");
         }
     }
 

@@ -242,7 +242,8 @@ public class SSHCommandService {
                     out.write(buf,0,len);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
+                logger.debug(e, e);
             }
         }
     }
