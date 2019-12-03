@@ -394,7 +394,7 @@ eskimo.NodesConfig = function() {
 
         // check IP addresses and ranges configuration
         var nodeCount = 0;
-        for (key in setupConfig) {
+        for (var key in setupConfig) {
             if (key.indexOf("action_id") > -1) {
                 nodeCount++;
                 var nodeNbr = parseInt(key.substring(9));
@@ -444,7 +444,7 @@ eskimo.NodesConfig = function() {
         }
 
         // foolproof bug check : make sure all ids are within node count
-        for (key in setupConfig) {
+        for (var key in setupConfig) {
             //var re = /([a-zA-Z\-_]+)([0-9]+)/;
             var match = key.match(re);
             if (match[2] != null && match[2] != "") {
@@ -471,7 +471,7 @@ eskimo.NodesConfig = function() {
 
                 var foundNodes = 0;
                 // just make sure it is installed on every node
-                for (key in setupConfig) {
+                for (var key in setupConfig) {
                     var match = key.match(re);
                     var serviceName = match[1];
 
@@ -488,7 +488,7 @@ eskimo.NodesConfig = function() {
         }
 
         // check service dependencies
-        for (key in setupConfig) {
+        for (var key in setupConfig) {
             var re = /([a-zA-Z\-_]+)([0-9]*)/;
 
             var match = key.match(re);
@@ -515,7 +515,7 @@ eskimo.NodesConfig = function() {
 
                             var serviceFound = false;
 
-                            for (otherKey in setupConfig) {
+                            for (var otherKey in setupConfig) {
                                 var otherMatcher = otherKey.match(re);
 
                                 if (otherMatcher[1] != null && otherMatcher[1] != "") {
@@ -551,7 +551,7 @@ eskimo.NodesConfig = function() {
                             var expectedCount = dependency.numberOfMasters;
                             var actualCount = 0;
 
-                            for (otherKey in setupConfig) {
+                            for (var otherKey in setupConfig) {
                                 var otherMatcher = otherKey.match(re);
 
                                 if (otherMatcher[1] != null && otherMatcher[1] != "") {

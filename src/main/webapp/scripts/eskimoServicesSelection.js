@@ -221,7 +221,7 @@ eskimo.ServicesSelection = function() {
 
         var retModel = {};
 
-        for (key in serviceSelection) {
+        for (var key in serviceSelection) {
 
             var serviceName = key.substring(0, key.length - "-choice".length);
 

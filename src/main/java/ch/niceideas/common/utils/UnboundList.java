@@ -8,6 +8,8 @@ public class UnboundList<T> implements List<T> {
 
     private static final Logger logger = Logger.getLogger(UnboundList.class);
 
+    public static final String ERROR_TO_BE_IMPLEMENTED = "To Be Implemented";
+
     private final int maxSize;
 
     private final FixedSizeList<T> buffer;
@@ -137,52 +139,52 @@ public class UnboundList<T> implements List<T> {
 
     @Override
     public T set(int index, T element) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public void add(int index, T element) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public int indexOf(Object o) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public ListIterator<T> listIterator() {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
     @Override
     public ListIterator<T> listIterator(int index) {
-        throw new UnsupportedOperationException("To Be Implemented");
+        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
 
 }

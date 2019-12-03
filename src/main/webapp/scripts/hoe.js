@@ -33,7 +33,7 @@ Software.
 */
 
 var initHoe = function() {
-    HoeDatapp = {
+    window.HoeDatapp = {
         appinit: function() {
             HoeDatapp.HandleSidebartoggle();
             HoeDatapp.Handlelpanel();

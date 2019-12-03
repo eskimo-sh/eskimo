@@ -107,9 +107,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private boolean isAjax(HttpServletRequest request) {
-        return request.getHeader("accept") != null && (
-                request.getHeader("accept").contains("json")
-                || request.getHeader("accept").contains("javascript"));
+        String acceptHeader = request.getHeader("accept");
+        return acceptHeader != null && (
+                   acceptHeader.contains("json") || acceptHeader.contains("javascript"));
     }
 
     @Override

@@ -455,7 +455,7 @@ eskimo.SystemStatus = function() {
 
         // C. Cluster nodes and services
         var nodesWithproblem = [];
-        for (key in nodeServicesStatus) {
+        for (var key in nodeServicesStatus) {
             if (key.indexOf("node_alive_") > -1) {
                 var nodeName = key.substring("node_alive_".length);
                 var nodeAlive = nodeServicesStatus[key];
@@ -476,7 +476,7 @@ eskimo.SystemStatus = function() {
 
         // find out about services status
         var servicesWithproblem = [];
-        for (key in nodeServicesStatus) {
+        for (var key in nodeServicesStatus) {
             if (key.indexOf("service_") > -1) {
                 var serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
                 var serviceAlive = nodeServicesStatus[key];
@@ -543,7 +543,7 @@ eskimo.SystemStatus = function() {
         var availableNodes = [];
 
         // loop on node nbrs and get Node Name + create table row
-        for (key in nodeServicesStatus) {
+        for (var key in nodeServicesStatus) {
             if (key.indexOf("node_nbr_") > -1) {
                 var nodeName = key.substring("node_nbr_".length);
                 var nbr = nodeServicesStatus[key];
