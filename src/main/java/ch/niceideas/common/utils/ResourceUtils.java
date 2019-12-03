@@ -75,7 +75,11 @@ public abstract class ResourceUtils {
 
     /** Separator between JAR URL and file path within the JAR */
     public static final String JAR_URL_SEPARATOR = "!/";
+
     public static final String RESOURCE_LOCATION_MUST_NOT_BE_NULL = "Resource location must not be null";
+    public static final String UNRESOLVABLE_PATH_ERROR = " cannot be resolved to absolute file path because it does not reside in the file system";
+
+    private ResourceUtils() {}
 
     /**
      * Return whether the given resource location is a URL: either a special "classpath" pseudo URL or a standard
@@ -172,8 +176,7 @@ public abstract class ResourceUtils {
                     url = Thread.currentThread().getContextClassLoader().getResource(path);
 
                     if (url == null) {
-                        throw new FileNotFoundException(resourceLocation + " cannot be resolved to absolute file path "
-                                + "because it does not reside in the file system");
+                        throw new FileNotFoundException(resourceLocation + UNRESOLVABLE_PATH_ERROR);
                     }
                 }
             }
@@ -206,8 +209,7 @@ public abstract class ResourceUtils {
         }
         
         if (!URL_PROTOCOL_FILE.equals(resourceUrl.getProtocol())) {        
-            throw new FileNotFoundException(resourceUrl + " cannot be resolved to absolute file path "
-                    + "because it does not reside in the file system: " + resourceUrl);
+            throw new FileNotFoundException(resourceUrl + UNRESOLVABLE_PATH_ERROR);
         }
         try {
             return new File(toURI(resourceUrl).getSchemeSpecificPart());
@@ -243,10 +245,10 @@ public abstract class ResourceUtils {
         
         InputStream inputStream = null;
         try {
-            //logger.info("Trying to load configuration from file " + fileName);
+            logger.debug("Trying to load configuration from file " + fileName);
             File targetFile = getFile(fileName);
-            if (targetFile != null && targetFile.exists()) {
-                //logger.info(fileName + " has been found :-) Using it.");
+            if (targetFile.exists()) {
+                logger.debug(fileName + " has been found :-) Using it.");
                 inputStream = new FileInputStream(targetFile);
             } else {
                 logger.debug("Configuration file " + fileName + " does not exist.");
@@ -255,11 +257,11 @@ public abstract class ResourceUtils {
             logger.debug(e, e);
         }
         
-        if (fileName.startsWith("classpath:")) {
-            fileName = fileName.substring("classpath:".length());
+        if (fileName.startsWith(CLASSPATH_URL_PREFIX)) {
+            fileName = fileName.substring(CLASSPATH_URL_PREFIX.length());
         }
 
-        //logger.info("Now trying to lookup resource " + fileName + " in the classpath.");
+        logger.debug("Now trying to lookup resource " + fileName + " in the classpath.");
 
         if (inputStream == null) {
             inputStream = FileUtils.class.getResourceAsStream(fileName);
@@ -294,8 +296,7 @@ public abstract class ResourceUtils {
             throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }
         if (!URL_PROTOCOL_FILE.equals(resourceUri.getScheme())) {
-            throw new FileNotFoundException(description + " cannot be resolved to absolute file path "
-                    + "because it does not reside in the file system: " + resourceUri);
+            throw new FileNotFoundException(resourceUri + UNRESOLVABLE_PATH_ERROR);
         }
         return new File(resourceUri.getSchemeSpecificPart());
     }

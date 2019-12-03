@@ -66,11 +66,11 @@ public class JsonWrapper implements Serializable {
 
     private JSONObject json;
 
-    public static JsonWrapper empty() throws JSONException{
+    public static JsonWrapper empty() {
         return new JsonWrapper("{}");
     }
 
-    public JsonWrapper(JSONObject json) throws JSONException {
+    public JsonWrapper(JSONObject json)  {
         this.json = json;
     }
 
@@ -78,9 +78,8 @@ public class JsonWrapper implements Serializable {
      * Build a new JsonWrapper around the given JSON string.
      * 
      * @param jsonString the string to wrap.
-     * @throws JSONException whenever anything goes wrong
      */
-    public JsonWrapper(String jsonString) throws JSONException {
+    public JsonWrapper(String jsonString)  {
         super();
 
         try {
@@ -121,11 +120,11 @@ public class JsonWrapper implements Serializable {
         return json;
     }
 
-    public JSONObject getSubJSONObject(String key)throws JSONException  {
+    public JSONObject getSubJSONObject(String key)  {
         return json.getJSONObject(key);
     }
 
-    public JSONArray getSubJSONArray(String key)throws JSONException  {
+    public JSONArray getSubJSONArray(String key)  {
         return json.getJSONArray(key);
     }
 
@@ -143,9 +142,9 @@ public class JsonWrapper implements Serializable {
      * 
      * @param path the java-property-style path to follow to get the value
      * @return the found value or null if none
-     * @throws JSONException whenever anything goes wrong
+     * @ whenever anything goes wrong
      */
-    public String getValueForPathAsString(String path) throws JSONException {
+    public String getValueForPathAsString(String path)  {
         Object value = getValueForPath(path);
         if (value != null) {
             return value.toString();
@@ -158,9 +157,9 @@ public class JsonWrapper implements Serializable {
      * 
      * @param path the java-property-style path to follow to get the value
      * @return the found value or null if none
-     * @throws JSONException whenever anything goes wrong
+     * @ whenever anything goes wrong
      */
-    public Object getValueForPath(String path) throws JSONException {
+    public Object getValueForPath(String path)  {
         String[] splittedPath = path.split("\\.");
         Object current = json;
         int i = 0;
@@ -199,9 +198,9 @@ public class JsonWrapper implements Serializable {
      * 
      * @param path the java-property-style path to follow to get the value
      * @param value the value to set at the desired path
-     * @throws JSONException whenever anything goes wrong
+     * @ whenever anything goes wrong
      */
-    public void setValueForPath(String path, Object value) throws JSONException {
+    public void setValueForPath(String path, Object value)  {
         String[] splittedPath = path.split("\\.");
         Object current = json;
         Object parent = null;
@@ -287,7 +286,7 @@ public class JsonWrapper implements Serializable {
         return current;
     }
 
-    private Object createMissingCurrent(Object parent, String parentPath, String nextPath) throws JSONException {
+    private Object createMissingCurrent(Object parent, String parentPath, String nextPath)  {
         Object current;
         if (Character.isDigit(nextPath.charAt(0))) {
             current = new JSONArray();
@@ -303,8 +302,7 @@ public class JsonWrapper implements Serializable {
         return current;
     }
 
-    private void setValueOnPath(Object value, Object current, String path) throws JSONException,
-            JSONException {
+    private void setValueOnPath(Object value, Object current, String path) {
         if (current instanceof JSONObject) {
             if (Character.isDigit(path.charAt(0))) {
                 throw new JSONException (path + ELEMENT_NOT_ARRAY);
@@ -326,9 +324,9 @@ public class JsonWrapper implements Serializable {
 
     /**
      * @return the underlying JSON string.
-     * @throws JSONException whenever anything goes wrong
+     * @ whenever anything goes wrong
      */
-    public String getFormattedValue() throws JSONException {
+    public String getFormattedValue()  {
         try {
             return json.toString(4);
         } catch (JSONException e) {
@@ -343,9 +341,9 @@ public class JsonWrapper implements Serializable {
      * 
      * @param path the java-property-style path to follow to get the value
      * @return true if the target path exists in the JSON structure or false if it doesn't.
-     * @throws JSONException whenever anything goes wrong
+     * @ whenever anything goes wrong
      */
-    public boolean hasPath(String path) throws JSONException {
+    public boolean hasPath(String path)  {
         String[] splittedPath = path.split("\\.");
         Object current = json;
         int i = 0;
@@ -374,7 +372,7 @@ public class JsonWrapper implements Serializable {
         return true;
     }
 
-    Object handleArray(String path, Object current, String nextPath) throws JSONException {
+    Object handleArray(String path, Object current, String nextPath)  {
         if (current instanceof JSONArray) {
 
             int index = -1;
@@ -401,20 +399,20 @@ public class JsonWrapper implements Serializable {
     /**
      * 
      * @return a map representation of the same JSON data
-     * @throws JSONException in case anything goes wrong
+     * @ in case anything goes wrong
      */
-    public Map<String, Object> toMap() throws JSONException {
+    public Map<String, Object> toMap()  {
         Map<String, Object> retMap = new HashMap<String, Object>();        
         toMap(retMap, "", this.json);
         return retMap;
     }
 
-    public Set<String> keySet() throws JSONException {
+    public Set<String> keySet()  {
         return toMap().keySet();
     }
 
     private void toMap(Map<String, Object> retMap, String prefix, JSONObject obj)
-            throws JSONException {
+             {
         for (Iterator<String> keyIt = obj.keys(); keyIt.hasNext(); ) { 
             String key = keyIt.next();
             Object keyVal;
@@ -430,7 +428,7 @@ public class JsonWrapper implements Serializable {
         }
     }
 
-    private void handleValue(Map<String, Object> retMap, Object keyVal, String curPrefix) throws JSONException {
+    private void handleValue(Map<String, Object> retMap, Object keyVal, String curPrefix)  {
         if (keyVal instanceof JSONObject) {
             // recursive call
             toMap (retMap, curPrefix, (JSONObject) keyVal);
@@ -443,7 +441,7 @@ public class JsonWrapper implements Serializable {
     }
 
     private void toMap(Map<String, Object> retMap, String prefix, JSONArray arr)
-            throws JSONException {
+             {
         for (int i = 0; i < arr.length(); i++) {
             Object keyVal;
             try {

@@ -56,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final Logger logger = Logger.getLogger(WebSecurityConfiguration.class);
+    public static final String LOGIN_PAGE_URL = "/login.html";
 
     @Value("${security.userJsonFile}")
     private String userJsonFilePath = "/tmp/eskimo-users.json";
@@ -73,7 +74,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             // authentication and authorization stuff
             .authorizeRequests()
-                .antMatchers("/login.html").permitAll()
+                .antMatchers(LOGIN_PAGE_URL).permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/scripts/**").permitAll()
                 .antMatchers("/images/**").permitAll()
@@ -88,12 +89,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     if (isAjax(httpServletRequest)) {
                         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     } else {
-                        httpServletResponse.sendRedirect(contextPath + "/login.html");
+                        httpServletResponse.sendRedirect(contextPath + LOGIN_PAGE_URL);
                     }
                 }).and()
             // own login stuff
             .formLogin()
-                .loginPage("/login.html").permitAll()
+                .loginPage(LOGIN_PAGE_URL).permitAll()
                 .loginProcessingUrl("/login").permitAll()
                 .defaultSuccessUrl("/index.html",true)
                 .and()
@@ -105,7 +106,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .headers().frameOptions().disable();
     }
 
-    private Boolean isAjax(HttpServletRequest request) {
+    private boolean isAjax(HttpServletRequest request) {
         return request.getHeader("accept") != null && (
                 request.getHeader("accept").contains("json")
                 || request.getHeader("accept").contains("javascript"));

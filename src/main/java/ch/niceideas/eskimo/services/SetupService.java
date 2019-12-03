@@ -607,15 +607,14 @@ public class SetupService {
 
     protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
         // download mesos using full java solution, no script (don't want dependency on system script for this)
-        ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream());
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream())) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
+                try (FileChannel fileChannel = fileOutputStream.getChannel()) {
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
-            FileChannel fileChannel = fileOutputStream.getChannel();
-
-            builder.append(message);
-
-            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-            fileChannel.close();
+                    builder.append(message);
+                    fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+                }
+            }
         }
     }
 

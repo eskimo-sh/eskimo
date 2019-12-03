@@ -40,6 +40,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,9 +61,7 @@ public abstract class StringUtils {
 
     private static final String EOL = System.getProperty("line.separator", "\n");
 
-    private static final char EOL_CHAR = EOL.charAt(0);
-
-    final static public String DEFAULT_ENCODING = "ISO-8859-1";
+    public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
     private static final int LARGEST_FIELD_LENGTH = 100;
 
@@ -74,7 +73,9 @@ public abstract class StringUtils {
         (byte)'8', (byte)'9', (byte)'a', (byte)'b',
         (byte)'c', (byte)'d', (byte)'e', (byte)'f'
       }; 
-    
+
+    private StringUtils() {}
+
     public static String getHexString(byte[] raw) 
         throws UnsupportedEncodingException 
     {
@@ -86,7 +87,7 @@ public abstract class StringUtils {
           hex[index++] = HEX_CHAR_TABLE[v >>> 4];
           hex[index++] = HEX_CHAR_TABLE[v & 0xF];
         }
-        return new String(hex, "ASCII");
+        return new String(hex,  StandardCharsets.US_ASCII);
     }
     
     private static String[] buildSpaceArray(int n) {
@@ -106,7 +107,7 @@ public abstract class StringUtils {
      * 
      * @param nibble the nibble to convert.
      */
-    private static char toHex(int nibble) {
+    public static char toHex(int nibble) {
         return hexDigit[(nibble & 0xF)];
     }
 

@@ -34,11 +34,10 @@
 
 package ch.niceideas.eskimo.configurations;
 
-import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.apache.catalina.connector.Connector;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

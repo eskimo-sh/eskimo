@@ -34,20 +34,18 @@
 
 package ch.niceideas.common.utils;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.apache.log4j.Logger;
 
 
 public class ProcessHelper {
 
     private static final Logger logger = Logger.getLogger(ProcessHelper.class);
+
+    private ProcessHelper() {}
 
     public static String exec(String cmd) {
         try {

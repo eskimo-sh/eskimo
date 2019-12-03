@@ -51,6 +51,8 @@ public abstract class StreamUtils {
      */
     public static final int DEFAULT_BUFFER_SIZE = 2048;
 
+    private StreamUtils() {}
+
     /**
      * Copies information from the input stream to the output stream using the specified buffer size
      */
@@ -178,7 +180,8 @@ public abstract class StreamUtils {
         if (in != null) {
             try {
                 in.close();
-            } catch (Throwable ignored) {
+            } catch (Exception ignored) {
+                logger.debug (ignored, ignored);
             }
         }
     }
@@ -192,7 +195,8 @@ public abstract class StreamUtils {
         if (out != null) {
             try {
                 out.close();
-            } catch (Throwable ignored) {
+            } catch (Exception ignored) {
+                logger.debug (ignored, ignored);
             }
         }
     }
@@ -206,7 +210,8 @@ public abstract class StreamUtils {
         if (in != null) {
             try {
                 in.close();
-            } catch (Throwable ignored) {
+            } catch (Exception ignored) {
+                logger.debug (ignored, ignored);
             }
         }
     }
@@ -220,7 +225,8 @@ public abstract class StreamUtils {
         if (out != null) {
             try {
                 out.close();
-            } catch (Throwable ignored) {
+            } catch (Exception ignored) {
+                logger.debug (ignored, ignored);
             }
         }
     }
