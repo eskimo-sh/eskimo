@@ -38,7 +38,6 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import junit.framework.TestCase;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.comparator.Comparators;
@@ -48,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 public class NodeRangeResolverTest extends TestCase {

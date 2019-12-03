@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

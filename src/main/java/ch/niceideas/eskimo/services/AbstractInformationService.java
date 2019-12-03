@@ -38,8 +38,6 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.UnboundList;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

@@ -434,8 +434,6 @@ Software.
                             <resources>
                                 <resource>
                                     <directory>doc/fonts</directory>
-                                    <!-- (Optional) Directory to copy to. By default uses the option `outputDirectory` -->
-                                    <!--<targetPath>OUTPUT_DIR</targetPath>-->
                                 </resource>
                                 <resource>
                                     <directory>doc/guides/eskimo-guide/pngs</directory>
@@ -463,7 +461,6 @@ Software.
                                     <sourceDirectory>doc/guides/eskimo-guide</sourceDirectory>
                                     <imagesDir>./</imagesDir>
                                     <attributes>
-                                        <!--<imagesdir>./pngs</imagesdir>-->
                                         <stylesheet>../../theme/eskimo.css</stylesheet>
                                         <sectnums>true</sectnums>
                                         <toc>left</toc>
@@ -491,7 +488,6 @@ Software.
                                     <sourceDirectory>doc/guides/service-dev-guide</sourceDirectory>
                                     <imagesDir>./</imagesDir>
                                     <attributes>
-                                        <!--<imagesdir>./pngs</imagesdir>-->
                                         <stylesheet>../../theme/eskimo.css</stylesheet>
                                         <sectnums>true</sectnums>
                                         <toc>left</toc>

@@ -34,23 +34,18 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServicesConfigWrapper;
 import org.apache.log4j.Logger;
-import org.apache.xpath.operations.Operation;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ServicesConfigServiceTest extends AbstractSystemTest {
 

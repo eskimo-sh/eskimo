@@ -35,17 +35,17 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.SystemService;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SetupCommand implements Serializable {
 

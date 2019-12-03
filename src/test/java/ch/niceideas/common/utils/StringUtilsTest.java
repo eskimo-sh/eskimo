@@ -35,12 +35,10 @@
 
 package ch.niceideas.common.utils;
 
+import org.junit.Test;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
-
-import junit.framework.TestCase;
-
-import org.junit.Test;
 
 import static org.junit.Assert.*;
 

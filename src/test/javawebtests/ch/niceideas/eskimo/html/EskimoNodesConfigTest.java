@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import com.gargoylesoftware.htmlunit.html.DomElement;
 import org.junit.Before;
 import org.junit.Test;
 

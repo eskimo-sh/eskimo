@@ -34,9 +34,12 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.SerializablePair;
-import ch.niceideas.eskimo.services.*;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.SerializablePair;
+import ch.niceideas.eskimo.services.NodeRangeResolver;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SystemException;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;

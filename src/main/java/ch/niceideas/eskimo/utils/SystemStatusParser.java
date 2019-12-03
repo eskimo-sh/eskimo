@@ -34,8 +34,6 @@
 
 package ch.niceideas.eskimo.utils;
 
-import org.apache.log4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;

@@ -2,7 +2,10 @@ package ch.niceideas.common.utils;
 
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class UnboundList<T> implements List<T> {
 

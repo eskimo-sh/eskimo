@@ -48,7 +48,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class TerminalServiceTest extends AbstractBaseSSHTest {
 

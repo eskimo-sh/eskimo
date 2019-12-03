@@ -34,11 +34,9 @@
 
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

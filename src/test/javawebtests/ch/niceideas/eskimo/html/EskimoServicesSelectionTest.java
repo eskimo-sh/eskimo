@@ -36,14 +36,12 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class EskimoServicesSelectionTest extends AbstractWebTest {
 

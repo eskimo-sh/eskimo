@@ -34,8 +34,8 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.services.NotificationService;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +46,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 
 @Controller

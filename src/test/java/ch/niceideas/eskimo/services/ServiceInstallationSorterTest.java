@@ -35,10 +35,9 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,7 +47,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTest  {
 

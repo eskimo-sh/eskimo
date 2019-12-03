@@ -35,11 +35,11 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServicesConfigService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -53,8 +53,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 

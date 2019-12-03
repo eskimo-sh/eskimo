@@ -34,8 +34,6 @@
 
 package ch.niceideas.eskimo.model;
 
-import org.json.JSONException;
-
 import java.util.Map;
 
 public class MemoryModel {

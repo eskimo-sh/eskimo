@@ -38,7 +38,6 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

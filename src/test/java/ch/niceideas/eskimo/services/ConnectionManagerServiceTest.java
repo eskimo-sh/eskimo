@@ -41,7 +41,6 @@ import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.LocalPortForwarder;
-import com.trilead.ssh2.channel.ChannelManager;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Before;

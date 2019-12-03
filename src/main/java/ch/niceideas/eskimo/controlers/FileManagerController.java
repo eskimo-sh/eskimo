@@ -34,9 +34,9 @@
 
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.FileManagerService;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
-import ch.niceideas.common.utils.Pair;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -5,9 +5,7 @@ import org.junit.Test;
 import java.io.FileNotFoundException;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 
 public class ResourceUtilsTest {
 

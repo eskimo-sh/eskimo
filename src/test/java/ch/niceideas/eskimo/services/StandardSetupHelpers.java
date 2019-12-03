@@ -37,8 +37,6 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 

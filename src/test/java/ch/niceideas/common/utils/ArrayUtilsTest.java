@@ -35,11 +35,7 @@
 
 package ch.niceideas.common.utils;
 
-import junit.framework.TestCase;
 import org.junit.Test;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 

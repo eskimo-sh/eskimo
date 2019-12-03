@@ -40,9 +40,7 @@ import ch.niceideas.eskimo.model.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
-import com.sun.jna.Memory;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.junit.Before;
 
 import java.util.Arrays;

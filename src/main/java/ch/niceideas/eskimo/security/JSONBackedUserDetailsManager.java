@@ -58,7 +58,10 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDetailsPasswordService {

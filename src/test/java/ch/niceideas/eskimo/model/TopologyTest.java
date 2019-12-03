@@ -34,9 +34,10 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.*;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
+import ch.niceideas.eskimo.services.NodeRangeResolver;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -46,7 +47,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
 
 public class TopologyTest extends AbstractServicesDefinitionTest {
 

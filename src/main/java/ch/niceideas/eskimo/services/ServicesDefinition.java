@@ -39,7 +39,6 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

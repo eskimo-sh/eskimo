@@ -35,7 +35,10 @@
 package ch.niceideas.eskimo;
 
 import ch.niceideas.common.utils.FileUtils;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assert;
@@ -45,10 +48,6 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Hashtable;
 
 public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
 
