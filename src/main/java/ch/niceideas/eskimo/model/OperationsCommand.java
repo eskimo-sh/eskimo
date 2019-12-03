@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.common.utils.Pair;
 import org.apache.log4j.Logger;
@@ -46,7 +47,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OperationsCommand {
+public class OperationsCommand implements Serializable {
 
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
 
@@ -54,9 +55,9 @@ public class OperationsCommand {
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private List<Pair<String, String>> installations = new ArrayList<>();
-    private List<Pair<String, String>> uninstallations = new ArrayList<>();
-    private List<Pair<String, String>> restarts = new ArrayList<>();
+    private List<SerializablePair<String, String>> installations = new ArrayList<>();
+    private List<SerializablePair<String, String>> uninstallations = new ArrayList<>();
+    private List<SerializablePair<String, String>> restarts = new ArrayList<>();
 
     public static OperationsCommand create (
             ServicesDefinition servicesDefinition,
@@ -178,29 +179,29 @@ public class OperationsCommand {
     }
 
     void addInstallation(String service, String ipAddress) {
-        installations.add(new Pair<>(service, ipAddress));
+        installations.add(new SerializablePair<>(service, ipAddress));
     }
 
     void addUninstallation(String service, String ipAddress) {
-        uninstallations.add(new Pair<>(service, ipAddress));
+        uninstallations.add(new SerializablePair<>(service, ipAddress));
     }
 
     void addRestart(String service, String ipAddress) {
-        Pair<String, String> addedPair = new Pair<>(service, ipAddress);
+        SerializablePair<String, String> addedPair = new SerializablePair<>(service, ipAddress);
         if (!installations.contains(addedPair)) {
             restarts.add(addedPair);
         }
     }
 
-    public List<Pair<String, String>> getInstallations() {
+    public List<SerializablePair<String, String>> getInstallations() {
         return installations;
     }
 
-    public List<Pair<String, String>> getUninstallations() {
+    public List<SerializablePair<String, String>> getUninstallations() {
         return uninstallations;
     }
 
-    public List<Pair<String, String>> getRestarts() {
+    public List<SerializablePair<String, String>> getRestarts() {
         return restarts;
     }
 
@@ -212,7 +213,7 @@ public class OperationsCommand {
         }});
     }
 
-    private Collection<Object> toJsonList(List<Pair<String, String>> listOfPairs) {
+    private Collection<Object> toJsonList(List<? extends Pair<String, String>> listOfPairs) {
         return listOfPairs.stream()
                 .map((Function<Pair<String, String>, Object>) pair -> {
                     JSONObject ret = new JSONObject();

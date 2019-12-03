@@ -34,8 +34,6 @@
 
 package ch.niceideas.common.utils;
 
-import java.io.Serializable;
-
 public class Pair<K, V> {
 
     /**

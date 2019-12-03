@@ -205,8 +205,7 @@ public class ServicesConfigService {
                                         // Handle service dirtyness
                                         if (   (StringUtils.isBlank(previousValue) && StringUtils.isNotBlank(value))
                                             || (StringUtils.isNotBlank(previousValue) && StringUtils.isBlank(value))
-                                            || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value)
-                                                && !previousValue.equals(value)
+                                            || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value) && !previousValue.equals(value)
                                                 )) {
                                             dirtyServices.add(serviceName);
                                         }

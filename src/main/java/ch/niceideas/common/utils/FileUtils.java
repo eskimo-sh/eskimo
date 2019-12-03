@@ -34,16 +34,13 @@
 
 package ch.niceideas.common.utils;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
+
+import java.io.*;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -144,7 +141,7 @@ public class FileUtils {
 
     public static void writeFile (File file, String content) throws FileException {
 
-        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file))) { ;
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file))) {
             fileWriter.write(content);
 
         } catch (IOException e) {

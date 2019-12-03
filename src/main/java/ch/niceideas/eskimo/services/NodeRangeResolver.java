@@ -197,7 +197,7 @@ public class NodeRangeResolver  {
             throw new NodeRangeResolverException(e);
         }
         for (int i=0 ; i<bytes.length ; i++) {
-            compacted += (bytes[i] * Math.pow(256,4-i-1));
+            compacted += (bytes[i] * Math.pow(256.0,(double)4-i-1));
         }
         return compacted;
     }

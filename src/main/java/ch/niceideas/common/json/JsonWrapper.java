@@ -300,7 +300,7 @@ public class JsonWrapper implements Serializable {
             current = new JSONObject();
         }
         if (Character.isDigit(parentPath.charAt(0))) {
-            int index = Integer.valueOf(parentPath);
+            int index = Integer.parseInt(parentPath);
             ((JSONArray) parent).put(index, current);
         } else {
             ((JSONObject) parent).put(parentPath, current);
@@ -319,7 +319,7 @@ public class JsonWrapper implements Serializable {
         } else if (current instanceof JSONArray) {
 
             if (Character.isDigit(path.charAt(0))) {
-                int index = Integer.valueOf(path);
+                int index = Integer.parseInt(path);
                 ((JSONArray) current).put(index, value);
             } else {
                 throw new JSONException (path + PATH_NOT_INTEGER);
@@ -407,7 +407,7 @@ public class JsonWrapper implements Serializable {
      * @ in case anything goes wrong
      */
     public Map<String, Object> toMap()  {
-        Map<String, Object> retMap = new HashMap<String, Object>();        
+        Map<String, Object> retMap = new HashMap<>();
         toMap(retMap, "", this.json);
         return retMap;
     }

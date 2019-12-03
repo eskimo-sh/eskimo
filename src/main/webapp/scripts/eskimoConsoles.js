@@ -211,7 +211,7 @@ eskimo.Consoles = function() {
 
             // remove from open console
             var openedConsole = null;
-            var closedConsoleNbr = -1;
+            var closedConsoleNbr;
             for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
                 if (openedConsoles[closedConsoleNbr].nodeName == terminalToClose) {
                     openedConsole = openedConsoles[closedConsoleNbr];
@@ -227,10 +227,10 @@ eskimo.Consoles = function() {
             $("#consoles-console-" + nodeName).remove();
 
             // close session on backend
-            console.log(openedConsole.terminal);
             if (openedConsole == null) {
                 alert("Console " + nodeToClose + " not found");
             } else {
+                console.log(openedConsole.terminal);
                 $.ajax({
                     type: "GET",
                     dataType: "json",

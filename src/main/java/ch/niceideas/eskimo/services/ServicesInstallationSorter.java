@@ -63,7 +63,7 @@ public class ServicesInstallationSorter {
     private static final Logger logger = Logger.getLogger(ServicesInstallationSorter.class);
 
     public List<Pair<String, String>>[] orderOperations(
-            List<Pair<String, String>> operations,
+            List<? extends Pair<String, String>> operations,
             NodesConfigWrapper nodesConfig,
             Set<String> deadIps) throws NodesConfigurationException, ServiceDefinitionException {
 

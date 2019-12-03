@@ -68,7 +68,7 @@ public class TerminalService {
     private int defaultSessionWHeight = 30;
 
     @Value("${terminal.idleTimeoutSeconds}")
-    private int idleTimeoutSeconds = 600;
+    private long idleTimeoutSeconds = 600;
 
     @Autowired
     private ConnectionManagerService connectionManagerService;
@@ -97,7 +97,7 @@ public class TerminalService {
                         }
                     }
                 }
-            }, idleTimeoutSeconds / 10 * 1000, idleTimeoutSeconds / 10 * 1000);
+            }, idleTimeoutSeconds / 10 * 1000, (long) idleTimeoutSeconds / 10 * 1000);
     }
 
     /** For tests */

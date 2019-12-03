@@ -308,8 +308,10 @@ ajaxterm.Terminal=function(id,options) {
 			else if (kc==219) k=String.fromCharCode(27); // Ctrl-[
 			else if (kc==220) k=String.fromCharCode(28); // Ctrl-\
 			else if (kc==221) k=String.fromCharCode(29); // Ctrl-]
+				/*
 			else if (kc==219) k=String.fromCharCode(29); // Ctrl-]
 			else if (kc==219) k=String.fromCharCode(0);  // Ctrl-@
+			*/
 
             if (kc==33) {
                 k=""; // PgUp

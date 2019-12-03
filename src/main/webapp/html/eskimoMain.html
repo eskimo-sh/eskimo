@@ -36,7 +36,7 @@ Software.
 
     <div class="hoe-left-header">
         <a href="#" style="margin-right: 10px; padding-left: 7px;">
-            <img class="img-circle" src="images/eskimo-icon.png" style="width: 30px;">
+            <img class="img-circle" alt="eskimo icon" src="images/eskimo-icon.png" style="width: 30px;">
         </a>
         <a href="#"> <span id="eskimoTitle">Eskimo Console</span></a>
         <span class="hoe-sidebar-toggle"><a href="#"></a></span>
@@ -48,12 +48,12 @@ Software.
         <ul class="left-navbar">
 
             <li class="dropdown hoe-rheader-submenu message-notification left-min-30">
-                <span class="dashboardTitle"><b>Platform Administration and Operation</b></span><span id="dashboardTitle" class="dashboardTitle"></span>
+                <span class="dashboardTitle"><strong>Platform Administration and Operation</strong></span><span id="dashboardTitle" class="dashboardTitle"></span>
             </li>
 
             <li style="padding-left: 5px;" class="dropdown hoe-rheader-submenu message-notification left-min-30">
                 <a href="#" onclick="javascript:eskimoMain.getNotifications().notificationsShown();" class="dropdown-toggle icon-circle" data-toggle="dropdown" >
-                    <i class="fa fa-bell-o"></i>
+                    <span class="fa fa-bell-o"></span>
                     <span id="new-notifications-count" class="badge badge-success"></span>
                 </a>
                 <ul id="notifications-container" class="dropdown-menu ">
@@ -77,8 +77,8 @@ Software.
     <aside id="hoe-left-panel" hoe-position-type="absolute">
         <div class="left-panel-container">
             <div id="menu-scroll-up" class="menu-scroll-button" style="display: none;">
-                <i class="fa fa-arrow-up">
-                </i>
+                <span class="fa fa-arrow-up">
+                </span>
             </div>
             <div id="menu-container" class="left-panel-menu-container">
                 <ul class="nav panel-list" id="mainFolderMenu">
@@ -86,13 +86,13 @@ Software.
 
                     <li class="folder-menu-items disabled" id="folderMenuConsoles">
                         <a href="javascript:eskimoMain.getConsoles().showConsoles();">
-                            <i class="fa fa-terminal"></i>
+                            <span class="fa fa-terminal"></span>
                             <span class="menu-text">SSH Terminals</span>
                         </a>
                     </li>
                     <li class="folder-menu-items disabled" id="folderMenuFileManagers">
                         <a href="javascript:eskimoMain.getFileManagers().showFileManagers();">
-                            <i class="fa fa-folder"></i>
+                            <span class="fa fa-folder"></span>
                             <span class="menu-text">SFTP File Manager</span>
                         </a>
                     </li>
@@ -101,45 +101,45 @@ Software.
                     <li id="adminTitle" class="nav-level" style="border-top: 2px solid #677889;">Platform Administration</li>
                     <li class="config-menu-items disabled">
                         <a href="javascript:eskimoMain.getSystemStatus().showStatus();">
-                            <i class="fa fa-server"></i>
+                            <span class="fa fa-server"></span>
                             <span class="menu-text">Status</span>
                         </a>
                     </li>
                     <li class="config-menu-items disabled" id="menu-configure-setup">
                         <a href="javascript:eskimoMain.getSetup().showSetup();">
-                            <i class="fa fa-check-square"></i>
+                            <span class="fa fa-check-square"></span>
                             <span class="menu-text">Setup</span>
                         </a>
                     </li>
                     <li class="config-menu-items disabled">
                         <a href="javascript:eskimoMain.getServicesConfig().showServicesConfig();">
-                            <i class="fa fa-cog"></i>
+                            <span class="fa fa-cog"></span>
                             <span class="menu-text">Configure Services</span>
                         </a>
                     </li>
                     <li class="config-menu-items disabled">
                         <a href="javascript:eskimoMain.getNodesConfig().showNodesConfig();">
-                            <i class="fa fa-cog"></i>
+                            <span class="fa fa-cog"></span>
                             <span class="menu-text">Configure Eskimo Nodes</span>
                         </a>
                     </li>
                     <li class="config-menu-items disabled"  id="menu-messages">
                         <a href="javascript:eskimoMain.getMessaging().showMessages();">
-                            <i class="fa fa-envelope"></i>
+                            <span class="fa fa-envelope"></span>
                             <span class="menu-text">Backend messages</span>
                         </a>
                     </li>
                     <li class="config-menu-items disabled">
                         <a href="javascript:window.location='logout';">
-                            <i class="fa fa-sign-out"></i>
+                            <span class="fa fa-sign-out"></span>
                             <span class="menu-text">Logout</span>
                         </a>
                     </li>
                 </ul>
             </div>
             <div id="menu-scroll-down" class="menu-scroll-button" style="display: none;">
-                <i class="fa fa-arrow-down">
-                </i>
+                <span class="fa fa-arrow-down">
+                </span>
             </div>
         </div>
     </aside>
