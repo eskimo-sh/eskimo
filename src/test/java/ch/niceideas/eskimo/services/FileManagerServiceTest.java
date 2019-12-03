@@ -210,22 +210,9 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         assertEquals (originalContent, downloadedContent);
     }
 
-    /*
     @Test
-    @Ignore("Difficult to test, would need to mock SSHCommandService")
     public void testOpenFile() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (sc);
-
-        String result = sc.openFile("localhost", "/etc/", "passwd");
-
-        logger.error (result);
-
-        assertTrue(result.startsWith("{\"status\": \"OK\", \"folder\" : \"/boot\", \"content\" : {\n" +
-                "\".\": {\n" +
-                "\"permissions\":"));
+        fail ("Implemment by mocking SSH framework - perhaps separated test");
     }
-    */
 
 }

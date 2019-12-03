@@ -63,8 +63,7 @@ public class OperationsCommand implements Serializable {
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             ServicesInstallStatusWrapper servicesInstallStatus,
-            NodesConfigWrapper rawNodesConfig)
-            throws JSONException, NodesConfigurationException {
+            NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
         OperationsCommand retCommand = new OperationsCommand(rawNodesConfig);
 
@@ -150,8 +149,7 @@ public class OperationsCommand implements Serializable {
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             String[] servicesToRestart,
-            NodesConfigWrapper rawNodesConfig)
-            throws JSONException, NodesConfigurationException {
+            NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
         OperationsCommand retCommand = new OperationsCommand(rawNodesConfig);
 

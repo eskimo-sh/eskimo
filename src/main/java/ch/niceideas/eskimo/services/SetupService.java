@@ -336,7 +336,7 @@ public class SetupService {
     public void prepareSetup (
             JsonWrapper setupConfig,
             Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos, Set<String> packageUpdate)
-            throws JSONException, SetupException {
+            throws SetupException {
 
         File packagesDistribFolder = new File (packageDistributionPath);
         if (!packagesDistribFolder.exists()) {

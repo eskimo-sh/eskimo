@@ -497,4 +497,14 @@ public class SystemServiceTest extends AbstractSystemTest {
             assertTrue (commandEnd + "\nis contained", commandString.contains(commandEnd));
         }
     }
+
+    @Test
+    public void testUninstallation() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testApplyServiceOperation() throws Exception {
+        fail ("To Be Implemented");
+    }
 }

@@ -372,7 +372,7 @@ public class FileManagerService {
         return getClient(hostAddress);
     }
 
-    JSONObject directoryListToJson(List<SFTPv3DirectoryEntry> folder) throws JSONException {
+    JSONObject directoryListToJson(List<SFTPv3DirectoryEntry> folder) {
 
         Map<String, Object> directoryContent = new HashMap<>();
 

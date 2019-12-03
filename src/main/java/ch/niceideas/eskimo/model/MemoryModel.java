@@ -46,7 +46,7 @@ public class MemoryModel {
         this.innerModel = innerModel;
     }
 
-    public Map<String,Long> getModelForNode(NodesConfigWrapper nodesConfig, int nodeNbr) throws JSONException {
+    public Map<String,Long> getModelForNode(NodesConfigWrapper nodesConfig, int nodeNbr) {
         return innerModel.get(nodesConfig.getNodeAddress(nodeNbr));
     }
 }

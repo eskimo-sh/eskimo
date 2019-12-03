@@ -64,8 +64,7 @@ public class SetupCommand implements Serializable {
     public static SetupCommand create (
             JsonWrapper rawSetup,
             SystemService systemService,
-            SetupService setupService)
-            throws JSONException, SetupException {
+            SetupService setupService) throws SetupException {
 
         Set<String> downloadPackages = new HashSet<String>();
         Set<String> buildPackage = new HashSet<String>();

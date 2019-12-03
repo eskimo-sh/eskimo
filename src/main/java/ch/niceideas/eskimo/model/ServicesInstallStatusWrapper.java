@@ -53,23 +53,23 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
     private static final Logger logger = Logger.getLogger(ServicesInstallStatusWrapper.class);
     private List<String> installedServices;
 
-    public ServicesInstallStatusWrapper(File statusFile) throws FileException, JSONException {
+    public ServicesInstallStatusWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
     }
 
-    public static ServicesInstallStatusWrapper empty() throws JSONException{
+    public static ServicesInstallStatusWrapper empty() {
         return new ServicesInstallStatusWrapper("{}");
     }
 
-    public ServicesInstallStatusWrapper(JSONObject json) throws JSONException {
+    public ServicesInstallStatusWrapper(JSONObject json) {
         super(json);
     }
 
-    public ServicesInstallStatusWrapper(Map<String, Object> map) throws JSONException {
+    public ServicesInstallStatusWrapper(Map<String, Object> map) {
         super(new JSONObject(map));
     }
 
-    public ServicesInstallStatusWrapper(String jsonString) throws JSONException {
+    public ServicesInstallStatusWrapper(String jsonString) {
         super(jsonString);
     }
 
@@ -92,11 +92,11 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         }
     }
 
-    public void copyFrom(String flag, ServicesInstallStatusWrapper other) throws JSONException {
+    public void copyFrom(String flag, ServicesInstallStatusWrapper other) {
         this.setValueForPath(flag, other.getValueForPath(flag));
     }
 
-    public List<String> getInstalledServicesFlags() throws JSONException {
+    public List<String> getInstalledServicesFlags() {
         return keySet().stream()
                 .filter (installFlag -> !installFlag.startsWith("node_check_IP"))
                 .collect(Collectors.toList());
@@ -106,7 +106,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         return serviceInstallStatusFlag.substring(0, serviceInstallStatusFlag.indexOf("_installed"));
     }
 
-    public List<String> getAllInstallStatusesExceptServiceOnNode(String service, String nodeName) throws JSONException {
+    public List<String> getAllInstallStatusesExceptServiceOnNode(String service, String nodeName) {
         return keySet().stream()
                 .filter(is -> is.startsWith("node_check_IP")
                         || !is.substring(0, is.indexOf("_installed")).equals(service)

@@ -90,7 +90,7 @@ public class ServicesConfigService {
     private ReentrantLock servicesConfigFileLock = new ReentrantLock();
 
 
-    public void saveServicesConfig(ServicesConfigWrapper status) throws FileException, JSONException, SetupException {
+    public void saveServicesConfig(ServicesConfigWrapper status) throws FileException, SetupException {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
@@ -100,7 +100,7 @@ public class ServicesConfigService {
         }
     }
 
-    public ServicesConfigWrapper loadServicesConfig() throws JSONException, FileException, SetupException {
+    public ServicesConfigWrapper loadServicesConfig() throws FileException, SetupException {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
@@ -115,7 +115,7 @@ public class ServicesConfigService {
         }
     }
 
-    public ServicesConfigWrapper loadServicesConfigNoLock() throws JSONException, FileException, SetupException {
+    public ServicesConfigWrapper loadServicesConfigNoLock() throws FileException, SetupException {
         String configStoragePath = setupService.getConfigStoragePath();
         File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_FILE);
         if (!statusFile.exists()) {
@@ -125,7 +125,7 @@ public class ServicesConfigService {
         return new ServicesConfigWrapper(statusFile);
     }
 
-    public void saveAndApplyServicesConfig(String configFormAsString)  throws JSONException, FileException, SetupException, SystemException  {
+    public void saveAndApplyServicesConfig(String configFormAsString)  throws FileException, SetupException, SystemException  {
 
         servicesConfigFileLock.lock();
         try {

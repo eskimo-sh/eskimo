@@ -44,7 +44,7 @@ import java.util.HashMap;
 
 public class StandardSetupHelpers {
 
-    public static NodesConfigWrapper getStandard2NodesSetup() throws JSONException {
+    public static NodesConfigWrapper getStandard2NodesSetup() {
         return new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("action_id1", "192.168.10.11");
             put("cerebro", "1");
@@ -73,7 +73,7 @@ public class StandardSetupHelpers {
         }});
     }
 
-    public static ServicesInstallStatusWrapper getStandard2NodesStatus() throws JSONException {
+    public static ServicesInstallStatusWrapper getStandard2NodesStatus() {
         return new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
             put("cerebro_installed_on_IP_192-168-10-11", "OK");
             put("elasticsearch_installed_on_IP_192-168-10-11", "OK");
@@ -100,7 +100,7 @@ public class StandardSetupHelpers {
         }});
     }
 
-    public static SystemStatusWrapper getStandard2NodesSystemStatus() throws JSONException {
+    public static SystemStatusWrapper getStandard2NodesSystemStatus() {
         return  new SystemStatusWrapper (new HashMap<String, Object>() {{
             put("node_address_192-168-10-11", "192.168.10.11");
             put("node_address_192-168-10-13", "192.168.10.13");

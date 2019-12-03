@@ -215,7 +215,11 @@ public class SetupServiceTest extends AbstractSystemTest {
                     "logstash, mesos-debian, mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
                 String.join(", ", builtPackageList));
 
+    }
 
+    @Test
+    public void testFindLastPackageFile() throws Exception {
+        fail ("To Be Implemented");
     }
 
 }

@@ -55,7 +55,7 @@ public class NodeRangeResolver  {
 
     public static final String ACTION_ID_FLAG = "action_id";
 
-    public NodesConfigWrapper resolveRanges(NodesConfigWrapper rawNodesConfig) throws JSONException, NodesConfigurationException {
+    public NodesConfigWrapper resolveRanges(NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
         NodesConfigWrapper retNodesConfig = NodesConfigWrapper.empty();
 
@@ -131,7 +131,7 @@ public class NodeRangeResolver  {
 
     private Map<String, String> generateRange(
             NodesConfigWrapper rawNodesConfig, Integer rangeNodeNbr, Integer maxNodeNbr, String rangeValue)
-            throws JSONException, NodesConfigurationException {
+            throws NodesConfigurationException {
 
         Map<String, String> generatedConfig = new HashMap<>();
 

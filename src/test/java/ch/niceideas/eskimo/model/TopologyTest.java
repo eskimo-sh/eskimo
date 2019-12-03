@@ -66,7 +66,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
     }
 
-    NodesConfigWrapper createStandardNodesConfig() throws JSONException {
+    NodesConfigWrapper createStandardNodesConfig() {
         return new NodesConfigWrapper(new HashMap<String, Object>() {{
                     put("action_id1", "192.168.10.11");
                     put("service_a1", "on");

@@ -287,7 +287,7 @@ public class ServicesDefinition implements InitializingBean {
 
 
     public void executeInEnvironmentLock (EnvironmentOperation operation)
-            throws JSONException, FileException, ServiceDefinitionException, SetupException {
+            throws FileException, ServiceDefinitionException, SetupException {
         JsonWrapper env = null;
         try {
             persistEnvLock.lock();
@@ -305,12 +305,12 @@ public class ServicesDefinition implements InitializingBean {
 
     }
 
-    private void savePersistentEnvironment(JsonWrapper env) throws FileException, JSONException, SetupException {
+    private void savePersistentEnvironment(JsonWrapper env) throws FileException, SetupException {
         String configStoragePath = setupService.getConfigStoragePath();
         FileUtils.writeFile(new File(configStoragePath + "/persistent-environment.json"), env.getFormattedValue());
     }
 
-    private JsonWrapper loadPersistentEnvironment() throws JSONException, FileException, SetupException {
+    private JsonWrapper loadPersistentEnvironment() throws FileException, SetupException {
         String configStoragePath = setupService.getConfigStoragePath();
         File envFile = new File(configStoragePath + "/persistent-environment.json");
         if (!envFile.exists()) {
@@ -464,6 +464,6 @@ public class ServicesDefinition implements InitializingBean {
     }
 
     public interface EnvironmentOperation {
-        void call(JsonWrapper persistentEnvironment) throws JSONException, ServiceDefinitionException;
+        void call(JsonWrapper persistentEnvironment) throws ServiceDefinitionException;
     }
 }

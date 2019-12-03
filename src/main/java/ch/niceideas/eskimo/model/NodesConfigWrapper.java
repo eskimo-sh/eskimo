@@ -59,19 +59,19 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
         super(FileUtils.readFile(statusFile));
     }
 
-    public static NodesConfigWrapper empty() throws JSONException{
+    public static NodesConfigWrapper empty() {
         return new NodesConfigWrapper("{}");
     }
 
-    public NodesConfigWrapper(JSONObject json) throws JSONException {
+    public NodesConfigWrapper(JSONObject json) {
         super(json);
     }
 
-    public NodesConfigWrapper(Map<String, Object> map) throws JSONException {
+    public NodesConfigWrapper(Map<String, Object> map) {
         super(new JSONObject(map));
     }
 
-    public NodesConfigWrapper(String jsonString) throws JSONException {
+    public NodesConfigWrapper(String jsonString) {
         super(jsonString);
     }
 
@@ -97,7 +97,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public String getNodeAddress(int nodeNbr) throws JSONException {
+    public String getNodeAddress(int nodeNbr) {
         return (String) getValueForPath(ACTION_ID_FIELD + nodeNbr);
     }
 
@@ -177,7 +177,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
         throw new SystemException("Impossible to find node number for ipAddress " + ipAddress);
     }
 
-    public boolean shouldInstall(String service, int nodeNbr) throws JSONException {
+    public boolean shouldInstall(String service, int nodeNbr) {
 
         boolean shall = false;
 
@@ -207,7 +207,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public List<Integer> getNodeNumbers(String service) throws JSONException {
+    public List<Integer> getNodeNumbers(String service) {
         return getRootKeys().stream()
                 .map(key -> {
                     try {

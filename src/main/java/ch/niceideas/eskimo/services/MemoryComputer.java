@@ -83,11 +83,11 @@ public class MemoryComputer {
 
 
 
-    public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, Set<String> deadIps) throws JSONException, SystemException {
+    public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
         return new MemoryModel(computeMemory(nodesConfig, deadIps));
     }
 
-    Map<String, Map<String, Long>> computeMemory(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws JSONException, SystemException {
+    Map<String, Map<String, Long>> computeMemory(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
 
         // returns ipAdress -> service -> memory in MB
         Map<String, Map<String, Long>> retMap = new HashMap<>();

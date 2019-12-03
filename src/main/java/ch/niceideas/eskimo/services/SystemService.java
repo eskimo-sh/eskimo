@@ -261,7 +261,7 @@ public class SystemService {
         }
     }
 
-    public SystemStatusWrapper getStatus() throws JSONException, SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
+    public SystemStatusWrapper getStatus() throws SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
 
         // 0. Build returned status
         SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
@@ -580,7 +580,7 @@ public class SystemService {
         }
     }
 
-    void restartServiceForSystem(String service, String ipAddress) throws JSONException, SystemException {
+    void restartServiceForSystem(String service, String ipAddress) throws SystemException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
                 (builder) -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
@@ -635,7 +635,7 @@ public class SystemService {
         }
     }
 
-    public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws JSONException, FileException, SetupException {
+    public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
         statusFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
@@ -825,7 +825,7 @@ public class SystemService {
     boolean handleRemoveServiceIfDown(
             ServicesInstallStatusWrapper savedSystemStatusWrapper, SystemStatusWrapper systemStatusWrapper,
             String serviceStatusFullString, String savedService, String nodeName)
-            throws JSONException, ConnectionManagerException {
+            throws ConnectionManagerException {
 
         boolean changes = false;
 
@@ -914,7 +914,7 @@ public class SystemService {
 
 
     private String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
-            throws JSONException, SystemException, SSHCommandException, IOException {
+            throws SystemException, SSHCommandException, IOException {
 
         File tempTopologyFile = createTempFile("eskimo_topology", ipAddress, ".sh");
         try {
@@ -1196,7 +1196,7 @@ public class SystemService {
     }
 
     interface StatusUpdater {
-        void updateStatus (ServicesInstallStatusWrapper servicesInstallationStatus) throws JSONException;
+        void updateStatus (ServicesInstallStatusWrapper servicesInstallationStatus);
     }
 
     public static class PooledOperationException extends RuntimeException {

@@ -162,7 +162,7 @@ public abstract class AbstractSystemTest {
 
         memoryComputer = new MemoryComputer() {
             @Override
-            public MemoryModel buildMemoryModel(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws JSONException, SystemException {
+            public MemoryModel buildMemoryModel(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
                 return new MemoryModel(computeMemory(nodesConfig, deadIps));
             }
         };

@@ -52,9 +52,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 
 public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
@@ -182,5 +180,10 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         assertEquals(1, dropCalledFor.size());
 
+    }
+
+    @Test
+    public void testForceRecreateConnection() throws Exception {
+        fail ("To be Implemented");
     }
 }

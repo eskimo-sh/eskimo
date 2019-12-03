@@ -61,7 +61,7 @@ public class NodesConfigurationChecker {
     }
 
 
-    public void checkServicesConfig(NodesConfigWrapper nodesConfig) throws JSONException, NodesConfigurationException {
+    public void checkServicesConfig(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
 
         int nodeCount = 0;
 

@@ -56,11 +56,11 @@ public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ServicesConfigWrapper.class);
 
-    public ServicesConfigWrapper(File configFile) throws FileException, JSONException {
+    public ServicesConfigWrapper(File configFile) throws FileException {
         super(FileUtils.readFile(configFile));
     }
 
-    public static ServicesConfigWrapper initEmpty(ServicesDefinition def) throws JSONException{
+    public static ServicesConfigWrapper initEmpty(ServicesDefinition def) {
 
         List<JSONObject> allConfigurations = def.getAllServices().stream()
                 .map(serviceName -> def.getService(serviceName))
@@ -74,15 +74,15 @@ public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
         return new ServicesConfigWrapper(configObject.toString(2));
     }
 
-    public ServicesConfigWrapper(JSONObject json) throws JSONException {
+    public ServicesConfigWrapper(JSONObject json) {
         super(json);
     }
 
-    public ServicesConfigWrapper(Map<String, Object> map) throws JSONException {
+    public ServicesConfigWrapper(Map<String, Object> map) {
         super(new JSONObject(map));
     }
 
-    public ServicesConfigWrapper(String jsonString) throws JSONException {
+    public ServicesConfigWrapper(String jsonString) {
         super(jsonString);
     }
 

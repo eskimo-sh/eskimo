@@ -79,7 +79,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 return StandardSetupHelpers.getStandard2NodesSetup();
             }
             @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws JSONException, FileException, SetupException {
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 return StandardSetupHelpers.getStandard2NodesStatus();
             }
         };
