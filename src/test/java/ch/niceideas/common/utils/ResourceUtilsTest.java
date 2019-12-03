@@ -35,4 +35,19 @@ public class ResourceUtilsTest {
         });
         assertNotNull(exception);
     }
+
+    @Test
+    public void testGetFile() throws Exception {
+        assertNotNull(ResourceUtils.getFile("classpath:application.properties"));
+        assertTrue(ResourceUtils.getFile("classpath:application.properties").exists());
+
+        assertNotNull(ResourceUtils.getFile("file:///etc/passwd"));
+        assertTrue(ResourceUtils.getFile("file:///etc/passwd").exists());
+
+        assertNotNull(ResourceUtils.getFile("/etc/passwd"));
+        assertTrue(ResourceUtils.getFile("/etc/passwd").exists());
+
+        assertNotNull(ResourceUtils.getFile("/etc/nonexistent"));
+        assertFalse(ResourceUtils.getFile("/etc/nonexistent").exists());
+    }
 }

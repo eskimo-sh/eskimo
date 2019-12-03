@@ -109,10 +109,12 @@ public abstract class AbstractSystemTest {
         proxyManagerService.setServicesDefinition(servicesDefinition);
 
         proxyManagerService.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
             public void recreateTunnels(String host) throws ConnectionManagerException {
             }
         });
         proxyManagerService.setWebSocketProxyServer(new WebSocketProxyServer(proxyManagerService, servicesDefinition) {
+            @Override
             public void removeForwarders(String serviceId) {
             }
         });
@@ -159,6 +161,7 @@ public abstract class AbstractSystemTest {
         systemService.setServicesDefinition(servicesDefinition);
 
         memoryComputer = new MemoryComputer() {
+            @Override
             public MemoryModel buildMemoryModel(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws JSONException, SystemException {
                 return new MemoryModel(computeMemory(nodesConfig, deadIps));
             }

@@ -54,12 +54,8 @@ public abstract class StringUtils {
     
     private static final Pattern INTEGER_VALUE = Pattern.compile(" *[\\-+]{0,1} *[0-9]+(\\.(0)*){0,1}");
     private static final Pattern NUMERIC_VALUE = Pattern.compile(" *[\\-+]{0,1} *[0-9]+( *\\.[0-9]+){0,1}( *[Ee][0-9]+){0,1}");
-    
-    //private static final Pattern NUMBER_PATTERN = Pattern.compile("((-|\\+)?[0-9]+(\\.[0-9]+)?)+");
 
     private static final char[] PHRASE_ENDING_CHARS = { '.', '!', '?' };
-
-    private static final String EOL = System.getProperty("line.separator", "\n");
 
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
@@ -262,6 +258,7 @@ public abstract class StringUtils {
             try {
                 return new BigDecimal(stringValue.trim());
             } catch (NumberFormatException e) {
+                logger.debug (e, e);
             }
         }
         return defautValue;
@@ -528,7 +525,7 @@ public abstract class StringUtils {
                 || newPattern == null) {
             return inString;
         }
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         // output StringBuffer we'll build up
         int pos = 0; // our position in the old string
         int index = inString.indexOf(oldPattern);

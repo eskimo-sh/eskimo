@@ -94,84 +94,58 @@ public class SystemAdminController {
         }
     }
 
-    @GetMapping("/show-journal")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
-    @ResponseBody
-    public String showJournal(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
+    public String performOperation(Operation operation, String message) {
 
         try {
-            systemService.showJournal(service, address);
+            operation.performOperation(systemService);
 
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
-                put("messages", service + " journal display from " + address  + ".");
+                put("messages", message);
             }}).toString(2);
 
-        } catch (JSONException | SSHCommandException e) {
+        } catch (JSONException | SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus(e);
 
         }
+    }
+
+    @GetMapping("/show-journal")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String showJournal(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
+        return performOperation(
+                systemService -> systemService.showJournal(service, address),
+                service + " journal display from " + address  + ".");
+
     }
 
     @GetMapping("/start-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String startService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-
-        try {
-            systemService.startService(service, address);
-
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", service + " has been started successfuly on " + address  + ".");
-            }}).toString(2);
-
-        } catch (JSONException | SSHCommandException e) {
-            logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
-
-        }
+        return performOperation(
+                systemService -> systemService.startService(service, address),
+                service + " has been started successfuly on " + address  + ".");
     }
 
     @GetMapping("/stop-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String stopService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-
-        try {
-
-            systemService.stopService(service, address);
-
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", service + " has been stopped successfuly on " + address  + ".");
-            }}).toString(2);
-
-        } catch (JSONException | SSHCommandException e) {
-            logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
+        return performOperation(
+                systemService -> systemService.stopService(service, address),
+                service + " has been stopped successfuly on " + address  + ".");
     }
 
     @GetMapping("/restart-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String restartService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-
-        try {
-            systemService.restartService(service, address);
-
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", service + " has been restarted successfuly on " + address  + ".");
-            }}).toString(2);
-
-        } catch (JSONException | SSHCommandException e) {
-            logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-
-        }
+        return performOperation(
+                systemService -> systemService.restartService(service, address),
+                service + " has been restarted successfuly on " + address  + ".");
     }
 
     @GetMapping("/reinstall-service")
@@ -208,19 +182,21 @@ public class SystemAdminController {
             OperationsCommand operationsCommand = OperationsCommand.create (
                     servicesDefinition, nodeRangeResolver, newServicesInstallationStatus, nodesConfig);
 
-            systemService.applyNodesConfig (operationsCommand);
+            return performOperation(
+                    systemService -> systemService.applyNodesConfig (operationsCommand),
+                    service + " has been reinstalled successfuly on " + address  + ".");
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", service + " has been reinstalled successfuly on " + address  + ".");
-            }}).toString(2);
-
-        } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException | ServiceDefinitionException e) {
+        } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addEvent("error", "Nodes installation failed !");
             return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
+    }
+
+    private static interface Operation {
+
+        void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException;
     }
 
 }

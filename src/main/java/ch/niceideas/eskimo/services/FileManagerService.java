@@ -176,7 +176,7 @@ public class FileManagerService {
                     put ("content", result.getValue());
                 }});
 
-            } else if (fileMimeType.contains("no read permission")) {
+            } if (fileMimeType.contains("no read permission")) {
 
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
@@ -209,8 +209,8 @@ public class FileManagerService {
                         put("fileViewable", false);
                     }});
                 }
-
-            } else {
+            }
+            else {
 
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
@@ -293,7 +293,9 @@ public class FileManagerService {
             throw new IOException("IOError writing file to output stream", ex);
 
         } finally {
-            client.close();
+            if (client != null) {
+                client.close();
+            }
         }
     }
 

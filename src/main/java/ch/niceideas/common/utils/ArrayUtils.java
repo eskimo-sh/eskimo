@@ -38,6 +38,8 @@ import java.util.Arrays;
 
 public class ArrayUtils {
 
+    private ArrayUtils() {}
+
     public static <T> T[] concatAll(T[] first, T[]... rest) {
         int totalLength = first.length;
         if (rest != null) {

@@ -57,14 +57,11 @@ public class Terminal {
         void handle(Terminal t, String s, Matcher m);
     }
 
-    private static final EscapeSequence NONE = new EscapeSequence() {
-        public void handle(Terminal t, String s, Matcher m) {
-        }
-    };
+    private static final EscapeSequence NONE = (t, s, m) -> {};
 
-    private static final Map<String,EscapeSequence> ESCAPE_SEQUENCES = new HashMap<String,EscapeSequence>();
+    private static final Map<String,EscapeSequence> ESCAPE_SEQUENCES = new HashMap<>();
 
-    private static final Map<Pattern,EscapeSequence> REGEXP_ESCAPE_SEQUENCES = new HashMap<Pattern,EscapeSequence>();
+    private static final Map<Pattern,EscapeSequence> REGEXP_ESCAPE_SEQUENCES = new HashMap<>();
 
     private static abstract class CsiSequence {
         final int arg2; // ?
@@ -80,50 +77,29 @@ public class Terminal {
 
     private static final String HTML_TABLE, LATEN1_TABLE;
 
+    public static final String CSI_PREFIX = "csi_";
+    public static final String CSI_LOWER_PREFIX = "csi_Lower";
+
     static {
         for( final Method m : Terminal.class.getDeclaredMethods() ) {
             Esc esc = m.getAnnotation(Esc.class);
             if(esc!=null) {
                 for( String s : esc.value() ) {
-                    ESCAPE_SEQUENCES.put(s,new EscapeSequence() {
-                        public void handle(Terminal t, String s, Matcher matcher) {
-                            try {
-                                m.invoke(t);
-                            } catch (IllegalAccessException e) {
-                                throw new IllegalAccessError();
-                            } catch (InvocationTargetException e) {
-                                throw new RuntimeException(e);
-                            }
+                    ESCAPE_SEQUENCES.put(s, (t, s1, matcher) -> {
+                        try {
+                            m.invoke(t);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new TerminalException(e);
                         }
                     });
                 }
             }
-            // FIXME : handle differentiated names here !
-            if(m.getName().startsWith("csi_") && m.getName().length()=="csi_".length()+1) {
-                CSI_SEQUENCE.put(m.getName().charAt("csi_".length()),new CsiSequence(1) {
-                    void handle(Terminal t, int[] args) {
-                        try {
-                            m.invoke(t,new Object[]{args});
-                        } catch (IllegalAccessException e) {
-                            throw new IllegalAccessError();
-                        } catch (InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
+
+            if(m.getName().startsWith(CSI_PREFIX) && m.getName().length()== CSI_PREFIX.length()+1) {
+                CSI_SEQUENCE.put(m.getName().charAt(CSI_PREFIX.length()), buildCsiSequence(m));
             }
-            if(m.getName().startsWith("csi_Lower") && m.getName().length()=="csi_Lower".length() + 1) {
-                CSI_SEQUENCE.put(m.getName().toLowerCase().charAt("csi_Lower".length()),new CsiSequence(1) {
-                    void handle(Terminal t, int[] args) {
-                        try {
-                            m.invoke(t,new Object[]{args});
-                        } catch (IllegalAccessException e) {
-                            throw new IllegalAccessError();
-                        } catch (InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
+            if(m.getName().startsWith(CSI_LOWER_PREFIX) && m.getName().length()== CSI_LOWER_PREFIX.length() + 1) {
+                CSI_SEQUENCE.put(m.getName().toLowerCase().charAt(CSI_LOWER_PREFIX.length()), buildCsiSequence(m));
             }
         }
 
@@ -160,15 +136,15 @@ public class Terminal {
             }
         });
 
-        StringBuffer html = new StringBuffer(256);
-        StringBuffer lat1 = new StringBuffer(256);
+        StringBuilder html = new StringBuilder(256);
+        StringBuilder lat1 = new StringBuilder(256);
         for( int i=0; i<256; i++) {
             if(i<32) {
                 lat1.append(' ');
                 if(i==0x0A)
                     html.append('\n');
                 else
-                    html.append('\u00A0'); // &nbsp;
+                    html.append('\u00A0');
             } else
             if(i<127 || 160<i) {
                 lat1.append((char)i);
@@ -180,6 +156,18 @@ public class Terminal {
         }
         HTML_TABLE = html.toString();
         LATEN1_TABLE = lat1.toString();
+    }
+
+    private static CsiSequence buildCsiSequence(Method m) {
+        return new CsiSequence(1) {
+            void handle(Terminal t, int[] args) {
+                try {
+                    m.invoke(t,new Object[]{args});
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new TerminalException(e);
+                }
+            }
+        };
     }
 
     private static final char EMPTY_CH = '\u0700'; // back=0,fore=7,char=0
@@ -769,4 +757,13 @@ public class Terminal {
         restoreCursor();
     }
 
+
+    public static class TerminalException extends RuntimeException {
+
+        static final long serialVersionUID = -3311512123124229248L;
+
+        TerminalException(Throwable cause) {
+            super(cause);
+        }
+    }
 }

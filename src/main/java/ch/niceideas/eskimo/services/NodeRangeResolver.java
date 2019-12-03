@@ -194,7 +194,7 @@ public class NodeRangeResolver  {
             bytes = InetAddress.getByName(ipAddr).getAddress();
         } catch (UnknownHostException e) {
             logger.error (e, e);
-            throw new RuntimeException(e);
+            throw new NodeRangeResolverException(e);
         }
         for (int i=0 ; i<bytes.length ; i++) {
             compacted += (bytes[i] * Math.pow(256,4-i-1));
@@ -204,5 +204,15 @@ public class NodeRangeResolver  {
 
     private static String toInetAddress(int ip) {
         return (( (ip >> 24) & 0xFF ) + 1) + "." + ( ( ip >> 16 ) & 0xFF ) + "." + ( ( ip >> 8 ) & 0xFF ) + "." + (ip & 0xFF );
+    }
+
+
+    public static class NodeRangeResolverException extends RuntimeException {
+
+        static final long serialVersionUID = -3317632123124229248L;
+
+        NodeRangeResolverException(Throwable cause) {
+            super(cause);
+        }
     }
 }

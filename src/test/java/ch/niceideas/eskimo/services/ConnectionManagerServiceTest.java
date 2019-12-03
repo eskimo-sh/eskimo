@@ -120,6 +120,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         final List<String> dropCalledFor = new ArrayList<>();
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT) {
+            @Override
             protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
                 return new Connection(ipAddress, SSH_PORT) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
@@ -131,6 +132,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                     }
                 };
             }
+            @Override
             protected void dropTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
                 super.dropTunnels(connection, ipAddress);
                 dropCalledFor.add(ipAddress);

@@ -47,7 +47,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SetupCommand implements Serializable {
+public class SetupCommand  {
 
     private static final Logger logger = Logger.getLogger(SetupCommand.class);
 

@@ -52,6 +52,7 @@ public abstract class ProcessWithPty extends Process {
     /**
      * Is this process still alive?
      */
+    @Override
     public boolean isAlive() {
         try {
             exitValue();

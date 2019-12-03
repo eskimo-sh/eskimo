@@ -214,11 +214,12 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                         return Topology.parseKeyToServiceConfig(key, this);
                     } catch (NodesConfigurationException | JSONException e) {
                         logger.error(e, e);
-                        throw new RuntimeException(e);
+                        throw new TopologyException(e);
                     }
                 })
                 .filter(result -> result.getKey().equals(service))
                 .map(result -> result.getValue() == null ? -1 : result.getValue())
+                .filter (value -> value != -1)
                 .collect(Collectors.toList());
     }
 }

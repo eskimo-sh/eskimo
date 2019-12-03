@@ -89,6 +89,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
     public void testGetStatus() throws Exception {
 
         systemService.setSshCommandService(new SSHCommandService() {
+            @Override
             public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
@@ -99,10 +100,12 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 }
                 return testSSHCommandResultBuilder.toString();
             }
+            @Override
             public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
                 testSSHCommandScript.append(command + "\n");
                 return testSSHCommandResultBuilder.toString();
             }
+            @Override
             public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
                 // just do nothing
             }

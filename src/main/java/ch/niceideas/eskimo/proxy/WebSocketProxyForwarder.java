@@ -79,13 +79,13 @@ public class WebSocketProxyForwarder {
             WebSocketHttpHeaders headers = getWebSocketHttpHeaders(webSocketServerSession);
             WebSocketSession clientSession = new StandardWebSocketClient()
                     .doHandshake(new WebSocketProxyClientHandler(webSocketServerSession), headers, new URI(targetWsUri))
-                    .get(30 * 1000, TimeUnit.MILLISECONDS);
+                    .get((long)30 * (long)1000, TimeUnit.MILLISECONDS);
             clientSession.setBinaryMessageSizeLimit(10_000_000); // 10Mb
             clientSession.setTextMessageSizeLimit(10_000_000); // 10Mb
             return clientSession;
         } catch (Exception e) {
             logger.error (e, e);
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 

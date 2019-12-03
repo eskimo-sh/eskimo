@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.terminal;
 
 import com.trilead.ssh2.Connection;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,8 +45,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Represents a session.
@@ -57,6 +56,8 @@ import java.util.logging.Logger;
  *
  */
 public final class Session extends Thread {
+
+    private static final Logger logger = Logger.getLogger(Session.class);
 
     private final Connection connection;
 
@@ -131,13 +132,13 @@ public final class Session extends Thread {
             } catch (IOException e) {
                 // fd created by forkpty seems to cause I/O error when the other side is closed via kill -9
                 if (!hasChildProcessFinished())
-                    LOGGER.log(Level.WARNING, "Session pump thread is dead", e);
+                    logger.warn ("Session pump thread is dead", e);
             } finally {
                 closeQuietly(in);
                 closeQuietly(out);
             }
-        } catch (Throwable e) {
-            LOGGER.log(Level.WARNING, "Session pump thread is dead", e);
+        } catch (Exception e) {
+            logger.warn ("Session pump thread is dead", e);
         }
     }
 
@@ -146,6 +147,7 @@ public final class Session extends Thread {
             childProcess.exitValue();
             return true;
         } catch (IllegalThreadStateException e) {
+            logger.debug (e, e);
             return false;
         }
     }
@@ -155,6 +157,7 @@ public final class Session extends Thread {
             if (c!=null)    c.close();
         } catch (IOException e) {
             // silently ignore
+            logger.debug (e, e);
         }
     }
 
@@ -207,5 +210,4 @@ public final class Session extends Thread {
         return "linux";
     }
 
-    private static final Logger LOGGER = Logger.getLogger(Session.class.getName());
 }

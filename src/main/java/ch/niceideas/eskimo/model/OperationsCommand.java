@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OperationsCommand implements Serializable {
+public class OperationsCommand {
 
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
 
@@ -72,15 +72,15 @@ public class OperationsCommand implements Serializable {
         // 1. Find out about services that need to be installed
         for (String service : servicesDefinition.listServicesOrderedByDependencies()) {
             for (int nodeNumber : nodesConfig.getNodeNumbers(service)) {
-                if (nodeNumber > -1) {
-                    String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
-                    String nodeName = ipAddress.replace(".", "-");
 
-                    if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
+                String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+                String nodeName = ipAddress.replace(".", "-");
 
-                        retCommand.addInstallation(service, ipAddress);
-                    }
+                if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
+
+                    retCommand.addInstallation(service, ipAddress);
                 }
+
             }
         }
 
@@ -136,11 +136,9 @@ public class OperationsCommand implements Serializable {
         for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
             for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
-                if (nodeNumber > -1) {
-                    String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+                String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
 
-                    retCommand.addRestart(restartedService, ipAddress);
-                }
+                retCommand.addRestart(restartedService, ipAddress);
             }
         }
 
@@ -161,11 +159,9 @@ public class OperationsCommand implements Serializable {
         for (String restartedService : Arrays.stream(servicesToRestart).sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
             for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
-                if (nodeNumber > -1) {
-                    String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+                String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
 
-                    retCommand.addRestart(restartedService, ipAddress);
-                }
+                retCommand.addRestart(restartedService, ipAddress);
             }
         }
 

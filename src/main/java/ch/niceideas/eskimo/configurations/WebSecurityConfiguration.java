@@ -67,9 +67,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        String contextPath = StringUtils.isBlank(configuredContextPath) ?
-                "" :
-                (configuredContextPath.startsWith("/") ? "" : "/") + configuredContextPath;
+        final String contextPath = getContextPath();
 
         http
             // authentication and authorization stuff
@@ -106,10 +104,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .headers().frameOptions().disable();
     }
 
+    private String getContextPath() {
+        if (StringUtils.isBlank(configuredContextPath)) {
+            return "";
+        } else {
+            return (configuredContextPath.startsWith("/") ? "" : "/") + configuredContextPath;
+        }
+    }
+
     private boolean isAjax(HttpServletRequest request) {
         String acceptHeader = request.getHeader("accept");
         return acceptHeader != null && (
-                   acceptHeader.contains("json") || acceptHeader.contains("javascript"));
+                 acceptHeader.contains("json") || acceptHeader.contains("javascript"));
     }
 
     @Override
@@ -124,7 +130,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             return new JSONBackedUserDetailsManager(userJsonFilePath);
         } catch (FileException | JSONException e) {
             logger.error (e, e);
-            throw new RuntimeException(e);
+            throw new ConfigurationException(e);
         }
     }
 }

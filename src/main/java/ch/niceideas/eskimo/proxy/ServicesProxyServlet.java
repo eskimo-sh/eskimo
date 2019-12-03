@@ -183,7 +183,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         HttpEntityEnclosingRequest eProxyRequest = new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
 
-        if ("application/x-www-form-urlencoded".equals(servletRequest.getContentType()) || getContentLength(servletRequest) == 0){
+        if ("application/x-www-form-urlencoded".equals(servletRequest.getContentType()) || getContentLengthOverride(servletRequest) == 0){
             List<NameValuePair> formparams = new ArrayList<NameValuePair>();
             Enumeration<String> paramNames = servletRequest.getParameterNames();
             while (paramNames.hasMoreElements()) {
@@ -197,13 +197,13 @@ public class ServicesProxyServlet extends ProxyServlet {
             }
         } else {
             eProxyRequest.setEntity(
-                    new InputStreamEntity(servletRequest.getInputStream(), getContentLength(servletRequest)));
+                    new InputStreamEntity(servletRequest.getInputStream(), getContentLengthOverride(servletRequest)));
         }
         return eProxyRequest;
     }
 
     // Get the header value as a long in order to more correctly proxy very large requests
-    private long getContentLength(HttpServletRequest request) {
+    private long getContentLengthOverride(HttpServletRequest request) {
         String contentLengthHeader = request.getHeader("Content-Length");
         if (contentLengthHeader != null) {
             return Long.parseLong(contentLengthHeader);

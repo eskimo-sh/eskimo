@@ -129,8 +129,7 @@ public abstract class ResourceUtils {
                     url = Thread.currentThread().getContextClassLoader().getResource(path);
 
                     if (url == null) {
-                        String description = "class path resource [" + path + "]";
-                        throw new FileNotFoundException(description + " cannot be resolved to URL because it does not exist");
+                        throw new FileNotFoundException("class path resource [" + path + "]  cannot be resolved to URL because it does not exist");
                     }
                 }
             }
@@ -144,8 +143,7 @@ public abstract class ResourceUtils {
             try {
                 return new File(resourceLocation).toURI().toURL();
             } catch (MalformedURLException ex2) {
-                throw new FileNotFoundException("Resource location [" + resourceLocation
-                        + "] is neither a URL not a well-formed file path");
+                throw new FileNotFoundException("Resource location [" + resourceLocation + "] is neither a URL not a well-formed file path");
             }
         }
     }
@@ -162,33 +160,7 @@ public abstract class ResourceUtils {
      * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
      */
     public static File getFile(String resourceLocation) throws FileNotFoundException {
-        if (resourceLocation == null) {
-            throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
-        }
-        if (resourceLocation.startsWith(CLASSPATH_URL_PREFIX)) {
-            String path = resourceLocation.substring(CLASSPATH_URL_PREFIX.length());
-
-            URL url = ClassLoader.getSystemClassLoader().getResource(path);
-            if (url == null) {
-
-                url = ResourceUtils.class.getClassLoader().getResource(path);
-                if (url == null) {
-                    url = Thread.currentThread().getContextClassLoader().getResource(path);
-
-                    if (url == null) {
-                        throw new FileNotFoundException(resourceLocation + UNRESOLVABLE_PATH_ERROR);
-                    }
-                }
-            }
-            return getFile(url);
-        }
-        try {
-            // try URL
-            return getFile(new URL(resourceLocation));
-        } catch (MalformedURLException ex) {
-            // no URL -> treat as file path
-            return new File(resourceLocation);
-        }
+        return getFile (getURL(resourceLocation));
     }
 
     /**
@@ -219,16 +191,6 @@ public abstract class ResourceUtils {
         }
     }
 
-    /**
-     * Resolve the given resource URI to a <code>java.io.File</code>, i.e. to a file in the file system.
-     * 
-     * @param resourceUri the resource URI to resolve
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the URL cannot be resolved to a file in the file system
-     */
-    public static File getFile(URI resourceUri) throws FileNotFoundException {
-        return getFile(resourceUri, "URI");
-    }
 
     /**
      * Search for the filenames in the various classLoader as a Resource and returns an inputStream in it should it
@@ -286,12 +248,10 @@ public abstract class ResourceUtils {
      * Resolve the given resource URI to a <code>java.io.File</code>, i.e. to a file in the file system.
      * 
      * @param resourceUri the resource URI to resolve
-     * @param description a description of the original resource that the URI was created for (for example, a class
-     *            path location)
      * @return a corresponding File object
      * @throws FileNotFoundException if the URL cannot be resolved to a file in the file system
      */
-    public static File getFile(URI resourceUri, String description) throws FileNotFoundException {
+    public static File getFile(URI resourceUri) throws FileNotFoundException {
         if (resourceUri == null) {
             throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }

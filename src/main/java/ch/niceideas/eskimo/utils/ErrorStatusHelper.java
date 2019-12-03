@@ -42,6 +42,8 @@ import java.util.HashMap;
 
 public class ErrorStatusHelper {
 
+    private ErrorStatusHelper() {}
+
     public static String createErrorStatus (Exception e) {
         return createErrorStatus(e.getMessage());
     }
@@ -66,7 +68,7 @@ public class ErrorStatusHelper {
             }}).toString(2);
         } catch (JSONException e1) {
             // cannot happen
-            throw new RuntimeException(e1);
+            throw new ErrorStatusException(e1);
         }
     }
 
@@ -81,7 +83,7 @@ public class ErrorStatusHelper {
             }}).toString(2);
         } catch (JSONException e1) {
             // cannot happen
-            throw new RuntimeException(e1);
+            throw new ErrorStatusException(e1);
         }
     }
 
@@ -95,7 +97,31 @@ public class ErrorStatusHelper {
             }}).toString(2);
         } catch (JSONException e1) {
             // cannot happen
-            throw new RuntimeException(e1);
+            throw new ErrorStatusException(e1);
+        }
+    }
+
+    public static String createClearStatusWithMessage (String flag, boolean processingPending, String message) {
+
+        try {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("processingPending", processingPending);
+                put("clear", flag);
+                put("message", message);
+            }}).toString(2);
+        } catch (JSONException e1) {
+            // cannot happen
+            throw new ErrorStatusException(e1);
+        }
+    }
+
+    public static class ErrorStatusException extends RuntimeException {
+
+        static final long serialVersionUID = -331151212312431248L;
+
+        ErrorStatusException(Throwable cause) {
+            super(cause);
         }
     }
 }

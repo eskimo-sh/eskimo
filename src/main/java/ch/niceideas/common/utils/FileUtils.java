@@ -35,6 +35,7 @@
 package ch.niceideas.common.utils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -46,11 +47,13 @@ import org.apache.log4j.Logger;
 
 
 /**
- * FIXME document me please
+ * Various utility methods for File manipulation
  */
 public class FileUtils {
 
     private static final Logger logger = Logger.getLogger(FileUtils.class);
+
+    private FileUtils() {}
 
     /**
      * Supports recursive deletion of directories

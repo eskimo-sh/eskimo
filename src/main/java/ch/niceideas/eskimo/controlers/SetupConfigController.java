@@ -86,14 +86,7 @@ public class SetupConfigController {
                 setupService.ensureSetupCompleted();
             } catch (SetupException e) {
                 logger.debug (e, e);
-                try {
-
-                    configWrapper.setValueForPath("clear", "setup");
-                    configWrapper.setValueForPath("message", e.getMessage());
-                } catch (JSONException e1) {
-                    logger.error (e1, e1);
-                    throw new RuntimeException(e1);
-                }
+                return ErrorStatusHelper.createClearStatusWithMessage("setup", systemService.isProcessingPending(), e.getMessage());
             }
 
             if (systemService.isProcessingPending()) {

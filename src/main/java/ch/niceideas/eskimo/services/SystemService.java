@@ -67,6 +67,8 @@ public class SystemService {
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
     public static final String NODES_STATUS_JSON_PATH = "/nodes-status.json";
+    public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
+    public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -293,7 +295,7 @@ public class SystemService {
                         fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);
                     } catch (SystemException e) {
                         logger.error(e, e);
-                        throw new RuntimeException(e);
+                        throw new PooledOperationException(e);
                     }
                 });
             }
@@ -532,7 +534,7 @@ public class SystemService {
                         } catch (SystemException | JSONException | FileException | SetupException | ConnectionManagerException e) {
                             logger.error(e, e);
                             error.set(e);
-                            throw new RuntimeException(e);
+                            throw new PooledOperationException(e);
                         }
                     }
                 });
@@ -891,18 +893,13 @@ public class SystemService {
                 if (StringUtils.isNotBlank(prevStatusAsString)) {
                     SystemStatusWrapper previousStatus = new SystemStatusWrapper(prevStatusAsString);
 
-                    //logger.error (prevStatusAsString);
-                    //logger.error (prevStatusAsString);
-
                     for (String service : systemStatus.getRootKeys()) {
 
-                        if (!systemStatus.isServiceOK(service)) {
+                        if (!systemStatus.isServiceOK(service)
+                            && previousStatus.isServiceOK(service)) {
 
-                            if (previousStatus.isServiceOK(service)) {
-
-                                logger.warn("For service " + service + " - previous status was OK and status is " + systemStatus.getValueForPath(service));
-                                notificationService.addEvent("error", "Service " + service + " got into problem");
-                            }
+                            logger.warn("For service " + service + " - previous status was OK and status is " + systemStatus.getValueForPath(service));
+                            notificationService.addEvent("error", "Service " + service + " got into problem");
                         }
                     }
                 }
@@ -1012,20 +1009,21 @@ public class SystemService {
         return sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-mesos.sh");
     }
 
+    private void copyCommand (String source, String target, String ipAddress) throws SSHCommandException {
+        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/" + source);
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", source, target});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", target});
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", target});
+    }
+
     private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
         sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
         sb.append(" - Copying jq program\n");
-        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/jq-1.6-linux64");
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "jq-1.6-linux64", "/usr/local/bin/jq"});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", "/usr/local/bin/jq"});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/jq"});
+        copyCommand ("jq-1.6-linux64", USR_LOCAL_BIN_JQ, ipAddress);
 
         sb.append(" - Copying mesos-cli script\n");
-        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/mesos-cli.sh");
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", "mesos-cli.sh", "/usr/local/bin/mesos-cli.sh"});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", "/usr/local/bin/mesos-cli.sh"});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/usr/local/bin/mesos-cli.sh"});
+        copyCommand ("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, ipAddress);
 
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
     }
@@ -1143,7 +1141,7 @@ public class SystemService {
         }
 
         // 4. call setup script
-        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", "/tmp/" + service + "/setup.sh", ipAddress});//, dependencies);
+        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", "/tmp/" + service + "/setup.sh", ipAddress});
         try {
             exec(ipAddress, sb, setupScript);
         } catch (SSHCommandException e) {
@@ -1199,5 +1197,14 @@ public class SystemService {
 
     interface StatusUpdater {
         void updateStatus (ServicesInstallStatusWrapper servicesInstallationStatus) throws JSONException;
+    }
+
+    public static class PooledOperationException extends RuntimeException {
+
+        static final long serialVersionUID = -3317632123352229248L;
+
+        PooledOperationException(Throwable cause) {
+            super(cause);
+        }
     }
 }

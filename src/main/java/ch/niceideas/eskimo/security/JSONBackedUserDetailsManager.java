@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.configurations.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -141,7 +142,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
             FileUtils.writeFile(new File (jsonFilePath), usersConfigObject.toString(2));
         } catch (FileException | JSONException e) {
             logger.error (e, e);
-            throw new RuntimeException(e);
+            throw new ConfigurationException(e);
         }
     }
 

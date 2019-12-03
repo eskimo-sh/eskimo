@@ -189,12 +189,15 @@ public class SetupServiceTest extends AbstractSystemTest {
         final List<String> downloadPackageList = new ArrayList<>();
 
         SetupService setupService = createSetupService(new SetupService() {
+            @Override
             protected void buildPackage(String image) throws SetupException {
                 builtPackageList.add (image);
             }
+            @Override
             protected void downloadPackage(String fileName) throws SetupException {
                 downloadPackageList.add (fileName);
             }
+            @Override
             protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
                 return new JsonWrapper(packagesVersionFile);
             }

@@ -35,12 +35,16 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -117,6 +121,8 @@ public class SystemOperationService {
     }
 
     interface SystemOperation {
-        void call(StringBuilder result) throws Exception;
+        void call(StringBuilder result)
+                throws ProcessHelper.ProcessHelperException, SSHCommandException, SystemException, IOException,
+                       FileUtils.FileDeleteFailedException;
     }
 }

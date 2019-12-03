@@ -63,7 +63,7 @@ public class Topology {
     private final Map<String, Map<String, String>> additionalEnvironment = new HashMap<>();
 
     public static Pair<String, Integer> parseKeyToServiceConfig (String key, NodesConfigWrapper nodesConfig)
-            throws NodesConfigurationException, JSONException {
+            throws NodesConfigurationException {
         Matcher matcher = serviceParser.matcher(key);
 
         if (!matcher.matches()) {
@@ -77,19 +77,21 @@ public class Topology {
         return new Pair<>(serviceName, nodeNbr > -1 ? nodeNbr : null);
     }
 
-    public static int getNodeNbr(String key, NodesConfigWrapper nodesConfig, Matcher matcher) throws JSONException {
-        int nodeNbr = -1;
-        if (matcher.groupCount() > 1) {
-            String nbrAsString = matcher.group(2);
-            if (StringUtils.isNotBlank(nbrAsString)) {
-                nodeNbr = Integer.parseInt(nbrAsString);
-            } else {
-                nodeNbr = Integer.parseInt((String) nodesConfig.getValueForPath(key));
+    public static int getNodeNbr(String key, NodesConfigWrapper nodesConfig, Matcher matcher) throws NodesConfigurationException {
+
+        try {
+            if (matcher.groupCount() > 1) {
+                String nbrAsString = matcher.group(2);
+                if (StringUtils.isNotBlank(nbrAsString)) {
+                    return Integer.parseInt(nbrAsString);
+                }
             }
-        } else {
-            nodeNbr = Integer.parseInt((String) nodesConfig.getValueForPath(key));
+
+            return Integer.parseInt((String) nodesConfig.getValueForPath(key));
+        } catch (JSONException e) {
+            logger.error (e, e);
+            throw new NodesConfigurationException (e);
         }
-        return nodeNbr;
     }
 
     public static Topology create(
@@ -123,7 +125,7 @@ public class Topology {
 
     private void defineAdditionalEnvionment (
             Service service, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, JSONException, FileException, SetupException {
+            throws ServiceDefinitionException, FileException, SetupException {
 
         String ipAddress = nodesConfig.getNodeAddress (nodeNbr);
 
@@ -191,14 +193,14 @@ public class Topology {
     }
 
     private void defineMasters(Service service, Set<String> deadIps, int nodeNbr, NodesConfigWrapper nodesConfig)
-            throws NodesConfigurationException, ServiceDefinitionException, JSONException {
+            throws NodesConfigurationException, ServiceDefinitionException {
         for (Dependency dep : service.getDependencies()) {
             defineMasters (dep, deadIps, service, nodeNbr, nodesConfig);
         }
 
     }
     private void defineMasters(Dependency dep, Set<String> deadIps, Service service, int nodeNbr, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException, JSONException {
+            throws ServiceDefinitionException, NodesConfigurationException {
 
         Set<String> otherMasters = new HashSet<>();
         String ipAddress = nodesConfig.getNodeAddress(nodeNbr);
@@ -291,7 +293,7 @@ public class Topology {
     }
 
 
-    private String findFirstServiceIP(NodesConfigWrapper nodesConfig, Set<String> deadIps, String serviceName) throws NodesConfigurationException, JSONException {
+    private String findFirstServiceIP(NodesConfigWrapper nodesConfig, Set<String> deadIps, String serviceName) throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
         for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
@@ -310,11 +312,10 @@ public class Topology {
 
     private String findFirstOtherServiceIP(
             NodesConfigWrapper nodesConfig, Set<String> deadIps, String serviceName, Set<String> existingMasters)
-            throws NodesConfigurationException, JSONException {
+            throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
         for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            if (candidateNbr == -1) candidateNbr = Integer.MAX_VALUE;
             String otherIp = nodesConfig.getNodeAddress(candidateNbr);
             if (!existingMasters.contains(otherIp) && !deadIps.contains(otherIp)) {
                 if (candidateNbr < nodeNbr) {
@@ -329,8 +330,7 @@ public class Topology {
         return findNodeIp(nodesConfig, nodeNbr);
     }
 
-    private String findRandomOtherServiceIP(NodesConfigWrapper nodesConfig, Set<String> deadIps, String serviceName, Set<String> existingMasters)
-            throws JSONException {
+    private String findRandomOtherServiceIP(NodesConfigWrapper nodesConfig, Set<String> deadIps, String serviceName, Set<String> existingMasters) {
 
         // Try to find any other number running ElasticSearch
         for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
@@ -344,7 +344,7 @@ public class Topology {
     }
 
     private String findRandomServiceIPAfter(NodesConfigWrapper nodesConfig, Set<String> deadIps, String serviceName, int currentNodeNumber)
-            throws NodesConfigurationException, JSONException {
+            throws NodesConfigurationException {
         int masterNumber = -1;
 
         for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
@@ -364,7 +364,7 @@ public class Topology {
         }
     }
 
-    private String findNodeIp(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException, JSONException {
+    private String findNodeIp(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
         if (nodeNumber > -1) {
             // return IP address correspondoing to master number
             String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
@@ -392,19 +392,23 @@ public class Topology {
         return retMasters.toArray(new String[0]);
     }
 
+    private void appendExport (StringBuilder sb, String variable, String value) {
+        sb.append("export ");
+        sb.append(variable);
+        sb.append("=");
+        sb.append(value);
+        sb.append("\n");
+    }
+
     public String getTopologyScript() {
         StringBuilder sb = new StringBuilder();
         for (String master : definedMasters.keySet().stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList())) {
-            sb.append("export ");
-            sb.append(master);
-            sb.append("=");
-            sb.append(definedMasters.get(master));
-            sb.append("\n");
+            appendExport (sb, master, definedMasters.get(master));
         }
         return sb.toString();
     }
 
-    public String getTopologyScriptForNode(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException, JSONException {
+    public String getTopologyScriptForNode(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException {
         StringBuilder sb = new StringBuilder();
         sb.append("#Topology\n");
         sb.append(getTopologyScript());
@@ -432,11 +436,7 @@ public class Topology {
         for (String serviceName : serviceNames.stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList())) {
             if (additionalEnvironment.get(serviceName) != null) {
                 for (String additionalProp : additionalEnvironment.get(serviceName).keySet()) {
-                    sb.append("export ");
-                    sb.append(additionalProp);
-                    sb.append("=");
-                    sb.append(additionalEnvironment.get(serviceName).get(additionalProp));
-                    sb.append("\n");
+                    appendExport (sb, additionalProp, additionalEnvironment.get(serviceName).get(additionalProp));
                 }
             }
         }
@@ -447,15 +447,9 @@ public class Topology {
         if (StringUtils.isBlank(ipAddress)) {
             throw new NodesConfigurationException("No IP address found for node number " + nodeNbr);
         }
-        sb.append("export SELF_IP_ADDRESS");
-        sb.append("=");
-        sb.append(ipAddress);
-        sb.append("\n");
+        appendExport(sb, "SELF_IP_ADDRESS", ipAddress);
 
-        sb.append("export SELF_NODE_NUMBER");
-        sb.append("=");
-        sb.append(nodeNbr);
-        sb.append("\n");
+        appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);
 
         // memory management
         Map<String, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
@@ -464,12 +458,8 @@ public class Topology {
 
             List<String> memoryList = memorySettings.keySet().stream().sorted().collect(Collectors.toList());
             for (String service : memoryList) {
-                sb.append("export ");
-                sb.append("MEMORY_");
-                sb.append(service.toUpperCase().replace("-", "_"));
-                sb.append("=");
-                sb.append(memorySettings.get(service));
-                sb.append("\n");
+
+                appendExport(sb, "MEMORY_"+service.toUpperCase().replace("-", "_"), ""+memorySettings.get(service));
             }
         }
 

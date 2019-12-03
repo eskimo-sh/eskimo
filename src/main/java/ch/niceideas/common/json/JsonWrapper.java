@@ -64,7 +64,8 @@ public class JsonWrapper implements Serializable {
     public static final String ELEMENT_NOT_ARRAY = " contains contains an element which is not an array but asked next path is an integer";
     public static final String PATH_NOT_INTEGER = " contains an array but the concerned path is not an integer";
 
-    private JSONObject json;
+
+    private transient JSONObject json;
 
     public static JsonWrapper empty() {
         return new JsonWrapper("{}");
@@ -92,6 +93,9 @@ public class JsonWrapper implements Serializable {
 
     private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
     {
+        if (aInputStream == null) {
+            throw new IllegalArgumentException("passed inputstream cannot be null");
+        }
         String serializedString = aInputStream.readUTF();
         try {
             json = new JSONObject(serializedString);
@@ -103,6 +107,9 @@ public class JsonWrapper implements Serializable {
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException
     {
+        if (aOutputStream == null) {
+            throw new IllegalArgumentException("passed outputstream cannot be null");
+        }
         aOutputStream.writeUTF(getFormattedValue());
     }
 
@@ -177,7 +184,6 @@ public class JsonWrapper implements Serializable {
             } catch (JSONException e) {
 
                 if (exceptionsIsNotFound(e)) {
-                    //logger.debug(e, e);
                     return null;
                 }
                 logger.error(e, e);
@@ -361,7 +367,6 @@ public class JsonWrapper implements Serializable {
             } catch (JSONException e) {
 
                 if (exceptionsIsNotFound(e)) {
-                    //logger.debug(e, e);
                     return false;
                 }
                 logger.error(e, e);

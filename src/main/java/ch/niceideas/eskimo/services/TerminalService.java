@@ -49,6 +49,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -136,12 +137,7 @@ public class TerminalService {
 
            Session session = getSession(terminalBody, defaultSessionWidth, defaultSessionWHeight, s);
 
-           String k = extractArgument (terminalBody,  "k");
-           try {
-               k = java.net.URLDecoder.decode(k, StandardCharsets.UTF_8.name());
-           } catch (UnsupportedEncodingException e) {
-               logger.error (e, e);
-           }
+           String k = urlDecode(terminalBody);
            String c = extractArgument (terminalBody, "c");
            String tStr = extractArgument (terminalBody, "t");
            int t = StringUtils.isBlank(tStr) && tStr.equals("null") ? 0 : Integer.parseInt(tStr);
@@ -153,6 +149,15 @@ public class TerminalService {
            throw new IOException(e.getMessage(), e);
 
        }
+    }
+
+    String urlDecode(String terminalBody) {
+        try {
+            return URLDecoder.decode(extractArgument (terminalBody,  "k"), StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            logger.error (e, e);
+            throw new TerminalException(e);
+        }
     }
 
     synchronized Session getSession(String terminalBody, int sessionWidth, int sessionHeight, String sessionId) throws ConnectionManagerException, IOException {
@@ -185,7 +190,9 @@ public class TerminalService {
 
                 try {
                     removeTerminal(sessionId);
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                    logger.debug (ignored);
+                }
                 return getSession(terminalBody, sessionWidth, sessionHeight, sessionId);
             }
         }
@@ -194,10 +201,19 @@ public class TerminalService {
 
     private static String extractArgument(String source, String argument) {
         int start = source.indexOf(argument+"=");
-        int end = source.indexOf("&", start + (argument.length() + 1));
+        int end = source.indexOf('&', start + (argument.length() + 1));
         if (end == -1) {
             end = source.length();
         }
         return source.substring(start + (argument.length() + 1), end);
+    }
+
+    public static class TerminalException extends RuntimeException {
+
+        static final long serialVersionUID = -331151672312431248L;
+
+        TerminalException(Throwable cause) {
+            super(cause);
+        }
     }
 }

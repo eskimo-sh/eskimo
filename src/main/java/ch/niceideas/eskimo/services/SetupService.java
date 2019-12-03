@@ -68,13 +68,7 @@ public class SetupService {
     public static final String DOCKER_TEMPLATE_PREFIX = "docker_template_";
 
     @Autowired
-    private ServicesDefinition servicesDefinition;
-
-    @Autowired
     private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
 
     @Autowired
     private SystemService systemService;

@@ -170,7 +170,7 @@ public class MemoryComputer {
                     } catch (SSHCommandException e) {
                         logger.error (e, e);
                         error.set(e);
-                        throw new RuntimeException(e);
+                        throw new MemoryComputerException(e);
                     }
                 });
             }
@@ -187,6 +187,15 @@ public class MemoryComputer {
             throw new SystemException(error.get());
         }
         return memoryMap;
+    }
+
+    public static class MemoryComputerException extends RuntimeException {
+
+        static final long serialVersionUID = -3311512123124229248L;
+
+        MemoryComputerException(Throwable cause) {
+            super(cause);
+        }
     }
 
 }

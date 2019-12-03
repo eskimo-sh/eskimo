@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 
 public class SystemStatusParser {
 
-    private static final Logger logger = Logger.getLogger(SystemStatusParser.class);
+    //private static final Logger logger = Logger.getLogger(SystemStatusParser.class);
 
     /**
      * Debug with
@@ -56,7 +56,6 @@ public class SystemStatusParser {
      */
 
     static Pattern pattern = Pattern.compile(" *Active: ([^\\( ]+) \\(([^\\(\\)]+)\\).*");
-    //private Pattern pattern = Pattern.compile("(.*)");
 
 
     private final Map<String, String> serviceStatus = new HashMap<>();
@@ -74,7 +73,7 @@ public class SystemStatusParser {
 
                 handleServiceFound (
                         contentLines[i].substring(
-                                contentLines[i].indexOf("●") + 2,
+                                contentLines[i].indexOf('●') + 2,
                                 contentLines[i].indexOf(".service")),
                         i,
                         contentLines);
@@ -98,12 +97,8 @@ public class SystemStatusParser {
 
                 } else if (contentLines[i].contains("Active: ")) {
 
-                    //System.err.println(contentLines[i]);
-
                     Matcher matcher = pattern.matcher(contentLines[i]);
                     if (matcher.find()) {
-
-                        //System.err.println (service + " : " + matcher.group(2));
 
                         serviceStatus.put(service, matcher.group(2));
                     }
