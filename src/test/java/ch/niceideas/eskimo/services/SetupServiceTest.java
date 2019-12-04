@@ -220,7 +220,25 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     @Test
     public void testFindLastPackageFile() throws Exception {
-        fail ("To Be Implemented");
+
+        File packagePath = File.createTempFile("package_path", "test");
+        assertTrue (packagePath.delete());
+        assertTrue (packagePath.mkdirs());
+
+        assertTrue (new File (packagePath, "docker_template_grafana_1.2.0_1.tar.gz").createNewFile());
+        assertTrue (new File (packagePath, "docker_template_grafana_1.2.0_2.tar.gz").createNewFile());
+
+        assertTrue (new File (packagePath, "docker_template_grafana_1.3.1_1.tar.gz").createNewFile());
+        assertTrue (new File (packagePath, "docker_template_grafana_1.3.1_2.tar.gz").createNewFile());
+        assertTrue (new File (packagePath, "docker_template_grafana_1.3.1_3.tar.gz").createNewFile());
+
+        setupService.setPackageDistributionPath(packagePath.getAbsolutePath());
+
+        String lastPackage = setupService.findLastPackageFile("docker_template_", "grafana");
+
+        assertEquals ("docker_template_grafana_1.3.1_3.tar.gz", lastPackage);
+
+        FileUtils.delete(packagePath);
     }
 
 }

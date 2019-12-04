@@ -38,6 +38,9 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.SFTPv3Client;
+import com.trilead.ssh2.Session;
 import org.apache.log4j.Logger;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
@@ -45,15 +48,16 @@ import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Proxy;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.*;
@@ -210,9 +214,119 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         assertEquals (originalContent, downloadedContent);
     }
 
-    @Test
-    public void testOpenFile() throws Exception {
-        fail ("Implemment by mocking SSH framework - perhaps separated test");
+    void getTestClient(String mimeType) throws IOException, ConnectionManagerException {
+        sc = new FileManagerService() {
+            @Override
+            SFTPv3Client getClient(@RequestParam("address") String hostAddress) throws ConnectionManagerException, IOException {
+                return new SFTPv3Client(cm.getSharedConnection("localhost"));
+            }
+            @Override
+            String getFileMimeType(String hostAddress, String newPath) throws SSHCommandException {
+                return mimeType;
+            }
+            @Override
+            public Pair<String, JSONObject> navigateFileManager(String hostAddress, String folder, String subFolder) throws IOException {
+                return new Pair<>("/test", new JSONObject(new HashMap<String, Object>() {{
+
+                    put ("test", new JSONObject(new HashMap<String, Object>() {{
+                        put ("permissions", "rwxrwxrwx");
+                        put ("count", "2");
+                        put ("user", "badtrash");
+                        put ("group", "badtrash");
+                        put ("size", "1024");
+                        put ("timestamp", "2019-11-11 08:30:00");
+                    }}));
+
+                }}));
+            }
+        };
     }
+
+    @Test
+    public void testOpenFileDirectory() throws Exception {
+
+        getTestClient("inode/directory");
+
+        sc.setConnectionManagerService(cm);
+        sc.setSshCommandService(scs);
+
+        JSONObject result = sc.openFile("localhost", "/etc", "passwd");
+
+        assertEquals ("{\n" +
+                "  \"content\": {\"test\": {\n" +
+                "    \"count\": \"2\",\n" +
+                "    \"size\": \"1024\",\n" +
+                "    \"user\": \"badtrash\",\n" +
+                "    \"permissions\": \"rwxrwxrwx\",\n" +
+                "    \"group\": \"badtrash\",\n" +
+                "    \"timestamp\": \"2019-11-11 08:30:00\"\n" +
+                "  }},\n" +
+                "  \"folder\": \"/test\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", result.toString(2));
+    }
+
+    @Test
+    public void testOpenFileNoPermission() throws Exception {
+
+        getTestClient("no read permission");
+
+        sc.setConnectionManagerService(cm);
+        sc.setSshCommandService(scs);
+
+        JSONObject result = sc.openFile("localhost", "/etc", "passwd");
+
+        assertEquals ("{\n" +
+                "  \"accessible\": false,\n" +
+                "  \"fileViewable\": false,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", result.toString(2));
+    }
+
+    @Test
+    public void testOpenFileTextSmallFile() throws Exception {
+
+        File tempFile = File.createTempFile("test", "sftp");
+        FileUtils.writeFile(tempFile, "ABCD");
+
+        getTestClient("text/plain");
+
+        sc.setConnectionManagerService(cm);
+        sc.setSshCommandService(scs);
+
+        JSONObject result = sc.openFile("localhost", tempFile.getParent(), tempFile.getName());
+
+        assertEquals (tempFile.getAbsolutePath(), result.getString("fileName"));
+        assertEquals (Base64.getEncoder().encodeToString("ABCD".getBytes()), result.getString("fileContent"));
+
+        tempFile.delete();
+    }
+
+    @Test
+    public void testOpenFileTextBigFile() throws Exception {
+
+        File tempFile = File.createTempFile("test_big", "sftp");
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
+        for (int i = 0; i < 2000000; i++) {
+            bw.write("NEW_LINE_" + ThreadLocalRandom.current().nextInt());
+        }
+        bw.close();
+
+        getTestClient("text/plain");
+
+        sc.setConnectionManagerService(cm);
+        sc.setSshCommandService(scs);
+
+        JSONObject result = sc.openFile("localhost", tempFile.getParent(), tempFile.getName());
+
+        assertEquals ("{\n" +
+                "  \"accessible\": true,\n" +
+                "  \"fileViewable\": false,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", result.toString(2));
+
+        tempFile.delete();
+    }
+
 
 }

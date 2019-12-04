@@ -189,8 +189,8 @@ public class FileManagerService {
                 SFTPv3FileAttributes fileAttributes = client.stat(newPath);
                 if (fileAttributes.size != null && fileAttributes.size <= maxFileSize) {
 
-                        InputStream is = client.read(newPath);
-                        String fileContent = StreamUtils.getAsString(is);
+                    InputStream is = client.read(newPath);
+                    String fileContent = StreamUtils.getAsString(is);
 
                     return new JSONObject(new HashMap<String, Object>() {{
                         put("status", "OK");

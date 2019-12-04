@@ -183,6 +183,38 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testForceRecreateConnection() throws Exception {
-        fail ("To be Implemented");
+
+        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT) {
+            @Override
+            protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
+                return new Connection(ipAddress, SSH_PORT) {
+                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
+                        return null;
+                    }
+                    public synchronized void sendIgnorePacket() throws IOException {
+                        // NO-OP
+                    }
+                };
+            }
+            @Override
+            protected void dropTunnels(Connection connection, String ipAddress)  {
+                // NO-OP
+            }
+            @Override
+            protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+                // NO-OP
+            }
+        };
+        cm.setSetupService (setupService);
+
+        Connection con1 = cm.getSharedConnection("localhost");
+        Connection con2 = cm.getSharedConnection("localhost");
+
+        assertTrue (con1 == con2);
+
+        cm.forceRecreateConnection("localhost");
+
+        Connection con3 = cm.getSharedConnection("localhost");
+        assertFalse (con1 == con3);
     }
 }

@@ -50,6 +50,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
 
@@ -500,11 +501,54 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Test
     public void testUninstallation() throws Exception {
-        fail ("To Be Implemented");
+
+        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
+            put("mesos_installed_on_IP_192-168-10-11", "OK");
+            put("mesos_installed_on_IP_192-168-10-13", "OK");
+            put("node_check_IP_192-168-10-11", "OK");
+            put("node_check_IP_192-168-10-13", "OK");
+            put("ntp_installed_on_IP_192-168-10-11", "OK");
+            put("ntp_installed_on_IP_192-168-10-13", "OK");
+            put("zookeeper_installed_on_IP_192-168-10-11", "OK");
+        }});
+
+        systemService.saveServicesInstallationStatus(savedStatus);
+
+        // testing zookeeper installation
+        systemService.uninstallService("zookeeper", "192.168.10.11");
+
+        assertTrue(testSSHCommandScript.toString().contains(
+                "sudo systemctl stop zookeeper\n" +
+                "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi\n" +
+                "sudo rm -f  /usr/lib/systemd/system/zookeeper.service\n" +
+                "sudo docker rm -f zookeeper || true \n" +
+                "sudo docker image rm -f eskimo:zookeeper\n" +
+                "sudo systemctl daemon-reload\n" +
+                "sudo systemctl reset-failed\n"));
     }
 
     @Test
     public void testApplyServiceOperation() throws Exception {
-        fail ("To Be Implemented");
+
+        AtomicBoolean called = new AtomicBoolean(false);
+
+        systemService.applyServiceOperation("ntp", "192.168.10.11", "test op", () -> {
+            called.set(true);
+            return "OK";
+        });
+
+        assertTrue (called.get());
+
+        assertEquals("[" +
+                        "{\"type\":\"doing\",\"message\":\"test op ntp on 192.168.10.11\"}, " +
+                        "{\"type\":\"info\",\"message\":\"test op ntp succeeded on 192.168.10.11\"}" +
+                        "]",
+                ""+notificationService.getSubList(0));
+
+        assertEquals ("[\n" +
+                "test op ntp on 192.168.10.11, Done test op ntp on 192.168.10.11, " +
+                "-------------------------------------------------------------------------------, " +
+                "OK" +
+                "]", ""+messagingService.getSubList(0));
     }
 }

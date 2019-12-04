@@ -34,16 +34,28 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.trilead.ssh2.Connection;
+import org.apache.catalina.ssi.ByteArrayServletOutputStream;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.entity.BasicHttpEntity;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
@@ -257,7 +269,143 @@ public class ServicesProxyServletTest {
     }
 
     @Test
-    public void testCopyResponseEntity() throws Exception {
-        fail ("To Be Implemented");
+    public void testCopyResponseEntityNotText() throws Exception {
+
+        String testString = "TEST ABC STRING";
+
+        BasicHttpEntity proxyServedEntity = new BasicHttpEntity();
+        proxyServedEntity.setContent(new ByteArrayInputStream(testString.getBytes()));
+
+        ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
+
+        HttpRequest proxyRequest = (HttpRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpRequest.class },
+                (proxy, method, methodArgs) -> {
+                    throw new UnsupportedOperationException(
+                            "Unsupported method: " + method.getName());
+                });
+
+        HttpResponse proxyResponse = (HttpResponse) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpResponse.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getEntity")) {
+                        return proxyServedEntity;
+                    } else {
+                        throw new UnsupportedOperationException(
+                            "Unsupported method: " + method.getName());
+                    }
+                });
+
+        HttpServletRequest servletRequest = (HttpServletRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletRequest.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getRequestURI")) {
+                        return "/mesos-master/statistics?server=192.168.10.13";
+                    } else if (method.getName().equals("getPathInfo")) {
+                        return "/mesos-master/statistics";
+                    } else if (method.getName().equals("getRequestURL")) {
+                        return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                    } else if (method.getName().equals("getQueryString")) {
+                        return "server=192.168.10.13";
+                    } else if (method.getName().equals("getContextPath")) {
+                        return null;
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+
+        HttpServletResponse servletResponse = (HttpServletResponse) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletResponse.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getOutputStream")) {
+                        return responseOutputStream;
+                    } else {
+                        throw new UnsupportedOperationException(
+                            "Unsupported method: " + method.getName());
+                    }
+                });
+
+        servlet.copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
+
+        assertEquals (testString, new String (responseOutputStream.toByteArray()));
+    }
+
+    @Test
+    public void testCopyResponseEntityText() throws Exception {
+
+        String testString = "src=\"/TEST ABC STRING";
+
+        BasicHttpEntity proxyServedEntity = new BasicHttpEntity();
+        proxyServedEntity.setContent(new ByteArrayInputStream(testString.getBytes()));
+        proxyServedEntity.setContentType("plain/text");
+
+        ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
+
+        Map<String, Object> headers = new HashMap<>();
+
+        HttpRequest proxyRequest = (HttpRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpRequest.class },
+                (proxy, method, methodArgs) -> {
+                    throw new UnsupportedOperationException(
+                            "Unsupported method: " + method.getName());
+                });
+
+        HttpResponse proxyResponse = (HttpResponse) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpResponse.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getEntity")) {
+                        return proxyServedEntity;
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+
+        HttpServletRequest servletRequest = (HttpServletRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletRequest.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getRequestURI")) {
+                        return "/mesos-master/statistics?server=192.168.10.13";
+                    } else if (method.getName().equals("getPathInfo")) {
+                        return "/mesos-master/statistics";
+                    } else if (method.getName().equals("getRequestURL")) {
+                        return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                    } else if (method.getName().equals("getQueryString")) {
+                        return "server=192.168.10.13";
+                    } else if (method.getName().equals("getContextPath")) {
+                        return null;
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+
+        HttpServletResponse servletResponse = (HttpServletResponse) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletResponse.class },
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("getOutputStream")) {
+                        return responseOutputStream;
+                    } else if (method.getName().equals("setIntHeader")) {
+                        return headers.put ((String)methodArgs[0], methodArgs[1]);
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+
+        servlet.copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
+
+        assertEquals ("src=\"/mesos-master/TEST ABC STRING", new String (responseOutputStream.toByteArray()));
+
+        assertEquals(34, headers.get(HttpHeaders.CONTENT_LENGTH));
     }
 }

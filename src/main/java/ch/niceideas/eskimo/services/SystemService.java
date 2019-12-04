@@ -237,7 +237,7 @@ public class SystemService {
         });
     }
 
-    private void applyServiceOperation(String service, String ipAddress, String opLabel, ServiceOperation<String> operation) throws SSHCommandException {
+    void applyServiceOperation(String service, String ipAddress, String opLabel, ServiceOperation<String> operation) throws SSHCommandException {
 
         boolean success = false;
         setProcessingPending();
