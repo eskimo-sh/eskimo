@@ -188,7 +188,7 @@ public class NodesConfigController {
         } catch (JSONException | SetupException | FileException | NodesConfigurationException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
-            notificationService.addEvent("error", "Nodes installation failed !");
+            notificationService.addError("Nodes installation failed !");
             return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
@@ -231,7 +231,7 @@ public class NodesConfigController {
         } catch (JSONException | SetupException | FileException | NodesConfigurationException | ServiceDefinitionException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
-            notificationService.addEvent("error", "Nodes installation failed !");
+            notificationService.addError("Nodes installation failed !");
             return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }

@@ -54,6 +54,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 
@@ -76,9 +77,13 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
     private final String jsonFilePath;
 
+    private BCryptPasswordEncoder passwordEncoder = null;
+
     public JSONBackedUserDetailsManager(String jsonFilePath) throws FileException, JSONException {
 
         this.jsonFilePath = jsonFilePath;
+
+        passwordEncoder = new BCryptPasswordEncoder(11);
 
         File configFile = new File(jsonFilePath);
         if (!configFile.exists()) {
@@ -201,7 +206,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
             throw new IllegalStateException("Current user doesn't exist in database.");
         }
 
-        user.setPassword(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
 
         saveUserConfig();
     }
@@ -218,6 +223,11 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
     }
 
     public UserDetails loadUserByUsername(String username) {
+
+        if (username == null) {
+            throw new UsernameNotFoundException(username);
+        }
+
         UserDetails user = users.get(username.toLowerCase());
 
         if (user == null) {

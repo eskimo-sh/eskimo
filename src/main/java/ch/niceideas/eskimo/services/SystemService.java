@@ -67,6 +67,8 @@ public class SystemService {
     public static final String NODES_STATUS_JSON_PATH = "/nodes-status.json";
     public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
     public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
+    public static final String SERVICE_PREFIX = "service_";
+    public static final String TMP_PATH_PREFIX = "/tmp/";
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -201,7 +203,7 @@ public class SystemService {
 
     void notifyInterruption() {
         if (interruption.get() && !interruptionNotified.get()) {
-            notificationService.addEvent("error", "Processing has been interrupted");
+            notificationService.addError("Processing has been interrupted");
             messagingService.addLine("Processing has been interrupted");
             interruptionNotified.set(true);
         }
@@ -243,14 +245,14 @@ public class SystemService {
         setProcessingPending();
         try {
 
-            notificationService.addEvent("doing", opLabel + " " + service + " on " + ipAddress);
+            notificationService.addDoing(opLabel + " " + service + " on " + ipAddress);
             String message = opLabel + " " + service + " on " + ipAddress;
             logOperationMessage (message);
             messagingService.addLines("Done "
                     + message
                     + "\n-------------------------------------------------------------------------------\n"
                     + operation.call());
-            notificationService.addEvent("info", opLabel + " " + service + " succeeded on " + ipAddress);
+            notificationService.addInfo(opLabel + " " + service + " succeeded on " + ipAddress);
 
             success = true;
         } finally {
@@ -553,7 +555,7 @@ public class SystemService {
 
     void handleNodeDead(Set<String> deadIps, String ipAddress) {
         messagingService.addLines("\nNode seems dead " + ipAddress);
-        notificationService.addEvent("error", "Node " + ipAddress + " is dead.");
+        notificationService.addError("Node " + ipAddress + " is dead.");
         deadIps.add(ipAddress);
     }
 
@@ -723,7 +725,7 @@ public class SystemService {
                     if (shall) {
                         if (!installed) {
 
-                            statusMap.put("service_" + service + "_" + nodeName, "NA");
+                            statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "NA");
 
                         } else {
 
@@ -732,14 +734,14 @@ public class SystemService {
                             boolean running = parser.getServiceStatus(service).equals("running");
 
                             if (!running) {
-                                statusMap.put("service_" + service + "_" + nodeName, "KO");
+                                statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "KO");
 
                             } else {
 
                                 if (servicesInstallationStatus.isServiceOK(service,nodeName)) {
-                                    statusMap.put("service_" + service + "_" + nodeName, "OK");
+                                    statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "OK");
                                 } else {
-                                    statusMap.put("service_" + service + "_" + nodeName, "restart");
+                                    statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "restart");
                                 }
 
                                 // configure proxy if required
@@ -748,7 +750,7 @@ public class SystemService {
                         }
                     } else {
                         if (installed) {
-                            statusMap.put("service_" + service + "_" + nodeName, "TD"); // To Be Deleted
+                            statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "TD"); // To Be Deleted
                         }
                     }
                 }
@@ -828,7 +830,7 @@ public class SystemService {
         boolean changes = false;
 
         // make sure service for node name is found in new status
-        String serviceStatus = (String) systemStatusWrapper.getValueForPath("service_" + savedService + "_" + nodeName);
+        String serviceStatus = (String) systemStatusWrapper.getValueForPath(SERVICE_PREFIX + savedService + "_" + nodeName);
 
         // if OK reset error count
         if (StringUtils.isNotBlank(serviceStatus) && !serviceStatus.equals("NA")) {
@@ -861,7 +863,7 @@ public class SystemService {
 
                 servicesInstallationStatus.removeRootKey(serviceStatusFullString);
                 serviceMissingCounter.remove(serviceStatusFullString);
-                notificationService.addEvent("error", "Service " + savedService + " on " + nodeName + " vanished!");
+                notificationService.addError("Service " + savedService + " on " + nodeName + " vanished!");
 
                 // unconfigure proxy if required
                 proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
@@ -897,7 +899,7 @@ public class SystemService {
                             && previousStatus.isServiceOK(service)) {
 
                             logger.warn("For service " + service + " - previous status was OK and status is " + systemStatus.getValueForPath(service));
-                            notificationService.addEvent("error", "Service " + service + " got into problem");
+                            notificationService.addError("Service " + service + " got into problem");
                         }
                     }
                 }
@@ -1092,22 +1094,22 @@ public class SystemService {
 
         // 1.2 Create archive
         File tmpArchiveFile = createTempFile(service, ipAddress, ".tgz");
-        FileUtils.createTarFile(servicesSetupPath + "/" + service, "/tmp/" + tmpArchiveFile.getName());
-        File archive = new File("/tmp/" +  tmpArchiveFile.getName());
+        FileUtils.createTarFile(servicesSetupPath + "/" + service, TMP_PATH_PREFIX + tmpArchiveFile.getName());
+        File archive = new File(TMP_PATH_PREFIX +  tmpArchiveFile.getName());
         if (!archive.exists()) {
-            throw new SystemException("Could not create archive for service " + service + " : /tmp/" +  tmpArchiveFile.getName());
+            throw new SystemException("Could not create archive for service " + service + " : " + TMP_PATH_PREFIX +  tmpArchiveFile.getName());
         }
 
         // 2. copy it over to target node and extract it
 
         // 2.1
-        sshCommandService.copySCPFile(ipAddress, "/tmp/" +  tmpArchiveFile.getName());
+        sshCommandService.copySCPFile(ipAddress, TMP_PATH_PREFIX +  tmpArchiveFile.getName());
 
-        exec(ipAddress, sb, "rm -Rf /tmp/" + service);
-        exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
-        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " /tmp/" + service + ".tgz");
-        exec(ipAddress, sb, "tar xfz /tmp/" + service + ".tgz --directory=/tmp/");
-        exec(ipAddress, sb, "chmod 755 /tmp/" + service + "/setup.sh");
+        exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
+        exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
+        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " " + TMP_PATH_PREFIX + service + ".tgz");
+        exec(ipAddress, sb, "tar xfz " + TMP_PATH_PREFIX + service + ".tgz --directory=" + TMP_PATH_PREFIX);
+        exec(ipAddress, sb, "chmod 755 " + TMP_PATH_PREFIX + service + "/setup.sh");
 
         // 2.2 delete local archive
         try {
@@ -1129,9 +1131,9 @@ public class SystemService {
                 sb.append(" - Copying over docker image " + imageFileName + "\n");
                 sshCommandService.copySCPFile(ipAddress, packageDistributionPath + "/" + imageFileName);
 
-                exec(ipAddress, sb, new String[]{"mv", imageFileName, "/tmp/" + service + "/"});
+                exec(ipAddress, sb, new String[]{"mv", imageFileName, TMP_PATH_PREFIX + service + "/"});
 
-                exec(ipAddress, sb, new String[]{"ln", "-s", "/tmp/" + service + "/" + imageFileName, "/tmp/" + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
+                exec(ipAddress, sb, new String[]{"ln", "-s", TMP_PATH_PREFIX + service + "/" + imageFileName, TMP_PATH_PREFIX + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
 
             } else {
                 sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
@@ -1139,7 +1141,7 @@ public class SystemService {
         }
 
         // 4. call setup script
-        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", "/tmp/" + service + "/setup.sh", ipAddress});
+        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
         try {
             exec(ipAddress, sb, setupScript);
         } catch (SSHCommandException e) {
@@ -1149,8 +1151,8 @@ public class SystemService {
         }
 
         // 5. cleanup
-        exec(ipAddress, sb, "rm -Rf /tmp/" + service);
-        exec(ipAddress, sb, "rm -f /tmp/" + service + ".tgz");
+        exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
+        exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
 
         if (StringUtils.isNotBlank(imageName)) {
             try {
@@ -1164,7 +1166,7 @@ public class SystemService {
         }
 
         try {
-            FileUtils.delete (new File ("/tmp/" + tmpArchiveFile.getName() + ".tgz"));
+            FileUtils.delete (new File (TMP_PATH_PREFIX + tmpArchiveFile.getName() + ".tgz"));
         } catch (FileUtils.FileDeleteFailedException e) {
             logger.error (e, e);
             throw new SystemException(e);

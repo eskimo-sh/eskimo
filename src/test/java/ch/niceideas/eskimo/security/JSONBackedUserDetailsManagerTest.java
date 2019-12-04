@@ -34,14 +34,20 @@
 
 package ch.niceideas.eskimo.security;
 
+import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
@@ -69,6 +75,9 @@ public class JSONBackedUserDetailsManagerTest {
         assertTrue (mgr.userExists("admin"));
 
         assertTrue (passwordEncoder.matches("password", mgr.loadUserByUsername("admin").getPassword()));
+
+        assertThrows(UsernameNotFoundException.class, () -> mgr.loadUserByUsername(null) );
+        assertThrows(UsernameNotFoundException.class, () -> mgr.loadUserByUsername("blabla") );
     }
 
     @Test
@@ -102,7 +111,7 @@ public class JSONBackedUserDetailsManagerTest {
     }
 
     @Test
-    public void testChangePasswordPersisted() throws Exception {
+    public void testUpdatePasswordPersisted() throws Exception {
 
         // use other test to add user
         testAddUserPersisted();
@@ -116,6 +125,29 @@ public class JSONBackedUserDetailsManagerTest {
 
         assertTrue (otherMgr.userExists("test_user"));
         assertTrue (passwordEncoder.matches("other-password", otherMgr.loadUserByUsername("test_user").getPassword()));
+
+    }
+
+    @Test
+    public void testChangePassword() throws Exception {
+
+        // use other test to add user
+        testAddUserPersisted();
+
+        UserDetails testUser = mgr.loadUserByUsername("test_user");
+        assertNotNull(testUser);
+
+        TestingAuthenticationToken auth = new TestingAuthenticationToken(testUser, null);
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mgr.changePassword("test_password", "other-password");
+
+        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath());
+
+        assertTrue (otherMgr.userExists("test_user"));
+        assertTrue (passwordEncoder.matches("other-password", otherMgr.loadUserByUsername("test_user").getPassword()));
+
 
     }
 }

@@ -65,7 +65,7 @@ public class WebSocketProxyForwarder {
         return headers;
     }
 
-    private WebSocketSession createWebSocketClientSession(WebSocketSession webSocketServerSession) {
+    WebSocketSession createWebSocketClientSession(WebSocketSession webSocketServerSession) {
         try {
 
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig(serviceId);

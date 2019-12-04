@@ -120,10 +120,6 @@ public class ProcessHelper {
 
         private static final long serialVersionUID = 100537626321527736L;
 
-        public ProcessHelperException() {
-            super();
-        }
-
         public ProcessHelperException(String message, Throwable under) {
             super(message, under);
         }
@@ -131,10 +127,5 @@ public class ProcessHelper {
         public ProcessHelperException(String message) {
             super(message);
         }
-
-        public ProcessHelperException(Throwable under) {
-            super(under);
-        }
-
     }
 }

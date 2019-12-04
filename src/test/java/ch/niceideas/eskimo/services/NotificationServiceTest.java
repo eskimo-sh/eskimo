@@ -49,8 +49,8 @@ public class NotificationServiceTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         ns = new NotificationService();
-        ns.addEvent("Error", "Test");
-        ns.addEvent("Info", "Test2");
+        ns.addError("Test");
+        ns.addInfo("Test2");
     }
 
     @Test

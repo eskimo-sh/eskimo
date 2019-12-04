@@ -61,7 +61,7 @@ public final class ScreenImage implements Serializable {
     ScreenImage(int timestamp, String screen, Terminal t) {
         this.timestamp = timestamp;
         this.screen = screen;
-        if (t.showCursor) {
+        if (t.isCursorShown()) {
             this.cursorX = t.getCx();
             this.cursorY = t.getCy();
         } else {

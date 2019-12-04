@@ -4,6 +4,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertThrows;

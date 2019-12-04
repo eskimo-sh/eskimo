@@ -58,6 +58,7 @@ import java.util.HashMap;
 public class StatusService {
 
     private static final Logger logger = Logger.getLogger(StatusService.class);
+    public static final String SSH_USERNAME_FIELD = "sshUsername";
 
     @Autowired
     private SetupService setupService;
@@ -95,16 +96,16 @@ public class StatusService {
 
         try {
             JsonWrapper systemConfig = new JsonWrapper(setupService.loadSetupConfig());
-            systemStatus.setValueForPath("sshUsername", systemConfig.getValueForPath("ssh_username"));
+            systemStatus.setValueForPath(SSH_USERNAME_FIELD, systemConfig.getValueForPath("ssh_username"));
         } catch (FileException e) {
 
             logger.error (e, e);
-            systemStatus.setValueForPath("sshUsername", "(ERROR)");
+            systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(ERROR)");
         } catch (SetupException e) {
 
             logger.warn (e.getMessage());
             logger.debug (e, e);
-            systemStatus.setValueForPath("sshUsername", "(Setup incomplete)");
+            systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(Setup incomplete)");
         }
 
         // Get JVM's thread system bean

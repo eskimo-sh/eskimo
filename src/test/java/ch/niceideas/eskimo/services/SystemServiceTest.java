@@ -250,9 +250,9 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertEquals(2, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
 
-        assertEquals("{\"type\":\"error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
     }
 
     @Test
@@ -283,9 +283,9 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertEquals(2, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
 
-        assertEquals("{\"type\":\"error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
     }
 
     @Test
@@ -540,8 +540,8 @@ public class SystemServiceTest extends AbstractSystemTest {
         assertTrue (called.get());
 
         assertEquals("[" +
-                        "{\"type\":\"doing\",\"message\":\"test op ntp on 192.168.10.11\"}, " +
-                        "{\"type\":\"info\",\"message\":\"test op ntp succeeded on 192.168.10.11\"}" +
+                        "{\"type\":\"Doing\",\"message\":\"test op ntp on 192.168.10.11\"}, " +
+                        "{\"type\":\"Info\",\"message\":\"test op ntp succeeded on 192.168.10.11\"}" +
                         "]",
                 ""+notificationService.getSubList(0));
 

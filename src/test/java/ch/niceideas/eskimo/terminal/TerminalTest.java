@@ -318,15 +318,15 @@ public class TerminalTest {
 
         term.write("\u001B[?25h");
 
-        assertTrue (term.showCursor);
+        assertTrue (term.isCursorShown());
 
         term.write("\u001B[?25l");
 
-        assertFalse (term.showCursor);
+        assertFalse (term.isCursorShown());
 
         term.write("\u001B[?25h");
 
-        assertTrue (term.showCursor);
+        assertTrue (term.isCursorShown());
     }
 
     @Test

@@ -175,7 +175,7 @@ public class FileManagerService {
                     put ("content", result.getValue());
                 }});
 
-            } if (fileMimeType.contains("no read permission")) {
+            } else if (fileMimeType.contains("no read permission")) {
 
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
@@ -269,7 +269,7 @@ public class FileManagerService {
             return fullPath;
 
         } catch (ConnectionManagerException ex) {
-            logger.error("Error writing file to output stream. Filename was " + file, ex);
+            logger.error("Error deleting path. Error was " + file, ex);
             throw new IOException("IOError writing file to output stream", ex);
         }
     }
@@ -288,7 +288,7 @@ public class FileManagerService {
             writeFile(hostAddress, fullPath, fileContent);
 
         } catch (ConnectionManagerException ex) {
-            logger.error("Deletion error. Filename was " + name, ex);
+            logger.error("Upload error. Filename was " + name, ex);
             throw new IOException("IOError writing file to output stream", ex);
 
         } finally {

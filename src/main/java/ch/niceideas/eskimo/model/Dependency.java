@@ -41,7 +41,7 @@ import java.util.HashMap;
 
 public class Dependency {
 
-    private static final Logger logger = Logger.getLogger(Dependency.class);
+    //private static final Logger logger = Logger.getLogger(Dependency.class);
 
     private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
     private String masterService = null;

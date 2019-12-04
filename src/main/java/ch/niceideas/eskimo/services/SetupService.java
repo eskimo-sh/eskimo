@@ -66,6 +66,9 @@ public class SetupService {
     public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
     public static final String TEMP_DOWNLOAD_SUFFIX = "__temp_download";
     public static final String DOCKER_TEMPLATE_PREFIX = "docker_template_";
+    public static final String DOWNLOAD_FLAG = "download";
+    public static final String BUILD_FLAG = "build";
+    public static final String TAR_GZ_EXTENSION = ".tar.gz";
 
     @Autowired
     private MessagingService messagingService;
@@ -251,16 +254,27 @@ public class SetupService {
 
             File privateKeyFile = new File(getConfigStoragePath() + "/privateKey");
             FileUtils.writeFile(privateKeyFile, sshKeyContent.replaceAll("\r\n", "\n"));
-            privateKeyFile.setExecutable(false, false);
-            privateKeyFile.setWritable(false, false);
-            privateKeyFile.setWritable(true, true);
-            privateKeyFile.setReadable (false, false);
-            privateKeyFile.setReadable(true, true);
+
+            if (!privateKeyFile.setExecutable(false, false)) {
+                logger.debug("Coudln't remove world executable flag from key file. Moving on.");
+            }
+            if (!privateKeyFile.setWritable(false, false)) {
+                logger.debug("Coudln't remove world writable flag from key file. Moving on.");
+            }
+            if (!privateKeyFile.setWritable(true, true)) {
+                logger.debug("Coudln't add user writabke flag from key file. Moving on.");
+            }
+            if (!privateKeyFile.setReadable (false, false)) {
+                logger.debug("Coudln't remove world readable flag from key file. Moving on.");
+            }
+            if (!privateKeyFile.setReadable(true, true)) {
+                logger.debug("Coudln't add user readable flag from key file. Moving on.");
+            }
 
             File configFile = new File(getConfigStoragePath() + "/config.json");
             FileUtils.writeFile(configFile, configAsString);
 
-            return SetupCommand.create(setupConfigJSON, systemService, this);
+            return SetupCommand.create(setupConfigJSON, this);
 
         } catch (JSONException | FileException e) {
             logger.error(e, e);
@@ -351,7 +365,7 @@ public class SetupService {
 
         // 1. Find out about missing packages
         String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
-        if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
+        if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
 
             findMissingServices(packagesDistribFolder, buildPackage);
 
@@ -370,7 +384,7 @@ public class SetupService {
 
         // 2. Find out about missing mesos distrib
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
-        if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
+        if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
             if (packagesVersion == null) {
                 throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
@@ -467,7 +481,7 @@ public class SetupService {
             JsonWrapper packagesVersion = null;
 
             if (missingServices.size() > 0) {
-                if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("build")) { // for services default is build
+                if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
 
                     for (String packageName : missingServices) {
                         buildPackage(packageName);
@@ -484,7 +498,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
 
-                        String fileName = DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+                        String fileName = DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION;
 
                         downloadPackage(fileName);
                     }
@@ -499,7 +513,7 @@ public class SetupService {
             String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
 
             if (missingMesosPackages.size() > 0) {
-                if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals("download")) { // for mesos default is download
+                if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
                     if (packagesVersion == null) {
                         packagesVersion = loadRemotePackagesVersionFile();
@@ -510,7 +524,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".distribution");
 
-                        String fileName = "eskimo_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + ".tar.gz";
+                        String fileName = "eskimo_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION;
 
                         downloadPackage(fileName);
                     }
@@ -525,7 +539,7 @@ public class SetupService {
             }
 
             // 3. Handle updates
-            if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals("download")) { // for mesos default is download
+            if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
                 for (String imageName : packagesToBuild.split(",")) {
 
                     Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);
@@ -544,7 +558,7 @@ public class SetupService {
                                 || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
                                 && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
 
-                            String fileName = DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + ".tar.gz";
+                            String fileName = DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION;
                             downloadPackage(fileName);
                         }
                     }

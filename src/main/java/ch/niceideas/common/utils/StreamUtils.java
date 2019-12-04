@@ -81,12 +81,17 @@ public abstract class StreamUtils {
      * @throws IOException if an I/O error occurs
      */
     public static long copy(Reader input, Writer output) throws IOException {
-        char[] buffer = new char[DEFAULT_BUFFER_SIZE];
+        if (input == null) {
+            throw new IOException ("Passed reader is null");
+        }
         long count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer))) {
-            output.write(buffer, 0, n);
-            count += n;
+        if (output != null) {
+            char[] buffer = new char[DEFAULT_BUFFER_SIZE];
+            int n = 0;
+            while (-1 != (n = input.read(buffer))) {
+                output.write(buffer, 0, n);
+                count += n;
+            }
         }
         return count;
     }

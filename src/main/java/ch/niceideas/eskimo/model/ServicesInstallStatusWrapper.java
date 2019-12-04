@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
 public class ServicesInstallStatusWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ServicesInstallStatusWrapper.class);
-    private List<String> installedServices;
 
     public ServicesInstallStatusWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
@@ -59,10 +58,6 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public static ServicesInstallStatusWrapper empty() {
         return new ServicesInstallStatusWrapper("{}");
-    }
-
-    public ServicesInstallStatusWrapper(JSONObject json) {
-        super(json);
     }
 
     public ServicesInstallStatusWrapper(Map<String, Object> map) {

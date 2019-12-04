@@ -79,7 +79,7 @@ public class SystemOperationService {
 
         if (!systemService.isInterrupted()) {
             try {
-                notificationService.addEvent("doing", message);
+                notificationService.addDoing(message);
                 logOperationMessage(message);
 
 
@@ -92,7 +92,7 @@ public class SystemOperationService {
                             + "--> Completed Successfuly.");
                 }
 
-                notificationService.addEvent("info", message + " succeeded");
+                notificationService.addInfo(message + " succeeded");
 
                 if (statusUpdater != null) {
                     systemService.updateAndSaveServicesInstallationStatus(statusUpdater);
@@ -108,7 +108,7 @@ public class SystemOperationService {
                         + "--> Completed in error : "
                         + e.getMessage());
 
-                notificationService.addEvent("error", message + " failed !");
+                notificationService.addError(message + " failed !");
                 throw new SystemException(e);
             }
         }

@@ -43,7 +43,7 @@ import java.util.List;
 
 public class UIConfig {
 
-    private static final Logger logger = Logger.getLogger(UIConfig.class);
+    //private static final Logger logger = Logger.getLogger(UIConfig.class);
 
     private final Service service;
 

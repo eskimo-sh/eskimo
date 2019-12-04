@@ -209,8 +209,6 @@ public class Terminal {
     private boolean cl;
     /**
      * Set graphics rendition. This is the value that gets stored into the higher 8 bits of {@link #scr}
-     *
-     * @see #csi_m(int[])
      */
     private int sgr;
     private String buf; // TODO: switch to StringBuilder
@@ -234,7 +232,7 @@ public class Terminal {
     /**
      * True if the cursor should be displayed.
      */
-    public boolean showCursor;
+    private boolean showCursor;
 
     private String cssClass;
 
@@ -242,6 +240,10 @@ public class Terminal {
         this.width = width;
         this.height = height;
         reset();
+    }
+
+    public boolean isCursorShown() {
+        return showCursor;
     }
 
     /**
@@ -624,18 +626,20 @@ public class Terminal {
     //NOSONAR
     void csi_J(int[] i) {
         switch (defaultsTo(i,0)) {
-        case 0: zero(cy,cx,height,0);return;
-        case 1: zero(0,0,cx,cy);return;
-        case 2: zero(0,0,height,0);return;
+            default:
+            case 0: zero(cy,cx,height,0);return;
+            case 1: zero(0,0,cx,cy);return;
+            case 2: zero(0,0,height,0);return;
         }
     }
 
     //NOSONAR
     void csi_K(int... i) {
         switch (defaultsTo(i,0)) {
-        case 0: zero(cy,cx,cy,width);return;
-        case 1: zero(cy,0,cy,cx);return;
-        case 2: zero(cy,0,cy,width);return;
+            default:
+            case 0: zero(cy,cx,cy,width);return;
+            case 1: zero(cy,0,cy,cx);return;
+            case 2: zero(cy,0,cy,width);return;
         }
     }
 
@@ -703,18 +707,20 @@ public class Terminal {
     //NOSONAR
     void csi_LowerH(int[] args) {
         switch(args[0]) {
-        case 25:
-            showCursor = true;
-            break;
+            default:
+            case 25:
+                showCursor = true;
+                break;
         }
     }
 
     //NOSONAR
     void csi_LowerL(int[] args) {
         switch(args[0]) {
-        case 25:
-            showCursor = false;
-            break;
+            default:
+            case 25:
+                showCursor = false;
+                break;
         }
     }
 

@@ -63,7 +63,21 @@ public class NotificationService extends AbstractInformationService<JSONObject, 
     }
 
     @Transactional
-    public void addEvent (String type, String message) {
+    public void addError (String message) {
+        addEvent ("Error", message);
+    }
+
+    @Transactional
+    public void addDoing (String message) {
+        addEvent ("Doing", message);
+    }
+
+    @Transactional
+    public void addInfo (String message) {
+        addEvent ("Info", message);
+    }
+
+    private void addEvent (String type, String message) {
 
         if (type.equals("error")) {
             logger.error(message);

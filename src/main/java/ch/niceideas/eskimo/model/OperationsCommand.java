@@ -58,9 +58,9 @@ public class OperationsCommand implements Serializable {
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private List<SerializablePair<String, String>> installations = new ArrayList<>();
-    private List<SerializablePair<String, String>> uninstallations = new ArrayList<>();
-    private List<SerializablePair<String, String>> restarts = new ArrayList<>();
+    private ArrayList<SerializablePair<String, String>> installations = new ArrayList<>();
+    private ArrayList<SerializablePair<String, String>> uninstallations = new ArrayList<>();
+    private ArrayList<SerializablePair<String, String>> restarts = new ArrayList<>();
 
     public static OperationsCommand create (
             ServicesDefinition servicesDefinition,

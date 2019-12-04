@@ -73,11 +73,11 @@ public class SystemOperationServiceTest extends AbstractSystemTest {
         assertNotNull (notifications);
         assertEquals(Integer.valueOf(2), notifications.getKey());
         assertEquals("{\n" +
-                "  \"type\": \"doing\",\n" +
+                "  \"type\": \"Doing\",\n" +
                 "  \"message\": \"Test\"\n" +
                 "}\n" +
                 "{\n" +
-                "  \"type\": \"info\",\n" +
+                "  \"type\": \"Info\",\n" +
                 "  \"message\": \"Test succeeded\"\n" +
                 "}", notifications.getValue().stream()
                 .map(object -> {

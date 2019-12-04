@@ -49,7 +49,7 @@ import java.util.Set;
 
 public class SetupCommand implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(SetupCommand.class);
+    //private static final Logger logger = Logger.getLogger(SetupCommand.class);
 
     private final JsonWrapper rawSetup;
 
@@ -63,7 +63,6 @@ public class SetupCommand implements Serializable {
 
     public static SetupCommand create (
             JsonWrapper rawSetup,
-            SystemService systemService,
             SetupService setupService) throws SetupException {
 
         Set<String> downloadPackages = new HashSet<>();

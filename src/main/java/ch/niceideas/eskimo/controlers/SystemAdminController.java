@@ -116,7 +116,7 @@ public class SystemAdminController {
     @ResponseBody
     public String showJournal(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
         return performOperation(
-                systemService -> systemService.showJournal(service, address),
+                sysService -> sysService.showJournal(service, address),
                 service + " journal display from " + address  + ".");
 
     }
@@ -126,7 +126,7 @@ public class SystemAdminController {
     @ResponseBody
     public String startService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
         return performOperation(
-                systemService -> systemService.startService(service, address),
+                sysService -> sysService.startService(service, address),
                 service + " has been started successfuly on " + address  + ".");
     }
 
@@ -135,7 +135,7 @@ public class SystemAdminController {
     @ResponseBody
     public String stopService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
         return performOperation(
-                systemService -> systemService.stopService(service, address),
+                sysService -> sysService.stopService(service, address),
                 service + " has been stopped successfuly on " + address  + ".");
     }
 
@@ -144,7 +144,7 @@ public class SystemAdminController {
     @ResponseBody
     public String restartService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
         return performOperation(
-                systemService -> systemService.restartService(service, address),
+                sysService -> sysService.restartService(service, address),
                 service + " has been restarted successfuly on " + address  + ".");
     }
 
@@ -189,7 +189,7 @@ public class SystemAdminController {
         } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
-            notificationService.addEvent("error", "Nodes installation failed !");
+            notificationService.addError("Nodes installation failed !");
             return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
