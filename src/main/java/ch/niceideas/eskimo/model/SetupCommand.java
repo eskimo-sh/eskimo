@@ -66,11 +66,11 @@ public class SetupCommand implements Serializable {
             SystemService systemService,
             SetupService setupService) throws SetupException {
 
-        Set<String> downloadPackages = new HashSet<String>();
-        Set<String> buildPackage = new HashSet<String>();
-        Set<String> downloadMesos = new HashSet<String>();
-        Set<String> buildMesos = new HashSet<String>();
-        Set<String> packageUpdates = new HashSet<String>();
+        Set<String> downloadPackages = new HashSet<>();
+        Set<String> buildPackage = new HashSet<>();
+        Set<String> downloadMesos = new HashSet<>();
+        Set<String> buildMesos = new HashSet<>();
+        Set<String> packageUpdates = new HashSet<>();
 
         setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
 

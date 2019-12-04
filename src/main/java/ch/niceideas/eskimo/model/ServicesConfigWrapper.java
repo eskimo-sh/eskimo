@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(ServicesConfigWrapper.class);
+    //private static final Logger logger = Logger.getLogger(ServicesConfigWrapper.class);
 
     public ServicesConfigWrapper(File configFile) throws FileException {
         super(FileUtils.readFile(configFile));
@@ -60,8 +60,8 @@ public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
     public static ServicesConfigWrapper initEmpty(ServicesDefinition def) {
 
         List<JSONObject> allConfigurations = def.getAllServices().stream()
-                .map(serviceName -> def.getService(serviceName))
-                .map (service -> service.getEditableConfigurationsJSON())
+                .map(def::getService)
+                .map (Service::getEditableConfigurationsJSON)
                 .collect(Collectors.toList());
 
         JSONObject configObject = new JSONObject(new HashMap<String, Object>() {{
