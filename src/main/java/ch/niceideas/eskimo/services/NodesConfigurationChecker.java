@@ -81,7 +81,6 @@ public class NodesConfigurationChecker {
 
                     for (String uniqueServiceName : servicesDefinition.listUniqueServices()) {
 
-                        int foundNodes = 0;
                         // just make sure it is installed on every node
                         for (String otherKey : nodesConfig.keySet()) {
                             Matcher otherMatcher = re.matcher(otherKey);

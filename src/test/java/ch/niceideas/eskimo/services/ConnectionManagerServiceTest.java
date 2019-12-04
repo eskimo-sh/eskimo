@@ -130,7 +130,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+            protected void dropTunnels(Connection connection, String ipAddress)  {
                 super.dropTunnels(connection, ipAddress);
                 dropCalledFor.add(ipAddress);
             }

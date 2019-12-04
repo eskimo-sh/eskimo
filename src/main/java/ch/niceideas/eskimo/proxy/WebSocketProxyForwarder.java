@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class WebSocketProxyForwarder {
 
+    public static final String WS_LOCALHOST_PREFIX = "ws://localhost:";
     private final Logger logger = Logger.getLogger(this.getClass());
 
     private final String serviceId;
@@ -28,15 +29,11 @@ public class WebSocketProxyForwarder {
 
     private final ProxyManagerService proxyManagerService;
 
-    private final ServicesDefinition servicesDefinition;
-
     public WebSocketProxyForwarder(
-            String serviceId, String targetPath, ProxyManagerService proxyManagerService,
-            ServicesDefinition servicesDefinition, WebSocketSession webSocketServerSession) {
+            String serviceId, String targetPath, ProxyManagerService proxyManagerService, WebSocketSession webSocketServerSession) {
         this.serviceId = serviceId;
         this.targetPath = targetPath;
         this.proxyManagerService = proxyManagerService;
-        this.servicesDefinition = servicesDefinition;
         this.webSocketServerSession = webSocketServerSession;
         webSocketClientSession = createWebSocketClientSession(webSocketServerSession);
     }
@@ -73,8 +70,7 @@ public class WebSocketProxyForwarder {
 
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig(serviceId);
 
-            //String targetWsUri = "ws://192.168.10.11:38080/ws";
-            String targetWsUri = "ws://localhost:" + config.getLocalPort() + targetPath;
+            String targetWsUri = WS_LOCALHOST_PREFIX + config.getLocalPort() + targetPath;
 
             WebSocketHttpHeaders headers = getWebSocketHttpHeaders(webSocketServerSession);
             WebSocketSession clientSession = new StandardWebSocketClient()

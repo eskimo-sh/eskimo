@@ -217,8 +217,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
         return mutableUser;
     }
 
-    public UserDetails loadUserByUsername(String username)
-            throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         UserDetails user = users.get(username.toLowerCase());
 
         if (user == null) {

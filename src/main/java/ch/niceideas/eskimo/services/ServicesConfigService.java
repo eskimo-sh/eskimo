@@ -133,13 +133,9 @@ public class ServicesConfigService {
             // 1. load saved config (or initialized one)
             ServicesConfigWrapper servicesConfig = loadServicesConfig();
 
-            //System.out.println (servicesConfig.getFormattedValue());
             String[] dirtyServices = fillInEditedConfigs(new JSONObject(configFormAsString), servicesConfig.getSubJSONArray("configs"));
 
-            //System.out.println (servicesConfig.getFormattedValue());
-
             saveServicesConfig (servicesConfig);
-
 
             if (dirtyServices != null && dirtyServices.length > 0) {
                 NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();

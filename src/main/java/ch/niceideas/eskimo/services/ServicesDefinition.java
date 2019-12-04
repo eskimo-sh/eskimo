@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesDefinition implements InitializingBean {
 
-    private static final Logger logger = Logger.getLogger(ServicesDefinition.class);
+    //private static final Logger logger = Logger.getLogger(ServicesDefinition.class);
 
     @Autowired
     private SetupService setupService;
@@ -87,11 +87,11 @@ public class ServicesDefinition implements InitializingBean {
 
         InputStream is = ResourceUtils.getResourceAsStream(servicesDefinitionFile);
         if (is == null) {
-            throw new RuntimeException("File " + servicesDefinitionFile + " couldn't be loaded");
+            throw new ServiceDefinitionException("File " + servicesDefinitionFile + " couldn't be loaded");
         }
         String servicesAsString =  StreamUtils.getAsString(is);
         if (StringUtils.isBlank(servicesAsString)) {
-            throw new RuntimeException("File " + servicesDefinitionFile + " is empty.");
+            throw new ServiceDefinitionException("File " + servicesDefinitionFile + " is empty.");
         }
         JsonWrapper servicesConfig = new JsonWrapper(servicesAsString);
 
@@ -363,7 +363,7 @@ public class ServicesDefinition implements InitializingBean {
 
     public String[] listProxiedServices() {
         return services.values().stream()
-                .filter(it -> it.isProxied())
+                .filter(Service::isProxied)
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
                 .map(Service::getName)
                 .toArray(String[]::new);
@@ -371,15 +371,15 @@ public class ServicesDefinition implements InitializingBean {
 
     public UIConfig[] listLinkServices() {
         return services.values().stream()
-                .filter(it -> it.isLink())
+                .filter(Service::isLink)
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(service -> service.getUiConfig())
+                .map(Service::getUiConfig)
                 .toArray(UIConfig[]::new);
     }
 
     public String[] listUIServices() {
         return services.values().stream()
-                .filter(it -> it.isUiService())
+                .filter(Service::isUiService)
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
                 .map(Service::getName)
                 .toArray(String[]::new);
@@ -387,7 +387,7 @@ public class ServicesDefinition implements InitializingBean {
 
     public Map<String, UIConfig> getUIServicesConfig() {
         return services.values().stream()
-                .filter(it -> it.isUiService())
+                .filter(Service::isUiService)
                 .collect(Collectors.toMap(Service::getName, Service::getUiConfig));
     }
 

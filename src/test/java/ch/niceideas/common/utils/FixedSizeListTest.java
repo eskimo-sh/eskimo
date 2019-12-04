@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotSame;
@@ -41,7 +42,7 @@ public class FixedSizeListTest {
     public void testMaxSize() throws Exception {
 
         for (int i  = 0; i < 100; i++) {
-            testList.add(""+(Math.random()*100000000));
+            testList.add(""+ThreadLocalRandom.current().nextInt(100000000));
         }
 
         assertEquals(10, testList.size());

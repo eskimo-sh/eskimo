@@ -69,7 +69,7 @@ public class FileManagerService {
 
     private static final Pattern pattern = Pattern.compile("([tlcbdprwxs-]+) *([^ ]+) *([^ ]+) *([^ ]+) *([^ ]+) *(.*) +([^ ]+|'.+'|\".+\")");
 
-    private static String[] OTHER_TEXT_MIME_TYPES = new String[]{
+    private static final String[] OTHER_TEXT_MIME_TYPES = new String[]{
             "application/x-sh",
             "application/x-csh",
             "text/x-c",
@@ -252,8 +252,8 @@ public class FileManagerService {
             response.flushBuffer();
 
         } catch (IOException | SSHCommandException | ConnectionManagerException ex) {
-            logger.error("Error writing file to output stream. Filename was " + file, ex);
-            throw new RuntimeException("IOError writing file to output stream");
+            logger.error("Download error. Filename was " + file, ex);
+            throw new FileDownloadException("IOError writing file to output stream");
         }
     }
 
@@ -288,7 +288,7 @@ public class FileManagerService {
             writeFile(hostAddress, fullPath, fileContent);
 
         } catch (ConnectionManagerException ex) {
-            logger.error("Error writing file to output stream. Filename was " + name, ex);
+            logger.error("Deletion error. Filename was " + name, ex);
             throw new IOException("IOError writing file to output stream", ex);
 
         } finally {
@@ -403,5 +403,14 @@ public class FileManagerService {
             tsString = tsString.substring(0, 12);
         }
         return tsString;
+    }
+
+    public static class FileDownloadException extends RuntimeException {
+
+        static final long serialVersionUID = -3117632123352229248L;
+
+        FileDownloadException(String message) {
+            super(message);
+        }
     }
 }

@@ -174,7 +174,7 @@ public class SetupService {
         findMissingMesos(packagesDistribFolder, missingServices);
 
         if (!missingServices.isEmpty()) {
-            List<String> missingServicesList = new ArrayList<String>(missingServices);
+            List<String> missingServicesList = new ArrayList<>(missingServices);
             Collections.sort(missingServicesList);
             throw new SetupException ("Following services are missing and need to be downloaded or built " + String.join(", ", missingServicesList));
         }
@@ -184,8 +184,7 @@ public class SetupService {
         for (String mesosPackage : mesosPackages.split(",")) {
             if (Arrays.stream(packagesDistribFolder.listFiles())
                     .noneMatch(file ->
-                            file.getName().contains(mesosPackage)
-                                    && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX))) {
+                            file.getName().contains(mesosPackage) && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX))) {
                 missingServices.add(mesosPackage);
             }
         }
@@ -206,7 +205,6 @@ public class SetupService {
     public String loadSetupConfig() throws FileException, SetupException {
         File configFile = new File(getConfigStoragePath() + "/config.json");
         if (!configFile.exists()) {
-            //return ErrorStatusHelper.createClearStatus("missing");
             throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
         }
 

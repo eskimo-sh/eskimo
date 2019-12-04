@@ -50,12 +50,18 @@ import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ProxyManagerService {
+
+    public static final int LOCAL_PORT_RANGE_START = 39152;
+
+    private static final int PORT_GENERATION_MAX_ATTEMPT_COUNT = 10000;
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -110,7 +116,7 @@ public class ProxyManagerService {
         if (pathInfo.startsWith("/")) {
             startIndex = 1;
         }
-        int lastIndex = pathInfo.indexOf("/", startIndex + 1);
+        int lastIndex = pathInfo.indexOf('/', startIndex + 1);
         if (lastIndex == -1) {
             lastIndex = pathInfo.length();
         }
@@ -169,11 +175,11 @@ public class ProxyManagerService {
         int portNumber = -1;
         int tryCount = 0;
         do {
-            int randInc = (int) (Math.random() * (65534.0 - 49152.0));
-            portNumber = 49152 + randInc;
+            int randInc = ThreadLocalRandom.current().nextInt(65534 - LOCAL_PORT_RANGE_START);
+            portNumber = LOCAL_PORT_RANGE_START + randInc;
             tryCount++;
-        } while (isLocalPortInUse(portNumber) && tryCount < 10000);
-        if (tryCount >= 10000) {
+        } while (isLocalPortInUse(portNumber) && tryCount < PORT_GENERATION_MAX_ATTEMPT_COUNT);
+        if (tryCount >= PORT_GENERATION_MAX_ATTEMPT_COUNT) {
             throw new IllegalStateException();
         }
         return portNumber;

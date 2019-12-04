@@ -78,7 +78,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     private String getServiceName(HttpServletRequest servletRequest) {
         String uri = servletRequest.getRequestURI();
         if (StringUtils.isBlank(configuredContextPath)) {
-            int indexOfSlash = uri.indexOf("/", 2);
+            int indexOfSlash = uri.indexOf('/', 2);
             if (indexOfSlash < 0) {
                 throw new IllegalArgumentException("No / found in URI " + uri);
             }
@@ -89,22 +89,24 @@ public class ServicesProxyServlet extends ProxyServlet {
             if (!configuredContextPath.endsWith("/")) {
                 startIndex = startIndex + 1;
             }
-            return uri.substring(startIndex, uri.indexOf("/", startIndex + 1));
+            return uri.substring(startIndex, uri.indexOf('/', startIndex + 1));
         }
     }
 
-    private String getContextPath (HttpServletRequest servletRequest) {
-        return StringUtils.isBlank(configuredContextPath) ?
-                "" :
-                ((configuredContextPath.startsWith("/") ? configuredContextPath.substring(1) : configuredContextPath)
-                        + (configuredContextPath.endsWith("/") ? "" : "/"));
+    private String getContextPath () {
+        if (StringUtils.isBlank(configuredContextPath)) {
+            return "";
+        } else {
+            return ((configuredContextPath.startsWith("/") ?
+                        configuredContextPath.substring(1) : configuredContextPath)
+                    + (configuredContextPath.endsWith("/") ?
+                        "" : "/"));
+        }
     }
 
     private String getPrefixPath(HttpServletRequest servletRequest, String contextPathPrefix) {
         String serviceName = getServiceName(servletRequest);
         Service service = servicesDefinition.getService(serviceName);
-
-
 
         if (service.isUnique()) {
             return contextPathPrefix + serviceName;
@@ -114,14 +116,6 @@ public class ServicesProxyServlet extends ProxyServlet {
             return contextPathPrefix + serviceName + "/" + targetHost.replaceAll("\\.", "-");
         }
     }
-
-    /*
-    private String getTargetHost(HttpServletRequest servletRequest, String serviceName) {
-        String uri = servletRequest.getRequestURI();
-        int indexOfServiceName = uri.indexOf(serviceName);
-        return uri.substring(indexOfServiceName+1, uri.indexOf("/", indexOfServiceName + 2));
-    }
-    */
 
     @Override
     protected HttpHost getTargetHost(HttpServletRequest servletRequest) {
@@ -162,7 +156,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
             // Need to remove host from pathInfo
             if (!service.isUnique()) {
-                pathInfo = pathInfo.substring(pathInfo.indexOf("/"));
+                pathInfo = pathInfo.substring(pathInfo.indexOf('/'));
             }
 
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters
@@ -183,14 +177,14 @@ public class ServicesProxyServlet extends ProxyServlet {
         HttpEntityEnclosingRequest eProxyRequest = new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
 
         if ("application/x-www-form-urlencoded".equals(servletRequest.getContentType()) || getContentLengthOverride(servletRequest) == 0){
-            List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+            List<NameValuePair> formparams = new ArrayList<>();
             Enumeration<String> paramNames = servletRequest.getParameterNames();
             while (paramNames.hasMoreElements()) {
                 String name = paramNames.nextElement();
                 String value = servletRequest.getParameter(name);
                 formparams.add(new BasicNameValuePair(name, value));
             }
-            if (formparams.size() != 0){
+            if (!formparams.isEmpty()){
                 UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(formparams, "UTF-8");
                 eProxyRequest.setEntity(urlEncodedFormEntity);
             }
@@ -221,7 +215,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         HttpEntity entity = proxyResponse.getEntity();
 
-        String contextPathPrefix = getContextPath (servletRequest);
+        String contextPathPrefix = getContextPath ();
 
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
 
@@ -321,11 +315,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     @Override
     protected String rewriteUrlFromResponse(HttpServletRequest servletRequest, String theUrl) {
 
-        String serviceName = getServiceName(servletRequest);
-        Service service = servicesDefinition.getService(serviceName);
-
         final String targetUri = getTargetUri(servletRequest);
-
 
         if (theUrl.startsWith(targetUri)) {
             /*-
@@ -357,10 +347,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             }
 
             // Servlet path starts with a / if it is not blank
-            //curUrl.append(servletRequest.getServletPath()).append("/"); // JKE
-
             curUrl.append(getPrefixPath(servletRequest, "")).append("/"); // JKE
-
 
             curUrl.append(theUrl, targetUri.length(), theUrl.length());
             return curUrl.toString();

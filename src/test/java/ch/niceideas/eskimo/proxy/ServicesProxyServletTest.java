@@ -45,6 +45,7 @@ import org.junit.Test;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Proxy;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class ServicesProxyServletTest {
@@ -253,5 +254,10 @@ public class ServicesProxyServletTest {
                 "    }\n" +
                 "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}", result);
+    }
+
+    @Test
+    public void testCopyResponseEntity() throws Exception {
+        fail ("To Be Implemented");
     }
 }

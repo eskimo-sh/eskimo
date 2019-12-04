@@ -173,8 +173,8 @@ public class NodeRangeResolver  {
 
         List<String> retList = new ArrayList<>();
 
-        String startIp = rangeValue.substring(0, rangeValue.indexOf("-"));
-        String endIp = rangeValue.substring(rangeValue.indexOf("-") + 1);
+        String startIp = rangeValue.substring(0, rangeValue.indexOf('-'));
+        String endIp = rangeValue.substring(rangeValue.indexOf('-') + 1);
 
         int startIpInt = ipToInt(startIp);
         int endIpInt = ipToInt(endIp);

@@ -41,7 +41,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
         String uri = webSocketServerSession.getUri().toString();
 
         int indexOfWs = uri.indexOf("/ws");
-        int indexOfSlash = uri.indexOf("/", indexOfWs + 4);
+        int indexOfSlash = uri.indexOf('/', indexOfWs + 4);
 
         String serviceName = uri.substring(indexOfWs + 4, indexOfSlash > -1 ? indexOfSlash : uri.length());
 
@@ -60,23 +60,15 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
     }
 
     private WebSocketProxyForwarder getForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
-        Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.get(serviceId);
-        if (forwardersForService == null) {
-            forwardersForService = new HashMap<>();
-            forwarders.put(serviceId, forwardersForService);
-        }
-        Map<String, WebSocketProxyForwarder> forwardersForSession = forwardersForService.get(webSocketServerSession.getId());
-        if (forwardersForSession == null) {
-            forwardersForSession = new HashMap<>();
-            forwardersForService.put(webSocketServerSession.getId(), forwardersForSession);
-        }
-        WebSocketProxyForwarder forwarder = forwardersForSession.get(targetPath);
-        if (forwarder == null) {
+
+        Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.computeIfAbsent(serviceId, k -> new HashMap<>());
+
+        Map<String, WebSocketProxyForwarder> forwardersForSession = forwardersForService.computeIfAbsent(webSocketServerSession.getId(), k -> new HashMap<>());
+
+        return forwardersForSession.computeIfAbsent(targetPath, k  -> {
             logger.info ("Creating new forwarder for session : " + webSocketServerSession.getId() + " - service ID : " + serviceId + " - target path : " + targetPath);
-            forwarder = new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, servicesDefinition, webSocketServerSession);
-            forwardersForSession.put(targetPath, forwarder);
-        }
-        return forwarder;
+            return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession);
+        });
     }
 
     public void removeForwarders(String serviceId) {

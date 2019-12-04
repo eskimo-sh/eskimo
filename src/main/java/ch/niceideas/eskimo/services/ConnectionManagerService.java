@@ -271,7 +271,7 @@ public class ConnectionManagerService {
     }
 
 
-    protected void dropTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+    protected void dropTunnels(Connection connection, String ipAddress) {
 
         // Find out about declared forwarders to be handled
         List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
@@ -314,20 +314,15 @@ public class ConnectionManagerService {
     }
 
     private List<LocalPortForwarderWrapper> getForwarders(Connection connection) {
-        List<LocalPortForwarderWrapper> previousForwarders = portForwardersMap.get(connection);
-        if (previousForwarders == null) {
-            previousForwarders = new ArrayList<>();
-            portForwardersMap.put(connection, previousForwarders);
-        }
-        return previousForwarders;
+        return portForwardersMap.computeIfAbsent(connection, k -> new ArrayList<>());
     }
 
     private boolean notIn(ProxyTunnelConfig config, List<LocalPortForwarderWrapper> previousForwarders) {
-        return !previousForwarders.stream().anyMatch(forwarder -> forwarder.matches(config));
+        return previousForwarders.stream().noneMatch(forwarder -> forwarder.matches(config));
     }
 
     private boolean notIn(LocalPortForwarderWrapper forwarder, List<ProxyTunnelConfig> tunnelConfigs) {
-        return !tunnelConfigs.stream().anyMatch(config -> forwarder.matches(config));
+        return tunnelConfigs.stream().noneMatch(forwarder::matches);
     }
 
     private class ConnectionOperationWatchDog implements AutoCloseable{

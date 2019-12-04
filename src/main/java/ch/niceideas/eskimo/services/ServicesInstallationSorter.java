@@ -52,6 +52,8 @@ import java.util.stream.Collectors;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesInstallationSorter {
 
+    //private static final Logger logger = Logger.getLogger(ServicesInstallationSorter.class);
+
     @Autowired
     private ServicesDefinition servicesDefinition;
 
@@ -60,7 +62,6 @@ public class ServicesInstallationSorter {
         this.servicesDefinition = servicesDefinition;
     }
 
-    private static final Logger logger = Logger.getLogger(ServicesInstallationSorter.class);
 
     public List<Pair<String, String>>[] orderOperations(
             List<? extends Pair<String, String>> operations,
@@ -126,7 +127,7 @@ public class ServicesInstallationSorter {
                     group = newGroup;
                 }
 
-                if (group.size() > 0) { // there may well be none left
+                if (!group.isEmpty()) { // there may well be none left
                     orderedOperationsSteps.add(group);
                 }
 

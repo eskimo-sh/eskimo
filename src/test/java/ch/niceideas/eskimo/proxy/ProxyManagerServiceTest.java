@@ -61,11 +61,13 @@ public class ProxyManagerServiceTest {
         pms.setServicesDefinition(sd);
         sd.afterPropertiesSet();
         pms.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
             public void recreateTunnels(String host) throws ConnectionManagerException {
                 recreateTunnelsCalled.set(true);
             }
         });
         pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
+            @Override
             public void removeForwarders(String serviceId) {
                 removeForwardersCalled.set(true);
             }
@@ -78,6 +80,8 @@ public class ProxyManagerServiceTest {
 
         assertEquals("http://localhost:"+pms.getTunnelConfig("zeppelin").getLocalPort()+"/", pms.getServerURI("zeppelin", "/localhost:8080/zeppelin"));
         assertEquals("http://localhost:"+pms.getTunnelConfig("zeppelin").getLocalPort()+"/", pms.getServerURI("zeppelin", "/localhost:8080/zeppelin/tugudu"));
+
+        assertTrue (pms.getTunnelConfig("zeppelin").getLocalPort() >= ProxyManagerService.LOCAL_PORT_RANGE_START && pms.getTunnelConfig("zeppelin").getLocalPort() <= 65535);
     }
 
     @Test

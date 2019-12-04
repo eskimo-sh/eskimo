@@ -89,20 +89,19 @@ public class SSHCommandService {
             throw new SSHCommandException("Impossible to load script " + scriptName);
         }
 
-        BufferedReader reader = new BufferedReader( new InputStreamReader(scriptIs));
-        String line = null;
-        StringBuilder scriptBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader (new InputStreamReader(scriptIs))) {
+            String line = null;
+            StringBuilder scriptBuilder = new StringBuilder();
 
-        try {
             while ((line = reader.readLine()) != null) {
                 scriptBuilder.append(line);
                 scriptBuilder.append("\n");
             }
-            reader.close();
 
             return runSSHScript(hostAddress, scriptBuilder.toString());
+
         } catch (IOException e) {
-            logger.error (e, e);
+            logger.error(e, e);
             throw new SSHCommandException(e);
         }
 
@@ -111,10 +110,8 @@ public class SSHCommandService {
     public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
 
         Session session = null;
-        try {
-
-            ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-            ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
+             ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
 
             Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
@@ -230,6 +227,7 @@ public class SSHCommandService {
             this.out = out;
         }
 
+        @Override
         public void run() {
             byte[] buf = new byte[1024];
             try {
