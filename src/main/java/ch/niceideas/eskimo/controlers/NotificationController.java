@@ -58,9 +58,14 @@ public class NotificationController extends AbstractInformationController {
     @Resource
     private NotificationService notificationService;
 
+    /* For tests */
+    void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
     @GetMapping("/fetch-notifications")
     @ResponseBody
-    public String fetchMontoring(@RequestParam(name="last_line") Integer lastLine) {
+    public String fetchNotifications(@RequestParam(name="last_line") Integer lastLine) {
 
         try {
             Pair<Integer, List<JSONObject>> newLines = notificationService.fetchElements (lastLine);

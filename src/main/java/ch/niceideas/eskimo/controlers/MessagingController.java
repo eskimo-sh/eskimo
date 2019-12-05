@@ -57,13 +57,19 @@ public class MessagingController extends AbstractInformationController {
     @Resource
     private MessagingService messagingService;
 
+    /* For tests */
+    void setMessagingService(MessagingService messagingService) {
+        this.messagingService = messagingService;
+    }
+
     @GetMapping("/fetch-messaging")
     @ResponseBody
     public String fetchMessages(@RequestParam(name="last_line") Integer lastLine) {
 
-        Pair<Integer, String> newLines = messagingService.fetchElements (lastLine);
-
         try {
+
+            Pair<Integer, String> newLines = messagingService.fetchElements (lastLine);
+
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
                 put("lastLine", newLines.getKey() );

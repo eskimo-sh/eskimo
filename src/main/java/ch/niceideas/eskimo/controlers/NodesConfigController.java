@@ -86,6 +86,23 @@ public class NodesConfigController {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
+    /* For tests */
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setSetupService(SetupService setupService) {
+        this.setupService = setupService;
+    }
+    void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
+        this.nodeRangeResolver = nodeRangeResolver;
+    }
+    void setServicesDefinition(ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
+    }
+    void setNodesConfigChecker(NodesConfigurationChecker nodesConfigChecker) {
+        this.nodesConfigChecker = nodesConfigChecker;
+    }
+
     @GetMapping("/load-nodes-config")
     @ResponseBody
     public String loadNodesConfig() {
@@ -96,9 +113,11 @@ public class NodesConfigController {
                 return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
             return nodesConfig.getFormattedValue();
+
         } catch (SystemException | JSONException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus(e.getMessage());
+
         } catch (SetupException e) {
             // this is OK. means application is not yet initialized
             logger.debug (e, e);

@@ -92,14 +92,13 @@ public class ServicesController {
     @GetMapping("/get-ui-services-config")
     @ResponseBody
     public String getUIServicesConfig() {
-
-        Map<String, Object> uiServicesConfig = new HashMap<>();
-        Map<String, UIConfig> uiConfigs = servicesDefinition.getUIServicesConfig();
-
-        uiConfigs.keySet()
-                .forEach(name -> uiServicesConfig.put (name, uiConfigs.get(name).toJSON()));
-
         try {
+            Map<String, Object> uiServicesConfig = new HashMap<>();
+            Map<String, UIConfig> uiConfigs = servicesDefinition.getUIServicesConfig();
+
+            uiConfigs.keySet()
+                    .forEach(name -> uiServicesConfig.put (name, uiConfigs.get(name).toJSON()));
+
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
                 put("uiServicesConfig", new JSONObject(uiServicesConfig));

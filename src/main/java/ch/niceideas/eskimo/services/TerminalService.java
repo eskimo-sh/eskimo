@@ -100,7 +100,7 @@ public class TerminalService {
                         }
                     }
                 }
-            }, idleTimeoutSeconds / 10 * 1000, (long) idleTimeoutSeconds / 10 * 1000);
+            }, idleTimeoutSeconds / (long) 10 * 1000, idleTimeoutSeconds / (long) 10 * 1000);
     }
 
     /** For tests */

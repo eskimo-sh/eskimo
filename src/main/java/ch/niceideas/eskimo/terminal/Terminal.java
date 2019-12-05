@@ -78,8 +78,8 @@ public class Terminal {
 
     private static final String HTML_TABLE, LATEN1_TABLE;
 
-    public static final String CSI_PREFIX = "csi_";
-    public static final String CSI_LOWER_PREFIX = "csi_Lower";
+    public static final String CSI_PREFIX = "csiUpper";
+    public static final String CSI_LOWER_PREFIX = "csiLower";
 
     static {
         for( final Method m : Terminal.class.getDeclaredMethods() ) {
@@ -508,7 +508,7 @@ public class Terminal {
 
     @Esc({"\u0005","\u001B[c","\u001B[0c","\u001BZ"})
     //NOSONAR
-    void esc_da() {
+    void escDa() {
         outbuf = "\u001B[?6c";
     }
 
@@ -517,7 +517,7 @@ public class Terminal {
      */
     @Esc("\u0008")
     //NOSONAR
-    void esc_0x08() {
+    void esc0x08() {
         cx = max(0,cx-1);
     }
 
@@ -526,7 +526,7 @@ public class Terminal {
      */
     @Esc("\u0009")
     //NOSONAR
-    void esc_0x09() {
+    void esc0x09() {
         cx = (((cx/8)+1)*8)%width;
     }
 
@@ -535,7 +535,7 @@ public class Terminal {
      */
     @Esc("\r")
     //NOSONAR
-    void esc_0x0d() {
+    void esc0x0d() {
         cl=false;
         cx=0;
     }
@@ -568,23 +568,23 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_A(int[] i) {
+    void csiUpperA(int[] i) {
         cy = max(st,cy-defaultsTo(i,1));
     }
 
     //NOSONAR
-    void csi_B(int[] i) {
+    void csiUpperB(int[] i) {
         cy = min(sb,cy+defaultsTo(i,1));
     }
 
     //NOSONAR
-    void csi_C(int[] i) {
+    void csiUpperC(int[] i) {
         cx = min(width-1,cx+defaultsTo(i,1));
         cl = false;
     }
 
     //NOSONAR
-    void csi_D(int[] i) {
+    void csiUpperD(int[] i) {
         cx = max(0,cx-defaultsTo(i,1));
         cl = false;
     }
@@ -597,26 +597,26 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_E(int[] i) {
-        csi_B(i);
+    void csiUpperE(int[] i) {
+        csiUpperB(i);
         cx = 0;
         cl = false;
     }
 
     //NOSONAR
-    void csi_F(int[] i) {
-        csi_A(i);
+    void csiUpperF(int[] i) {
+        csiUpperA(i);
         cx = 0;
         cl = false;
     }
 
     //NOSONAR
-    void csi_G(int[] i) {
+    void csiUpperG(int[] i) {
         cx = min(width,i[0])-1;
     }
 
     //NOSONAR
-    void csi_H(int[] i) {
+    void csiUpperH(int[] i) {
         if(i.length<2)  i=new int[]{1,1};
         cx = min(width,i[1])-1;
         cy = min(height,i[0])-1;
@@ -624,7 +624,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_J(int[] i) {
+    void csiUpperJ(int[] i) {
         switch (defaultsTo(i,0)) {
             default:
             case 0: zero(cy,cx,height,0);return;
@@ -634,7 +634,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_K(int... i) {
+    void csiUpperK(int... i) {
         switch (defaultsTo(i,0)) {
             default:
             case 0: zero(cy,cx,cy,width);return;
@@ -647,7 +647,7 @@ public class Terminal {
      * Insert lines.
      */
     //NOSONAR
-    void csi_L(int[] args) {
+    void csiUpperL(int[] args) {
         for(int i=0;i<defaultsTo(args,1);i++)
             if(cy<sb)
                 scrollDown(cy,sb);
@@ -657,7 +657,7 @@ public class Terminal {
      * Delete lines.
      */
     //NOSONAR
-    void csi_M(int[] args) {
+    void csiUpperM(int[] args) {
         if(cy>=st && cy<=sb)
             for(int i=0;i<defaultsTo(args,1);i++)
                 scrollUp(cy,sb);
@@ -667,45 +667,45 @@ public class Terminal {
      * Delete n chars
      */
     //NOSONAR
-    void csi_P(int[] args) {
+    void csiUpperP(int[] args) {
         int _cy=cy,_cx=cx;
         String end = peek(cy,cx,cy,width);
-        csi_K(0);
+        csiUpperK(0);
         poke(_cy,_cx,end.substring(defaultsTo(args,1)));
     }
 
     //NOSONAR
-    void csi_X(int[] args) {
+    void csiUpperX(int[] args) {
         zero(cy,cx,cy,cx+args[0]);
     }
 
     //NOSONAR
-    void csi_LowerA(int[] args) {
-        csi_C(args);
+    void csiLowerA(int[] args) {
+        csiUpperC(args);
     }
 
     //NOSONAR
-    void csi_LowerC(int[] args) {
+    void csi_owerC(int[] args) {
         // noop
     }
 
     //NOSONAR
-    void csi_LowerD(int[] args) {
+    void csiLowerD(int[] args) {
         cy = min(height,args[0])-1;
     }
 
     //NOSONAR
-    void csi_LowerE(int[] args) {
-        csi_B(args);
+    void csiLowerE(int[] args) {
+        csiUpperB(args);
     }
 
     //NOSONAR
-    void csi_LowerF(int[] args) {
-        csi_H(args);
+    void csiLowerF(int[] args) {
+        csiUpperH(args);
     }
 
     //NOSONAR
-    void csi_LowerH(int[] args) {
+    void csiLowerH(int[] args) {
         switch(args[0]) {
             default:
             case 25:
@@ -715,7 +715,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_LowerL(int[] args) {
+    void csiLowerL(int[] args) {
         switch(args[0]) {
             default:
             case 25:
@@ -725,7 +725,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_LowerM(int[] args) {
+    void csiLowerM(int[] args) {
         if (args.length==0) {
             sgr = 0x0700;
             return;
@@ -746,7 +746,7 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_LowerR(int[] args) {
+    void csiLowerR(int[] args) {
         if(args.length<2)   args=new int[]{0,height};
         st=min(height,args[0])-1;
         sb=min(height,args[1])-1;
@@ -754,13 +754,13 @@ public class Terminal {
     }
 
     //NOSONAR
-    void csi_LowerS(int[] args) {
+    void csiLowerS(int[] args) {
         sb=max(sb,st);
         saveCursor();
     }
 
     //NOSONAR
-    void csi_LowerU(int[] args) {
+    void csiLowerU(int[] args) {
         restoreCursor();
     }
 

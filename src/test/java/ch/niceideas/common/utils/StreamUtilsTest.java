@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.*;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -43,10 +44,14 @@ public class StreamUtilsTest {
 
     @Test
     public void testClose() {
-        StreamUtils.close(new BufferedReader(new InputStreamReader(new ByteArrayInputStream("aaa".getBytes()))));
-        StreamUtils.close(new ByteArrayInputStream("aaa".getBytes()));
-        StreamUtils.close((InputStream)null);
-        StreamUtils.close((OutputStream)null);
-        StreamUtils.close(new ByteArrayOutputStream());
+        try {
+            StreamUtils.close(new BufferedReader(new InputStreamReader(new ByteArrayInputStream("aaa".getBytes()))));
+            StreamUtils.close(new ByteArrayInputStream("aaa".getBytes()));
+            StreamUtils.close((InputStream) null);
+            StreamUtils.close((OutputStream) null);
+            StreamUtils.close(new ByteArrayOutputStream());
+        } catch (Exception e) {
+            fail ("No exception expected");
+        }
     }
 }

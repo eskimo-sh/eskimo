@@ -61,6 +61,11 @@ public class FileManagerController {
     @Autowired
     private FileManagerService fileManagerService;
 
+    /* For tests */
+    void setFileManagerService(FileManagerService fileManagerService) {
+        this.fileManagerService = fileManagerService;
+    }
+
     @GetMapping("/file-manager-remove")
     @ResponseBody
     public String removeFileManager(@RequestParam("address") String hostAddress) {

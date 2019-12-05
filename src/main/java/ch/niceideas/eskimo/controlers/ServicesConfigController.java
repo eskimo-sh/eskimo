@@ -62,10 +62,12 @@ public class ServicesConfigController {
     private static final Logger logger = Logger.getLogger(ServicesConfigController.class);
 
     @Autowired
-    private ServicesDefinition servicesDefinition;
-
-    @Autowired
     private ServicesConfigService servicesConfigService;
+
+    /* For tests */
+    void setServicesConfigService(ServicesConfigService servicesConfigService) {
+        this.servicesConfigService = servicesConfigService;
+    }
 
     @GetMapping("/load-services-config")
     @ResponseBody
