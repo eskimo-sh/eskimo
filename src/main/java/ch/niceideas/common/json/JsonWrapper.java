@@ -82,13 +82,7 @@ public class JsonWrapper implements Serializable {
      */
     public JsonWrapper(String jsonString)  {
         super();
-
-        try {
-            json = new JSONObject(jsonString);
-        } catch (JSONException e) {
-            logger.error(e, e);
-            throw new JSONException (e.getMessage(), e);
-        }
+        json = new JSONObject(jsonString);
     }
 
     private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
@@ -215,44 +209,31 @@ public class JsonWrapper implements Serializable {
         for (i = 0; i < splittedPath.length - 1; i++) {
             String nextPath = splittedPath[i];
 
-            try {
+            if (current == null) {
+                current = createMissingCurrent(parent, parentPath, nextPath);
+            }
 
-                if (current == null) {
-                    current = createMissingCurrent(parent, parentPath, nextPath);
-                }
+            parent = current;
 
-                parent = current;
+            if (current instanceof JSONArray) {
 
-                if (current instanceof JSONArray) {
+                current = setValueJSONArray(path, current, nextPath);
 
-                    current = setValueJSONArray(path, current, nextPath);
+            } else if (current instanceof JSONObject) {
 
-                } else if (current instanceof JSONObject) {
-
-                    current = setValueJSONObject(path, current, nextPath);
-
-                }
-
-            } catch (JSONException e) {
-                logger.error(e, e);
-                throw new JSONException (e.getMessage(), e);
+                current = setValueJSONObject(path, current, nextPath);
             }
 
             parentPath = nextPath;
         }
 
-        try {
-            // I know current now points on the parent of the node I have to overwrite
-            // Condition : current has not to be null !!
-            String lastPath = splittedPath[splittedPath.length - 1];
-            if (current == null) {
-                current = createMissingCurrent(parent, parentPath, lastPath);
-            }
-            setValueOnPath(value, current, lastPath);
-        } catch (JSONException e) {
-            logger.error(e, e);
-            throw new JSONException (e.getMessage(), e);
+        // I know current now points on the parent of the node I have to overwrite
+        // Condition : current has not to be null !!
+        String lastPath = splittedPath[splittedPath.length - 1];
+        if (current == null) {
+            current = createMissingCurrent(parent, parentPath, lastPath);
         }
+        setValueOnPath(value, current, lastPath);
     }
 
     private Object setValueJSONObject(String path, Object current, String nextPath) {
@@ -333,13 +314,7 @@ public class JsonWrapper implements Serializable {
      * @ whenever anything goes wrong
      */
     public String getFormattedValue()  {
-        try {
-            return json.toString(4);
-        } catch (JSONException e) {
-            logger.error(e, e);
-            throw new JSONException (e.getMessage(), e);
-
-        }
+        return json.toString(4);
     }
 
     /**
@@ -421,12 +396,7 @@ public class JsonWrapper implements Serializable {
         for (Iterator<String> keyIt = obj.keys(); keyIt.hasNext(); ) { 
             String key = keyIt.next();
             Object keyVal;
-            try {
-                keyVal = obj.get(key);
-            } catch (JSONException e) {
-                logger.error (e, e);
-                throw new JSONException (e.getMessage(), e);
-            }
+            keyVal = obj.get(key);
             String curPrefix = !StringUtils.isEmpty(prefix) ? prefix + "." + key : key;
 
             handleValue(retMap, keyVal, curPrefix);
@@ -449,12 +419,7 @@ public class JsonWrapper implements Serializable {
              {
         for (int i = 0; i < arr.length(); i++) {
             Object keyVal;
-            try {
-                keyVal = arr.get(i);
-            } catch (JSONException e) {
-                logger.error (e, e);
-                throw new JSONException (e.getMessage(), e);
-            }
+            keyVal = arr.get(i);
             String curPrefix = !StringUtils.isEmpty(prefix) ? prefix + "." + i : "" + i;
 
             handleValue(retMap, keyVal, curPrefix);

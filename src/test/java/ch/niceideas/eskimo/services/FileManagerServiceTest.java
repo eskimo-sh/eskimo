@@ -284,6 +284,26 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
+    public void testOpenFileBinaryFile() throws Exception {
+
+        File tempFile = File.createTempFile("test", "sftp");
+        FileUtils.writeFile(tempFile, "ABCD");
+
+        getTestClient("application/binary");
+
+        sc.setConnectionManagerService(cm);
+        sc.setSshCommandService(scs);
+
+        JSONObject result = sc.openFile("localhost", tempFile.getParent(), tempFile.getName());
+
+        assertEquals ("{\n" +
+                "  \"accessible\": true,\n" +
+                "  \"fileViewable\": false,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", result.toString(2));
+    }
+
+    @Test
     public void testOpenFileTextSmallFile() throws Exception {
 
         File tempFile = File.createTempFile("test", "sftp");
@@ -326,6 +346,25 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                 "}", result.toString(2));
 
         tempFile.delete();
+    }
+
+    @Test
+    public void testCreateFile() throws Exception {
+
+        File tempFile = File.createTempFile("test", "sftp");
+
+        tempFile.delete();
+
+        sc.createFile("localhost", "/tmp/", tempFile.getName());
+
+        assertTrue(tempFile.exists());
+
+        IOException exception = assertThrows(IOException.class, () -> {
+            sc.createFile("localhost", "/", tempFile.getName());
+        });
+
+        assertTrue(exception.getMessage().contains("Permission denied"));
+
     }
 
 
