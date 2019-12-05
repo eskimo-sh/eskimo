@@ -334,7 +334,7 @@ public class SystemService {
 
             // find out if SSH connection to host can succeed
             try {
-                String ping = sshCommandService.runSSHScript(ipAddress, "echo OK", false);
+                String ping = sendPing(ipAddress);
 
                 if (ping.startsWith("OK")) {
                     liveIps.add(ipAddress);
@@ -348,6 +348,10 @@ public class SystemService {
 
         // 6. return result
         return systemStatus;
+    }
+
+    private String sendPing(String ipAddress) throws SSHCommandException {
+        return sshCommandService.runSSHScript(ipAddress, "echo OK", false);
     }
 
 
@@ -382,7 +386,7 @@ public class SystemService {
 
                 // find out if SSH connection to host can succeed
                 try {
-                    String ping = sshCommandService.runSSHScript(ipAddress, "echo OK", false);
+                    String ping = sendPing(ipAddress);
 
                     if (!ping.startsWith("OK")) {
 
@@ -693,7 +697,7 @@ public class SystemService {
             // find out if SSH connection to host can succeeed
             String ping = null;
             try {
-                ping = sshCommandService.runSSHScript(ipAddress, "echo OK", false);
+                ping = sendPing(ipAddress);
             } catch (SSHCommandException e) {
                 logger.warn(e.getMessage());
                 logger.debug(e, e);

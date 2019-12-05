@@ -423,21 +423,21 @@ public class Terminal {
     }
 
     public String dump() {
-        StringBuilder buf = new StringBuilder(scr.length);
+        StringBuilder sb = new StringBuilder(scr.length);
         for (char ch : scr)
-            buf.append((char) (ch&0xFF));
-        return buf.toString();
+            sb.append((char) (ch&0xFF));
+        return sb.toString();
     }
 
     public String dumpLatin1() {
-        StringBuilder buf = new StringBuilder(scr.length);
+        StringBuilder sb = new StringBuilder(scr.length);
         int i=0;
         for (char ch : scr) {
-            buf.append(LATEN1_TABLE.charAt((ch&0xFF)));
+            sb.append(LATEN1_TABLE.charAt((ch&0xFF)));
             if (++i%width==0)
-                buf.append('\n');
+                sb.append('\n');
         }
-        return buf.toString();
+        return sb.toString();
     }
 
     private int pack(int fg, int bg, boolean cursor) {

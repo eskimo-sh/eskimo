@@ -51,10 +51,10 @@ public class ProxyReplacement {
 
             if (StringUtils.isBlank(urlPattern) || requestURI.contains(urlPattern)) {
 
-                String source = getResolved(this.source, contextPath, prefixPath);
-                String target = getResolved(this.target, contextPath, prefixPath);
+                String effSource = getResolved(source, contextPath, prefixPath);
+                String effTarget = getResolved(target, contextPath, prefixPath);
 
-                return input.replace(source, target);
+                return input.replace(effSource, effTarget);
             }
 
         } else {
@@ -65,9 +65,9 @@ public class ProxyReplacement {
     }
 
     String getResolved(String initial, String contextPath, String prefixPath) {
-        String target = initial.replace("{PREFIX_PATH}", prefixPath);
-        target = target.replace("{CONTEXT_PATH}", contextPath);
-        return target;
+        String effective = initial.replace("{PREFIX_PATH}", prefixPath);
+        effective = effective.replace("{CONTEXT_PATH}", contextPath);
+        return effective;
     }
 
 

@@ -39,7 +39,7 @@ public class Pair<K, V> {
     /**
      * Key of this <code>Pair</code>.
      */
-    private final K key;
+    private K key;
 
     /**
      * Gets the key for this pair.
@@ -50,13 +50,15 @@ public class Pair<K, V> {
     /**
      * Value of this this <code>Pair</code>.
      */
-    private final V value;
+    private V value;
 
     /**
      * Gets the value for this pair.
      * @return value for this pair
      */
     public V getValue() { return value; }
+
+    public Pair() {}
 
     /**
      * Creates a new pair

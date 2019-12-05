@@ -58,6 +58,11 @@ public class TerminalController {
     @Autowired
     private TerminalService terminalService;
 
+    /* For tests */
+    void setTerminalService(TerminalService terminalService) {
+        this.terminalService = terminalService;
+    }
+
     @GetMapping("/terminal-remove")
     @ResponseBody
     public String removeTerminal(@RequestParam("session") String sessionId) {

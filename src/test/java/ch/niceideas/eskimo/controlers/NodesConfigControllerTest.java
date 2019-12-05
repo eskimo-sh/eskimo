@@ -256,21 +256,21 @@ public class NodesConfigControllerTest {
         assertTrue(sessionContent.isEmpty());
     }
 
-    private HttpSession createHttpSession(Map<String, Object> sessionContent) {
+    public static HttpSession createHttpSession(Map<String, Object> sessionContent) {
         return (HttpSession) Proxy.newProxyInstance(
-                    NodesConfigController.class.getClassLoader(),
-                    new Class[]{HttpSession.class},
-                    (proxy, method, methodArgs) -> {
-                        if (method.getName().equals("setAttribute")) {
-                            return sessionContent.put ((String)methodArgs[0], methodArgs[1]);
-                        } else if (method.getName().equals("getAttribute")) {
-                            return sessionContent.get (methodArgs[0]);
-                        } else if (method.getName().equals("removeAttribute")) {
-                            return sessionContent.remove (methodArgs[0]);
-                        } else {
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                        }
-                    });
+            NodesConfigController.class.getClassLoader(),
+            new Class[]{HttpSession.class},
+            (proxy, method, methodArgs) -> {
+                if (method.getName().equals("setAttribute")) {
+                    return sessionContent.put ((String)methodArgs[0], methodArgs[1]);
+                } else if (method.getName().equals("getAttribute")) {
+                    return sessionContent.get (methodArgs[0]);
+                } else if (method.getName().equals("removeAttribute")) {
+                    return sessionContent.remove (methodArgs[0]);
+                } else {
+                    throw new UnsupportedOperationException(
+                            "Unsupported method: " + method.getName());
+                }
+            });
     }
 }

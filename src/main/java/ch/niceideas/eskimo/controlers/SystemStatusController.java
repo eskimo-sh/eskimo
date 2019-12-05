@@ -63,8 +63,16 @@ public class SystemStatusController {
     @Autowired
     private StatusService statusService;
 
-    @Autowired
-    private NodeRangeResolver nodeRangeResolver;
+    /* For tests */
+    void setSetupService(SetupService setupService) {
+        this.setupService = setupService;
+    }
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setStatusService(StatusService statusService) {
+        this.statusService = statusService;
+    }
 
     @GetMapping("/get-last-operation-result")
     @ResponseBody

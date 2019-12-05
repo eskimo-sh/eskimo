@@ -75,10 +75,21 @@ public class SystemAdminController {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
+    /* for tests */
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setServicesDefinition(ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
+    }
+    void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
+        this.nodeRangeResolver = nodeRangeResolver;
+    }
+
     @GetMapping("/interupt-processing")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String interuptProcessing() {
+    public String interruptProcessing() {
 
         try {
             systemService.interruptProcessing();
@@ -94,7 +105,7 @@ public class SystemAdminController {
         }
     }
 
-    public String performOperation(Operation operation, String message) {
+    private String performOperation(Operation operation, String message) {
 
         try {
             operation.performOperation(systemService);
@@ -194,7 +205,7 @@ public class SystemAdminController {
         }
     }
 
-    private static interface Operation {
+    private interface Operation {
 
         void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException;
     }

@@ -253,7 +253,7 @@ public class FileManagerService {
 
         } catch (IOException | SSHCommandException | ConnectionManagerException ex) {
             logger.error("Download error. Filename was " + file, ex);
-            throw new FileDownloadException("IOError writing file to output stream");
+            throw new FileDownloadException("Download error. Filename was " + file, ex);
         }
     }
 
@@ -270,7 +270,7 @@ public class FileManagerService {
 
         } catch (ConnectionManagerException ex) {
             logger.error("Error deleting path. Error was " + file, ex);
-            throw new IOException("IOError writing file to output stream", ex);
+            throw new IOException("Error deleting path. Error was " + file, ex);
         }
     }
 
@@ -289,7 +289,7 @@ public class FileManagerService {
 
         } catch (ConnectionManagerException ex) {
             logger.error("Upload error. Filename was " + name, ex);
-            throw new IOException("IOError writing file to output stream", ex);
+            throw new IOException("Upload error. Filename was " + name, ex);
 
         } finally {
             if (client != null) {
@@ -309,7 +309,7 @@ public class FileManagerService {
 
         } catch (ConnectionManagerException ex) {
             logger.error("Error writing file to output stream. Filename path " + fullPath, ex);
-            throw new IOException("IOError writing file to output stream", ex);
+            throw new IOException("Error writing file to output stream. Filename path " + fullPath, ex);
         }
     }
 
@@ -408,6 +408,10 @@ public class FileManagerService {
     public static class FileDownloadException extends RuntimeException {
 
         static final long serialVersionUID = -3117632123352229248L;
+
+        FileDownloadException(String message, Throwable cause) {
+            super(message, cause);
+        }
 
         FileDownloadException(String message) {
             super(message);

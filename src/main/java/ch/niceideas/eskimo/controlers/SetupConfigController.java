@@ -70,6 +70,14 @@ public class SetupConfigController {
     @Autowired
     private SystemService systemService;
 
+    /* For tests */
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setSetupService(SetupService setupService) {
+        this.setupService = setupService;
+    }
+
 
     @GetMapping("/load-setup")
     @ResponseBody

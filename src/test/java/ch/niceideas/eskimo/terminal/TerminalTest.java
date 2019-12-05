@@ -2,8 +2,12 @@ package ch.niceideas.eskimo.terminal;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import org.apache.tomcat.util.security.MD5Encoder;
+import org.bouncycastle.crypto.digests.MD5Digest;
 import org.junit.Test;
+import sun.security.provider.MD5;
 
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static junit.framework.TestCase.assertEquals;
@@ -18,6 +22,43 @@ public class TerminalTest {
         Terminal term = new Terminal(80, 24);
         ScreenImage si = term.dumpHtml(false, 0);
         assertEquals(emptyScreen, si.screen);
+    }
+
+    @Test
+    public void testDump() throws Exception {
+        Terminal term = new Terminal(80, 24);
+        term.write("A");
+        assertEquals (1920, term.dump().length());
+    }
+
+    @Test
+    public void testDumpLatin1() throws Exception {
+        Terminal term = new Terminal(80, 24);
+        term.write("A");
+        assertEquals("A                                                                               \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n" +
+                "                                                                                \n", term.dumpLatin1());
     }
 
     @Test
