@@ -551,4 +551,25 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "OK" +
                 "]", ""+messagingService.getSubList(0));
     }
+
+    @Test
+    public void testInterruption() throws Exception {
+
+        // no processing pending => no interruption
+        systemService.interruptProcessing();
+
+        assertFalse(systemService.isInterrupted());
+
+        // test interruption
+        systemService.setProcessingPending();
+
+        systemService.interruptProcessing();
+
+        assertTrue(systemService.isInterrupted());
+
+        systemService.releaseProcessingPending();
+
+        // no processing anymore
+        assertFalse(systemService.isInterrupted());
+    }
 }
