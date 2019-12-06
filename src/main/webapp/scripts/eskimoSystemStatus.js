@@ -55,8 +55,6 @@ eskimo.SystemStatus = function() {
 
     var prevHidingMessageTimeout = null;
 
-    var monitoringDashboardFrameTamperTimeout = null;
-
     this.initialize = function () {
         // Initialize HTML Div from Template
         $("#inner-content-status").load("html/eskimoSystemStatus.html", function (responseTxt, statusTxt, jqXHR) {

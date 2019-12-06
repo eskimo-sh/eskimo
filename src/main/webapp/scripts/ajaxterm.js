@@ -209,10 +209,10 @@ ajaxterm.Terminal=function(id,options) {
                         // update cursor position
                         var cxs = r.getResponseHeader("Cursor-X");
                         if(cxs!=null) {
-                            var cx = new Number(cxs);
-                            var cy = new Number(r.getResponseHeader("Cursor-Y"));
-                            var sx = new Number(r.getResponseHeader("Screen-X"));
-                            var sy = new Number(r.getResponseHeader("Screen-Y"));
+                            var cx = Number(cxs);
+                            var cy = Number(r.getResponseHeader("Cursor-Y"));
+                            var sx = Number(r.getResponseHeader("Screen-X"));
+                            var sy = Number(r.getResponseHeader("Screen-Y"));
 
                             cursor.style.left=(dterm.offsetWidth*cx/sx)+"px";
                             cursor.style.top=(dterm.offsetHeight*cy/sy)+"px";

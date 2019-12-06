@@ -174,7 +174,7 @@ public class TerminalService {
 
             com.trilead.ssh2.Session innerSession = con.openSession();
 
-            innerSession.requestPTY(Session.getAjaxTerm(), sessionWidth, sessionHeight, 0, 0, null);
+            innerSession.requestPTY(Session.AJAX_TERM_NAME, sessionWidth, sessionHeight, 0, 0, null);
             innerSession.startShell();
 
             session = new Session(con, sessionWidth, sessionHeight, new SshProcessWithPty(innerSession));

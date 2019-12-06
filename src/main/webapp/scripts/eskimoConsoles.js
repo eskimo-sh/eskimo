@@ -99,7 +99,7 @@ eskimo.Consoles = function() {
                 actionOpenConsole.append($(newLi));
             }
         }
-    };
+    }
     this.showConsoles = showConsoles;
 
     function selectConsole (nodeAddress, nodeName) {
@@ -124,7 +124,7 @@ eskimo.Consoles = function() {
         consoleForNode.css("display", "inherit");
 
         $("#term_" + nodeName).focus();
-    };
+    }
     this.selectConsole = selectConsole;
 
     function showPrevTab() {

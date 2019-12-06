@@ -74,9 +74,10 @@ public class Terminal {
         abstract void handle(Terminal t, int[] args);
     }
 
-    private static final Map<Character,CsiSequence> CSI_SEQUENCE = new HashMap<Character,CsiSequence>();
+    private static final Map<Character,CsiSequence> CSI_SEQUENCE = new HashMap<>();
 
-    private static final String HTML_TABLE, LATEN1_TABLE;
+    private static final String HTML_TABLE;
+    private static final String LATIN1_TABLE;
 
     public static final String CSI_PREFIX = "csiUpper";
     public static final String CSI_LOWER_PREFIX = "csiLower";
@@ -156,14 +157,14 @@ public class Terminal {
             }
         }
         HTML_TABLE = html.toString();
-        LATEN1_TABLE = lat1.toString();
+        LATIN1_TABLE = lat1.toString();
     }
 
     private static CsiSequence buildCsiSequence(Method m) {
         return new CsiSequence(1) {
             void handle(Terminal t, int[] args) {
                 try {
-                    m.invoke(t,new Object[]{args});
+                    m.invoke(t,args);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new TerminalException(e);
                 }
@@ -193,19 +194,24 @@ public class Terminal {
     /**
      * Screen width and height.
      */
-    public final int width,height;
+    public final int width;
+    public final int height;
     /**
      * Scroll region.
      */
-    private int st,sb;
+    private int st;
+    private int sb;
     /**
      * Current cursor position.
      */
-    private int cx,cy;
+    private int cx;
+    private int cy;
     /**
      * Cursor back up position.
      */
-    private int cx_bak,cy_bak;
+    private int cxBak;
+    private int cyBak;
+
     private boolean cl;
     /**
      * Set graphics rendition. This is the value that gets stored into the higher 8 bits of {@link #scr}
@@ -216,11 +222,11 @@ public class Terminal {
     /**
      * The HTML that we returned from {@link #dumpHtml(boolean,int)} the last time.
      */
-    private String last_html;
+    private String lastHtml;
     /**
-     * The value of {@link #timestamp} when we computed {@link #last_html}
+     * The value of {@link #timestamp} when we computed {@link #lastHtml}
      */
-    private int last_html_timestamp;
+    private int lastHtmlTimestamp;
 
     /**
      * Unique counter that increases as the screen changes.
@@ -275,12 +281,12 @@ public class Terminal {
         Arrays.fill(scr,EMPTY_CH);
         st = 0;
         sb = height-1;
-        cx_bak = cx = 0;
-        cy_bak = cy = 0;
+        cxBak = cx = 0;
+        cyBak = cy = 0;
         cl = false;
         sgr = 0x700;
         showCursor = true;
-        buf = outbuf = last_html = "";
+        buf = outbuf = lastHtml = "";
         timestamp += 1000;
     }
 
@@ -433,7 +439,7 @@ public class Terminal {
         StringBuilder stringBuilder = new StringBuilder(scr.length);
         int i=0;
         for (char ch : scr) {
-            stringBuilder.append(LATEN1_TABLE.charAt((ch&0xFF)));
+            stringBuilder.append(LATIN1_TABLE.charAt((ch&0xFF)));
             if (++i%width==0)
                 stringBuilder.append('\n');
         }
@@ -497,11 +503,11 @@ public class Terminal {
         r.append("</span></pre>");
 
         String str = r.toString();
-        if(str.equals(last_html) && last_html_timestamp==clientTimestamp) {
+        if(str.equals(lastHtml) && lastHtmlTimestamp ==clientTimestamp) {
             return new ScreenImage(clientTimestamp,NO_CHANGE,this);
         } else {
-            last_html = str;
-            last_html_timestamp = timestamp;
+            lastHtml = str;
+            lastHtmlTimestamp = timestamp;
             return new ScreenImage(timestamp,str,this);
         }
     }
@@ -549,14 +555,14 @@ public class Terminal {
 
     @Esc("\u001B7")
     void saveCursor() {
-        cx_bak = cx;
-        cy_bak = cy;
+        cxBak = cx;
+        cyBak = cy;
     }
 
     @Esc("\u001B8")
     void restoreCursor() {
-        cx = cx_bak;
-        cy = cy_bak;
+        cx = cxBak;
+        cy = cyBak;
     }
 
     @Esc("\u001BM")

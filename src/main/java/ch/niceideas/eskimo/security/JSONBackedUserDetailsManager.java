@@ -79,7 +79,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
     private BCryptPasswordEncoder passwordEncoder = null;
 
-    public JSONBackedUserDetailsManager(String jsonFilePath) throws FileException, JSONException {
+    public JSONBackedUserDetailsManager(String jsonFilePath) throws FileException {
 
         this.jsonFilePath = jsonFilePath;
 

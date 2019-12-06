@@ -283,7 +283,7 @@ public class SystemService {
 
             for (Pair<String, String> nbrAndPair : nodesConfig.getNodeAdresses()) {
 
-                int nodeNbr = Integer.valueOf(nbrAndPair.getKey());
+                int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
                 String ipAddress = nbrAndPair.getValue();
                 String nodeName = ipAddress.replace(".", "-");
 
@@ -356,7 +356,7 @@ public class SystemService {
 
 
     public void applyNodesConfig(OperationsCommand command)
-            throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+            throws SystemException, ServiceDefinitionException, NodesConfigurationException {
 
         boolean success = false;
         setProcessingPending();
@@ -418,7 +418,7 @@ public class SystemService {
 
                             if (!isInterrupted() && (error.get() == null && !isInstalledOnNode("base_system", ipAddress))) {
                                 systemOperationService.applySystemOperation("Installation of Base System on " + ipAddress,
-                                        (builder) -> installEskimoBaseSystem(builder, ipAddress), null);
+                                        builder -> installEskimoBaseSystem(builder, ipAddress), null);
 
                                 flagInstalledOnNode("base_system", ipAddress);
                             }
@@ -426,12 +426,12 @@ public class SystemService {
                             // topology
                             if (!isInterrupted() && (error.get() == null)) {
                                 systemOperationService.applySystemOperation("Installation of Topology and settings on " + ipAddress,
-                                        (builder) -> installTopologyAndSettings(nodesConfig, memoryModel, ipAddress, deadIps), null);
+                                        builder -> installTopologyAndSettings(nodesConfig, memoryModel, ipAddress, deadIps), null);
                             }
 
                             if (!isInterrupted() && (error.get() == null && !isInstalledOnNode("mesos", ipAddress))) {
                                 systemOperationService.applySystemOperation("Installation of Mesos on " + ipAddress,
-                                        (builder) -> {
+                                        builder -> {
                                             uploadMesos(ipAddress);
                                             builder.append (installMesos(ipAddress));
                                         }, null);
@@ -587,37 +587,37 @@ public class SystemService {
     void restartServiceForSystem(String service, String ipAddress) throws SystemException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
-                (builder) -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
+                builder -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
                 status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
     void uninstallService(String service, String ipAddress)
-            throws SystemException, JSONException, ConnectionManagerException {
+            throws SystemException, ConnectionManagerException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
-                (builder) -> proceedWithServiceUninstallation(builder, ipAddress, service),
+                builder -> proceedWithServiceUninstallation(builder, ipAddress, service),
                 status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
     void uninstallServiceNoOp(String service, String ipAddress)
-            throws SystemException, JSONException, ConnectionManagerException {
+            throws SystemException, ConnectionManagerException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
-                (builder) -> {},
+                builder -> {},
                 status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
     void installService(String service, String ipAddress)
-            throws SystemException, JSONException {
+            throws SystemException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("installation of " + service + " on " + ipAddress,
-                (builder) -> proceedWithServiceInstallation(builder, ipAddress, service),
+                builder -> proceedWithServiceInstallation(builder, ipAddress, service),
                 status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
-    void updateAndSaveServicesInstallationStatus(StatusUpdater statusUpdater) throws FileException, JSONException, SetupException {
+    void updateAndSaveServicesInstallationStatus(StatusUpdater statusUpdater) throws FileException, SetupException {
         statusFileLock.lock();
         try {
             ServicesInstallStatusWrapper status = loadServicesInstallationStatus();
@@ -629,7 +629,7 @@ public class SystemService {
         }
     }
 
-    public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
+    public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, SetupException {
         statusFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
@@ -654,7 +654,7 @@ public class SystemService {
         }
     }
 
-    public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, JSONException, SetupException {
+    public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
         nodesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
@@ -687,7 +687,7 @@ public class SystemService {
              ServicesInstallStatusWrapper servicesInstallationStatus)
                 throws SystemException {
 
-        int nodeNbr = Integer.valueOf(nbrAndPair.getKey());
+        int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
         String ipAddress = nbrAndPair.getValue();
         String nodeName = ipAddress.replace(".", "-");
 
@@ -881,7 +881,7 @@ public class SystemService {
         return changes;
     }
 
-    void checkServiceDisappearance(SystemStatusWrapper systemStatus) throws FileException, JSONException, SetupException {
+    void checkServiceDisappearance(SystemStatusWrapper systemStatus) throws FileException, SetupException {
 
         prevStatusCheckLock.lock();
         try {
@@ -1189,7 +1189,7 @@ public class SystemService {
 
     interface PooledOperation {
         void call(Pair<String, String> operation, AtomicReference<Exception> error)
-                throws SystemException, JSONException, FileException, SetupException, ConnectionManagerException;
+                throws SystemException, FileException, SetupException, ConnectionManagerException;
     }
 
     interface ServiceOperation<V> {

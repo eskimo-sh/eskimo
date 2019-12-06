@@ -57,7 +57,7 @@ var initHoe = function() {
                 $('#theme-color > a.theme-bg').on("click", function() {
                     $('body').attr("theme-bg", $(this).attr("hoe-themebg-type"));
                 });
-            };
+            }
 			setthemebgcolor();
         },
         HandleSettings: function() {

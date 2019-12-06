@@ -250,7 +250,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
     }
 
-    String performReplacements(Service service, String requestURI, String contextPath, String prefixPath, String input) throws IOException {
+    String performReplacements(Service service, String requestURI, String contextPath, String prefixPath, String input) {
         if (service.getUiConfig().isApplyStandardProxyReplacements()) {
 
             input = input.replace("src=\"/", "src=\"/" + prefixPath + "/");

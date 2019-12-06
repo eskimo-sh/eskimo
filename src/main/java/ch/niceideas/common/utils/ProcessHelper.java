@@ -56,7 +56,7 @@ public class ProcessHelper {
         return "";
     }
 
-    public static String exec(String cmd[], boolean throwExceptions) throws ProcessHelperException {
+    public static String exec(String[] cmd, boolean throwExceptions) throws ProcessHelperException {
         try {
             Process proc = Runtime.getRuntime().exec(cmd);
             return execProc (proc, throwExceptions);

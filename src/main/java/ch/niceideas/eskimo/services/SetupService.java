@@ -453,7 +453,7 @@ public class SetupService {
     }
 
 
-    public String applySetup(JsonWrapper setupConfig) throws SetupException, JSONException {
+    public String applySetup(JsonWrapper setupConfig) throws SetupException {
 
         boolean success = false;
         systemService.setProcessingPending();
@@ -479,7 +479,7 @@ public class SetupService {
 
             JsonWrapper packagesVersion = null;
 
-            if (missingServices.size() > 0) {
+            if (!missingServices.isEmpty()) {
                 if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
 
                     for (String packageName : missingServices) {
@@ -511,7 +511,7 @@ public class SetupService {
 
             String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
 
-            if (missingMesosPackages.size() > 0) {
+            if (!missingMesosPackages.isEmpty()) {
                 if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
                     if (packagesVersion == null) {
@@ -583,7 +583,7 @@ public class SetupService {
         if (!systemService.isInterrupted()) {
             try {
                 systemOperationService.applySystemOperation("Downloading of package " + fileName,
-                        (builder) -> {
+                        builder -> {
 
                             File targetFile = new File(packageDistributionPath + "/" + fileName);
 
@@ -629,7 +629,7 @@ public class SetupService {
 
             try {
                 systemOperationService.applySystemOperation("Building of package " + image,
-                        (builder) -> {
+                        builder -> {
                             String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", packagesDevPath + "/build.sh", "-n", image});
                             try {
                                 builder.append(ProcessHelper.exec(setupScript, true));

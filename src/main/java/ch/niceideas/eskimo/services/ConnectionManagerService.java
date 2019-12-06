@@ -163,7 +163,7 @@ public class ConnectionManagerService {
         recreateTunnels(getConnectionInternal(host), host);
     }
 
-    public void dropTunnels (String host) throws ConnectionManagerException {
+    public void dropTunnels (String host) {
         Connection connection = connectionMap.get(host);
         if (connection != null) {
             dropTunnels(connection, host);

@@ -37,8 +37,6 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
-import ch.niceideas.eskimo.services.SystemService;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -71,11 +69,8 @@ public class SetupCommand implements Serializable {
 
         setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
 
-        SetupCommand retCommand = new SetupCommand(rawSetup, setupService.getPackagesDownloadUrlRoot(),
+        return new SetupCommand(rawSetup, setupService.getPackagesDownloadUrlRoot(),
                 downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
-
-        return retCommand;
-
     }
 
     SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl,

@@ -54,6 +54,8 @@ public final class Session extends Thread {
 
     private static final Logger logger = Logger.getLogger(Session.class);
 
+    public static final String AJAX_TERM_NAME = "linux";
+
     private final Connection connection;
 
     private final ProcessWithPty childProcess;
@@ -196,13 +198,5 @@ public final class Session extends Thread {
         return connection;
     }
 
-    /**
-     * Name of the terminal ajaxterm.js is implmenting.
-     *
-     * A static method instead of a constant to avoid compile-time bake-in to the client code.
-     */
-    public static String getAjaxTerm() {
-        return "linux";
-    }
 
 }
