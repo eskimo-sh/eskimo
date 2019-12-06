@@ -55,7 +55,7 @@ public class EskimoSetupTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoSetup = new eskimo.Setup();");
 
-        waitForElementIdinDOM("setup-warning");
+        waitForElementIdInDOM("setup-warning");
     }
 
     @Test

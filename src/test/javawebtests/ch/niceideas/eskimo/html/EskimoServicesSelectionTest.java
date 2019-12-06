@@ -58,7 +58,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection();");
 
-        waitForElementIdinDOM("select-all-services-button");
+        waitForElementIdInDOM("select-all-services-button");
 
         URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
 

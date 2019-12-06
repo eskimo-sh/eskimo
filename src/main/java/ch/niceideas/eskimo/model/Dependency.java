@@ -34,14 +34,11 @@
 
 package ch.niceideas.eskimo.model;
 
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 public class Dependency {
-
-    //private static final Logger logger = Logger.getLogger(Dependency.class);
 
     private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
     private String masterService = null;

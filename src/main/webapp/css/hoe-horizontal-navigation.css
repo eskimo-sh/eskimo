@@ -94,17 +94,15 @@ body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"
 body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
   display: none;
   list-style: outside none none;
+
+  width: 156px;
+  position:absolute;
 }
 body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu  li.hoe-has-menu > ul.hoe-sub-menu {
   display: none;
   list-style: outside none none;
 }
-body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
-  display: none;
-  list-style: outside none none;
-  width: 156px;
-  position:absolute;
-}
+
 body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu > ul.hoe-sub-menu {
   left: 156px;
   position: absolute;
@@ -130,11 +128,11 @@ body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"
   display: block !important;
 }
 body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu:hover > ul.hoe-sub-menu, 
-body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu:hover > ul.hoe-sub-menu{
+body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu:focus > ul.hoe-sub-menu{
   display: block !important;
 }
 body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu:hover > ul.hoe-sub-menu, 
-body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"]#hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu:hover > ul.hoe-sub-menu{
+body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu:focus > ul.hoe-sub-menu{
   display: block !important;
 }
 body[hoe-navigation-type="horizontal"] #hoeapp-wrapper[hoe-device-type="desktop"] #hoeapp-container  #hoe-left-panel .panel-list > li.active > a {

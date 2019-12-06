@@ -43,8 +43,6 @@ import java.util.stream.Collectors;
 
 public class Service {
 
-    //private static final Logger logger = Logger.getLogger(Service.class);
-
     private String name;
 
     private final List<Dependency> dependencies = new ArrayList<>();

@@ -106,7 +106,6 @@ public class NodesConfigurationChecker {
 
         // foolproof bug check : make sure all ids are within node count
         for (String key : nodesConfig.keySet()) {
-            //var re = /([a-zA-Z\-_]+)([0-9]+)/;
 
             Matcher matcher = re.matcher(key);
 

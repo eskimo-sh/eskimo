@@ -331,11 +331,10 @@ public class SetupService {
                     if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) > 0) {
                         lastVersionFile = imageFile;
                         lastFileVersion = imageVersion;
-                    } else if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) == 0) {
-                        if (imageVersion.getValue().compareTo(lastFileVersion.getValue()) > 0) {
-                            lastVersionFile = imageFile;
-                            lastFileVersion = imageVersion;
-                        }
+                    } else if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) == 0
+                            && imageVersion.getValue().compareTo(lastFileVersion.getValue()) > 0) {
+                        lastVersionFile = imageFile;
+                        lastFileVersion = imageVersion;
                     }
                 }
             }
@@ -631,7 +630,7 @@ public class SetupService {
             try {
                 systemOperationService.applySystemOperation("Building of package " + image,
                         (builder) -> {
-                            String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", packagesDevPath + "/build.sh", "-n", image});//, dependencies);
+                            String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", packagesDevPath + "/build.sh", "-n", image});
                             try {
                                 builder.append(ProcessHelper.exec(setupScript, true));
                             } catch (ProcessHelper.ProcessHelperException e) {

@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.model;
 
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -42,8 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class UIConfig {
-
-    //private static final Logger logger = Logger.getLogger(UIConfig.class);
 
     private final Service service;
 

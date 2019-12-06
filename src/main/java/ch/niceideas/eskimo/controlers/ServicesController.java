@@ -53,8 +53,6 @@ import java.util.Map;
 @Controller
 public class ServicesController {
 
-    private static final Logger logger = Logger.getLogger(ServicesController.class);
-
     @Resource
     private ServicesDefinition servicesDefinition;
 

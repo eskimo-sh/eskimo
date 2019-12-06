@@ -2,16 +2,13 @@ package ch.niceideas.common.utils;
 
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
-public class UnboundList<T> implements List<T> {
+public class UnboundList<T> extends AbstractWrappingList<T> implements List<T> {
 
     private static final Logger logger = Logger.getLogger(UnboundList.class);
 
-    public static final String ERROR_TO_BE_IMPLEMENTED = "To Be Implemented";
+    private static final String ERROR_TO_BE_IMPLEMENTED = "To Be Implemented";
 
     private final int maxSize;
 
@@ -22,6 +19,7 @@ public class UnboundList<T> implements List<T> {
     public UnboundList(int maxSize) {
         this.maxSize = maxSize;
         buffer = new FixedSizeList<>(maxSize);
+        setUnderlying (buffer);
     }
 
     @Override
@@ -98,11 +96,6 @@ public class UnboundList<T> implements List<T> {
     }
 
     @Override
-    public boolean contains(Object o) {
-        return buffer.contains(o);
-    }
-
-    @Override
     public void clear() {
         buffer.clear();
         virtualSize = 0;
@@ -123,21 +116,6 @@ public class UnboundList<T> implements List<T> {
         return retValue;
     }
 
-    @Override
-    public Iterator<T> iterator() {
-        return buffer.iterator();
-    }
-
-    @Override
-    public Object[] toArray() {
-        return buffer.toArray();
-    }
-
-    @Override
-    public <T1> T1[] toArray(T1[] a) {
-        return buffer.toArray(a);
-    }
-
     // unimplemented mehtod
 
     @Override
@@ -151,43 +129,7 @@ public class UnboundList<T> implements List<T> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
-    @Override
     public boolean addAll(int index, Collection<? extends T> c) {
         throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
     }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
-    @Override
-    public int indexOf(Object o) {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
-    @Override
-    public ListIterator<T> listIterator() {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
-    @Override
-    public ListIterator<T> listIterator(int index) {
-        throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
-    }
-
 }

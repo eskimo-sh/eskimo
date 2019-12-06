@@ -41,8 +41,6 @@ import java.util.regex.Pattern;
 
 public class SystemStatusParser {
 
-    //private static final Logger logger = Logger.getLogger(SystemStatusParser.class);
-
     /**
      * Debug with
      *

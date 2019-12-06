@@ -449,7 +449,7 @@ eskimo.FileManagers = function() {
     };
 
     function submitFormFileUpload (e, nodeName, nodeAddress) {
-        $("#file-manager-upload-form-"+nodeName).on('submit',(function(e) {
+        $("#file-manager-upload-form-"+nodeName).on('submit',(function(event) {
 
             // reset modal
             $('#file-upload-progress-bar').attr('aria-valuenow', "1%").css('width', "1%");
@@ -473,7 +473,7 @@ eskimo.FileManagers = function() {
                 }
             };
 
-            e.preventDefault();
+            event.preventDefault();
             $.ajax({
                 url: "file-manager-upload?address=" + nodeAddress+ "&nodeName=" + nodeName,
                 xhr: function () {

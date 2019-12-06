@@ -39,9 +39,6 @@ eskimo.SetupCommand = function() {
 
     var that = this;
 
-    // constants
-    var MESSAGES_POLLING_STOP_DELAY = 10000;
-
     this.initialize = function() {
         // Initialize HTML Div from Template
         $("#setup-command-modal-wrapper").load("html/eskimoSetupCommand.html", function (responseTxt, statusTxt, jqXHR) {

@@ -194,7 +194,7 @@ public class SystemAdminController {
                     servicesDefinition, nodeRangeResolver, newServicesInstallationStatus, nodesConfig);
 
             return performOperation(
-                    systemService -> systemService.applyNodesConfig (operationsCommand),
+                    sysService -> sysService.applyNodesConfig (operationsCommand),
                     service + " has been reinstalled successfuly on " + address  + ".");
 
         } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {

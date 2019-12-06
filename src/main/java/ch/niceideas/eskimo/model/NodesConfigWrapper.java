@@ -136,7 +136,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                     try {
                         retList.add(new Pair<>(key.substring(ACTION_ID_FIELD.length()), (String) getValueForPath(key)));
                     } catch (JSONException e) {
-                        throw new RuntimeException();
+                        throw new NodesConfigWrapperException(e);
                     }
                 });
 
@@ -184,12 +184,13 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
         boolean shall = false;
 
-        // First case : unique service
-        if (getValueForPath(service) != null && getValueForPath(service).equals("" + nodeNbr)) {
-            shall = true;
-        }
-        // second case multiple service
-        else if (getValueForPath(service + nodeNbr) != null && getValueForPath(service + nodeNbr).equals("on")) {
+
+        if (
+            // First case : unique service
+            (getValueForPath(service) != null && getValueForPath(service).equals("" + nodeNbr))
+            ||
+            // second case multiple service
+            (getValueForPath(service + nodeNbr) != null && getValueForPath(service + nodeNbr).equals("on"))) {
             shall = true;
         }
 
@@ -224,5 +225,13 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                 .map(result -> result.getValue() == null ? -1 : result.getValue())
                 .filter (value -> value != -1)
                 .collect(Collectors.toList());
+    }
+
+    private static final class NodesConfigWrapperException extends RuntimeException {
+
+        public NodesConfigWrapperException (Throwable cause) {
+            super (cause);
+        }
+
     }
 }

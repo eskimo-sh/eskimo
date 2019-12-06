@@ -317,10 +317,10 @@ public class Topology {
 
         for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
             String otherIp = nodesConfig.getNodeAddress(candidateNbr);
-            if (!existingMasters.contains(otherIp) && !deadIps.contains(otherIp)) {
-                if (candidateNbr < nodeNbr) {
-                    nodeNbr = candidateNbr;
-                }
+            if (!existingMasters.contains(otherIp)
+                    && !deadIps.contains(otherIp)
+                    && (candidateNbr < nodeNbr)) {
+                nodeNbr = candidateNbr;
             }
         }
 

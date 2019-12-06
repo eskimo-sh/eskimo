@@ -59,7 +59,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers();");
 
-        waitForElementIdinDOM("file-managers-file-manager-content");
+        waitForElementIdInDOM("file-managers-file-manager-content");
 
         page.executeJavaScript("var openedFileManagers = [];");
         page.executeJavaScript("eskimoFileManagers.setOpenedFileManagers(openedFileManagers);");

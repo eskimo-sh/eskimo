@@ -41,8 +41,6 @@ eskimo.Setup = function() {
     var that = this;
 
     // constants
-    var MESSAGES_POLLING_STOP_DELAY = 10000;
-
     var MESSAGE_SHOW_DURATION = 10000;
 
     // Initialize HTML Div from Template
@@ -83,13 +81,12 @@ eskimo.Setup = function() {
 
                     var reader = new FileReader();
 
-
                     reader.onload = function () {
                         $("#content-ssh-key").val(reader.result);
                     };
 
                     // Read in the image file as a data URL.
-                    reader.readAsText($(this).get(0).files[0]);
+                    reader.readAsText(files[0]);
                 });
 
 

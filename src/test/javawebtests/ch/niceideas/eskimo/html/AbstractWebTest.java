@@ -112,7 +112,7 @@ public abstract class AbstractWebTest {
         webClient.close();
     }
 
-    protected void waitForElementIdinDOM(String elementId) throws InterruptedException {
+    protected void waitForElementIdInDOM(String elementId) throws InterruptedException {
         int attempt = 0;
         while (page.getElementById(elementId) == null && attempt < 10) {
             Thread.sleep(500);

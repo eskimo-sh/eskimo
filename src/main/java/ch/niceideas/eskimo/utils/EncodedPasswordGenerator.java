@@ -34,26 +34,29 @@
 
 package ch.niceideas.eskimo.utils;
 
+import org.apache.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class EncodedPasswordGenerator {
 
+    private static final Logger logger = Logger.getLogger(EncodedPasswordGenerator.class);
+
     public static void main (String[] args) {
 
         if (args.length == 0) {
-            System.err.println ("Expected password to encode as first argument");
+            logger.error ("Expected password to encode as first argument");
             System.exit (-1);
         }
 
         if (args[0] == null || args[0].length() == 0) {
-            System.err.println ("Expected password to encode as first argument");
+            logger.error ("Expected password to encode as first argument");
             System.exit (-2);
         }
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(11);
 
-        System.out.println ("Encoded password is : ");
-        System.out.println (passwordEncoder.encode(args[0]));
+        logger.info ("Encoded password is : ");
+        logger.info (passwordEncoder.encode(args[0]));
 
     }
 }

@@ -48,9 +48,7 @@ Software.
 /*************************************/
 
 /* ********** Default Theme Style************* */
-body,html {
 
-}
 body{position:relative;}
 #hoeapp-wrapper a:focus {
     outline: none;
@@ -241,8 +239,6 @@ body{position:relative;}
     border-top: 1px solid #efefef;
     font-weight: bold;
 }
-#hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
-  list-style: none;}
 
 #hoe-left-panel .nav-level:first-child {
     border-top: 0px solid #efefef;
@@ -336,6 +332,7 @@ body{position:relative;}
 }
 #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
     display: none;
+    list-style: none;
 }
 #hoe-left-panel .panel-list li.hoe-has-menu > ul.hoe-sub-menu li > a:hover,
 #hoe-left-panel .panel-list li.hoe-has-menu > ul.hoe-sub-menu li > a:focus {
@@ -377,11 +374,7 @@ body{position:relative;}
 
   list-style: outside none none;
 }
-#hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
 
-  list-style: outside none none;
-
-}
 #hoe-left-panel .panel-list > li.hoe-has-menu > ul > li.hoe-has-menu > ul > li > a span.menu-text {
     padding-left: 25px;
     position: relative;
@@ -401,14 +394,6 @@ body{position:relative;}
     position: relative;
     float: left;
     left: 4px;
-}
-#hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu > ul.hoe-sub-menu > li > a span.menu-text:before {
-    font-family: FontAwesome;
-    content: "\f0da";
-    font-size: 12px;
-    position: relative;
-    float: left;
-    left: 15px;
 }
 #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu > li.hoe-has-menu > ul.hoe-sub-menu > li > a span.menu-text:before {
     font-family: FontAwesome;
@@ -497,13 +482,12 @@ body{position:relative;}
 }
 .hoe-minimized-lpanel #hoe-left-panel .profile-box {
     border-bottom: 0px solid #efefef;
+    padding: 5px;
 }
 .hoe-minimized-lpanel #hoe-left-panel .media-body {
     display: none;
 }
-.hoe-minimized-lpanel #hoe-left-panel .profile-box {
-    padding: 5px;
-}
+
 .hoe-minimized-lpanel #hoe-left-panel .nav-level {
     display: none;
 }
@@ -532,10 +516,6 @@ body{position:relative;}
     position: relative;
     width: 230px;
     margin-bottom: -1px;
-    border-radius: 0px 4px 4px 0px;
-}
-.hoe-minimized-lpanel #hoe-left-panel .panel-list > li:hover > a,
-.hoe-minimized-lpanel #hoe-left-panel .panel-list > li:focus > a {
     border-radius: 0px 4px 4px 0px;
 }
 .hoe-minimized-lpanel #hoe-left-panel .panel-list > li.hoe-has-menu:hover > a,
@@ -590,9 +570,7 @@ body{position:relative;}
     left: 0px;
 }
 
-.hoe-minimized-lpanel #hoe-left-panel .panel-list > li.hoe-has-menu li.hoe-has-menu > a:after {
-    display: none;
-}
+
 .hoe-minimized-lpanel #hoe-left-panel .panel-list > li.hoe-has-menu li.hoe-has-menu > a:after {
     font-family: FontAwesome;
     content: "\f103";
@@ -667,12 +645,10 @@ body{position:relative;}
 	position: relative;
 	z-index: 999;
 	top: 50px;
+    margin-left: 0px;
 }
-#hoeapp-wrapper[hoe-device-type="phone"].hoe-hide-lpanel #hoe-left-panel {display:none;}
+
 #hoeapp-wrapper[hoe-device-type="phone"].hoe-hide-lpanel .hoe-right-header {
-  margin-left: 0px;
-}
-#hoeapp-wrapper[hoe-device-type="phone"] .hoe-right-header {
   margin-left: 0px;
 }
 
@@ -795,14 +771,3 @@ body[theme-layout="box-layout"] #hoeapp-wrapper[hoe-device-type="desktop"] {
 	width:96%;
 	margin:0 auto;
 }
-/*Boxed Theme Layout Style Close*/
-
-/*Theme Background Color in Start */
-body[theme-layout="box-layout"] #hoeapp-wrapper[hoe-device-type="desktop"]{
-	margin:0 auto;
-}
-
-/*Theme Background Color in Close */
-
-
-

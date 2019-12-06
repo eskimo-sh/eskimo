@@ -63,7 +63,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoSystemStatus = new eskimo.SystemStatus();");
 
-        waitForElementIdinDOM("service-status-warning");
+        waitForElementIdInDOM("service-status-warning");
 
         // set services for tests
         page.executeJavaScript("eskimoSystemStatus.setStatusServices (STATUS_SERVICES);");

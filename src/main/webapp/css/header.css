@@ -42,7 +42,7 @@ Software.
   position: absolute;
   right: 0;
 }
-.hoe-rh-mega > ul  > li{}
+
 .hoe-rheader-submenu > ul > li {
   display: block;
   width: 100%;
@@ -165,9 +165,7 @@ Software.
   background-color: #70ca63;
   background-image: none;
 }
-.hoe-right-header .hoe-rheader-submenu .dropdown-menu li.hoe-submenu-label {
 
-}
 .hoe-right-header .hoe-rheader-submenu .dropdown-menu li.hoe-submenu-label h3 {
   background: #eaedf2 none repeat scroll 0 0;
   color: #62878f;

@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
@@ -56,8 +55,6 @@ import java.util.stream.Collectors;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesDefinition implements InitializingBean {
-
-    //private static final Logger logger = Logger.getLogger(ServicesDefinition.class);
 
     @Autowired
     private SetupService setupService;

@@ -158,14 +158,11 @@ eskimo.ServicesConfig = function() {
             return;
         }
 
-        var re = /([a-zA-Z\-_]+)([0-9]*)/;
-
         if (eskimoMain.isOperationInProgress()) {
             eskimoMain.showProgressbar();
         }
 
         loadServicesConfig();
-
 
         eskimoMain.showOnlyContent("services-config");
     }

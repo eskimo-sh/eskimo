@@ -79,7 +79,7 @@ eskimo.Messaging = function() {
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",
                     url: "clear-messaging",
-                    success: function (data, status, jqXHR) {
+                    success: function (data, status, jqXHR2) {
                         lastLineMessaging = 0;
                         $("#pending-message-content").html("");
                     },
@@ -97,7 +97,7 @@ eskimo.Messaging = function() {
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",
                     url: "interupt-processing",
-                    success: function (data, status, jqXHR) {
+                    success: function (data, status, jqXHR2) {
                     },
                     error: errorHandler
                 });

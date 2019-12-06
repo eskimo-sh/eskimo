@@ -62,7 +62,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
 
-        waitForElementIdinDOM("reset-nodes-config");
+        waitForElementIdInDOM("reset-nodes-config");
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 

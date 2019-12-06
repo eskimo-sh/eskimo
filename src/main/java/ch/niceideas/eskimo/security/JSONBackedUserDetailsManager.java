@@ -128,9 +128,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
         List<Object> usersArray = new ArrayList<>();
 
-        for (String username : users.keySet()) {
-
-            MutableUser user = users.get(username);
+        for (MutableUser user: users.values()) {
 
             JSONObject userObject = new JSONObject(new HashMap<String, Object>(){{
                 put ("username", user.getUsername());

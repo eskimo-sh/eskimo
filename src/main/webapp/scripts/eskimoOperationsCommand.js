@@ -39,9 +39,6 @@ eskimo.OperationsCommand = function() {
 
     var that = this;
 
-    // constants
-    var MESSAGES_POLLING_STOP_DELAY = 10000;
-
     this.initialize = function() {
         // Initialize HTML Div from Template
         $("#operations-command-modal-wrapper").load("html/eskimoOperationsCommand.html", function (responseTxt, statusTxt, jqXHR) {

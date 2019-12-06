@@ -54,7 +54,7 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig();");
 
-        waitForElementIdinDOM("reset-services-config-btn");
+        waitForElementIdInDOM("reset-services-config-btn");
 
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
 

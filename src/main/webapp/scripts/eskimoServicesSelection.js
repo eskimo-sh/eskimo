@@ -48,36 +48,34 @@ eskimo.ServicesSelection = function() {
     this.initialize = function() {
         $("#services-selection-modal-wrapper").load("html/eskimoServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {
 
-            loadServicesConfig(statusTxt, jqXHR);
+            if (statusTxt == "success") {
+                loadServicesConfig();
+            } else if (statusTxt == "error") {
+                alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
+            }
         });
     };
 
-    function loadServicesConfig(statusTxt, jqXHR) {
-        if (statusTxt == "success") {
+    function loadServicesConfig() {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            url: "get-services-config",
+            success: function (data, status, jqXHR2) {
 
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                url: "get-services-config",
-                success: function (data, status, jqXHR) {
+                if (data.status == "OK") {
 
-                    if (data.status == "OK") {
+                    SERVICES_CONFIGURATION = data.servicesConfigurations;
 
-                        SERVICES_CONFIGURATION = data.servicesConfigurations;
+                    initModalServicesConfig();
 
-                        initModalServicesConfig();
-
-                    } else {
-                        alert(data.error);
-                    }
-                },
-                error: errorHandler
-            });
-
-        } else if (statusTxt == "error") {
-            alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
-        }
+                } else {
+                    alert(data.error);
+                }
+            },
+            error: errorHandler
+        });
     }
 
     this.setServicesConfigForTest = function (servicesConfig) {

@@ -49,8 +49,6 @@ import java.util.Set;
 
 public class SetupCommand implements Serializable {
 
-    //private static final Logger logger = Logger.getLogger(SetupCommand.class);
-
     private final JsonWrapper rawSetup;
 
     private String packageDownloadUrl;

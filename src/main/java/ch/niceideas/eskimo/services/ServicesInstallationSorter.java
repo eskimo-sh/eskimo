@@ -39,7 +39,6 @@ import ch.niceideas.eskimo.model.Dependency;
 import ch.niceideas.eskimo.model.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Service;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -51,8 +50,6 @@ import java.util.stream.Collectors;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesInstallationSorter {
-
-    //private static final Logger logger = Logger.getLogger(ServicesInstallationSorter.class);
 
     @Autowired
     private ServicesDefinition servicesDefinition;

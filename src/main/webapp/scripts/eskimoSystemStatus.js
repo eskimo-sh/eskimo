@@ -130,11 +130,11 @@ eskimo.SystemStatus = function() {
                             top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop') - $("#inner-content-status").offset().top
                         })
                         .off('click')
-                        .on('click', 'a', function (e) {
+                        .on('click', 'a', function (evt) {
                             $menu.hide();
 
                             var $invokedOn = $menu.data("invokedOn");
-                            var $selectedMenu = $(e.target);
+                            var $selectedMenu = $(evt.target);
 
                             settings.menuSelected.call(this, $invokedOn, $selectedMenu);
                         });
@@ -977,13 +977,11 @@ eskimo.SystemStatus = function() {
             var newRow = $(arrayRow);
 
             // filtering
-            if (!nodeFilter || nodeFilter == null) {
-                statusContainerTableBody.append(newRow);
-
-            } else if ((nodeFilter == "master") && nodeHasMasters) {
-                statusContainerTableBody.append(newRow);
-
-            } else if ((nodeFilter == "issues") && nodeHasIssues) {
+            if (   (!nodeFilter || nodeFilter == null)
+                ||
+                   ((nodeFilter == "master") && nodeHasMasters)
+                ||
+                   ((nodeFilter == "issues") && nodeHasIssues)) {
                 statusContainerTableBody.append(newRow);
             }
         }

@@ -57,7 +57,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
         // instantiate test object
         page.executeJavaScript("eskimoConsoles = new eskimo.Consoles();");
 
-        waitForElementIdinDOM("consoles-console-content");
+        waitForElementIdInDOM("consoles-console-content");
 
         page.executeJavaScript("var openedConsoles = [];");
         page.executeJavaScript("eskimoConsoles.setOpenedConsoles(openedConsoles);");

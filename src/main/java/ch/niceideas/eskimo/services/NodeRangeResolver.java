@@ -94,8 +94,9 @@ public class NodeRangeResolver  {
                         throw new NodesConfigurationException("Range resolves to empty address set : " + value);
                     }
 
-                    for (String generatedKey : generatedConfig.keySet()) {
-                        String generatedValue = generatedConfig.get(generatedKey);
+                    for (Map.Entry<String, String> entry: generatedConfig.entrySet()) {
+                        String generatedKey = entry.getKey();
+                        String generatedValue = entry.getValue();
 
                         if (generatedKey.startsWith(ACTION_ID_FLAG)) {
                             checkAddress(ipaddresses, generatedValue);
@@ -155,7 +156,12 @@ public class NodeRangeResolver  {
                     }
 
                     String newKey = key.endsWith(rangeNodeNbr.toString()) ? service + actualNbr : service;
-                    String newValue = key.endsWith(rangeNodeNbr.toString()) ? (key.startsWith(ACTION_ID_FLAG) ? ipAddress : value) : ""+actualNbr;
+                    String newValue;
+                    if (key.endsWith(rangeNodeNbr.toString())) {
+                        newValue = key.startsWith(ACTION_ID_FLAG) ? ipAddress : value;
+                    } else {
+                        newValue = ""+actualNbr;
+                    }
                     generatedConfig.put(newKey, newValue);
 
                     if (first) {

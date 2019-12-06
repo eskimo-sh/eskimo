@@ -98,11 +98,13 @@ public class MemoryComputer {
         Map<String, Long> memoryMap = getMemoryMap(nodesConfig, deadIps);
 
         // 2. for every node
-        for (String nodeAddress : memoryMap.keySet()) {
+        for (Map.Entry<String, Long> entry: memoryMap.entrySet()) {
 
+
+            String nodeAddress = entry.getKey();
             Map<String, Long> nodeMemoryModel = new HashMap<>();
 
-            long totalMemory = memoryMap.get(nodeAddress);
+            long totalMemory = entry.getValue();
 
             // 2..1  Compute total amount of memory shards (high = 3, medium = 2, small = 1, neglectable = 0)
             //       assume filesystem cache has to keep a high share (3) or medium share (2) => dynamical

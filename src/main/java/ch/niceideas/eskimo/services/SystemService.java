@@ -971,7 +971,6 @@ public class SystemService {
         String mesosFlavour = "mesos-" + getNodeFlavour(ipAddress);
 
         File packageDistributionDir = new File (packageDistributionPath);
-        //File[] mesosDistrib = packageDistributionDir.listFiles((dir, name) -> name.contains(flavour) && name.endsWith(".tar.gz"));
 
         String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
         File mesosDistrib = new File (packageDistributionDir, mesosFileName);
@@ -982,23 +981,21 @@ public class SystemService {
     private String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
         // Find out if debian or RHEL or SUSE
         String flavour = null;
-        if (flavour == null) {
-            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-            if (rawIsDebian.contains("debian")) {
-                flavour = "debian";
-            }
+        String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
+        if (rawIsDebian.contains("debian")) {
+            flavour = "debian";
         }
 
         if (flavour == null) {
-            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
-            if (rawIsDebian.contains("redhat")) {
+            String rawIsRedHat = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
+            if (rawIsRedHat.contains("redhat")) {
                 flavour = "redhat";
             }
         }
 
         if (flavour == null) {
-            String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
-            if (rawIsDebian.contains("suse")) {
+            String rawIsSuse = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
+            if (rawIsSuse.contains("suse")) {
                 flavour = "suse";
             }
         }

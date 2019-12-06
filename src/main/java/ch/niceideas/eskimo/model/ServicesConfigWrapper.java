@@ -38,7 +38,6 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,8 +49,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
-
-    //private static final Logger logger = Logger.getLogger(ServicesConfigWrapper.class);
 
     public ServicesConfigWrapper(File configFile) throws FileException {
         super(FileUtils.readFile(configFile));

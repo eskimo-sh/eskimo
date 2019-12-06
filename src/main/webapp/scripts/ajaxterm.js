@@ -168,7 +168,6 @@ ajaxterm.Terminal=function(id,options) {
 		if (p) {
 			debug('Pasted');
 			queue(encodeURIComponent(p));
-		} else {
 		}
 	}
 	function update() {
@@ -202,8 +201,9 @@ ajaxterm.Terminal=function(id,options) {
 							rmax=100;
 						} else {
 							rmax*=2;
-							if(rmax>1000)
+							if(rmax>1000) {
 								rmax=1000;
+                            }
 						}
 
                         // update cursor position
@@ -214,7 +214,6 @@ ajaxterm.Terminal=function(id,options) {
                             var sx = new Number(r.getResponseHeader("Screen-X"));
                             var sy = new Number(r.getResponseHeader("Screen-Y"));
 
-                            var t=dterm.firstChild;
                             cursor.style.left=(dterm.offsetWidth*cx/sx)+"px";
                             cursor.style.top=(dterm.offsetHeight*cy/sy)+"px";
                             cursor.style.display="";
@@ -267,7 +266,9 @@ ajaxterm.Terminal=function(id,options) {
         112:1, 113:1, 114:1, 115:1, 116:1, 117:1, 118:1, 119:1, 120:1, 121:1, 122:1, 123:1 // F1-F12
     };
 	function keydown(ev) {
-		if (!ev) ev=window.event;
+		if (!ev) {
+		    ev=window.event;
+        }
         if ((keyDownKeyCodes[ev.keyCode] && ev.charCode==0) || ev.ctrlKey || ev.altKey) {
             // ev.charCode!=0 implies those are keys that produce ASCII codes
             return handleKey(ev,0);
@@ -283,31 +284,44 @@ ajaxterm.Terminal=function(id,options) {
 
     // which==0 appears to be used as a signel but not sure exactly why --- Kohsuke
     function handleKey(ev,which) {
-		if (!ev) ev=window.event;
+		if (!ev) {
+            ev=window.event;
+        }
         console.log ("kp keyCode="+ev.keyCode+" which="+ev.which+" shiftKey="+ev.shiftKey+" ctrlKey="+ev.ctrlKey+" altKey="+ev.altKey);
 //		debug(s);
 //		return false;
 //		else { if (!ev.ctrlKey || ev.keyCode==17) { return; }
 		var kc;
 		var k="";
-		if (ev.keyCode)
+		if (ev.keyCode) {
 			kc=ev.keyCode;
-		if (which)
-			kc=which;
+        }
+		if (which) {
+            kc = which;
+        }
 		if (ev.altKey) {
-			if (kc>=65 && kc<=90)
-				kc+=32;
+			if (kc>=65 && kc<=90) {
+                kc += 32;
+            }
 			if (kc>=97 && kc<=122) {
 				k=String.fromCharCode(27)+String.fromCharCode(kc);
 			}
 		} else if (ev.ctrlKey) {
-			if (kc>=65 && kc<=90) k=String.fromCharCode(kc-64); // Ctrl-A..Z
-			else if (kc>=97 && kc<=122) k=String.fromCharCode(kc-96); // Ctrl-A..Z
-			else if (kc==54)  k=String.fromCharCode(30); // Ctrl-^
-			else if (kc==109) k=String.fromCharCode(31); // Ctrl-_
-			else if (kc==219) k=String.fromCharCode(27); // Ctrl-[
-			else if (kc==220) k=String.fromCharCode(28); // Ctrl-\
-			else if (kc==221) k=String.fromCharCode(29); // Ctrl-]
+			if (kc>=65 && kc<=90) {
+                k=String.fromCharCode(kc-64); // Ctrl-A..Z
+            } else if (kc>=97 && kc<=122) {
+                k=String.fromCharCode(kc-96); // Ctrl-A..Z
+            } else if (kc==54)  {
+                k=String.fromCharCode(30); // Ctrl-^
+            } else if (kc==109) {
+                k=String.fromCharCode(31); // Ctrl-_
+            } else if (kc==219) {
+                k=String.fromCharCode(27); // Ctrl-[
+            } else if (kc==220) {
+                k=String.fromCharCode(28); // Ctrl-\
+            } else if (kc==221) {
+                k=String.fromCharCode(29); // Ctrl-]
+            }
 				/*
 			else if (kc==219) k=String.fromCharCode(29); // Ctrl-]
 			else if (kc==219) k=String.fromCharCode(0);  // Ctrl-@
@@ -358,10 +372,11 @@ ajaxterm.Terminal=function(id,options) {
 				}
 			}
 		} else {
-			if (kc==8)
-				k=String.fromCharCode(127);  // Backspace
-			else
-				k=String.fromCharCode(kc);
+			if (kc==8) {
+                k = String.fromCharCode(127);  // Backspace
+            } else {
+                k = String.fromCharCode(kc);
+            }
 		}
 		if(k.length) {
 //			queue(encodeURIComponent(k));
