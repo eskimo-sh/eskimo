@@ -64,7 +64,7 @@ public class Terminal {
 
     private static final Map<Pattern,EscapeSequence> REGEXP_ESCAPE_SEQUENCES = new HashMap<>();
 
-    private static abstract class CsiSequence {
+    private abstract static class CsiSequence {
         final int arg2; // ?
 
         protected CsiSequence(int arg2) {
@@ -473,7 +473,8 @@ public class Terminal {
         for( int i=0; i< total; i++) {
             int q = scr[i]/256;
 
-            int bg,fg;
+            int bg;
+            int fg;
             if(color) {
                 bg = q/16;
                 fg = q%16;
@@ -674,7 +675,8 @@ public class Terminal {
      */
     //NOSONAR
     void csiUpperP(int[] args) {
-        int _cy=cy,_cx=cx;
+        int _cy=cy;
+        int _cx=cx;
         String end = peek(cy,cx,cy,width);
         csiUpperK(0);
         poke(_cy,_cx,end.substring(defaultsTo(args,1)));
@@ -712,22 +714,12 @@ public class Terminal {
 
     //NOSONAR
     void csiLowerH(int[] args) {
-        switch(args[0]) {
-            default:
-            case 25:
-                showCursor = true;
-                break;
-        }
+        showCursor = true;
     }
 
     //NOSONAR
     void csiLowerL(int[] args) {
-        switch(args[0]) {
-            default:
-            case 25:
-                showCursor = false;
-                break;
-        }
+        showCursor = false;
     }
 
     //NOSONAR

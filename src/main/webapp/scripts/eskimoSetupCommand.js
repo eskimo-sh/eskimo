@@ -61,7 +61,6 @@ eskimo.SetupCommand = function() {
         var commandDescription = "<b>Following Operations are about to be applied</b>";
 
         // Build of packages
-        var none = true;
         if (command.buildPackage != null && command.buildPackage.length > 0) {
 
             commandDescription += '<br><br><b>Packages are about to be built.</b>' +
@@ -75,8 +74,6 @@ eskimo.SetupCommand = function() {
             for (var i = 0; i < command.buildPackage.length; i++) {
                 commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildPackage[i] + '</b><br>';
             }
-
-            none = false;
         }
 
         // Download of packages
@@ -91,8 +88,6 @@ eskimo.SetupCommand = function() {
             for (var i = 0; i < command.downloadPackages.length; i++) {
                 commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadPackages[i] + '</b><br>';
             }
-
-            none = false;
         }
 
         // Build of mesos
@@ -109,8 +104,6 @@ eskimo.SetupCommand = function() {
             for (var i = 0; i < command.buildMesos.length; i++) {
                 commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildMesos[i] + '</b><br>';
             }
-
-            none = false;
         }
 
         // Download of mesos
@@ -125,8 +118,6 @@ eskimo.SetupCommand = function() {
             for (var i = 0; i < command.downloadMesos.length; i++) {
                 commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadMesos[i] + '</b><br>';
             }
-
-            none = false;
         }
 
         // Package Updates
@@ -139,8 +130,6 @@ eskimo.SetupCommand = function() {
             for (var i = 0; i < command.packageUpdates.length; i++) {
                 commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.packageUpdates[i] + '</b><br>';
             }
-
-            none = false;
         }
 
         $("#setup-command-body").html(commandDescription);

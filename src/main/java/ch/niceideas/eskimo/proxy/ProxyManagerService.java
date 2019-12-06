@@ -153,7 +153,7 @@ public class ProxyManagerService {
         }
     }
 
-    public void removeServerForService(String serviceName, String ipAddress) throws ConnectionManagerException {
+    public void removeServerForService(String serviceName, String ipAddress) {
 
         Service service = servicesDefinition.getService(serviceName);
         String serviceId = service.getServiceId(ipAddress);

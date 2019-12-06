@@ -85,16 +85,14 @@ public class NodesConfigurationChecker {
                         for (String otherKey : nodesConfig.keySet()) {
                             Matcher otherMatcher = re.matcher(otherKey);
 
-                            if (otherMatcher.matches()) {
-                                if (otherMatcher.groupCount() >= 1) {
+                            if (otherMatcher.matches() && otherMatcher.groupCount() >= 1) {
 
-                                    String serviceName = otherMatcher.group(1);
-                                    if (serviceName.equals(uniqueServiceName)) {
+                                String serviceName = otherMatcher.group(1);
+                                if (serviceName.equals(uniqueServiceName)) {
 
-                                        int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
-                                        if (otherNodeNbr == nodeNbr) {
-                                            throw new NodesConfigurationException("Node " + key.substring(9) + " is a range an declares service " + serviceName + " which is a unique service, hence forbidden on a range.");
-                                        }
+                                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
+                                    if (otherNodeNbr == nodeNbr) {
+                                        throw new NodesConfigurationException("Node " + key.substring(9) + " is a range an declares service " + serviceName + " which is a unique service, hence forbidden on a range.");
                                     }
                                 }
                             }
@@ -110,6 +108,7 @@ public class NodesConfigurationChecker {
             Matcher matcher = re.matcher(key);
 
             if (matcher.matches()) {
+
                 if (matcher.groupCount() >= 2 && StringUtils.isNotBlank(matcher.group(2))) {
 
                     if (!StringUtils.isNumericValue(matcher.group(2))) {
@@ -148,13 +147,11 @@ public class NodesConfigurationChecker {
                 for (String key : nodesConfig.keySet()) {
                     Matcher matcher = re.matcher(key);
 
-                    if (matcher.matches()) {
-                        if (matcher.groupCount() >= 1) {
+                    if (matcher.matches() && matcher.groupCount() >= 1) {
 
-                            String serviceName = matcher.group(1);
-                            if (serviceName.equals(mandatoryServiceName)) {
-                                foundNodes++;
-                            }
+                        String serviceName = matcher.group(1);
+                        if (serviceName.equals(mandatoryServiceName)) {
+                            foundNodes++;
                         }
                     }
                 }
@@ -186,17 +183,15 @@ public class NodesConfigurationChecker {
                             for (String otherKey : nodesConfig.keySet()) {
                                 Matcher otherMatcher = re.matcher(otherKey);
 
-                                if (otherMatcher.matches()) {
-                                    if (otherMatcher.groupCount() >= 1) {
+                                if (otherMatcher.matches() && otherMatcher.groupCount() >= 1) {
 
-                                        String otherServiceName = otherMatcher.group(1);
-                                        if (otherServiceName.equals(dependency.getMasterService())) {
+                                    String otherServiceName = otherMatcher.group(1);
+                                    if (otherServiceName.equals(dependency.getMasterService())) {
 
-                                            int otherNodeNbr = Topology.getNodeNbr(key, nodesConfig, matcher);
-                                            if (otherNodeNbr == nodeNbr) {
+                                        int otherNodeNbr = Topology.getNodeNbr(key, nodesConfig, matcher);
+                                        if (otherNodeNbr == nodeNbr) {
 
-                                                serviceFound = true;
-                                            }
+                                            serviceFound = true;
                                         }
                                     }
                                 }
@@ -219,23 +214,21 @@ public class NodesConfigurationChecker {
                             for (String otherKey : nodesConfig.keySet()) {
                                 Matcher otherMatcher = re.matcher(otherKey);
 
-                                if (otherMatcher.matches()) {
-                                    if (otherMatcher.groupCount() >= 1) {
+                                if (otherMatcher.matches() && otherMatcher.groupCount() >= 1) {
 
-                                        String otherServiceName = otherMatcher.group(1);
-                                        if (otherServiceName.equals(dependency.getMasterService())) {
+                                    String otherServiceName = otherMatcher.group(1);
+                                    if (otherServiceName.equals(dependency.getMasterService())) {
 
-                                            // RANDOM_NODE_AFTER wants a different node, I need to check IPs
-                                            if (dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
+                                        // RANDOM_NODE_AFTER wants a different node, I need to check IPs
+                                        if (dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
 
-                                                int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
-                                                if (otherNodeNbr == nodeNbr) {
-                                                    continue;
-                                                }
+                                            int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
+                                            if (otherNodeNbr == nodeNbr) {
+                                                continue;
                                             }
-
-                                            actualCount++;
                                         }
+
+                                        actualCount++;
                                     }
                                 }
                             }

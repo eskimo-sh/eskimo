@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesConfigWrapper;
 import ch.niceideas.eskimo.services.ServicesConfigService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;

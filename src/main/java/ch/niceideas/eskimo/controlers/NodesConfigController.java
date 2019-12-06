@@ -109,7 +109,7 @@ public class NodesConfigController {
         try {
             setupService.ensureSetupCompleted();
             NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
-            if (nodesConfig == null || nodesConfig.isEmpty()) { ;
+            if (nodesConfig == null || nodesConfig.isEmpty()) {
                 return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
             return nodesConfig.getFormattedValue();

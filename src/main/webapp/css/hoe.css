@@ -332,7 +332,7 @@ body{position:relative;}
 }
 #hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
     display: none;
-    list-style: none;
+    list-style: outside none none;
 }
 #hoe-left-panel .panel-list li.hoe-has-menu > ul.hoe-sub-menu li > a:hover,
 #hoe-left-panel .panel-list li.hoe-has-menu > ul.hoe-sub-menu li > a:focus {
@@ -365,10 +365,6 @@ body{position:relative;}
 #hoe-left-panel .panel-list > li.hoe-has-menu > ul > li > a span.menu-text {
     padding-left: 15px;
     position: relative;
-}
-#hoe-left-panel .panel-list > li.hoe-has-menu > ul.hoe-sub-menu {
-
-  list-style: outside none none;
 }
 #hoe-left-panel .panel-list > li.hoe-has-menu  li.hoe-has-menu > ul.hoe-sub-menu {
 

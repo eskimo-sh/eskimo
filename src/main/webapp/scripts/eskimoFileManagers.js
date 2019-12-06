@@ -51,10 +51,7 @@ eskimo.FileManagers = function() {
         // Initialize HTML Div from Template
         $("#inner-content-file-managers").load("html/eskimoFileManagers.html", function (responseTxt, statusTxt, jqXHR) {
 
-            if (statusTxt == "success") {
-
-
-            } else if (statusTxt == "error") {
+            if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
 

@@ -231,13 +231,13 @@ public class OperationsCommand implements Serializable {
     public Set<String> getAllIpAddresses() {
         Set<String> retSet = new HashSet<>();
         installations.stream()
-                .map(pair -> pair.getValue())
+                .map(Pair::getValue)
                 .forEach(retSet::add);
         uninstallations.stream()
-                .map(pair -> pair.getValue())
+                .map(Pair::getValue)
                 .forEach(retSet::add);
         restarts.stream()
-                .map(pair -> pair.getValue())
+                .map(Pair::getValue)
                 .forEach(retSet::add);
         return retSet;
     }

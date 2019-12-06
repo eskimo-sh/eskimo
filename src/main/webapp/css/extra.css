@@ -36,13 +36,13 @@ Software.
 
 body.empty-page {
     width: 100%;
-    flex-grow: 1;;
+    flex-grow: 1;
     background-color: #373a3c;
 }
 
 body.empty-page-white {
     width: 100%;
-    flex-grow: 1;;
+    flex-grow: 1;
     background-color: white;
 }
 
@@ -140,7 +140,7 @@ But it breaks  the menu entry title overlay
         opacity: 0.6;
     }
     50% {
-        opacity: 1;;
+        opacity: 1;
     }
     75% {
         opacity: 0.6;
@@ -805,7 +805,6 @@ table.system-information tr td.info-label {
     padding: 0px 10px;
     width: 100%;
 }
-/**/
 
 #theme-color a {
     border-radius: 50%;

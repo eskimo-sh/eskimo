@@ -328,11 +328,10 @@ public class SetupService {
                     lastVersionFile = imageFile;
                     lastFileVersion = imageVersion;
                 } else {
-                    if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) > 0) {
-                        lastVersionFile = imageFile;
-                        lastFileVersion = imageVersion;
-                    } else if (imageVersion.getKey().compareTo(lastFileVersion.getKey()) == 0
-                            && imageVersion.getValue().compareTo(lastFileVersion.getValue()) > 0) {
+                    if (   (imageVersion.getKey().compareTo(lastFileVersion.getKey()) > 0)
+                         ||
+                            (imageVersion.getKey().compareTo(lastFileVersion.getKey()) == 0
+                              && imageVersion.getValue().compareTo(lastFileVersion.getValue()) > 0)) {
                         lastVersionFile = imageFile;
                         lastFileVersion = imageVersion;
                     }

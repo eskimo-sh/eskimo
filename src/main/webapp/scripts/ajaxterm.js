@@ -47,7 +47,6 @@ ajaxterm.Terminal=function(id,options) {
 	var sid=""+Math.round(Math.random()*1000000000);
 	var query0="s="+sid+"&w="+width+"&h="+height;
 	var query1=query0+"&c=1&k=";
-	var buf="";
 	var timeout;
     var screenTimestamp = 0;
 	var error_timeout;
@@ -112,11 +111,7 @@ ajaxterm.Terminal=function(id,options) {
 		if (window.clipboardData) {
 			return true;
 		} else if(window.netscape) {
-			if (is_mozilla_clipboard_support() == '') {
-				return true;
-			} else {
-				return false;
-			}
+			return is_mozilla_clipboard_support() == '';
 		}
 		return false;
 	}

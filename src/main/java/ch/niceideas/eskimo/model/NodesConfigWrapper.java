@@ -58,7 +58,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     public static final String ACTION_ID_FIELD = "action_id";
 
-    public NodesConfigWrapper(File statusFile) throws FileException, JSONException {
+    public NodesConfigWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
     }
 

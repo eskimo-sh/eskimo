@@ -124,7 +124,7 @@ vagrant ssh -c "sudo zypper install -y python-devel python-six python-virtualenv
 echo " - Installing maven repository"
 vagrant ssh -c "sudo zypper addrepo https://download.opensuse.org/repositories/devel:tools:building/openSUSE_Leap_15.1/devel:tools:building.repo" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
 vagrant ssh -c "sudo zypper --no-gpg-checks --non-interactive refresh" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
-vagrant ssh -c "sudo zypper --no-gpg-checks install -y maven" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+vagrant ssh -c "sudo zypper --no-gpg-checks install -y maven-local" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing other Mesos dependencies"
 vagrant ssh -c "sudo zypper --no-gpg-checks install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1

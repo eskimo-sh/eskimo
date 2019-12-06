@@ -258,7 +258,7 @@ public class Service {
     public JSONObject getEditableConfigurationsJSON() {
 
         JSONArray configsArray = new JSONArray(getEditableConfigurations().stream()
-                .map(config -> config.toJSON())
+                .map(EditableConfiguration::toJSON)
                 .collect(Collectors.toList())
         );
 

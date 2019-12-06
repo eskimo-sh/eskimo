@@ -126,7 +126,7 @@ echo " - Installing other Mesos dependencies"
 vagrant ssh -c "sudo yum install -y  apache-maven zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel rhel-build-node" rhel-build-node  >> /tmp/build-mesos-redhat-log 2>&1
 
 echo " - Building Mesos"
-vagrant ssh -c "sudo JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64 /vagrant/buildMesosFromSources.sh" rhel-build-node
+vagrant ssh -c "sudo JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.232.b09-0.el7_7.x86_64 /vagrant/buildMesosFromSources.sh" rhel-build-node
 
 echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
 vagrant ssh -c "sudo bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" rhel-build-node  >> /tmp/build-mesos-debian-log 2>&1

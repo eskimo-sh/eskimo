@@ -72,9 +72,7 @@ public abstract class StringUtils {
 
     private StringUtils() {}
 
-    public static String getHexString(byte[] raw) 
-        throws UnsupportedEncodingException 
-    {
+    public static String getHexString(byte[] raw) {
         byte[] hex = new byte[2 * raw.length];
         int index = 0;
     

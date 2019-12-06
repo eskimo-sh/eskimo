@@ -121,7 +121,6 @@ eskimo.OperationsCommand = function() {
 
                 // OK
                 console.log(data);
-                var success = false;
 
                 if (!data || data.error) {
                     console.error(atob(data.error));

@@ -53,7 +53,7 @@ import java.util.List;
 @Controller
 public class NotificationController extends AbstractInformationController {
 
-    private static final Logger logger = Logger.getLogger(AbstractInformationController.class);
+    private static final Logger logger = Logger.getLogger(NotificationController.class);
 
     @Resource
     private NotificationService notificationService;

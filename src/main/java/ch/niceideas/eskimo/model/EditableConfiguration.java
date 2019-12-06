@@ -96,7 +96,7 @@ public class EditableConfiguration {
 
     public JSONObject toJSON() {
         JSONArray propertiesArray = new JSONArray(properties.stream()
-                .map(prop -> prop.toJSON())
+                .map(EditableProperty::toJSON)
                 .collect(Collectors.toList())
         );
         return new JSONObject(new HashMap<String, Object>() {{
