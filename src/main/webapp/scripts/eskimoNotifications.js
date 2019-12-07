@@ -170,7 +170,7 @@ eskimo.Notifications = function() {
 
             var notification = notifications[i];
 
-            if (notification.type == "error") {
+            if (notification.type == "error" || notification.type == "Error") {
 
                 notificationHTML = notificationHTML +
                     '<li>\n' +
@@ -182,7 +182,7 @@ eskimo.Notifications = function() {
                     '    </a>\n' +
                     '</li>';
 
-            } else if (notification.type == "doing") {
+            } else if (notification.type == "doing" || notification.type == "Doing") {
 
                 notificationHTML = notificationHTML +
                     '<li>\n' +
@@ -201,7 +201,7 @@ eskimo.Notifications = function() {
                     '    </a>\n' +
                     '</li>';
 
-            } else if (notification.type == "info") {
+            } else if (notification.type == "info" || notification.type == "Info") {
 
                 notificationHTML = notificationHTML +
                     '<li>\n' +
