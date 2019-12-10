@@ -1,0 +1,436 @@
+{
+  "paragraphs":[
+    {
+      "text":"%md\n\n## Spark Streaming and Kafka Integration Demo\n\n*TODO Explanation*\n\n*TODO needs \"Logstash Demo\" and \"Spark Integration ES\" Demo to have been executed before*\n\n*TODO : document how to create topics on the host*\n\n```bash\necho \" -- Creating KAFKA topic berka-payments\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho \" -- Creating KAFKA topic berka-profiled-aggregate\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n```\n\n*Note :one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper*",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:16:33+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h2>Spark Streaming and Kafka Integration Demo</h2>\n<p><em>TODO Explanation</em></p>\n<p><em>TODO needs &ldquo;Logstash Demo&rdquo; and &ldquo;Spark Integration ES&rdquo; Demo to have been executed before</em></p>\n<p><em>TODO : document how to create topics on the host</em></p>\n<pre><code class=\"language-bash\">echo &quot; -- Creating KAFKA topic berka-payments&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho &quot; -- Creating KAFKA topic berka-profiled-aggregate&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n</code></pre>\n<p><em>Note :one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper</em></p>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994158921_1992204415",
+      "id":"paragraph_1575994158921_1992204415",
+      "dateCreated":"2019-12-10T16:09:18+0000",
+      "dateStarted":"2019-12-10T19:16:33+0000",
+      "dateFinished":"2019-12-10T19:16:33+0000",
+      "status":"FINISHED",
+      "focus":true,
+      "$$hashKey":"object:383"
+    },
+    {
+      "text":"%md\n\n### A) First program : reading Data from berka-payments index and periodically sending it to kafka\n\n*TODO Explanation*\n\n*TODO replace zookeeper server* ",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:39:08+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h3>A) First program : reading Data from berka-payments index and periodically sending it to kafka</h3>\n<p><em>TODO Explanation</em></p>\n<p><em>TODO replace zookeeper server</em></p>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994130002_-702893878",
+      "id":"paragraph_1575994130002_-702893878",
+      "dateCreated":"2019-12-10T16:08:50+0000",
+      "dateStarted":"2019-12-10T19:39:08+0000",
+      "dateFinished":"2019-12-10T19:39:08+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:384"
+    },
+    {
+      "text":"%python\n\nfrom elasticsearch import Elasticsearch\nimport time, requests, json, sys\nfrom kafka import KafkaProducer\nfrom kafka.errors import KafkaError\n\n\ndef publish_message(producer_instance, topic_name, key, value):\n    try:\n        key_bytes = key.encode ('utf-8')\n        value_bytes = value.encode ('utf-8')\n        #print('sending')\n        producer_instance.send(topic_name, key=key_bytes, value=value_bytes)\n        #print('flushing')\n        producer_instance.flush()\n        #print('Message published successfully.')\n    except Exception as ex:\n        print('Exception in publishing message')\n        print ex  \n        sys.exit (-1);\n\n\ndef connect_kafka_producer():\n    _producer = None\n    try:\n        _producer = KafkaProducer(bootstrap_servers=[\"192.168.10.13:9092\"], api_version=(0, 10, 1))\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _producer\n\nes = Elasticsearch([{'host': 'localhost', 'port': 9200}])\n\nkafka_producer = connect_kafka_producer()\n\n\n\nres = es.search(index=\"berka-payments\", body={\"query\": {\"match_all\": {}}}, scroll='15m', search_type='query_then_fetch', size=10000)\n\nprint(\"%d documents found - %d fetchable\" % (res['hits']['total'], len(res['hits']['hits'])) )\n\nsid = res['_scroll_id']\nscroll_size = res['hits']['total']\n\ncounter = 0\nprint (\"Sending payments to kafka ...\")\n\n# Start scrolling\nwhile (scroll_size > 0):\n\n    page = es.scroll(scroll_id=sid, scroll='2m')\n\n    # Update the scroll ID\n    sid = page['_scroll_id']\n\n    # Get the number of results that we returned in the last scroll\n    scroll_size = len(page['hits']['hits'])\n\n    for cur in page[\"hits\"][\"hits\"]:\n        data = cur[\"_source\"]\n\n        publish_message(kafka_producer, 'berka-payments', data['trans_id'], json.dumps(data))\n\n        #print(\"(%s) - %s\" % (data['trans_id'], json.dumps(data)))\n\n        if counter % 10 == 0: \n            print (\"Sent %d payments. waiting 2 seconds\" % counter)\n            time.sleep(2) \n\n        counter = counter + 1 \n        \n\n\nif kafka_producer is not None:\n    kafka_producer.close()\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:39:19+0000",
+      "config":{
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"ERROR",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"208283 documents found - 10000 fetchable\nSending payments to kafka ...\nSent 0 payments. waiting 2 seconds\n"
+          },
+          {
+            "type":"TEXT",
+            "data":"Fail to execute line 69:             time.sleep(2) \nTraceback (most recent call last):\n  File \"/tmp/1575996844223-0/zeppelin_python.py\", line 153, in <module>\n    exec(code, _zcUserQueryNameSpace)\n  File \"<stdin>\", line 69, in <module>\nKeyboardInterrupt\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994097569_-232881020",
+      "id":"paragraph_1575994097569_-232881020",
+      "dateCreated":"2019-12-10T16:08:17+0000",
+      "dateStarted":"2019-12-10T19:39:19+0000",
+      "dateFinished":"2019-12-10T19:42:52+0000",
+      "status":"ERROR",
+      "$$hashKey":"object:385"
+    },
+    {
+      "text":"%md\n\n### B) Reading result from kafka and dumping it on the console \n\n*TODO : Explanation*\n\n*TODO : replace localhost:9092 by our kafka broker address*\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T16:54:56+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h3>B) Reading result from kafka and dumping it on the console</h3>\n<p><em>TODO : Explanation</em></p>\n<p><em>TODO : replace localhost:9092 by our kafka broker address</em></p>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994301932_1832333687",
+      "id":"paragraph_1575994301932_1832333687",
+      "dateCreated":"2019-12-10T16:11:41+0000",
+      "dateStarted":"2019-12-10T16:54:56+0000",
+      "dateFinished":"2019-12-10T16:54:56+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:386"
+    },
+    {
+      "text":"%python\n\n\nimport json, sys, pickle, os.path, time, threading\nfrom threading import Thread, Lock\nfrom Queue import Queue, Empty\nfrom kafka import KafkaConsumer, KafkaProducer\nfrom filelock import FileLock\n\n\n# Define handle event function\ndef handleEvent(event):\n\n    output = json.dumps (event)\n    sys.stdout.write(output+\"\\n\")\n\n    sys.stdout.write(\"trans_id: {} - handling period (s): {}\\n\".format(event[\"trans_id\"], (output_timestamp - input_timestamp)))\n\n# Process input lines\n#for line in sys.stdin:\nconsumer = KafkaConsumer(bootstrap_servers='192.168.10.13:9092',\n                         auto_offset_reset='latest',\n                         consumer_timeout_ms=3600000)\nconsumer.subscribe(['berka-payments-aggregate'])\nfor message in consumer:\n    receive_time = time.time();\n    event = json.loads (message.value)\n    #print (event)\n    event[\"topic_timestamp\"] = receive_time;\n    handleEvent (event)\n\n# forcing flush in the end\nsys.stdout.flush()\n\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:39:42+0000",
+      "config":{
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"ERROR",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"Fail to execute line 22: for message in consumer:\nTraceback (most recent call last):\n  File \"/tmp/1575996844223-0/zeppelin_python.py\", line 153, in <module>\n    exec(code, _zcUserQueryNameSpace)\n  File \"<stdin>\", line 22, in <module>\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/vendor/six.py\", line 570, in next\n    return type(self).__next__(self)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/consumer/group.py\", line 1181, in __next__\n    return self.next_v2()\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/consumer/group.py\", line 1189, in next_v2\n    return next(self._iterator)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/consumer/group.py\", line 1106, in _message_generator_v2\n    record_map = self.poll(timeout_ms=timeout_ms, update_offsets=False)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/consumer/group.py\", line 645, in poll\n    records = self._poll_once(remaining, max_records, update_offsets=update_offsets)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/consumer/group.py\", line 692, in _poll_once\n    self._client.poll(timeout_ms=timeout_ms)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/client_async.py\", line 598, in poll\n    self._poll(timeout / 1000)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/client_async.py\", line 630, in _poll\n    ready = self._selector.select(timeout)\n  File \"/usr/local/lib/python2.7/dist-packages/kafka/vendor/selectors34.py\", line 466, in select\n    fd_event_list = self._epoll.poll(timeout, max_ev)\nKeyboardInterrupt\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994336780_1490271990",
+      "id":"paragraph_1575994336780_1490271990",
+      "dateCreated":"2019-12-10T16:12:16+0000",
+      "dateStarted":"2019-12-10T19:37:57+0000",
+      "dateFinished":"2019-12-10T19:39:30+0000",
+      "status":"ABORT",
+      "$$hashKey":"object:387"
+    },
+    {
+      "text":"%md\n\n### C) Spark Streaming Program : reading from kafka, computing aggregate and sending result to kafka\n\n*TODO : Explanation*\n\n*TODO : replace kafla URls by actual nodes*\n\n*TODO : monitor process in SSH terminal -> zeppelin node -> /var/log/zeppelin/...spark....*\n\n*TODO : CAUTION - SPARK STREAMING PROGRAM IS NOT PROPERLY TERMINATED BY ZEPPELIN !!! ONE NEEDS TO KIL THE FRAMEWORK IN MESOS !!! Use mesos-cli.sh*",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:46:35+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h3>C) Spark Streaming Program : reading from kafka, computing aggregate and sending result to kafka</h3>\n<p><em>TODO : Explanation</em></p>\n<p><em>TODO : replace kafla URls by actual nodes</em></p>\n<p><em>TODO : monitor process in SSH terminal -&gt; zeppelin node -&gt; /var/log/zeppelin/&hellip;spark&hellip;.</em></p>\n<p><em>TODO : CAUTION - SPARK STREAMING PROGRAM IS NOT PROPERLY TERMINATED BY ZEPPELIN !!! ONE NEEDS TO KIL THE FRAMEWORK IN MESOS !!! Use mesos-cli.sh</em></p>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994270617_-321954293",
+      "id":"paragraph_1575994270617_-321954293",
+      "dateCreated":"2019-12-10T16:11:10+0000",
+      "dateStarted":"2019-12-10T19:46:35+0000",
+      "dateFinished":"2019-12-10T19:46:35+0000",
+      "status":"FINISHED",
+      "$$hashKey":"object:388"
+    },
+    {
+      "text":"%pyspark\n\n\nfrom pyspark import SparkContext, SparkConf\nfrom pyspark.sql import SQLContext, SparkSession\nfrom pyspark.sql.types import *\nimport pyspark.sql.functions as F\nfrom pyspark.storagelevel import *\nimport math\n\n# Spark configuration \n# all these options can be given to the command line to spark-submit\n# (they would need to be prefixed by \"spark.\")\nconf = SparkConf().setAppName(\"ESTest_Berka\")\n\n# Every time there is a shuffle, Spark needs to decide how many partitions will \n# the shuffle RDD have. \n# 2 times the amount of CPUS in the cluster is a good value (default is 200) \nNUM_PARTITIONS=2\nconf.set(\"spark.sql.shuffle.partitions\", NUM_PARTITIONS)\n\n# Spark SQL Session \nss = SparkSession.builder \\\n        .config(conf=conf) \\\n        .getOrCreate()\n\n\n# Query configuration only (cannot pass any ES conf here :-( )\nes_query_conf= { \n    \"pushdown\": True\n}\n\ndf = ss \\\n  .readStream \\\n  .format(\"kafka\") \\\n  .option(\"kafka.bootstrap.servers\", \"192.168.10.11:9092,192.168.10.13:9092,192.168.10.14:9092\") \\\n  .option(\"subscribe\", \"berka-payments\") \\\n  .option(\"failOnDataLoss\", \"false\") \\\n  .load() \n\n\n# extract json\nschema = StructType([ \\\n    StructField(\"value_date\", StringType()), \\\n    StructField(\"disp_access_type\", StringType()), \\\n    StructField(\"account_frequency\", StringType()), \\\n    StructField(\"account_id\", StringType()), \\\n    StructField(\"region_name\", StringType()), \\\n    StructField(\"district_name\", StringType()), \\\n    StructField(\"@timestamp\", StringType()), \\\n    StructField(\"transaction_type\", StringType()), \\\n    StructField(\"client_birth_number\", StringType()), \\\n    StructField(\"amount\", StringType()), \\\n    StructField(\"disp_id\", StringType()), \\\n    StructField(\"beneficiary_bank\", StringType()), \\\n    StructField(\"k_symbol\", StringType()), \\\n    StructField(\"client_id\", StringType()), \\\n    StructField(\"client_district_id\", StringType()), \\\n    StructField(\"beneficiary_account\", StringType()), \\\n    StructField(\"operation\", StringType()), \\\n    StructField(\"balance\", StringType()), \\\n    StructField(\"trans_id\", StringType()), \\\n    StructField(\"account_district_id\", StringType())\n])\n\npayments_df = df.select(F.from_json(df.value.cast('string'), schema) \\\n        .alias(\"json\")) \\\n        .select (\"json.*\") \\\n        .withColumn(\"day_of_month\", F.dayofmonth(F.col('@timestamp'))) \\\n        .withColumn(\"day_of_week\", F.date_format(F.col('@timestamp'), 'EEEE')) \\\n        .repartition(NUM_PARTITIONS, \"client_id\") \\\n        .alias(\"payments_df\")\n        \n        \n# TODO do a little more\n        \n       \n\n\n\n# Create output DataFrame\nto_kafka_payments_df = payments_df \\\n        .select(F.col(\"trans_id\").cast(\"string\"), F.to_json(F.struct(\"*\"))) \\\n        .toDF(\"key\", \"value\") \n\n#payments_df \\\n#    .writeStream \\\n#    .trigger() \\\n#    .format(\"console\") \\\n#    .start() \\\n#    .awaitTermination() \n\n#continuous=\"1 second\"\n#processingTime='100 milliseconds'\n\n\n# Start streaming\nto_kafka_payments_df \\\n  .writeStream \\\n  .trigger(processingTime='100 milliseconds') \\\n  .format(\"kafka\") \\\n  .option(\"kafka.bootstrap.servers\", \"192.168.10.11:9092,192.168.10.13:9092,192.168.10.14:9092\") \\\n  .option(\"topic\", \"berka-payments-aggregate\") \\\n  .option(\"checkpointLocation\", \"file:/var/lib/spark/data/checkpoints/spark_streaming_kafka_checkpointPath_berka\") \\\n  .start() \\\n  .awaitTermination() \n\n\n# Write to ElasticSearch\n#payments_df.writeStream \\\n#   .trigger(processingTime='200 milliseconds') \\\n#   .format(\"org.elasticsearch.spark.sql\") \\\n#   .outputMode(\"append\") \\\n#   .option(\"checkpointLocation\", \"file:/tmp/spark_streaming_es_checkpointPath\") \\\n#   .start(\"berka-streaming-profiled-payments/doc\") \\\n#   .awaitTermination()\n\n\n# # (3) Collect result to the driver\n# payments_list = payments_df.collect()\n# \n# print (\"Printing 10 first results\")\n# for x in payments_list[0:20]:\n#     print x\n# \n# # Print count \n# print (\"Computed %s positions (from collected list)\") % len (payments_list)\n\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:36:33+0000",
+      "config":{
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "fontSize":9,
+        "results":{
+
+        },
+        "enabled":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"ERROR",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"Fail to execute line 101:   .option(\"checkpointLocation\", \"file:/var/lib/spark/data/checkpoints/spark_streaming_kafka_checkpointPath_berka\") \\\nTraceback (most recent call last):\n  File \"/tmp/1575993053982-0/zeppelin_python.py\", line 158, in <module>\n    exec(code, _zcUserQueryNameSpace)\n  File \"<stdin>\", line 101, in <module>\n  File \"/usr/local/lib/spark/python/pyspark/sql/streaming.py\", line 103, in awaitTermination\n    return self._jsq.awaitTermination()\n  File \"/usr/local/lib/spark/python/lib/py4j-0.10.7-src.zip/py4j/java_gateway.py\", line 1255, in __call__\n    answer = self.gateway_client.send_command(command)\n  File \"/usr/local/lib/spark/python/lib/py4j-0.10.7-src.zip/py4j/java_gateway.py\", line 985, in send_command\n    response = connection.send_command(command)\n  File \"/usr/local/lib/spark/python/lib/py4j-0.10.7-src.zip/py4j/java_gateway.py\", line 1152, in send_command\n    answer = smart_decode(self.stream.readline()[:-1])\n  File \"/usr/lib/python2.7/socket.py\", line 451, in readline\n    data = self._sock.recv(self._rbufsize)\n  File \"/usr/local/lib/spark/python/pyspark/context.py\", line 270, in signal_handler\n    raise KeyboardInterrupt()\nKeyboardInterrupt\n"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575994043909_340690103",
+      "id":"paragraph_1575994043909_340690103",
+      "dateCreated":"2019-12-10T16:07:23+0000",
+      "dateStarted":"2019-12-10T19:36:33+0000",
+      "dateFinished":"2019-12-10T19:40:34+0000",
+      "status":"ABORT",
+      "$$hashKey":"object:389"
+    },
+    {
+      "text":"%pyspark\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T19:36:33+0000",
+      "config":{
+        "colWidth":12,
+        "fontSize":9,
+        "enabled":true,
+        "results":{
+
+        },
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionSupport":true,
+          "completionKey":"TAB"
+        },
+        "editorMode":"ace/mode/python"
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1576006593109_1487261689",
+      "id":"paragraph_1576006593109_1487261689",
+      "dateCreated":"2019-12-10T19:36:33+0000",
+      "status":"READY",
+      "$$hashKey":"object:390"
+    }
+  ],
+  "name":"Spark Integration Kafka",
+  "id":"2EW78UWA7",
+  "defaultInterpreterGroup":"spark",
+  "version":"0.9.0-SNAPSHOT",
+  "permissions":{
+
+  },
+  "noteParams":{
+
+  },
+  "noteForms":{
+
+  },
+  "angularObjects":{
+
+  },
+  "config":{
+    "isZeppelinNotebookCronEnable":false,
+    "looknfeel":"default",
+    "personalizedMode":"false"
+  },
+  "info":{
+
+  },
+  "path":"/Spark Integration Kafka"
+}

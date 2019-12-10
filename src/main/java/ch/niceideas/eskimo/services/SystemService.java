@@ -472,9 +472,7 @@ public class SystemService {
             }
 
             // uninstallations
-            List<Pair<String, String>>[] invertedUninstallations =  servicesInstallationSorter.orderOperations (command.getUninstallations(), nodesConfig, deadIps);
-
-            List<List<Pair<String, String>>> orderedUninstallations = Arrays.asList(invertedUninstallations);
+            List<List<Pair<String, String>>> orderedUninstallations =  servicesInstallationSorter.orderOperations (command.getUninstallations(), nodesConfig, deadIps);
             Collections.reverse(orderedUninstallations);
 
             for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
@@ -591,8 +589,7 @@ public class SystemService {
                 status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
-    void uninstallService(String service, String ipAddress)
-            throws SystemException, ConnectionManagerException {
+    void uninstallService(String service, String ipAddress) throws SystemException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 builder -> proceedWithServiceUninstallation(builder, ipAddress, service),
@@ -600,8 +597,7 @@ public class SystemService {
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
-    void uninstallServiceNoOp(String service, String ipAddress)
-            throws SystemException, ConnectionManagerException {
+    void uninstallServiceNoOp(String service, String ipAddress) throws SystemException {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 builder -> {},
@@ -767,7 +763,7 @@ public class SystemService {
 
     public void handleStatusChanges(
             ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> liveIps)
-            throws FileException, SetupException, ConnectionManagerException {
+            throws FileException, SetupException {
 
         // If there is some processing pending, then nothing is reliable, just move on
         if (!isProcessingPending()) {
@@ -828,8 +824,7 @@ public class SystemService {
 
     boolean handleRemoveServiceIfDown(
             ServicesInstallStatusWrapper savedSystemStatusWrapper, SystemStatusWrapper systemStatusWrapper,
-            String serviceStatusFullString, String savedService, String nodeName)
-            throws ConnectionManagerException {
+            String serviceStatusFullString, String savedService, String nodeName) {
 
         boolean changes = false;
 
@@ -850,7 +845,7 @@ public class SystemService {
 
     boolean countErrorAndRemoveServices(
             ServicesInstallStatusWrapper servicesInstallationStatus, String serviceStatusFullString,
-            String savedService, String nodeName) throws ConnectionManagerException {
+            String savedService, String nodeName) {
         boolean changes = false;
         // otherwise count error
         Integer counter = serviceMissingCounter.get(serviceStatusFullString);
@@ -937,7 +932,7 @@ public class SystemService {
         }
         sshCommandService.copySCPFile(ipAddress, tempTopologyFile.getAbsolutePath());
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempTopologyFile.getName(), "/etc/eskimo_topology.sh"});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/etc/eskimo_topology.sh"});
+        sshChmod755(ipAddress, "/etc/eskimo_topology.sh");
 
         try {
             ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfigNoLock();
@@ -954,7 +949,7 @@ public class SystemService {
 
             sshCommandService.copySCPFile(ipAddress, tempServicesSettingsFile.getAbsolutePath());
             sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-config.json"});
-            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", "/etc/eskimo_services-config.json"});
+            sshChmod755(ipAddress, "/etc/eskimo_services-config.json");
 
 
         } catch (FileException | SetupException e) {
@@ -963,6 +958,14 @@ public class SystemService {
         }
 
         return null;
+    }
+
+    private void sshChmod755 (String ipAddress, String file) throws SSHCommandException {
+        sshChmod (ipAddress, file, "755");
+    }
+
+    private void sshChmod (String ipAddress, String file, String mode) throws SSHCommandException {
+        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", mode, file});
     }
 
     private void uploadMesos(String ipAddress) throws SSHCommandException, SystemException {
@@ -1014,7 +1017,7 @@ public class SystemService {
         sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/" + source);
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", source, target});
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", target});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", "755", target});
+        sshChmod755(ipAddress, target);
     }
 
     private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
@@ -1142,9 +1145,8 @@ public class SystemService {
         }
 
         // 4. call setup script
-        String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
         try {
-            exec(ipAddress, sb, setupScript);
+            exec(ipAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
         } catch (SSHCommandException e) {
             logger.debug (e, e);
             sb.append(e.getMessage());

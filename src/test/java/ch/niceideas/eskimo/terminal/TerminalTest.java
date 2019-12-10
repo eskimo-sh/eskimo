@@ -2,12 +2,8 @@ package ch.niceideas.eskimo.terminal;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import org.apache.tomcat.util.security.MD5Encoder;
-import org.bouncycastle.crypto.digests.MD5Digest;
 import org.junit.Test;
-import sun.security.provider.MD5;
 
-import java.io.ByteArrayOutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static junit.framework.TestCase.assertEquals;

@@ -240,17 +240,17 @@ eskimo.Services = function () {
 
             var uiConfig = uiConfigsToRetry[i];
 
-            setTimeout (function (uiConfig) {
+            setTimeout (function (effUIConfig) {
                 $.ajax({
                     type: "GET",
-                    url: uiConfig.targetUrl,
+                    url: effUIConfig.targetUrl,
                     success: function (data, status, jqXHR) {
 
-                        console.log("FOUND : " + uiConfig.service + " - " + uiConfig.targetUrl + " - " + uiConfig.targetWaitTime);
+                        console.log("FOUND : " + effUIConfig.service + " - " + effUIConfig.targetUrl + " - " + effUIConfig.targetWaitTime);
 
                         // remove from retry list
                         for (var j = 0; j < uiConfigsToRetry.length; j++) {
-                            if (uiConfigsToRetry[j] == uiConfig) {
+                            if (uiConfigsToRetry[j] == effUIConfig) {
                                 console.log("removing from retry " + uiConfigsToRetry[j].service);
                                 uiConfigsToRetry.splice(j, 1);
                                 break;
@@ -258,25 +258,20 @@ eskimo.Services = function () {
                         }
 
                         // schedule usual refresh
-                        setTimeout(function (uiConfig) {
+                        setTimeout(function (otherUIConfig) {
 
                             // iframe
-                            uiConfig.actualUrl = uiConfig.targetUrl;
-                            $("#iframe-content-" + uiConfig.service).attr('src', uiConfig.actualUrl);
-                            uiConfig.refreshWaiting = false;
+                            otherUIConfig.actualUrl = otherUIConfig.targetUrl;
+                            $("#iframe-content-" + otherUIConfig.service).attr('src', otherUIConfig.actualUrl);
+                            otherUIConfig.refreshWaiting = false;
 
-                            /*
-                            // menu
-                            var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(uiConfig.service)));
-                            serviceMenu.attr("class", "folder-menu-items");
-                            */
 
-                        }, uiConfig.targetWaitTime, uiConfig);
+                        }, effUIConfig.targetWaitTime, effUIConfig);
 
                     },
                     error: function (jqXHR, status) {
                         // ignore
-                        console.log("error : " + uiConfig.service + " - " + uiConfig.targetUrl);
+                        console.log("error : " + effUIConfig.service + " - " + effUIConfig.targetUrl);
                     }
                 });
             }, 0, uiConfig);

@@ -294,7 +294,7 @@ public class Terminal {
         return sgr;
     }
 
-    private int $(int y, int x) {
+    private int getPosition(int y, int x) {
         return y*width+x;
     }
 
@@ -303,14 +303,14 @@ public class Terminal {
     }
 
     String peek(int y1, int x1, int y2, int x2) {
-        int s = $(y1,x1);
-        return new String(scr,s,$(y2,x2)-s);
+        int s = getPosition(y1,x1);
+        return new String(scr,s, getPosition(y2,x2)-s);
     }
 
     void poke(int y, int x, String s) {
         // TODO: i18n
         char[] chars = s.toCharArray();
-        int destPos = $(y, x);
+        int destPos = getPosition(y, x);
         System.arraycopy(chars,0,scr, destPos, min(chars.length, scr.length - destPos));
     }
 
@@ -319,8 +319,8 @@ public class Terminal {
     }
 
     void zero(int y1, int x1, int y2, int x2) {
-        int e = $(y2,x2);
-        for( int i= $(y1,x1); i<e; i++ )
+        int e = getPosition(y2,x2);
+        for(int i = getPosition(y1,x1); i<e; i++ )
             scr[i] = EMPTY_CH;
     }
 
@@ -372,7 +372,7 @@ public class Terminal {
             cursorDown();
             cx = 0;
         }
-        scr[$(cy,cx)] = (char)(sgr|c);
+        scr[getPosition(cy,cx)] = (char)(sgr|c);
         cursorRight();
     }
 
@@ -482,7 +482,7 @@ public class Terminal {
                 bg = 1;
                 fg = 7;
             }
-            boolean cursor = $(cy,cx)==i;
+            boolean cursor = getPosition(cy,cx)==i;
             int p = pack(fg,bg,cursor);
             if(currentStatus!=p) {// rendering status has changed
                 currentStatus = p;

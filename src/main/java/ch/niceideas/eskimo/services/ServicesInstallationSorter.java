@@ -60,7 +60,7 @@ public class ServicesInstallationSorter {
     }
 
 
-    public List<Pair<String, String>>[] orderOperations(
+    public List<List<Pair<String, String>>> orderOperations(
             List<? extends Pair<String, String>> operations,
             NodesConfigWrapper nodesConfig,
             Set<String> deadIps) throws NodesConfigurationException, ServiceDefinitionException {
@@ -182,6 +182,6 @@ public class ServicesInstallationSorter {
             }
         }
 
-        return orderedOperationsSteps.toArray(new List[0]);
+        return orderedOperationsSteps;
     }
 }

@@ -73,11 +73,17 @@ public class UnboundList<T> extends AbstractWrappingList<T> implements List<T> {
 
         if (fromIndex < 0)
             throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
+        if (fromIndex > virtualSize)
+            throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
         if (toIndex > virtualSize)
             throw new IndexOutOfBoundsException("toIndex = " + toIndex);
         if (fromIndex > toIndex)
             throw new IllegalArgumentException("fromIndex(" + fromIndex +
                     ") > toIndex(" + toIndex + ")");
+
+        if (fromIndex == virtualSize) {
+            return Collections.emptyList();
+        }
 
         int fromPosition = adaptIndex(fromIndex);
         int toPosition = adaptIndex(toIndex - 1) + 1;
@@ -131,5 +137,23 @@ public class UnboundList<T> extends AbstractWrappingList<T> implements List<T> {
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
         throw new UnsupportedOperationException(ERROR_TO_BE_IMPLEMENTED);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UnboundList)) return false;
+        if (!super.equals(o)) return false;
+        UnboundList<?> that = (UnboundList<?>) o;
+        // buffer is already accounted by parent equals
+        return maxSize == that.maxSize &&
+                virtualSize == that.virtualSize;
+    }
+
+    @Override
+    public int hashCode() {
+        // buffer is already accounted by parent hashCode
+        return Objects.hash(super.hashCode(), maxSize, virtualSize);
     }
 }

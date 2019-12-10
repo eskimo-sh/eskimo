@@ -1,0 +1,172 @@
+{
+  "paragraphs":[
+    {
+      "text":"%md\n\n\n### Spark and ElasticSearch Integration\n\n\nThis notebook presents a sample program illustrating Spark (Batch) and ElasticSearch Integration.\n\nThis sample program uses the Berka DataSet loaded in ElasticSearch by the \"Logstash Demo\" Notebook and flattens the transaction dataset by denornmalizing all related data into the transaction dataset.\n\n| **warning: You need to have executed all the Paragraphs from the \"Logstash Demo\" Notebook before you can run this notebook !** |\n| --- |\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T10:01:06+0000",
+      "config":{
+        "tableHide":false,
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionKey":"TAB",
+          "completionSupport":false
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/markdown",
+        "fontSize":9,
+        "editorHide":true,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"SUCCESS",
+        "msg":[
+          {
+            "type":"HTML",
+            "data":"<div class=\"markdown-body\">\n<h3>Spark and ElasticSearch Integration</h3>\n<p>This notebook presents a sample program illustrating Spark (Batch) and ElasticSearch Integration.</p>\n<p>This sample program uses the Berka DataSet loaded in ElasticSearch by the &ldquo;Logstash Demo&rdquo; Notebook and flattens the transaction dataset by denornmalizing all related data into the transaction dataset.</p>\n<table>\n<thead>\n<tr><th><strong>warning: You need to have executed all the Paragraphs from the &ldquo;Logstash Demo&rdquo; Notebook before you can run this notebook !</strong></th></tr>\n</thead>\n<tbody></tbody>\n</table>\n\n</div>"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575966915510_-1727530779",
+      "id":"paragraph_1575966915510_-1727530779",
+      "dateCreated":"2019-12-10T08:35:15+0000",
+      "dateStarted":"2019-12-10T08:37:12+0000",
+      "dateFinished":"2019-12-10T08:37:12+0000",
+      "status":"FINISHED",
+      "focus":true,
+      "$$hashKey":"object:360"
+    },
+    {
+      "text":"%pyspark\n\n\nfrom pyspark import SparkContext, SparkConf\nfrom pyspark.sql import SQLContext, SparkSession\nimport pyspark.sql.functions as F\n\n## Spark SQL Session \n#ss = SparkSession.builder \\\n#        .config(conf=conf) \\\n#        .getOrCreate()\n\n\n# Query configuration only (cannot pass any ES conf here :-( )\nes_query_conf= { \n    \"pushdown\": True\n}\n\n# Zeppelin calls the spark session \"spark\n# ss is perhaps politically unsure but is really much more standard\nss = spark\n\n# Every time there is a shuffle, Spark needs to decide how many partitions will \n# the shuffle RDD have. \n# 2 times the amount of CPUS in the cluster is a good value (default is 200) \nss.conf.set(\"spark.sql.shuffle.partitions\", \"12\")\n\n# Read transactions dataset\ntrans_df = ss.read \\\n        .format(\"org.elasticsearch.spark.sql\") \\\n        .options(conf=es_query_conf) \\\n        .load(\"berka-trans\") \\\n        .alias(\"trans_df\")\n\n\n# 1. Joining on Account\n# ---------------------------------------------------------\n\n# Read account dataset\naccount_df = ss.read \\\n        .format(\"org.elasticsearch.spark.sql\") \\\n        .options(conf=es_query_conf) \\\n        .load(\"berka-account\") \\\n        .alias(\"account_df\")\n\n# Join on account_id\naccount_joint_df = trans_df \\\n            .join( \\\n                  account_df, \\\n                  (F.lower(trans_df.account_id) == F.lower(account_df.account_id)), \\\n                  \"left_outer\" \\\n                 ) \\\n            .select( \\\n                    'trans_id', 'trans_df.account_id', \\\n                    F.col(\"trans_df.@timestamp\").alias(\"@timestamp\"), \\\n                    F.col(\"trans_df.@timestamp\").alias(\"value_date\"), 'type', 'operation', 'amount', 'balance', 'k_symbol', \\\n                    F.col(\"bank\").alias(\"beneficiary_bank\"), F.col(\"account\").alias(\"beneficiary_account\"), \\\n                    F.col(\"district_id\").alias(\"account_district_id\"), \\\n                    F.col(\"frequency\").alias(\"account_frequency\")\n                   )\n\n\n# 2. Joining on Disp\n# ---------------------------------------------------------\n\n# Read disp dataset\ndisp_df = ss.read \\\n        .format(\"org.elasticsearch.spark.sql\") \\\n        .options(conf=es_query_conf) \\\n        .load(\"berka-disp\") \\\n        .alias(\"disp_df\") \\\n        .filter(F.col (\"type\") == \"OWNER\")\n\ndisp_joint_df = account_joint_df \\\n            .join( \\\n                  disp_df, \\\n                  (F.lower(account_joint_df.account_id) == F.lower(disp_df.account_id)), \\\n                  \"left_outer\" \\\n                 ) \\\n            .select( \\\n                    'trans_id', F.col ('trans_df.account_id').alias ('account_id'), \"@timestamp\", \\\n                    'value_date', F.col(\"trans_df.type\").alias(\"transaction_type\"), 'operation', 'amount', 'balance', 'k_symbol', 'beneficiary_bank', 'beneficiary_account', \\\n                    'account_district_id', 'account_frequency', \\\n                    'disp_id', 'client_id', F.col(\"disp_df.type\").alias(\"disp_access_type\")\n                   )\n\n\n# 3. Joining on Client\n# ---------------------------------------------------------\n\n# Read client dataset\nclient_df = ss.read \\\n        .format(\"org.elasticsearch.spark.sql\") \\\n        .options(conf=es_query_conf) \\\n        .load(\"berka-client\") \\\n        .alias(\"client_df\")\n\nclient_joint_df = disp_joint_df \\\n            .join( \\\n                  client_df, \\\n                  (F.lower(disp_joint_df.client_id) == F.lower(client_df.client_id)), \\\n                  \"left_outer\" \\\n                 ) \\\n            .select( \\\n                    'trans_id', 'account_id', '@timestamp', 'value_date', 'transaction_type', 'operation', 'amount', \\\n                    'balance', 'k_symbol', 'beneficiary_bank', 'beneficiary_account', \\\n                    'account_district_id', 'disp_id', 'account_frequency', \n                    F.col ('client_df.client_id').alias ('client_id'), \n                    'disp_access_type',\n                    F.col (\"birth_number\").alias(\"client_birth_number\"),\n                    F.col (\"district_id\").alias(\"client_district_id\")\n                   )\n\n\n\n\n# 4. Joining on District\n# ---------------------------------------------------------\n\n# Read district dataset\ndistrict_df = ss.read \\\n        .format(\"org.elasticsearch.spark.sql\") \\\n        .options(conf=es_query_conf) \\\n        .load(\"berka-district\") \\\n        .alias(\"district_df\")\n\ndistrict_joint_df = client_joint_df \\\n            .join( \\\n                  district_df, \\\n                  (F.lower(client_joint_df.client_district_id) == F.lower(district_df.district_id)), \\\n                  \"left_outer\" \\\n                 ) \\\n            .select( \\\n                    'trans_id', 'account_id', \\\n                    F.date_format(F.col('@timestamp'), \"yyyy-MM-dd'T'HH:mm:ssZZ\").alias('@timestamp'), \\\n                    F.date_format(F.col('value_date'), \"yyyy-MM-dd'T'HH:mm:ssZZ\").alias('value_date'), \\\n                    'transaction_type', 'operation', \\\n                    'amount', 'balance', 'k_symbol', 'beneficiary_bank', 'beneficiary_account', \\\n                    'account_district_id', 'disp_id', 'account_frequency', 'client_id', \n                    'disp_access_type', 'client_birth_number', 'client_district_id',\n                    'district_name', 'region_name'\n                   )\n\n\n# 5. Save transactions\n# ---------------------------------------------------------\n\n\n# # (3) Collect result to the driver\n# join_transactions_list = district_joint_df.collect()\n# \n# print (\"Printing 10 first results\")\n# for x in join_transactions_list[0:10]:\n#     print x\n# \n# # Print count \n# print (\"Computed %s positions (from collected list)\") % len (join_transactions_list)\n\n\n#district_joint_df.write \\\n#        .format(\"org.elasticsearch.spark.sql\") \\\n#        .option(\"es.resource\", \"berka-trans-join/doc\") \\\n#        .mode(saveMode=\"Overwrite\") \\\n#        .save()\n\n\n# 6. Filter in payments only\n# ---------------------------------------------------------\n\n\npayment_df = district_joint_df.filter( (F.col(\"transaction_type\") == \"VYDAJ\") & (F.col(\"operation\") != \"VYBER\") )\n\n\npayment_df.write \\\n        .format(\"org.elasticsearch.spark.sql\") \\\n        .option(\"es.resource\", \"berka-payments/doc\") \\\n        .mode(saveMode=\"Overwrite\") \\\n        .save()\n\n\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T09:35:56+0000",
+      "config":{
+        "editorSetting":{
+          "language":"python",
+          "editOnDblClick":false,
+          "completionKey":"TAB",
+          "completionSupport":true
+        },
+        "colWidth":12,
+        "editorMode":"ace/mode/python",
+        "fontSize":9,
+        "runOnSelectionChange":true,
+        "title":false,
+        "checkEmpty":true,
+        "results":{
+
+        },
+        "enabled":true
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "results":{
+        "code":"ERROR",
+        "msg":[
+          {
+            "type":"TEXT",
+            "data":"(Run again)"
+          }
+        ]
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575966927372_-290792050",
+      "id":"paragraph_1575966927372_-290792050",
+      "dateCreated":"2019-12-10T08:35:27+0000",
+      "dateStarted":"2019-12-10T09:35:56+0000",
+      "dateFinished":"2019-12-10T09:51:36+0000",
+      "status":"ERROR",
+      "$$hashKey":"object:361"
+    },
+    {
+      "text":"%md\n\n**You can now find  the result joined index in \"berka-payments\" on ElasticSearch**\n\n",
+      "user":"anonymous",
+      "dateUpdated":"2019-12-10T10:01:25+0000",
+      "config":{
+        "colWidth":12,
+        "fontSize":9,
+        "enabled":true,
+        "results":{
+
+        },
+        "editorSetting":{
+          "language":"markdown",
+          "editOnDblClick":true,
+          "completionSupport":false
+        },
+        "editorMode":"ace/mode/markdown",
+        "editorHide":true,
+        "tableHide":false
+      },
+      "settings":{
+        "params":{
+
+        },
+        "forms":{
+
+        }
+      },
+      "apps":[
+
+      ],
+      "progressUpdateIntervalMs":500,
+      "jobName":"paragraph_1575967108779_-1236820496",
+      "id":"paragraph_1575967108779_-1236820496",
+      "dateCreated":"2019-12-10T08:38:28+0000",
+      "status":"READY",
+      "$$hashKey":"object:362"
+    }
+  ],
+  "name":"Spark Integration ES",
+  "id":"2EUG9JP4N",
+  "defaultInterpreterGroup":"spark",
+  "version":"0.9.0-SNAPSHOT",
+  "permissions":{
+
+  },
+  "noteParams":{
+
+  },
+  "noteForms":{
+
+  },
+  "angularObjects":{
+
+  },
+  "config":{
+    "isZeppelinNotebookCronEnable":false,
+    "looknfeel":"default",
+    "personalizedMode":"false"
+  },
+  "info":{
+
+  },
+  "path":"/Spark Integration ES"
+}

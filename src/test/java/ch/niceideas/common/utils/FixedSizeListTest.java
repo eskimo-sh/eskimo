@@ -51,14 +51,14 @@ public class FixedSizeListTest {
     @Test
     public void testRemoveAll() throws Exception {
         testNominal();
-        testList.removeAll(Arrays.asList(new String[] {"5", "6", "7", "8"}));
+        testList.removeAll(Arrays.asList("5", "6", "7", "8"));
         assertEquals ("1,2,3,4,9,10", String.join(",", testList));
     }
 
     @Test
     public void testRetainAll() throws Exception {
         testNominal();
-        testList.retainAll(Arrays.asList(new String[] {"5", "6", "7", "8"}));
+        testList.retainAll(Arrays.asList("5", "6", "7", "8"));
         assertEquals ("5,6,7,8", String.join(",", Arrays.asList (testList.toArray(new String[0]))));
     }
 
@@ -72,7 +72,7 @@ public class FixedSizeListTest {
 
     @Test
     public void testEqualsHashCode() throws Exception {
-        FixedSizeList testList2 = new FixedSizeList<>(10);
+        FixedSizeList<String> testList2 = new FixedSizeList<>(10);
 
         testList.add("0");
         testList.add("1");

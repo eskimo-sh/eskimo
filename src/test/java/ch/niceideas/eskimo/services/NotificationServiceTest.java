@@ -88,4 +88,39 @@ public class NotificationServiceTest extends TestCase {
         assertEquals(0, (int) result.getKey());
         assertEquals(0, result.getValue().size());
     }
+
+    @Test
+    public void testCycling() throws Exception {
+
+        testNominal();
+
+        for (int i = 0; i < 1000; i++) {
+            ns.addError("Test__"+i);
+        }
+
+        Pair<Integer,List<JSONObject>> result2 = ns.fetchElements(2);
+
+        assertEquals(1002, (int) result2.getKey());
+
+        Pair<Integer,List<JSONObject>> result3 = ns.fetchElements(1002);
+
+        assertEquals(1002, (int) result3.getKey());
+        assertEquals(0, result3.getValue().size());
+
+        ns.addError("TestX");
+        ns.addInfo("TestY");
+
+        Pair<Integer,List<JSONObject>> result4 = ns.fetchElements(1002);
+
+        assertEquals(1004, (int) result4.getKey());
+        assertEquals(2, result4.getValue().size());
+
+        assertEquals("{\"type\":\"Error\",\"message\":\"TestX\"}", result4.getValue().get(0).toString());
+        assertEquals("{\"type\":\"Info\",\"message\":\"TestY\"}", result4.getValue().get(1).toString());
+
+        Pair<Integer,List<JSONObject>> result5 = ns.fetchElements(1004);
+
+        assertEquals(1004, (int) result5.getKey());
+        assertEquals(0, result5.getValue().size());
+    }
 }

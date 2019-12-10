@@ -48,7 +48,8 @@ PermissionsStartOnly=true
 # attempt to recreate  / remount gluster shares
 ExecStartPre=/bin/bash /usr/local/sbin/setupFlinkGlusterShares.sh
 
-ExecStart=/bin/bash -c 'while [[ 1 ]]; do sleep 5 ; if [[ `docker image ls -a | grep eskimo | grep flink-worker ` == "" ]]; then echo "BAD"; exit; fi; done'
+# Basically here we just want SystemD to know if the image is not available anymore.
+ExecStart=/bin/bash -c 'while [[ 1 ]]; do if [[ `docker image ls -a | grep eskimo | grep flink-worker ` == "" ]]; then echo "BAD"; exit -1; fi; sleep 5; done'
 
 Type=simple
 

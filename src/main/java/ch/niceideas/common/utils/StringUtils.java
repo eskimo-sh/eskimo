@@ -61,7 +61,7 @@ public abstract class StringUtils {
 
     private static final int LARGEST_FIELD_LENGTH = 100;
 
-    private static String[] SPACES = buildSpaceArray(LARGEST_FIELD_LENGTH);
+    private static final String[] SPACES = buildSpaceArray(LARGEST_FIELD_LENGTH);
     
     static final byte[] HEX_CHAR_TABLE = {
         (byte)'0', (byte)'1', (byte)'2', (byte)'3',

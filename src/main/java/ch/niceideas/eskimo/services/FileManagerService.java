@@ -126,6 +126,7 @@ public class FileManagerService {
 
             String newPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + subFolder);
 
+            @SuppressWarnings("unchecked")
             List<SFTPv3DirectoryEntry> listing = client.ls(newPath);
 
             return new Pair<>(newPath, directoryListToJson (listing));
@@ -332,7 +333,7 @@ public class FileManagerService {
         }
     }
 
-    synchronized SFTPv3Client getClient(@RequestParam("address") String hostAddress) throws ConnectionManagerException, IOException {
+    synchronized SFTPv3Client getClient(String hostAddress) throws ConnectionManagerException, IOException {
 
         SFTPv3Client client = sftpClients.get(hostAddress);
 

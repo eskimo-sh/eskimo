@@ -43,8 +43,8 @@ public class WebSocketProxyForwarder {
 
     private WebSocketHttpHeaders getWebSocketHttpHeaders(final WebSocketSession userAgentSession) {
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        Principal principal = userAgentSession.getPrincipal();
         /*
+        Principal principal = userAgentSession.getPrincipal();
         if (principal != null && OAuth2Authentication.class.isAssignableFrom(principal.getClass())) {
             OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) principal;
             OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) oAuth2Authentication.getDetails();

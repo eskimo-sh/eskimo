@@ -629,9 +629,8 @@ public class SetupService {
             try {
                 systemOperationService.applySystemOperation("Building of package " + image,
                         builder -> {
-                            String[] setupScript = ArrayUtils.concatAll(new String[]{"bash", packagesDevPath + "/build.sh", "-n", image});
                             try {
-                                builder.append(ProcessHelper.exec(setupScript, true));
+                                builder.append(ProcessHelper.exec(new String[]{"bash", packagesDevPath + "/build.sh", "-n", image}, true));
                             } catch (ProcessHelper.ProcessHelperException e) {
                                 logger.debug(e, e);
                                 builder.append(e.getMessage());

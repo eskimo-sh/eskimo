@@ -74,27 +74,27 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         OperationsCommand oc = OperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
 
-        List<Pair<String, String>>[] orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig, new HashSet<>());
+        List<List<Pair<String, String>>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig, new HashSet<>());
 
         assertNotNull(orderedInstall);
 
-        assertEquals(13, orderedInstall.length);
+        assertEquals(13, orderedInstall.size());
 
         // Test first, third and last group
-        List<Pair<String, String>> group1 = orderedInstall[0];
+        List<Pair<String, String>> group1 = orderedInstall.get(0);
         assertEquals(2, group1.size());
         assertEquals("zookeeper", group1.get(0).getKey());
         assertEquals("192.168.10.13", group1.get(0).getValue());
         assertEquals("ntp", group1.get(1).getKey());
         assertEquals("192.168.10.11", group1.get(1).getValue());
 
-        List<Pair<String, String>> group3 = orderedInstall[2];
+        List<Pair<String, String>> group3 = orderedInstall.get(2);
         assertEquals(2, group3.size());
         assertEquals("gluster", group3.get(0).getKey());
         assertEquals("192.168.10.11", group3.get(0).getValue());
         assertEquals("gluster", group3.get(1).getKey());
 
-        List<Pair<String, String>> group13 = orderedInstall[12];
+        List<Pair<String, String>> group13 = orderedInstall.get(12);
         assertEquals(1, group13.size());
         assertEquals("zeppelin", group13.get(0).getKey());
         assertEquals("192.168.10.13", group13.get(0).getValue());

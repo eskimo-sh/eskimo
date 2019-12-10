@@ -35,9 +35,13 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import junit.framework.TestCase;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 public class MessagingServiceTest extends TestCase {
 
@@ -159,7 +163,38 @@ public class MessagingServiceTest extends TestCase {
         assertEquals(0, (int) result2_3.getKey());
         assertEquals("", result2_3.getValue());
         lastLineUser2 = result2_3.getKey();
-
-
     }
+
+    @Test
+    public void testCycling() throws Exception {
+
+        testNominal();
+
+        for (int i = 0; i < 100000; i++) {
+            ms.addLines("Test__"+i);
+        }
+
+        Pair<Integer,String> result2 = ms.fetchElements(2);
+
+        assertEquals(100003, (int) result2.getKey());
+
+        Pair<Integer,String> result3 = ms.fetchElements(100003);
+
+        assertEquals(100003, (int) result3.getKey());
+        assertTrue(StringUtils.isBlank(result3.getValue()));
+
+        ms.addLines("TestX");
+        ms.addLines("TestY");
+
+        Pair<Integer,String> result4 = ms.fetchElements(100003);
+
+        assertEquals(100005, (int) result4.getKey());
+        assertEquals(2, result4.getValue().split("\n").length);
+
+        Pair<Integer,String> result5 = ms.fetchElements(100005);
+
+        assertEquals(100005, (int) result5.getKey());
+        assertTrue(StringUtils.isBlank(result5.getValue()));
+    }
+
 }

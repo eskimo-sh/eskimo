@@ -79,4 +79,20 @@ public class FixedSizeList<T> extends AbstractWrappingList<T> implements List<T>
         return retValue;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FixedSizeList)) return false;
+        if (!super.equals(o)) return false;
+        FixedSizeList<?> that = (FixedSizeList<?>) o;
+        // buffer is already accounted by parent equals
+        return maxSize == that.maxSize;
+    }
+
+    @Override
+    public int hashCode() {
+        // buffer is already accounted by parent hashcode
+        return Objects.hash(super.hashCode(), maxSize);
+    }
+
 }
