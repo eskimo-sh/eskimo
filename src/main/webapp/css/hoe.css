@@ -269,7 +269,8 @@ body{position:relative;}
     border-top: 1px solid #efefef;
     color: #000;
 }
-#hoe-left-panel .panel-list > li > a > i {
+#hoe-left-panel .panel-list > li > a > i,
+#hoe-left-panel .panel-list > li > a > span {
     display: inline;
     font-size: 14px;
     padding-right: 6px;
@@ -493,7 +494,8 @@ body{position:relative;}
 .hoe-minimized-lpanel #hoe-left-panel .panel-list > li.hoe-has-menu > a:after {
     display: none;
 }
-.hoe-minimized-lpanel #hoe-left-panel .panel-list > li > a > i {
+.hoe-minimized-lpanel #hoe-left-panel .panel-list > li > a > i,
+.hoe-minimized-lpanel #hoe-left-panel .panel-list > li > a > span {
     display: inline;
     font-size: 15px;
     padding-left: 6px;
