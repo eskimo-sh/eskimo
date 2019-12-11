@@ -480,7 +480,7 @@ Then in the folder `bin` under the newly extracted eskimo binary distribution fo
 With eskimo properly started using the above scripts, one can reach eskimo using http://machine_ip:9090. +
 The default port number is 9090. This can be changed in configuration file `eskimo.properties`.
 
-The default login / password credentials are _admin_ / _password_.
+*The default login / password credentials are _admin_ / _password_.*
 
 === Typical startup issues
 

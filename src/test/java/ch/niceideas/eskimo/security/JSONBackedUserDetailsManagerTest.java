@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.security;
 
-import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -46,8 +45,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
