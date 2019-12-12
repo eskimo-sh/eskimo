@@ -527,7 +527,7 @@ eskimo.NodesConfig = function() {
                                         if (otherMatcher[2] != null && otherMatcher[2] != "") {
                                             otherNodeNbr = parseInt(otherMatcher[2]);
                                         } else {
-                                            var otherNbr = setupConfig[key];
+                                            var otherNbr = setupConfig[otherKey];
                                             otherNodeNbr = parseInt(otherNbr);
                                         }
                                         if (otherNodeNbr == nodeNbr) {

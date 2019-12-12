@@ -188,7 +188,7 @@ public class NodesConfigurationChecker {
                                     String otherServiceName = otherMatcher.group(1);
                                     if (otherServiceName.equals(dependency.getMasterService())) {
 
-                                        int otherNodeNbr = Topology.getNodeNbr(key, nodesConfig, matcher);
+                                        int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
                                         if (otherNodeNbr == nodeNbr) {
 
                                             serviceFound = true;

@@ -61,5 +61,11 @@ cd $saved_dir
 # reached by the TaskManagers and any clients which want to connect
 sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
+# The address to which the REST client will connect to
+sed -i s/"#rest.address: 0.0.0.0"/"rest.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
+
+# The address that the REST & web server binds to
+sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
+
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

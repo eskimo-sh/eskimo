@@ -515,7 +515,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "FIRST_NODE",
+        "masterElectionStrategy": "SAME_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
@@ -809,6 +809,12 @@
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "flink-app-master",
+        "numberOfMasters": 1,
+        "mandatory": false
       },
       {
         "masterElectionStrategy": "FIRST_NODE",

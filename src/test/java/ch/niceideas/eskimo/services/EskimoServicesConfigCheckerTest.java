@@ -35,12 +35,15 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import com.gargoylesoftware.htmlunit.ScriptResult;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 public class EskimoServicesConfigCheckerTest  {
@@ -436,6 +439,33 @@ public class EskimoServicesConfigCheckerTest  {
         });
 
         assertEquals("Inconsistency found : Service mesos-agent expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
+    }
+
+    @Test
+    public void testFlinkAndZookeeperSeparated() throws Exception {
+        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+                put("action_id1", "192.168.10.11");
+                put("action_id2", "192.168.10.12");
+                put("ntp1", "on");
+                put("ntp2", "on");
+                put("mesos-agent1", "on");
+                put("mesos-agent2", "on");
+                put("prometheus1", "on");
+                put("prometheus2", "on");
+                put("gluster1", "on");
+                put("gluster2", "on");
+                put("mesos-master", "1");
+                put("zookeeper", "1");
+                put("flink-worker1", "on");
+                put("flink-worker2", "on");
+                put("flink-app-master", "2");
+            }});
+
+            nodeConfigChecker.checkServicesConfig(nodesConfig);
+        });
+
+        assertEquals("Inconsistency found : Service flink-app-master was expecting a service zookeeper on same node, but none were found !", exception.getMessage());
     }
 
 }

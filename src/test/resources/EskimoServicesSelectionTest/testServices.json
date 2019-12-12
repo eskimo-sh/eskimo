@@ -139,6 +139,26 @@
     "title": "Spark Executor",
     "unique": false
   },
+  "flink-worker": {
+    "col": 3,
+    "conditional": "NONE",
+    "configOrder": 18,
+    "mandatory": false,
+    "name": "flink-worker",
+    "row": 6,
+    "title": "Flink Worker",
+    "unique": false
+  },
+  "flink-app-master": {
+    "col": 3,
+    "conditional": "NONE",
+    "configOrder": 19,
+    "mandatory": false,
+    "name": "flink-app-master",
+    "row": 7,
+    "title": "Flink App Master",
+    "unique": false
+  },
   "spark-history-server": {
     "col": 1,
     "conditional": "NONE",

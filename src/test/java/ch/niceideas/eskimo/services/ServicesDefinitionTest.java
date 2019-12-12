@@ -171,7 +171,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         Topology topology = def.getTopology(nodesConfig, new HashSet<>());
 
         assertEquals ("#Topology\n" +
-                "export MASTER_ELASTICSEARCH_1921681011=\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
                 "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
@@ -349,7 +348,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
                 "export MASTER_GLUSTER_1921681013=192.168.10.14\n" +
                 "export MASTER_GLUSTER_1921681014=192.168.10.11\n" +
-                "export MASTER_GRAFANA_1=\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
                 "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
                 "\n" +

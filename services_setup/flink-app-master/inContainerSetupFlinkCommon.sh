@@ -98,8 +98,6 @@ sed -i s/"#jobmanager.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"jobmanager.a
 # Comma separated list of directories to monitor for completed jobs.
 sed -i s/"#historyserver.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"historyserver.archive.fs.dir: file:\/\/\/var\/lib\/flink\/completed_jobs\/"/g \
         /usr/local/lib/flink/conf/flink-conf.yaml
-# uncomment
-sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 # uncomment
 sed -i s/"#rest.port: 8081"/"rest.port: 8081"/g /usr/local/lib/flink/conf/flink-conf.yaml

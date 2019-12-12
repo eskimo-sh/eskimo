@@ -78,11 +78,9 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        // redefine constructor
-        page.executeJavaScript("eskimo.NodesConfig.initialize = function() {};");
-
         // instantiate test object
         page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
+
 
         // set services for tests
         page.executeJavaScript("eskimoNodesConfig.setServicesDependenciesForTest (SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);");
@@ -410,6 +408,35 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         assertNotNull(result);
         assertEquals (false, result.getJavaScriptResult());
+    }
+
+    @Test
+    public void testFlinkAndZookeeperSeparated() throws Exception {
+
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("action_id2", "192.168.10.12");
+            put("ntp1", "on");
+            put("ntp2", "on");
+            put("mesos-agent1", "on");
+            put("mesos-agent2", "on");
+            put("prometheus1", "on");
+            put("prometheus2", "on");
+            put("gluster1", "on");
+            put("gluster2", "on");
+            put("mesos-master", "1");
+            put("zookeeper", "1");
+            put("flink-worker1", "on");
+            put("flink-worker2", "on");
+            put("flink-app-master", "2");
+        }});
+
+
+        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+
+        assertEquals (false, result.getJavaScriptResult());
+
+        Thread.sleep(2000);
     }
 
 }

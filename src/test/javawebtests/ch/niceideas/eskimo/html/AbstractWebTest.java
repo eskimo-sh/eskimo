@@ -35,8 +35,12 @@
 package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
+import com.gargoylesoftware.htmlunit.AjaxController;
+import com.gargoylesoftware.htmlunit.AlertHandler;
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,12 +49,21 @@ import java.net.URL;
 
 public abstract class AbstractWebTest {
 
+    private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
+
     protected WebClient webClient;
     protected HtmlPage page;
 
     @Before
     public void init() throws Exception {
         webClient = new WebClient();
+
+        webClient.setAlertHandler((page, s) -> logger.info(s));
+
+        webClient.setAjaxController(new AjaxController() {
+
+        });
+
         URL testPage = ResourceUtils.getURL("classpath:GenericTestPage.html");
         page = webClient.getPage(testPage);
         Assert.assertEquals("Generic Test Page", page.getTitleText());

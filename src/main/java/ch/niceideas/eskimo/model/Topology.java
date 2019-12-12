@@ -211,8 +211,10 @@ public class Topology {
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     String masterIp = findFirstOtherServiceIP(nodesConfig, deadIps, dep.getMasterService(), otherMasters);
                     masterIp = handleMissingMaster(dep, service, masterIp, i);
-                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) +"_"+i, masterIp);
-                    otherMasters.add(masterIp);
+                    if (StringUtils.isNotBlank(masterIp)) {
+                        definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterIp);
+                        otherMasters.add(masterIp);
+                    }
                 }
                 break;
 
@@ -231,7 +233,9 @@ public class Topology {
                     } else {
                         String masterIp = findFirstServiceIP(nodesConfig, deadIps, dep.getMasterService());
                         masterIp = handleMissingMaster(dep, service, masterIp);
-                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), masterIp);
+                        if (StringUtils.isNotBlank(masterIp)) {
+                            definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + ipAddress.replace(".", ""), masterIp);
+                        }
                     }
                 }
                 break;
@@ -240,8 +244,10 @@ public class Topology {
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     String masterIp = findRandomOtherServiceIP(nodesConfig, deadIps, dep.getMasterService(), otherMasters);
                     masterIp = handleMissingMaster(dep, service, masterIp, i);
-                    definedMasters.put(MASTER_PREFIX + getVariableName(dep)+"_"+i, masterIp);
-                    otherMasters.add(masterIp);
+                    if (StringUtils.isNotBlank(masterIp)) {
+                        definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterIp);
+                        otherMasters.add(masterIp);
+                    }
                 }
                 break;
 
@@ -251,9 +257,10 @@ public class Topology {
                 }
 
                 String masterIp = findRandomServiceIPAfter(nodesConfig, deadIps, dep.getMasterService(), nodeNbr);
-                masterIp = handleMissingMaster(dep, service, masterIp);
-                definedMasters.put(MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), masterIp);
-
+                if (StringUtils.isNotBlank(masterIp)) {
+                    masterIp = handleMissingMaster(dep, service, masterIp);
+                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + ipAddress.replace(".", ""), masterIp);
+                }
                 break;
 
             case SAME_NODE:
