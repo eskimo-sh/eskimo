@@ -84,12 +84,14 @@ docker exec -i zeppelin pip install pandas scikit-learn matplotlib nltk plotly f
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
 echo " - Installing flink"
-docker exec -i zeppelin bash /scripts/installFlink.sh | tee -a /tmp/zeppelin_build_log 2>&1
+cp installFlink.sh __installFlinkEff.sh
+docker exec -i zeppelin bash /scripts/__installFlinkEff.sh | tee -a /tmp/zeppelin_build_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/zeppelin_build_log
     exit -102
 fi
+rm -f __installFlinkEff.sh
 
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then

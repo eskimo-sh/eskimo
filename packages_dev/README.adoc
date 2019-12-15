@@ -72,6 +72,16 @@ Docker images can be downloaded from internet (or the internal corporation netwo
 running eskimo. +
 The later is achieved using the packages development framework which is presented in this guide.
 
+=== Requirements
+
+In order for one to be able to either build the eskimo software compontnents packages locally (or have eskimo building
+them locally), there are a few requirements:
+
+* Docker must be installed and available on the user local computer (or the eskimo host machine in case Eskimo builds
+them)
+* At least 10Gb of hard drive space on the partition hosting `/tmp` must be available.
+* At least 15Gb of hard drive space on the partition histing the eskimo installation folder must be available.
+
 === Principle
 
 The principle is pretty straightforward
@@ -293,15 +303,6 @@ It's content should be aligned with the followin properties from the configurati
 
 * `system.packagesToBuild` giving the set of docker images for packages to be or downloaded
 * `system.mesosPackages` giving the name of the mesos packages to built or downloaded
-
-
-
-
-
-
-
-
-
 
 
 
