@@ -1,6 +1,8 @@
 language: java
 before_install: bash libs/install_libs.sh
 
+jdk:
+  - openjdk9
 
 addons:
   sonarcloud:
