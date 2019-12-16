@@ -45,7 +45,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoConsoles.js')");
+        loadScript (page, "eskimoConsoles.js");
 
         // mock ajax term
         page.executeJavaScript("ajaxterm = {};");

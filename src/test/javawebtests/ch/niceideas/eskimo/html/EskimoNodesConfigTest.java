@@ -51,8 +51,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoNodesConfig.js')");
+        loadScript(page, "eskimoUtils.js");
+        loadScript(page, "eskimoNodesConfig.js");
 
         page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"];");
         page.executeJavaScript("MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");

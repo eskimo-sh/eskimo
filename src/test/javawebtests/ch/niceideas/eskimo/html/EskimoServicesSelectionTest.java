@@ -52,8 +52,8 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoServicesSelection.js')");
+        loadScript(page, "eskimoUtils.js");
+        loadScript(page, "eskimoServicesSelection.js");
 
         // instantiate test object
         page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection();");

@@ -156,6 +156,12 @@ Software.
             <version>2.35.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.tntim96</groupId>
+            <artifactId>JSCover</artifactId>
+            <version>2.0.8</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- for HTML Unit -->
         <dependency>
@@ -273,6 +279,46 @@ Software.
     </build>
 
     <profiles>
+        <profile>
+            <id>jsCoverage</id>
+            <build>
+                <plugins>
+                    <!-- Set the JS coverage run flag -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>setFlag</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>/bin/touch</executable>
+                                    <arguments>
+                                        <argument>target/jsCoverageFlag</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>computeLcov</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <includeProjectDependencies>true</includeProjectDependencies>
+                                    <mainClass>ch.niceideas.eskimo.utils.GenerateLCOV</mainClass>
+                                    <classpathScope>test</classpathScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>pdfDoc</id>
             <activation>

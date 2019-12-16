@@ -34,25 +34,122 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.eskimo.utils.GenerateLCOV;
 import com.gargoylesoftware.htmlunit.AjaxController;
-import com.gargoylesoftware.htmlunit.AlertHandler;
-import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import jscover.Main;
+import jscover.report.FileData;
+import jscover.report.JSONDataMerger;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.*;
+import org.junit.rules.TestName;
 
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
 
+    private static Thread server;
+    private static Main main = null;
+
+    private static File jsCoverageFlagFile = new File("target/jsCoverageFlag");
+
+    private static String jsCoverReportDir = "target/jscov-report";
+    private static String[] jsCoverArgs = new String[]{
+            "-ws",
+            "--document-root=src/main/webapp",
+            "--port=9001",
+            //"--no-branch",
+            //"--no-function",
+            //"--no-instrument=example/lib",
+            "--log=INFO",
+            "--report-dir=" + jsCoverReportDir
+    };
+
+    private static String className = null;
+    private static List<String> coverages = new ArrayList<>();
+
+    private static JSONDataMerger jsonDataMerger = new JSONDataMerger();
+    @Rule
+    public TestName name = new TestName();
+
     protected WebClient webClient;
     protected HtmlPage page;
+
+    @BeforeClass
+    public static void setUpOnce() {
+        if (isCoverageRun()) {
+            main = new Main();
+            server = new Thread(() -> main.runMain(jsCoverArgs));
+            server.start();
+        }
+    }
+
+    @AfterClass
+    public static void tearDownOnce() throws Exception {
+        if (isCoverageRun()) {
+            main.stop();
+
+            File targetFile = new File(jsCoverReportDir + "/" + className, "jscoverage.json");
+            targetFile.getParentFile().mkdirs();
+            FileUtils.writeFile(targetFile, mergeJSON());
+        }
+    }
+
+    @Before
+    public void setUpClassName() throws Exception {
+        Class clazz = this.getClass(); //if you want to get Class object
+        className = clazz.getCanonicalName(); //you want to get only class name
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        if (isCoverageRun()) {
+            page.executeJavaScript("window.jscoverFinished = false;");
+            page.executeJavaScript("jscoverage_report('', function(){window.jscoverFinished=true;});");
+
+            int attempt = 0;
+            while ((!((Boolean) (page.executeJavaScript("window.jscoverFinished").getJavaScriptResult())).booleanValue()) && attempt < 10) {
+                logger.debug("Waiting for coverage report to be written ...");
+                Thread.sleep(500);
+                attempt++;
+            }
+
+            String json = (String) (page.executeJavaScript("jscoverage_serializeCoverageToJSON();")).getJavaScriptResult();
+            coverages.add(json);
+        }
+    }
+
+    private static String mergeJSON() {
+        SortedMap<String, FileData> total = new TreeMap<>();
+        for (int i = 0; i < coverages.size(); i++) {
+            String json = coverages.get(i);
+            total = jsonDataMerger.mergeJSONCoverageMaps(total, jsonDataMerger.jsonToMap(json));
+        }
+        return GenerateLCOV.toJSON(total);
+    }
+
+    protected static final boolean isCoverageRun() {
+        //return true;
+        return jsCoverageFlagFile.exists();
+    }
+
+    protected final void loadScript (HtmlPage page, String script) {
+        if (isCoverageRun()) {
+            page.executeJavaScript("loadScript('http://localhost:9001/scripts/"+script+"')");
+        } else {
+            page.executeJavaScript("loadScript('../../src/main/webapp/scripts/"+script+"')");
+        }
+    }
 
     @Before
     public void init() throws Exception {
@@ -112,7 +209,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
         page.executeJavaScript("eskimoMain.menuResize = function () {};");
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/jquery-3.3.1.js')");
+        loadScript (page, "jquery-3.3.1.js");
 
         // override jquery load
         page.executeJavaScript("$.fn._internalLoad = $.fn.load;");

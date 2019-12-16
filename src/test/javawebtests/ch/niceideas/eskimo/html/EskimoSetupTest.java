@@ -44,8 +44,8 @@ public class EskimoSetupTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoUtils.js')");
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoSetup.js')");
+        loadScript(page, "eskimoUtils.js");
+        loadScript(page, "eskimoSetup.js");
 
         page.executeJavaScript("function errorHandler() {};");
 

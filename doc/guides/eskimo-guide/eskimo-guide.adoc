@@ -900,8 +900,8 @@ available from within Eskimo.
 
 They are disposed in the menu under "_Eskimo Services_".
 
-The pre-packaged web consoles with Eskimo are Zeppelin, Gdash, Kibana, Grafana, Cerebro, Spark History Server, Kafka
-Manager and Mesos Console.
+The pre-packaged web consoles with Eskimo are Zeppelin, Gdash, Kibana, Grafana, Cerebro, Spark History Server,
+Flink App Manager, Kafka Manager and Mesos Console.
 
 
 == Eskimo pre-Packaged services
@@ -934,7 +934,7 @@ Since every restart of a service creates actually a new docker container, contai
 freshly restarted every time. +
 This is why the persistent data is stored under sub-folders if `/var/lib` which is mounted to the docker container.
 
-==== Commands wrappers for kafka, logstash and spark
+==== Commands wrappers for kafka, logstash, spark and flink
 
 Commands such as kafka `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
 executor docker containers.
@@ -1138,7 +1138,7 @@ enabling fault-tolerant and elastic distributed systems to easily be built and r
 
 Mesos is a distributed system kernel. Mesos is built using the same principles as the Linux kernel, only at a
 different level of abstraction. +
-The Mesos kernel runs on every machine and provides applications (e.g., Hadoop, Spark, Kafka, Elasticsearch) with
+The Mesos kernel runs on every machine and provides applications (e.g., Hadoop, Spark, Kafka, Flink) with
 API’s for resource management and scheduling across entire datacenter and cloud environments.
 
 http://mesos.apache.org/

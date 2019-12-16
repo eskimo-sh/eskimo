@@ -50,7 +50,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"));
 
-        page.executeJavaScript("loadScript('../../src/main/webapp/scripts/eskimoFileManagers.js')");
+        loadScript (page, "eskimoFileManagers.js");
 
         page.executeJavaScript("function errorHandler() {};");
 
