@@ -83,13 +83,14 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
 
         page.executeJavaScript("openedFileManagers.push({\"nodeName\" : \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\", \"current\": \"/\"});");
-        assertEquals ("1.0", page.executeJavaScript("eskimoFileManagers.getOpenedFileManagers().length").getJavaScriptResult().toString());
-        assertEquals ("192-168-10-11", page.executeJavaScript("eskimoFileManagers.getOpenedFileManagers()[0].nodeName").getJavaScriptResult().toString());
+
+        assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
+        assertJavascriptEquals("192-168-10-11", "eskimoFileManagers.getOpenedFileManagers()[0].nodeName");
 
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
         // if this is set then we want as far as listFolder function
-        assertEquals("/", page.executeJavaScript("eskimoFileManagers.getOpenedFileManagers()[0].current").getJavaScriptResult().toString());
+        assertJavascriptEquals("/", "eskimoFileManagers.getOpenedFileManagers()[0].current");
     }
 
 }

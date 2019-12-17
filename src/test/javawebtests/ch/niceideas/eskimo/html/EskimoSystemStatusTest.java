@@ -37,12 +37,17 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class EskimoSystemStatusTest extends AbstractWebTest {
+
+    private static final Logger logger = Logger.getLogger(EskimoSystemStatusTest.class);
 
     private String jsonStatus = null;
     private String jsonStatusConfig = null;
@@ -136,6 +141,84 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertNotNull (tableString);
         assertTrue (tableString.contains("192.168.10.11"));
         assertFalse (tableString.contains("192.168.10.13"));
+    }
 
+    @Test
+    public void testHandleSystemStatus() throws Exception {
+
+        String jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));
+
+        page.executeJavaScript("var jsonFullStatus = " + jsonFullStatus);
+
+        // grafana not available
+        page.executeJavaScript("eskimoServices.isServiceAvailable = function () { return false; }");
+
+        page.executeJavaScript("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
+
+        assertCssValue("#status-monitoring-no-dashboard", "display", "inherit");
+        assertCssValue("#status-monitoring-dashboard-frame", "display", "none");
+
+        assertAttrValue("#status-monitoring-dashboard-frame", "src", "html/emptyPage.html");
+
+        // grafana available
+        page.executeJavaScript("eskimoServices.isServiceAvailable = function () { return true; }");
+
+        page.executeJavaScript("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
+
+        int i = 0;
+        for (; i < 20; i++) {
+            Thread.sleep(400);
+            try {
+                assertCssValue("#status-monitoring-no-dashboard", "display", "none");
+                assertCssValue("#status-monitoring-dashboard-frame", "display", "inherit");
+            } catch (ComparisonFailure e) {
+                logger.debug (e, e);
+            }
+            break;
+        }
+        if (i == 20) {
+            fail ("Race condition ? Couldn't find monitoring dashboard frame");
+        }
+
+        assertJavascriptEquals("<span style=\"color: darkgreen;\">OK</span>", "$('#system-information-nodes-status').html()");
+
+        assertJavascriptEquals("<span style=\"color: darkgreen;\">OK</span>", "$('#system-information-services-status').html()");
+
+        // ruin a service and a node
+        SystemStatusWrapper ssw = new SystemStatusWrapper(jsonFullStatus);
+        ssw.setValueForPath("nodeServicesStatus.service_mesos-agent_192-168-10-11", "KO");
+        ssw.setValueForPath("nodeServicesStatus.node_alive_192-168-10-13", "KO");
+        ssw.setValueForPath("nodeServicesStatus.node_address_192-168-10-13", "192.168.10.13");
+        page.executeJavaScript("jsonFullStatus = " + ssw.getFormattedValue());
+
+        page.executeJavaScript("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
+
+        Thread.sleep(400);
+
+        assertJavascriptEquals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>",
+                "$('#system-information-nodes-status').html()");
+
+        assertJavascriptEquals("Following services are reporting problems : <span style=\"color: darkred;\">mesos-agent</span>",
+                "$('#system-information-services-status').html()");
+
+        String expectedHtmlInformation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/expectedHtmlInformation.html"));
+        assertJavascriptEquals(expectedHtmlInformation.replace("\n", "").replace("  ", ""), "$('#system-information-actions').html()");
+    }
+
+    @Test
+    public void testShowStatusMessage() throws Exception {
+
+        page.executeJavaScript("eskimoSystemStatus.showStatusMessage ('test');");
+
+        assertCssValue("#service-status-warning", "display", "block");
+        assertCssValue("#service-status-warning", "visibility", "visible");
+
+        assertAttrValue("#service-status-warning-message", "class", "alert alert-warning");
+
+        assertJavascriptEquals("test", "$('#service-status-warning-message').html()");
+
+        page.executeJavaScript("eskimoSystemStatus.showStatusMessage ('test', true);");
+
+        assertAttrValue("#service-status-warning-message", "class", "alert alert-danger");
     }
 }

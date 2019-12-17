@@ -34,55 +34,47 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
-public class EskimoServicesConfigTest extends AbstractWebTest {
-
-    private String jsonConfig = null;
+public class EskimoNotificationsTest extends AbstractWebTest {
 
     @Before
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServicesConfig.js");
+        loadScript(page, "eskimoNotifications.js");
+
+        page.executeJavaScript("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig();");
-
-        waitForElementIdInDOM("reset-services-config-btn");
-
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
-
-        page.executeJavaScript("var TEST_SERVICE_CONFIG = " + jsonConfig + ";");
-
-        page.executeJavaScript("eskimoServicesConfig.setServicesConfigForTest(TEST_SERVICE_CONFIG.configs)");
-
+        page.executeJavaScript("eskimoNotifications = new eskimo.Notifications();");
     }
 
     @Test
-    public void testLayoutServicesConfig() throws Exception {
+    public void testAddNotifications() throws Exception {
+        page.executeJavaScript("eskimoNotifications.addNotification({\n" +
+                "      \"type\": \"Info\",\n" +
+                "      \"message\": \"Installation of Topology and settings on 192.168.10.11 succeeded\"\n" +
+                "    });");
 
-        page.executeJavaScript("eskimoServicesConfig.layoutServicesConfig();");
+        assertJavascriptEquals("1", "$('#new-notifications-count').html()");
 
-        //System.out.println (page.asXml());
+        String notificationsHTML = page.executeJavaScript("$('#notifications-container').html()").getJavaScriptResult().toString();
+        assertTrue (notificationsHTML.startsWith ("" +
+                "<li class=\"hoe-submenu-label\">\n" +
+                "    <h3><span id=\"notifications-count\" class=\"bold\">1    </span> Notification(s)     <a href=\"javascript:eskimoMain.getNotifications().clearNotifications();\"><span class=\"notifications-clear-link\">Clear</span></a></h3>\n" +
+                "</li><li>\n" +
+                "    <a href=\"#\" class=\"clearfix\">\n" +
+                "        <i class=\"fa fa-cogs green-text\"></i>\n" +
+                "        <span class=\"notification-title\">Information</span>\n"));
 
-        // test a few input values
-
-        assertJavascriptEquals ("false", "$('#elasticsearch-action-destructive_requires_name').val()");
-
-        assertJavascriptEquals ("", "$('#kafka-socket-send-buffer-bytes').val()");
-
-        assertJavascriptEquals ("3", "$('#kafka-num-partitions').val()");
-
-        assertJavascriptEquals ("", "$('#spark-executor-spark-rpc-numRetries').val()");
-
-        assertJavascriptEquals ("", "$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()");
-
+        assertTrue (notificationsHTML.endsWith("" +
+                "        <p class=\"notification-message\">Installation of Topology and settings on 192.168.10.11 succeeded</p>\n" +
+                "    </a>\n" +
+                "</li>"));
     }
 
 }
+

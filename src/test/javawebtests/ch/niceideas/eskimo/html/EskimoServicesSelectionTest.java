@@ -60,8 +60,6 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         waitForElementIdInDOM("select-all-services-button");
 
-        URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
-
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
         page.executeJavaScript("eskimoServicesSelection.setServicesConfigForTest(SERVICES_CONFIGURATION);");
@@ -70,8 +68,8 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testGetService() throws Exception {
 
-        assertEquals ("spark-history-server", page.executeJavaScript("eskimoServicesSelection.getService(1, 1).name").getJavaScriptResult().toString());
-        assertEquals ("elasticsearch", page.executeJavaScript("eskimoServicesSelection.getService(3, 3).name").getJavaScriptResult().toString());
+        assertJavascriptEquals("spark-history-server", "eskimoServicesSelection.getService(1, 1).name");
+        assertJavascriptEquals ("elasticsearch", "eskimoServicesSelection.getService(3, 3).name");
 
     }
 
@@ -80,9 +78,9 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServicesSelection.initModalServicesConfig()");
 
-        assertEquals("1.0", page.executeJavaScript("$('#cerebro-choice').length").getJavaScriptResult().toString());
-        assertEquals("1.0", page.executeJavaScript("$('#kibana-choice').length").getJavaScriptResult().toString());
-        assertEquals("1.0", page.executeJavaScript("$('#grafana-choice').length").getJavaScriptResult().toString());
+        assertJavascriptEquals("1.0", "$('#cerebro-choice').length");
+        assertJavascriptEquals("1.0", "$('#kibana-choice').length");
+        assertJavascriptEquals("1.0", "$('#grafana-choice').length");
 
     }
 

@@ -95,5 +95,8 @@ function errorHandler (jqXHR, status) {
 }
 
 function isFunction(functionToCheck) {
-    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+    if (!functionToCheck) {
+        return false;
+    }
+    return {}.toString.call(functionToCheck) === '[object Function]';
 }

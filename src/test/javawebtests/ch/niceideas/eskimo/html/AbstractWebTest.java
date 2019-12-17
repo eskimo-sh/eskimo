@@ -54,6 +54,8 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
@@ -220,6 +222,22 @@ public abstract class AbstractWebTest {
     @After
     public void close() throws Exception {
         webClient.close();
+    }
+
+    protected void assertAttrValue(String selector, String attribute, String value) throws Exception {
+        assertEquals (value, page.executeJavaScript("$('"+selector+"').attr('"+attribute+"')").getJavaScriptResult());
+    }
+
+    protected void assertCssValue(String selector, String attribute, String value) throws Exception {
+        assertEquals (value, page.executeJavaScript("$('"+selector+"').css('"+attribute+"')").getJavaScriptResult());
+    }
+
+    protected void assertJavascriptEquals(String value, String javascript) throws Exception {
+        assertEquals (value, page.executeJavaScript(javascript).getJavaScriptResult().toString());
+    }
+
+    protected void assertTagName(String elementId, String tagName) throws Exception {
+        assertEquals (tagName, page.getElementById(elementId).getTagName());
     }
 
     protected void waitForElementIdInDOM(String elementId) throws InterruptedException {

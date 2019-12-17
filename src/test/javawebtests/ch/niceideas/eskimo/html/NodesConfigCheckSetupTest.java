@@ -97,10 +97,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (true, result.getJavaScriptResult());
+        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -112,10 +109,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -147,10 +141,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (true, result.getJavaScriptResult());
+        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -184,10 +175,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (true, result.getJavaScriptResult());
+        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -209,10 +197,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (true, result.getJavaScriptResult());
+        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
 
@@ -247,10 +232,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
 
@@ -261,11 +243,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("action_id1", "");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
-    }
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");    }
 
     @Test
     public void testKeyGreaterThanNodeNumber() throws Exception {
@@ -274,10 +252,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("action_id2", "192.168.10.11");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -289,10 +264,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("ntp1", "on");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -307,10 +279,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("ntp2", "on");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -325,10 +294,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("logstash1", "on");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -350,10 +316,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -368,10 +331,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -385,10 +345,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -403,10 +360,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("spark-history-server", "1");
         }});
 
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertNotNull(result);
-        assertEquals (false, result.getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -430,12 +384,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("flink-app-master", "2");
         }});
 
-
-        ScriptResult result = page.executeJavaScript("eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
-
-        assertEquals (false, result.getJavaScriptResult());
-
-        Thread.sleep(2000);
+        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
     }
 
 }

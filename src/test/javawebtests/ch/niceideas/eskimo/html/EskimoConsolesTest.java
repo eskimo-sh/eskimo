@@ -86,19 +86,19 @@ public class EskimoConsolesTest extends AbstractWebTest {
         page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
         page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.13', '192-168-10-13')");
 
-        assertEquals ("hidden", page.executeJavaScript("$('#consoles-console-192-168-10-11').css('visibility')").getJavaScriptResult().toString());
-        assertEquals ("none", page.executeJavaScript("$('#consoles-console-192-168-10-11').css('display')").getJavaScriptResult().toString());
+        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "hidden");
+        assertCssValue ("#consoles-console-192-168-10-11", "display", "none");
 
-        assertEquals ("inherit", page.executeJavaScript("$('#consoles-console-192-168-10-13').css('visibility')").getJavaScriptResult().toString());
-        assertEquals ("inherit", page.executeJavaScript("$('#consoles-console-192-168-10-13').css('display')").getJavaScriptResult().toString());
+        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "inherit");
+        assertCssValue ("#consoles-console-192-168-10-13", "display", "inherit");
 
         page.executeJavaScript("eskimoConsoles.showPrevTab()");
 
-        assertEquals ("inherit", page.executeJavaScript("$('#consoles-console-192-168-10-11').css('visibility')").getJavaScriptResult().toString());
-        assertEquals ("inherit", page.executeJavaScript("$('#consoles-console-192-168-10-11').css('display')").getJavaScriptResult().toString());
+        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "inherit");
+        assertCssValue ("#consoles-console-192-168-10-11", "display", "inherit");
 
-        assertEquals ("hidden", page.executeJavaScript("$('#consoles-console-192-168-10-13').css('visibility')").getJavaScriptResult().toString());
-        assertEquals ("none", page.executeJavaScript("$('#consoles-console-192-168-10-13').css('display')").getJavaScriptResult().toString());
+        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "hidden");
+        assertCssValue ("#consoles-console-192-168-10-13", "display", "none");
     }
 
     @Test
@@ -110,12 +110,11 @@ public class EskimoConsolesTest extends AbstractWebTest {
         page.executeJavaScript("eskimoConsoles.showNextTab()");
 
         // situation is now inverse
-        assertEquals ("hidden", page.executeJavaScript("$('#consoles-console-192-168-10-11').css('visibility')").getJavaScriptResult().toString());
-        assertEquals ("none", page.executeJavaScript("$('#consoles-console-192-168-10-11').css('display')").getJavaScriptResult().toString());
+        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "hidden");
+        assertCssValue ("#consoles-console-192-168-10-11", "display", "none");
 
-        assertEquals ("inherit", page.executeJavaScript("$('#consoles-console-192-168-10-13').css('visibility')").getJavaScriptResult().toString());
-        assertEquals ("inherit", page.executeJavaScript("$('#consoles-console-192-168-10-13').css('display')").getJavaScriptResult().toString());
-
+        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "inherit");
+        assertCssValue ("#consoles-console-192-168-10-13", "display", "inherit");
     }
 
 }

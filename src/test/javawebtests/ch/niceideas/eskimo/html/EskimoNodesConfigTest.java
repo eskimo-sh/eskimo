@@ -88,9 +88,10 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("eskimoNodesConfig.removeNode ('remove1')");
 
         // ensure values are found in node 1
-        assertEquals ("192.168.10.11", page.executeJavaScript("$('#action_id1').attr('value')").getJavaScriptResult());
-        assertEquals (true, page.executeJavaScript("$('#zeppelin1').get(0).checked").getJavaScriptResult());
-        assertEquals (true, page.executeJavaScript("$('#elasticsearch1').get(0).checked").getJavaScriptResult());
+        assertAttrValue("#action_id1", "value", "192.168.10.11");
+
+        assertJavascriptEquals("true", "$('#zeppelin1').get(0).checked");
+        assertJavascriptEquals("true", "$('#elasticsearch1').get(0).checked");
     }
 
     @Test
@@ -99,48 +100,45 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("eskimoNodesConfig.addNode()");
 
         assertNotNull (page.getElementById("action_id1"));
-        assertEquals ("input", page.getElementById("action_id1").getTagName());
+        assertTagName ("action_id1", "input");
 
         assertNotNull (page.getElementById("spark-history-server1"));
-        assertEquals ("input", page.getElementById("spark-history-server1").getTagName());
+        assertTagName ("spark-history-server1", "input");
 
         assertNotNull (page.getElementById("zookeeper1"));
-        assertEquals ("input", page.getElementById("zookeeper1").getTagName());
+        assertTagName ("zookeeper1", "input");
 
         assertNotNull (page.getElementById("gluster1"));
-        assertEquals ("input", page.getElementById("gluster1").getTagName());
+        assertTagName ("gluster1", "input");
 
         assertNotNull (page.getElementById("cerebro1"));
-        assertEquals ("input", page.getElementById("cerebro1").getTagName());
+        assertTagName ("cerebro1", "input");
 
         assertNotNull (page.getElementById("mesos-master1"));
-        assertEquals ("input", page.getElementById("mesos-master1").getTagName());
-
-        assertNotNull (page.getElementById("mesos-agent1"));
-        assertEquals ("input", page.getElementById("mesos-agent1").getTagName());
+        assertTagName ("mesos-master1", "input");
 
         assertNotNull (page.getElementById("kibana1"));
-        assertEquals ("input", page.getElementById("kibana1").getTagName());
+        assertTagName ("kibana1", "input");
 
         assertNotNull (page.getElementById("gdash1"));
-        assertEquals ("input", page.getElementById("gdash1").getTagName());
+        assertTagName ("gdash1", "input");
 
         assertNotNull (page.getElementById("elasticsearch1"));
-        assertEquals ("input", page.getElementById("elasticsearch1").getTagName());
+        assertTagName ("elasticsearch1", "input");
 
         assertNotNull (page.getElementById("zeppelin1"));
-        assertEquals ("input", page.getElementById("zeppelin1").getTagName());
+        assertTagName ("zeppelin1", "input");
 
         assertNotNull (page.getElementById("spark-executor1"));
-        assertEquals ("input", page.getElementById("spark-executor1").getTagName());
+        assertTagName ("spark-executor1", "input");
 
         assertNotNull (page.getElementById("kafka1"));
-        assertEquals ("input", page.getElementById("kafka1").getTagName());
+        assertTagName ("kafka1", "input");
 
         assertNotNull (page.getElementById("logstash1"));
-        assertEquals ("input", page.getElementById("logstash1").getTagName());
+        assertTagName ("logstash1", "input");
 
-        assertEquals (1.0, (double) page.executeJavaScript("eskimoNodesConfig.getNodesCount()").getJavaScriptResult(), 0.0);
+        assertJavascriptEquals ("1.0", "eskimoNodesConfig.getNodesCount()");
 
     }
 }

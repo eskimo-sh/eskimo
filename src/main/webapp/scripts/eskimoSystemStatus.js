@@ -463,7 +463,7 @@ eskimo.SystemStatus = function() {
         }
 
         if (nodesWithproblem.length == 0) {
-            $("#system-information-nodes-status").html("<span style='color: darkgreen;'>OK</span>")
+            $("#system-information-nodes-status").html("<span style='color: darkgreen;'>OK</span>");
         } else {
             $("#system-information-nodes-status").html(
                 "Following nodes are reporting problems : <span style='color: darkred;'>" +
@@ -478,7 +478,7 @@ eskimo.SystemStatus = function() {
                 var serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
                 var serviceAlive = nodeServicesStatus[key];
                 if (serviceAlive != "OK") {
-                    if (!servicesWithproblem.includes(serviceName)) {
+                    if (servicesWithproblem.length <= 0 || !servicesWithproblem.includes(serviceName)) {
                         servicesWithproblem.push(serviceName);
                     }
                 }
@@ -487,12 +487,15 @@ eskimo.SystemStatus = function() {
 
         if (servicesWithproblem.length == 0) {
             if (nodesWithproblem.length == 0) {
-                $("#system-information-services-status").html("<span style='color: darkgreen;'>OK</span>")
+                $("#system-information-services-status").html("<span style='color: darkgreen;'>OK</span>");
             } else {
-                $("#system-information-services-status").html("<span style='color: darkred;'>-</span>")
+                $("#system-information-services-status").html("<span style='color: darkred;'>-</span>");
             }
         } else {
-            $("#system-information-services-status").html("Following services are reporting problems : " + servicesWithproblem.join(", "));
+            $("#system-information-services-status").html("Following services are reporting problems : " +
+                "<span style='color: darkred;'>" +
+                servicesWithproblem.join(", ") +
+                "</span>");
         }
 
         // C. System Information Actions

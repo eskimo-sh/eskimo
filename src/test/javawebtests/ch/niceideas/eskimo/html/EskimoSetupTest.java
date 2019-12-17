@@ -37,8 +37,6 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
-
 public class EskimoSetupTest extends AbstractWebTest {
 
     @Before
@@ -67,20 +65,39 @@ public class EskimoSetupTest extends AbstractWebTest {
         //System.out.println (page.asXml());
 
         // should have displayed the error
-        assertEquals ("inherit", page.executeJavaScript("$('#setup-warning').css('display')").getJavaScriptResult());
-        assertEquals ("Configuration Storage path should be set", page.executeJavaScript("$('#setup-warning-message').html()").getJavaScriptResult());
+        assertCssValue ("#setup-warning", "display", "inherit");
+        assertJavascriptEquals ("Configuration Storage path should be set", "$('#setup-warning-message').html()");
 
         page.executeJavaScript("$('#setup_storage').val('/tmp/test')");
 
         page.executeJavaScript("eskimoSetup.saveSetup()");
 
-        assertEquals ("SSH Username to use to reach cluster nodes should be set", page.executeJavaScript("$('#setup-warning-message').html()").getJavaScriptResult());
+        assertJavascriptEquals ("SSH Username to use to reach cluster nodes should be set",
+                "$('#setup-warning-message').html()");
 
         page.executeJavaScript("$('#ssh_username').val('eskimo')");
 
         page.executeJavaScript("eskimoSetup.saveSetup()");
 
-        assertEquals ("SSH Identity Private Key to use to reach cluster nodes should be set", page.executeJavaScript("$('#setup-warning-message').html()").getJavaScriptResult());
+        assertJavascriptEquals ("SSH Identity Private Key to use to reach cluster nodes should be set",
+                "$('#setup-warning-message').html()");
+    }
+
+    @Test
+    public void testShowSetupMessage() throws Exception {
+
+        page.executeJavaScript("eskimoSetup.showSetupMessage ('test');");
+
+        assertCssValue("#setup-warning", "display", "inherit");
+        assertCssValue("#setup-warning", "visibility", "inherit");
+
+        assertAttrValue("#setup-warning-message", "class", "alert alert-danger");
+
+        assertJavascriptEquals("test", "$('#setup-warning-message').html()");
+
+        page.executeJavaScript("eskimoSetup.showSetupMessage ('test', true);");
+
+        assertAttrValue("#setup-warning-message", "class", "alert alert-info");
     }
 
 }

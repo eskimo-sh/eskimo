@@ -73,17 +73,17 @@ public class EskimoMainTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoMain.showOnlyContent('pending')");
 
-        assertEquals("hidden", page.executeJavaScript("$('#inner-content-status').css('visibility')").getJavaScriptResult());
-        assertEquals("hidden", page.executeJavaScript("$('#inner-content-consoles').css('visibility')").getJavaScriptResult());
-        assertEquals("hidden", page.executeJavaScript("$('#inner-content-setup').css('visibility')").getJavaScriptResult());
-        assertEquals("hidden", page.executeJavaScript("$('#inner-content-nodes').css('visibility')").getJavaScriptResult());
-        assertEquals("hidden", page.executeJavaScript("$('#inner-content-services-config').css('visibility')").getJavaScriptResult());
-        assertEquals("hidden", page.executeJavaScript("$('#inner-content-file-managers').css('visibility')").getJavaScriptResult());
+        assertCssValue("#inner-content-status", "visibility", "hidden");
 
-        assertEquals("visible", page.executeJavaScript("$('#inner-content-pending').css('visibility')").getJavaScriptResult());
+        assertCssValue("#inner-content-consoles", "visibility", "hidden");
+        assertCssValue("#inner-content-setup", "visibility", "hidden");
+        assertCssValue("#inner-content-nodes", "visibility", "hidden");
+        assertCssValue("#inner-content-services-config", "visibility", "hidden");
+        assertCssValue("#inner-content-file-managers", "visibility", "hidden");
 
-        assertEquals(true, page.executeJavaScript("eskimoMain.isCurrentDisplayedService('pending')").getJavaScriptResult());
+        assertCssValue("#inner-content-pending", "visibility", "visible");
 
+        assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('pending')");
     }
 
 }

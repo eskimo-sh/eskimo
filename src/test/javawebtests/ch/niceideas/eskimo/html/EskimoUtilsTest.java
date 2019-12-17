@@ -41,48 +41,51 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class EskimoServicesConfigTest extends AbstractWebTest {
-
-    private String jsonConfig = null;
+public class EskimoUtilsTest extends AbstractWebTest {
 
     @Before
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServicesConfig.js");
-
-        // instantiate test object
-        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig();");
-
-        waitForElementIdInDOM("reset-services-config-btn");
-
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
-
-        page.executeJavaScript("var TEST_SERVICE_CONFIG = " + jsonConfig + ";");
-
-        page.executeJavaScript("eskimoServicesConfig.setServicesConfigForTest(TEST_SERVICE_CONFIG.configs)");
-
     }
 
     @Test
-    public void testLayoutServicesConfig() throws Exception {
+    public void testGetHyphenSeparated() throws Exception {
 
-        page.executeJavaScript("eskimoServicesConfig.layoutServicesConfig();");
+        assertJavascriptEquals("test-a-string", "getHyphenSeparated('testAString')");
 
-        //System.out.println (page.asXml());
+        assertJavascriptEquals("test", "getHyphenSeparated('test')");
+    }
 
-        // test a few input values
+    @Test
+    public void testGetCamelCase() throws Exception {
 
-        assertJavascriptEquals ("false", "$('#elasticsearch-action-destructive_requires_name').val()");
+        assertJavascriptEquals("testAString", "getCamelCase('test-a-string')");
 
-        assertJavascriptEquals ("", "$('#kafka-socket-send-buffer-bytes').val()");
+        assertJavascriptEquals("test", "getCamelCase('test')");
+    }
 
-        assertJavascriptEquals ("3", "$('#kafka-num-partitions').val()");
+    @Test
+    public void testSerializeObject() throws Exception {
 
-        assertJavascriptEquals ("", "$('#spark-executor-spark-rpc-numRetries').val()");
+        String testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoUtilsTest/testForm.html"));
+        page.executeJavaScript("$('#main-content').html('"+testForm.replace("\n", "")+"')");
 
-        assertJavascriptEquals ("", "$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()");
+        String serializedForm = page.executeJavaScript("JSON.stringify($('form#testForm').serializeObject())").getJavaScriptResult().toString();
+        assertEquals("{\"text1\":\"test1\",\"text2\":\"test2\",\"hidden1\":\"testHidden1\"}", serializedForm);
+    }
 
+    @Test
+    public void testIsFunction() throws Exception {
+        assertJavascriptEquals("false", "isFunction(new Array())");
+        assertJavascriptEquals("false", "isFunction(null)");
+        assertJavascriptEquals("false", "isFunction(0)");
+        assertJavascriptEquals("false", "isFunction(\"test\")");
+        assertJavascriptEquals("false", "isFunction('test')");
+        assertJavascriptEquals("false", "isFunction({})");
+
+        assertJavascriptEquals("true", "isFunction(new Function())");
     }
 
 }
+

@@ -1,0 +1,68 @@
+{
+  "nodeServicesStatus": {
+    "service_kafka-manager_192-168-10-11": "OK",
+    "node_nbr_192-168-10-11": "1",
+    "service_kafka_192-168-10-11": "OK",
+    "service_cerebro_192-168-10-11": "OK",
+    "service_elasticsearch_192-168-10-11": "OK",
+    "service_flink-worker_192-168-10-11": "OK",
+    "service_spark-history-server_192-168-10-11": "OK",
+    "service_flink-app-master_192-168-10-11": "OK",
+    "service_mesos-agent_192-168-10-11": "OK",
+    "service_ntp_192-168-10-11": "OK",
+    "service_grafana_192-168-10-11": "OK",
+    "service_kibana_192-168-10-11": "OK",
+    "node_address_192-168-10-11": "192.168.10.11",
+    "node_alive_192-168-10-11": "OK",
+    "service_mesos-master_192-168-10-11": "OK",
+    "service_zeppelin_192-168-10-11": "OK",
+    "service_spark-executor_192-168-10-11": "OK",
+    "service_zookeeper_192-168-10-11": "OK",
+    "service_logstash_192-168-10-11": "OK",
+    "service_prometheus_192-168-10-11": "OK"
+  },
+  "processingPending": false,
+  "systemStatus": {
+    "monitoringDashboardId": "OMwJrHAWk",
+    "monitoringDashboardRefreshPeriod": "30s",
+    "buildVersion": "0.2-SNAPSHOT",
+    "buildTimestamp": "2019-12-12T17:14:31Z",
+    "sshUsername": "eskimo",
+    "links": [
+      {
+        "title": "Access all monitoring dashboards in Grafana",
+        "service": "grafana"
+      },
+      {
+        "title": "Monitor Flink and Spark processes in Mesos",
+        "service": "mesos-master"
+      },
+      {
+        "title": "Administer your kafka topics",
+        "service": "kafka-manager"
+      },
+      {
+        "title": "Monitor your Spark jobs",
+        "service": "spark-history-server"
+      },
+      {
+        "title": "Monitor your Flink jobs",
+        "service": "flink-app-master"
+      },
+      {
+        "title": "Administer your data in Elasticsearch",
+        "service": "cerebro"
+      },
+      {
+        "title": "Visualize your data in Elasticsearch",
+        "service": "kibana"
+      },
+      {
+        "title": "Use Zeppelin for your Data Science projects",
+        "service": "zeppelin"
+      }
+    ],
+    "startTimestamp": "2019-12-15 11:02:14"
+  },
+  "status": "OK"
+}

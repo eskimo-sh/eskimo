@@ -40,8 +40,6 @@ import org.junit.Test;
 
 import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
-
 public class EskimoServicesTest extends AbstractWebTest {
 
     @Before
@@ -77,15 +75,15 @@ public class EskimoServicesTest extends AbstractWebTest {
         page.executeJavaScript("eskimoServices.createServicesMenu()");
 
         // make sure they're created
-        assertEquals (1.0, page.executeJavaScript("$( \"#folderMenuCerebro\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#folderMenuKibana\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#folderMenuGdash\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#folderMenuSparkHistoryServer\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#folderMenuZeppelin\" ).length").getJavaScriptResult());
+        assertJavascriptEquals ("1.0", "$('#folderMenuCerebro').length");
+        assertJavascriptEquals ("1.0", "$('#folderMenuKibana').length");
+        assertJavascriptEquals ("1.0", "$('#folderMenuGdash').length");
+        assertJavascriptEquals ("1.0", "$('#folderMenuSparkHistoryServer').length");
+        assertJavascriptEquals ("1.0", "$('#folderMenuZeppelin').length");
 
         // test zeppelin menu entry
-        assertEquals ("zeppelin-icon.png", page.executeJavaScript("$('#folderMenuZeppelin').find('a > img').attr('src')").getJavaScriptResult());
-        assertEquals ("zeppelin", page.executeJavaScript("$('#folderMenuZeppelin').find('a > span').html()").getJavaScriptResult());
+        assertJavascriptEquals ("zeppelin-icon.png", "$('#folderMenuZeppelin').find('a > img').attr('src')");
+        assertJavascriptEquals ("zeppelin", "$('#folderMenuZeppelin').find('a > span').html()");
     }
 
     @Test
@@ -94,19 +92,19 @@ public class EskimoServicesTest extends AbstractWebTest {
         page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin' }});");
 
-        assertEquals(true, page.executeJavaScript("eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')").getJavaScriptResult());
+        assertJavascriptEquals("true", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
 
         page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
                 "'actualUrl' : 'http://other-ip-address:9999/zeppelin' }});");
 
-        assertEquals(true, page.executeJavaScript("eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')").getJavaScriptResult());
+        assertJavascriptEquals("true", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
 
         page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
                 "'actualUrl' : 'http://192.168.10.11:9999/zeppelin' }});");
 
-        assertEquals(false, page.executeJavaScript("eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')").getJavaScriptResult());
+        assertJavascriptEquals("false", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
     }
 
     @Test
@@ -118,24 +116,24 @@ public class EskimoServicesTest extends AbstractWebTest {
         // make sure they are created
 
         // ensure values are found in node 1
-        assertEquals (1.0, page.executeJavaScript("$( \"#iframe-content-cerebro\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#iframe-content-kibana\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#iframe-content-gdash\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#iframe-content-spark-history-server\" ).length").getJavaScriptResult());
-        assertEquals (1.0, page.executeJavaScript("$( \"#iframe-content-zeppelin\" ).length").getJavaScriptResult());
+        assertJavascriptEquals ("1.0", "$('#iframe-content-cerebro').length");
+        assertJavascriptEquals ("1.0", "$('#iframe-content-kibana').length");
+        assertJavascriptEquals ("1.0", "$('#iframe-content-gdash').length");
+        assertJavascriptEquals ("1.0", "$('#iframe-content-spark-history-server').length");
+        assertJavascriptEquals ("1.0", "$('#iframe-content-zeppelin').length");
     }
 
     @Test
     public void testBuildUrl() throws Exception {
 
         page.executeJavaScript("uiConfig = {'urlTemplate': 'http://{NODE_ADDRESS}:9999/test'}"); // proxyContext
-        assertEquals("http://192.168.10.11:9999/test", page.executeJavaScript("eskimoServices.buildUrl(uiConfig, '192.168.10.11')").getJavaScriptResult());
+        assertJavascriptEquals("http://192.168.10.11:9999/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
         page.executeJavaScript("uiConfig = {'proxyContext': '/test', 'unique': true}"); //
-        assertEquals("/test", page.executeJavaScript("eskimoServices.buildUrl(uiConfig, '192.168.10.11')").getJavaScriptResult());
+        assertJavascriptEquals("/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
         page.executeJavaScript("uiConfig = {'proxyContext': '/test'}"); //
-        assertEquals("/test/192-168-10-11", page.executeJavaScript("eskimoServices.buildUrl(uiConfig, '192.168.10.11')").getJavaScriptResult());
+        assertJavascriptEquals("/test/192-168-10-11", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
     }
 
 }

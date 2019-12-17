@@ -34,55 +34,60 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
-public class EskimoServicesConfigTest extends AbstractWebTest {
-
-    private String jsonConfig = null;
+public class EskimoMessagingTest extends AbstractWebTest {
 
     @Before
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServicesConfig.js");
+        loadScript(page, "eskimoMessaging.js");
+
+        page.executeJavaScript("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig();");
-
-        waitForElementIdInDOM("reset-services-config-btn");
-
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
-
-        page.executeJavaScript("var TEST_SERVICE_CONFIG = " + jsonConfig + ";");
-
-        page.executeJavaScript("eskimoServicesConfig.setServicesConfigForTest(TEST_SERVICE_CONFIG.configs)");
-
+        page.executeJavaScript("eskimoMessaging = new eskimo.Messaging();");
     }
 
     @Test
-    public void testLayoutServicesConfig() throws Exception {
+    public void testStartStopOperationInprogress() throws Exception {
 
-        page.executeJavaScript("eskimoServicesConfig.layoutServicesConfig();");
+        page.executeJavaScript("eskimoMessaging.startOperationInProgress();");
 
-        //System.out.println (page.asXml());
+        assertCssValue("#progress-bar-pending-wrapper", "visibility", "inherit");
+        assertCssValue("#progress-bar-pending-wrapper", "display", "block");
 
-        // test a few input values
+        assertJavascriptEquals("<h3>Processing pending on Eskimo backend ....</h3>", "$('#pending-message-title').html()");
 
-        assertJavascriptEquals ("false", "$('#elasticsearch-action-destructive_requires_name').val()");
+        page.executeJavaScript("eskimoMessaging.stopOperationInProgress(false);");
 
-        assertJavascriptEquals ("", "$('#kafka-socket-send-buffer-bytes').val()");
+        assertCssValue("#progress-bar-pending-wrapper", "visibility", "hidden");
+        assertCssValue("#progress-bar-pending-wrapper", "display", "none");
 
-        assertJavascriptEquals ("3", "$('#kafka-num-partitions').val()");
+        assertJavascriptEquals("<h3><span class=\"processing-error\">Processing completed in error !</span></h3>",
+                "$('#pending-message-title').html()");
 
-        assertJavascriptEquals ("", "$('#spark-executor-spark-rpc-numRetries').val()");
 
-        assertJavascriptEquals ("", "$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()");
+        page.executeJavaScript("eskimoMessaging.startOperationInProgress();");
+
+        assertCssValue("#progress-bar-pending-wrapper", "visibility", "inherit");
+        assertCssValue("#progress-bar-pending-wrapper", "display", "block");
+
+        assertJavascriptEquals("<h3>Processing pending on Eskimo backend ....</h3>", "$('#pending-message-title').html()");
+
+        page.executeJavaScript("eskimoMessaging.stopOperationInProgress(true);");
+
+        assertCssValue("#progress-bar-pending-wrapper", "visibility", "hidden");
+        assertCssValue("#progress-bar-pending-wrapper", "display", "none");
+
+        assertJavascriptEquals("<h3>Processing completed successfully.</h3>",
+                "$('#pending-message-title').html()");
 
     }
 
 }
+

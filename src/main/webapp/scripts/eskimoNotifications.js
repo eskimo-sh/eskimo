@@ -227,8 +227,7 @@ eskimo.Notifications = function() {
             }
         }
 
-        var notifContainer = $("#notifications-container");
-        notifContainer.html(notificationHTML);
+        $("#notifications-container").html(notificationHTML);
 
     }
 

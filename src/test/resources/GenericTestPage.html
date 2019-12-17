@@ -15,6 +15,16 @@
 
 </script>
 
+<a href="#" onclick="javascript:eskimoMain.getNotifications().notificationsShown();" class="dropdown-toggle icon-circle" data-toggle="dropdown" >
+    <span class="fa fa-bell-o"></span>
+    <span id="new-notifications-count" class="badge badge-success"></span>
+</a>
+<ul id="notifications-container" class="dropdown-menu ">
+    <li class="hoe-submenu-label">
+        <h3><span id="notifications-count" class="bold">0</span> Notification(s) <a href="javascript:eskimoMain.getNotifications().clearNotifications();"><span style="color: #333333;">Clear</span></a></h3>
+    </li>
+</ul>
+
 <ul class="panel-list" id="mainFolderMenu">
     <li id="mainFolderMenuAnchor">Eskimo Services</li>
 </ul>
@@ -28,7 +38,24 @@
 <div class="inner-content" id="inner-content-consoles"></div>
 
 <!-- eskimoMessaging.html -->
-<div class="inner-content" id="inner-content-pending" style="display: none; visibility: hidden;"> </div>
+<div class="inner-content" id="inner-content-pending" style="display: none; visibility: hidden;">
+    <div id="pending-message-panel" style="position: relative;">
+
+        <div class="col-xs-12">
+            <div class="col-md-12" id="pending-message-title">
+                <h3>Information returned from Eskimo Backend</h3>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="col-md-12" id="pending-message">
+                <pre id="pending-message-content">(Here are displayed messages from Eskimo backend)</pre>
+            </div>
+        </div>
+    </div>
+
+
+</div>
 
 <!-- eskimoSetup.html -->
 <div class="inner-content" id="inner-content-setup" style="visibility: hidden; display: none;"></div>
