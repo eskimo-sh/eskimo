@@ -34,63 +34,38 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
 
-public class EskimoMessagingTest extends AbstractWebTest {
+public class EskimoOperationsCommandTest extends AbstractWebTest {
 
     @Before
-    public void init() throws Exception {
-        super.init();
+    public void setUp() throws Exception {
 
-        loadScript(page, "eskimoMessaging.js");
+        loadScript(page, "bootstrap.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        loadScript(page, "eskimoOperationsCommand.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoMessaging = new eskimo.Messaging();");
+        page.executeJavaScript("eskimoOperationsCommand = new eskimo.OperationsCommand();");
 
-        waitForElementIdInDOM("progress-bar-pending-wrapper");
+        waitForElementIdInDOM("operations-command-body");
     }
 
     @Test
-    public void testStartStopOperationInprogress() throws Exception {
+    public void testShowCommand() throws Exception {
 
-        page.executeJavaScript("eskimoMessaging.startOperationInProgress();");
+        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsCommandTest/command.json"));
 
-        assertCssValue("#progress-bar-pending-wrapper", "visibility", "inherit");
-        assertCssValue("#progress-bar-pending-wrapper", "display", "block");
+        page.executeJavaScript("eskimoOperationsCommand.showCommand("+command+".command)");
 
-        assertJavascriptEquals("<h3>Processing pending on Eskimo backend ....</h3>", "$('#pending-message-title').html()");
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsCommandTest/expectedResult.html"));
 
-        page.executeJavaScript("eskimoMessaging.stopOperationInProgress(false);");
-
-        assertCssValue("#progress-bar-pending-wrapper", "visibility", "hidden");
-        assertCssValue("#progress-bar-pending-wrapper", "display", "none");
-
-        assertJavascriptEquals("<h3><span class=\"processing-error\">Processing completed in error !</span></h3>",
-                "$('#pending-message-title').html()");
-
-
-        page.executeJavaScript("eskimoMessaging.startOperationInProgress();");
-
-        assertCssValue("#progress-bar-pending-wrapper", "visibility", "inherit");
-        assertCssValue("#progress-bar-pending-wrapper", "display", "block");
-
-        assertJavascriptEquals("<h3>Processing pending on Eskimo backend ....</h3>", "$('#pending-message-title').html()");
-
-        page.executeJavaScript("eskimoMessaging.stopOperationInProgress(true);");
-
-        assertCssValue("#progress-bar-pending-wrapper", "visibility", "hidden");
-        assertCssValue("#progress-bar-pending-wrapper", "display", "none");
-
-        assertJavascriptEquals("<h3>Processing completed successfully.</h3>",
-                "$('#pending-message-title').html()");
-
+        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#operations-command-body').html()");
     }
-
 }
 

@@ -1,0 +1,34 @@
+{
+  "command": {
+    "buildPackage": [],
+    "buildMesos": [],
+    "downloadMesos": [
+      "mesos-suse_1.8.1_1",
+      "mesos-redhat_1.8.1_1",
+      "mesos-debian_1.8.1_1"
+    ],
+    "none": false,
+    "downloadPackages": [
+      "zookeeper_debian_09_stretch_1",
+      "elasticsearch_6.8.3_1",
+      "gdash_0.0.1_1",
+      "flink_1.9.1_2",
+      "cerebro_0.8.4_1",
+      "mesos-master_1.8.1_1",
+      "kibana_6.8.3_1",
+      "logstash_6.8.3_1",
+      "ntp_debian_09_stretch_1",
+      "kafka-manager_2.0.0.2_1",
+      "spark_2.4.4_1",
+      "base-eskimo_0.2_1",
+      "grafana_6.3.3_1",
+      "prometheus_2.10.0_1",
+      "zeppelin_0.9.0_1",
+      "gluster_debian_09_stretch_1",
+      "kafka_2.2.0_1"
+    ],
+    "packageUpdates": [],
+    "packageDownloadUrl": "https://niceideas.ch/eskimo/"
+  },
+  "status": "OK"
+}

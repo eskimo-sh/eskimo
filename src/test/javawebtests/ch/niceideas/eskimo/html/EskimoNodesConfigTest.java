@@ -36,9 +36,12 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -54,8 +57,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoNodesConfig.js");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"];");
-        page.executeJavaScript("MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
+        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\"];");
+        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -70,6 +73,41 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // set services for tests
         page.executeJavaScript("eskimoNodesConfig.setServicesConfigForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
+    }
+
+    @Test
+    public void testServicesConfigMethods() throws Exception {
+
+        assertJavascriptEquals("kibana.png", "eskimoNodesConfig.getServiceLogoPath('kibana')");
+        assertJavascriptEquals("kibana.png", "eskimoNodesConfig.getServiceIconPath('kibana')");
+        assertJavascriptEquals("true", "eskimoNodesConfig.isServiceUnique('kibana')");
+
+        assertJavascriptEquals("false", "eskimoNodesConfig.isServiceUnique('gluster')");
+
+        assertJavascriptEquals("undefined", "eskimoNodesConfig.getServiceIconPath('test-none')");
+    }
+
+    @Test
+    public void testRenderNodesConfig() throws Exception {
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+
+        page.executeJavaScript("eskimoNodesConfig.renderNodesConfig("+nodesConfig.getFormattedValue()+");");
+
+        // test a few nodes
+        assertJavascriptEquals("1.0", "$('#ntp1:checked').length");
+        assertJavascriptEquals("1.0", "$('#spark-executor1:checked').length");
+        assertJavascriptEquals("1.0", "$('#logstash1:checked').length");
+
+        assertJavascriptEquals("1.0", "$('#ntp2:checked').length");
+        assertJavascriptEquals("1.0", "$('#spark-executor2:checked').length");
+        assertJavascriptEquals("1.0", "$('#logstash2:checked').length");
+
+        assertJavascriptEquals("0.0", "$('#zookeeper1:checked').length");
+        assertJavascriptEquals("1.0", "$('#zookeeper2:checked').length");
+
+        assertJavascriptEquals("0.0", "$('#mesos-master1:checked').length");
+        assertJavascriptEquals("1.0", "$('#mesos-master2:checked').length");
     }
 
     @Test

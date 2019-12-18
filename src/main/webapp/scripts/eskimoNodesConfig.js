@@ -190,14 +190,94 @@ eskimo.NodesConfig = function() {
         SERVICES_CONFIGURATION = servicesConfig;
     };
 
+    this.renderNodesConfig = function (data) {
+
+        var re = /([a-zA-Z\-_]+)([0-9]*)/;
+
+        // render nodes and range containers
+        var actionIds = [];
+        for (var serviceConfig in data) {
+            //console.log(attr);
+            if (serviceConfig.indexOf("action_id") > -1) {
+                actionIds.push(serviceConfig);
+            }
+        }
+        actionIds.sort();
+        console.log(actionIds);
+        for (var i = 0; i < actionIds.length; i++) {
+            var ipAddress = data[actionIds[i]];
+            if (ipAddress.indexOf("-") > -1) { // range
+                addRange()
+            } else {
+                addNode();
+            }
+        }
+
+        // then empty service placeholders
+        for (var serviceConfig in data) {
+
+            if (serviceConfig.indexOf("action_id") > -1) {
+                $("#" + serviceConfig).val(data[serviceConfig]);
+
+                var match = serviceConfig.match(re);
+
+                var nbr = match[2];
+
+                var placeHolderMs = $("#field" + nbr).find(".configured-multiple-services-placeholder");
+                placeHolderMs.html("");
+
+                var placeHolderUs = $("#field" + nbr).find(".configured-unique-services-placeholder");
+                placeHolderUs.html("");
+            }
+        }
+
+        // finally fill them up !
+        for (var serviceConfig in data) {
+
+            if (serviceConfig.indexOf("action_id") == -1) {
+
+                var match = serviceConfig.match(re);
+
+                var serviceName = null;
+                var nbr = -1;
+                if (match[2] != null && match[2] != "") {
+                    nbr = parseInt(match[2]);
+                    serviceName = match[1]
+
+                    var placeHolder = $("#field" + nbr).find(".configured-multiple-services-placeholder");
+                    placeHolder.html(placeHolder.html() +
+                        '<div class="nodes-config-entry">' +
+                        '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />' +
+                        serviceName +
+                        '<br>' +
+                        '</div>');
+
+                } else {
+                    nbr = data[serviceConfig];
+                    serviceName = serviceConfig;
+
+                    var placeHolder = $("#field" + nbr).find(".configured-unique-services-placeholder");
+                    placeHolder.html(placeHolder.html() +
+                        '<div class="nodes-config-entry">' +
+                        '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />' +
+                        serviceName +
+                        '<br>' +
+                        '</div>');
+                }
+
+                //console.log ('#'+serviceName+nbr);
+                $('#' + serviceName + nbr).get(0).checked = true;
+
+            }
+        }
+    };
+
     function showNodesConfig () {
 
         if (!eskimoMain.isSetupDone()) {
             eskimoMain.showSetupNotDone("Cannot configure nodes as long as initial setup is not completed");
             return;
         }
-
-        var re = /([a-zA-Z\-_]+)([0-9]*)/;
 
         if (eskimoMain.isOperationInProgress()) {
             eskimoMain.showProgressbar();
@@ -216,82 +296,7 @@ eskimo.NodesConfig = function() {
 
                 if (!data.clear) {
 
-                    // render nodes and range containers
-                    var actionIds = [];
-                    for (var serviceConfig in data) {
-                        //console.log(attr);
-                        if (serviceConfig.indexOf("action_id") > -1) {
-                            actionIds.push(serviceConfig);
-                        }
-                    }
-                    actionIds.sort();
-                    console.log (actionIds);
-                    for (var i = 0 ; i < actionIds.length; i++) {
-                        var ipAddress = data[actionIds[i]];
-                        if (ipAddress.indexOf("-") > -1) { // range
-                            addRange()
-                        } else {
-                            addNode();
-                        }
-                    }
-
-                    // then empty service placeholders
-                    for (var serviceConfig in data) {
-
-                        if (serviceConfig.indexOf("action_id") > -1) {
-                            $("#" + serviceConfig).val(data[serviceConfig]);
-
-                            var match = serviceConfig.match(re);
-
-                            var nbr = match[2];
-
-                            var placeHolderMs = $("#field"+nbr).find(".configured-multiple-services-placeholder");
-                            placeHolderMs.html("");
-
-                            var placeHolderUs = $("#field"+nbr).find(".configured-unique-services-placeholder");
-                            placeHolderUs.html("");
-                        }
-                    }
-
-                    // finally fill them up !
-                    for (var serviceConfig in data) {
-
-                        if (serviceConfig.indexOf("action_id") == -1) {
-
-                            var match = serviceConfig.match(re);
-
-                            var serviceName = null;
-                            var nbr = -1;
-                            if (match[2] != null && match[2] != "") {
-                                nbr = parseInt(match[2]);
-                                serviceName = match[1]
-
-                                var placeHolder = $("#field"+nbr).find(".configured-multiple-services-placeholder");
-                                placeHolder.html(placeHolder.html() +
-                                    '<div class="nodes-config-entry">' +
-                                    '<img class="nodes-config-logo" src="'+ eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
-                                    serviceName +
-                                    '<br>' +
-                                    '</div>');
-
-                            } else {
-                                nbr = data[serviceConfig];
-                                serviceName = serviceConfig;
-
-                                var placeHolder = $("#field"+nbr).find(".configured-unique-services-placeholder");
-                                placeHolder.html(placeHolder.html() +
-                                    '<div class="nodes-config-entry">' +
-                                    '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
-                                    serviceName +
-                                    '<br>' +
-                                    '</div>');
-                            }
-
-                            //console.log ('#'+serviceName+nbr);
-                            $('#'+serviceName+nbr).get(0).checked = true;
-
-                        }
-                    }
+                    that.renderNodesConfig(data);
 
                 } else if (data.clear == "missing") {
                     $("#nodes-placeholder").html(''+

@@ -71,6 +71,8 @@
   },
   "kibana": {
     "col": 1,
+    "logo": "kibana.png",
+    "icon": "kibana.png",
     "conditional": "NONE",
     "configOrder": 15,
     "mandatory": false,

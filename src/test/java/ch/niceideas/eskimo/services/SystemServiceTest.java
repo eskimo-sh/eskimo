@@ -491,11 +491,11 @@ public class SystemServiceTest extends AbstractSystemTest {
         System.err.println (commandString);
 
         for (String commandStart : expectedCommandStart.split("\n")) {
-            assertTrue (commandStart + "\nis contained", commandString.contains(commandStart));
+            assertTrue (commandStart + "\nis contained in \n" + commandString, commandString.contains(commandStart));
         }
 
         for (String commandEnd : expectedCommandEnd.split("\n")) {
-            assertTrue (commandEnd + "\nis contained", commandString.contains(commandEnd));
+            assertTrue (commandEnd + "\nis contained in \n" + commandString, commandString.contains(commandEnd));
         }
     }
 
