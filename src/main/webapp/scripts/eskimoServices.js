@@ -139,13 +139,6 @@ eskimo.Services = function () {
 
     this.showServiceIFrame = showServiceIFrame;
 
-    function checkIFrames() {
-
-        // Unfortunately, as long as I don't procy everything, I cannot check iframe content due to cross-orifins policy
-        // being enforced by browsers : the parent frame cannot access iframe content
-
-    }
-
     this.isServiceAvailable = function (service) {
 
         var uiConfig = UI_SERVICES_CONFIG[service];

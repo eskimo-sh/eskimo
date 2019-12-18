@@ -444,7 +444,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         SSHCommandService sshCommandService = new SSHCommandService() {
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+            public synchronized String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -459,7 +459,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+            public synchronized String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
                 testSSHCommandScript.append(command + "\n");
                 if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
                     return "OK";
@@ -468,7 +468,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+            public synchronized void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
                 // just do nothing
             }
         };
@@ -487,8 +487,6 @@ public class SystemServiceTest extends AbstractSystemTest {
         expectedCommandEnd = expectedCommandEnd.replace("{UUID}", testRunUUID);
 
         String commandString = testSSHCommandScript.toString();
-
-        System.err.println (commandString);
 
         for (String commandStart : expectedCommandStart.split("\n")) {
             assertTrue (commandStart + "\nis contained in \n" + commandString, commandString.contains(commandStart));

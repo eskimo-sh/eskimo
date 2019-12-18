@@ -81,8 +81,6 @@ public abstract class AbstractWebTest {
     private static List<String> coverages = new ArrayList<>();
 
     private static JSONDataMerger jsonDataMerger = new JSONDataMerger();
-    @Rule
-    public TestName name = new TestName();
 
     protected WebClient webClient;
     protected HtmlPage page;
@@ -212,6 +210,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.menuResize = function () {};");
 
         loadScript (page, "jquery-3.3.1.js");
+        Thread.sleep(2000);
 
         // override jquery load
         page.executeJavaScript("$.fn._internalLoad = $.fn.load;");
