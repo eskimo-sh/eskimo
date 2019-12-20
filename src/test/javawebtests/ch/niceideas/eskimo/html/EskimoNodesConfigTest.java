@@ -57,8 +57,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoNodesConfig.js");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\"];");
-        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
+        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
+        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -110,7 +110,34 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertJavascriptEquals("1.0", "$('#mesos-master2:checked').length");
     }
 
+
     @Test
+    public void testOnServiceSelectedForNode() throws Exception {
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+
+        page.executeJavaScript("eskimoNodesConfig.renderNodesConfig(" + nodesConfig.getFormattedValue() + ");");
+
+        page.executeJavaScript("eskimoNodesConfig.onServicesSelectedForNode({\n" +
+                "\"elasticsearch2\": \"on\",\n" +
+                "\"flink-worker2\": \"on\",\n" +
+                "\"gdash\": \"2\",\n" +
+                "\"gluster2\": \"on\",\n" +
+                "\"kafka2\": \"on\",\n" +
+                "\"logstash2\": \"on\",\n" +
+                "\"mesos-agent2\": \"on\",\n" +
+                "\"ntp2\": \"on\",\n" +
+                "\"prometheus2\": \"on\",\n" +
+                "\"spark-executor2\": \"on\"\n" +
+                "}, 2)");
+
+        assertJavascriptEquals("1.0", "$('#prometheus2:checked').length");
+
+        assertJavascriptEquals("1.0", "$('#gdash2:checked').length");
+    }
+
+
+        @Test
     public void testRemoveNode() throws Exception {
 
         // add two nodes

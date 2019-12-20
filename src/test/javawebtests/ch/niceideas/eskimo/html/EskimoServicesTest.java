@@ -40,6 +40,8 @@ import org.junit.Test;
 
 import java.net.URL;
 
+import static junit.framework.TestCase.fail;
+
 public class EskimoServicesTest extends AbstractWebTest {
 
     @Before
@@ -134,6 +136,21 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         page.executeJavaScript("uiConfig = {'proxyContext': '/test'}"); //
         assertJavascriptEquals("/test/192-168-10-11", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
+    }
+
+    @Test
+    public void testHandleServiceDisplayed() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testHandleServiceHiding() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testServiceMenuServiceFoundHook() throws Exception {
+        fail ("To Be Implemented");
     }
 
 }

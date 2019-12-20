@@ -329,13 +329,14 @@ eskimo.NodesConfig = function() {
     function onServicesSelectedForNode (model, nodeNbr) {
         console.log (nodeNbr, model);
 
+        var re = /([a-zA-Z\-_]+)([0-9]*)/;
+
         // clear all boxes
         for (var i = 0; i < CONFIGURED_SERVICES.length; i++) {
             $('#'+CONFIGURED_SERVICES[i]+nodeNbr).get(0).checked = false;
         }
 
         for (var key in model) {
-            var re = /([a-zA-Z\-_]+)([0-9]*)/;
             var match = key.match(re);
 
             var serviceName = null;
@@ -361,13 +362,13 @@ eskimo.NodesConfig = function() {
 
             for (var j = 0; j < UNIQUE_SERVICES.length; j++) {
 
-                var serviceName = UNIQUE_SERVICES[j];
-                if ($('#' + serviceName + i).length) {
-                    if ($('#' + serviceName + i).get(0).checked) {
+                var effServiceName = UNIQUE_SERVICES[j];
+                if ($('#' + effServiceName + i).length) {
+                    if ($('#' + effServiceName + i).get(0).checked) {
                         placeHolderUs.html(placeHolderUs.html() +
                             '<div class="nodes-config-entry">' +
-                            '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
-                            serviceName +
+                            '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(effServiceName) + '" />'+
+                            effServiceName +
                             '<br>' +
                             '</div>');
 
@@ -376,13 +377,13 @@ eskimo.NodesConfig = function() {
             }
 
             for (var j = 0; j < MULTIPLE_SERVICES.length; j++) {
-                var serviceName = MULTIPLE_SERVICES[j];
-                if ($('#'+serviceName+i).length) {
-                    if ($('#'+serviceName+i).get(0).checked) {
+                var effServiceName = MULTIPLE_SERVICES[j];
+                if ($('#'+effServiceName+i).length) {
+                    if ($('#'+effServiceName+i).get(0).checked) {
                         placeHolderMs.html(placeHolderMs.html() +
                             '<div class="nodes-config-entry">' +
-                            '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" />'+
-                            serviceName +
+                            '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(effServiceName) + '" />'+
+                            effServiceName +
                             '<br>' +
                             '</div>');
                     }

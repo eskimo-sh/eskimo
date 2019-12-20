@@ -1,0 +1,314 @@
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <tbody>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', '.');">.                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>24</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 07:12</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', '.');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', '..');">..                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>24</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 07:12</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', '..');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'bin');">bin                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 19:09</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'bin');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'boot');">boot                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>3</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 19:24</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'boot');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'dev');">dev                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>18</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>3800</td>
+                    <td>Jun  7 07:11</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'dev');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'etc');">etc                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>101</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 15:31</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'etc');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'home');">home                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>4</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 07:12</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'home');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFile('192.168.10.11', '192-168-10-11', '/', 'initrd.img');">initrd.img                        </a>                    </td>
+                    <td>lrwxrwxrwx</td>
+                    <td>1</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>33</td>
+                    <td>Dec 28 19:15</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'initrd.img');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFile('192.168.10.11', '192-168-10-11', '/', 'initrd.img.old');">initrd.img.old                        </a>                    </td>
+                    <td>lrwxrwxrwx</td>
+                    <td>1</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>33</td>
+                    <td>Dec 28 18:59</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'initrd.img.old');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'lib');">lib                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>21</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 19:16</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'lib');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'lib64');">lib64                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 18:58</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'lib64');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'lost+found');">lost+found                        </a>                    </td>
+                    <td>drwx------</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>16384</td>
+                    <td>Dec 28 18:58</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'lost+found');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'media');">media                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>3</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 18:58</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'media');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'mnt');">mnt                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jul 25  2018</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'mnt');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'opt');">opt                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>4</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 07:20</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'opt');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'proc');">proc                        </a>                    </td>
+                    <td>dr-xr-xr-x</td>
+                    <td>188</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>0</td>
+                    <td>Jun  7 07:11</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'proc');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'root');">root                        </a>                    </td>
+                    <td>drwx------</td>
+                    <td>3</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 07:12</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'root');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'run');">run                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>37</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>1260</td>
+                    <td>Jun  7 15:30</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'run');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'sbin');">sbin                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>12288</td>
+                    <td>Jun  7 07:22</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'sbin');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'snap');">snap                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 19:08</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'snap');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'srv');">srv                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>2</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jul 25  2018</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'srv');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'sys');">sys                        </a>                    </td>
+                    <td>dr-xr-xr-x</td>
+                    <td>13</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>0</td>
+                    <td>Jun  7 07:11</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'sys');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'tmp');">tmp                        </a>                    </td>
+                    <td>drwxrwxrwt</td>
+                    <td>13</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Jun  7 15:36</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'tmp');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'usr');">usr                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>10</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 18:58</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'usr');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'vagrant');">vagrant                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>1</td>
+                    <td>vagrant</td>
+                    <td>vagrant</td>
+                    <td>4096</td>
+                    <td>May 23 19:45</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'vagrant');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', 'var');">var                        </a>                    </td>
+                    <td>drwxr-xr-x</td>
+                    <td>13</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>4096</td>
+                    <td>Dec 28 19:03</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'var');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFile('192.168.10.11', '192-168-10-11', '/', 'vmlinuz');">vmlinuz                        </a>                    </td>
+                    <td>lrwxrwxrwx</td>
+                    <td>1</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>30</td>
+                    <td>Dec 28 19:15</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'vmlinuz');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>                        <a href="javascript:eskimoMain.getFileManagers().openFile('192.168.10.11', '192-168-10-11', '/', 'vmlinuz.old');">vmlinuz.old                        </a>                    </td>
+                    <td>lrwxrwxrwx</td>
+                    <td>1</td>
+                    <td>root</td>
+                    <td>root</td>
+                    <td>30</td>
+                    <td>Dec 28 18:59</td>
+                    <td>                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath('192.168.10.11', '192-168-10-11', '/', 'vmlinuz.old');" class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>

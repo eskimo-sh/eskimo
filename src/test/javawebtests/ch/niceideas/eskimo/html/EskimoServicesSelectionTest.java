@@ -41,6 +41,7 @@ import org.junit.Test;
 
 import java.net.URL;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class EskimoServicesSelectionTest extends AbstractWebTest {
@@ -51,6 +52,8 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     public void setUp() throws Exception {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
+
+        loadScript(page, "bootstrap.js");
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoServicesSelection.js");
@@ -63,6 +66,22 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
         page.executeJavaScript("eskimoServicesSelection.setServicesConfigForTest(SERVICES_CONFIGURATION);");
+
+        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
+
+        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        //page.executeJavaScript("nodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
+
+        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
+        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
+        page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+
+        page.executeJavaScript("nodesConfig.getConfiguredServices = function() {\n"+
+                "    return CONFIGURED_SERVICES;\n"+
+                "};\n");
+
+        page.executeJavaScript("eskimoServicesSelection.initModalServicesConfig();");
     }
 
     @Test
@@ -81,7 +100,29 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         assertJavascriptEquals("1.0", "$('#cerebro-choice').length");
         assertJavascriptEquals("1.0", "$('#kibana-choice').length");
         assertJavascriptEquals("1.0", "$('#grafana-choice').length");
+    }
 
+    @Test
+    public void testShowServiceSelection() throws Exception {
+
+        page.executeJavaScript("nodesConfig.getNodesCount = function() { return 2; }");
+
+        page.executeJavaScript("eskimoServicesSelection.showServiceSelection(1)");
+
+        // test somes fileds have been rendered
+        assertJavascriptEquals("1.0", "$('#gluster-choice').length");
+
+        // TODO find something better to test
+    }
+
+    @Test
+    public void testSelectAll() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testValidateServicesSelection() throws Exception {
+        fail ("To Be Implemented");
     }
 
 }

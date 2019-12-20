@@ -208,6 +208,15 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
         page.executeJavaScript("eskimoMain.menuResize = function () {};");
+        page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
+        page.executeJavaScript("eskimoMain.hideProgressbar = function () { }");
+
+        page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
+                "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +
+                "    $(\"#inner-content-\" + content).css(\"visibility\", \"visible\");" +
+                "    $(\"#inner-content-\" + content).css(\"display\", \"block\");" +
+                "}");
+
 
         loadScript (page, "jquery-3.3.1.js");
         Thread.sleep(2000);

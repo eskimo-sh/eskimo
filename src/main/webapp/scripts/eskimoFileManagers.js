@@ -118,12 +118,12 @@ eskimo.FileManagers = function() {
             }
         });
 
-        // Hide all consoles
+        // Hide all file managers
         var fileManagerView = $(".file-manager-view");
         fileManagerView.css("visibility", "hidden");
         fileManagerView.css("display", "none");
 
-        // Select Sftp
+        // Show selected one
         var fileManagerNode = $("#file-managers-file-manager-" + nodeName);
         fileManagerNode.css("visibility", "inherit");
         fileManagerNode.css("display", "inherit");
@@ -145,6 +145,7 @@ eskimo.FileManagers = function() {
         }
         return openedFileManager;
     }
+    this.findFileManager = findFileManager;
 
     this.updateCurrentFolder = function (nodeName, folderName) {
         // update current folder in openedFileManager
@@ -445,7 +446,7 @@ eskimo.FileManagers = function() {
         $("#file-manager-hidden-file-"+nodeName).trigger('click');
     };
 
-    function submitFormFileUpload (e, nodeName, nodeAddress) {
+    function registerSubmitFormFileUpload (e, nodeName, nodeAddress) {
         $("#file-manager-upload-form-"+nodeName).on('submit',(function(event) {
 
             // reset modal
@@ -588,7 +589,7 @@ eskimo.FileManagers = function() {
             });
 
             $(document).ready(function (e) {
-                submitFormFileUpload (e, nodeName, nodeAddress);
+                registerSubmitFormFileUpload (e, nodeName, nodeAddress);
             });
 
             // $('input[type=file]').simpleUpload(url, options);

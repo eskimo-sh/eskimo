@@ -34,77 +34,41 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
 
-public class EskimoSetupTest extends AbstractWebTest {
+public class EskimoAboutTest extends AbstractWebTest {
 
     @Before
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoSetup.js");
+        loadScript(page, "bootstrap.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        loadScript(page, "eskimoAbout.js");
 
-        String currentDir = System.getProperty("user.dir");
-        System.out.println("Current dir using System:" +currentDir);
+        page.executeJavaScript("eskimoAbout = new eskimo.About();");
 
-        // instantiate test object
-        page.executeJavaScript("eskimoSetup = new eskimo.Setup();");
-
-        waitForElementIdInDOM("setup-warning");
+        waitForElementIdInDOM("about-modal-body");
     }
 
     @Test
-    public void testSaveSetupMessages() throws Exception {
+    public void testNominal() throws Exception {
 
-        // add services menu
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        page.executeJavaScript("eskimoAbout.showAbout()");
 
-        //System.out.println (page.asXml());
+        assertCssValue("#about-modal", "display", "block");
+        assertCssValue("#about-modal", "visibility", "visible");
 
-        // should have displayed the error
-        assertCssValue ("#setup-warning", "display", "inherit");
-        assertJavascriptEquals ("Configuration Storage path should be set", "$('#setup-warning-message').html()");
+        page.executeJavaScript("eskimoAbout.cancelAbout()");
+        Thread.sleep(2000);
 
-        page.executeJavaScript("$('#setup_storage').val('/tmp/test')");
-
-        page.executeJavaScript("eskimoSetup.saveSetup()");
-
-        assertJavascriptEquals ("SSH Username to use to reach cluster nodes should be set",
-                "$('#setup-warning-message').html()");
-
-        page.executeJavaScript("$('#ssh_username').val('eskimo')");
-
-        page.executeJavaScript("eskimoSetup.saveSetup()");
-
-        assertJavascriptEquals ("SSH Identity Private Key to use to reach cluster nodes should be set",
-                "$('#setup-warning-message').html()");
-    }
-
-    @Test
-    public void testShowSetupMessage() throws Exception {
-
-        page.executeJavaScript("eskimoSetup.showSetupMessage ('test');");
-
-        assertCssValue("#setup-warning", "display", "inherit");
-        assertCssValue("#setup-warning", "visibility", "inherit");
-
-        assertAttrValue("#setup-warning-message", "class", "alert alert-danger");
-
-        assertJavascriptEquals("test", "$('#setup-warning-message').html()");
-
-        page.executeJavaScript("eskimoSetup.showSetupMessage ('test', true);");
-
-        assertAttrValue("#setup-warning-message", "class", "alert alert-info");
-    }
-
-    @Test
-    public void testLoadSetup() throws Exception {
-        fail ("To Be Implemented");
+        assertCssValue("#about-modal", "display", "none");
     }
 
 }
+
