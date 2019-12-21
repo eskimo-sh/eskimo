@@ -61,6 +61,9 @@ public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
 
+    private static final int INCREMENTAL_WAIT_MS = 500;
+    private static final int MAX_WAIT_RETRIES = 30;
+
     private static Thread server;
     private static Main main = null;
 
@@ -223,7 +226,7 @@ public abstract class AbstractWebTest {
 
         loadScript (page, "jquery-3.3.1.js");
 
-        waitForDefinition ("$");
+        waitForDefinition ("window.$");
 
         waitForDefinition ("$.fn");
 
@@ -260,16 +263,16 @@ public abstract class AbstractWebTest {
 
     protected void waitForElementIdInDOM(String elementId) throws InterruptedException {
         int attempt = 0;
-        while (page.getElementById(elementId) == null && attempt < 10) {
-            Thread.sleep(500);
+        while (page.getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
+            Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }
     }
 
     protected void waitForDefinition(String varName) throws InterruptedException {
         int attempt = 0;
-        while (page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < 10) {
-            Thread.sleep(500);
+        while (page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
+            Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }
     }
