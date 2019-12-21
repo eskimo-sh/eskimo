@@ -225,6 +225,29 @@ eskimo.Services = function () {
     /* For tests */
     this.shouldReinitialize = shouldReinitialize;
 
+    function handleServiceIsUp(effUIConfig) {
+        // remove from retry list
+        for (var j = 0; j < uiConfigsToRetry.length; j++) {
+            if (uiConfigsToRetry[j] == effUIConfig) {
+                console.log("removing from retry " + uiConfigsToRetry[j].service);
+                uiConfigsToRetry.splice(j, 1);
+                break;
+            }
+        }
+
+        // schedule usual refresh
+        setTimeout(function (otherUIConfig) {
+
+            // iframe
+            otherUIConfig.actualUrl = otherUIConfig.targetUrl;
+            $("#iframe-content-" + otherUIConfig.service).attr('src', otherUIConfig.actualUrl);
+            otherUIConfig.refreshWaiting = false;
+
+
+        }, effUIConfig.targetWaitTime, effUIConfig);
+    }
+    this.handleServiceIsUp = handleServiceIsUp;
+
     this.periodicRetryServices = function() {
 
         //console.log ("periodicRetryServices - " + uiConfigsToRetry.length);
@@ -241,25 +264,7 @@ eskimo.Services = function () {
 
                         console.log("FOUND : " + effUIConfig.service + " - " + effUIConfig.targetUrl + " - " + effUIConfig.targetWaitTime);
 
-                        // remove from retry list
-                        for (var j = 0; j < uiConfigsToRetry.length; j++) {
-                            if (uiConfigsToRetry[j] == effUIConfig) {
-                                console.log("removing from retry " + uiConfigsToRetry[j].service);
-                                uiConfigsToRetry.splice(j, 1);
-                                break;
-                            }
-                        }
-
-                        // schedule usual refresh
-                        setTimeout(function (otherUIConfig) {
-
-                            // iframe
-                            otherUIConfig.actualUrl = otherUIConfig.targetUrl;
-                            $("#iframe-content-" + otherUIConfig.service).attr('src', otherUIConfig.actualUrl);
-                            otherUIConfig.refreshWaiting = false;
-
-
-                        }, effUIConfig.targetWaitTime, effUIConfig);
+                        handleServiceIsUp(effUIConfig);
 
                     },
                     error: function (jqXHR, status) {
@@ -279,7 +284,7 @@ eskimo.Services = function () {
 
         var reinitialize = shouldReinitialize(service, nodeAddress);
 
-        var waitTime = immediate || !reinitialize ? 0 : uiConfig.waitTime;
+        var waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
 
         //console.log ("service display : " + service + " - immediate ? " + immediate + " - reinitialize ? " + reinitialize + " - waitTime : " +  uiConfig.waitTime);
 

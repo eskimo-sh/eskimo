@@ -55,6 +55,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public abstract class AbstractWebTest {
 
@@ -210,6 +211,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.menuResize = function () {};");
         page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
         page.executeJavaScript("eskimoMain.hideProgressbar = function () { }");
+        page.executeJavaScript("eskimoMain.isCurrentDisplayedService = function () { return false; }");
 
         page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
                 "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +
@@ -242,6 +244,10 @@ public abstract class AbstractWebTest {
 
     protected void assertJavascriptEquals(String value, String javascript) throws Exception {
         assertEquals (value, page.executeJavaScript(javascript).getJavaScriptResult().toString());
+    }
+
+    protected void assertJavascriptNull(String javascript) throws Exception {
+        assertNull (page.executeJavaScript(javascript).getJavaScriptResult());
     }
 
     protected void assertTagName(String elementId, String tagName) throws Exception {

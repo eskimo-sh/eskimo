@@ -61,13 +61,15 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"] );");
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
-                "\"cerebro\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro' }, " +
-                "\"kibana\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana' }, " +
-                "\"gdash\": {'urlTemplate': 'http://{NODE_ADDRESS}:9999/gdash', 'title' : 'gdash' }, " +
-                "\"spark-history-server\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo' }, " +
-                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin' }" +
-                "});");
+        page.executeJavaScript("var UI_SERVICES_CONFIG = {" +
+                "\"cerebro\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
+                "\"kibana\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana', 'waitTime': 15 }, " +
+                "\"gdash\": {'urlTemplate': 'http://{NODE_ADDRESS}:9999/gdash', 'title' : 'gdash', 'waitTime': 20 }, " +
+                "\"spark-history-server\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo', 'waitTime': 25 }, " +
+                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
+                "};");
+
+        page.executeJavaScript("eskimoServices.setUiServicesConfig(UI_SERVICES_CONFIG);");
     }
 
     @Test
@@ -139,18 +141,42 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testHandleServiceDisplayed() throws Exception {
-        fail ("To Be Implemented");
+    public void testHandleServiceDisplay() throws Exception {
+
+        assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].targetUrl");
+        assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].service");
+        assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
+        assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
+
+        assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('cerebro')");
+
+        page.executeJavaScript("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
+
+        assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].targetUrl");
+        assertJavascriptEquals("cerebro", "UI_SERVICES_CONFIG['cerebro'].service");
+        assertJavascriptEquals("10.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
+        assertJavascriptEquals("true", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
+
+
+        page.executeJavaScript("UI_SERVICES_CONFIG['cerebro'].refreshWaiting = false;");
+        page.executeJavaScript("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', true);");
+
+        assertJavascriptEquals("0.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
+
+        page.executeJavaScript("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
+        Thread.sleep(2000); // FIXME
+
+        assertJavascriptEquals("false", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
+        assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");
     }
 
     @Test
     public void testHandleServiceHiding() throws Exception {
-        fail ("To Be Implemented");
-    }
 
-    @Test
-    public void testServiceMenuServiceFoundHook() throws Exception {
-        fail ("To Be Implemented");
-    }
+        testHandleServiceDisplay();
 
+        page.executeJavaScript("eskimoServices.handleServiceHiding('cerebro', UI_SERVICES_CONFIG['cerebro'])");
+
+        assertJavascriptNull("UI_SERVICES_CONFIG['cerebro'].actualUrl");
+    }
 }

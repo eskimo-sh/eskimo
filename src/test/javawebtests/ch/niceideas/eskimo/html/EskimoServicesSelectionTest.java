@@ -103,26 +103,95 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowServiceSelection() throws Exception {
+    public void testNominal() throws Exception {
+
+        page.executeJavaScript("var result = null;");
+
+        page.executeJavaScript("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
+                "return {\n" +
+                "  \"action_id1\": \"192.168.10.11\",\n" +
+                "  \"cerebro\": \"1\",\n" +
+                "  \"elasticsearch1\": \"on\",\n" +
+                "  \"flink-app-master\": \"1\",\n" +
+                "  \"flink-worker1\": \"on\",\n" +
+                "  \"grafana\": \"1\",\n" +
+                "  \"kafka1\": \"on\",\n" +
+                "  \"kafka-manager\": \"1\",\n" +
+                "  \"kibana\": \"1\",\n" +
+                "  \"logstash1\": \"on\",\n" +
+                "  \"mesos-agent1\": \"on\",\n" +
+                "  \"mesos-master\": \"1\",\n" +
+                "  \"ntp1\": \"on\",\n" +
+                "  \"prometheus1\": \"on\",\n" +
+                "  \"spark-executor1\": \"on\",\n" +
+                "  \"spark-history-server\": \"1\",\n" +
+                "  \"zeppelin\": \"1\",\n" +
+                "  \"zookeeper\": \"1\"\n" +
+                "};" +
+                "}");
 
         page.executeJavaScript("nodesConfig.getNodesCount = function() { return 2; }");
 
-        page.executeJavaScript("eskimoServicesSelection.showServiceSelection(1)");
+        page.executeJavaScript("eskimoServicesSelection.showServiceSelection(1, function(model) {result = model;})");
 
-        // test somes fileds have been rendered
-        assertJavascriptEquals("1.0", "$('#gluster-choice').length");
+        page.executeJavaScript("eskimoServicesSelection.validateServicesSelection();");
 
-        // TODO find something better to test
+        assertJavascriptEquals("" +
+                "{" +
+                "\"spark-history-server\":\"1\"," +
+                "\"ntp1\":\"on\"," +
+                "\"gluster1\":\"on\"," +
+                "\"cerebro\":\"1\"," +
+                "\"zookeeper\":\"1\"," +
+                "\"mesos-agent1\":\"on\"," +
+                "\"kibana\":\"1\"," +
+                "\"mesos-master\":\"1\"," +
+                "\"elasticsearch1\":\"on\"," +
+                "\"zeppelin\":\"1\"," +
+                "\"spark-executor1\":\"on\"," +
+                "\"kafka-manager\":\"1\"," +
+                "\"kafka1\":\"on\"," +
+                "\"logstash1\":\"on\"," +
+                "\"grafana\":\"1\"," +
+                "\"prometheus1\":\"on\"," +
+                "\"flink-worker1\":\"on\"," +
+                "\"flink-app-master1\":\"on\"" +
+                "}", "JSON.stringify (result)");
     }
 
     @Test
     public void testSelectAll() throws Exception {
-        fail ("To Be Implemented");
-    }
 
-    @Test
-    public void testValidateServicesSelection() throws Exception {
-        fail ("To Be Implemented");
-    }
+        page.executeJavaScript("var result = null;");
 
+        page.executeJavaScript("nodesConfig.getNodesCount = function() { return 2; }");
+
+        page.executeJavaScript("eskimoServicesSelection.showServiceSelection(\"empty\", function(model) {result = model;})");
+
+        page.executeJavaScript("eskimoServicesSelection.servicesSelectionSelectAll();");
+
+        page.executeJavaScript("eskimoServicesSelection.validateServicesSelection();");
+
+        assertJavascriptEquals("{" +
+                "\"spark-history-server\":\"on\"," +
+                "\"ntp\":\"on\"," +
+                "\"gluster\":\"on\"," +
+                "\"cerebro\":\"on\"," +
+                "\"zookeeper\":\"on\"," +
+                "\"mesos-agent\":\"on\"," +
+                "\"kibana\":\"on\"," +
+                "\"mesos-master\":\"on\"," +
+                "\"elasticsearch\":\"on\"," +
+                "\"zeppelin\":\"on\"," +
+                "\"gdash\":\"on\"," +
+                "\"spark-executor\":\"on\"," +
+                "\"kafka-manager\":\"on\"," +
+                "\"kafka\":\"on\"," +
+                "\"logstash\":\"on\"," +
+                "\"grafana\":\"on\"," +
+                "\"prometheus\":\"on\"," +
+                "\"flink-worker\":\"on\"," +
+                "\"flink-app-master\":\"on\"" +
+                "}", "JSON.stringify (result)");
+    }
 }

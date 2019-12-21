@@ -82,6 +82,12 @@ eskimo.ServicesSelection = function() {
         SERVICES_CONFIGURATION = servicesConfig;
     };
 
+    this.getCurrentNodesConfig = function() {
+        var setupConfig = $("form#nodes-config").serializeObject();
+        //console.log (setupConfig);
+        return setupConfig;
+    };
+
     function showServiceSelection(nodeNbr, callback, isRange) {
 
         servicesSelectedcallback = callback;
@@ -151,7 +157,7 @@ eskimo.ServicesSelection = function() {
             $("#select-all-services-button").css("visibility", "hidden");
 
             // enabling node ntp to nake it selectaBLE
-            var setupConfig = $("form#nodes-config").serializeObject();
+            var setupConfig = that.getCurrentNodesConfig();
 
             for (var key in setupConfig) {
                 //var re = /([a-zA-Z\-_]+)([0-9]+)/;
@@ -215,8 +221,6 @@ eskimo.ServicesSelection = function() {
 
         var serviceSelection = $("#services-selection-form").serializeObject();
 
-        console.log (serviceSelection);
-
         var retModel = {};
 
         for (var key in serviceSelection) {
@@ -254,10 +258,8 @@ eskimo.ServicesSelection = function() {
         var radioName = match[1];
 
         var value = (match[3] != null && match[3] != "") ? "choice" : match[2];
-        console.log(value);
 
         if ($('form#services-selection-form input[name=' + radioName + (value == "choice" ? "-choice" : "") + ']:checked').val() == value) {
-            //console.log("KK");
             setTimeout(
                 function () {
                     $('#' + radioName + (value == "choice" ? "-choice" : value)).get(0).checked = false;
