@@ -222,7 +222,10 @@ public abstract class AbstractWebTest {
 
 
         loadScript (page, "jquery-3.3.1.js");
-        Thread.sleep(2000);
+
+        waitForDefinition ("$");
+
+        waitForDefinition ("$.fn");
 
         // override jquery load
         page.executeJavaScript("$.fn._internalLoad = $.fn.load;");
@@ -258,6 +261,14 @@ public abstract class AbstractWebTest {
     protected void waitForElementIdInDOM(String elementId) throws InterruptedException {
         int attempt = 0;
         while (page.getElementById(elementId) == null && attempt < 10) {
+            Thread.sleep(500);
+            attempt++;
+        }
+    }
+
+    protected void waitForDefinition(String varName) throws InterruptedException {
+        int attempt = 0;
+        while (page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < 10) {
             Thread.sleep(500);
             attempt++;
         }
