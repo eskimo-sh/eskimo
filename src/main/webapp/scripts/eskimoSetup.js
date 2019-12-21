@@ -96,66 +96,70 @@ eskimo.Setup = function() {
         });
     };
 
+    function handleSetup(data, initializationTime) {
+        eskimoMain.setSetupLoaded();
+
+        console.log(data);
+
+        if (data.setup_storage != null) {
+            $("#setup_storage").val(data.setup_storage);
+        }
+
+        if (data.ssh_username != null) {
+            $("#ssh_username").val(data.ssh_username);
+        }
+
+        if (data['filename-ssh-key'] != null) {
+            $("#filename-ssh-key").val(data['filename-ssh-key']);
+        }
+
+        if (data['content-ssh-key'] != null) {
+            $("#content-ssh-key").val(data['content-ssh-key']);
+        }
+
+        if (data['setup-mesos-origin'] == "build") {
+            $('#setup-mesos-origin-build').get(0).checked = true;
+        } else {
+            $('#setup-mesos-origin-download').get(0).checked = true; // default
+        }
+
+        if (data['setup-services-origin'] == "download") {
+            $('#setup-services-origin-download').get(0).checked = true;
+        } else {
+            $('#setup-services-origin-build').get(0).checked = true; // default
+        }
+
+        if (!data.clear || data.clear == "services") {
+
+            eskimoMain.handleSetupCompleted();
+
+            if (initializationTime) {
+                eskimoMain.getSystemStatus().showStatus(true);
+            }
+
+        } else {
+
+            eskimoMain.handleSetupNotCompleted();
+
+            if (initializationTime) { // only at initialization time
+                eskimoMain.showOnlyContent("setup");
+                eskimoMain.getSystemStatus().updateStatus(false);
+            }
+
+            if (data.message && data.message != null) {
+                showSetupMessage(data.message, true);
+            }
+        }
+    }
+    this.handleSetup = handleSetup;
+
     function loadSetup(initializationTime) {
         $.ajax({
             type: "GET",
             dataType: "json",
             url: "load-setup",
             success: function (data, status, jqXHR) {
-
-                eskimoMain.setSetupLoaded();
-
-                console.log (data);
-
-                if (data.setup_storage != null) {
-                    $("#setup_storage").val(data.setup_storage);
-                }
-
-                if (data.ssh_username != null) {
-                    $("#ssh_username").val(data.ssh_username);
-                }
-
-                if (data['filename-ssh-key'] != null) {
-                    $("#filename-ssh-key").val(data['filename-ssh-key']);
-                }
-
-                if (data['content-ssh-key'] != null) {
-                    $("#content-ssh-key").val(data['content-ssh-key']);
-                }
-
-                if (data['setup-mesos-origin'] == "build") {
-                    $('#setup-mesos-origin-build').get(0).checked = true;
-                } else {
-                    $('#setup-mesos-origin-download').get(0).checked = true; // default
-                }
-
-                if (data['setup-services-origin'] == "download") {
-                    $('#setup-services-origin-download').get(0).checked = true;
-                } else {
-                    $('#setup-services-origin-build').get(0).checked = true; // default
-                }
-
-                if (!data.clear || data.clear == "services") {
-
-                    eskimoMain.handleSetupCompleted();
-
-                    if (initializationTime) {
-                        eskimoMain.getSystemStatus().showStatus(true);
-                    }
-
-                } else {
-
-                    eskimoMain.handleSetupNotCompleted();
-
-                    if (initializationTime) { // only at initialization time
-                        eskimoMain.showOnlyContent("setup");
-                        eskimoMain.getSystemStatus().updateStatus(false);
-                    }
-
-                    if (data.message && data.message != null) {
-                        showSetupMessage(data.message, true);
-                    }
-                }
+                handleSetup(data, initializationTime);
 
                 if (data.processingPending) {  // if backend says there is some provessing going on
                     eskimoMain.recoverOperationInProgress();

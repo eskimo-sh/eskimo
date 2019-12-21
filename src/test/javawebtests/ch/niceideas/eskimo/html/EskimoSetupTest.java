@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -103,8 +105,15 @@ public class EskimoSetupTest extends AbstractWebTest {
     }
 
     @Test
-    public void testLoadSetup() throws Exception {
-        fail ("To Be Implemented");
+    public void testHandleSetup() throws Exception {
+
+        String setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
+
+        page.executeJavaScript("eskimoSetup.handleSetup("+setupConfig+")");
+
+        assertJavascriptEquals("/tmp/setupConfigTest", "$('#setup_storage').val()");
+        assertJavascriptEquals("eskimo", "$('#ssh_username').val()");
+        assertJavascriptEquals("ssh_key", "$('#filename-ssh-key').val()");
     }
 
 }

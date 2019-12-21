@@ -212,6 +212,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
         page.executeJavaScript("eskimoMain.hideProgressbar = function () { }");
         page.executeJavaScript("eskimoMain.isCurrentDisplayedService = function () { return false; }");
+        page.executeJavaScript("eskimoMain.setSetupLoaded = function () {}");
 
         page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
                 "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +
