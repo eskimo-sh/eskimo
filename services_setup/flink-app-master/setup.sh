@@ -132,5 +132,12 @@ handle_topology_settings flink-app-master /tmp/flink_install_log
 echo " - Committing changes to local template and exiting container flink-app-master"
 commit_container flink-app-master /tmp/flink_install_log
 
+echo " - Copying flink command line programs docker wrappers to /usr/local/bin"
+for i in `find ./flink_wrappers -mindepth 1`; do
+    sudo cp $i /usr/local/bin
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /usr/local/bin/$filename
+done
+
 echo " - Installing and checking systemd service file"
 install_and_check_service_file flink-app-master /tmp/flink_install_log

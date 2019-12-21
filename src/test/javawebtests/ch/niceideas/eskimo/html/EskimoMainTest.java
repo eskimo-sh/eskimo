@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class EskimoMainTest extends AbstractWebTest {
@@ -64,8 +65,6 @@ public class EskimoMainTest extends AbstractWebTest {
 
         // instantiate test object
         page.executeJavaScript("eskimoMain = new eskimo.Main();");
-
-
     }
 
     @Test
@@ -84,6 +83,26 @@ public class EskimoMainTest extends AbstractWebTest {
         assertCssValue("#inner-content-pending", "visibility", "visible");
 
         assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('pending')");
+    }
+
+    @Test
+    public void testMenuResize() throws Exception {
+        fail ("To Be Implemneted");
+    }
+
+    @Test
+    public void testMenuUpAndDown() throws Exception {
+        fail ("To Be Implemneted");
+    }
+
+    @Test
+    public void testHandleSetupCompletedAndNotCompleted() throws Exception {
+        fail ("To Be Implemneted");
+    }
+
+    @Test
+    public void testServiceMenuClear() throws Exception {
+        fail ("To Be Implemneted");
     }
 
 }

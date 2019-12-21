@@ -82,7 +82,23 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
         assertJavascriptEquals ("", "$('#spark-executor-spark-rpc-numRetries').val()");
 
         assertJavascriptEquals ("", "$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()");
+    }
 
+    @Test
+    public void testShowServicesConfigMessage() throws Exception {
+
+        page.executeJavaScript("eskimoServicesConfig.showServicesConfigMessage ('test');");
+
+        assertCssValue("#services-config-warning", "display", "inherit");
+        assertCssValue("#services-config-warning", "visibility", "inherit");
+
+        assertAttrValue("#services-config-warning-message", "class", "alert alert-danger");
+
+        assertJavascriptEquals("test", "$('#services-config-warning-message').html()");
+
+        page.executeJavaScript("eskimoServicesConfig.showServicesConfigMessage ('test', true);");
+
+        assertAttrValue("#services-config-warning-message", "class", "alert alert-info");
     }
 
 }
