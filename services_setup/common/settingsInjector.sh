@@ -129,7 +129,7 @@ for configFile in `jq -c  ".configs | .[] | .configs | .[] | select (.service==\
     export commentPrefix=`echo $configFile | jq -r ' .commentPrefix'`
     export filesystemService=`echo $configFile | jq -r ' .filesystemService'`
 
-    echoDebug "rocessing properties for \"$filename\""
+    echoDebug "Processing properties for \"$filename\""
 
     IFS=$'\n'
     for property in `jq -c  ".configs | .[] | .configs | .[] | select (.service==\"$SERVICE\" and .filename==\"$filename\") | .properties | .[] | select (.value) " $SETTINGS_FILE`; do
@@ -137,18 +137,22 @@ for configFile in `jq -c  ".configs | .[] | .configs | .[] | select (.service==\
         export name=`echo $property | jq -r ' .name'`
         export value=`echo $property | jq -r ' .value'`
 
-        echoDebug "Found property $name : $value"
+        # Don't overwrite values that need to be kept to default
+        if [[ "$value" != "[ESKIMO_DEFAULT]" ]]; then
 
-        # TODO Implement additional cases as they appear
-        case "$propertyType" in
-            VARIABLE)
-                injectVariableProperty $SERVICE $filename $propertyFormat $commentPrefix $filesystemService $name $value
-                ;;
-            *)
-                echo "Unknown property type $propertyType";
-                exit -3
-                ;;
-        esac
+            echoDebug "Found property $name : $value"
+
+            # TODO Implement additional cases as they appear
+            case "$propertyType" in
+                VARIABLE)
+                    injectVariableProperty $SERVICE $filename $propertyFormat $commentPrefix $filesystemService $name $value
+                    ;;
+                *)
+                    echo "Unknown property type $propertyType";
+                    exit -3
+                    ;;
+            esac
+        fi
 
     done
 

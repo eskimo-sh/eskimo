@@ -379,12 +379,6 @@ eskimo.Main = function() {
         var actualMenuHeight = $("#menu-container").height();
         var menuContainerHeight = $("#hoe-left-panel").height();
 
-        /*
-        alert ("Implement me : whenever menu is too small in height, dynmically render it (eskimoMain.js)");
-
-        # FIXME : only if menu is shown !
-            */
-
         console.log (menuContainerHeight + " -  " + actualMenuHeight);
 
         if (menuContainerHeight - 80 < actualMenuHeight) {

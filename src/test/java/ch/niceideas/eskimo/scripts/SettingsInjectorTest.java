@@ -139,6 +139,8 @@ public class SettingsInjectorTest {
 
         assertTrue (sparkFileContent.contains("spark.eskimo.isTest=true"));
         assertFalse (sparkFileContent.contains("#spark.eskimo.isTest=true"));
+
+        assertTrue (sparkFileContent.contains("spark.executor.memory=1872m"));
     }
 
 

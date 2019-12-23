@@ -224,11 +224,21 @@ public abstract class AbstractWebTest {
                 "}");
 
 
-        loadScript (page, "jquery-3.3.1.js");
+        // 3 attempts
+        for (int i = 0; i < 3 ; i++) {
+            logger.info ("Loading jquery : attempt " + i);
+            loadScript(page, "jquery-3.3.1.js");
 
-        waitForDefinition ("window.$");
+            waitForDefinition("window.$");
 
-        waitForDefinition ("$.fn");
+            if (!page.executeJavaScript("typeof window.$").getJavaScriptResult().toString().equals ("undefined")) {
+                break;
+            }
+        }
+
+        waitForDefinition("$.fn");
+
+
 
         // override jquery load
         page.executeJavaScript("$.fn._internalLoad = $.fn.load;");

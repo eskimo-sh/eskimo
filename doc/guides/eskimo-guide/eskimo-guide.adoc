@@ -871,6 +871,23 @@ The button "Force reinstall" enables the user to select services that will be re
 latest service docker image available. +
 Dependent services will be properly restarted.
 
+=== Services settings configuration
+
+The most essential settings for all eskimo pre-packaged services are set automatically in such a way that the nominal
+use cases of an eskimo cluster work out of the box.
+
+But for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
+For this reason, Eskimo CE embeds a settings editor enabling administrators to find tune runtime settings for eskimo
+embedded services.
+
+The settings editor is available from the menu under "Configured Services":
+
+image::pngs/eskimo-setttings.png[800, 800, align="center"]
+
+For every service, administrators have access to supported configuration files and supported settings. +
+The default values enforced by eskimo right after installation are indicated.
+
+
 === SSH and SFTP Client
 
 The last and last but one menu entries in the "_Eskimo Services_" part are special consoles implemented within eskimo to
@@ -1201,6 +1218,34 @@ gluster shares created and mounted:
 * `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
 
 
+==== Flink bugs and workarounds
+
+The version 1.9.1 of Flink suffers from a bug affecting severely the way tasks are dispatched to tasks managers. A
+consequence of this bug is that most of the time, after an initial job was accepted by a task manager, all subsequent
+jobs are refused and cannot be executed anymore if the task manager lost its execution slots on mesos.
+
+The workaround implemented within Eskimo consists in keeping the TaskManager execution context in mesos for 1 hours
+instead of using the default 1 minute timeout. +
+In addition, after when the 1 hour timeout occurs, the Flink App Master is restarted by force to trigger a
+re-registration of the framework within Mesos in order to enable further flink processings to be successfully
+dispatched.
+
+This workaround works well but has a severe consequence: *when a flink job has been executed, the resources it has been
+allocated to will be kept booked for ONE WHOLE HOUR within Mesos*.
+
+This is fairly acceptable on a large cluster, but on a single node or on a tiny cluster, if all resources of the
+cluster are booked by the flink task managers, no other job will be schedulable by mesos!
+
+In this case, instead of waiting one hour for this task manager to be released and free its resources from mesos,
+one needs to *Kill the flink framework using mesos-cli.sh* in order to force release the resources booked by flink.
+
+In terms of process:
+
+1. Use the "mesos Console" to find out about the `frameworkId` of the mesos app master
+2. Use a terminal on one of the node of the Eskimo cluster to execute `mesos-cli.sh kill_framework -f [frameworkId]`
+
+
+
 === Apache zeppelin
 
 image::pngs/zeppelin-logo.png[50, 50, align="center"]
@@ -1247,10 +1292,10 @@ gluster when deploying in cluster mode).
 
 ==== Zeppelin 0.9-SNAPSHOT bugs and workarounds
 
-In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin 0.9 since Zeppelin 0.9 is not released yet and
-the fodmer 0.8 version is incompatible with most software versions packages within Eskimo.
+In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin-0.9 since the 0.9 version is not released yet
+and the former 0.8 version is incompatible with most software versions packages within Eskimo.
 
-Unfortunately this SNAPSHOT version is a development versions and some bugs exist.
+Unfortunately this SNAPSHOT version is a development version and suffers from some bugs.
 
 These bugs and workarounds are reported hereunder:
 

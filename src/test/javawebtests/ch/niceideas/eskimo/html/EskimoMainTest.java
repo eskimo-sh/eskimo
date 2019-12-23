@@ -46,6 +46,7 @@ public class EskimoMainTest extends AbstractWebTest {
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoMain.js");
+        loadScript(page, "eskimoUtils.js");
 
         // redefine constructor
         page.executeJavaScript("eskimo.Setup = function(){};");
@@ -54,7 +55,9 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimo.Messaging = function(){};");
         page.executeJavaScript("eskimo.SystemStatus = function(){};");
         page.executeJavaScript("eskimo.Consoles = function(){};");
-        page.executeJavaScript("eskimo.Services = function(){};");
+        page.executeJavaScript("eskimo.Services = function(){" +
+                "   this.handleServiceHiding = function() {}" +
+                "};");
         page.executeJavaScript("eskimo.ServicesSelection = function(){};");
         page.executeJavaScript("eskimo.ServicesConfig = function(){};");
         page.executeJavaScript("eskimo.OperationsCommand = function(){};");
@@ -85,24 +88,37 @@ public class EskimoMainTest extends AbstractWebTest {
         assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('pending')");
     }
 
-    @Test
-    public void testMenuResize() throws Exception {
-        fail ("To Be Implemneted");
-    }
-
-    @Test
-    public void testMenuUpAndDown() throws Exception {
-        fail ("To Be Implemneted");
-    }
 
     @Test
     public void testHandleSetupCompletedAndNotCompleted() throws Exception {
-        fail ("To Be Implemneted");
-    }
 
-    @Test
-    public void testServiceMenuClear() throws Exception {
-        fail ("To Be Implemneted");
-    }
+        page.executeJavaScript("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
+        waitForElementIdInDOM("menu-container");
+
+        page.executeJavaScript("eskimoMain.handleSetupCompleted()");
+
+        page.executeJavaScript("var allDisabled = true;");
+
+        page.executeJavaScript("" +
+                " $('.config-menu-items').each(function() {\n" +
+                "     if ($(this).attr('class') == 'config-menu-items') {\n" +
+                "         allDisabled=false;\n"+
+                "     }\n" +
+                "});");
+
+        assertJavascriptEquals("false", "allDisabled");
+
+        page.executeJavaScript("eskimoMain.handleSetupNotCompleted()");
+
+        page.executeJavaScript("var allEnabled = true;");
+
+        page.executeJavaScript("" +
+                " $('.config-menu-items').each(function() {\n" +
+                "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
+                "         allEnabled=false;\n"+
+                "     }\n" +
+                "});");
+    }
+    
 }
