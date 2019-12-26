@@ -323,6 +323,10 @@ set JAVA_HOME=C:\programs\jdk-9
 set PATH=%JAVA_HOME%\bin;%PATH%
 ----
 
+(On Windows, you might want to define these as _System Variables_: Right-click on "My Computer", choose "Properties",
+then "Advanced System Settings", then "Environment Variables" and finally add or update the variables above as "System
+Variables")
+
 ==== System requirements
 
 In order to run eskimo, one needs to have
@@ -481,6 +485,27 @@ With eskimo properly started using the above scripts, one can reach eskimo using
 The default port number is 9090. This can be changed in configuration file `eskimo.properties`.
 
 *The default login / password credentials are _admin_ / _password_.*
+
+This login is configured in the file pointed to by the confguration property `security.userJsonFile`. +
+A sample file is created automatically if the target file doesn't exist with the `admin` login above.
+
+The structure of this file is as follows;
+
+.Sample user definition file
+----
+{
+  "users" : [
+    {
+      "username" : "admin",
+      "password" : "$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO"
+    }
+  ]
+}
+----
+
+The password is a `BCrypt` hash of the actual password.
+
+TODO Document `EncodedPasswordGenerator` provided by Eskimo
 
 === Typical startup issues
 
@@ -1428,6 +1453,39 @@ Within Eskimo, Grafana is mostly used as a Data visualization tool on Prometheus
 to view ElasticSearch data, Spark results, etc.
 
 https://grafana.com/
+
+
+=== Sample Zeppelin notebooks
+
+Upon Zeppelin installation, Eskimo sets up a set of Sample notebooks in Zeppelin to illustrate the behaviour of the
+Eskimo cluster using different frameworks and the different packaged technologies such as Flink, Spark, Logstash, etc.
+
+These sample zeppelin notebooks are intended to demonstrate the possibilities with Eskimo and to show how Zeppelin can
+be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
+
+The different sample notebooks packages with Eskimo and available from within Zeppelin are described hereafter.
+
+TODO
+
+==== ElasticSearch Demo (Queries)
+
+==== Logstash Demo
+
+==== Spark RDD Demo
+
+==== Spark ML Demo (Regression)
+
+==== Spark SQL Demo
+
+==== Spark Integration ES
+
+==== Spark Integration Kafka
+
+==== Flink Batch Demo
+
+==== Flink Streaming Demo
+
+==== Flink Integration Kafka
 
 
 [appendix]

@@ -201,7 +201,7 @@ public class SystemAdminController {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ErrorStatusHelper.createErrorStatus(e);
         }
     }
 

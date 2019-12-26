@@ -154,4 +154,48 @@ public class MemoryComputerTest {
         assertEquals(3898, (long) memMap.get("192.168.10.13"));
         assertEquals(3898, (long) memMap.get("192.168.10.14"));
     }
+
+    @Test
+    public void testOtherConfig() throws Exception {
+        String otherConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MemoryComputerTest/testConfig.json"));
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(otherConfig);
+
+        memoryComputer = new MemoryComputer();
+        memoryComputer.setServicesDefinition(servicesDefinition);
+
+        memoryComputer.setSshCommandService(new SSHCommandService() {
+            @Override
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                return "MemTotal:        20000000 kB";
+            }
+            @Override
+            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+                return null;
+            }
+            @Override
+            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+                // just do nothing
+            }
+        });
+
+        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(nodesConfig, new HashSet<>());
+
+        Map<String, Long> memmModel1 = res.get("192.168.10.11");
+        assertNotNull(memmModel1);
+        assertEquals(7, memmModel1.size());
+
+        assertEquals(null, memmModel1.get("ntp"));
+        assertEquals(null, memmModel1.get("prometheus"));
+        assertEquals(null, memmModel1.get("gluster"));
+        assertEquals(null, memmModel1.get("mesos-agent"));
+        assertEquals(Long.valueOf(3465), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(1155), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(2310), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(3465), memmModel1.get("spark-executor"));
+        assertEquals(Long.valueOf(2310), memmModel1.get("flink-worker"));
+        assertEquals(null, memmModel1.get("zookeeper"));
+        assertEquals(Long.valueOf(1155), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(1155), memmModel1.get("zeppelin"));
+    }
 }

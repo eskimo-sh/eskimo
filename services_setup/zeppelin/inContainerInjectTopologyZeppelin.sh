@@ -79,3 +79,10 @@ sed -i -n '1h;1!H;${;g;s/'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 
+if [[ $MEMORY_ZEPPELIN != "" ]]; then
+    echo " - Applying eskimo memory settings from topology in jvm.options"
+
+    export permSize=$((MEMORY_ZEPPELIN / 2))
+
+    sed -i s/"# export ZEPPELIN_MEM"/"export ZEPPELIN_MEM\"=-Xmx"$MEMORY_ZEPPELIN"m -XX:MaxPermSize="$permSize"m\""/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+fi

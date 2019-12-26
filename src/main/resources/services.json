@@ -548,8 +548,8 @@
           },
           {
             "name": "taskmanager.heap.size",
-            "comment": "JVM heap size for the TaskManager. Default value : 1024m.",
-            "defaultValue": "1024m"
+            "comment": "JVM heap size for the TaskManager. Use [ESKIMO_DEFAULT] to use Eskimo computed memory.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
           },
           {
             "name": "parallelism.default",
@@ -786,7 +786,7 @@
       "selectionLayout" : { "row" : 4, "col" : 1},
       "memory": "small",
       "____comment": "We need to know about the spark executor memory to set",
-      "memoryAdditional": ["spark-executor"],
+      "memoryAdditional__commentedOut": ["spark-executor"],
       "logo" : "images/zeppelin-logo.png",
       "icon" : "images/zeppelin-icon.png"
     },

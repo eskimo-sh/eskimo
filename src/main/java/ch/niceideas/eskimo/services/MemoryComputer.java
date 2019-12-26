@@ -108,20 +108,11 @@ public class MemoryComputer {
 
             // 2..1  Compute total amount of memory shards (high = 3, medium = 2, small = 1, neglectable = 0)
             //       assume filesystem cache has to keep a high share (3) or medium share (2) => dynamical
-            Set<String> initalServices = new HashSet<>(nodesConfig.getServicesForIpAddress (nodeAddress));
-            Set<String> services = new HashSet<>();
-
-            // Add additional services memory requirements
-            initalServices.stream()
-                    .map(service -> servicesDefinition.getService(service))
-                    .map(Service::getAdditionalmemoryServices)
-                    .forEach(services::addAll);
-            services.addAll(initalServices); // cannot do it directly on services (need to split it in two phases)
-                                             // to avoid concurrentModificationException on stream iterator
+            Set<String> services = new HashSet<>(nodesConfig.getServicesForIpAddress (nodeAddress));
 
             Long sumOfParts = services.stream()
                     .map (service -> servicesDefinition.getService(service))
-                    .map (service -> (long) service.getMemoryConsumptionSize().getNbrParts())
+                    .map (service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
                     .reduce( (long)(totalMemory > 10000 ? 3 : 2), Long::sum); // the filesystem cache is considered always 3 or 2
 
             // 2.2. Dive the total memory by the total shards => gives us the value of a shard
@@ -131,7 +122,7 @@ public class MemoryComputer {
             services.stream()
                     .map (service -> servicesDefinition.getService(service))
                     .filter (service -> service.getMemoryConsumptionSize().getNbrParts() > 0)
-                    .forEach(service -> nodeMemoryModel.put (service.getName(), service.getMemoryConsumptionSize().getNbrParts() * valueOfShard));
+                    .forEach(service -> nodeMemoryModel.put (service.getName(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
 
             retMap.put(nodeAddress, nodeMemoryModel);
         }

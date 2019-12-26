@@ -1105,7 +1105,9 @@ public class SystemService {
             throw new SystemException("Unable to get system temporary directory.");
         }
         File tmpArchiveFile = createTempFile(service, ipAddress, ".tgz");
-        tmpArchiveFile.delete(); // I just want te file name
+        if (!tmpArchiveFile.delete()) { // I just want te file name
+            logger.debug ("Deleting of temp file shoudln't have failed.");
+        }
         File archive = new File(tempDir + "/" + tmpArchiveFile.getName());
         FileUtils.createTarFile(servicesSetupPath + "/" + service, archive);
         if (!archive.exists()) {

@@ -422,6 +422,48 @@ to every service by dividing it amongst shares and allocating the corresponding 
 Of course, the system first removes from the available memory a significant portion to ensure some room for kernel and
 filesystem cache.
 
+===== Examples of memory allocation
+
+Let's imagine the following services installed on a cluster node, along with their memory setting:
+
+* *ntp* - neglectable
+* *prometheus* - neglectable
+* *gluster* - neglectable
+* *mesos agent* - neglectable
+* *elasticsearch* - large
+* *logstash* - small
+* *kafka* - medium
+* *(spark executor)* - large
+* *(flink worker)* - medium
+* *zookeeper* - neglectable
+* *kibana* - small
+* *zeppelin* - small
+
+The following table gives various examples in terms of memory allocation for three different total RAM size values on the
+cluster node running these services. +
+The different columns gives how much memory is allocated to the different services in the different rows for various
+size of total RAM.
+
+[width="80%",frame="topbot",options="header"]
+|===================
+| Node total RAM      | 8 Gb  | 16 Gb | 20 Gb
+| *ntp*               |  -    |  -    |  -
+| *prometheus*        |  -    |  -    |  -
+| *gluster*           |  -    |  -    |  -
+| *mesos agent*       |  -    |  -    |  -
+| *elasticsearch*     | 1359m | 2736m | 3465m
+| *logstash*          |  453m |  912m | 1155m
+| *kafka*             |  906m | 1824m | 2310m
+| *(spark executor)*  | 1359m | 2736m | 3465m
+| *(flink worker)*    |  906m | 1824m | 2310m
+| *zookeeper*         |  -    |  -    |  -
+| *kibana*            |  453m |  912m | 1155m
+| *zeppelin*          |  453m |  912m | 1155m
+| *_Filesystem cache reserve_*  | 1359m | 2736m | 3465m
+|===================
+
+
+
 ==== Topology file on cluster nodes
 
 Every time the cluster nodes / services configuration is changed. Eskimo will verify the global services topology and
@@ -547,7 +589,15 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-// marker for exclusion : line 550
+
+
+
+
+
+
+
+
+// marker for exclusion : line 600
 
 
 

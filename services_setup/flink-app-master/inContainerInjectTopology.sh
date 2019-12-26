@@ -50,3 +50,10 @@ fi
 
 echo -e "\n# Specyfing mesos master"  >> /usr/local/lib/flink/conf/flink-conf.yaml
 echo -e "mesos.master: zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos"  >> /usr/local/lib/flink/conf/flink-conf.yaml
+
+
+if [[ $MEMORY_FLINK_WORKER != "" ]]; then
+    sed -i s/"taskmanager.heap.size: 1024m"/"taskmanager.heap.size: "$MEMORY_FLINK_WORKER"m"/g  /usr/local/lib/flink/conf/flink-conf.yaml
+fi
+
+

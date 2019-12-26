@@ -313,7 +313,7 @@ eskimo.SystemStatus = function() {
                 console.log(data);
 
                 if (!data || data.error) {
-                    console.error(atob(data.error));
+                    console.error(data.error);
                     eskimoMain.scheduleStopOperationInProgress (false);
                 } else {
                     eskimoMain.scheduleStopOperationInProgress (true);

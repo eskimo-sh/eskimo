@@ -34,14 +34,34 @@
 # Software.
 #
 
-set -e
+# extract path arguments and create volume mount command part
+export DOCKER_VOLUMES_ARGS=""
 
-echo " - Injecting topology"
-. /usr/local/sbin/inContainerInjectTopology.sh
+# Add standard folders if not already part of it
+if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/flink` == "" ]]; then
+    export DOCKER_VOLUMES_ARGS=" -v /var/lib/flink:/var/lib/flink:shared $DOCKER_VOLUMES_ARGS"
+fi
+if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/flink` == "" ]]; then
+    export DOCKER_VOLUMES_ARGS=" -v /var/log/flink:/var/log/flink:shared $DOCKER_VOLUMES_ARGS"
+fi
 
-echo " - Inject settings"
-/usr/local/sbin/settingsInjector.sh kibana
+#echo $DOCKER_VOLUMES_ARGS
 
-echo " - Starting service"
-# Use file created from inContainerInjectTopology.sh
-/tmp/kibana.eskimo
+
+export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
+
+/usr/bin/docker run \
+        -it \
+        --rm \
+        --network host \
+        --user flink \
+        $DOCKER_VOLUMES_ARGS \
+        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
+        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        -e NODE_NAME=$HOSTNAME \
+        eskimo:flink-app-master \
+        /usr/local/bin/pyflink-shell.sh "$@"
+
+# -p 5000-5010:5000-5010 \

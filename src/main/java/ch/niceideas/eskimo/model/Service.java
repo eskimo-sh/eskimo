@@ -35,10 +35,12 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Service {
@@ -105,6 +107,14 @@ public class Service {
 
     public MemoryConsumptionSize getMemoryConsumptionSize() {
         return memoryConsumptionSize;
+    }
+
+    public int getMemoryConsumptionParts (ServicesDefinition servicesDefinition) {
+        AtomicInteger parts = new AtomicInteger (getMemoryConsumptionSize().getNbrParts());
+        getAdditionalmemoryServices().stream()
+                .map(serviceName -> servicesDefinition.getService(serviceName))
+                .forEach(service -> parts.addAndGet(service.getMemoryConsumptionSize().getNbrParts()));
+        return parts.get();
     }
 
     public void setMemoryConsumptionSize(MemoryConsumptionSize memoryConsumptionSize) {

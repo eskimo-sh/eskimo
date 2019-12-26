@@ -1,0 +1,15 @@
+{
+  "action_id1": "192.168.10.11",
+  "ntp1": "on",
+  "prometheus1": "on",
+  "gluster1": "on",
+  "mesos-agent1": "on",
+  "elasticsearch1": "on",
+  "logstash1": "on",
+  "kafka1": "on",
+  "spark-executor1": "on",
+  "flink-worker1": "on",
+  "zookeeper" : "1",
+  "kibana" : "1",
+  "zeppelin" : "1"
+}

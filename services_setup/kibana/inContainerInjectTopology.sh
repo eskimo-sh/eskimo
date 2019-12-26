@@ -55,3 +55,15 @@ sed -i s/"#elasticsearch.url: \"http:\/\/localhost:9200\""/"elasticsearch.url: \
 sed -i s/"#elasticsearch.hosts: \[\"http:\/\/localhost:9200\"\]"/"elasticsearch.hosts: \[\"http:\/\/$ELASTICSEARCH_MASTER:9200\"\]"/g \
         /usr/local/etc/kibana/kibana.yml
 
+
+# For memory, I need to adapt the node command line in bin/kibana
+echo "#/bin/bash" > /tmp/kibana.eskimo
+
+if [[ $MEMORY_KIBANA != "" ]]; then
+    echo "export NODE_OPTIONS=\"--max-old-space-size="$MEMORY_KIBANA"\"" >> /tmp/kibana.eskimo
+fi
+
+echo "/usr/local/lib/kibana/bin/kibana" >> /tmp/kibana.eskimo
+
+chmod 755 /tmp/kibana.eskimo
+
