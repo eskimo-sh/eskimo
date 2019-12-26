@@ -1097,9 +1097,17 @@ public class SystemService {
         }
 
         // 1.2 Create archive
+
+
+        // Get the temporary directory and print it.
+        String tempDir = System.getProperty("java.io.tmpdir");
+        if (StringUtils.isBlank(tempDir)) {
+            throw new SystemException("Unable to get system temporary directory.");
+        }
         File tmpArchiveFile = createTempFile(service, ipAddress, ".tgz");
-        FileUtils.createTarFile(servicesSetupPath + "/" + service, TMP_PATH_PREFIX + tmpArchiveFile.getName());
-        File archive = new File(TMP_PATH_PREFIX +  tmpArchiveFile.getName());
+        tmpArchiveFile.delete(); // I just want te file name
+        File archive = new File(tempDir + "/" + tmpArchiveFile.getName());
+        FileUtils.createTarFile(servicesSetupPath + "/" + service, archive);
         if (!archive.exists()) {
             throw new SystemException("Could not create archive for service " + service + " : " + TMP_PATH_PREFIX +  tmpArchiveFile.getName());
         }
@@ -1107,7 +1115,7 @@ public class SystemService {
         // 2. copy it over to target node and extract it
 
         // 2.1
-        sshCommandService.copySCPFile(ipAddress, TMP_PATH_PREFIX +  tmpArchiveFile.getName());
+        sshCommandService.copySCPFile(ipAddress, archive.getAbsolutePath());
 
         exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
         exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");

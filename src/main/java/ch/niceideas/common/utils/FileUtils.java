@@ -178,10 +178,9 @@ public class FileUtils {
     /**
      *
      * @param sourceFolder the source folder to archive
-     * @param targetFileName the archive name
+     * @param targetFile the archive name
      */
-    public static void createTarFile(String sourceFolder, String targetFileName) throws IOException {
-        File targetFile = new File (targetFileName);
+    public static void createTarFile(String sourceFolder, File targetFile) throws IOException {
         boolean success = true;
         try {
             // Using input name to create output name
@@ -203,7 +202,7 @@ public class FileUtils {
         } finally {
 
             if (!success) {
-                logger.warn ("Creating tar file " + targetFileName + " ended up in error. Trying to clean file");
+                logger.warn ("Creating tar file " + targetFile.getName() + " ended up in error. Trying to clean file");
                 if (targetFile.delete()) {
                     logger.debug ("Cleaned file");
                 }

@@ -256,6 +256,47 @@ Software.
                 <version>2.1.4.RELEASE</version>
             </plugin>
 
+            <!-- dereference symlinks in services_setup and packages_dev-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>dereferenceServicesSetup</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>/bin/cp</executable>
+                            <arguments>
+                                <argument>-R</argument>
+                                <argument>-L</argument>
+                                <argument>services_setup</argument>
+                                <argument>target/services_setup</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>dereferencePackagesDev</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>/bin/cp</executable>
+                            <arguments>
+                                <argument>-R</argument>
+                                <argument>-L</argument>
+                                <argument>packages_dev</argument>
+                                <argument>target/packages_dev</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

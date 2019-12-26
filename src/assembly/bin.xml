@@ -74,14 +74,14 @@ Software.
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/packages_dev</directory>
+            <directory>${project.build.directory}/packages_dev</directory>
             <outputDirectory>packages_dev</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/services_setup</directory>
+            <directory>${project.build.directory}/services_setup</directory>
             <outputDirectory>services_setup</outputDirectory>
             <includes>
                 <include>**/*</include>
@@ -93,6 +93,13 @@ Software.
             <includes>
                 <include>eskimo.bat</include>
                 <include>eskimo.sh</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/distrib</directory>
+            <outputDirectory>utils</outputDirectory>
+            <includes>
+                <include>cacert</include>
             </includes>
         </fileSet>
         <fileSet>

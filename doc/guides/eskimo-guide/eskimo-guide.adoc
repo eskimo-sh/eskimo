@@ -487,6 +487,91 @@ The default port number is 9090. This can be changed in configuration file `eski
 Several issues can happen upon first eskimo startup. +
 This section describes common issues and ways to resolve them.
 
+=== Failing to download package from remote docker images repository
+
+If you encounter an error message on the Setup Page - during initial setup or after - saying `Could not download latest
+package definition file from [Configured Remote Repository]`, this means likely that you are suffering from the empty
+`cacert` file problem affecting OpenJDK and Oracle JDK 9 and perhaps further versions as well.
+
+These Java Development Kits do indeed suffer fom a quite annying issue: the `lib/security/cacert` file referencing the
+SSL certifications authorities is empty. +
+This prevents most of the time to download any file from a remote web server using HTTPS, as is the case during initial
+setup of Eskimo.
+
+A first step is to confirm that this is indeed the problem you are suffering from by looking at the eskimo logs, either
+the files in the `logs` sub-folder of the eskimo root folder or simply on the eskimo console.
+
+Search for the following error message:
+
+.Impossible to download
+----
+2019-12-24T11:08:55,431 ERROR [http-nio-9090-exec-5] c.n.e.s.SetupService: javax.net.ssl.SSLException: java.lang.RuntimeException:
+ Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+javax.net.ssl.SSLException: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the tr
+ustAnchors parameter must be non-empty
+        at java.base/sun.security.ssl.Alerts.getSSLException(Alerts.java:214)
+        at java.base/sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1969)
+        at java.base/sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1921)
+        at java.base/sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1904)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1436)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1413)
+        at java.base/sun.net.www.protocol.https.HttpsClient.afterConnect(HttpsClient.java:567)
+        at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java
+:185)
+        at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1563)
+        at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1491)
+        at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:236)
+        at java.base/java.net.URL.openStream(URL.java:1117)
+        at ch.niceideas.eskimo.services.SetupService.dowloadFile(SetupService.java:614)
+        at ch.niceideas.eskimo.services.SetupService.loadRemotePackagesVersionFile(SetupService.java:443)
+        at ch.niceideas.eskimo.services.SetupService.prepareSetup(SetupService.java:358)
+        at ch.niceideas.eskimo.model.SetupCommand.create(SetupCommand.java:70)
+        at ch.niceideas.eskimo.services.SetupService.saveAndPrepareSetup(SetupService.java:277)
+        at ch.niceideas.eskimo.controlers.SetupConfigController.saveSetup(SetupConfigController.java:126)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+        ...
+Caused by: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parame
+ter must be non-empty
+        at java.base/sun.security.validator.PKIXValidator.<init>(PKIXValidator.java:89)
+        at java.base/sun.security.validator.Validator.getInstance(Validator.java:181)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.getValidator(X509TrustManagerImpl.java:330)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrustedInit(X509TrustManagerImpl.java:180)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:192)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:133)
+        at java.base/sun.security.ssl.ClientHandshaker.checkServerCerts(ClientHandshaker.java:1825)
+        at java.base/sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1655)
+        at java.base/sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:260)
+        at java.base/sun.security.ssl.Handshaker.processLoop(Handshaker.java:1086)
+        at java.base/sun.security.ssl.Handshaker.processRecord(Handshaker.java:1020)
+        at java.base/sun.security.ssl.SSLSocketImpl.processInputRecord(SSLSocketImpl.java:1137)
+        at java.base/sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1074)
+        at java.base/sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:973)
+        at java.base/sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1402)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1429)
+        ... 99 more
+Caused by: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+        at java.base/java.security.cert.PKIXParameters.setTrustAnchors(PKIXParameters.java:200)
+        at java.base/java.security.cert.PKIXParameters.<init>(PKIXParameters.java:120)
+        at java.base/java.security.cert.PKIXBuilderParameters.<init>(PKIXBuilderParameters.java:104)
+        at java.base/sun.security.validator.PKIXValidator.<init>(PKIXValidator.java:86)
+        ... 114 more
+----
+
+If the eskimo logs report the error above, it means that you do indeed suffer from the empty cacert file of the JDK.
+
+*In this case, you need to locate your JDK installation and overwrite the file `lib/security/cacert` with a valid file
+(non-empty)*.
+
+The generation of a valid `cacert` file exceeds the scope of this documentation. Please refer to your Operating System
+manual.
+
+Eskimo provides however  a default `cacert` file in the sub-folder `utils` of its root installation. This `cacert` file
+is a default Debian `cacert` file as of July 2019 and is guaranteed safe as of July 2019. No guarantee whatsoever are
+ensured by eskimo.sh and one can use it at his own risk.
+
 ==== eskimo-users.json cannot be written
 
 If you meet an error as the following one upon startup:

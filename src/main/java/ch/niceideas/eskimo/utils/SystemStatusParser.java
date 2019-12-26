@@ -34,12 +34,16 @@
 
 package ch.niceideas.eskimo.utils;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SystemStatusParser {
+
+    private static final Logger logger = Logger.getLogger(SystemStatusParser.class);
 
     /**
      * Debug with
@@ -96,7 +100,9 @@ public class SystemStatusParser {
                     Matcher matcher = pattern.matcher(contentLines[i]);
                     if (matcher.find()) {
 
-                        serviceStatus.put(service, matcher.group(2));
+                        String status = matcher.group(2);
+                        logger.debug ("Found service status " + status + " for service " + service);
+                        serviceStatus.put(service, status);
                     }
                 }
             }

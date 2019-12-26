@@ -99,19 +99,24 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimoMain.handleSetupCompleted()");
 
         page.executeJavaScript("var allDisabled = true;");
+        page.executeJavaScript("var allEnabled = true;");
 
         page.executeJavaScript("" +
                 " $('.config-menu-items').each(function() {\n" +
                 "     if ($(this).attr('class') == 'config-menu-items') {\n" +
                 "         allDisabled=false;\n"+
                 "     }\n" +
+                "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
+                "         allEnabled=false;\n"+
+                "     }\n" +
                 "});");
 
         assertJavascriptEquals("false", "allDisabled");
+        assertJavascriptEquals("true", "allEnabled");
 
         page.executeJavaScript("eskimoMain.handleSetupNotCompleted()");
 
-        page.executeJavaScript("var allEnabled = true;");
+        page.executeJavaScript("allEnabled = true;");
 
         page.executeJavaScript("" +
                 " $('.config-menu-items').each(function() {\n" +
@@ -119,6 +124,8 @@ public class EskimoMainTest extends AbstractWebTest {
                 "         allEnabled=false;\n"+
                 "     }\n" +
                 "});");
+
+        assertJavascriptEquals("false", "allEnabled");
     }
     
 }

@@ -109,7 +109,7 @@ eskimo.SetupCommand = function() {
         // Download of mesos
         if (command.downloadMesos != null && command.downloadMesos.length > 0) {
 
-            commandDescription += '<br><br><b>Mesos Packages are about to be built.</b>' +
+            commandDescription += '<br><br><b>Mesos Packages are about to be downloaded from '+command.packageDownloadUrl+'.</b>' +
                 '<br>'+
                 'Downloading of mesos packages can take several dozen of minutes depending on your internet connection<br>'+
                 '<b>List of Mesos packages to be downloaded</b><br>';

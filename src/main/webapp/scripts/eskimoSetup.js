@@ -123,10 +123,10 @@ eskimo.Setup = function() {
             $('#setup-mesos-origin-download').get(0).checked = true; // default
         }
 
-        if (data['setup-services-origin'] == "download") {
-            $('#setup-services-origin-download').get(0).checked = true;
+        if (data['setup-services-origin'] == "build") {
+            $('#setup-services-origin-build').get(0).checked = true;
         } else {
-            $('#setup-services-origin-build').get(0).checked = true; // default
+            $('#setup-services-origin-download').get(0).checked = true; // default
         }
 
         if (!data.clear || data.clear == "services") {

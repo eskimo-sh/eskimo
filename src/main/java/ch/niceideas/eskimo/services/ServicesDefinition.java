@@ -322,8 +322,7 @@ public class ServicesDefinition implements InitializingBean {
     }
 
     public String getAllServicesString() {
-        String[] allServices = getAllServices().toArray(new String[0]);
-        return String.join(" ", allServices);
+        return String.join(" ", getAllServices().toArray(new String[0]));
     }
 
     public Topology getTopology(NodesConfigWrapper nodesConfig, Set<String> deadIps)

@@ -31,7 +31,7 @@ REM - you deploy eskimo as part of a commercial product, platform or software.
 REM For more information, please contact eskimo.sh at https://www.eskimo.sh
 REM
 REM The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
-REM So
+REM Software
 
 java -version
 IF %ERRORLEVEL% NEQ 0 (
@@ -45,11 +45,19 @@ IF %ERRORLEVEL% NEQ 0 (
 
 SET scriptpath=%~dp0
 
+SET drive=%CD:~0,3%
+
 FOR /f "tokens=*" %%G IN ('dir /b %scriptpath%..\lib\eskimo*war') DO set WAR_FILE=%%G
+
+cd /D %drive%
+cd %scriptpath%..
+
+REM encoding UTF-8 is required to parse SSH command results properly.
 
 %JAVA_HOME%\bin\java ^
     -Xms1024m ^
     -Xmx1024m ^
+    -Dfile.encoding=UTF-8 ^
     -jar %scriptpath%..\lib\%WAR_FILE% ^
     --spring.config.location=%scriptpath%..\conf\eskimo.properties
 
