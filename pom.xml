@@ -246,6 +246,7 @@ Software.
                 <version>3.0.0-M3</version>
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <argLine>-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
 
