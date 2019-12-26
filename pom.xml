@@ -259,45 +259,30 @@ Software.
 
             <!-- dereference symlinks in services_setup and packages_dev-->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
                 <executions>
                     <execution>
-                        <id>dereferenceServicesSetup</id>
+                        <id>dereferenceServicesSymLinks</id>
                         <phase>test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
                         <configuration>
-                            <executable>/bin/cp</executable>
-                            <arguments>
-                                <argument>-R</argument>
-                                <argument>-L</argument>
-                                <argument>services_setup</argument>
-                                <argument>target/services_setup</argument>
-                            </arguments>
+                            <target>
+                                <copy outputencoding="UTF-8" todir="${project.build.directory}/services_setup">
+                                    <fileset followsymlinks="true" dir="${project.basedir}/services_setup" includes="**/*"/>
+                                </copy>
+                                <copy outputencoding="UTF-8" todir="${project.build.directory}/packages_dev">
+                                    <fileset followsymlinks="true" dir="${project.basedir}/packages_dev" includes="**/*"/>
+                                </copy>
+                            </target>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>dereferencePackagesDev</id>
-                        <phase>test</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>run</goal>
                         </goals>
-                        <configuration>
-                            <executable>/bin/cp</executable>
-                            <arguments>
-                                <argument>-R</argument>
-                                <argument>-L</argument>
-                                <argument>packages_dev</argument>
-                                <argument>target/packages_dev</argument>
-                            </arguments>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
+            <!-- Distribution packaging -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -327,23 +312,29 @@ Software.
                 <plugins>
                     <!-- Set the JS coverage run flag -->
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.6.0</version>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
                         <executions>
                             <execution>
                                 <id>setFlag</id>
                                 <phase>compile</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
                                 <configuration>
-                                    <executable>/bin/touch</executable>
-                                    <arguments>
-                                        <argument>target/jsCoverageFlag</argument>
-                                    </arguments>
+                                    <target>
+                                        <touch file="${project.build.directory}/jsCoverageFlag"/>
+                                    </target>
                                 </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
                             </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Generate LCOV file from coverage reports -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
                             <execution>
                                 <id>computeLcov</id>
                                 <phase>verify</phase>
