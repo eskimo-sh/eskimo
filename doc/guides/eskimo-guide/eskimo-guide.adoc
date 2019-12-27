@@ -864,7 +864,7 @@ service context menu which he can use to stop / start / restart a service or eve
 Most of the time when a service is reporting an error, a first step is to try to reapply the configuration. +
 See <<apply_configuration>>
 
-==== The menu
+=== The menu
 
 The menu on the left is separated in two parts :
 
@@ -1071,6 +1071,18 @@ commands. +
 These wrappers take care of calling the corresponding command in the required container.
 
 The remaining of this chapter presents each and every pre-packaged service:
+
+==== reloading a Service UI IFrame
+
+Master services that have a wen console and other UI applications are wrapped and shown from within the Eskimo UI, in a
+consistent and coherent fashion, without the user needing to reach anything else that the Eskimo UI to access all
+services and features of an Eskimo cluster.
+
+These wrapped UI applications are displayed as iframes in the Eskimo main UI window.
+
+Whenever a service UI is being displayed by selecting the service from the menu, *clicking the service menu entry a
+second time will force refresh the service iframe*.
+
 
 === NTP
 
@@ -1400,6 +1412,89 @@ An additional share exist in order to be able to share data to the zeppelin dock
 ** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
 gluster when deploying in cluster mode).
 
+==== Sample Zeppelin notebooks
+
+Upon Zeppelin installation, Eskimo sets up a set of Sample notebooks in Zeppelin to illustrate the behaviour of the
+Eskimo cluster using different frameworks and the different packaged technologies such as Flink, Spark, Logstash, etc.
+
+These sample zeppelin notebooks are intended to demonstrate the possibilities with Eskimo and to show how Zeppelin can
+be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
+
+The different sample notebooks packages with Eskimo and available from within Zeppelin are described hereafter.
+
+===== ElasticSearch Demo (Queries)
+
+This is a very simple demo notebook showing how to submit queries to ElasticSearch from a Zeppelin notebook.
+
+It uses the elasticsearch interpreter from Zeppelin. +
+One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
+
+===== Logstash Demo
+
+The logstash demo notebook shows how to integrate with logstash on Eskimo from a Zeppelin notebook.
+
+It uses the shell interpreter from Zeppelin and the command line client wrapper to logstash. +
+It uses the "sample berka transaction" datset downloaded from niceideas.ch and inserts it in ElasticSearch using
+logstash.
+
+===== Spark RDD Demo
+
+This is a plain old Spark Demo notebook showing various RDD operations and how to run them from within Zeppelin.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Spark ML Demo (Regression)
+
+This is a simple notebook showing some basic ML feature sich as how to run a regression.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Spark SQL Demo
+
+This is a simple notebook showing some Spark SQL functions from within Zeppelin and the way to integrate with
+Zeppelin's visualizations abilities.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Spark Integration ES
+
+This notebook demonstrates how to integrate Spark and ElasticSearch on Eskimo from within Zeppelin.
+
+It uses the Spark Interpreter from Zeppelin and requires to run the "Logstash Demo" notebook first to have the
+"Berka Transaction" dataset available in ElasticSearch in prior to using it.
+
+===== Spark Integration Kafka
+
+This notebook shows how to integrate Spark Streaming (Structured Streaming / SQL actually) and kafka on Eskimo from
+within Zeppelin.
+
+Two sample notebooks must have been executed in prior to executing this one : the "Logstash Demo" and
+"Spark Integration ES", in this order.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Flink Batch Demo
+
+This is a simple notebook showing some simple Flink Batch Computing examples.
+
+It uses the Flink interpreter from Zeppelin.
+
+===== Flink Streaming Demo
+
+This notebook demonstrates a more advanced example of a flink streaming job. It registers a custom data source and
+serves as an illustration purpose of Flink's job monitoring abilities.
+
+It uses the Flink interpreter from Zeppelin.
+
+===== Flink Integration Kafka
+
+This notebook shows how to integrate Flink Streaming with Kafka on Eskimo from within Zeppelin.
+
+Two sample notebooks must have been executed in prior to executing this one : the "Logstash Demov and
+"Spark Integration ES", in this order.
+
+It uses the Flink interpreter from Zeppelin.
+
 ==== Zeppelin 0.9-SNAPSHOT bugs and workarounds
 
 In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin-0.9 since the 0.9 version is not released yet
@@ -1422,7 +1517,7 @@ it is saved for real.
 * *Problem* : Importing a note from the UI is broken. The UI always reports that the file is exceeding maximum size
 regardless of actual size.
 * *Workaround* : Use the REST API to importe note. +
-For instance if your have a note `test.json`that you want to import, go in its folder and type following command: +
+For instance if your have a note `test.json` that you want to import, go in its folder and type following command: +
 `curl -XPOST -H "Content-Type: application/json" http://localhost:38080/api/notebook/import -d @test.json` +
 (replace localhost by the IP address of the node running zeppelin) +
 (See above note about REST API import workaround)
@@ -1454,72 +1549,15 @@ to view ElasticSearch data, Spark results, etc.
 
 https://grafana.com/
 
+==== Pre-packaged Grafana Dashboards
 
-=== Sample Zeppelin notebooks
+Eskimo CE provides two pre-packaged Grafana dashboards :
 
-Upon Zeppelin installation, Eskimo sets up a set of Sample notebooks in Zeppelin to illustrate the behaviour of the
-Eskimo cluster using different frameworks and the different packaged technologies such as Flink, Spark, Logstash, etc.
+* *Eskimo System Wide Monitoring* : This is the global cluster sttaus monitoring dashboard. This dashboard is the one
+used on the Eskimo Status Page.
+* *Eskimo Nodes System Monitoring* : This s a complete monitoring dashboard showing all individual eskimo cluster nodes
+metrics. It is intended for fine-grained monitoring and debugging purpose.
 
-These sample zeppelin notebooks are intended to demonstrate the possibilities with Eskimo and to show how Zeppelin can
-be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
-
-The different sample notebooks packages with Eskimo and available from within Zeppelin are described hereafter.
-
-==== ElasticSearch Demo (Queries)
-
-This is a very simple demo notebook showing how to submit queries to ElasticSearch from a Zeppelin notebook.
-
-It uses the elasticsearch interpreter from Zeppelin. +
-One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
-
-==== Logstash Demo
-
-The logstash demo notebook shows how to integrate with logstash on Eskimo from a Zeppelin notebook.
-
-It uses the shell interpreter from Zeppelin and the command line client wrapper to logstash. +
-It uses the "sample berka transaction" datset downloaded from niceideas.ch and inserts it in ElasticSearch using
-logstash.
-
-==== Spark RDD Demo
-
-This is a plain old Spark Demo notebook showing various RDD operations and how to run them from within Zeppelin.
-
-It uses the Spark interpreter from Zeppelin.
-
-==== Spark ML Demo (Regression)
-
-This is a simple notebook showing some basic ML feature sich as how to run a regression.
-
-It uses the Spark interpreter from Zeppelin.
-
-==== Spark SQL Demo
-
-TODO
-
-==== Spark Integration ES
-
-TODO
-
-==== Spark Integration Kafka
-
-TODO
-
-==== Flink Batch Demo
-
-TODO
-
-==== Flink Streaming Demo
-
-TODO
-
-==== Flink Integration Kafka
-
-TODO
-
-
-=== Pre-packages Grafana Dashboards
-
-TODO
 
 
 
