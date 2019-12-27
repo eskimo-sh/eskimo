@@ -1465,27 +1465,62 @@ be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
 
 The different sample notebooks packages with Eskimo and available from within Zeppelin are described hereafter.
 
-TODO
-
 ==== ElasticSearch Demo (Queries)
+
+This is a very simple demo notebook showing how to submit queries to ElasticSearch from a Zeppelin notebook.
+
+It uses the elasticsearch interpreter from Zeppelin. +
+One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
 
 ==== Logstash Demo
 
+The logstash demo notebook shows how to integrate with logstash on Eskimo from a Zeppelin notebook.
+
+It uses the shell interpreter from Zeppelin and the command line client wrapper to logstash. +
+It uses the "sample berka transaction" datset downloaded from niceideas.ch and inserts it in ElasticSearch using
+logstash.
+
 ==== Spark RDD Demo
+
+This is a plain old Spark Demo notebook showing various RDD operations and how to run them from within Zeppelin.
+
+It uses the Spark interpreter from Zeppelin.
 
 ==== Spark ML Demo (Regression)
 
+This is a simple notebook showing some basic ML feature sich as how to run a regression.
+
+It uses the Spark interpreter from Zeppelin.
+
 ==== Spark SQL Demo
+
+TODO
 
 ==== Spark Integration ES
 
+TODO
+
 ==== Spark Integration Kafka
+
+TODO
 
 ==== Flink Batch Demo
 
+TODO
+
 ==== Flink Streaming Demo
 
+TODO
+
 ==== Flink Integration Kafka
+
+TODO
+
+
+=== Pre-packages Grafana Dashboards
+
+TODO
+
 
 
 [appendix]

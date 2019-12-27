@@ -51,6 +51,7 @@ Software.
 
     <properties>
         <java.version>1.8</java.version>
+        <argLine>-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8</argLine>
     </properties>
 
     <dependencies>
@@ -246,7 +247,6 @@ Software.
                 <version>3.0.0-M3</version>
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <argLine>@{argLine} >-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
 
