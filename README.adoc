@@ -88,6 +88,13 @@ Minimum requirements are as follows:
 
 Every other dependency will be downloaded during the maven build process.
 
+Theoretically, Eskimo can be built on any Operating System providing a command line and supporting Java 8+ (Java 9
+recommended) and Maven 3+.
+*However, the eskimo source tree makes an extensive use of symbolic links wich - unfortunately - are not supported on
+Microsoft Windows*. +
+For this reason, building eskimo on windows is absolutely possible but it is highly discouraged to develop eskimo on
+Windows.
+
 
 === Building using maven
 

@@ -184,7 +184,7 @@ public class FileUtils {
         boolean success = true;
         try {
             // Using input name to create output name
-            try (TarArchiveOutputStream tarOs = new TarArchiveOutputStream(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile))))) {
+            try (TarArchiveOutputStream tarOs = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(targetFile)))) {
                 File folder = new File(sourceFolder);
                 File[] fileNames = folder.listFiles();
                 assert fileNames != null;
@@ -216,15 +216,14 @@ public class FileUtils {
         // New TarArchiveEntry
         tos.putArchiveEntry(new TarArchiveEntry(file, fileName));
         if (file.isFile()){
-            FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            // Write content of the file
-            IOUtils.copy(bis, tos);
-            tos.closeArchiveEntry();
-            fis.close();
+            try (FileInputStream fis = new FileInputStream(file)) {
+                // Write content of the file
+                IOUtils.copy(fis, tos);
+                tos.closeArchiveEntry();
+            }
         } else if (file.isDirectory()){
             // no need to copy any content since it is
-            // a directory, just close the outputstream
+            // a directory, just close the archive Entry
             tos.closeArchiveEntry();
             for (File cFile : file.listFiles()){
                 // recursively call the method for all the subfolders
@@ -232,6 +231,5 @@ public class FileUtils {
 
             }
         }
-
     }
 }

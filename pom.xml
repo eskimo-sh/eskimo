@@ -267,10 +267,10 @@ Software.
                         <phase>test</phase>
                         <configuration>
                             <target>
-                                <copy outputencoding="UTF-8" todir="${project.build.directory}/services_setup">
+                                <copy todir="${project.build.directory}/services_setup">
                                     <fileset followsymlinks="true" dir="${project.basedir}/services_setup" includes="**/*"/>
                                 </copy>
-                                <copy outputencoding="UTF-8" todir="${project.build.directory}/packages_dev">
+                                <copy todir="${project.build.directory}/packages_dev">
                                     <fileset followsymlinks="true" dir="${project.basedir}/packages_dev" includes="**/*"/>
                                 </copy>
                             </target>
