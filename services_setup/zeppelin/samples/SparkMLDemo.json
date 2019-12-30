@@ -1,1081 +1,858 @@
 ﻿{
-  "paragraphs":[
+  "paragraphs": [
     {
-      "text":"%md\n\n# Introduction to Machine Learning using Linear Regression\n\n![spark-ml-lib](https://2xbbhjxc6wk3v21p62t8n4d4-wpengine.netdna-ssl.com/wp-content/uploads/2017/06/spark-mllib-logo.png)",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"markdown",
-          "editOnDblClick":true,
-          "completionKey":"TAB",
-          "completionSupport":false
+      "text": "%md\n\n# Introduction to Machine Learning using Linear Regression\n![spark-ml-lib](https://2xbbhjxc6wk3v21p62t8n4d4-wpengine.netdna-ssl.com/wp-content/uploads/2017/06/spark-mllib-logo.png)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 09:03:29.010",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h1>Introduction to Machine Learning using Linear Regression</h1>\n<p><img src=\"https://2xbbhjxc6wk3v21p62t8n4d4-wpengine.netdna-ssl.com/wp-content/uploads/2017/06/spark-mllib-logo.png\" alt=\"spark-ml-lib\" /></p>\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eIntroduction to Machine Learning using Linear Regression\u003c/h1\u003e\n\u003cp\u003e\u003cimg src\u003d\"https://2xbbhjxc6wk3v21p62t8n4d4-wpengine.netdna-ssl.com/wp-content/uploads/2017/06/spark-mllib-logo.png\" alt\u003d\"spark-ml-lib\" /\u003e\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686928_190909173",
-      "id":"20180808-223736_226202175",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "focus":true,
-      "$$hashKey":"object:10834"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791197_-834585299",
+      "id": "20180808-223736_226202175",
+      "dateCreated": "2019-11-06 08:59:51.197",
+      "dateStarted": "2019-11-06 09:03:29.015",
+      "dateFinished": "2019-11-06 09:03:29.063",
+      "status": "FINISHED"
     },
     {
-      "text":"%md\n## Introduction\n\nIn this lab we’ll cover basics of building a Linear Regression model using Apache Spark ML Pipeline API.\n\n- Starting from a simple 2 dim array\n- Using Pipeline API to create vectorised version of features and build the model\n- Using Pipeline API to calculate predictions\n- Exchanging data between Scala and Python pandas via TempView (new API in 2.x)\n- Simplified plotting by using pandas plot function (pandas similar as Spark DataFrame)\n- Saving and loading back the model",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"markdown",
-          "editOnDblClick":true,
-          "completionKey":"TAB",
-          "completionSupport":false
+      "text": "%md\n## Introduction\n\nIn this lab we’ll cover basics of building a Linear Regression model using Apache Spark ML Pipeline API.\n\n- Starting from a simple 2 dim array\n- Using Pipeline API to create vectorised version of features and build the model\n- Using Pipeline API to calculate predictions\n- Exchanging data between Scala and Python pandas via TempView (new API in 2.x)\n- Simplified plotting by using pandas plot function (pandas similar as Spark DataFrame)\n- Saving and loading back the model",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.202",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h2>Introduction</h2>\n<p>In this lab we’ll cover basics of building a Linear Regression model using Apache Spark ML Pipeline API.</p>\n<ul>\n  <li>Starting from a simple 2 dim array</li>\n  <li>Using Pipeline API to create vectorised version of features and build the model</li>\n  <li>Using Pipeline API to calculate predictions</li>\n  <li>Exchanging data between Scala and Python pandas via TempView (new API in 2.x)</li>\n  <li>Simplified plotting by using pandas plot function (pandas similar as Spark DataFrame)</li>\n  <li>Saving and loading back the model</li>\n</ul>\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eIntroduction\u003c/h2\u003e\n\u003cp\u003eIn this lab we’ll cover basics of building a Linear Regression model using Apache Spark ML Pipeline API.\u003c/p\u003e\n\u003cul\u003e\n  \u003cli\u003eStarting from a simple 2 dim array\u003c/li\u003e\n  \u003cli\u003eUsing Pipeline API to create vectorised version of features and build the model\u003c/li\u003e\n  \u003cli\u003eUsing Pipeline API to calculate predictions\u003c/li\u003e\n  \u003cli\u003eExchanging data between Scala and Python pandas via TempView (new API in 2.x)\u003c/li\u003e\n  \u003cli\u003eSimplified plotting by using pandas plot function (pandas similar as Spark DataFrame)\u003c/li\u003e\n  \u003cli\u003eSaving and loading back the model\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686930_720252371",
-      "id":"20180808-223816_1197842744",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10835"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791202_66312593",
+      "id": "20180808-223816_1197842744",
+      "dateCreated": "2019-11-06 08:59:51.202",
+      "status": "READY"
     },
     {
-      "text":"%md\n## What is a model?\n\nA machine learning model consists of data provided to a machine learning algorithm which includes the correct answer (Target attribute) to the problem that it is trying to solve.<br> The machine learning algorithm is tasked with finding patterns in the data and producing a model which reflect the patterns in the data.<br> For a more specific explanation of the model used here visit the [**Hortonworks tutorial**](https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#what-is-a-model).",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"markdown",
-          "editOnDblClick":true,
-          "completionKey":"TAB",
-          "completionSupport":false
+      "text": "%md\n## What is a model?\n\nA machine learning model consists of data provided to a machine learning algorithm which includes the correct answer (Target attribute) to the problem that it is trying to solve.\u003cbr\u003e The machine learning algorithm is tasked with finding patterns in the data and producing a model which reflect the patterns in the data.\u003cbr\u003e For a more specific explanation of the model used here visit the [**Hortonworks tutorial**](https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#what-is-a-model).",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.202",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h2>What is a model?</h2>\n<p>A machine learning model consists of data provided to a machine learning algorithm which includes the correct answer (Target attribute) to the problem that it is trying to solve.<br> The machine learning algorithm is tasked with finding patterns in the data and producing a model which reflect the patterns in the data.<br> For a more specific explanation of the model used here visit the <a href=\"https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#what-is-a-model\"><strong>Hortonworks tutorial</strong></a>.</p>\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eWhat is a model?\u003c/h2\u003e\n\u003cp\u003eA machine learning model consists of data provided to a machine learning algorithm which includes the correct answer (Target attribute) to the problem that it is trying to solve.\u003cbr\u003e The machine learning algorithm is tasked with finding patterns in the data and producing a model which reflect the patterns in the data.\u003cbr\u003e For a more specific explanation of the model used here visit the \u003ca href\u003d\"https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#what-is-a-model\"\u003e\u003cstrong\u003eHortonworks tutorial\u003c/strong\u003e\u003c/a\u003e.\u003c/p\u003e\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686933_506232571",
-      "id":"20180808-223841_433347963",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10836"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791202_1966910222",
+      "id": "20180808-223841_433347963",
+      "dateCreated": "2019-11-06 08:59:51.202",
+      "status": "READY"
     },
     {
-      "title":"Verify Spark version (should be 2.x)",
-      "text":"%spark.spark\n\nspark.version",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:32:51+0000",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"scala",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Verify Spark version (should be 2.x)",
+      "text": "%spark.spark\n\nspark.version",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.202",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "scala",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "fontSize":9,
-        "title":false,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "title": false,
+        "runOnSelectionChange": true,
+        "checkEmpty": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true,
-        "runOnSelectionChange":true,
-        "checkEmpty":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"\u001b[1m\u001b[34mres1\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m = 2.4.4\n"
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mres1\u001b[0m: \u001b[1m\u001b[32mString\u001b[0m \u003d 2.4.4\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686934_72268099",
-      "id":"20161023-082330_1254378286",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "dateStarted":"2019-11-04T12:32:51+0000",
-      "dateFinished":"2019-11-04T12:33:19+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:10837"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791202_-614512154",
+      "id": "20161023-082330_1254378286",
+      "dateCreated": "2019-11-06 08:59:51.202",
+      "status": "READY"
     },
     {
-      "title":"Create a small data set that we will use for our Linear Regression model",
-      "text":"%spark.spark\n\nimport org.apache.spark.ml.linalg.Vectors\n\nval data = spark.createDataFrame(Seq(\n\t(-12.0,  -4.9),\n\t( -6.0,  -4.5),\n\t( -7.2,  -4.1),\n\t( -5.0,  -3.2),\n\t( -2.0,  -3.0),\n\t( -3.1,  -2.1),\n\t( -4.0,  -1.5),\n\t( -2.2,  -1.2),\n\t( -2.0,  -0.7),\n\t( 1.0,   -0.5),\n\t( -0.7,  -0.2),\n\t( 1.2,   0.1),\n\t( 2.2,   0.3),  \n\t( 6.5,   0.52),\n\t( 4.2,   0.72),\n\t( 8.6,   1.1),\n\t( 9.5,   2.3),\n\t( 14.52, 3.4),\n\t( 12.9,  3.61), \n\t( 16.3,  3.8)\n)).toDF(\"y\", \"x\")\n\ndata.registerTempTable(\"simple_points\")",
-      "user":"anonymous",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"scala",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Create a small data set that we will use for our Linear Regression model",
+      "text": "%spark.spark\n\nimport org.apache.spark.ml.linalg.Vectors\n\nval data \u003d spark.createDataFrame(Seq(\n\t(-12.0,  -4.9),\n\t( -6.0,  -4.5),\n\t( -7.2,  -4.1),\n\t( -5.0,  -3.2),\n\t( -2.0,  -3.0),\n\t( -3.1,  -2.1),\n\t( -4.0,  -1.5),\n\t( -2.2,  -1.2),\n\t( -2.0,  -0.7),\n\t( 1.0,   -0.5),\n\t( -0.7,  -0.2),\n\t( 1.2,   0.1),\n\t( 2.2,   0.3),  \n\t( 6.5,   0.52),\n\t( 4.2,   0.72),\n\t( 8.6,   1.1),\n\t( 9.5,   2.3),\n\t( 14.52, 3.4),\n\t( 12.9,  3.61), \n\t( 16.3,  3.8)\n)).toDF(\"y\", \"x\")\n\ndata.registerTempTable(\"simple_points\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.202",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "scala",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "editorHide":false,
-        "fontSize":9,
-        "title":false,
-        "runOnSelectionChange":true,
-        "checkEmpty":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "fontSize": 9.0,
+        "title": false,
+        "runOnSelectionChange": true,
+        "checkEmpty": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"\u001b[33mwarning: \u001b[0mthere was one deprecation warning; re-run with -deprecation for details\nimport org.apache.spark.ml.linalg.Vectors\n\u001b[1m\u001b[34mdata\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [y: double, x: double]\n"
+            "type": "TEXT",
+            "data": "\u001b[33mwarning: \u001b[0mthere was one deprecation warning; re-run with -deprecation for details\nimport org.apache.spark.ml.linalg.Vectors\n\u001b[1m\u001b[34mdata\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [y: double, x: double]\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20161023-063018_227184425",
-      "id":"20161023-063018_227184425",
-      "dateCreated":"2019-11-04T12:36:04+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:10838",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791202_638645163",
+      "id": "20161023-063018_227184425",
+      "dateCreated": "2019-11-06 08:59:51.202",
+      "status": "READY"
     },
     {
-      "text":"%spark.sql\n\nselect * from simple_points",
-      "user":"anonymous",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"sql",
-          "editOnDblClick":false,
-          "completionKey":"TAB",
-          "completionSupport":true
+      "text": "%spark.sql\n\nselect * from simple_points",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/sql",
-        "fontSize":9,
-        "editorHide":true,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-          "0":{
-            "graph":{
-              "mode":"lineChart",
-              "height":300,
-              "optionOpen":false,
-              "setting":{
-                "table":{
-                  "tableGridState":{
-
-                  },
-                  "tableColumnTypeState":{
-                    "names":{
-                      "y":"string",
-                      "x":"string"
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "y": "string",
+                      "x": "string"
                     },
-                    "updated":false
+                    "updated": false
                   },
-                  "tableOptionSpecHash":"[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
-                  "tableOptionValue":{
-                    "useFilter":false,
-                    "showPagination":false,
-                    "showAggregationFooter":false
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
                   },
-                  "updated":false,
-                  "initialized":false
+                  "updated": false,
+                  "initialized": false
                 },
-                "multiBarChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default"
+                  "xLabelStatus": "default"
                 },
-                "lineChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default"
+                  "xLabelStatus": "default"
                 },
-                "scatterChart":{
-                  "xAxis":{
-                    "name":"x",
-                    "index":1,
-                    "aggr":"sum"
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "x",
+                    "index": 1.0,
+                    "aggr": "sum"
                   },
-                  "yAxis":{
-                    "name":"y",
-                    "index":0,
-                    "aggr":"sum"
+                  "yAxis": {
+                    "name": "y",
+                    "index": 0.0,
+                    "aggr": "sum"
                   }
                 }
               },
-              "keys":[
+              "keys": [
                 {
-                  "name":"x",
-                  "index":1,
-                  "aggr":"sum"
+                  "name": "x",
+                  "index": 1.0,
+                  "aggr": "sum"
                 }
               ],
-              "groups":[
-
-              ],
-              "values":[
+              "groups": [],
+              "values": [
                 {
-                  "name":"y",
-                  "index":0,
-                  "aggr":"sum"
+                  "name": "y",
+                  "index": 0.0,
+                  "aggr": "sum"
                 }
               ],
-              "commonSetting":{
-
-              }
+              "commonSetting": {}
             },
-            "helium":{
-
-            }
+            "helium": {}
           }
         },
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TABLE",
-            "data":"y\tx\n-12.0\t-4.9\n-6.0\t-4.5\n-7.2\t-4.1\n-5.0\t-3.2\n-2.0\t-3.0\n-3.1\t-2.1\n-4.0\t-1.5\n-2.2\t-1.2\n-2.0\t-0.7\n1.0\t-0.5\n-0.7\t-0.2\n1.2\t0.1\n2.2\t0.3\n6.5\t0.52\n4.2\t0.72\n8.6\t1.1\n9.5\t2.3\n14.52\t3.4\n12.9\t3.61\n16.3\t3.8\n"
+            "type": "TABLE",
+            "data": "y\tx\n-12.0\t-4.9\n-6.0\t-4.5\n-7.2\t-4.1\n-5.0\t-3.2\n-2.0\t-3.0\n-3.1\t-2.1\n-4.0\t-1.5\n-2.2\t-1.2\n-2.0\t-0.7\n1.0\t-0.5\n-0.7\t-0.2\n1.2\t0.1\n2.2\t0.3\n6.5\t0.52\n4.2\t0.72\n8.6\t1.1\n9.5\t2.3\n14.52\t3.4\n12.9\t3.61\n16.3\t3.8\n"
           },
           {
-            "type":"TEXT",
-            "data":""
+            "type": "TEXT",
+            "data": ""
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870847465_-1625453923",
-      "id":"paragraph_1572870847465_-1625453923",
-      "dateCreated":"2019-11-04T12:37:19+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:10839",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_1602207682",
+      "id": "paragraph_1572870847465_-1625453923",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "title":"Run Linear Regression",
-      "text":"%spark.spark\n\nimport org.apache.spark.ml.Pipeline\nimport org.apache.spark.ml.feature.VectorAssembler\nimport org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}\n\n// Set Features\nval features = (new VectorAssembler()\n    .setInputCols(Array(\"x\"))\n    .setOutputCol(\"features\"))\n\nval linreg = new LinearRegression().setLabelCol(\"y\")\n  \nval pipeline = new Pipeline().setStages(Array(features, linreg))\nval model = pipeline.fit(data)",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"scala",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Run Linear Regression",
+      "text": "%spark.spark\n\nimport org.apache.spark.ml.Pipeline\nimport org.apache.spark.ml.feature.VectorAssembler\nimport org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}\n\n// Set Features\nval features \u003d (new VectorAssembler()\n    .setInputCols(Array(\"x\"))\n    .setOutputCol(\"features\"))\n\nval linreg \u003d new LinearRegression().setLabelCol(\"y\")\n  \nval pipeline \u003d new Pipeline().setStages(Array(features, linreg))\nval model \u003d pipeline.fit(data)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "scala",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "fontSize":9,
-        "title":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "title": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"import org.apache.spark.ml.Pipeline\nimport org.apache.spark.ml.feature.VectorAssembler\nimport org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}\nfeatures: org.apache.spark.ml.feature.VectorAssembler = vecAssembler_e7c860c65304\nlinreg: org.apache.spark.ml.regression.LinearRegression = linReg_8753a356748c\npipeline: org.apache.spark.ml.Pipeline = pipeline_28a4e4328fa9\nmodel: org.apache.spark.ml.PipelineModel = pipeline_28a4e4328fa9\n"
+            "type": "TEXT",
+            "data": "import org.apache.spark.ml.Pipeline\nimport org.apache.spark.ml.feature.VectorAssembler\nimport org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}\nfeatures: org.apache.spark.ml.feature.VectorAssembler \u003d vecAssembler_e7c860c65304\nlinreg: org.apache.spark.ml.regression.LinearRegression \u003d linReg_8753a356748c\npipeline: org.apache.spark.ml.Pipeline \u003d pipeline_28a4e4328fa9\nmodel: org.apache.spark.ml.PipelineModel \u003d pipeline_28a4e4328fa9\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686935_-22011356",
-      "id":"20161023-063047_142266605",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10840"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_-2059352869",
+      "id": "20161023-063047_142266605",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "title":"Summarize model training",
-      "text":"%spark.spark\n\nval linRegModel = model.stages(1).asInstanceOf[LinearRegressionModel]\n\nprintln(s\"RMSE:  ${linRegModel.summary.rootMeanSquaredError}\")\nprintln(s\"r2:    ${linRegModel.summary.r2}\")\nprintln(s\"Model: Y = ${linRegModel.coefficients(0)} * X + ${linRegModel.intercept}\")\n\nlinRegModel.summary.residuals.show()",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"scala",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Summarize model training",
+      "text": "%spark.spark\n\nval linRegModel \u003d model.stages(1).asInstanceOf[LinearRegressionModel]\n\nprintln(s\"RMSE:  ${linRegModel.summary.rootMeanSquaredError}\")\nprintln(s\"r2:    ${linRegModel.summary.r2}\")\nprintln(s\"Model: Y \u003d ${linRegModel.coefficients(0)} * X + ${linRegModel.intercept}\")\n\nlinRegModel.summary.residuals.show()",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "scala",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "fontSize":9,
-        "title":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "title": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"linRegModel: org.apache.spark.ml.regression.LinearRegressionModel = linReg_8753a356748c\nRMSE:  2.1064773603437077\nr2:    0.9205193637224095\nModel: Y = 2.8057645950707624 * X + 3.045896709023058\n+--------------------+\n|           residuals|\n+--------------------+\n|  -1.297650193176322|\n|  3.5800439687953727|\n|  1.2577381307670672|\n|  0.9325499952033827|\n|   3.371397076189229|\n|-0.25379105937445656|\n| -2.8372498164169144|\n| -1.8789791949381436|\n|  -3.081861492473524|\n| -0.6430144114876768|\n| -3.1847437900089055|\n| -2.1264731685301346|\n| -1.6876260875442863|\n|  1.9951057015401457|\n| -0.8660472174740068|\n|  2.4677622363991034|\n|8.447223141878624E-4|\n|  1.9345036677363492|\n|-0.27470689722851027|\n|   2.592197829708047|\n+--------------------+\n\n"
+            "type": "TEXT",
+            "data": "linRegModel: org.apache.spark.ml.regression.LinearRegressionModel \u003d linReg_8753a356748c\nRMSE:  2.1064773603437077\nr2:    0.9205193637224095\nModel: Y \u003d 2.8057645950707624 * X + 3.045896709023058\n+--------------------+\n|           residuals|\n+--------------------+\n|  -1.297650193176322|\n|  3.5800439687953727|\n|  1.2577381307670672|\n|  0.9325499952033827|\n|   3.371397076189229|\n|-0.25379105937445656|\n| -2.8372498164169144|\n| -1.8789791949381436|\n|  -3.081861492473524|\n| -0.6430144114876768|\n| -3.1847437900089055|\n| -2.1264731685301346|\n| -1.6876260875442863|\n|  1.9951057015401457|\n| -0.8660472174740068|\n|  2.4677622363991034|\n|8.447223141878624E-4|\n|  1.9345036677363492|\n|-0.27470689722851027|\n|   2.592197829708047|\n+--------------------+\n\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686940_684783872",
-      "id":"20161023-065504_1972452148",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10841"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_-187927884",
+      "id": "20161023-065504_1972452148",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "title":"Use the same data to predict the model ",
-      "text":"%spark.spark\n\nval result = model.transform(data).select(\"x\", \"y\", \"prediction\")\n\nresult.show()",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"scala",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Use the same data to predict the model ",
+      "text": "%spark.spark\n\nval result \u003d model.transform(data).select(\"x\", \"y\", \"prediction\")\n\nresult.show()",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "scala",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "fontSize":9,
-        "title":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "title": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"result: org.apache.spark.sql.DataFrame = [x: double, y: double ... 1 more field]\n+----+-----+-------------------+\n|   x|    y|         prediction|\n+----+-----+-------------------+\n|-4.9|-12.0|-10.702349806823678|\n|-4.5| -6.0| -9.580043968795373|\n|-4.1| -7.2| -8.457738130767067|\n|-3.2| -5.0| -5.932549995203383|\n|-3.0| -2.0| -5.371397076189229|\n|-2.1| -3.1|-2.8462089406255435|\n|-1.5| -4.0|-1.1627501835830856|\n|-1.2| -2.2|-0.3210208050618566|\n|-0.7| -2.0| 1.0818614924735244|\n|-0.5|  1.0| 1.6430144114876768|\n|-0.2| -0.7| 2.4847437900089053|\n| 0.1|  1.2| 3.3264731685301343|\n| 0.3|  2.2| 3.8876260875442865|\n|0.52|  6.5|  4.504894298459854|\n|0.72|  4.2|  5.066047217474007|\n| 1.1|  8.6|  6.132237763600896|\n| 2.3|  9.5|  9.499155277685812|\n| 3.4|14.52|  12.58549633226365|\n|3.61| 12.9|  13.17470689722851|\n| 3.8| 16.3| 13.707802170291954|\n+----+-----+-------------------+\n\n"
+            "type": "TEXT",
+            "data": "result: org.apache.spark.sql.DataFrame \u003d [x: double, y: double ... 1 more field]\n+----+-----+-------------------+\n|   x|    y|         prediction|\n+----+-----+-------------------+\n|-4.9|-12.0|-10.702349806823678|\n|-4.5| -6.0| -9.580043968795373|\n|-4.1| -7.2| -8.457738130767067|\n|-3.2| -5.0| -5.932549995203383|\n|-3.0| -2.0| -5.371397076189229|\n|-2.1| -3.1|-2.8462089406255435|\n|-1.5| -4.0|-1.1627501835830856|\n|-1.2| -2.2|-0.3210208050618566|\n|-0.7| -2.0| 1.0818614924735244|\n|-0.5|  1.0| 1.6430144114876768|\n|-0.2| -0.7| 2.4847437900089053|\n| 0.1|  1.2| 3.3264731685301343|\n| 0.3|  2.2| 3.8876260875442865|\n|0.52|  6.5|  4.504894298459854|\n|0.72|  4.2|  5.066047217474007|\n| 1.1|  8.6|  6.132237763600896|\n| 2.3|  9.5|  9.499155277685812|\n| 3.4|14.52|  12.58549633226365|\n|3.61| 12.9|  13.17470689722851|\n| 3.8| 16.3| 13.707802170291954|\n+----+-----+-------------------+\n\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686940_-1348302882",
-      "id":"20161104-232822_1626397932",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10842"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_-1150242836",
+      "id": "20161104-232822_1626397932",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "title":"Create a Temporary View",
-      "text":"%spark.spark\n\nresult.createOrReplaceTempView(\"linreg\")",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"scala",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Create a Temporary View",
+      "text": "%spark.spark\n\nresult.createOrReplaceTempView(\"linreg\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "scala",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "fontSize":9,
-        "title":true,
-        "results":{
-
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "title": true,
+        "results": {},
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
         },
-        "graph":{
-          "mode":"table",
-          "height":300,
-          "optionOpen":false,
-          "keys":[
-
-          ],
-          "values":[
-
-          ],
-          "groups":[
-
-          ],
-          "scatter":{
-
-          }
-        },
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
-
-        ]
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686943_1033576549",
-      "id":"20161104-232946_1293428390",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10843"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_-1564901700",
+      "id": "20161104-232946_1293428390",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "title":"Show View",
-      "text":"%spark.sql\n\nselect * from linreg",
-      "user":"anonymous",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"sql",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Show View",
+      "text": "%spark.sql\n\nselect * from linreg",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "sql",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/sql",
-        "editorHide":true,
-        "fontSize":9,
-        "title":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "editorHide": true,
+        "fontSize": 9.0,
+        "title": true,
+        "results": [
           {
-            "graph":{
-              "mode":"lineChart",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
+            "graph": {
+              "mode": "lineChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [
                 {
-                  "name":"x",
-                  "index":0,
-                  "aggr":"sum"
+                  "name": "x",
+                  "index": 0.0,
+                  "aggr": "sum"
                 }
               ],
-              "values":[
+              "values": [
                 {
-                  "name":"y",
-                  "index":1,
-                  "aggr":"sum"
+                  "name": "y",
+                  "index": 1.0,
+                  "aggr": "sum"
                 },
                 {
-                  "name":"prediction",
-                  "index":2,
-                  "aggr":"sum"
+                  "name": "prediction",
+                  "index": 2.0,
+                  "aggr": "sum"
                 }
               ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              },
-              "setting":{
-                "table":{
-                  "tableGridState":{
-
-                  },
-                  "tableColumnTypeState":{
-                    "names":{
-                      "x":"string",
-                      "y":"string",
-                      "prediction":"string"
+              "groups": [],
+              "scatter": {},
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "x": "string",
+                      "y": "string",
+                      "prediction": "string"
                     },
-                    "updated":false
+                    "updated": false
                   },
-                  "tableOptionSpecHash":"[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
-                  "tableOptionValue":{
-                    "useFilter":false,
-                    "showPagination":false,
-                    "showAggregationFooter":false
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
                   },
-                  "updated":false,
-                  "initialized":false
+                  "updated": false,
+                  "initialized": false
                 },
-                "lineChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default"
+                  "xLabelStatus": "default"
                 },
-                "stackedAreaChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default"
+                  "xLabelStatus": "default"
                 },
-                "multiBarChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default"
+                  "xLabelStatus": "default"
                 }
               },
-              "commonSetting":{
-
-              }
+              "commonSetting": {}
             },
-            "helium":{
-
-            }
+            "helium": {}
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TABLE",
-            "data":"x\ty\tprediction\n-4.9\t-12.0\t-10.702349806823678\n-4.5\t-6.0\t-9.580043968795373\n-4.1\t-7.2\t-8.457738130767067\n-3.2\t-5.0\t-5.932549995203383\n-3.0\t-2.0\t-5.371397076189229\n-2.1\t-3.1\t-2.8462089406255435\n-1.5\t-4.0\t-1.1627501835830856\n-1.2\t-2.2\t-0.3210208050618566\n-0.7\t-2.0\t1.0818614924735244\n-0.5\t1.0\t1.6430144114876768\n-0.2\t-0.7\t2.4847437900089053\n0.1\t1.2\t3.3264731685301343\n0.3\t2.2\t3.8876260875442865\n0.52\t6.5\t4.504894298459854\n0.72\t4.2\t5.066047217474007\n1.1\t8.6\t6.132237763600896\n2.3\t9.5\t9.499155277685812\n3.4\t14.52\t12.58549633226365\n3.61\t12.9\t13.17470689722851\n3.8\t16.3\t13.707802170291954\n"
+            "type": "TABLE",
+            "data": "x\ty\tprediction\n-4.9\t-12.0\t-10.702349806823678\n-4.5\t-6.0\t-9.580043968795373\n-4.1\t-7.2\t-8.457738130767067\n-3.2\t-5.0\t-5.932549995203383\n-3.0\t-2.0\t-5.371397076189229\n-2.1\t-3.1\t-2.8462089406255435\n-1.5\t-4.0\t-1.1627501835830856\n-1.2\t-2.2\t-0.3210208050618566\n-0.7\t-2.0\t1.0818614924735244\n-0.5\t1.0\t1.6430144114876768\n-0.2\t-0.7\t2.4847437900089053\n0.1\t1.2\t3.3264731685301343\n0.3\t2.2\t3.8876260875442865\n0.52\t6.5\t4.504894298459854\n0.72\t4.2\t5.066047217474007\n1.1\t8.6\t6.132237763600896\n2.3\t9.5\t9.499155277685812\n3.4\t14.52\t12.58549633226365\n3.61\t12.9\t13.17470689722851\n3.8\t16.3\t13.707802170291954\n"
           },
           {
-            "type":"TEXT",
-            "data":""
+            "type": "TEXT",
+            "data": ""
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20161019-185706_496188641",
-      "id":"20161019-185706_496188641",
-      "dateCreated":"2019-11-04T12:38:12+0000",
-      "status":"READY",
-      "$$hashKey":"object:10844",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_-122626547",
+      "id": "20161019-185706_496188641",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "text":"%md\n\n#### Visualise the model and training data\n\n**_Note_**: The following paragraphs require the Python [**Pandas**](https://pandas.pydata.org/) library which is not installed by default. In order to run these paragraphs check back in to the Intro to [Machine Learning with Apache Spark and Apache Zeppelin appendix A](https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#appendix-a-installing-anaconda-on-the-hortonworks-data-platform-sandbox) and install Pandas using Anaconda. By installing Anaconda you will have access to myriad of Machine Learning and Data Science packages which will help you get started with your journey as a data scientist using HDP.\n\n",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "editOnDblClick":true,
-          "language":"markdown",
-          "completionSupport":false
+      "text": "%md\n\n#### Visualise the model and training data\n\n**_Note_**: The following paragraphs require the Python [**Pandas**](https://pandas.pydata.org/) library which is not installed by default. In order to run these paragraphs check back in to the Intro to [Machine Learning with Apache Spark and Apache Zeppelin appendix A](https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#appendix-a-installing-anaconda-on-the-hortonworks-data-platform-sandbox) and install Pandas using Anaconda. By installing Anaconda you will have access to myriad of Machine Learning and Data Science packages which will help you get started with your journey as a data scientist using HDP.\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.203",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "editOnDblClick": true,
+          "language": "markdown",
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "editorHide":true,
-        "fontSize":9,
-        "title":false,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "fontSize": 9.0,
+        "title": false,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h4>Visualise the model and training data</h4>\n<p><strong><em>Note</em></strong>: The following paragraphs require the Python <a href=\"https://pandas.pydata.org/\"><strong>Pandas</strong></a> library which is not installed by default. In order to run these paragraphs check back in to the Intro to <a href=\"https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#appendix-a-installing-anaconda-on-the-hortonworks-data-platform-sandbox\">Machine Learning with Apache Spark and Apache Zeppelin appendix A</a> and install Pandas using Anaconda. By installing Anaconda you will have access to myriad of Machine Learning and Data Science packages which will help you get started with your journey as a data scientist using HDP.</p>\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch4\u003eVisualise the model and training data\u003c/h4\u003e\n\u003cp\u003e\u003cstrong\u003e\u003cem\u003eNote\u003c/em\u003e\u003c/strong\u003e: The following paragraphs require the Python \u003ca href\u003d\"https://pandas.pydata.org/\"\u003e\u003cstrong\u003ePandas\u003c/strong\u003e\u003c/a\u003e library which is not installed by default. In order to run these paragraphs check back in to the Intro to \u003ca href\u003d\"https://hortonworks.com/tutorial/intro-to-machine-learning-with-apache-spark-and-apache-zeppelin/#appendix-a-installing-anaconda-on-the-hortonworks-data-platform-sandbox\"\u003eMachine Learning with Apache Spark and Apache Zeppelin appendix A\u003c/a\u003e and install Pandas using Anaconda. By installing Anaconda you will have access to myriad of Machine Learning and Data Science packages which will help you get started with your journey as a data scientist using HDP.\u003c/p\u003e\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686945_654003377",
-      "id":"20161104-232912_1326325430",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10845"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791203_-29796967",
+      "id": "20161104-232912_1326325430",
+      "dateCreated": "2019-11-06 08:59:51.203",
+      "status": "READY"
     },
     {
-      "title":"Convert to Pandas (requires Pandas)",
-      "text":"%spark.pyspark\n\nlinreg = spark.table(\"linreg\").toPandas()\nlinreg",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"python",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Convert to Pandas (requires Pandas)",
+      "text": "%spark.pyspark\n\nlinreg \u003d spark.table(\"linreg\").toPandas()\nlinreg",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.204",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "python",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/python",
-        "editorHide":false,
-        "fontSize":9,
-        "title":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "fontSize": 9.0,
+        "title": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"       x      y  prediction\n0  -4.90 -12.00  -10.702350\n1  -4.50  -6.00   -9.580044\n2  -4.10  -7.20   -8.457738\n3  -3.20  -5.00   -5.932550\n4  -3.00  -2.00   -5.371397\n5  -2.10  -3.10   -2.846209\n6  -1.50  -4.00   -1.162750\n7  -1.20  -2.20   -0.321021\n8  -0.70  -2.00    1.081861\n9  -0.50   1.00    1.643014\n10 -0.20  -0.70    2.484744\n11  0.10   1.20    3.326473\n12  0.30   2.20    3.887626\n13  0.52   6.50    4.504894\n14  0.72   4.20    5.066047\n15  1.10   8.60    6.132238\n16  2.30   9.50    9.499155\n17  3.40  14.52   12.585496\n18  3.61  12.90   13.174707\n19  3.80  16.30   13.707802\n"
+            "type": "TEXT",
+            "data": "       x      y  prediction\n0  -4.90 -12.00  -10.702350\n1  -4.50  -6.00   -9.580044\n2  -4.10  -7.20   -8.457738\n3  -3.20  -5.00   -5.932550\n4  -3.00  -2.00   -5.371397\n5  -2.10  -3.10   -2.846209\n6  -1.50  -4.00   -1.162750\n7  -1.20  -2.20   -0.321021\n8  -0.70  -2.00    1.081861\n9  -0.50   1.00    1.643014\n10 -0.20  -0.70    2.484744\n11  0.10   1.20    3.326473\n12  0.30   2.20    3.887626\n13  0.52   6.50    4.504894\n14  0.72   4.20    5.066047\n15  1.10   8.60    6.132238\n16  2.30   9.50    9.499155\n17  3.40  14.52   12.585496\n18  3.61  12.90   13.174707\n19  3.80  16.30   13.707802\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686945_-517339954",
-      "id":"20161104-233336_1115890215",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10846"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791204_-185890254",
+      "id": "20161104-233336_1115890215",
+      "dateCreated": "2019-11-06 08:59:51.204",
+      "status": "READY"
     },
     {
-      "title":"Plot the result (requires Pandas)",
-      "text":"%spark.pyspark\nimport StringIO\n\ndef show(p):\n    img = StringIO.StringIO()\n    p.get_figure().savefig(img, format='svg')\n    img.seek(0)\n    print \"%html <div style='width:500px'>\" + img.buf + \"</div>\"\n\nplot = linreg.plot.scatter(x='x', y='y')\n    \nplot.plot(linreg[\"x\"], linreg[\"prediction\"])\nshow(plot)",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "editOnDblClick":false,
-          "language":"python",
-          "completionKey":"TAB",
-          "completionSupport":true
+      "title": "Plot the result (requires Pandas)",
+      "text": "%spark.pyspark\nimport StringIO\n\ndef show(p):\n    img \u003d StringIO.StringIO()\n    p.get_figure().savefig(img, format\u003d\u0027svg\u0027)\n    img.seek(0)\n    print \"%html \u003cdiv style\u003d\u0027width:500px\u0027\u003e\" + img.buf + \"\u003c/div\u003e\"\n\nplot \u003d linreg.plot.scatter(x\u003d\u0027x\u0027, y\u003d\u0027y\u0027)\n    \nplot.plot(linreg[\"x\"], linreg[\"prediction\"])\nshow(plot)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.204",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "editOnDblClick": false,
+          "language": "python",
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/python",
-        "fontSize":9,
-        "title":true,
-        "results":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9.0,
+        "title": true,
+        "results": [
           {
-            "graph":{
-              "mode":"table",
-              "height":300,
-              "optionOpen":false,
-              "keys":[
-
-              ],
-              "values":[
-
-              ],
-              "groups":[
-
-              ],
-              "scatter":{
-
-              }
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "keys": [],
+              "values": [],
+              "groups": [],
+              "scatter": {}
             }
           }
         ],
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div style='width:500px'><?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n  \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<!-- Created with matplotlib (http://matplotlib.org/) -->\n<svg height=\"400pt\" version=\"1.1\" viewBox=\"0 0 600 400\" width=\"600pt\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n <defs>\n  <style type=\"text/css\">\n*{stroke-linecap:butt;stroke-linejoin:round;}\n  </style>\n </defs>\n <g id=\"figure_1\">\n  <g id=\"patch_1\">\n   <path d=\"M 0 400 \nL 600 400 \nL 600 0 \nL 0 0 \nz\n\" style=\"fill:#ffffff;\"/>\n  </g>\n  <g id=\"axes_1\">\n   <g id=\"patch_2\">\n    <path d=\"M 75 356 \nL 540 356 \nL 540 48 \nL 75 48 \nz\n\" style=\"fill:#ffffff;\"/>\n   </g>\n   <g id=\"PathCollection_1\">\n    <defs>\n     <path d=\"M 0 2.236068 \nC 0.593012 2.236068 1.161816 2.000462 1.581139 1.581139 \nC 2.000462 1.161816 2.236068 0.593012 2.236068 0 \nC 2.236068 -0.593012 2.000462 -1.161816 1.581139 -1.581139 \nC 1.161816 -2.000462 0.593012 -2.236068 0 -2.236068 \nC -0.593012 -2.236068 -1.161816 -2.000462 -1.581139 -1.581139 \nC -2.000462 -1.161816 -2.236068 -0.593012 -2.236068 0 \nC -2.236068 0.593012 -2.000462 1.161816 -1.581139 1.581139 \nC -1.161816 2.000462 -0.593012 2.236068 0 2.236068 \nz\n\" id=\"m338fb2e694\" style=\"stroke:#1f77b4;\"/>\n    </defs>\n    <g clip-path=\"url(#p3e733342e8)\">\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"96.36976\" xlink:href=\"#m338fb2e694\" y=\"341.928207\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"115.784035\" xlink:href=\"#m338fb2e694\" y=\"282.594692\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"135.19831\" xlink:href=\"#m338fb2e694\" y=\"294.461395\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"178.880428\" xlink:href=\"#m338fb2e694\" y=\"272.705772\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"188.587566\" xlink:href=\"#m338fb2e694\" y=\"243.039015\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"232.269684\" xlink:href=\"#m338fb2e694\" y=\"253.916826\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"261.391097\" xlink:href=\"#m338fb2e694\" y=\"262.816853\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"275.951803\" xlink:href=\"#m338fb2e694\" y=\"245.016799\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"300.219647\" xlink:href=\"#m338fb2e694\" y=\"243.039015\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"309.926784\" xlink:href=\"#m338fb2e694\" y=\"213.372257\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"324.487491\" xlink:href=\"#m338fb2e694\" y=\"230.18342\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"339.048197\" xlink:href=\"#m338fb2e694\" y=\"211.394473\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"348.755334\" xlink:href=\"#m338fb2e694\" y=\"201.505554\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"359.433186\" xlink:href=\"#m338fb2e694\" y=\"158.983201\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"369.140323\" xlink:href=\"#m338fb2e694\" y=\"181.727716\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"387.583884\" xlink:href=\"#m338fb2e694\" y=\"138.216471\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"445.826709\" xlink:href=\"#m338fb2e694\" y=\"129.316444\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"499.215965\" xlink:href=\"#m338fb2e694\" y=\"79.674069\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"509.40846\" xlink:href=\"#m338fb2e694\" y=\"95.694118\"/>\n     <use style=\"fill:#1f77b4;stroke:#1f77b4;\" x=\"518.63024\" xlink:href=\"#m338fb2e694\" y=\"62.071793\"/>\n    </g>\n   </g>\n   <g id=\"matplotlib.axis_1\">\n    <g id=\"xtick_1\">\n     <g id=\"line2d_1\">\n      <defs>\n       <path d=\"M 0 0 \nL 0 3.5 \n\" id=\"md6165274ea\" style=\"stroke:#000000;stroke-width:0.8;\"/>\n      </defs>\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"140.051878\" xlink:href=\"#md6165274ea\" y=\"356\"/>\n      </g>\n     </g>\n     <g id=\"text_1\">\n      <!-- −4 -->\n      <defs>\n       <path d=\"M 10.59375 35.5 \nL 73.1875 35.5 \nL 73.1875 27.203125 \nL 10.59375 27.203125 \nz\n\" id=\"DejaVuSans-2212\"/>\n       <path d=\"M 37.796875 64.3125 \nL 12.890625 25.390625 \nL 37.796875 25.390625 \nz\nM 35.203125 72.90625 \nL 47.609375 72.90625 \nL 47.609375 25.390625 \nL 58.015625 25.390625 \nL 58.015625 17.1875 \nL 47.609375 17.1875 \nL 47.609375 0 \nL 37.796875 0 \nL 37.796875 17.1875 \nL 4.890625 17.1875 \nL 4.890625 26.703125 \nz\n\" id=\"DejaVuSans-34\"/>\n      </defs>\n      <g transform=\"translate(132.680785 370.598437)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-2212\"/>\n       <use x=\"83.789062\" xlink:href=\"#DejaVuSans-34\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_2\">\n     <g id=\"line2d_2\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"237.123253\" xlink:href=\"#md6165274ea\" y=\"356\"/>\n      </g>\n     </g>\n     <g id=\"text_2\">\n      <!-- −2 -->\n      <defs>\n       <path d=\"M 19.1875 8.296875 \nL 53.609375 8.296875 \nL 53.609375 0 \nL 7.328125 0 \nL 7.328125 8.296875 \nQ 12.9375 14.109375 22.625 23.890625 \nQ 32.328125 33.6875 34.8125 36.53125 \nQ 39.546875 41.84375 41.421875 45.53125 \nQ 43.3125 49.21875 43.3125 52.78125 \nQ 43.3125 58.59375 39.234375 62.25 \nQ 35.15625 65.921875 28.609375 65.921875 \nQ 23.96875 65.921875 18.8125 64.3125 \nQ 13.671875 62.703125 7.8125 59.421875 \nL 7.8125 69.390625 \nQ 13.765625 71.78125 18.9375 73 \nQ 24.125 74.21875 28.421875 74.21875 \nQ 39.75 74.21875 46.484375 68.546875 \nQ 53.21875 62.890625 53.21875 53.421875 \nQ 53.21875 48.921875 51.53125 44.890625 \nQ 49.859375 40.875 45.40625 35.40625 \nQ 44.1875 33.984375 37.640625 27.21875 \nQ 31.109375 20.453125 19.1875 8.296875 \nz\n\" id=\"DejaVuSans-32\"/>\n      </defs>\n      <g transform=\"translate(229.752159 370.598437)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-2212\"/>\n       <use x=\"83.789062\" xlink:href=\"#DejaVuSans-32\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_3\">\n     <g id=\"line2d_3\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"334.194628\" xlink:href=\"#md6165274ea\" y=\"356\"/>\n      </g>\n     </g>\n     <g id=\"text_3\">\n      <!-- 0 -->\n      <defs>\n       <path d=\"M 31.78125 66.40625 \nQ 24.171875 66.40625 20.328125 58.90625 \nQ 16.5 51.421875 16.5 36.375 \nQ 16.5 21.390625 20.328125 13.890625 \nQ 24.171875 6.390625 31.78125 6.390625 \nQ 39.453125 6.390625 43.28125 13.890625 \nQ 47.125 21.390625 47.125 36.375 \nQ 47.125 51.421875 43.28125 58.90625 \nQ 39.453125 66.40625 31.78125 66.40625 \nz\nM 31.78125 74.21875 \nQ 44.046875 74.21875 50.515625 64.515625 \nQ 56.984375 54.828125 56.984375 36.375 \nQ 56.984375 17.96875 50.515625 8.265625 \nQ 44.046875 -1.421875 31.78125 -1.421875 \nQ 19.53125 -1.421875 13.0625 8.265625 \nQ 6.59375 17.96875 6.59375 36.375 \nQ 6.59375 54.828125 13.0625 64.515625 \nQ 19.53125 74.21875 31.78125 74.21875 \nz\n\" id=\"DejaVuSans-30\"/>\n      </defs>\n      <g transform=\"translate(331.013378 370.598437)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-30\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_4\">\n     <g id=\"line2d_4\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"431.266003\" xlink:href=\"#md6165274ea\" y=\"356\"/>\n      </g>\n     </g>\n     <g id=\"text_4\">\n      <!-- 2 -->\n      <g transform=\"translate(428.084753 370.598437)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-32\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"xtick_5\">\n     <g id=\"line2d_5\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"528.337378\" xlink:href=\"#md6165274ea\" y=\"356\"/>\n      </g>\n     </g>\n     <g id=\"text_5\">\n      <!-- 4 -->\n      <g transform=\"translate(525.156128 370.598437)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-34\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"text_6\">\n     <!-- x -->\n     <defs>\n      <path d=\"M 54.890625 54.6875 \nL 35.109375 28.078125 \nL 55.90625 0 \nL 45.3125 0 \nL 29.390625 21.484375 \nL 13.484375 0 \nL 2.875 0 \nL 24.125 28.609375 \nL 4.6875 54.6875 \nL 15.28125 54.6875 \nL 29.78125 35.203125 \nL 44.28125 54.6875 \nz\n\" id=\"DejaVuSans-78\"/>\n     </defs>\n     <g transform=\"translate(304.540625 384.276563)scale(0.1 -0.1)\">\n      <use xlink:href=\"#DejaVuSans-78\"/>\n     </g>\n    </g>\n   </g>\n   <g id=\"matplotlib.axis_2\">\n    <g id=\"ytick_1\">\n     <g id=\"line2d_6\">\n      <defs>\n       <path d=\"M 0 0 \nL -3.5 0 \n\" id=\"mc65ea33f96\" style=\"stroke:#000000;stroke-width:0.8;\"/>\n      </defs>\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"75\" xlink:href=\"#mc65ea33f96\" y=\"322.150368\"/>\n      </g>\n     </g>\n     <g id=\"text_7\">\n      <!-- −10 -->\n      <defs>\n       <path d=\"M 12.40625 8.296875 \nL 28.515625 8.296875 \nL 28.515625 63.921875 \nL 10.984375 60.40625 \nL 10.984375 69.390625 \nL 28.421875 72.90625 \nL 38.28125 72.90625 \nL 38.28125 8.296875 \nL 54.390625 8.296875 \nL 54.390625 0 \nL 12.40625 0 \nz\n\" id=\"DejaVuSans-31\"/>\n      </defs>\n      <g transform=\"translate(46.895313 325.949587)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-2212\"/>\n       <use x=\"83.789062\" xlink:href=\"#DejaVuSans-31\"/>\n       <use x=\"147.412109\" xlink:href=\"#DejaVuSans-30\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_2\">\n     <g id=\"line2d_7\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"75\" xlink:href=\"#mc65ea33f96\" y=\"272.705772\"/>\n      </g>\n     </g>\n     <g id=\"text_8\">\n      <!-- −5 -->\n      <defs>\n       <path d=\"M 10.796875 72.90625 \nL 49.515625 72.90625 \nL 49.515625 64.59375 \nL 19.828125 64.59375 \nL 19.828125 46.734375 \nQ 21.96875 47.46875 24.109375 47.828125 \nQ 26.265625 48.1875 28.421875 48.1875 \nQ 40.625 48.1875 47.75 41.5 \nQ 54.890625 34.8125 54.890625 23.390625 \nQ 54.890625 11.625 47.5625 5.09375 \nQ 40.234375 -1.421875 26.90625 -1.421875 \nQ 22.3125 -1.421875 17.546875 -0.640625 \nQ 12.796875 0.140625 7.71875 1.703125 \nL 7.71875 11.625 \nQ 12.109375 9.234375 16.796875 8.0625 \nQ 21.484375 6.890625 26.703125 6.890625 \nQ 35.15625 6.890625 40.078125 11.328125 \nQ 45.015625 15.765625 45.015625 23.390625 \nQ 45.015625 31 40.078125 35.4375 \nQ 35.15625 39.890625 26.703125 39.890625 \nQ 22.75 39.890625 18.8125 39.015625 \nQ 14.890625 38.140625 10.796875 36.28125 \nz\n\" id=\"DejaVuSans-35\"/>\n      </defs>\n      <g transform=\"translate(53.257812 276.504991)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-2212\"/>\n       <use x=\"83.789062\" xlink:href=\"#DejaVuSans-35\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_3\">\n     <g id=\"line2d_8\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"75\" xlink:href=\"#mc65ea33f96\" y=\"223.261176\"/>\n      </g>\n     </g>\n     <g id=\"text_9\">\n      <!-- 0 -->\n      <g transform=\"translate(61.6375 227.060395)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-30\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_4\">\n     <g id=\"line2d_9\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"75\" xlink:href=\"#mc65ea33f96\" y=\"173.81658\"/>\n      </g>\n     </g>\n     <g id=\"text_10\">\n      <!-- 5 -->\n      <g transform=\"translate(61.6375 177.615799)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-35\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_5\">\n     <g id=\"line2d_10\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"75\" xlink:href=\"#mc65ea33f96\" y=\"124.371984\"/>\n      </g>\n     </g>\n     <g id=\"text_11\">\n      <!-- 10 -->\n      <g transform=\"translate(55.275 128.171203)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-31\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-30\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"ytick_6\">\n     <g id=\"line2d_11\">\n      <g>\n       <use style=\"stroke:#000000;stroke-width:0.8;\" x=\"75\" xlink:href=\"#mc65ea33f96\" y=\"74.927388\"/>\n      </g>\n     </g>\n     <g id=\"text_12\">\n      <!-- 15 -->\n      <g transform=\"translate(55.275 78.726607)scale(0.1 -0.1)\">\n       <use xlink:href=\"#DejaVuSans-31\"/>\n       <use x=\"63.623047\" xlink:href=\"#DejaVuSans-35\"/>\n      </g>\n     </g>\n    </g>\n    <g id=\"text_13\">\n     <!-- y -->\n     <defs>\n      <path d=\"M 32.171875 -5.078125 \nQ 28.375 -14.84375 24.75 -17.8125 \nQ 21.140625 -20.796875 15.09375 -20.796875 \nL 7.90625 -20.796875 \nL 7.90625 -13.28125 \nL 13.1875 -13.28125 \nQ 16.890625 -13.28125 18.9375 -11.515625 \nQ 21 -9.765625 23.484375 -3.21875 \nL 25.09375 0.875 \nL 2.984375 54.6875 \nL 12.5 54.6875 \nL 29.59375 11.921875 \nL 46.6875 54.6875 \nL 56.203125 54.6875 \nz\n\" id=\"DejaVuSans-79\"/>\n     </defs>\n     <g transform=\"translate(40.815625 204.959375)rotate(-90)scale(0.1 -0.1)\">\n      <use xlink:href=\"#DejaVuSans-79\"/>\n     </g>\n    </g>\n   </g>\n   <g id=\"line2d_12\">\n    <path clip-path=\"url(#p3e733342e8)\" d=\"M 96.36976 329.095849 \nL 115.784035 317.997457 \nL 135.19831 306.899065 \nL 178.880428 281.927684 \nL 188.587566 276.378488 \nL 232.269684 251.407107 \nL 261.391097 234.759519 \nL 275.951803 226.435725 \nL 300.219647 212.562735 \nL 309.926784 207.01354 \nL 324.487491 198.689746 \nL 339.048197 190.365952 \nL 348.755334 184.816756 \nL 359.433186 178.712641 \nL 369.140323 173.163445 \nL 387.583884 162.619972 \nL 445.826709 129.324797 \nL 499.215965 98.80422 \nL 509.40846 92.977564 \nL 518.63024 87.705828 \n\" style=\"fill:none;stroke:#1f77b4;stroke-linecap:square;stroke-width:1.5;\"/>\n   </g>\n   <g id=\"patch_3\">\n    <path d=\"M 75 356 \nL 75 48 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"patch_4\">\n    <path d=\"M 540 356 \nL 540 48 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"patch_5\">\n    <path d=\"M 75 356 \nL 540 356 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n   <g id=\"patch_6\">\n    <path d=\"M 75 48 \nL 540 48 \n\" style=\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/>\n   </g>\n  </g>\n </g>\n <defs>\n  <clipPath id=\"p3e733342e8\">\n   <rect height=\"308\" width=\"465\" x=\"75\" y=\"48\"/>\n  </clipPath>\n </defs>\n</svg>\n</div>\n"
+            "type": "HTML",
+            "data": "\u003cdiv style\u003d\u0027width:500px\u0027\u003e\u003c?xml version\u003d\"1.0\" encoding\u003d\"utf-8\" standalone\u003d\"no\"?\u003e\n\u003c!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n  \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\"\u003e\n\u003c!-- Created with matplotlib (http://matplotlib.org/) --\u003e\n\u003csvg height\u003d\"400pt\" version\u003d\"1.1\" viewBox\u003d\"0 0 600 400\" width\u003d\"600pt\" xmlns\u003d\"http://www.w3.org/2000/svg\" xmlns:xlink\u003d\"http://www.w3.org/1999/xlink\"\u003e\n \u003cdefs\u003e\n  \u003cstyle type\u003d\"text/css\"\u003e\n*{stroke-linecap:butt;stroke-linejoin:round;}\n  \u003c/style\u003e\n \u003c/defs\u003e\n \u003cg id\u003d\"figure_1\"\u003e\n  \u003cg id\u003d\"patch_1\"\u003e\n   \u003cpath d\u003d\"M 0 400 \nL 600 400 \nL 600 0 \nL 0 0 \nz\n\" style\u003d\"fill:#ffffff;\"/\u003e\n  \u003c/g\u003e\n  \u003cg id\u003d\"axes_1\"\u003e\n   \u003cg id\u003d\"patch_2\"\u003e\n    \u003cpath d\u003d\"M 75 356 \nL 540 356 \nL 540 48 \nL 75 48 \nz\n\" style\u003d\"fill:#ffffff;\"/\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"PathCollection_1\"\u003e\n    \u003cdefs\u003e\n     \u003cpath d\u003d\"M 0 2.236068 \nC 0.593012 2.236068 1.161816 2.000462 1.581139 1.581139 \nC 2.000462 1.161816 2.236068 0.593012 2.236068 0 \nC 2.236068 -0.593012 2.000462 -1.161816 1.581139 -1.581139 \nC 1.161816 -2.000462 0.593012 -2.236068 0 -2.236068 \nC -0.593012 -2.236068 -1.161816 -2.000462 -1.581139 -1.581139 \nC -2.000462 -1.161816 -2.236068 -0.593012 -2.236068 0 \nC -2.236068 0.593012 -2.000462 1.161816 -1.581139 1.581139 \nC -1.161816 2.000462 -0.593012 2.236068 0 2.236068 \nz\n\" id\u003d\"m338fb2e694\" style\u003d\"stroke:#1f77b4;\"/\u003e\n    \u003c/defs\u003e\n    \u003cg clip-path\u003d\"url(#p3e733342e8)\"\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"96.36976\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"341.928207\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"115.784035\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"282.594692\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"135.19831\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"294.461395\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"178.880428\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"272.705772\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"188.587566\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"243.039015\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"232.269684\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"253.916826\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"261.391097\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"262.816853\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"275.951803\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"245.016799\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"300.219647\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"243.039015\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"309.926784\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"213.372257\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"324.487491\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"230.18342\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"339.048197\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"211.394473\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"348.755334\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"201.505554\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"359.433186\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"158.983201\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"369.140323\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"181.727716\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"387.583884\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"138.216471\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"445.826709\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"129.316444\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"499.215965\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"79.674069\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"509.40846\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"95.694118\"/\u003e\n     \u003cuse style\u003d\"fill:#1f77b4;stroke:#1f77b4;\" x\u003d\"518.63024\" xlink:href\u003d\"#m338fb2e694\" y\u003d\"62.071793\"/\u003e\n    \u003c/g\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"matplotlib.axis_1\"\u003e\n    \u003cg id\u003d\"xtick_1\"\u003e\n     \u003cg id\u003d\"line2d_1\"\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 0 0 \nL 0 3.5 \n\" id\u003d\"md6165274ea\" style\u003d\"stroke:#000000;stroke-width:0.8;\"/\u003e\n      \u003c/defs\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"140.051878\" xlink:href\u003d\"#md6165274ea\" y\u003d\"356\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_1\"\u003e\n      \u003c!-- −4 --\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 10.59375 35.5 \nL 73.1875 35.5 \nL 73.1875 27.203125 \nL 10.59375 27.203125 \nz\n\" id\u003d\"DejaVuSans-2212\"/\u003e\n       \u003cpath d\u003d\"M 37.796875 64.3125 \nL 12.890625 25.390625 \nL 37.796875 25.390625 \nz\nM 35.203125 72.90625 \nL 47.609375 72.90625 \nL 47.609375 25.390625 \nL 58.015625 25.390625 \nL 58.015625 17.1875 \nL 47.609375 17.1875 \nL 47.609375 0 \nL 37.796875 0 \nL 37.796875 17.1875 \nL 4.890625 17.1875 \nL 4.890625 26.703125 \nz\n\" id\u003d\"DejaVuSans-34\"/\u003e\n      \u003c/defs\u003e\n      \u003cg transform\u003d\"translate(132.680785 370.598437)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-2212\"/\u003e\n       \u003cuse x\u003d\"83.789062\" xlink:href\u003d\"#DejaVuSans-34\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"xtick_2\"\u003e\n     \u003cg id\u003d\"line2d_2\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"237.123253\" xlink:href\u003d\"#md6165274ea\" y\u003d\"356\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_2\"\u003e\n      \u003c!-- −2 --\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 19.1875 8.296875 \nL 53.609375 8.296875 \nL 53.609375 0 \nL 7.328125 0 \nL 7.328125 8.296875 \nQ 12.9375 14.109375 22.625 23.890625 \nQ 32.328125 33.6875 34.8125 36.53125 \nQ 39.546875 41.84375 41.421875 45.53125 \nQ 43.3125 49.21875 43.3125 52.78125 \nQ 43.3125 58.59375 39.234375 62.25 \nQ 35.15625 65.921875 28.609375 65.921875 \nQ 23.96875 65.921875 18.8125 64.3125 \nQ 13.671875 62.703125 7.8125 59.421875 \nL 7.8125 69.390625 \nQ 13.765625 71.78125 18.9375 73 \nQ 24.125 74.21875 28.421875 74.21875 \nQ 39.75 74.21875 46.484375 68.546875 \nQ 53.21875 62.890625 53.21875 53.421875 \nQ 53.21875 48.921875 51.53125 44.890625 \nQ 49.859375 40.875 45.40625 35.40625 \nQ 44.1875 33.984375 37.640625 27.21875 \nQ 31.109375 20.453125 19.1875 8.296875 \nz\n\" id\u003d\"DejaVuSans-32\"/\u003e\n      \u003c/defs\u003e\n      \u003cg transform\u003d\"translate(229.752159 370.598437)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-2212\"/\u003e\n       \u003cuse x\u003d\"83.789062\" xlink:href\u003d\"#DejaVuSans-32\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"xtick_3\"\u003e\n     \u003cg id\u003d\"line2d_3\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"334.194628\" xlink:href\u003d\"#md6165274ea\" y\u003d\"356\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_3\"\u003e\n      \u003c!-- 0 --\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 31.78125 66.40625 \nQ 24.171875 66.40625 20.328125 58.90625 \nQ 16.5 51.421875 16.5 36.375 \nQ 16.5 21.390625 20.328125 13.890625 \nQ 24.171875 6.390625 31.78125 6.390625 \nQ 39.453125 6.390625 43.28125 13.890625 \nQ 47.125 21.390625 47.125 36.375 \nQ 47.125 51.421875 43.28125 58.90625 \nQ 39.453125 66.40625 31.78125 66.40625 \nz\nM 31.78125 74.21875 \nQ 44.046875 74.21875 50.515625 64.515625 \nQ 56.984375 54.828125 56.984375 36.375 \nQ 56.984375 17.96875 50.515625 8.265625 \nQ 44.046875 -1.421875 31.78125 -1.421875 \nQ 19.53125 -1.421875 13.0625 8.265625 \nQ 6.59375 17.96875 6.59375 36.375 \nQ 6.59375 54.828125 13.0625 64.515625 \nQ 19.53125 74.21875 31.78125 74.21875 \nz\n\" id\u003d\"DejaVuSans-30\"/\u003e\n      \u003c/defs\u003e\n      \u003cg transform\u003d\"translate(331.013378 370.598437)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-30\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"xtick_4\"\u003e\n     \u003cg id\u003d\"line2d_4\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"431.266003\" xlink:href\u003d\"#md6165274ea\" y\u003d\"356\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_4\"\u003e\n      \u003c!-- 2 --\u003e\n      \u003cg transform\u003d\"translate(428.084753 370.598437)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-32\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"xtick_5\"\u003e\n     \u003cg id\u003d\"line2d_5\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"528.337378\" xlink:href\u003d\"#md6165274ea\" y\u003d\"356\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_5\"\u003e\n      \u003c!-- 4 --\u003e\n      \u003cg transform\u003d\"translate(525.156128 370.598437)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-34\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"text_6\"\u003e\n     \u003c!-- x --\u003e\n     \u003cdefs\u003e\n      \u003cpath d\u003d\"M 54.890625 54.6875 \nL 35.109375 28.078125 \nL 55.90625 0 \nL 45.3125 0 \nL 29.390625 21.484375 \nL 13.484375 0 \nL 2.875 0 \nL 24.125 28.609375 \nL 4.6875 54.6875 \nL 15.28125 54.6875 \nL 29.78125 35.203125 \nL 44.28125 54.6875 \nz\n\" id\u003d\"DejaVuSans-78\"/\u003e\n     \u003c/defs\u003e\n     \u003cg transform\u003d\"translate(304.540625 384.276563)scale(0.1 -0.1)\"\u003e\n      \u003cuse xlink:href\u003d\"#DejaVuSans-78\"/\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"matplotlib.axis_2\"\u003e\n    \u003cg id\u003d\"ytick_1\"\u003e\n     \u003cg id\u003d\"line2d_6\"\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 0 0 \nL -3.5 0 \n\" id\u003d\"mc65ea33f96\" style\u003d\"stroke:#000000;stroke-width:0.8;\"/\u003e\n      \u003c/defs\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"75\" xlink:href\u003d\"#mc65ea33f96\" y\u003d\"322.150368\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_7\"\u003e\n      \u003c!-- −10 --\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 12.40625 8.296875 \nL 28.515625 8.296875 \nL 28.515625 63.921875 \nL 10.984375 60.40625 \nL 10.984375 69.390625 \nL 28.421875 72.90625 \nL 38.28125 72.90625 \nL 38.28125 8.296875 \nL 54.390625 8.296875 \nL 54.390625 0 \nL 12.40625 0 \nz\n\" id\u003d\"DejaVuSans-31\"/\u003e\n      \u003c/defs\u003e\n      \u003cg transform\u003d\"translate(46.895313 325.949587)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-2212\"/\u003e\n       \u003cuse x\u003d\"83.789062\" xlink:href\u003d\"#DejaVuSans-31\"/\u003e\n       \u003cuse x\u003d\"147.412109\" xlink:href\u003d\"#DejaVuSans-30\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"ytick_2\"\u003e\n     \u003cg id\u003d\"line2d_7\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"75\" xlink:href\u003d\"#mc65ea33f96\" y\u003d\"272.705772\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_8\"\u003e\n      \u003c!-- −5 --\u003e\n      \u003cdefs\u003e\n       \u003cpath d\u003d\"M 10.796875 72.90625 \nL 49.515625 72.90625 \nL 49.515625 64.59375 \nL 19.828125 64.59375 \nL 19.828125 46.734375 \nQ 21.96875 47.46875 24.109375 47.828125 \nQ 26.265625 48.1875 28.421875 48.1875 \nQ 40.625 48.1875 47.75 41.5 \nQ 54.890625 34.8125 54.890625 23.390625 \nQ 54.890625 11.625 47.5625 5.09375 \nQ 40.234375 -1.421875 26.90625 -1.421875 \nQ 22.3125 -1.421875 17.546875 -0.640625 \nQ 12.796875 0.140625 7.71875 1.703125 \nL 7.71875 11.625 \nQ 12.109375 9.234375 16.796875 8.0625 \nQ 21.484375 6.890625 26.703125 6.890625 \nQ 35.15625 6.890625 40.078125 11.328125 \nQ 45.015625 15.765625 45.015625 23.390625 \nQ 45.015625 31 40.078125 35.4375 \nQ 35.15625 39.890625 26.703125 39.890625 \nQ 22.75 39.890625 18.8125 39.015625 \nQ 14.890625 38.140625 10.796875 36.28125 \nz\n\" id\u003d\"DejaVuSans-35\"/\u003e\n      \u003c/defs\u003e\n      \u003cg transform\u003d\"translate(53.257812 276.504991)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-2212\"/\u003e\n       \u003cuse x\u003d\"83.789062\" xlink:href\u003d\"#DejaVuSans-35\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"ytick_3\"\u003e\n     \u003cg id\u003d\"line2d_8\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"75\" xlink:href\u003d\"#mc65ea33f96\" y\u003d\"223.261176\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_9\"\u003e\n      \u003c!-- 0 --\u003e\n      \u003cg transform\u003d\"translate(61.6375 227.060395)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-30\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"ytick_4\"\u003e\n     \u003cg id\u003d\"line2d_9\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"75\" xlink:href\u003d\"#mc65ea33f96\" y\u003d\"173.81658\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_10\"\u003e\n      \u003c!-- 5 --\u003e\n      \u003cg transform\u003d\"translate(61.6375 177.615799)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-35\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"ytick_5\"\u003e\n     \u003cg id\u003d\"line2d_10\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"75\" xlink:href\u003d\"#mc65ea33f96\" y\u003d\"124.371984\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_11\"\u003e\n      \u003c!-- 10 --\u003e\n      \u003cg transform\u003d\"translate(55.275 128.171203)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-31\"/\u003e\n       \u003cuse x\u003d\"63.623047\" xlink:href\u003d\"#DejaVuSans-30\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"ytick_6\"\u003e\n     \u003cg id\u003d\"line2d_11\"\u003e\n      \u003cg\u003e\n       \u003cuse style\u003d\"stroke:#000000;stroke-width:0.8;\" x\u003d\"75\" xlink:href\u003d\"#mc65ea33f96\" y\u003d\"74.927388\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n     \u003cg id\u003d\"text_12\"\u003e\n      \u003c!-- 15 --\u003e\n      \u003cg transform\u003d\"translate(55.275 78.726607)scale(0.1 -0.1)\"\u003e\n       \u003cuse xlink:href\u003d\"#DejaVuSans-31\"/\u003e\n       \u003cuse x\u003d\"63.623047\" xlink:href\u003d\"#DejaVuSans-35\"/\u003e\n      \u003c/g\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n    \u003cg id\u003d\"text_13\"\u003e\n     \u003c!-- y --\u003e\n     \u003cdefs\u003e\n      \u003cpath d\u003d\"M 32.171875 -5.078125 \nQ 28.375 -14.84375 24.75 -17.8125 \nQ 21.140625 -20.796875 15.09375 -20.796875 \nL 7.90625 -20.796875 \nL 7.90625 -13.28125 \nL 13.1875 -13.28125 \nQ 16.890625 -13.28125 18.9375 -11.515625 \nQ 21 -9.765625 23.484375 -3.21875 \nL 25.09375 0.875 \nL 2.984375 54.6875 \nL 12.5 54.6875 \nL 29.59375 11.921875 \nL 46.6875 54.6875 \nL 56.203125 54.6875 \nz\n\" id\u003d\"DejaVuSans-79\"/\u003e\n     \u003c/defs\u003e\n     \u003cg transform\u003d\"translate(40.815625 204.959375)rotate(-90)scale(0.1 -0.1)\"\u003e\n      \u003cuse xlink:href\u003d\"#DejaVuSans-79\"/\u003e\n     \u003c/g\u003e\n    \u003c/g\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"line2d_12\"\u003e\n    \u003cpath clip-path\u003d\"url(#p3e733342e8)\" d\u003d\"M 96.36976 329.095849 \nL 115.784035 317.997457 \nL 135.19831 306.899065 \nL 178.880428 281.927684 \nL 188.587566 276.378488 \nL 232.269684 251.407107 \nL 261.391097 234.759519 \nL 275.951803 226.435725 \nL 300.219647 212.562735 \nL 309.926784 207.01354 \nL 324.487491 198.689746 \nL 339.048197 190.365952 \nL 348.755334 184.816756 \nL 359.433186 178.712641 \nL 369.140323 173.163445 \nL 387.583884 162.619972 \nL 445.826709 129.324797 \nL 499.215965 98.80422 \nL 509.40846 92.977564 \nL 518.63024 87.705828 \n\" style\u003d\"fill:none;stroke:#1f77b4;stroke-linecap:square;stroke-width:1.5;\"/\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"patch_3\"\u003e\n    \u003cpath d\u003d\"M 75 356 \nL 75 48 \n\" style\u003d\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"patch_4\"\u003e\n    \u003cpath d\u003d\"M 540 356 \nL 540 48 \n\" style\u003d\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"patch_5\"\u003e\n    \u003cpath d\u003d\"M 75 356 \nL 540 356 \n\" style\u003d\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/\u003e\n   \u003c/g\u003e\n   \u003cg id\u003d\"patch_6\"\u003e\n    \u003cpath d\u003d\"M 75 48 \nL 540 48 \n\" style\u003d\"fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;\"/\u003e\n   \u003c/g\u003e\n  \u003c/g\u003e\n \u003c/g\u003e\n \u003cdefs\u003e\n  \u003cclipPath id\u003d\"p3e733342e8\"\u003e\n   \u003crect height\u003d\"308\" width\u003d\"465\" x\u003d\"75\" y\u003d\"48\"/\u003e\n  \u003c/clipPath\u003e\n \u003c/defs\u003e\n\u003c/svg\u003e\n\u003c/div\u003e\n"
           },
           {
-            "type":"HTML",
-            "data":"<div style='width:auto;height:auto'><img src=data:image/png;base64,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 style='width=auto;height:auto'><div>\n"
+            "type": "HTML",
+            "data": "\u003cdiv style\u003d\u0027width:auto;height:auto\u0027\u003e\u003cimg src\u003ddata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAGQCAYAAAByNR6YAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMi40LCBodHRwOi8vbWF0cGxvdGxpYi5vcmcv7US4rQAAIABJREFUeJzt3X9clfX9//EnRxApbCPwV+eUpPgDNWKK/XL98Fc/1OEarZnValZUqz7L2rS1ta+ZllJt+pntU3w+tbKt+myjPhQqmRa21cqokAp/ZWocREXEHygHD5zz/QMhQEmBi3Od67oe99ut2y0uj/rKi+LZ+zx5XRHBYDAoAAAAGMZl9gAAAAB2Q8ACAAAwGAELAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELAAAAIMRsAAAAAxGwAIAADAYAQsAAMBgBCwAAACDEbAAAAAMRsACAAAwGAELAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELAAAAIMRsAAAAAxGwAIAADAYAQsAAMBgBCwAAACDEbAAAAAMRsACAAAwGAELAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELAAAAIMRsAAAAAxGwAIAADAYAQsAAMBgBCwAAACDEbAAAAAMRsACAAAwGAELAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELAAAAIMRsAAAAAxGwAIAADAYAQsAAMBgkWYPYCUJCQlKTEw0ewwAACxn27Zt2rNnj9ljhAwBqx0SExNVWFho9hgAAFhOWlqa2SOEFG8RAgAAGIyABQAAYDACFgAAgMEIWAAAAAYjYAEAABiMgAUAAGAwAhYAAIDBCFgAAAAGI2ABAAAYjIAFAACaVFbXal3pPlVW15o9iqXxqBwAACBJyi0q0+ycYkW5XPIHAsrKSFF6qtvssSyJEywAAKDK6lrNzimWzx/Qwdo6+fwBzcop5iSrgwhYAABA3qoaRblaxoIol0veqhqTJrI2AhYAAJAnLkb+QKDFNX8gIE9cjEkTWRsBCwAAKD42WlkZKeoR5VLP6Ej1iHIpKyNF8bHRZo9mSZTcAQCAJCk91a0xSQnyVtXIExdDuOoEAhYAAGgSHxtNsDIAbxECAAAYjIAFAABgMAIWAACAwQhYAAAABrN9wJoxY4Z69+6tESNGNF2bM2eO3G63UlNTlZqaquXLl5s4IQAAsBvbB6ybb75Z+fn5x1yfOXOmioqKVFRUpEmTJpkwGQAAsCvbB6xLLrlEp59+utljAAAAB7F9wGrLkiVLlJKSohkzZqiqqsrscQAAgI04MmDdeeed2rJli4qKitSvXz/df//9bb42OztbaWlpSktLU0VFRQinBAAAVuXIgNWnTx9169ZNLpdLt912m9auXdvmazMzM1VYWKjCwkL16tUrhFMCAACrcmTAKi8vb/r71157rcV3GAIAYCWV1bVaV7pPldW1Zo+CZmz/LMLrrrtOBQUF2rNnjzwejx5++GEVFBSoqKhIERERSkxM1DPPPGP2mAAAtFtuUZlm5xQryuWSPxBQVkaK0lPdZo8FSRHBYDBo9hBWkZaWpsLCQrPHAABAldW1GrPwbfn8gaZrPaJcem/2uLB8WLPTvoY68i1CAACszltVoyhXyy/jUS6XvFU1Jk2E5ghYAABYkCcuRv5AoMU1fyAgT1yMSROhOQIWAAAWFB8brayMFPWIcqlndKR6RLmUlZESlm8POpHtS+4AANhVeqpbY5IS5K2qkScuhnAVRghYAABYWHxsNMEqDPEWIQAAgMEIWAAAoEn5/hoFAmxw6iwCFgAA0KHaOj25cqMue7xA//jEa/Y4lkcHCwAABwsEgnr10zJl5W/Q7oO1+mHqGfp+UoLZY1keAQsAAIcq3LZXc/NKVOzdr9Qzv6unbxylkWfFmT2WLRCwAABwGG/VYS1YsUF5xeXqe1oPLfpJqtLPPUMuV4TZo9kGAQsAAIc4VFunp9dsUfa7XykiQvrF+EG6/dIBOqU7ccBo/IkCAGBzgUBQr31apoVHe1ZTU8/Q7CuH6ozv8lidrkLAAgDAxpr3rAb1jtXCjHM0dmgfs8eyPdY0AABgQ96qw7rn5U91zdP/1vbKw4rqFqHyfTW686+f6PWiMrPHsz0CFgAANtK4z2r8k2u08ouduu3is+Xz18lfH1T1kXr5/AHNyilWZXWt2aPaGm8RAgBgA409q6w3N2jXgYae1awrh2rPwVq9srZUtXV1Ta+NcrnkrarhGYZdiIAFAIDFNe9Znev5jv50/SiN6t+wz6pHpEv+QKDF6/2BgDxxFNy7EgELAACL8lYd1sL8jXpj3Q71OS1av7/2XP0w1d1in1V8bLSyMlI0K6dYUa6GsJWVkcLpVRcjYAEAYDHN91lJ0n+MS9Idlw1sc59VeqpbY5IS5K2qkScuhnAVAgQsAAAsonXPKv3cMzT7qqFyn8Q+q/jYaIJVCBGwAACwgGN7ViM1qv/pZo+FNhCwAAAIY2X7arRgxYZv7Vkh/BCwAAAIQ4dq6/TMmi16plnP6vZLB+rUaL50WwF3CQCAMNK6Z/WDc8/QAyfZs0L4IGABABAmPt6+V3PfKNE6elaWR8ACAMBk9Kzsh4AFAIBJ6FnZF3cQAIAQO17PavaVQ+SJO8Xs0WAQAhYAACHUvGeV4vmOnpo+UmmJ9KzshoAFAEAIlO2r0cIVG/T6uh3q3TNaT/74XF39PXpWdkXAAgCgCx0+UqenC77pWd0zLkl30LOyPe4uAABdIBAI6v+KyrQwn56VExGwAAAwGD0rELAAADBI657VEz8+Vz+iZ+VIBCwAADqJnhVa484DANBBrXtWU1L66YGrhtKzAgELAICO+Hh7lebmlWhd6T56VjgGAQsAgHbYcfS5gfSs8G0IWAAAnITDR+r09JqvlP3uFgWD9Kzw7VxmD9DVZsyYod69e2vEiBFN1/bu3auJEydq0KBBmjhxoqqqqkycEAAQzgKBoF79xKuxTxToP1dv1oTkPlp9/6W6//IhhCu0yfYB6+abb1Z+fn6LawsWLND48eO1efNmjR8/XgsWLDBpOgBAOPt4e5Wu/q/3dd/f1ql3zx76+x0Xasn0kZTYcUK2j96XXHKJtm3b1uJabm6uCgoKJEk33XSTLrvsMi1cuDD0wwEAwhI9K3SW7QPW8ezatUv9+vWTJPXt21e7du0yeSIAQDho3rMKBKW7xybpzsvoWaH9HP8ZExERoYiItv+PJDs7W9nZ2ZKkioqKUI0FAAihQCCo3HVlWrhio3Ye8LHPCp3myIDVp08flZeXq1+/fiovL1fv3r3bfG1mZqYyMzMlSWlpaaEaEQAQIp98XaW5b5SoqHSfznF/R3+c/j2NZp8VOsmRASs9PV0vvPCCHnjgAb3wwguaOnWq2SMBAEKgsrpW3qoaeeJiVFsX0ML8DcotomcF49k+YF133XUqKCjQnj175PF49PDDD+uBBx7Qtddeq2effVb9+/fX3/72N7PHBAB0sdyiMs3OKVZkRIRq6urlOloRoWeFrmD7z6aXX375uNdXr14d4kkAAGaprK7VrH+sU21dsOlaMCKo3Lsu0jme75o4GezK9nuwAABYvX63/PXBFtdO7R6pQLCNnwB0ku1PsAAAzrVjX01Tz6o1fyAgT1yMCVPBCQhYAADbOXykTs+s+UrPNNtn1f/0GD30+heKcrnkDwSUlZGi+Nhos0eFTRGwAAC2EQgE9fq6HVqwYoN2HvBpcko/PXDlUJ15esM+q3HJfZq+i5Bwha5EwAIA2MLJ7LOKj40mWCEkCFgAAEvbsa9GWfkb9H9FO9SrZ7QevyZFGSM97LOCqQhYAIAWCzitcsJTc6Rez7y7RU+vaehZ3TV2oO68LEmx7LNCGOCzEAAcrnEBZ/Pyd3qq2+yx2tTYs1qYv0Hl+4/tWQHhgIAFAA5WWV2r2TnF8vkD8ikgSZqVU6wxSQlheZLVvGc1wn2aFk/7ns47m+cGIvwQsADAwbxVNYpyuZrClSRFuVzyVtWEVcAq31+jhSvoWcE6CFgA4GCeuBj5A4EW18JpASc9K1gVn6EA4GDxsdHKykjRrFYdLLNPr4LBb/ZZle/3afI5/fTAVfSsYB0ELABwuPRUt8YkJYTNdxF++nWV5uaV6NOv6VnBughYAICwWMBZvr9GWfkb9dqnZerVM1pZ16ToGnpWsCgCFgDAVDVH6pX97ld6es0W1QeD9KxgC3z2AgBMQc8KdkbAAgCEXPOe1fAzTtOin6Tq/AHxZo8FGIaABQAImeP1rDJGetSNnhVshoAFAOhyrXtWP79soH4+lp4V7IvPbABAl2nsWS1csUE79vs06Zy++vVVyfSsYHsELABAlygq3ae5b3yhT472rP5AzwoOQsACABhq536fsvI36FV6VnAwAhYAwBD0rIBv8FkPAOgUelbAsQhYAIAOo2cFHB8BCwDQbs17Vgmx0crKSFHGKHpWQCMCFgDgpNUcqdd///Mr/VfBFtUHgrrzsoG6i54VcAz+jQCAMFNZXStvVY08cTGKj402exxJ9KyA9iJgAUAYyS0q0+ycYkW5XPIHAsrKSFF6qtvUmdaV7tPD9KyAdiFgAUCYqKyu1eycYvn8AfkUkCTNyinWmKQEU06ydu73KevNDXr1E3pWQHsRsAAgTHirahTlcjWFK0mKcrnkraoJacDy+Rv2WTXvWf38soHq2SMqZDMAVkfAAoAw4YmLkT8QaHHNHwjIExcTkt8/GAzqjeJyLVi+Xjv2+3TViIae1Vnx9KyA9iJgAUCYiD/6NtysVh2sUJxerSvdp7l5Jfp4e5WG9TtNv/9Jqi6gZwV0GAELAMJIeqpbY5ISQvZdhLsO+LQw/5ue1cKMc3TNqDPpWQGdRMACgDATHxvd5cHK56/Xf7/7lf50tGd1x6UDdddYelaAUQhYAOAgwWBQecXlWrBig8r21dCzAroIAQsAHKJ1z+qJH5+rCwfSswK6AgELAGyuZc+qOz0rIAQIWABgUz5/vf7nnw09q7p6elZAKBGwAMBmWvesrhzeV7+eNFT94081ezTAMQhYAGAjxd59mvtGiQq3VymZnhVgGkcHrMTERPXs2VPdunVTZGSkCgsLzR4JADpk1wGfsvI3KucTrxJiu2vBj87Rj9PoWQFmcXTAkqR33nlHCQkJZo8BAB3Sumd1+6UDdPfYJHpWgMkcH7AAwIqCwaCWfVaux5bTswLCkaMDVkREhC6//HJFRETo9ttvV2ZmptkjAcAJte5ZPf7jFF00kJN4IJw4OmD961//ktvt1u7duzVx4kQNHTpUl1xySYvXZGdnKzs7W5JUUVFhxpgAIKmhZ/X4mxv1j4/pWQHhLiIYDAbNHiIczJkzR7GxsfrlL3/Z5mvS0tIowgMIOZ+/Xs/+a6ueeudL1dUH9bPvJ9KzguU47WuoY0+wDh06pEAgoJ49e+rQoUNauXKlfve735k9FgA0oWcFWJdjA9auXbt09dVXS5Lq6uo0ffp0XXnllSZPBQANPvPu19y8L/TRNnpWgBU5NmANGDBA69atM3sMAGhhd2PP6hOv4k+lZwVYlWMDFgCEk9Y9q8yLB+jucd/es6qsrpW3qkaeuBjFx0aHcFoAJ0LAAgATte5ZXTG8jx6clHzCnlVuUZlm5xQryuWSPxBQVkaK0lPdIZoawIkQsADAJB3tWVVW12p2TrF8/oB8CkiSZuUUa0xSAidZQJggYAFAiDXus8r5xKvTT+mux350jq5tR8/KW1WjKJerKVxJUpTLJW9VDQELCBMELAAIkeY9K399QJkXD9Bd45J0Wjv3WXniYuQPBFpc8wcC8sTFGDkugE4gYAFAF2vds7p8WEPPKjGhY/us4mOjlZWRolmtOlicXgHhg4AFAF2oec9qaN+eeunW83VRUuf3WaWnujUmKYHvIgTCFAELALpA831Wp5/SXY9efY5+MtrYfVbxsdEEKyBMEbAAwECte1a3Hd1n1d6eFQBrI2ABgAGCwaCWf7ZTjy5fb0jPCoC1EbAAoJM+L9uvuW+UaO22vYb2rABYFwELADooFD0rANZEwAKAdmrsWf3pnS91hJ4VgOMgYAHASQoGg1rxeUPPyltFzwpA2whYAHASPi/br7l5JVq7lZ4VgBMjYAHAt9h90Kcn3tyov39MzwrAySNgAcBx0LMC0BkELABohp4VACMQsADgKHpWAIxCwALgeLsP+vTkm5v0t49LFXdKd82/eoSmjT6LnhWADiNgAXAsn79ez723VU+93dCzuvX7Z+ue8YO6rGdVWV0rb1WNPHExPKQZsLmwCVh//OMfdcMNNyguLs7sUQDYXDAYVP7nO/XoivUq3VujicP66Ddd3LPKLSrT7JxiRblc8gcCyspIUXqqu8t+PwDmCpuAtWvXLo0ePVojR47UjBkzdMUVVygiguN5AMZq3bP6663na0wX96wqq2s1O6dYPn9APgUkSbNyijUmKYGTLMCmXGYP0GjevHnavHmzbrnlFj3//PMaNGiQHnzwQW3ZssXs0QDYwO6DPs3+R7F+sORf+nJ3teZfPULL/uPiLg9XkuStqlGUq+V/bqNcLnmrarr89wZgjrA5wZKkiIgI9e3bV3379lVkZKSqqqp0zTXXaOLEicrKyjJ7PAAW5PPX68/vbdNT73yp2rp63fr9s3X3uEH6Tkzo9ll54mLkDwRaXPMHAvLExYRsBgChFTYBa/HixVq6dKkSEhJ066236vHHH1dUVJQCgYAGDRpEwALQLsfrWT04KVlnm7DPKj42WlkZKZrVqoPF24OAfYVNwNq7d69effVV9e/fv8V1l8ulvLw8k6YCYEWfl+3XI3kl+nDrXg3pE5qe1Ymkp7o1JimB7yIEHCJsAtbDDz/c5o8lJyeHcBIAVtV6n9W8H47QtNFnKrJbeNRN42OjCVaAQ4RNwAKAjmrds7plTMM+q1D2rACgOQIWAMtq3bOakNxHv5kc+p4VC0QBtEbAAmBJrXtWf7nlfH1/UOh7ViwQBXA8BCwAlnKinlUoT5NYIAqgLQQsAJbQvGfl8x+/ZxXq06TGBaKN4Ur6ZoEoAQtwNgIWgLB2bM+qtx6clKwBvWJbvM6M0yQWiAJoCwELQNhq3rMa3CdWL95yni4e1Ou4rzXjNIkFogDaQsACEHYqDtbqyZUb9b+FpfpuTJQe+eEIXXeCfVZmnSaxQBTA8RCwAISNk+lZtcXM0yQWiAJojYAFwHTBYFBvfrFT85d/e8/qRDhNAhAuCFgATPXFjv2a+8bJ9axOBqdJAMIBAQuAKTrSswIAq3D0f8ny8/M1ZMgQJSUlacGCBWaPAzhCbV29nl6zRWOfKNA/PvbqljFnq+BXY3XjBf0JVwBsw7EnWPX19brrrrv01ltvyePxaPTo0UpPT9ewYcPMHg2wpcae1aPLN+jrvYc73LMCACtwbMBau3atkpKSNGDAAEnStGnTlJubS8ACusAXOxr2WX3wlTE9KwAId44NWGVlZTrzzDObPvZ4PPrwww9NnAiwH3pWAJzKsQHrZGVnZys7O1uSVFFRYfI0gDXU1jXss1rydsM+qxljztZ/jBuk75xy4n1WAGAHjg1YbrdbpaWlTR97vV653cc+FDYzM1OZmZmSpLS0tJDNB1hRQ89qlx5dvl5f7z2s8UN76zeT6VkBcB7HBqzRo0dr8+bN2rp1q9xut1555RW99NJLZo8FWFbJjgOam/dFU89q6YzzdMlgelYAnMmxASsyMlJLlizRFVdcofr6es2YMUPDhw83eyzAcioO1ur3b23UKx/RswKARo4NWJI0adIkTZo0yewxAEuqravX8+9t0x9t0rOqrK7lETsADOPogAWg/ezYs8otKtPsVg+JTk89tpMJACeLgAXgpJXsOKBH8kr0768qbdOzqqyu1eycYvn8AfkUkCTNyinWmKQETrIAdBgBC8AJ7alu2GfV1LOaOlzXnXeWLXpW3qoaRblcTeFKkqJcLnmraghYADqMgAWgTY09qyVvf6kaf71+dtHZ+sV46/asjscTFyN/INDimj8QkCcuxqSJANgBAQvAMYLBoFaWNPSstlc29KwenJysgRbuWbUlPjZaWRkpmtWqg8XpFYDOIGABaGF9+QHNfcNePasTSU91a0xSAt9FCMAwBCwAkhp7Vpv0vx99re/YrGd1MuJjowlWAAxDwAIcrrauXi+8v01/XN3Qs7rpokTdO36wrXpWABBqBCzAoYLBoN4q2aX5R3tW447us7JjzwoAQo2ABTjQ+vKGfVbvb6nUoN6xemHGebrU5j0rAAglAhbgIM17VqfFRGnu1OGa7qCeFQCECgELcIAjdQG98P42/efqzarx1+tmG+6zAoBwQsCCozjtgb6NPatHl6/XNov3rJx27wBYGwELjuG0B/quLz+gectK9N6X1u9ZOe3eAbA+AhYcwUkP9N1TXavfv7VJr6wNbc+qq06YnHTvANgHAQuO4IQH+rbuWYVyn1VXnjA54d4BsB8CFhzBzg/0DQaDWrV+t+YvK2nqWT04KVlJvUPTs+rqEyY73zsA9sX3ZsMRGh/o2yPKpZ7RkeoR5bLFA3037DygG579ULctLVRkN5demHGenrt5dMjClfTNCVNzjSdMRrDrvQNgb5xgwTHs9EDfyqM9q5dD3LM6nlCcMNnp3gFwBgIWHMXqD/Q9Xs/qF+MH6bundDdtpsYTplmtOlhG/zlb/d4BcBYCFmABrXtWY4f00m8mDwvpW4HfhhMmAGiJgAWEuQ07D2he3nr968s9Suodq+d/NlqXDelt9ljH4IQJAL5BwALCVOue1cPpwzX9/LMUxXMDASDsEbCAMHOkLqCl/96mRas26/CROl2bdqYeuGqoqT0rAED7ELCAMNG6Z+WKkHpEdtP/FZXpooHxPBoGACyE9xqAMLBh5wHd+Oxa3ba0UBEREYrqFqFAUDrsr5fPH9CsnGJVVteaPSYA4CRxggWY6Hg9qxFnnKab//yR/PV1Ta/j0TAAYC0ELMAEjT2rxas36/CRev30wkTdO6Fhn1VldS2PhgEAiyNgASEUDAa1ev1uzV++Xlv3HNJlQ3rpt5OTldS7Z9NrQrW4EwDQdQhYQIg032c1sNep+vPPRmtsG/usWNwJANZGwAK6WGV1rf6wapNe+vBr9ewRpTk/GKbrL+h/wn1WLO4EAOsiYAFd5Nt6VgAAeyNgAQZr3bO6dHAvPTSlZc8qXFVW1/K2JAAYgIAFGKg9Patwk1tUptmtivUsNwWAjiFgAQboaM8qXFRW12p2TrF8/oB8algRMSunWGOSEjjJAoAOIGABnXC8ntUvxg9S3KnW6ll5q2oU5XI1hSuJ5aYA0BkELKADrNyzOh5PXAzLTQHAQAQsoJ027jyoectK9M/N1utZtYXlpgBgLAIWcJL2Hjqi37+1saln9f9+MEw3WKhndSIsNwUA4xCwgBNo3bO68YL+unfCYMv1rE4Gy00BwBgELKANrXtWlwzupYcmJ2tQH2v2rAAAoWOP9zbaac6cOXK73UpNTVVqaqqWL19u9kgIMxt3HtRPn1urW5cWKiJC+vPNo/XCz0YTrgAAJ8WxJ1gzZ87UL3/5S7PHgEGM2kDevGcVGx2p300ZphsvtE/PCgAQGo4NWLAPIzaQO6lnBQDoeo793/IlS5YoJSVFM2bMUFVVldnjoIOabyA/WFsnnz+gWTnFqqyuPamf39Cz2qUrF72recvWK/XM72rFLy7Ww1NHEK4AAB1m24A1YcIEjRgx4pi/cnNzdeedd2rLli0qKipSv379dP/997f562RnZystLU1paWmqqKgI4T8BTkbjBvLmGjeQn8imXQ09q1teKJQkPXdzmpbOOE+D6VkBADrJtm8Rrlq16qRed9ttt2nKlClt/nhmZqYyMzMlSWlpaYbMBuN0ZAP53kNH9Ie3NumvH26nZwUA6BK2DVjfpry8XP369ZMkvfbaaxoxYoTJE6Gj2rOBvHXP6oYL+msmPSsAQBdwZMCaNWuWioqKFBERocTERD3zzDNmj4ROONEG8mAwqLc37Nb8Zev11Z5DunhQgh6aMoy3AgEAXcaRAevFF180ewQYrK0N5Jt2HdQjeQ3PDRyQcKqevSlN44b2VkREhAlTAgCcwpEBC/bX2LN6ae3XOrV7Nz00ZZhuvKC/ukfSswIAdD0CFmzlSF1AL36wXYtXbdKhI/W6/vyzdO+EwTqdnhUAIIQIWDZi1DZzKwoGg3pn427Ny6NnBQAwHwHLJozYZm5Vm3Yd1Lxl6/XupgoNSDhVz92cprFD6FkBAMxDwLKB5tvMfWrYCTUrp1hjkhJsfZK199ARLVq1SX/9kJ4VACC8ELBsoHGbeWO4kr7ZZm7HgOWvD+jFf2/XInpWAIAwRcCygY5sM7eipp7VsvX6qoKeFQAgfBGwbKA928ytqvU+K3pWAIBwRsCyiRNtM7cqelYAACsiYNlIW9vMrah5z6q6tk7Xn99fMyfSswIAWAMBC2ElGAyqYGOFHllW0tSz+u3kYRrSl54VAMA6CFgIG5t3HdQjzfZZ8dxAAIBVEbBguqqjPau/0LMCANgEAQvHFYrH7tCzAgDYFQELx+jqx+7QswIA2B0BCy109WN3mveszqZnBQCwKQIWWuiqx+4071md0r2bfjs5WT+9MJGeFQDAlghYaMHox+7QswIAOBEBCy0Y+diddzbsbupZfT+p4bmB9KwAAE5AwMIxOvvYnc27DmresvVaQ88KAOBQBCwcV0ceu0PPCgCABgQsdJq/PqC/fLBdi1Zt1kGfX9PPP0szJwy2zXMRAQBoLwIWOoWeFQAAxyJgoUNa96z+56dpGp9MzwoAAImAhXaiZwUAwIkRsHBS6FkBAHDyCFg4oeY9qzFJ8XpoyjAN7Xua2WMBABC2CFhoEz0rAAA6hoCFY1QdOqLFqzfrxQ+207MCAKADCFho0rpndd15Z+m+ifSsAABoLwIWJEnvbNyteXkl2kLPCgCATiNgOdyXuxt6VgUbK5QYf4r++6dpmkDPCgCATiFgOdS+w0e0aNXRnlVUN/1mUrJuuoieFQAARiBgOYy/PqC/frBdf6BnBQBAlyFgOUjBxt1FVMPyAAAIvklEQVSat2y9vtxdTc8KAIAuRMBygC93V2veshJ6VgAAhAgBy8boWQEAYA4Clg356wN66cOv9YdVm3Sgxq9p552l++lZAQAQMgQsm1mzqUKP5JXoy93VumhgQ88quR89KwAAQomAZRNf7q7W/GUlemdjhfrHn6LsG0dp4rA+9KwAADCBrcs4f//73zV8+HC5XC4VFha2+LHHHntMSUlJGjJkiN58802TJuy8fYePaM7rX+jKRe+qcFuVHpw0VCtnXqLLh/clXAEAYBJbn2CNGDFCr776qm6//fYW10tKSvTKK6/oiy++0I4dOzRhwgRt2rRJ3bp1M2nS9qurD+iltV/r929907O6b+JgJdCzAgDAdLYOWMnJyce9npubq2nTpik6Olpnn322kpKStHbtWl144YUhnrBj1myq0Ly8Em2mZwUAQFiydcBqS1lZmS644IKmjz0ej8rKykyc6OTQswIAwBosH7AmTJignTt3HnN9/vz5mjp1aqd//ezsbGVnZ0uSKioqOv3rdcS+w0e0ePVmvfjv7YqJ6qYHJw3VTRclKjrSOm9pAgDgJJYPWKtWrWr3z3G73SotLW362Ov1yu12H/e1mZmZyszMlCSlpaV1bMgOomcFAIA1WT5gdUR6erqmT5+u++67Tzt27NDmzZt13nnnmT1WC817VhcOiNfvfkDPCgAAq7B1wHrttdd0zz33qKKiQpMnT1ZqaqrefPNNDR8+XNdee62GDRumyMhIPfXUU2HzHYRbKqo1f9l6vb1ht/rHn6Jnbhyly+lZAQBgKRHBYDBo9hBWkZaWdsw+LaPsP+zX4tWbtfTf2xQT1U33jE+iZwUAsI2u/Boajmx9gmUFrXtWPxl9lu6/nJ4VAABWRsAy0Ufb9urBVz9r6lk9NGWYhp1BzwoAAKsjYJnI56/XkfoAPSsAAGyGgGWiiwf10qr7LlVUN1s/EhIAAMfhK7vJCFcAANgPX90BAAAMRsACAAAwGAELAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELBNVVtdqXek+VVbXmj0KAAAwEJvcTZJbVKbZOcWKcrnkDwSUlZGi9FS32WMBAAADcIJlgsrqWs3OKZbPH9DB2jr5/AHNyinmJAsAAJsgYJnAW1WjKFfLP/ool0veqhqTJgIAAEYiYJnAExcjfyDQ4po/EJAnLsakiQAAgJEIWCaIj41WVkaKekS51DM6Uj2iXMrKSFF8bLTZowEAAANQcjdJeqpbY5IS5K2qkScuhnAFAICNELBMFB8bTbACAMCGeIsQAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELAAAAIMRsAAAAAxGwAIAADAYAQsAAMBgEcFgMGj2EFaRkJCgxMREs8cwVUVFhXr16mX2GI7GPTAf98B83APztfcebNu2TXv27OnCicILAQvtkpaWpsLCQrPHcDTugfm4B+bjHpiPe/DteIsQAADAYAQsAAAAg3WbM2fOHLOHgLWMGjXK7BEcj3tgPu6B+bgH5uMetI0OFgAAgMF4ixAAAMBgBCx02JNPPqmIiAhHfdttuPjVr36loUOHKiUlRVdffbX27dtn9kiOkZ+fryFDhigpKUkLFiwwexzHKS0t1dixYzVs2DANHz5cixcvNnskx6qvr9f3vvc9TZkyxexRwhIBCx1SWlqqlStX6qyzzjJ7FEeaOHGiPv/8cxUXF2vw4MF67LHHzB7JEerr63XXXXdpxYoVKikp0csvv6ySkhKzx3KUyMhIPfnkkyopKdEHH3ygp556intgksWLFys5OdnsMcIWAQsdMnPmTGVlZSkiIsLsURzp8ssvV2RkpCTpggsukNfrNXkiZ1i7dq2SkpI0YMAAde/eXdOmTVNubq7ZYzlKv379NHLkSElSz549lZycrLKyMpOnch6v16tly5bp1ltvNXuUsEXAQrvl5ubK7Xbr3HPPNXsUSHruued01VVXmT2GI5SVlenMM89s+tjj8fDF3UTbtm3Tp59+qvPPP9/sURzn3nvvVVZWllwuYkRbIs0eAOFpwoQJ2rlz5zHX58+fr0cffVQrV640YSpn+bZ7MHXq1Ka/j4yM1PXXXx/q8QBTVVdXKyMjQ4sWLdJpp51m9jiOkpeXp969e2vUqFEqKCgwe5ywRcDCca1ateq41z/77DNt3bq16fTK6/Vq5MiRWrt2rfr27RvKEW2vrXvQ6Pnnn1deXp5Wr17NW7Uh4na7VVpa2vSx1+uV2+02cSJn8vv9ysjI0PXXX68f/ehHZo/jOO+9955ef/11LV++XD6fTwcOHNANN9ygv/zlL2aPFlbYg4VOSUxMVGFhoRISEswexVHy8/N13333ac2aNTzwNoTq6uo0ePBgrV69Wm63W6NHj9ZLL72k4cOHmz2aYwSDQd100006/fTTtWjRIrPHcbyCggI98cQTysvLM3uUsMObp4AF3X333Tp48KAmTpyo1NRU3XHHHWaP5AiRkZFasmSJrrjiCiUnJ+vaa68lXIXYe++9pxdffFFvv/22UlNTlZqaquXLl5s9FnAMTrAAAAAMxgkWAACAwQhYAAAABiNgAQAAGIyABQAAYDACFgAAgMEIWAAAAAYjYAEAABiMgAXA0j766COlpKTI5/Pp0KFDGj58uD7//HOzxwLgcCwaBWB5v/3tb+Xz+VRTUyOPx6Nf//rXZo8EwOEIWAAs78iRIxo9erR69Oih999/X926dTN7JAAOx1uEACyvsrJS1dXVOnjwoHw+n9njAAAnWACsLz09XdOmTdPWrVtVXl6uJUuWmD0SAIeLNHsAAOiMpUuXKioqStOnT1d9fb0uuugivf322xo3bpzZowFwME6wAAAADEYHCwAAwGAELAAAAIMRsAAAAAxGwAIAADAYAQsAAMBgBCwAAACDEbAAAAAMRsACAAAwGAELAADAYAQsAAAAgxGwAAAADEbAAgAAMBgBCwAAwGAELAAAAIP9f+9SJvoSWycJAAAAAElFTkSuQmCC style\u003d\u0027width\u003dauto;height:auto\u0027\u003e\u003cdiv\u003e\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686945_-1732862556",
-      "id":"20161104-233454_1462963013",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10847"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791204_1633384804",
+      "id": "20161104-233454_1462963013",
+      "dateCreated": "2019-11-06 08:59:51.204",
+      "status": "READY"
     },
     {
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:26+0000",
-      "config":{
-        "editorSetting":{
-          "language":"scala",
-          "editOnDblClick":false,
-          "completionKey":"TAB",
-          "completionSupport":true
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.206",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/scala",
-        "fontSize":9,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870686948_1923607989",
-      "id":"20180808-224453_1028333342",
-      "dateCreated":"2019-11-04T12:31:26+0000",
-      "status":"READY",
-      "$$hashKey":"object:10848"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791205_-1504736610",
+      "id": "20180808-224453_1028333342",
+      "dateCreated": "2019-11-06 08:59:51.205",
+      "status": "READY"
     }
   ],
-  "name":"/Spark ML Demo (Regression)",
-  "id":"2ETPUCYVU",
-  "defaultInterpreterGroup":"spark",
-  "version":"0.9.0-SNAPSHOT",
-  "permissions":{
-
+  "name": "Spark ML Demo (Regression)",
+  "id": "2EUQABDKD",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-SNAPSHOT",
+  "permissions": {},
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
   },
-  "noteParams":{
-
-  },
-  "noteForms":{
-
-  },
-  "angularObjects":{
-
-  },
-  "config":{
-    "isZeppelinNotebookCronEnable":false,
-    "looknfeel":"default",
-    "personalizedMode":"false"
-  },
-  "info":{
-
-  },
-  "path":"/Spark ML Demo (Regression)"
+  "info": {},
+  "path": "/Spark ML Demo (Regression)"
 }

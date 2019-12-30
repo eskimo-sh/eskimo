@@ -1,426 +1,336 @@
 {
-  "paragraphs":[
+  "paragraphs": [
     {
-      "text":"%md \n### 1. Cleanup : Delete raw data elasticsearch indices\n\nJust a cleaning step where the elasticsearch indices corresponding to raw data are deleted",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T16:45:00+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"markdown",
-          "editOnDblClick":true,
-          "completionSupport":false
+      "text": "%md \n\n### 1. Cleanup : Delete raw data elasticsearch indices\n\nJust a cleaning step where the elasticsearch indices corresponding to raw data are deleted",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-20 15:53:23.608",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h3>1. Cleanup : Delete raw data elasticsearch indices</h3>\n<p>Just a cleaning step where the elasticsearch indices corresponding to raw data are deleted</p>\n\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003e1. Cleanup : Delete raw data elasticsearch indices\u003c/h3\u003e\n\u003cp\u003eJust a cleaning step where the elasticsearch indices corresponding to raw data are deleted\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573144613610_1164885594",
-      "id":"paragraph_1573144613610_1164885594",
-      "dateCreated":"2019-11-07T16:36:53+0000",
-      "dateStarted":"2019-11-07T16:40:15+0000",
-      "dateFinished":"2019-11-07T16:40:15+0000",
-      "status":"FINISHED",
-      "focus":true,
-      "$$hashKey":"object:4641"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140711_2075889415",
+      "id": "paragraph_1573144613610_1164885594",
+      "dateCreated": "2019-11-20 15:52:20.711",
+      "dateStarted": "2019-11-20 15:53:23.625",
+      "dateFinished": "2019-11-20 15:53:25.467",
+      "status": "FINISHED"
     },
     {
-      "text":"%elasticsearch\n\ndelete /berka-*/*/*\n",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T17:02:45+0000",
-      "config":{
-        "editorSetting":{
-          "language":"sh",
-          "editOnDblClick":false,
-          "completionSupport":true
+      "text": "%elasticsearch\n\ndelete /berka-*/*/*\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-20 15:52:20.719",
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/undefined",
-        "fontSize":9,
-        "editorHide":false,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"ERROR",
-        "msg":[
+      "results": {
+        "code": "ERROR",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"Error : {\"error\":{\"root_cause\":[{\"type\":\"index_not_found_exception\",\"reason\":\"no such index\",\"resource.type\":\"index_expression\",\"resource.id\":\"berka-*\",\"index_uuid\":\"_na_\",\"index\":\"berka-*\"}],\"type\":\"index_not_found_exception\",\"reason\":\"no such index\",\"resource.type\":\"index_expression\",\"resource.id\":\"berka-*\",\"index_uuid\":\"_na_\",\"index\":\"berka-*\"},\"status\":404}"
+            "type": "TEXT",
+            "data": "Error : {\"error\":{\"root_cause\":[{\"type\":\"index_not_found_exception\",\"reason\":\"no such index\",\"resource.type\":\"index_expression\",\"resource.id\":\"berka-*\",\"index_uuid\":\"_na_\",\"index\":\"berka-*\"}],\"type\":\"index_not_found_exception\",\"reason\":\"no such index\",\"resource.type\":\"index_expression\",\"resource.id\":\"berka-*\",\"index_uuid\":\"_na_\",\"index\":\"berka-*\"},\"status\":404}"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573144770167_1974251292",
-      "id":"paragraph_1573144770167_1974251292",
-      "dateCreated":"2019-11-07T16:39:30+0000",
-      "dateStarted":"2019-11-07T16:43:13+0000",
-      "dateFinished":"2019-11-07T16:43:13+0000",
-      "status":"ERROR",
-      "$$hashKey":"object:4642"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140719_-1212682067",
+      "id": "paragraph_1573144770167_1974251292",
+      "dateCreated": "2019-11-20 15:52:20.719",
+      "status": "READY"
     },
     {
-      "text":"%md \n### 2. Download Berka dataset from niceideas.ch\n\nHere we download the individual files from the Berka Dataset from niceideas.ch and put them in /var/lib/logstash/data/test_berka/\n/var/lib/logstash/data/ is a folder shared between the logstash docker containre and the zeppelin docker container.\nIn a multi-node cluster deployment, /var/lib/logstash/data/test_berka/ is shared between all nodes using gluster.\n",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T16:53:57+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"markdown",
-          "editOnDblClick":true,
-          "completionSupport":false
+      "text": "%md \n### 2. Download Berka dataset from niceideas.ch\n\nHere we download the individual files from the Berka Dataset from niceideas.ch and put them in /var/lib/logstash/data/test_berka/\n/var/lib/logstash/data/ is a folder shared between the logstash docker containre and the zeppelin docker container.\nIn a multi-node cluster deployment, /var/lib/logstash/data/test_berka/ is shared between all nodes using gluster.\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-20 15:52:20.720",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h3>2. Download Berka dataset from niceideas.ch</h3>\n<p>Here we download the individual files from the Berka Dataset from niceideas.ch and put them in /var/lib/logstash/data/test_berka/<br />\n/var/lib/logstash/data/ is a folder shared between the logstash docker containre and the zeppelin docker container.<br />\nIn a multi-node cluster deployment, /var/lib/logstash/data/test_berka/ is shared between all nodes using gluster.</p>\n\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003e2. Download Berka dataset from niceideas.ch\u003c/h3\u003e\n\u003cp\u003eHere we download the individual files from the Berka Dataset from niceideas.ch and put them in /var/lib/logstash/data/test_berka/\u003cbr /\u003e\n/var/lib/logstash/data/ is a folder shared between the logstash docker containre and the zeppelin docker container.\u003cbr /\u003e\nIn a multi-node cluster deployment, /var/lib/logstash/data/test_berka/ is shared between all nodes using gluster.\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573145010348_1692553399",
-      "id":"paragraph_1573145010348_1692553399",
-      "dateCreated":"2019-11-07T16:43:30+0000",
-      "dateStarted":"2019-11-07T16:53:57+0000",
-      "dateFinished":"2019-11-07T16:53:57+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:4643"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140719_1663799918",
+      "id": "paragraph_1573145010348_1692553399",
+      "dateCreated": "2019-11-20 15:52:20.720",
+      "status": "READY"
     },
     {
-      "text":"%sh\n\n# Have to use /var/lib/logstash/data/ since it's shared between logstash and zeppelin containers\nmkdir -p /var/lib/logstash/data/test_berka/\n\n# Downloading all berka datasets\ndownload_dataset() {\n    if [[ ! -f \"/var/lib/logstash/data/test_berka/$1.asc\" ]]; then\n        echo \" - downloading berka $1 dataset\"\n        wget http://niceideas.ch/mes/berka/$1.asc > /tmp/download_data 2>&1    \n        if [[ $? != 0 ]]; then\n            echo \"-> Failed to download berka/$1.asc data from niceideas.ch \"\n            cat /tmp/download_data\n        fi\n        mv $1.asc /var/lib/logstash/data/test_berka/$1.asc\n    fi\n}\n\n# Now call the 'download_dataset' function defined above for all datasets\ndownload_dataset account\ndownload_dataset card\ndownload_dataset client\ndownload_dataset disp\ndownload_dataset district\ndownload_dataset loan\ndownload_dataset order\ndownload_dataset trans\n",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T17:02:39+0000",
-      "config":{
-        "editorSetting":{
-          "language":"sh",
-          "editOnDblClick":false,
-          "completionSupport":false
+      "text": "%sh\n\n# Have to use /var/lib/logstash/data/ since it\u0027s shared between logstash and zeppelin containers\nmkdir -p /var/lib/logstash/data/test_berka/\n\n# Downloading all berka datasets\ndownload_dataset() {\n    if [[ ! -f \"/var/lib/logstash/data/test_berka/$1.asc\" ]]; then\n        echo \" - downloading berka $1 dataset\"\n        wget http://niceideas.ch/mes/berka/$1.asc \u003e /tmp/download_data 2\u003e\u00261    \n        if [[ $? !\u003d 0 ]]; then\n            echo \"-\u003e Failed to download berka/$1.asc data from niceideas.ch \"\n            cat /tmp/download_data\n        fi\n        mv $1.asc /var/lib/logstash/data/test_berka/$1.asc\n    fi\n}\n\n# Now call the \u0027download_dataset\u0027 function defined above for all datasets\ndownload_dataset account\ndownload_dataset card\ndownload_dataset client\ndownload_dataset disp\ndownload_dataset district\ndownload_dataset loan\ndownload_dataset order\ndownload_dataset trans\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-12-29 08:44:26.523",
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/sh",
-        "fontSize":9,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 9.0,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":" - downloading berka account dataset\n - downloading berka card dataset\n - downloading berka client dataset\n - downloading berka disp dataset\n - downloading berka district dataset\n - downloading berka loan dataset\n - downloading berka order dataset\n - downloading berka trans dataset\n"
+            "type": "TEXT",
+            "data": " - downloading berka account dataset\n - downloading berka card dataset\n - downloading berka client dataset\n - downloading berka disp dataset\n - downloading berka district dataset\n - downloading berka loan dataset\n - downloading berka order dataset\n - downloading berka trans dataset\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573144840643_524948953",
-      "id":"paragraph_1573144840643_524948953",
-      "dateCreated":"2019-11-07T16:40:40+0000",
-      "dateStarted":"2019-11-07T16:50:58+0000",
-      "dateFinished":"2019-11-07T16:51:23+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:4644"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140721_-1273453641",
+      "id": "paragraph_1573144840643_524948953",
+      "dateCreated": "2019-11-20 15:52:20.721",
+      "dateStarted": "2019-12-29 08:44:26.642",
+      "dateFinished": "2019-12-29 08:44:43.473",
+      "status": "FINISHED"
     },
     {
-      "text":"%md\n\n### 3. Ingest Raw Berka Data in ElasticSearch\n\nIn this paragraph, we use logstash-cli to ingest the individual Berka dataset data into ElasticSearch, in different indices.\nlogstash-cli is a client using HTTP to reach a command server runnign on the logstash container.\n\n**YOU NEED TO EXTEND THE TIMEOUT IN THE SHELL INTERPRETER SETTING TO 1 HOURS FOR THIS TO WORK !!!**\n\n**Go in [MENU] -> Interpreter -> [Search for 'sh' interpreter] -> Extend value \"shell.command.timeout.millisecs\" from 60000 to 6000000**\n\n*Warning : STDIN piping is done with logstash-cli using the specific -std_in argument.*",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T21:36:56+0000",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "language":"markdown",
-          "editOnDblClick":true,
-          "completionSupport":false
+      "text": "%md\n\n### 3. Ingest Raw Berka Data in ElasticSearch\n\nIn this paragraph, we use logstash-cli to ingest the individual Berka dataset data into ElasticSearch, in different indices.\nlogstash-cli is a client using HTTP to reach a command server runnign on the logstash container.\n\n**YOU NEED TO EXTEND THE TIMEOUT IN THE SHELL INTERPRETER SETTING TO 1 HOURS FOR THIS TO WORK !!!**\n\n**Go in [MENU] -\u003e Interpreter -\u003e [Search for \u0027sh\u0027 interpreter] -\u003e Extend value \"shell.command.timeout.millisecs\" from 60000 to 6000000**\n\n*Warning : STDIN piping is done with logstash-cli using the specific -std_in argument.*",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-20 15:52:20.721",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h3>3. Ingest Raw Berka Data in ElasticSearch</h3>\n<p>In this paragraph, we use logstash-cli to ingest the individual Berka dataset data into ElasticSearch, in different indices.<br />\nlogstash-cli is a client using HTTP to reach a command server runnign on the logstash container.</p>\n<p><strong>YOU NEED TO EXTEND THE TIMEOUT IN THE SHELL INTERPRETER SETTING TO 1 HOURS FOR THIS TO WORK !!!</strong></p>\n<p><strong>Go in [MENU] -&gt; Interpreter -&gt; [Search for &lsquo;sh&rsquo; interpreter] -&gt; Extend value &ldquo;shell.command.timeout.millisecs&rdquo; from 60000 to 6000000</strong></p>\n<p><em>Warning : STDIN piping is done with logstash-cli using the specific -std_in argument.</em></p>\n\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003e3. Ingest Raw Berka Data in ElasticSearch\u003c/h3\u003e\n\u003cp\u003eIn this paragraph, we use logstash-cli to ingest the individual Berka dataset data into ElasticSearch, in different indices.\u003cbr /\u003e\nlogstash-cli is a client using HTTP to reach a command server runnign on the logstash container.\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eYOU NEED TO EXTEND THE TIMEOUT IN THE SHELL INTERPRETER SETTING TO 1 HOURS FOR THIS TO WORK !!!\u003c/strong\u003e\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eGo in [MENU] -\u0026gt; Interpreter -\u0026gt; [Search for \u0026lsquo;sh\u0026rsquo; interpreter] -\u0026gt; Extend value \u0026ldquo;shell.command.timeout.millisecs\u0026rdquo; from 60000 to 6000000\u003c/strong\u003e\u003c/p\u003e\n\u003cp\u003e\u003cem\u003eWarning : STDIN piping is done with logstash-cli using the specific -std_in argument.\u003c/em\u003e\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573145120689_-1755825542",
-      "id":"paragraph_1573145120689_-1755825542",
-      "dateCreated":"2019-11-07T16:45:20+0000",
-      "dateStarted":"2019-11-07T21:36:56+0000",
-      "dateFinished":"2019-11-07T21:36:57+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:4645"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140721_2124158508",
+      "id": "paragraph_1573145120689_-1755825542",
+      "dateCreated": "2019-11-20 15:52:20.721",
+      "status": "READY"
     },
     {
-      "text":"%sh\n\n# logstash ingestion configuration\ningest_dataset() {\n\n    echo -e \"\ninput {\n    stdin { }\n#  file {\n#    path => \\\"/var/lib/logstash/data/test_berka/$1.asc\\\"\n#    start_position => \\\"beginning\\\"\n#    sincedb_path => \\\"/dev/null\\\"\n#    }\n}\nfilter {\n  csv {\n    separator => \\\";\\\"\n    columns => [$3] \n  }\n  if ([col1] == \\\"$2\\\") {\n    drop { }\n  }  \n  mutate {\n    rename => { \\\"@timestamp\\\" => \\\"timestamp\\\" }\n  }\n  date {\n    match => [ \\\"$4\\\", \\\"$5\\\" ]\n    target => \\\"$6\\\"\n  }\n}\noutput {\n   if \\\"_dateparsefailure\\\" not in [tags] {\n      elasticsearch {\n        hosts => \\\"http://localhost:9200\\\"\n        index => \\\"berka-$1\\\"\n      }\n   }\n}\n\" > /var/lib/logstash/data/test_berka/import_berka_$1.conf\n\n\n    # logstash call (using logstash container on same host)\n    echo \" - Executing logstash on $1 (this takes time)\"\n    rm -f /tmp/logstash_raw_berka_$1.log\n    logstash-cli -target_host localhost -std_in /var/lib/logstash/data/test_berka/$1.asc -f /var/lib/logstash/data/test_berka/import_berka_$1.conf > /tmp/logstash_raw_berka_$1.log \n    if [[ $? != 0 ]]; then\n        echo \"-> Failed !\"\n        cat /tmp/logstash_raw_berka_$1.log \n    fi\n    \n}\n\ningest_dataset account '\\\"account_id\\\"' '\"account_id\",\"district_id\",\"frequency\",\"date\"' date 'YYMMdd' creation_date\ningest_dataset card '\\\"card_id\\\"' '\"card_id\",\"disp_id\",\"type\",\"issued\"' issued 'YYMMdd 00:00:00' creation_date\ningest_dataset client '\\\"client_id\\\"' '\"client_id\",\"birth_number\",\"district_id\"' none 'YYMMdd' creation_date\ningest_dataset disp '\\\"disp_id\\\"' '\"disp_id\",\"client_id\",\"account_id\",\"type\"' none 'YYMMdd' creation_date\ningest_dataset district 'A1' '\"district_id\",\"district_name\",\"region_name\",\"num_inhabitants\",\"num_munipalities_gt499\",\"num_munipalities_500to1999\",\"num_munipalities_2000to9999\",\"num_munipalities_gt10000\",\"num_cities\",\"ratio_urban\",\"average_salary\",\"unemp_rate95\",\"unemp_rate96\",\"num_entrep_per1000\",\"num_crimes95\",\"num_crimes96\"'  none 'YYMMdd' creation_date\ningest_dataset loan '\\\"load_id\\\"' '\"loan_id\",\"account_id\",\"date\",\"amount\",\"duration\",\"payments\",\"status\"' date 'YYMMdd' @timestamp\ningest_dataset order '\\\"order_id\\\"' '\"order_id\",\"account_id\",\"bank_to\",\"account_to\",\"amount\",\"k_symbol\"' none 'YYMMdd' creation_date\ningest_dataset trans '\\\"trans_id\\\"' '\"trans_id\",\"account_id\",\"date\",\"type\",\"operation\",\"amount\",\"balance\",\"k_symbol\",\"bank\",\"account\"' date 'YYMMdd' @timestamp\n\n\n",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T21:37:00+0000",
-      "config":{
-        "editorSetting":{
-          "language":"sh",
-          "editOnDblClick":false,
-          "completionSupport":false
+      "text": "%sh\n\n# logstash ingestion configuration\ningest_dataset() {\n\n    echo -e \"\ninput {\n    stdin { }\n#  file {\n#    path \u003d\u003e \\\"/var/lib/logstash/data/test_berka/$1.asc\\\"\n#    start_position \u003d\u003e \\\"beginning\\\"\n#    sincedb_path \u003d\u003e \\\"/dev/null\\\"\n#    }\n}\nfilter {\n  csv {\n    separator \u003d\u003e \\\";\\\"\n    columns \u003d\u003e [$3] \n  }\n  if ([col1] \u003d\u003d \\\"$2\\\") {\n    drop { }\n  }  \n  mutate {\n    rename \u003d\u003e { \\\"@timestamp\\\" \u003d\u003e \\\"timestamp\\\" }\n  }\n  date {\n    match \u003d\u003e [ \\\"$4\\\", \\\"$5\\\" ]\n    target \u003d\u003e \\\"$6\\\"\n  }\n}\noutput {\n   if \\\"_dateparsefailure\\\" not in [tags] {\n      elasticsearch {\n        hosts \u003d\u003e \\\"http://localhost:9200\\\"\n        index \u003d\u003e \\\"berka-$1\\\"\n      }\n   }\n}\n\" \u003e /var/lib/logstash/data/test_berka/import_berka_$1.conf\n\n\n    # logstash call (using logstash container on same host)\n    echo \" - Executing logstash on $1 (this takes time)\"\n    rm -f /tmp/logstash_raw_berka_$1.log\n    logstash-cli -target_host localhost -std_in /var/lib/logstash/data/test_berka/$1.asc -f /var/lib/logstash/data/test_berka/import_berka_$1.conf \u003e /tmp/logstash_raw_berka_$1.log \n    if [[ $? !\u003d 0 ]]; then\n        echo \"-\u003e Failed !\"\n        cat /tmp/logstash_raw_berka_$1.log \n    fi\n    \n}\n\ningest_dataset account \u0027\\\"account_id\\\"\u0027 \u0027\"account_id\",\"district_id\",\"frequency\",\"date\"\u0027 date \u0027YYMMdd\u0027 creation_date\ningest_dataset card \u0027\\\"card_id\\\"\u0027 \u0027\"card_id\",\"disp_id\",\"type\",\"issued\"\u0027 issued \u0027YYMMdd 00:00:00\u0027 creation_date\ningest_dataset client \u0027\\\"client_id\\\"\u0027 \u0027\"client_id\",\"birth_number\",\"district_id\"\u0027 none \u0027YYMMdd\u0027 creation_date\ningest_dataset disp \u0027\\\"disp_id\\\"\u0027 \u0027\"disp_id\",\"client_id\",\"account_id\",\"type\"\u0027 none \u0027YYMMdd\u0027 creation_date\ningest_dataset district \u0027A1\u0027 \u0027\"district_id\",\"district_name\",\"region_name\",\"num_inhabitants\",\"num_munipalities_gt499\",\"num_munipalities_500to1999\",\"num_munipalities_2000to9999\",\"num_munipalities_gt10000\",\"num_cities\",\"ratio_urban\",\"average_salary\",\"unemp_rate95\",\"unemp_rate96\",\"num_entrep_per1000\",\"num_crimes95\",\"num_crimes96\"\u0027  none \u0027YYMMdd\u0027 creation_date\ningest_dataset loan \u0027\\\"load_id\\\"\u0027 \u0027\"loan_id\",\"account_id\",\"date\",\"amount\",\"duration\",\"payments\",\"status\"\u0027 date \u0027YYMMdd\u0027 @timestamp\ningest_dataset order \u0027\\\"order_id\\\"\u0027 \u0027\"order_id\",\"account_id\",\"bank_to\",\"account_to\",\"amount\",\"k_symbol\"\u0027 none \u0027YYMMdd\u0027 creation_date\ningest_dataset trans \u0027\\\"trans_id\\\"\u0027 \u0027\"trans_id\",\"account_id\",\"date\",\"type\",\"operation\",\"amount\",\"balance\",\"k_symbol\",\"bank\",\"account\"\u0027 date \u0027YYMMdd\u0027 @timestamp\n\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-12-29 08:44:57.868",
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionSupport": false
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/sh",
-        "fontSize":9,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 9.0,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "INCOMPLETE",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":" - Executing logstash on account (this takes time)\n - Executing logstash on card (this takes time)\n - Executing logstash on client (this takes time)\n - Executing logstash on disp (this takes time)\n - Executing logstash on district (this takes time)\n - Executing logstash on loan (this takes time)\n - Executing logstash on order (this takes time)\n - Executing logstash on trans (this takes time)\n"
+            "type": "TEXT",
+            "data": " - Executing logstash on account (this takes time)\n - Executing logstash on card (this takes time)\n - Executing logstash on client (this takes time)\n - Executing logstash on disp (this takes time)\n - Executing logstash on district (this takes time)\n - Executing logstash on loan (this takes time)\n - Executing logstash on order (this takes time)\n - Executing logstash on trans (this takes time)\n"
+          },
+          {
+            "type": "TEXT",
+            "data": "Paragraph received a SIGTERM\nExitValue: 143"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573145219945_2112967654",
-      "id":"paragraph_1573145219945_2112967654",
-      "dateCreated":"2019-11-07T16:46:59+0000",
-      "dateStarted":"2019-11-07T21:37:00+0000",
-      "dateFinished":"2019-11-07T21:46:53+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:4646"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140722_-108928902",
+      "id": "paragraph_1573145219945_2112967654",
+      "dateCreated": "2019-11-20 15:52:20.722",
+      "dateStarted": "2019-12-29 08:44:57.902",
+      "dateFinished": "2019-12-29 09:05:22.113",
+      "status": "FINISHED"
     },
     {
-      "text":"%md\n\n### Data is now on ElasticSearch. Go to kibana and visualize it :-)\n",
-      "user":"anonymous",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "editOnDblClick":true,
-          "completionSupport":false,
-          "language":"markdown"
+      "text": "%md\n\n### Data is now on ElasticSearch. Go to kibana and visualize it :-)\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-20 15:52:20.722",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "editOnDblClick": true,
+          "completionSupport": false,
+          "language": "markdown"
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573145385601_1262117494",
-      "id":"paragraph_1573145385601_1262117494",
-      "dateCreated":"2019-11-07T21:47:46+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:4647",
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h3>Data is now on ElasticSearch. Go to kibana and visualize it :-)</h3>\n\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eData is now on ElasticSearch. Go to kibana and visualize it :-)\u003c/h3\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140722_-1556743178",
+      "id": "paragraph_1573145385601_1262117494",
+      "dateCreated": "2019-11-20 15:52:20.722",
+      "status": "READY"
     },
     {
-      "text":"%md\n",
-      "user":"anonymous",
-      "dateUpdated":"2019-11-07T21:47:46+0000",
-      "config":{
-        "colWidth":12,
-        "fontSize":9,
-        "enabled":true,
-        "results":{
-
+      "text": "%md\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-20 15:52:20.723",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": true,
+          "completionSupport": false,
+          "language": "markdown"
         },
-        "editorSetting":{
-          "editOnDblClick":true,
-          "completionSupport":false,
-          "language":"markdown"
-        },
-        "editorMode":"ace/mode/markdown"
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1573163266229_378561597",
-      "id":"paragraph_1573163266229_378561597",
-      "dateCreated":"2019-11-07T21:47:46+0000",
-      "status":"READY",
-      "focus":true,
-      "$$hashKey":"object:5234"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1574265140723_2124968970",
+      "id": "paragraph_1573163266229_378561597",
+      "dateCreated": "2019-11-20 15:52:20.723",
+      "status": "READY"
     }
   ],
-  "name":"Logstash Demo",
-  "id":"2EV1Z8UAN",
-  "defaultInterpreterGroup":"sh",
-  "version":"0.9.0-SNAPSHOT",
-  "permissions":{
-
+  "name": "Logstash Demo",
+  "id": "2EURNXTM1",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-SNAPSHOT",
+  "permissions": {},
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
   },
-  "noteParams":{
-
-  },
-  "noteForms":{
-
-  },
-  "angularObjects":{
-
-  },
-  "config":{
-    "isZeppelinNotebookCronEnable":false,
-    "looknfeel":"default",
-    "personalizedMode":"false"
-  },
-  "info":{
-
-  },
-  "path":"/Logstash Demo"
+  "info": {},
+  "path": "/Logstash Demo"
 }

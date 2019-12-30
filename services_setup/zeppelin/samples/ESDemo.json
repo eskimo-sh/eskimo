@@ -1,1389 +1,1048 @@
 {
-  "paragraphs":[
+  "paragraphs": [
     {
-      "text":"%md\n## Eskimo Zeppelin ElasticSearch Demo\nIn order to run the queries from this demo, you need to have the \"Sample flight data\" from Kibana addedd to elasticsearch.\n\n(For this, just go to Kibana and follow : Add Data to Kibana / Add sample data / Load a data set and a Kibana dashboard / Install \"Sample flight data\")\n\nWith this data properly loaded, you can execute the paragraphs below",
-      "user":"anonymous",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "editOnDblClick":true,
-          "completionSupport":false,
-          "language":"markdown"
+      "text": "%md\n\n## Eskimo Zeppelin ElasticSearch Demo\n\nThis is just a simple notebook illustrating how to integrate ElasticSearch queries in Zeppelin. \n\nIn order to run the queries from this demo, you need to have the \"Sample flight data\" from Kibana addedd to elasticsearch.\n\n(For this, just go to Kibana and follow : Add Data to Kibana / Add sample data / Load a data set and a Kibana dashboard / Install \"Sample flight data\")\n\nWith this data properly loaded, you can execute the paragraphs below",
+      "user": "anonymous",
+      "dateUpdated": "2019-12-30 10:41:01.320",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "editOnDblClick": true,
+          "completionSupport": false,
+          "language": "markdown"
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/markdown",
-        "fontSize":9,
-        "editorHide":true,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"HTML",
-            "data":"<div class=\"markdown-body\">\n<h2>Eskimo Zeppelin ElasticSearch Demo</h2>\n<p>In order to run the queries from this demo, you need to have the &ldquo;Sample flight data&rdquo; from Kibana addedd to elasticsearch.</p>\n<p>(For this, just go to Kibana and follow : Add Data to Kibana / Add sample data / Load a data set and a Kibana dashboard / Install &ldquo;Sample flight data&rdquo;)</p>\n<p>With this data properly loaded, you can execute the paragraphs below</p>\n\n</div>"
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eEskimo Zeppelin ElasticSearch Demo\u003c/h2\u003e\n\u003cp\u003eThis is just a simple notebook illustrating how to integrate ElasticSearch queries in Zeppelin.\u003c/p\u003e\n\u003cp\u003eIn order to run the queries from this demo, you need to have the \u0026ldquo;Sample flight data\u0026rdquo; from Kibana addedd to elasticsearch.\u003c/p\u003e\n\u003cp\u003e(For this, just go to Kibana and follow : Add Data to Kibana / Add sample data / Load a data set and a Kibana dashboard / Install \u0026ldquo;Sample flight data\u0026rdquo;)\u003c/p\u003e\n\u003cp\u003eWith this data properly loaded, you can execute the paragraphs below\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20190723-143642_272211369",
-      "id":"20190723-143642_272211369",
-      "dateCreated":"2019-11-04T12:41:45+0000",
-      "status":"FINISHED",
-      "focus":true,
-      "$$hashKey":"object:14207",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791239_104275405",
+      "id": "20190723-143642_272211369",
+      "dateCreated": "2019-11-06 08:59:51.239",
+      "dateStarted": "2019-12-30 10:41:01.333",
+      "dateFinished": "2019-12-30 10:41:01.357",
+      "status": "FINISHED"
     },
     {
-      "text":"%elasticsearch\nsize 100\nsearch /kibana_sample_data_flights/ { \"from\" : 0, \"query\" : { \"match_all\" : {} } }",
-      "user":"anonymous",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "completionSupport":true
+      "text": "%elasticsearch\nsize 100\nsearch /kibana_sample_data_flights/ { \"from\" : 0, \"query\" : { \"match_all\" : {} } }",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.240",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/undefined",
-        "fontSize":9,
-        "editorHide":false,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-          "0":{
-            "graph":{
-              "mode":"table",
-              "height":554,
-              "optionOpen":false,
-              "setting":{
-                "table":{
-                  "tableGridState":{
-                    "columns":[
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 554.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
                       {
-                        "name":"AvgTicketPrice",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "AvgTicketPrice",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Cancelled",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Cancelled",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Carrier",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Carrier",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Dest",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Dest",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestAirportID",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestAirportID",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestCityName",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestCityName",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestCountry",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestCountry",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestLocation.lat",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestLocation.lat",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestLocation.lon",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestLocation.lon",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestRegion",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestRegion",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestWeather",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestWeather",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DistanceKilometers",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DistanceKilometers",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DistanceMiles",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DistanceMiles",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightDelay",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightDelay",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightDelayMin",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightDelayMin",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightDelayType",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightDelayType",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightNum",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightNum",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightTimeHour",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightTimeHour",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightTimeMin",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightTimeMin",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Origin",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Origin",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginAirportID",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginAirportID",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginCityName",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginCityName",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginCountry",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginCountry",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginLocation.lat",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginLocation.lat",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginLocation.lon",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginLocation.lon",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginRegion",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginRegion",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginWeather",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginWeather",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"dayOfWeek",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "dayOfWeek",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"timestamp",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "timestamp",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       }
                     ],
-                    "scrollFocus":{
-
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
                     },
-                    "selection":[
-
-                    ],
-                    "grouping":{
-                      "grouping":[
-
-                      ],
-                      "aggregations":[
-
-                      ],
-                      "rowExpandedStates":{
-
-                      }
-                    },
-                    "treeView":{
-
-                    },
-                    "pagination":{
-                      "paginationCurrentPage":1,
-                      "paginationPageSize":250
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
                     }
                   },
-                  "tableColumnTypeState":{
-                    "names":{
-                      "AvgTicketPrice":"string",
-                      "Cancelled":"string",
-                      "Carrier":"string",
-                      "Dest":"string",
-                      "DestAirportID":"string",
-                      "DestCityName":"string",
-                      "DestCountry":"string",
-                      "DestLocation.lat":"string",
-                      "DestLocation.lon":"string",
-                      "DestRegion":"string",
-                      "DestWeather":"string",
-                      "DistanceKilometers":"string",
-                      "DistanceMiles":"string",
-                      "FlightDelay":"string",
-                      "FlightDelayMin":"string",
-                      "FlightDelayType":"string",
-                      "FlightNum":"string",
-                      "FlightTimeHour":"string",
-                      "FlightTimeMin":"string",
-                      "Origin":"string",
-                      "OriginAirportID":"string",
-                      "OriginCityName":"string",
-                      "OriginCountry":"string",
-                      "OriginLocation.lat":"string",
-                      "OriginLocation.lon":"string",
-                      "OriginRegion":"string",
-                      "OriginWeather":"string",
-                      "dayOfWeek":"string",
-                      "timestamp":"string"
+                  "tableColumnTypeState": {
+                    "names": {
+                      "AvgTicketPrice": "string",
+                      "Cancelled": "string",
+                      "Carrier": "string",
+                      "Dest": "string",
+                      "DestAirportID": "string",
+                      "DestCityName": "string",
+                      "DestCountry": "string",
+                      "DestLocation.lat": "string",
+                      "DestLocation.lon": "string",
+                      "DestRegion": "string",
+                      "DestWeather": "string",
+                      "DistanceKilometers": "string",
+                      "DistanceMiles": "string",
+                      "FlightDelay": "string",
+                      "FlightDelayMin": "string",
+                      "FlightDelayType": "string",
+                      "FlightNum": "string",
+                      "FlightTimeHour": "string",
+                      "FlightTimeMin": "string",
+                      "Origin": "string",
+                      "OriginAirportID": "string",
+                      "OriginCityName": "string",
+                      "OriginCountry": "string",
+                      "OriginLocation.lat": "string",
+                      "OriginLocation.lon": "string",
+                      "OriginRegion": "string",
+                      "OriginWeather": "string",
+                      "dayOfWeek": "string",
+                      "timestamp": "string"
                     },
-                    "updated":false
+                    "updated": false
                   },
-                  "tableOptionSpecHash":"[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
-                  "tableOptionValue":{
-                    "useFilter":false,
-                    "showPagination":true,
-                    "showAggregationFooter":true
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": true,
+                    "showAggregationFooter": true
                   },
-                  "updated":false,
-                  "initialized":false
+                  "updated": false,
+                  "initialized": false
                 }
               },
-              "commonSetting":{
-
-              }
+              "commonSetting": {}
             }
           }
         },
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TABLE",
-            "data":"AvgTicketPrice\tCancelled\tCarrier\tDest\tDestAirportID\tDestCityName\tDestCountry\tDestLocation.lat\tDestLocation.lon\tDestRegion\tDestWeather\tDistanceKilometers\tDistanceMiles\tFlightDelay\tFlightDelayMin\tFlightDelayType\tFlightNum\tFlightTimeHour\tFlightTimeMin\tOrigin\tOriginAirportID\tOriginCityName\tOriginCountry\tOriginLocation.lat\tOriginLocation.lon\tOriginRegion\tOriginWeather\tdayOfWeek\ttimestamp\n1085.055759169954\tfalse\tES-Air\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tClear\t1108.748925312635\t688.9446416133748\ttrue\t120\tLate Aircraft Delay\tN2A49U9\t2.8799594645338376\t172.79756787203024\tBarcelona International Airport\tBCN\tBarcelona\tES\t41.29710007\t2.078459978\tES-CT\tCloudy\t5\t2019-11-23T14:23:43\n723.0061145053526\ttrue\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tSunny\t231.35003515881962\t143.75424717078488\tfalse\t0\tNo Delay\t2R4CA85\t0.2570555946209107\t15.423335677254641\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tDamaging Wind\t5\t2019-11-23T15:45:26\n502.53132599374777\tfalse\tLogstash Airways\tSavannah Hilton Head International Airport\tSAV\tSavannah\tUS\t32.12760162\t-81.20210266\tUS-GA\tHail\t7582.480473832723\t4711.534932141743\tfalse\t0\tNo Delay\tEN8RCH6\t9.02676246884848\t541.6057481309088\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tThunder & Lightning\t5\t2019-11-23T12:31:29\n908.4870487600645\ttrue\tKibana Airlines\tMontreal / Pierre Elliott Trudeau International Airport\tYUL\tMontreal\tCA\t45.47060013\t-73.74079895\tCA-QC\tHeavy Fog\t5261.14701710131\t3269.125194552134\tfalse\t0\tNo Delay\tS3KPMTO\t6.26327025845394\t375.7962155072364\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tThunder & Lightning\t5\t2019-11-23T21:08:26\n1084.3377752722456\ttrue\tES-Air\tPortland International Airport\tPDX\tPortland\tUS\t45.58869934\t-122.5979996\tUS-OR\tDamaging Wind\t8870.432810933436\t5511.831411390875\tfalse\t0\tNo Delay\tP7WVTQT\t9.856036456592706\t591.3621873955624\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tCloudy\t5\t2019-11-23T02:53:51\n608.5614816651618\tfalse\tLogstash Airways\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tCloudy\t10371.918108155287\t6444.811120652444\tfalse\t0\tNo Delay\t3OPO9MP\t15.71502743659892\t942.9016461959352\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tSE-BD\tCloudy\t5\t2019-11-23T18:27:41\n1023.7468789874282\tfalse\tKibana Airlines\tLondon Luton Airport\tLTN\tLondon\tGB\t51.87469864\t-0.368333012\tGB-ENG\tCloudy\t7214.987846105365\t4483.1855999123645\ttrue\t30\tCarrier Delay\tN8F49WC\t6.226180830242353\t373.5708498145412\tChhatrapati Shivaji International Airport\tBOM\tMumbai\tIN\t19.08869934\t72.86789703\tSE-BD\tCloudy\t5\t2019-11-23T01:28:25\n647.2586102403212\tfalse\tJetBeats\tXi'an Xianyang International Airport\tXIY\tXi'an\tCN\t34.447102\t108.751999\tSE-BD\tDamaging Wind\t7822.173498884659\t4860.473272889239\tfalse\t0\tNo Delay\tRY0U76Z\t8.691303887649621\t521.4782332589773\tVenice Marco Polo Airport\tVE05\tVenice\tIT\t45.505299\t12.3519\tIT-34\tThunder & Lightning\t5\t2019-11-23T23:41:39\n327.2798877815482\tfalse\tKibana Airlines\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tThunder & Lightning\t3925.8377772068707\t2439.4025001533983\tfalse\t0\tNo Delay\tWJGVKE3\t5.033125355393424\t301.98752132360545\tOrlando Sanford International Airport\tSFB\tOrlando\tUS\t28.77759933\t-81.23750305\tUS-FL\tSunny\t5\t2019-11-23T13:30:24\n367.6847601818417\tfalse\tKibana Airlines\tSpokane International Airport\tGEG\tSpokane\tUS\t47.61989975\t-117.5339966\tUS-WA\tSunny\t1520.645084498816\t944.8850491248706\ttrue\t150\tLate Aircraft Delay\tKM7V7TR\t4.804007703786085\t288.2404622271651\tLos Angeles International Airport\tLAX\tLos Angeles\tUS\t33.94250107\t-118.4079971\tUS-CA\tCloudy\t5\t2019-11-23T20:55:23\n392.8302313692208\tfalse\tES-Air\tWarsaw Chopin Airport\tWAW\tWarsaw\tPL\t52.16569901\t20.96710014\tPL-MZ\tRain\t0\t0\tfalse\t0\tNo Delay\tLCFA22Z\t0\t0\tWarsaw Chopin Airport\tWAW\tWarsaw\tPL\t52.16569901\t20.96710014\tPL-MZ\tCloudy\t5\t2019-11-23T23:37:03\n281.4666880622766\tfalse\tJetBeats\tRajiv Gandhi International Airport\tHYD\tHyderabad\tIN\t17.23131752\t78.42985535\tSE-BD\tClear\t0\t0\ttrue\t150\tNAS Delay\tXA208F6\t2.5\t150\tRajiv Gandhi International Airport\tHYD\tHyderabad\tIN\t17.23131752\t78.42985535\tSE-BD\tCloudy\t5\t2019-11-23T17:35:14\n806.7657793122346\tfalse\tJetBeats\tTucson International Airport\tTUS\tTucson\tUS\t32.11610031\t-110.9410019\tUS-AZ\tSunny\t9506.814906723199\t5907.260912970252\tfalse\t0\tNo Delay\tCXUNLAV\t8.339311321687017\t500.358679301221\tTokyo Haneda International Airport\tHND\tTokyo\tJP\t35.552299\t139.779999\tSE-BD\tRain\t5\t2019-11-23T21:33:34\n870.9251271997441\tfalse\tES-Air\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tRain\t2072.558783121038\t1287.8283220498772\tfalse\t0\tNo Delay\tXWIJXIZ\t2.1589153990844143\t129.53492394506486\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tSunny\t5\t2019-11-23T20:38:55\n599.3835525987554\tfalse\tES-Air\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tHail\t6609.346596144037\t4106.857574355785\tfalse\t0\tNo Delay\tHQKN412\t5.507788830120031\t330.46732980720185\tOttawa Macdonald-Cartier International Airport\tYOW\tOttawa\tCA\t45.32249832\t-75.66919708\tCA-ON\tHail\t5\t2019-11-23T16:46:34\n769.0048183599122\ttrue\tJetBeats\tChicago Midway International Airport\tMDW\tChicago\tUS\t41.7859993\t-87.75240326\tUS-IL\tThunder & Lightning\t6762.714324124596\t4202.155862341796\tfalse\t0\tNo Delay\tCZXH828\t7.514127026805107\t450.8476216083064\tAdolfo Suarez Madrid— Barajas Airport\tMAD\tMadrid\tES\t40.471926\t-3.56264\tES-M\tCloudy\t5\t2019-11-23T05:26:30\n1089.188046468335\tfalse\tLogstash Airways\tPortland International Jetport Airport\tPWM\tPortland\tUS\t43.64619827\t-70.30930328\tUS-ME\tClear\t5948.144423152062\t3696.0055918138455\ttrue\t360\tCarrier Delay\tZP64NB4\t10.956787019293385\t657.4072211576031\tBerlin-Tegel Airport\tTXL\tBerlin\tDE\t52.5597\t13.2877\tDE-BE\tClear\t5\t2019-11-23T05:32:51\n839.6732082472579\tfalse\tES-Air\tNaples International Airport\tNA01\tNaples\tIT\t40.886002\t14.2908\tIT-72\tCloudy\t10244.079317830227\t6365.375779093983\tfalse\t0\tNo Delay\tLL04C7H\t10.670915956073152\t640.2549573643892\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tEC-P\tHeavy Fog\t5\t2019-11-23T11:35:20\n1128.9312077660675\tfalse\tJetBeats\tFrankfurt am Main Airport\tFRA\tFrankfurt am Main\tDE\t50.033333\t8.570556\tDE-HE\tSunny\t1489.607799271252\t925.599374199209\tfalse\t0\tNo Delay\tRW22A3J\t1.3792664808067145\t82.75598884840288\tCatania-Fontanarossa Airport\tCT03\tCatania\tIT\t37.466801\t15.0664\tIT-82\tThunder & Lightning\t5\t2019-11-23T17:43:43\n658.5080641348046\ttrue\tJetBeats\tLeonardo da Vinci___Fiumicino Airport\tRM11\tRome\tIT\t41.8002778\t12.2388889\tIT-62\tHeavy Fog\t7823.4202223315315\t4861.247950923812\tfalse\t0\tNo Delay\tK89VSU6\t9.313595502775632\t558.815730166538\tChicago Rockford International Airport\tRFD\tChicago/Rockford\tUS\t42.19540024\t-89.09719849\tUS-IL\tSunny\t5\t2019-11-23T17:43:43\n1195.3363155125162\tfalse\tKibana Airlines\tTurin Airport\tTO11\tTorino\tIT\t45.200802\t7.64963\tIT-21\tCloudy\t6084.005730187727\t3780.425894145519\tfalse\t0\tNo Delay\tLGPDV8J\t8.450007958594066\t507.0004775156439\tMontreal / Pierre Elliott Trudeau International Airport\tYUL\tMontreal\tCA\t45.47060013\t-73.74079895\tCA-QC\tClear\t5\t2019-11-23T14:56:36\n1083.4604775401094\ttrue\tES-Air\tOR Tambo International Airport\tJNB\tJohannesburg\tZA\t-26.1392\t28.246\tSE-BD\tRain\t8156.660697109297\t5068.3139820382075\ttrue\t315\tWeather Delay\t4P9QM92\t13.246726173636565\t794.8035704181939\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tHeavy Fog\t5\t2019-11-23T20:33:13\n493.94257726200476\tfalse\tES-Air\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tSunny\t2984.593135246927\t1854.5401947917455\tfalse\t0\tNo Delay\t7O5DDBP\t2.6180641537253746\t157.08384922352246\tChicago Midway International Airport\tMDW\tChicago\tUS\t41.7859993\t-87.75240326\tUS-IL\tSunny\t5\t2019-11-23T03:18:45\n1122.3138416780791\ttrue\tKibana Airlines\tGuangzhou Baiyun International Airport\tCAN\tGuangzhou\tCN\t23.39240074\t113.2990036\tSE-BD\tSunny\t9085.152701935163\t5645.2521660596885\tfalse\t0\tNo Delay\tPQ57NT5\t10.094614113261292\t605.6768467956775\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tThunder & Lightning\t5\t2019-11-23T16:38:55\n1017.8445480872658\tfalse\tES-Air\tAmsterdam Airport Schiphol\tAMS\tAmsterdam\tNL\t52.30860138\t4.76388979\tNL-NH\tClear\t5190.648154316156\t3225.319232131947\tfalse\t0\tNo Delay\tT49CZ18\t5.406925160745996\t324.41550964475977\tAl Maktoum International Airport\tDWC\tJebel Ali\tAE\t24.896356\t55.161389\tSE-BD\tThunder & Lightning\t5\t2019-11-23T01:43:11\n703.622004468903\tfalse\tJetBeats\tJackson-Medgar Wiley Evers International Airport\tJAN\tJackson\tUS\t32.31119919\t-90.07589722\tUS-MS\tSunny\t12659.767627817202\t7866.4149043443795\ttrue\t345\tLate Aircraft Delay\tZ3CUXHD\t16.85505932264667\t1011.3035593588002\tDubai International Airport\tDXB\tDubai\tAE\t25.25279999\t55.36439896\tSE-BD\tClear\t5\t2019-11-23T23:45:55\n1087.3430438882745\tfalse\tJetBeats\tPisa International Airport\tPI05\tPisa\tIT\t43.683899\t10.3927\tIT-52\tSunny\t9212.494420503683\t5724.37864154816\ttrue\t105\tWeather Delay\tR16ES6B\t10.78185727500361\t646.9114365002166\tEl Dorado International Airport\tBOG\tBogota\tCO\t4.70159\t-74.1469\tSE-BD\tHeavy Fog\t5\t2019-11-23T22:36:56\n802.4779186493154\tfalse\tES-Air\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tClear\t5993.979724960743\t3724.4863279452634\tfalse\t0\tNo Delay\tN2231OJ\t4.9949831041339525\t299.69898624803716\tOttawa Macdonald-Cartier International Airport\tYOW\tOttawa\tCA\t45.32249832\t-75.66919708\tCA-ON\tClear\t5\t2019-11-23T16:25:30\n746.3298479454032\tfalse\tLogstash Airways\tLicenciado Benito Juarez International Airport\tAICM\tMexico City\tMX\t19.4363\t-99.072098\tMX-DIF\tCloudy\t12454.945063600077\t7739.144063419676\tfalse\t0\tNo Delay\tV9P3LEP\t12.973901107916747\t778.4340664750048\tBeijing Capital International Airport\tPEK\tBeijing\tCN\t40.08010101\t116.5849991\tSE-BD\tSunny\t5\t2019-11-23T05:26:36\n690.4551743692057\ttrue\tLogstash Airways\tMalpensa International Airport\tMI12\tMilan\tIT\t45.6306\t8.72811\tIT-25\tHail\t6629.7566175584225\t4119.539773695631\tfalse\t0\tNo Delay\tAI0BW1Y\t9.207995302164475\t552.4797181298685\tLester B. Pearson International Airport\tYYZ\tToronto\tCA\t43.67720032\t-79.63059998\tCA-ON\tSunny\t5\t2019-11-23T14:11:09\n679.8190266203319\tfalse\tLogstash Airways\tVenice Marco Polo Airport\tVE05\tVenice\tIT\t45.505299\t12.3519\tIT-34\tClear\t1125.122504577908\t699.1187120826299\tfalse\t0\tNo Delay\tSXLJ3YS\t1.172002608935321\t70.32015653611926\tCopenhagen Kastrup Airport\tCPH\tCopenhagen\tDK\t55.61790085\t12.65600014\tDK-84\tRain\t5\t2019-11-23T12:08:35\n321.8432292482904\tfalse\tKibana Airlines\tVerona Villafranca Airport\tVR10\tVerona\tIT\t45.395699\t10.8885\tIT-34\tCloudy\t254.95049641847663\t158.41889392104895\tfalse\t0\tNo Delay\tSGWTPCI\t0.24995146707693788\t14.997088024616273\tTurin Airport\tTO11\tTorino\tIT\t45.200802\t7.64963\tIT-21\tHeavy Fog\t5\t2019-11-23T21:12:25\n842.3204093323304\tfalse\tJetBeats\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tSunny\t7436.235597749964\t4620.662579131598\tfalse\t0\tNo Delay\tVK3YXHJ\t8.26248399749996\t495.7490398499976\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tDamaging Wind\t5\t2019-11-23T14:25:41\n626.8760624629406\tfalse\tES-Air\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tClear\t7426.368101907524\t4614.531201475585\ttrue\t75\tCarrier Delay\tTNCKK81\t8.126266761025486\t487.5760056615291\tTreviso-Sant'Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tHail\t5\t2019-11-23T08:15:06\n1028.3575673252506\tfalse\tJetBeats\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tSunny\t9272.935609622278\t5761.935055291024\ttrue\t240\tLate Aircraft Delay\t5EKI6QP\t15.03920905907414\t902.3525435444484\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tRain\t5\t2019-11-23T19:36:28\n947.7839621219331\ttrue\tLogstash Airways\tBeijing Capital International Airport\tPEK\tBeijing\tCN\t40.08010101\t116.5849991\tSE-BD\tThunder & Lightning\t7916.667638444717\t4919.189209047113\ttrue\t135\tLate Aircraft Delay\tLJZ4FYE\t8.533069554321205\t511.98417325927227\tBari Karol Wojty__a Airport\tBA02\tBari\tIT\t41.138901\t16.760599\tIT-75\tSunny\t5\t2019-11-23T07:48:59\n1113.6247619837657\tfalse\tJetBeats\tTreviso-Sant'Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tHeavy Fog\t7087.384741310961\t4403.896706553081\tfalse\t0\tNo Delay\t8IX23WG\t5.906153951092467\t354.369237065548\tNorfolk International Airport\tORF\tNorfolk\tUS\t36.89459991\t-76.20120239\tUS-VA\tSunny\t5\t2019-11-23T22:41:48\n498.47119464013116\tfalse\tKibana Airlines\tTreviso-Sant'Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tClear\t0\t0\tfalse\t0\tNo Delay\tYZOOP32\t0\t0\tTreviso-Sant'Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tClear\t5\t2019-11-23T00:55:41\n1013.2721148334643\tfalse\tLogstash Airways\tKansai International Airport\tKIX\tOsaka\tJP\t34.4272995\t135.2440033\tSE-BD\tSunny\t11178.61953805324\t6946.072149927697\tfalse\t0\tNo Delay\tBLXF0IC\t14.331563510324667\t859.8938106194801\tJohn F Kennedy International Airport\tJFK\tNew York\tUS\t40.63980103\t-73.77890015\tUS-NY\tRain\t5\t2019-11-23T23:06:53\n1022.1109533594071\ttrue\tJetBeats\tShanghai Hongqiao International Airport\tSHA\tShanghai\tCN\t31.19790077\t121.3359985\tSE-BD\tClear\t9233.292282376244\t5737.3018337759\tfalse\t0\tNo Delay\tZPV8PFO\t9.052247335662985\t543.134840139779\tLondon Heathrow Airport\tLHR\tLondon\tGB\t51.4706\t-0.461941\tGB-ENG\tThunder & Lightning\t5\t2019-11-23T11:19:39\n1026.1449554460764\tfalse\tJetBeats\tWarsaw Chopin Airport\tWAW\tWarsaw\tPL\t52.16569901\t20.96710014\tPL-MZ\tClear\t7734.825896124278\t4806.197988822947\tfalse\t0\tNo Delay\tU12WLZU\t6.138750711209744\t368.3250426725847\tCharlotte Douglas International Airport\tCLT\tCharlotte\tUS\t35.2140007\t-80.94309998\tUS-NC\tThunder & Lightning\t5\t2019-11-23T07:43:41\n575.1934604637698\tfalse\tES-Air\tRichmond International Airport\tRIC\tRichmond\tUS\t37.50519943\t-77.31970215\tUS-VA\tClear\t6665.471849106242\t4141.732189703533\tfalse\t0\tNo Delay\tHIXO33O\t7.935085534650288\t476.1051320790173\tFrankfurt am Main Airport\tFRA\tFrankfurt am Main\tDE\t50.033333\t8.570556\tDE-HE\tHeavy Fog\t5\t2019-11-23T08:37:20\n1151.2852416116089\tfalse\tLogstash Airways\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tCloudy\t588.8606669636415\t365.90105469286954\tfalse\t0\tNo Delay\tPJG3ERI\t0.6542896299596016\t39.2573777975761\tIl Caravaggio International Airport\tBG01\tBergamo\tIT\t45.673901\t9.70417\tIT-25\tCloudy\t5\t2019-11-23T22:32:55\n509.86647384950754\tfalse\tLogstash Airways\tIl Caravaggio International Airport\tBG01\tBergamo\tIT\t45.673901\t9.70417\tIT-25\tDamaging Wind\t7789.731947226773\t4840.3150272575485\tfalse\t0\tNo Delay\t9NTQEZV\t6.83309819932173\t409.98589195930384\tEdmonton International Airport\tCYEG\tEdmonton\tCA\t53.30970001\t-113.5800018\tCA-AB\tClear\t5\t2019-11-23T02:17:41\n739.5838393318152\tfalse\tES-Air\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tClear\t7542.910010376165\t4686.946986086358\tfalse\t0\tNo Delay\tBG7F3YT\t6.616587728400145\t396.99526370400866\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tThunder & Lightning\t5\t2019-11-23T02:17:41\n369.96781404416157\tfalse\tES-Air\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tClear\t45.11814082012012\t28.03511295292996\tfalse\t0\tNo Delay\t6MZAPVF\t0.035808048269936596\t2.148482896196196\tShanghai Hongqiao International Airport\tSHA\tShanghai\tCN\t31.19790077\t121.3359985\tSE-BD\tDamaging Wind\t5\t2019-11-23T23:00:13\n295.3729162656206\tfalse\tES-Air\tMalpensa International Airport\tMI12\tMilan\tIT\t45.6306\t8.72811\tIT-25\tDamaging Wind\t510.91923079564344\t317.4704915764705\tfalse\t0\tNo Delay\tTY2HO91\t0.7741200466600658\t46.44720279960395\tLeonardo da Vinci - Fiumicino Airport\tFCO\tRome\tIT\t41.8002778\t12.2388889\tSE-BD\tRain\t5\t2019-11-23T01:23:09\n620.1264436579359\ttrue\tKibana Airlines\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tCloudy\t4987.283446870737\t3098.95426140759\tfalse\t0\tNo Delay\tBHRTWZZ\t6.393953137013765\t383.6371882208259\tAl Maktoum International Airport\tDWC\tJebel Ali\tAE\t24.896356\t55.161389\tSE-BD\tDamaging Wind\t5\t2019-11-23T17:16:38\n750.0888479320791\tfalse\tES-Air\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tDamaging Wind\t9399.162306680464\t5840.3686885342495\tfalse\t0\tNo Delay\tHYE5RVB\t9.214865006549475\t552.8919003929685\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tHeavy Fog\t5\t2019-11-23T17:16:38\n508.293526109741\tfalse\tKibana Airlines\tMontreal / Pierre Elliott Trudeau International Airport\tYUL\tMontreal\tCA\t45.47060013\t-73.74079895\tCA-QC\tRain\t15444.601759186087\t9596.830608736283\ttrue\t135\tWeather Delay\tV1VJB3G\t16.55055718443156\t993.0334310658938\tBrisbane International Airport\tBNE\tBrisbane\tAU\t-27.38419914\t153.1170044\tSE-BD\tDamaging Wind\t5\t2019-11-23T09:15:32\n559.6175435279979\tfalse\tJetBeats\tCopenhagen Kastrup Airport\tCPH\tCopenhagen\tDK\t55.61790085\t12.65600014\tDK-84\tClear\t6415.105005271914\t3986.1614454534974\tfalse\t0\tNo Delay\tRRDC6QI\t9.719856068593808\t583.1913641156285\tChhatrapati Shivaji International Airport\tBOM\tMumbai\tIN\t19.08869934\t72.86789703\tSE-BD\tCloudy\t5\t2019-11-23T10:03:34\n799.6878966634878\tfalse\tKibana Airlines\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tHail\t5829.911945822345\t3622.5393364143056\tfalse\t0\tNo Delay\tVLJP0K8\t6.477679939802605\t388.6607963881563\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tSE-BD\tRain\t5\t2019-11-23T13:48:47\n635.6799648579079\tfalse\tES-Air\tUkrainka Air Base\tXHBU\tBelogorsk\tRU\t51.169997\t128.445007\tRU-AMU\tCloudy\t5784.156282207905\t3594.1080851625907\tfalse\t0\tNo Delay\tZU9L9CQ\t5.670741453145005\t340.2444871887003\tRajiv Gandhi International Airport\tHYD\tHyderabad\tIN\t17.23131752\t78.42985535\tSE-BD\tClear\t5\t2019-11-23T12:04:03\n900.7175991285576\tfalse\tJetBeats\tPisa International Airport\tPI05\tPisa\tIT\t43.683899\t10.3927\tIT-52\tCloudy\t15520.385658783523\t9643.920540781537\ttrue\t225\tNAS Delay\tH0JHO2P\t18.966064371356392\t1137.9638622813836\tAdelaide International Airport\tADL\tAdelaide\tAU\t-34.945\t138.531006\tSE-BD\tClear\t5\t2019-11-23T23:20:32\n990.3206046689378\ttrue\tLogstash Airways\tHelsinki Vantaa Airport\tHEL\tHelsinki\tFI\t60.31719971\t24.9633007\tFI-ES\tSunny\t5925.742528879807\t3682.0857000615197\ttrue\t345\tCarrier Delay\tYJNDO9P\t12.80445539152358\t768.2673234914148\tChhatrapati Shivaji International Airport\tBOM\tMumbai\tIN\t19.08869934\t72.86789703\tSE-BD\tHail\t5\t2019-11-23T13:02:38\n555.0523269981645\tfalse\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tClear\t694.0061030093568\t431.23539964691\tfalse\t0\tNo Delay\tGTYX4GX\t0.5507984944518705\t33.04790966711223\tLeonardo da Vinci - Fiumicino Airport\tFCO\tRome\tIT\t41.8002778\t12.2388889\tSE-BD\tHeavy Fog\t5\t2019-11-23T13:02:38\n515.1258472803363\tfalse\tJetBeats\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tRain\t7488.60895970106\t4653.205877488628\tfalse\t0\tNo Delay\tOGSVOQL\t7.341773489903\t440.50640939417997\tLester B. Pearson International Airport\tYYZ\tToronto\tCA\t43.67720032\t-79.63059998\tCA-ON\tHail\t5\t2019-11-23T13:02:38\n924.5695288183703\tfalse\tJetBeats\tFrankfurt am Main Airport\tFRA\tFrankfurt am Main\tDE\t50.033333\t8.570556\tDE-HE\tRain\t9089.635878126865\t5648.037882594936\tfalse\t0\tNo Delay\t1J0WGJW\t10.099595420140961\t605.9757252084577\tEl Dorado International Airport\tBOG\tBogota\tCO\t4.70159\t-74.1469\tSE-BD\tSunny\t5\t2019-11-23T23:47:21\n1136.933988695569\tfalse\tLogstash Airways\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tClear\t6793.109023895527\t4221.042253176155\ttrue\t345\tNAS Delay\tBJSZW8R\t12.409910807740713\t744.5946484644428\tSyracuse Hancock International Airport\tSYR\tSyracuse\tUS\t43.11119843\t-76.10630035\tUS-NY\tSunny\t5\t2019-11-23T09:52:48\n862.9185477108235\tfalse\tKibana Airlines\tNew Chitose Airport\tCTS\tChitose / Tomakomai\tJP\t42.77519989\t141.6920013\tSE-BD\tCloudy\t7864.352746578924\t4886.682242316698\tfalse\t0\tNo Delay\tH19SQP5\t6.898555040858706\t413.9133024515223\tDubai International Airport\tDXB\tDubai\tAE\t25.25279999\t55.36439896\tSE-BD\tHail\t5\t2019-11-23T09:52:48\n909.5567658739699\ttrue\tES-Air\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tThunder & Lightning\t11354.741708554164\t7055.509392991283\tfalse\t0\tNo Delay\t6QUXPAP\t9.462284757128469\t567.7370854277082\tOttawa Macdonald-Cartier International Airport\tYOW\tOttawa\tCA\t45.32249832\t-75.66919708\tCA-ON\tCloudy\t5\t2019-11-23T08:38:17\n1119.8861321694526\tfalse\tES-Air\tSydney Kingsford Smith International Airport\tSYD\tSydney\tAU\t-33.94609833\t151.177002\tSE-BD\tCloudy\t16308.426581069576\t10133.58646819423\tfalse\t0\tNo Delay\tM3MAQEL\t15.988653510852524\t959.3192106511515\tMunich Airport\tMUC\tMunich\tDE\t48.353802\t11.7861\tDE-BY\tClear\t5\t2019-11-23T20:15:34\n745.9841243857696\tfalse\tJetBeats\tVerona Villafranca Airport\tVR10\tVerona\tIT\t45.395699\t10.8885\tIT-34\tRain\t9678.089496288638\t6013.68600888849\tfalse\t0\tNo Delay\tN02MCVF\t9.488323035577094\t569.2993821346257\tTokyo Haneda International Airport\tHND\tTokyo\tJP\t35.552299\t139.779999\tSE-BD\tThunder & Lightning\t5\t2019-11-23T07:20:16\n1153.5126402910191\ttrue\tLogstash Airways\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tClear\t9131.823450930926\t5674.252025005794\tfalse\t0\tNo Delay\tLSTKRRH\t8.455392084195301\t507.3235250517181\tLuis Munoz Marin International Airport\tSJU\tSan Juan\tPR\t18.43939972\t-66.00180054\tPR-U-A\tThunder & Lightning\t5\t2019-11-23T05:33:31\n1167.1842544261626\tfalse\tKibana Airlines\tXi'an Xianyang International Airport\tXIY\tXi'an\tCN\t34.447102\t108.751999\tSE-BD\tDamaging Wind\t10316.155866415009\t6410.16207002046\tfalse\t0\tNo Delay\t73MLPIL\t14.327994258909735\t859.6796555345841\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tClear\t5\t2019-11-23T18:45:48\n622.029310050951\tfalse\tJetBeats\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tHeavy Fog\t6646.597098428314\t4130.003963371606\tfalse\t0\tNo Delay\tAVA2W8U\t9.231384858928214\t553.8830915356929\tPittsburgh International Airport\tPIT\tPittsburgh\tUS\t40.49150085\t-80.23290253\tUS-PA\tHail\t5\t2019-11-23T14:55:54\n300.48242590011864\ttrue\tES-Air\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tHeavy Fog\t0\t0\tfalse\t0\tNo Delay\tX2HB4U3\t0\t0\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tClear\t5\t2019-11-23T09:38:34\n678.4953214603203\ttrue\tJetBeats\tMiami International Airport\tMIA\tMiami\tUS\t25.79319954\t-80.29060364\tUS-FL\tDamaging Wind\t1984.9346386787522\t1233.381202948998\tfalse\t0\tNo Delay\tI25YFMC\t3.0074767252708363\t180.4486035162502\tLester B. Pearson International Airport\tYYZ\tToronto\tCA\t43.67720032\t-79.63059998\tCA-ON\tClear\t5\t2019-11-23T16:31:13\n1041.5794809903948\tfalse\tES-Air\tDublin Airport\tDUB\tDublin\tIE\t53.42129898\t-6.270070076\tIE-D\tCloudy\t6783.657852285002\t4215.169567404484\tfalse\t0\tNo Delay\tU89PHXT\t8.075783157482146\t484.54698944892874\tBillings Logan International Airport\tBIL\tBillings\tUS\t45.80770111\t-108.5429993\tUS-MT\tCloudy\t5\t2019-11-23T00:35:19\n568.211219582184\tfalse\tJetBeats\tXi'an Xianyang International Airport\tXIY\tXi'an\tCN\t34.447102\t108.751999\tSE-BD\tRain\t1628.8575162205964\t1012.1251368387344\tfalse\t0\tNo Delay\tQ1APH10\t2.4679659336675703\t148.07795602005422\tIncheon International Airport\tICN\tSeoul\tKR\t37.46910095\t126.4509964\tSE-BD\tClear\t5\t2019-11-23T00:23:13\n370.2882350253934\tfalse\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tCloudy\t0\t0\tfalse\t0\tNo Delay\t34N82FN\t0\t0\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tHail\t5\t2019-11-23T17:25:14\n587.9588078119461\tfalse\tES-Air\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tEC-P\tCloudy\t4737.430076316423\t2943.7025746617396\tfalse\t0\tNo Delay\t21NN33Q\t6.579763994883921\t394.78583969303526\tChicago Midway International Airport\tMDW\tChicago\tUS\t41.7859993\t-87.75240326\tUS-IL\tSunny\t5\t2019-11-23T11:22:58\n1024.9183558887564\tfalse\tKibana Airlines\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tSunny\t10249.242700026725\t6368.584156045397\tfalse\t0\tNo Delay\t3DSZSYE\t9.490039537061783\t569.402372223707\tShanghai Hongqiao International Airport\tSHA\tShanghai\tCN\t31.19790077\t121.3359985\tSE-BD\tCloudy\t5\t2019-11-23T10:52:28\n610.075677579494\tfalse\tKibana Airlines\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tSunny\t6641.470312989073\t4126.81832659088\tfalse\t0\tNo Delay\tUEGA63R\t10.062833807559201\t603.7700284535521\tDetroit Metropolitan Wayne County Airport\tDTW\tDetroit\tUS\t42.21239853\t-83.35340118\tUS-MI\tCloudy\t5\t2019-11-23T12:47:17\n693.418491908601\tfalse\tJetBeats\tOR Tambo International Airport\tJNB\tJohannesburg\tZA\t-26.1392\t28.246\tSE-BD\tClear\t7508.848819542246\t4665.782343328863\tfalse\t0\tNo Delay\tR4BIRBF\t5.959403825033529\t357.5642295020117\tCagliari Elmas Airport\tCA07\tCagliari\tIT\t39.251499\t9.05428\tIT-88\tHeavy Fog\t5\t2019-11-23T02:22:58\n602.5246213886967\tfalse\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tThunder & Lightning\t9498.14738567995\t5901.875165085867\tfalse\t0\tNo Delay\tEIFJNY4\t8.331708233052588\t499.90249398315524\tKansai International Airport\tKIX\tOsaka\tJP\t34.4272995\t135.2440033\tSE-BD\tSunny\t5\t2019-11-23T21:27:50\n866.6428371210072\tfalse\tLogstash Airways\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tCloudy\t2264.78763216076\t1407.2737911601\tfalse\t0\tNo Delay\t9BEQGI2\t2.696175752572333\t161.77054515434\tSan Antonio International Airport\tSAT\tSan Antonio\tUS\t29.53370094\t-98.46980286\tUS-TX\tCloudy\t5\t2019-11-23T03:08:59\n655.4115715601646\tfalse\tLogstash Airways\tKing Shaka International Airport\tDUR\tDurban\tZA\t-29.61444444\t31.11972222\tSE-BD\tHail\t9159.927522887247\t5691.715085704017\tfalse\t0\tNo Delay\tNWFJU03\t8.481414373043746\t508.8848623826248\tCharles de Gaulle International Airport\tCDG\tParis\tFR\t49.01279831\t2.549999952\tFR-J\tHeavy Fog\t5\t2019-11-23T13:42:02\n797.9192565871901\tfalse\tES-Air\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tHeavy Fog\t9396.70214523572\t5838.840015084233\tfalse\t0\tNo Delay\tSI0CJ0G\t8.700650134477518\t522.0390080686511\tJeju International Airport\tCJU\tJeju City\tKR\t33.51129913\t126.4929962\tSE-BD\tRain\t5\t2019-11-23T10:26:23\n646.3222272808637\tfalse\tJetBeats\tCopenhagen Kastrup Airport\tCPH\tCopenhagen\tDK\t55.61790085\t12.65600014\tDK-84\tDamaging Wind\t4856.949002792603\t3017.96819250117\tfalse\t0\tNo Delay\tV9K5A0W\t4.047457502327169\t242.84745013963015\tAbu Dhabi International Airport\tAUH\tAbu Dhabi\tAE\t24.43300056\t54.65110016\tSE-BD\tRain\t5\t2019-11-23T08:05:25\n1199.403468490791\tfalse\tES-Air\tSyracuse Hancock International Airport\tSYR\tSyracuse\tUS\t43.11119843\t-76.10630035\tUS-NY\tRain\t15292.326373841706\t9502.211070996447\tfalse\t0\tNo Delay\t8322YWS\t12.743605311534756\t764.6163186920853\tBrisbane International Airport\tBNE\tBrisbane\tAU\t-27.38419914\t153.1170044\tSE-BD\tCloudy\t5\t2019-11-23T13:47:47\n1156.0533846562653\tfalse\tJetBeats\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tHeavy Fog\t630.498853438977\t391.7738242656492\tfalse\t0\tNo Delay\tX9PF01C\t0.7505938731416393\t45.03563238849836\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tSunny\t5\t2019-11-23T07:14:37\n768.6192289300727\tfalse\tES-Air\tComodoro Arturo Merino Benitez International Airport\tSCL\tSantiago\tCL\t-33.39300156\t-70.78579712\tSE-BD\tClear\t11848.233502497354\t7362.150977353104\tfalse\t0\tNo Delay\tJZ3WYY3\t16.45587986457966\t987.3527918747795\tAdelaide International Airport\tADL\tAdelaide\tAU\t-34.945\t138.531006\tSE-BD\tHeavy Fog\t5\t2019-11-23T04:18:14\n1179.1729743229207\tfalse\tES-Air\tChengdu Shuangliu International Airport\tCTU\tChengdu\tCN\t30.57850075\t103.9469986\tSE-BD\tThunder & Lightning\t8725.716838709335\t5421.9090751942\tfalse\t0\tNo Delay\t6C6CH43\t13.220783088953539\t793.2469853372123\tBarcelona International Airport\tBCN\tBarcelona\tES\t41.29710007\t2.078459978\tES-CT\tSunny\t5\t2019-11-23T23:05:53\n229.25727105370203\tfalse\tES-Air\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tRain\t0\t0\tfalse\t0\tNo Delay\tDARYSJ5\t0\t0\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tClear\t5\t2019-11-23T01:00:51\n519.7705585978445\tfalse\tLogstash Airways\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tSunny\t1182.4378708092847\t734.7328295313399\tfalse\t0\tNo Delay\t00CGX81\t1.2317061154263382\t73.9023669255803\tAdolfo Suarez Madrid— Barajas Airport\tMAD\tMadrid\tES\t40.471926\t-3.56264\tES-M\tSunny\t5\t2019-11-23T15:30:57\n846.284628551176\tfalse\tES-Air\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tHail\t7343.046237132674\t4562.757395020998\ttrue\t300\tWeather Delay\t992GFBG\t11.799116886233957\t707.9470131740375\tItami Airport\tITM\tOsaka\tJP\t34.78549957\t135.4380035\tSE-BD\tRain\t5\t2019-11-23T05:11:59\n1008.1747045573845\tfalse\tJetBeats\tNashville International Airport\tBNA\tNashville\tUS\t36.12450027\t-86.67819977\tUS-TN\tSunny\t5422.86662223493\t3369.6130984021624\tfalse\t0\tNo Delay\tJ7TXAVG\t6.455793597898727\t387.3476158739236\tJorge Chavez International Airport\tLIM\tLima\tPE\t-12.0219\t-77.114304\tSE-BD\tHeavy Fog\t5\t2019-11-23T09:05:37\n1026.0590729113128\ttrue\tJetBeats\tNewport News Williamsburg International Airport\tPHF\tNewport News\tUS\t37.13190079\t-76.49299622\tUS-VA\tHeavy Fog\t6509.934902355788\t4045.086011664248\tfalse\t0\tNo Delay\t8W3UW4Q\t6.781182189953946\t406.87093139723675\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tCloudy\t5\t2019-11-23T01:54:59\n647.4798361983383\tfalse\tKibana Airlines\tNarita International Airport\tNRT\tTokyo\tJP\t35.76470184\t140.3860016\tSE-BD\tClear\t7852.384786015633\t4879.245696392836\ttrue\t90\tCarrier Delay\tPB8BSSH\t8.388056829838273\t503.28340979029645\tEdmonton International Airport\tCYEG\tEdmonton\tCA\t53.30970001\t-113.5800018\tCA-AB\tCloudy\t5\t2019-11-23T02:34:40\n646.3791453439336\tfalse\tKibana Airlines\tJeju International Airport\tCJU\tJeju City\tKR\t33.51129913\t126.4929962\tSE-BD\tDamaging Wind\t2149.7274224549838\t1335.778691476144\tfalse\t0\tNo Delay\tRX7EFNI\t2.239299398390608\t134.35796390343648\tChengdu Shuangliu International Airport\tCTU\tChengdu\tCN\t30.57850075\t103.9469986\tSE-BD\tRain\t5\t2019-11-23T13:37:37\n520.7071005360559\tfalse\tLogstash Airways\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tSunny\t7150.1694661808515\t4442.909325899777\tfalse\t0\tNo Delay\tFYL83DU\t6.2720784791060105\t376.3247087463606\tChicago O'Hare International Airport\tORD\tChicago\tUS\t41.97859955\t-87.90480042\tUS-IL\tDamaging Wind\t5\t2019-11-23T02:23:29\n854.9995034358742\tfalse\tLogstash Airways\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tSE-BD\tHail\t9195.230466636465\t5713.651317950957\tfalse\t0\tNo Delay\tO94R5QW\t10.946702936471983\t656.802176188319\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tCloudy\t5\t2019-11-23T13:06:23\n385.6263584433285\tfalse\tES-Air\tVenice Marco Polo Airport\tVE05\tVenice\tIT\t45.505299\t12.3519\tIT-34\tHeavy Fog\t20.101647355324634\t12.490584583112518\tfalse\t0\tNo Delay\tXFYM3PU\t0.02233516372813848\t1.3401098236883089\tTreviso-Sant'Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tSunny\t5\t2019-11-23T20:38:27\n307.53156284777646\tfalse\tKibana Airlines\tXi'an Xianyang International Airport\tXIY\tXi'an\tCN\t34.447102\t108.751999\tSE-BD\tCloudy\t0\t0\tfalse\t0\tNo Delay\t0KM6BUN\t0\t0\tXi'an Xianyang International Airport\tXIY\tXi'an\tCN\t34.447102\t108.751999\tSE-BD\tRain\t5\t2019-11-23T16:07:57\n740.6134727386188\tfalse\tES-Air\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tCloudy\t15694.775066076032\t9752.281094704445\tfalse\t0\tNo Delay\t7I7QP3D\t23.77996222132732\t1426.7977332796393\tEl Dorado International Airport\tBOG\tBogota\tCO\t4.70159\t-74.1469\tSE-BD\tRain\t5\t2019-11-23T05:44:30\n214.5718770461978\tfalse\tKibana Airlines\tPortland International Airport\tPDX\tPortland\tUS\t45.58869934\t-122.5979996\tUS-OR\tHeavy Fog\t2698.091880980634\t1676.5165688508073\tfalse\t0\tNo Delay\tWOPL4A0\t2.8105123760214936\t168.63074256128962\tChicago Rockford International Airport\tRFD\tChicago/Rockford\tUS\t42.19540024\t-89.09719849\tUS-IL\tSunny\t5\t2019-11-23T04:59:29\n560.8665323557213\tfalse\tJetBeats\tMinistro Pistarini International Airport\tEZE\tBuenos Aires\tAR\t-34.8222\t-58.5358\tSE-BD\tRain\t11098.510103878027\t6896.294455304786\tfalse\t0\tNo Delay\tI0SW4X9\t13.212512028426223\t792.7507217055734\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tHeavy Fog\t5\t2019-11-23T13:45:02\n945.8285935796225\tfalse\tES-Air\tUkrainka Air Base\tXHBU\tBelogorsk\tRU\t51.169997\t128.445007\tRU-AMU\tCloudy\t1958.13674964267\t1216.7297666892039\tfalse\t0\tNo Delay\t4KVIPWK\t2.1757074996029666\t130.542449976178\tTokyo Haneda International Airport\tHND\tTokyo\tJP\t35.552299\t139.779999\tSE-BD\tSunny\t5\t2019-11-23T16:06:10\n1144.0830778553145\tfalse\tKibana Airlines\tLicenciado Benito Juarez International Airport\tAICM\tMexico City\tMX\t19.4363\t-99.072098\tMX-DIF\tThunder & Lightning\t10129.906523853564\t6294.432093979636\tfalse\t0\tNo Delay\tI6UAHKF\t10.551985962347462\t633.1191577408478\tCagliari Elmas Airport\tCA07\tCagliari\tIT\t39.251499\t9.05428\tIT-88\tThunder & Lightning\t5\t2019-11-23T12:24:59\n"
+            "type": "TABLE",
+            "data": "AvgTicketPrice\tCancelled\tCarrier\tDest\tDestAirportID\tDestCityName\tDestCountry\tDestLocation.lat\tDestLocation.lon\tDestRegion\tDestWeather\tDistanceKilometers\tDistanceMiles\tFlightDelay\tFlightDelayMin\tFlightDelayType\tFlightNum\tFlightTimeHour\tFlightTimeMin\tOrigin\tOriginAirportID\tOriginCityName\tOriginCountry\tOriginLocation.lat\tOriginLocation.lon\tOriginRegion\tOriginWeather\tdayOfWeek\ttimestamp\n1085.055759169954\tfalse\tES-Air\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tClear\t1108.748925312635\t688.9446416133748\ttrue\t120\tLate Aircraft Delay\tN2A49U9\t2.8799594645338376\t172.79756787203024\tBarcelona International Airport\tBCN\tBarcelona\tES\t41.29710007\t2.078459978\tES-CT\tCloudy\t5\t2019-11-23T14:23:43\n723.0061145053526\ttrue\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tSunny\t231.35003515881962\t143.75424717078488\tfalse\t0\tNo Delay\t2R4CA85\t0.2570555946209107\t15.423335677254641\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tDamaging Wind\t5\t2019-11-23T15:45:26\n502.53132599374777\tfalse\tLogstash Airways\tSavannah Hilton Head International Airport\tSAV\tSavannah\tUS\t32.12760162\t-81.20210266\tUS-GA\tHail\t7582.480473832723\t4711.534932141743\tfalse\t0\tNo Delay\tEN8RCH6\t9.02676246884848\t541.6057481309088\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tThunder \u0026 Lightning\t5\t2019-11-23T12:31:29\n908.4870487600645\ttrue\tKibana Airlines\tMontreal / Pierre Elliott Trudeau International Airport\tYUL\tMontreal\tCA\t45.47060013\t-73.74079895\tCA-QC\tHeavy Fog\t5261.14701710131\t3269.125194552134\tfalse\t0\tNo Delay\tS3KPMTO\t6.26327025845394\t375.7962155072364\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tThunder \u0026 Lightning\t5\t2019-11-23T21:08:26\n1084.3377752722456\ttrue\tES-Air\tPortland International Airport\tPDX\tPortland\tUS\t45.58869934\t-122.5979996\tUS-OR\tDamaging Wind\t8870.432810933436\t5511.831411390875\tfalse\t0\tNo Delay\tP7WVTQT\t9.856036456592706\t591.3621873955624\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tCloudy\t5\t2019-11-23T02:53:51\n608.5614816651618\tfalse\tLogstash Airways\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tCloudy\t10371.918108155287\t6444.811120652444\tfalse\t0\tNo Delay\t3OPO9MP\t15.71502743659892\t942.9016461959352\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tSE-BD\tCloudy\t5\t2019-11-23T18:27:41\n1023.7468789874282\tfalse\tKibana Airlines\tLondon Luton Airport\tLTN\tLondon\tGB\t51.87469864\t-0.368333012\tGB-ENG\tCloudy\t7214.987846105365\t4483.1855999123645\ttrue\t30\tCarrier Delay\tN8F49WC\t6.226180830242353\t373.5708498145412\tChhatrapati Shivaji International Airport\tBOM\tMumbai\tIN\t19.08869934\t72.86789703\tSE-BD\tCloudy\t5\t2019-11-23T01:28:25\n647.2586102403212\tfalse\tJetBeats\tXi\u0027an Xianyang International Airport\tXIY\tXi\u0027an\tCN\t34.447102\t108.751999\tSE-BD\tDamaging Wind\t7822.173498884659\t4860.473272889239\tfalse\t0\tNo Delay\tRY0U76Z\t8.691303887649621\t521.4782332589773\tVenice Marco Polo Airport\tVE05\tVenice\tIT\t45.505299\t12.3519\tIT-34\tThunder \u0026 Lightning\t5\t2019-11-23T23:41:39\n327.2798877815482\tfalse\tKibana Airlines\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tThunder \u0026 Lightning\t3925.8377772068707\t2439.4025001533983\tfalse\t0\tNo Delay\tWJGVKE3\t5.033125355393424\t301.98752132360545\tOrlando Sanford International Airport\tSFB\tOrlando\tUS\t28.77759933\t-81.23750305\tUS-FL\tSunny\t5\t2019-11-23T13:30:24\n367.6847601818417\tfalse\tKibana Airlines\tSpokane International Airport\tGEG\tSpokane\tUS\t47.61989975\t-117.5339966\tUS-WA\tSunny\t1520.645084498816\t944.8850491248706\ttrue\t150\tLate Aircraft Delay\tKM7V7TR\t4.804007703786085\t288.2404622271651\tLos Angeles International Airport\tLAX\tLos Angeles\tUS\t33.94250107\t-118.4079971\tUS-CA\tCloudy\t5\t2019-11-23T20:55:23\n392.8302313692208\tfalse\tES-Air\tWarsaw Chopin Airport\tWAW\tWarsaw\tPL\t52.16569901\t20.96710014\tPL-MZ\tRain\t0\t0\tfalse\t0\tNo Delay\tLCFA22Z\t0\t0\tWarsaw Chopin Airport\tWAW\tWarsaw\tPL\t52.16569901\t20.96710014\tPL-MZ\tCloudy\t5\t2019-11-23T23:37:03\n281.4666880622766\tfalse\tJetBeats\tRajiv Gandhi International Airport\tHYD\tHyderabad\tIN\t17.23131752\t78.42985535\tSE-BD\tClear\t0\t0\ttrue\t150\tNAS Delay\tXA208F6\t2.5\t150\tRajiv Gandhi International Airport\tHYD\tHyderabad\tIN\t17.23131752\t78.42985535\tSE-BD\tCloudy\t5\t2019-11-23T17:35:14\n806.7657793122346\tfalse\tJetBeats\tTucson International Airport\tTUS\tTucson\tUS\t32.11610031\t-110.9410019\tUS-AZ\tSunny\t9506.814906723199\t5907.260912970252\tfalse\t0\tNo Delay\tCXUNLAV\t8.339311321687017\t500.358679301221\tTokyo Haneda International Airport\tHND\tTokyo\tJP\t35.552299\t139.779999\tSE-BD\tRain\t5\t2019-11-23T21:33:34\n870.9251271997441\tfalse\tES-Air\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tRain\t2072.558783121038\t1287.8283220498772\tfalse\t0\tNo Delay\tXWIJXIZ\t2.1589153990844143\t129.53492394506486\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tSunny\t5\t2019-11-23T20:38:55\n599.3835525987554\tfalse\tES-Air\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tHail\t6609.346596144037\t4106.857574355785\tfalse\t0\tNo Delay\tHQKN412\t5.507788830120031\t330.46732980720185\tOttawa Macdonald-Cartier International Airport\tYOW\tOttawa\tCA\t45.32249832\t-75.66919708\tCA-ON\tHail\t5\t2019-11-23T16:46:34\n769.0048183599122\ttrue\tJetBeats\tChicago Midway International Airport\tMDW\tChicago\tUS\t41.7859993\t-87.75240326\tUS-IL\tThunder \u0026 Lightning\t6762.714324124596\t4202.155862341796\tfalse\t0\tNo Delay\tCZXH828\t7.514127026805107\t450.8476216083064\tAdolfo Suarez Madrid— Barajas Airport\tMAD\tMadrid\tES\t40.471926\t-3.56264\tES-M\tCloudy\t5\t2019-11-23T05:26:30\n1089.188046468335\tfalse\tLogstash Airways\tPortland International Jetport Airport\tPWM\tPortland\tUS\t43.64619827\t-70.30930328\tUS-ME\tClear\t5948.144423152062\t3696.0055918138455\ttrue\t360\tCarrier Delay\tZP64NB4\t10.956787019293385\t657.4072211576031\tBerlin-Tegel Airport\tTXL\tBerlin\tDE\t52.5597\t13.2877\tDE-BE\tClear\t5\t2019-11-23T05:32:51\n839.6732082472579\tfalse\tES-Air\tNaples International Airport\tNA01\tNaples\tIT\t40.886002\t14.2908\tIT-72\tCloudy\t10244.079317830227\t6365.375779093983\tfalse\t0\tNo Delay\tLL04C7H\t10.670915956073152\t640.2549573643892\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tEC-P\tHeavy Fog\t5\t2019-11-23T11:35:20\n1128.9312077660675\tfalse\tJetBeats\tFrankfurt am Main Airport\tFRA\tFrankfurt am Main\tDE\t50.033333\t8.570556\tDE-HE\tSunny\t1489.607799271252\t925.599374199209\tfalse\t0\tNo Delay\tRW22A3J\t1.3792664808067145\t82.75598884840288\tCatania-Fontanarossa Airport\tCT03\tCatania\tIT\t37.466801\t15.0664\tIT-82\tThunder \u0026 Lightning\t5\t2019-11-23T17:43:43\n658.5080641348046\ttrue\tJetBeats\tLeonardo da Vinci___Fiumicino Airport\tRM11\tRome\tIT\t41.8002778\t12.2388889\tIT-62\tHeavy Fog\t7823.4202223315315\t4861.247950923812\tfalse\t0\tNo Delay\tK89VSU6\t9.313595502775632\t558.815730166538\tChicago Rockford International Airport\tRFD\tChicago/Rockford\tUS\t42.19540024\t-89.09719849\tUS-IL\tSunny\t5\t2019-11-23T17:43:43\n1195.3363155125162\tfalse\tKibana Airlines\tTurin Airport\tTO11\tTorino\tIT\t45.200802\t7.64963\tIT-21\tCloudy\t6084.005730187727\t3780.425894145519\tfalse\t0\tNo Delay\tLGPDV8J\t8.450007958594066\t507.0004775156439\tMontreal / Pierre Elliott Trudeau International Airport\tYUL\tMontreal\tCA\t45.47060013\t-73.74079895\tCA-QC\tClear\t5\t2019-11-23T14:56:36\n1083.4604775401094\ttrue\tES-Air\tOR Tambo International Airport\tJNB\tJohannesburg\tZA\t-26.1392\t28.246\tSE-BD\tRain\t8156.660697109297\t5068.3139820382075\ttrue\t315\tWeather Delay\t4P9QM92\t13.246726173636565\t794.8035704181939\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tHeavy Fog\t5\t2019-11-23T20:33:13\n493.94257726200476\tfalse\tES-Air\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tSunny\t2984.593135246927\t1854.5401947917455\tfalse\t0\tNo Delay\t7O5DDBP\t2.6180641537253746\t157.08384922352246\tChicago Midway International Airport\tMDW\tChicago\tUS\t41.7859993\t-87.75240326\tUS-IL\tSunny\t5\t2019-11-23T03:18:45\n1122.3138416780791\ttrue\tKibana Airlines\tGuangzhou Baiyun International Airport\tCAN\tGuangzhou\tCN\t23.39240074\t113.2990036\tSE-BD\tSunny\t9085.152701935163\t5645.2521660596885\tfalse\t0\tNo Delay\tPQ57NT5\t10.094614113261292\t605.6768467956775\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tThunder \u0026 Lightning\t5\t2019-11-23T16:38:55\n1017.8445480872658\tfalse\tES-Air\tAmsterdam Airport Schiphol\tAMS\tAmsterdam\tNL\t52.30860138\t4.76388979\tNL-NH\tClear\t5190.648154316156\t3225.319232131947\tfalse\t0\tNo Delay\tT49CZ18\t5.406925160745996\t324.41550964475977\tAl Maktoum International Airport\tDWC\tJebel Ali\tAE\t24.896356\t55.161389\tSE-BD\tThunder \u0026 Lightning\t5\t2019-11-23T01:43:11\n703.622004468903\tfalse\tJetBeats\tJackson-Medgar Wiley Evers International Airport\tJAN\tJackson\tUS\t32.31119919\t-90.07589722\tUS-MS\tSunny\t12659.767627817202\t7866.4149043443795\ttrue\t345\tLate Aircraft Delay\tZ3CUXHD\t16.85505932264667\t1011.3035593588002\tDubai International Airport\tDXB\tDubai\tAE\t25.25279999\t55.36439896\tSE-BD\tClear\t5\t2019-11-23T23:45:55\n1087.3430438882745\tfalse\tJetBeats\tPisa International Airport\tPI05\tPisa\tIT\t43.683899\t10.3927\tIT-52\tSunny\t9212.494420503683\t5724.37864154816\ttrue\t105\tWeather Delay\tR16ES6B\t10.78185727500361\t646.9114365002166\tEl Dorado International Airport\tBOG\tBogota\tCO\t4.70159\t-74.1469\tSE-BD\tHeavy Fog\t5\t2019-11-23T22:36:56\n802.4779186493154\tfalse\tES-Air\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tClear\t5993.979724960743\t3724.4863279452634\tfalse\t0\tNo Delay\tN2231OJ\t4.9949831041339525\t299.69898624803716\tOttawa Macdonald-Cartier International Airport\tYOW\tOttawa\tCA\t45.32249832\t-75.66919708\tCA-ON\tClear\t5\t2019-11-23T16:25:30\n746.3298479454032\tfalse\tLogstash Airways\tLicenciado Benito Juarez International Airport\tAICM\tMexico City\tMX\t19.4363\t-99.072098\tMX-DIF\tCloudy\t12454.945063600077\t7739.144063419676\tfalse\t0\tNo Delay\tV9P3LEP\t12.973901107916747\t778.4340664750048\tBeijing Capital International Airport\tPEK\tBeijing\tCN\t40.08010101\t116.5849991\tSE-BD\tSunny\t5\t2019-11-23T05:26:36\n690.4551743692057\ttrue\tLogstash Airways\tMalpensa International Airport\tMI12\tMilan\tIT\t45.6306\t8.72811\tIT-25\tHail\t6629.7566175584225\t4119.539773695631\tfalse\t0\tNo Delay\tAI0BW1Y\t9.207995302164475\t552.4797181298685\tLester B. Pearson International Airport\tYYZ\tToronto\tCA\t43.67720032\t-79.63059998\tCA-ON\tSunny\t5\t2019-11-23T14:11:09\n679.8190266203319\tfalse\tLogstash Airways\tVenice Marco Polo Airport\tVE05\tVenice\tIT\t45.505299\t12.3519\tIT-34\tClear\t1125.122504577908\t699.1187120826299\tfalse\t0\tNo Delay\tSXLJ3YS\t1.172002608935321\t70.32015653611926\tCopenhagen Kastrup Airport\tCPH\tCopenhagen\tDK\t55.61790085\t12.65600014\tDK-84\tRain\t5\t2019-11-23T12:08:35\n321.8432292482904\tfalse\tKibana Airlines\tVerona Villafranca Airport\tVR10\tVerona\tIT\t45.395699\t10.8885\tIT-34\tCloudy\t254.95049641847663\t158.41889392104895\tfalse\t0\tNo Delay\tSGWTPCI\t0.24995146707693788\t14.997088024616273\tTurin Airport\tTO11\tTorino\tIT\t45.200802\t7.64963\tIT-21\tHeavy Fog\t5\t2019-11-23T21:12:25\n842.3204093323304\tfalse\tJetBeats\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tSunny\t7436.235597749964\t4620.662579131598\tfalse\t0\tNo Delay\tVK3YXHJ\t8.26248399749996\t495.7490398499976\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tDamaging Wind\t5\t2019-11-23T14:25:41\n626.8760624629406\tfalse\tES-Air\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tClear\t7426.368101907524\t4614.531201475585\ttrue\t75\tCarrier Delay\tTNCKK81\t8.126266761025486\t487.5760056615291\tTreviso-Sant\u0027Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tHail\t5\t2019-11-23T08:15:06\n1028.3575673252506\tfalse\tJetBeats\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tSunny\t9272.935609622278\t5761.935055291024\ttrue\t240\tLate Aircraft Delay\t5EKI6QP\t15.03920905907414\t902.3525435444484\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tRain\t5\t2019-11-23T19:36:28\n947.7839621219331\ttrue\tLogstash Airways\tBeijing Capital International Airport\tPEK\tBeijing\tCN\t40.08010101\t116.5849991\tSE-BD\tThunder \u0026 Lightning\t7916.667638444717\t4919.189209047113\ttrue\t135\tLate Aircraft Delay\tLJZ4FYE\t8.533069554321205\t511.98417325927227\tBari Karol Wojty__a Airport\tBA02\tBari\tIT\t41.138901\t16.760599\tIT-75\tSunny\t5\t2019-11-23T07:48:59\n1113.6247619837657\tfalse\tJetBeats\tTreviso-Sant\u0027Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tHeavy Fog\t7087.384741310961\t4403.896706553081\tfalse\t0\tNo Delay\t8IX23WG\t5.906153951092467\t354.369237065548\tNorfolk International Airport\tORF\tNorfolk\tUS\t36.89459991\t-76.20120239\tUS-VA\tSunny\t5\t2019-11-23T22:41:48\n498.47119464013116\tfalse\tKibana Airlines\tTreviso-Sant\u0027Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tClear\t0\t0\tfalse\t0\tNo Delay\tYZOOP32\t0\t0\tTreviso-Sant\u0027Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tClear\t5\t2019-11-23T00:55:41\n1013.2721148334643\tfalse\tLogstash Airways\tKansai International Airport\tKIX\tOsaka\tJP\t34.4272995\t135.2440033\tSE-BD\tSunny\t11178.61953805324\t6946.072149927697\tfalse\t0\tNo Delay\tBLXF0IC\t14.331563510324667\t859.8938106194801\tJohn F Kennedy International Airport\tJFK\tNew York\tUS\t40.63980103\t-73.77890015\tUS-NY\tRain\t5\t2019-11-23T23:06:53\n1022.1109533594071\ttrue\tJetBeats\tShanghai Hongqiao International Airport\tSHA\tShanghai\tCN\t31.19790077\t121.3359985\tSE-BD\tClear\t9233.292282376244\t5737.3018337759\tfalse\t0\tNo Delay\tZPV8PFO\t9.052247335662985\t543.134840139779\tLondon Heathrow Airport\tLHR\tLondon\tGB\t51.4706\t-0.461941\tGB-ENG\tThunder \u0026 Lightning\t5\t2019-11-23T11:19:39\n1026.1449554460764\tfalse\tJetBeats\tWarsaw Chopin Airport\tWAW\tWarsaw\tPL\t52.16569901\t20.96710014\tPL-MZ\tClear\t7734.825896124278\t4806.197988822947\tfalse\t0\tNo Delay\tU12WLZU\t6.138750711209744\t368.3250426725847\tCharlotte Douglas International Airport\tCLT\tCharlotte\tUS\t35.2140007\t-80.94309998\tUS-NC\tThunder \u0026 Lightning\t5\t2019-11-23T07:43:41\n575.1934604637698\tfalse\tES-Air\tRichmond International Airport\tRIC\tRichmond\tUS\t37.50519943\t-77.31970215\tUS-VA\tClear\t6665.471849106242\t4141.732189703533\tfalse\t0\tNo Delay\tHIXO33O\t7.935085534650288\t476.1051320790173\tFrankfurt am Main Airport\tFRA\tFrankfurt am Main\tDE\t50.033333\t8.570556\tDE-HE\tHeavy Fog\t5\t2019-11-23T08:37:20\n1151.2852416116089\tfalse\tLogstash Airways\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tCloudy\t588.8606669636415\t365.90105469286954\tfalse\t0\tNo Delay\tPJG3ERI\t0.6542896299596016\t39.2573777975761\tIl Caravaggio International Airport\tBG01\tBergamo\tIT\t45.673901\t9.70417\tIT-25\tCloudy\t5\t2019-11-23T22:32:55\n509.86647384950754\tfalse\tLogstash Airways\tIl Caravaggio International Airport\tBG01\tBergamo\tIT\t45.673901\t9.70417\tIT-25\tDamaging Wind\t7789.731947226773\t4840.3150272575485\tfalse\t0\tNo Delay\t9NTQEZV\t6.83309819932173\t409.98589195930384\tEdmonton International Airport\tCYEG\tEdmonton\tCA\t53.30970001\t-113.5800018\tCA-AB\tClear\t5\t2019-11-23T02:17:41\n739.5838393318152\tfalse\tES-Air\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tClear\t7542.910010376165\t4686.946986086358\tfalse\t0\tNo Delay\tBG7F3YT\t6.616587728400145\t396.99526370400866\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tThunder \u0026 Lightning\t5\t2019-11-23T02:17:41\n369.96781404416157\tfalse\tES-Air\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tClear\t45.11814082012012\t28.03511295292996\tfalse\t0\tNo Delay\t6MZAPVF\t0.035808048269936596\t2.148482896196196\tShanghai Hongqiao International Airport\tSHA\tShanghai\tCN\t31.19790077\t121.3359985\tSE-BD\tDamaging Wind\t5\t2019-11-23T23:00:13\n295.3729162656206\tfalse\tES-Air\tMalpensa International Airport\tMI12\tMilan\tIT\t45.6306\t8.72811\tIT-25\tDamaging Wind\t510.91923079564344\t317.4704915764705\tfalse\t0\tNo Delay\tTY2HO91\t0.7741200466600658\t46.44720279960395\tLeonardo da Vinci - Fiumicino Airport\tFCO\tRome\tIT\t41.8002778\t12.2388889\tSE-BD\tRain\t5\t2019-11-23T01:23:09\n620.1264436579359\ttrue\tKibana Airlines\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tCloudy\t4987.283446870737\t3098.95426140759\tfalse\t0\tNo Delay\tBHRTWZZ\t6.393953137013765\t383.6371882208259\tAl Maktoum International Airport\tDWC\tJebel Ali\tAE\t24.896356\t55.161389\tSE-BD\tDamaging Wind\t5\t2019-11-23T17:16:38\n750.0888479320791\tfalse\tES-Air\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tDamaging Wind\t9399.162306680464\t5840.3686885342495\tfalse\t0\tNo Delay\tHYE5RVB\t9.214865006549475\t552.8919003929685\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tHeavy Fog\t5\t2019-11-23T17:16:38\n508.293526109741\tfalse\tKibana Airlines\tMontreal / Pierre Elliott Trudeau International Airport\tYUL\tMontreal\tCA\t45.47060013\t-73.74079895\tCA-QC\tRain\t15444.601759186087\t9596.830608736283\ttrue\t135\tWeather Delay\tV1VJB3G\t16.55055718443156\t993.0334310658938\tBrisbane International Airport\tBNE\tBrisbane\tAU\t-27.38419914\t153.1170044\tSE-BD\tDamaging Wind\t5\t2019-11-23T09:15:32\n559.6175435279979\tfalse\tJetBeats\tCopenhagen Kastrup Airport\tCPH\tCopenhagen\tDK\t55.61790085\t12.65600014\tDK-84\tClear\t6415.105005271914\t3986.1614454534974\tfalse\t0\tNo Delay\tRRDC6QI\t9.719856068593808\t583.1913641156285\tChhatrapati Shivaji International Airport\tBOM\tMumbai\tIN\t19.08869934\t72.86789703\tSE-BD\tCloudy\t5\t2019-11-23T10:03:34\n799.6878966634878\tfalse\tKibana Airlines\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tHail\t5829.911945822345\t3622.5393364143056\tfalse\t0\tNo Delay\tVLJP0K8\t6.477679939802605\t388.6607963881563\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tSE-BD\tRain\t5\t2019-11-23T13:48:47\n635.6799648579079\tfalse\tES-Air\tUkrainka Air Base\tXHBU\tBelogorsk\tRU\t51.169997\t128.445007\tRU-AMU\tCloudy\t5784.156282207905\t3594.1080851625907\tfalse\t0\tNo Delay\tZU9L9CQ\t5.670741453145005\t340.2444871887003\tRajiv Gandhi International Airport\tHYD\tHyderabad\tIN\t17.23131752\t78.42985535\tSE-BD\tClear\t5\t2019-11-23T12:04:03\n900.7175991285576\tfalse\tJetBeats\tPisa International Airport\tPI05\tPisa\tIT\t43.683899\t10.3927\tIT-52\tCloudy\t15520.385658783523\t9643.920540781537\ttrue\t225\tNAS Delay\tH0JHO2P\t18.966064371356392\t1137.9638622813836\tAdelaide International Airport\tADL\tAdelaide\tAU\t-34.945\t138.531006\tSE-BD\tClear\t5\t2019-11-23T23:20:32\n990.3206046689378\ttrue\tLogstash Airways\tHelsinki Vantaa Airport\tHEL\tHelsinki\tFI\t60.31719971\t24.9633007\tFI-ES\tSunny\t5925.742528879807\t3682.0857000615197\ttrue\t345\tCarrier Delay\tYJNDO9P\t12.80445539152358\t768.2673234914148\tChhatrapati Shivaji International Airport\tBOM\tMumbai\tIN\t19.08869934\t72.86789703\tSE-BD\tHail\t5\t2019-11-23T13:02:38\n555.0523269981645\tfalse\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tClear\t694.0061030093568\t431.23539964691\tfalse\t0\tNo Delay\tGTYX4GX\t0.5507984944518705\t33.04790966711223\tLeonardo da Vinci - Fiumicino Airport\tFCO\tRome\tIT\t41.8002778\t12.2388889\tSE-BD\tHeavy Fog\t5\t2019-11-23T13:02:38\n515.1258472803363\tfalse\tJetBeats\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tRain\t7488.60895970106\t4653.205877488628\tfalse\t0\tNo Delay\tOGSVOQL\t7.341773489903\t440.50640939417997\tLester B. Pearson International Airport\tYYZ\tToronto\tCA\t43.67720032\t-79.63059998\tCA-ON\tHail\t5\t2019-11-23T13:02:38\n924.5695288183703\tfalse\tJetBeats\tFrankfurt am Main Airport\tFRA\tFrankfurt am Main\tDE\t50.033333\t8.570556\tDE-HE\tRain\t9089.635878126865\t5648.037882594936\tfalse\t0\tNo Delay\t1J0WGJW\t10.099595420140961\t605.9757252084577\tEl Dorado International Airport\tBOG\tBogota\tCO\t4.70159\t-74.1469\tSE-BD\tSunny\t5\t2019-11-23T23:47:21\n1136.933988695569\tfalse\tLogstash Airways\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tClear\t6793.109023895527\t4221.042253176155\ttrue\t345\tNAS Delay\tBJSZW8R\t12.409910807740713\t744.5946484644428\tSyracuse Hancock International Airport\tSYR\tSyracuse\tUS\t43.11119843\t-76.10630035\tUS-NY\tSunny\t5\t2019-11-23T09:52:48\n862.9185477108235\tfalse\tKibana Airlines\tNew Chitose Airport\tCTS\tChitose / Tomakomai\tJP\t42.77519989\t141.6920013\tSE-BD\tCloudy\t7864.352746578924\t4886.682242316698\tfalse\t0\tNo Delay\tH19SQP5\t6.898555040858706\t413.9133024515223\tDubai International Airport\tDXB\tDubai\tAE\t25.25279999\t55.36439896\tSE-BD\tHail\t5\t2019-11-23T09:52:48\n909.5567658739699\ttrue\tES-Air\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tThunder \u0026 Lightning\t11354.741708554164\t7055.509392991283\tfalse\t0\tNo Delay\t6QUXPAP\t9.462284757128469\t567.7370854277082\tOttawa Macdonald-Cartier International Airport\tYOW\tOttawa\tCA\t45.32249832\t-75.66919708\tCA-ON\tCloudy\t5\t2019-11-23T08:38:17\n1119.8861321694526\tfalse\tES-Air\tSydney Kingsford Smith International Airport\tSYD\tSydney\tAU\t-33.94609833\t151.177002\tSE-BD\tCloudy\t16308.426581069576\t10133.58646819423\tfalse\t0\tNo Delay\tM3MAQEL\t15.988653510852524\t959.3192106511515\tMunich Airport\tMUC\tMunich\tDE\t48.353802\t11.7861\tDE-BY\tClear\t5\t2019-11-23T20:15:34\n745.9841243857696\tfalse\tJetBeats\tVerona Villafranca Airport\tVR10\tVerona\tIT\t45.395699\t10.8885\tIT-34\tRain\t9678.089496288638\t6013.68600888849\tfalse\t0\tNo Delay\tN02MCVF\t9.488323035577094\t569.2993821346257\tTokyo Haneda International Airport\tHND\tTokyo\tJP\t35.552299\t139.779999\tSE-BD\tThunder \u0026 Lightning\t5\t2019-11-23T07:20:16\n1153.5126402910191\ttrue\tLogstash Airways\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tClear\t9131.823450930926\t5674.252025005794\tfalse\t0\tNo Delay\tLSTKRRH\t8.455392084195301\t507.3235250517181\tLuis Munoz Marin International Airport\tSJU\tSan Juan\tPR\t18.43939972\t-66.00180054\tPR-U-A\tThunder \u0026 Lightning\t5\t2019-11-23T05:33:31\n1167.1842544261626\tfalse\tKibana Airlines\tXi\u0027an Xianyang International Airport\tXIY\tXi\u0027an\tCN\t34.447102\t108.751999\tSE-BD\tDamaging Wind\t10316.155866415009\t6410.16207002046\tfalse\t0\tNo Delay\t73MLPIL\t14.327994258909735\t859.6796555345841\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tClear\t5\t2019-11-23T18:45:48\n622.029310050951\tfalse\tJetBeats\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tHeavy Fog\t6646.597098428314\t4130.003963371606\tfalse\t0\tNo Delay\tAVA2W8U\t9.231384858928214\t553.8830915356929\tPittsburgh International Airport\tPIT\tPittsburgh\tUS\t40.49150085\t-80.23290253\tUS-PA\tHail\t5\t2019-11-23T14:55:54\n300.48242590011864\ttrue\tES-Air\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tHeavy Fog\t0\t0\tfalse\t0\tNo Delay\tX2HB4U3\t0\t0\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tClear\t5\t2019-11-23T09:38:34\n678.4953214603203\ttrue\tJetBeats\tMiami International Airport\tMIA\tMiami\tUS\t25.79319954\t-80.29060364\tUS-FL\tDamaging Wind\t1984.9346386787522\t1233.381202948998\tfalse\t0\tNo Delay\tI25YFMC\t3.0074767252708363\t180.4486035162502\tLester B. Pearson International Airport\tYYZ\tToronto\tCA\t43.67720032\t-79.63059998\tCA-ON\tClear\t5\t2019-11-23T16:31:13\n1041.5794809903948\tfalse\tES-Air\tDublin Airport\tDUB\tDublin\tIE\t53.42129898\t-6.270070076\tIE-D\tCloudy\t6783.657852285002\t4215.169567404484\tfalse\t0\tNo Delay\tU89PHXT\t8.075783157482146\t484.54698944892874\tBillings Logan International Airport\tBIL\tBillings\tUS\t45.80770111\t-108.5429993\tUS-MT\tCloudy\t5\t2019-11-23T00:35:19\n568.211219582184\tfalse\tJetBeats\tXi\u0027an Xianyang International Airport\tXIY\tXi\u0027an\tCN\t34.447102\t108.751999\tSE-BD\tRain\t1628.8575162205964\t1012.1251368387344\tfalse\t0\tNo Delay\tQ1APH10\t2.4679659336675703\t148.07795602005422\tIncheon International Airport\tICN\tSeoul\tKR\t37.46910095\t126.4509964\tSE-BD\tClear\t5\t2019-11-23T00:23:13\n370.2882350253934\tfalse\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tCloudy\t0\t0\tfalse\t0\tNo Delay\t34N82FN\t0\t0\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tHail\t5\t2019-11-23T17:25:14\n587.9588078119461\tfalse\tES-Air\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tEC-P\tCloudy\t4737.430076316423\t2943.7025746617396\tfalse\t0\tNo Delay\t21NN33Q\t6.579763994883921\t394.78583969303526\tChicago Midway International Airport\tMDW\tChicago\tUS\t41.7859993\t-87.75240326\tUS-IL\tSunny\t5\t2019-11-23T11:22:58\n1024.9183558887564\tfalse\tKibana Airlines\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tSunny\t10249.242700026725\t6368.584156045397\tfalse\t0\tNo Delay\t3DSZSYE\t9.490039537061783\t569.402372223707\tShanghai Hongqiao International Airport\tSHA\tShanghai\tCN\t31.19790077\t121.3359985\tSE-BD\tCloudy\t5\t2019-11-23T10:52:28\n610.075677579494\tfalse\tKibana Airlines\tStockholm-Arlanda Airport\tARN\tStockholm\tSE\t59.65190125\t17.91860008\tSE-AB\tSunny\t6641.470312989073\t4126.81832659088\tfalse\t0\tNo Delay\tUEGA63R\t10.062833807559201\t603.7700284535521\tDetroit Metropolitan Wayne County Airport\tDTW\tDetroit\tUS\t42.21239853\t-83.35340118\tUS-MI\tCloudy\t5\t2019-11-23T12:47:17\n693.418491908601\tfalse\tJetBeats\tOR Tambo International Airport\tJNB\tJohannesburg\tZA\t-26.1392\t28.246\tSE-BD\tClear\t7508.848819542246\t4665.782343328863\tfalse\t0\tNo Delay\tR4BIRBF\t5.959403825033529\t357.5642295020117\tCagliari Elmas Airport\tCA07\tCagliari\tIT\t39.251499\t9.05428\tIT-88\tHeavy Fog\t5\t2019-11-23T02:22:58\n602.5246213886967\tfalse\tJetBeats\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tThunder \u0026 Lightning\t9498.14738567995\t5901.875165085867\tfalse\t0\tNo Delay\tEIFJNY4\t8.331708233052588\t499.90249398315524\tKansai International Airport\tKIX\tOsaka\tJP\t34.4272995\t135.2440033\tSE-BD\tSunny\t5\t2019-11-23T21:27:50\n866.6428371210072\tfalse\tLogstash Airways\tWinnipeg / James Armstrong Richardson International Airport\tYWG\tWinnipeg\tCA\t49.90999985\t-97.23989868\tCA-MB\tCloudy\t2264.78763216076\t1407.2737911601\tfalse\t0\tNo Delay\t9BEQGI2\t2.696175752572333\t161.77054515434\tSan Antonio International Airport\tSAT\tSan Antonio\tUS\t29.53370094\t-98.46980286\tUS-TX\tCloudy\t5\t2019-11-23T03:08:59\n655.4115715601646\tfalse\tLogstash Airways\tKing Shaka International Airport\tDUR\tDurban\tZA\t-29.61444444\t31.11972222\tSE-BD\tHail\t9159.927522887247\t5691.715085704017\tfalse\t0\tNo Delay\tNWFJU03\t8.481414373043746\t508.8848623826248\tCharles de Gaulle International Airport\tCDG\tParis\tFR\t49.01279831\t2.549999952\tFR-J\tHeavy Fog\t5\t2019-11-23T13:42:02\n797.9192565871901\tfalse\tES-Air\tSan Francisco International Airport\tSFO\tSan Francisco\tUS\t37.61899948\t-122.375\tUS-CA\tHeavy Fog\t9396.70214523572\t5838.840015084233\tfalse\t0\tNo Delay\tSI0CJ0G\t8.700650134477518\t522.0390080686511\tJeju International Airport\tCJU\tJeju City\tKR\t33.51129913\t126.4929962\tSE-BD\tRain\t5\t2019-11-23T10:26:23\n646.3222272808637\tfalse\tJetBeats\tCopenhagen Kastrup Airport\tCPH\tCopenhagen\tDK\t55.61790085\t12.65600014\tDK-84\tDamaging Wind\t4856.949002792603\t3017.96819250117\tfalse\t0\tNo Delay\tV9K5A0W\t4.047457502327169\t242.84745013963015\tAbu Dhabi International Airport\tAUH\tAbu Dhabi\tAE\t24.43300056\t54.65110016\tSE-BD\tRain\t5\t2019-11-23T08:05:25\n1199.403468490791\tfalse\tES-Air\tSyracuse Hancock International Airport\tSYR\tSyracuse\tUS\t43.11119843\t-76.10630035\tUS-NY\tRain\t15292.326373841706\t9502.211070996447\tfalse\t0\tNo Delay\t8322YWS\t12.743605311534756\t764.6163186920853\tBrisbane International Airport\tBNE\tBrisbane\tAU\t-27.38419914\t153.1170044\tSE-BD\tCloudy\t5\t2019-11-23T13:47:47\n1156.0533846562653\tfalse\tJetBeats\tVienna International Airport\tVIE\tVienna\tAT\t48.11029816\t16.56970024\tAT-9\tHeavy Fog\t630.498853438977\t391.7738242656492\tfalse\t0\tNo Delay\tX9PF01C\t0.7505938731416393\t45.03563238849836\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tSunny\t5\t2019-11-23T07:14:37\n768.6192289300727\tfalse\tES-Air\tComodoro Arturo Merino Benitez International Airport\tSCL\tSantiago\tCL\t-33.39300156\t-70.78579712\tSE-BD\tClear\t11848.233502497354\t7362.150977353104\tfalse\t0\tNo Delay\tJZ3WYY3\t16.45587986457966\t987.3527918747795\tAdelaide International Airport\tADL\tAdelaide\tAU\t-34.945\t138.531006\tSE-BD\tHeavy Fog\t5\t2019-11-23T04:18:14\n1179.1729743229207\tfalse\tES-Air\tChengdu Shuangliu International Airport\tCTU\tChengdu\tCN\t30.57850075\t103.9469986\tSE-BD\tThunder \u0026 Lightning\t8725.716838709335\t5421.9090751942\tfalse\t0\tNo Delay\t6C6CH43\t13.220783088953539\t793.2469853372123\tBarcelona International Airport\tBCN\tBarcelona\tES\t41.29710007\t2.078459978\tES-CT\tSunny\t5\t2019-11-23T23:05:53\n229.25727105370203\tfalse\tES-Air\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tRain\t0\t0\tfalse\t0\tNo Delay\tDARYSJ5\t0\t0\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tClear\t5\t2019-11-23T01:00:51\n519.7705585978445\tfalse\tLogstash Airways\tMilano Linate Airport\tMI11\tMilan\tIT\t45.445099\t9.27674\tIT-25\tSunny\t1182.4378708092847\t734.7328295313399\tfalse\t0\tNo Delay\t00CGX81\t1.2317061154263382\t73.9023669255803\tAdolfo Suarez Madrid— Barajas Airport\tMAD\tMadrid\tES\t40.471926\t-3.56264\tES-M\tSunny\t5\t2019-11-23T15:30:57\n846.284628551176\tfalse\tES-Air\tSheremetyevo International Airport\tSVO\tMoscow\tRU\t55.972599\t37.4146\tRU-MOS\tHail\t7343.046237132674\t4562.757395020998\ttrue\t300\tWeather Delay\t992GFBG\t11.799116886233957\t707.9470131740375\tItami Airport\tITM\tOsaka\tJP\t34.78549957\t135.4380035\tSE-BD\tRain\t5\t2019-11-23T05:11:59\n1008.1747045573845\tfalse\tJetBeats\tNashville International Airport\tBNA\tNashville\tUS\t36.12450027\t-86.67819977\tUS-TN\tSunny\t5422.86662223493\t3369.6130984021624\tfalse\t0\tNo Delay\tJ7TXAVG\t6.455793597898727\t387.3476158739236\tJorge Chavez International Airport\tLIM\tLima\tPE\t-12.0219\t-77.114304\tSE-BD\tHeavy Fog\t5\t2019-11-23T09:05:37\n1026.0590729113128\ttrue\tJetBeats\tNewport News Williamsburg International Airport\tPHF\tNewport News\tUS\t37.13190079\t-76.49299622\tUS-VA\tHeavy Fog\t6509.934902355788\t4045.086011664248\tfalse\t0\tNo Delay\t8W3UW4Q\t6.781182189953946\t406.87093139723675\tCologne Bonn Airport\tCGN\tCologne\tDE\t50.86589813\t7.142739773\tDE-NW\tCloudy\t5\t2019-11-23T01:54:59\n647.4798361983383\tfalse\tKibana Airlines\tNarita International Airport\tNRT\tTokyo\tJP\t35.76470184\t140.3860016\tSE-BD\tClear\t7852.384786015633\t4879.245696392836\ttrue\t90\tCarrier Delay\tPB8BSSH\t8.388056829838273\t503.28340979029645\tEdmonton International Airport\tCYEG\tEdmonton\tCA\t53.30970001\t-113.5800018\tCA-AB\tCloudy\t5\t2019-11-23T02:34:40\n646.3791453439336\tfalse\tKibana Airlines\tJeju International Airport\tCJU\tJeju City\tKR\t33.51129913\t126.4929962\tSE-BD\tDamaging Wind\t2149.7274224549838\t1335.778691476144\tfalse\t0\tNo Delay\tRX7EFNI\t2.239299398390608\t134.35796390343648\tChengdu Shuangliu International Airport\tCTU\tChengdu\tCN\t30.57850075\t103.9469986\tSE-BD\tRain\t5\t2019-11-23T13:37:37\n520.7071005360559\tfalse\tLogstash Airways\tZurich Airport\tZRH\tZurich\tCH\t47.464699\t8.54917\tCH-ZH\tSunny\t7150.1694661808515\t4442.909325899777\tfalse\t0\tNo Delay\tFYL83DU\t6.2720784791060105\t376.3247087463606\tChicago O\u0027Hare International Airport\tORD\tChicago\tUS\t41.97859955\t-87.90480042\tUS-IL\tDamaging Wind\t5\t2019-11-23T02:23:29\n854.9995034358742\tfalse\tLogstash Airways\tMariscal Sucre International Airport\tUIO\tQuito\tEC\t-0.129166667\t-78.3575\tSE-BD\tHail\t9195.230466636465\t5713.651317950957\tfalse\t0\tNo Delay\tO94R5QW\t10.946702936471983\t656.802176188319\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tCloudy\t5\t2019-11-23T13:06:23\n385.6263584433285\tfalse\tES-Air\tVenice Marco Polo Airport\tVE05\tVenice\tIT\t45.505299\t12.3519\tIT-34\tHeavy Fog\t20.101647355324634\t12.490584583112518\tfalse\t0\tNo Delay\tXFYM3PU\t0.02233516372813848\t1.3401098236883089\tTreviso-Sant\u0027Angelo Airport\tTV01\tTreviso\tIT\t45.648399\t12.1944\tIT-34\tSunny\t5\t2019-11-23T20:38:27\n307.53156284777646\tfalse\tKibana Airlines\tXi\u0027an Xianyang International Airport\tXIY\tXi\u0027an\tCN\t34.447102\t108.751999\tSE-BD\tCloudy\t0\t0\tfalse\t0\tNo Delay\t0KM6BUN\t0\t0\tXi\u0027an Xianyang International Airport\tXIY\tXi\u0027an\tCN\t34.447102\t108.751999\tSE-BD\tRain\t5\t2019-11-23T16:07:57\n740.6134727386188\tfalse\tES-Air\tShanghai Pudong International Airport\tPVG\tShanghai\tCN\t31.14340019\t121.8050003\tSE-BD\tCloudy\t15694.775066076032\t9752.281094704445\tfalse\t0\tNo Delay\t7I7QP3D\t23.77996222132732\t1426.7977332796393\tEl Dorado International Airport\tBOG\tBogota\tCO\t4.70159\t-74.1469\tSE-BD\tRain\t5\t2019-11-23T05:44:30\n214.5718770461978\tfalse\tKibana Airlines\tPortland International Airport\tPDX\tPortland\tUS\t45.58869934\t-122.5979996\tUS-OR\tHeavy Fog\t2698.091880980634\t1676.5165688508073\tfalse\t0\tNo Delay\tWOPL4A0\t2.8105123760214936\t168.63074256128962\tChicago Rockford International Airport\tRFD\tChicago/Rockford\tUS\t42.19540024\t-89.09719849\tUS-IL\tSunny\t5\t2019-11-23T04:59:29\n560.8665323557213\tfalse\tJetBeats\tMinistro Pistarini International Airport\tEZE\tBuenos Aires\tAR\t-34.8222\t-58.5358\tSE-BD\tRain\t11098.510103878027\t6896.294455304786\tfalse\t0\tNo Delay\tI0SW4X9\t13.212512028426223\t792.7507217055734\tLondon Gatwick Airport\tLGW\tLondon\tGB\t51.14810181\t-0.190277994\tGB-ENG\tHeavy Fog\t5\t2019-11-23T13:45:02\n945.8285935796225\tfalse\tES-Air\tUkrainka Air Base\tXHBU\tBelogorsk\tRU\t51.169997\t128.445007\tRU-AMU\tCloudy\t1958.13674964267\t1216.7297666892039\tfalse\t0\tNo Delay\t4KVIPWK\t2.1757074996029666\t130.542449976178\tTokyo Haneda International Airport\tHND\tTokyo\tJP\t35.552299\t139.779999\tSE-BD\tSunny\t5\t2019-11-23T16:06:10\n1144.0830778553145\tfalse\tKibana Airlines\tLicenciado Benito Juarez International Airport\tAICM\tMexico City\tMX\t19.4363\t-99.072098\tMX-DIF\tThunder \u0026 Lightning\t10129.906523853564\t6294.432093979636\tfalse\t0\tNo Delay\tI6UAHKF\t10.551985962347462\t633.1191577408478\tCagliari Elmas Airport\tCA07\tCagliari\tIT\t39.251499\t9.05428\tIT-88\tThunder \u0026 Lightning\t5\t2019-11-23T12:24:59\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20190723-143637_1537666552",
-      "id":"20190723-143637_1537666552",
-      "dateCreated":"2019-11-04T12:44:48+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:14208",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791240_-1574870906",
+      "id": "20190723-143637_1537666552",
+      "dateCreated": "2019-11-06 08:59:51.240",
+      "status": "READY"
     },
     {
-      "text":"%elasticsearch\nhelp\n",
-      "user":"anonymous",
-      "config":{
-        "tableHide":false,
-        "editorSetting":{
-          "editOnDblClick":false,
-          "completionSupport":true
+      "text": "%elasticsearch\nhelp\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.243",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "editOnDblClick": false,
+          "completionSupport": true
         },
-        "colWidth":12,
-        "editorMode":"ace/mode/undefined",
-        "fontSize":9,
-        "runOnSelectionChange":true,
-        "title":false,
-        "checkEmpty":true,
-        "results":{
-
-        },
-        "enabled":true,
-        "editorHide":true
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "runOnSelectionChange": true,
+        "title": false,
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TEXT",
-            "data":"Elasticsearch interpreter:\nGeneral format: <command> /<indices>/<types>/<id> <option> <JSON>\n  - indices: list of indices separated by commas (depends on the command)\n  - types: list of document types separated by commas (depends on the command)\nCommands:\n  - search /indices/types <query>\n    . indices and types can be omitted (at least, you have to provide '/')\n    . a query is either a JSON-formatted query, nor a lucene query\n  - size <value>\n    . defines the size of the result set (default value is in the config)\n    . if used, this command must be declared before a search command\n  - count /indices/types <query>\n    . same comments as for the search\n  - get /index/type/id\n  - delete /index/type/id\n  - index /index/type/id <json-formatted document>\n    . the id can be omitted, elasticsearch will generate one\n"
+            "type": "TEXT",
+            "data": "Elasticsearch interpreter:\nGeneral format: \u003ccommand\u003e /\u003cindices\u003e/\u003ctypes\u003e/\u003cid\u003e \u003coption\u003e \u003cJSON\u003e\n  - indices: list of indices separated by commas (depends on the command)\n  - types: list of document types separated by commas (depends on the command)\nCommands:\n  - search /indices/types \u003cquery\u003e\n    . indices and types can be omitted (at least, you have to provide \u0027/\u0027)\n    . a query is either a JSON-formatted query, nor a lucene query\n  - size \u003cvalue\u003e\n    . defines the size of the result set (default value is in the config)\n    . if used, this command must be declared before a search command\n  - count /indices/types \u003cquery\u003e\n    . same comments as for the search\n  - get /index/type/id\n  - delete /index/type/id\n  - index /index/type/id \u003cjson-formatted document\u003e\n    . the id can be omitted, elasticsearch will generate one\n"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20190723-144315_1204058098",
-      "id":"20190723-144315_1204058098",
-      "dateCreated":"2019-11-04T12:42:04+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:14209",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791243_-291648259",
+      "id": "20190723-144315_1204058098",
+      "dateCreated": "2019-11-06 08:59:51.243",
+      "status": "READY"
     },
     {
-      "title":"Average Distance by Airways",
-      "text":"%elasticsearch\nsearch /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"Carrier\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"DistanceMiles\"\n          }\n        }\n      }\n    }\n  } \n}",
-      "user":"anonymous",
-      "config":{
-        "editorSetting":{
-          "editOnDblClick":false,
-          "completionSupport":true
+      "title": "Average Distance by Airways",
+      "text": "%elasticsearch\nsearch /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"Carrier\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"DistanceMiles\"\n          }\n        }\n      }\n    }\n  } \n}",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.244",
+      "config": {
+        "editorSetting": {
+          "editOnDblClick": false,
+          "completionSupport": true
         },
-        "colWidth":6,
-        "editorMode":"ace/mode/undefined",
-        "fontSize":9,
-        "editorHide":true,
-        "title":false,
-        "runOnSelectionChange":true,
-        "checkEmpty":true,
-        "results":{
-          "0":{
-            "graph":{
-              "mode":"lineChart",
-              "height":244,
-              "optionOpen":false,
-              "setting":{
-                "table":{
-                  "tableGridState":{
-                    "columns":[
+        "colWidth": 6.0,
+        "editorMode": "ace/mode/undefined",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": false,
+        "runOnSelectionChange": true,
+        "checkEmpty": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "lineChart",
+              "height": 244.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
                       {
-                        "name":"AvgTicketPrice",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "AvgTicketPrice",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Cancelled",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Cancelled",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Carrier",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Carrier",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Dest",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Dest",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestAirportID",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestAirportID",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestCityName",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestCityName",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestCountry",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestCountry",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestLocation.lat",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestLocation.lat",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestLocation.lon",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestLocation.lon",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestRegion",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestRegion",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DestWeather",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DestWeather",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DistanceKilometers",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "DistanceKilometers",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"DistanceMiles",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-                          "priority":0,
-                          "direction":"desc"
+                        "name": "DistanceMiles",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {
+                          "priority": 0.0,
+                          "direction": "desc"
                         },
-                        "filters":[
-                          {
-
-                          }
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightDelay",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightDelay",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightDelayMin",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightDelayMin",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightDelayType",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightDelayType",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightNum",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightNum",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightTimeHour",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightTimeHour",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"FlightTimeMin",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "FlightTimeMin",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"Origin",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "Origin",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginAirportID",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginAirportID",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginCityName",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginCityName",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginCountry",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginCountry",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginLocation.lat",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginLocation.lat",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginLocation.lon",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginLocation.lon",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginRegion",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginRegion",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"OriginWeather",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "OriginWeather",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"dayOfWeek",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "dayOfWeek",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       },
                       {
-                        "name":"timestamp",
-                        "visible":true,
-                        "width":"*",
-                        "sort":{
-
-                        },
-                        "filters":[
-                          {
-
-                          }
+                        "name": "timestamp",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
                         ],
-                        "pinned":""
+                        "pinned": ""
                       }
                     ],
-                    "scrollFocus":{
-
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
                     },
-                    "selection":[
-
-                    ],
-                    "grouping":{
-                      "grouping":[
-
-                      ],
-                      "aggregations":[
-
-                      ],
-                      "rowExpandedStates":{
-
-                      }
-                    },
-                    "treeView":{
-
-                    },
-                    "pagination":{
-                      "paginationCurrentPage":1,
-                      "paginationPageSize":250
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
                     }
                   },
-                  "tableColumnTypeState":{
-                    "names":{
-                      "content_length_stats.sum":"string",
-                      "doc_count":"string",
-                      "content_length_stats.std_deviation_bounds.upper":"string",
-                      "content_length_stats.std_deviation_bounds.lower":"string",
-                      "content_length_stats.sum_of_squares":"string",
-                      "content_length_stats.std_deviation":"string",
-                      "content_length_stats.count":"string",
-                      "content_length_stats.max":"string",
-                      "content_length_stats.variance":"string",
-                      "content_length_stats.min":"string",
-                      "content_length_stats.avg":"string",
-                      "key":"string"
+                  "tableColumnTypeState": {
+                    "names": {
+                      "content_length_stats.sum": "string",
+                      "doc_count": "string",
+                      "content_length_stats.std_deviation_bounds.upper": "string",
+                      "content_length_stats.std_deviation_bounds.lower": "string",
+                      "content_length_stats.sum_of_squares": "string",
+                      "content_length_stats.std_deviation": "string",
+                      "content_length_stats.count": "string",
+                      "content_length_stats.max": "string",
+                      "content_length_stats.variance": "string",
+                      "content_length_stats.min": "string",
+                      "content_length_stats.avg": "string",
+                      "key": "string"
                     },
-                    "updated":false
+                    "updated": false
                   },
-                  "tableOptionSpecHash":"[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
-                  "tableOptionValue":{
-                    "useFilter":false,
-                    "showPagination":false,
-                    "showAggregationFooter":false
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
                   },
-                  "updated":false,
-                  "initialized":false
+                  "updated": false,
+                  "initialized": false
                 },
-                "multiBarChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default",
-                  "stacked":false
+                  "xLabelStatus": "default",
+                  "stacked": false
                 },
-                "lineChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default",
-                  "forceY":false
+                  "xLabelStatus": "default",
+                  "forceY": false
                 },
-                "stackedAreaChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default",
-                  "style":"stream"
+                  "xLabelStatus": "default",
+                  "style": "stream"
                 }
               },
-              "commonSetting":{
-
-              },
-              "keys":[
+              "commonSetting": {},
+              "keys": [
                 {
-                  "name":"key",
-                  "index":11,
-                  "aggr":"sum"
+                  "name": "key",
+                  "index": 11.0,
+                  "aggr": "sum"
                 }
               ],
-              "groups":[
-
-              ],
-              "values":[
+              "groups": [],
+              "values": [
                 {
-                  "name":"content_length_stats.avg",
-                  "index":10,
-                  "aggr":"sum"
+                  "name": "content_length_stats.avg",
+                  "index": 10.0,
+                  "aggr": "sum"
                 }
               ]
             },
-            "helium":{
-
-            }
+            "helium": {}
           }
         },
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TABLE",
-            "data":"content_length_stats.sum\tdoc_count\tcontent_length_stats.std_deviation_bounds.upper\tcontent_length_stats.std_deviation_bounds.lower\tcontent_length_stats.sum_of_squares\tcontent_length_stats.std_deviation\tcontent_length_stats.count\tcontent_length_stats.max\tcontent_length_stats.variance\tcontent_length_stats.min\tcontent_length_stats.avg\tkey\n14829468.037286758\t3331\t10120.354322874318\t-1216.4407610089593\t92777016771.22705\t2834.1987709708196\t3331\t12180.005859375\t8032682.673372505\t0\t4451.95678093268\tLogstash Airways\n14529526.784420967\t3274\t10125.847203554047\t-1250.1436089169247\t90961055844.73062\t2843.9977031177427\t3274\t12180.005859375\t8088322.935338996\t0\t4437.851797318561\tJetBeats\n14019552.266654015\t3234\t9961.720494009453\t-1291.6201435740695\t86372102671.57898\t2813.3351593958805\t3234\t12353.7802734375\t7914854.719093044\t0\t4335.0501752176915\tKibana Airlines\n14170546.369449615\t3220\t10173.255502600698\t-1371.673906669259\t89185295821.65695\t2886.232352317489\t3220\t12175.6591796875\t8330337.191564147\t0\t4400.790797965719\tES-Air"
+            "type": "TABLE",
+            "data": "content_length_stats.sum\tdoc_count\tcontent_length_stats.std_deviation_bounds.upper\tcontent_length_stats.std_deviation_bounds.lower\tcontent_length_stats.sum_of_squares\tcontent_length_stats.std_deviation\tcontent_length_stats.count\tcontent_length_stats.max\tcontent_length_stats.variance\tcontent_length_stats.min\tcontent_length_stats.avg\tkey\n14829468.037286758\t3331\t10120.354322874318\t-1216.4407610089593\t92777016771.22705\t2834.1987709708196\t3331\t12180.005859375\t8032682.673372505\t0\t4451.95678093268\tLogstash Airways\n14529526.784420967\t3274\t10125.847203554047\t-1250.1436089169247\t90961055844.73062\t2843.9977031177427\t3274\t12180.005859375\t8088322.935338996\t0\t4437.851797318561\tJetBeats\n14019552.266654015\t3234\t9961.720494009453\t-1291.6201435740695\t86372102671.57898\t2813.3351593958805\t3234\t12353.7802734375\t7914854.719093044\t0\t4335.0501752176915\tKibana Airlines\n14170546.369449615\t3220\t10173.255502600698\t-1371.673906669259\t89185295821.65695\t2886.232352317489\t3220\t12175.6591796875\t8330337.191564147\t0\t4400.790797965719\tES-Air"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20190723-144330_457603576",
-      "id":"20190723-144330_457603576",
-      "dateCreated":"2019-11-04T12:42:08+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:14210",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791244_-1652168594",
+      "id": "20190723-144330_457603576",
+      "dateCreated": "2019-11-06 08:59:51.244",
+      "status": "READY"
     },
     {
-      "title":"Average delay by source country",
-      "text":"%elasticsearch\nsearch /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"OriginCountry\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"FlightDelayMin\"\n          }\n        }\n      }\n    }\n  } \n}",
-      "user":"anonymous",
-      "config":{
-        "editorSetting":{
-
-        },
-        "colWidth":6,
-        "fontSize":9,
-        "editorHide":true,
-        "title":false,
-        "runOnSelectionChange":true,
-        "checkEmpty":true,
-        "results":{
-          "0":{
-            "graph":{
-              "mode":"multiBarChart",
-              "height":254,
-              "optionOpen":false,
-              "setting":{
-                "table":{
-                  "tableGridState":{
-
-                  },
-                  "tableColumnTypeState":{
-                    "names":{
-                      "content_length_stats.sum":"string",
-                      "doc_count":"string",
-                      "content_length_stats.std_deviation_bounds.upper":"string",
-                      "content_length_stats.std_deviation_bounds.lower":"string",
-                      "content_length_stats.sum_of_squares":"string",
-                      "content_length_stats.std_deviation":"string",
-                      "content_length_stats.count":"string",
-                      "content_length_stats.max":"string",
-                      "content_length_stats.variance":"string",
-                      "content_length_stats.min":"string",
-                      "content_length_stats.avg":"string",
-                      "key":"string"
+      "title": "Average delay by source country",
+      "text": "%elasticsearch\nsearch /kibana_sample_data_flights/ { \n  \"from\" : 0, \n  \"size\" : 100, \n  \"query\" : { \n    \"match_all\" : {} \n  },\n  \"aggs\": {\n    \"carrier\" : {\n      \"terms\" : { \"field\" : \"OriginCountry\" },\n      \"aggs\" : {\n        \"content_length_stats\": {\n          \"extended_stats\": {\n            \"field\": \"FlightDelayMin\"\n          }\n        }\n      }\n    }\n  } \n}",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.258",
+      "config": {
+        "editorSetting": {},
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": false,
+        "runOnSelectionChange": true,
+        "checkEmpty": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 254.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "content_length_stats.sum": "string",
+                      "doc_count": "string",
+                      "content_length_stats.std_deviation_bounds.upper": "string",
+                      "content_length_stats.std_deviation_bounds.lower": "string",
+                      "content_length_stats.sum_of_squares": "string",
+                      "content_length_stats.std_deviation": "string",
+                      "content_length_stats.count": "string",
+                      "content_length_stats.max": "string",
+                      "content_length_stats.variance": "string",
+                      "content_length_stats.min": "string",
+                      "content_length_stats.avg": "string",
+                      "key": "string"
                     },
-                    "updated":false
+                    "updated": false
                   },
-                  "tableOptionSpecHash":"[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
-                  "tableOptionValue":{
-                    "useFilter":false,
-                    "showPagination":false,
-                    "showAggregationFooter":false
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
                   },
-                  "updated":false,
-                  "initialized":false
+                  "updated": false,
+                  "initialized": false
                 },
-                "multiBarChart":{
-                  "rotate":{
-                    "degree":"-45"
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
                   },
-                  "xLabelStatus":"default"
+                  "xLabelStatus": "default"
                 }
               },
-              "commonSetting":{
-
-              },
-              "keys":[
+              "commonSetting": {},
+              "keys": [
                 {
-                  "name":"key",
-                  "index":11,
-                  "aggr":"sum"
+                  "name": "key",
+                  "index": 11.0,
+                  "aggr": "sum"
                 }
               ],
-              "groups":[
-
-              ],
-              "values":[
+              "groups": [],
+              "values": [
                 {
-                  "name":"content_length_stats.avg",
-                  "index":10,
-                  "aggr":"sum"
+                  "name": "content_length_stats.avg",
+                  "index": 10.0,
+                  "aggr": "sum"
                 }
               ]
             },
-            "helium":{
-
-            }
+            "helium": {}
           }
         },
-        "enabled":true
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "results":{
-        "code":"SUCCESS",
-        "msg":[
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
           {
-            "type":"TABLE",
-            "data":"content_length_stats.sum\tdoc_count\tcontent_length_stats.std_deviation_bounds.upper\tcontent_length_stats.std_deviation_bounds.lower\tcontent_length_stats.sum_of_squares\tcontent_length_stats.std_deviation\tcontent_length_stats.count\tcontent_length_stats.max\tcontent_length_stats.variance\tcontent_length_stats.min\tcontent_length_stats.avg\tkey\n108570\t2278\t240.18574288651143\t-144.86528634568617\t2.62836E+7\t96.2627573080494\t2278\t360\t9266.51844454842\t0\t47.660228270412645\tIT\n86190\t2001\t226.99867133055272\t-140.85174479382107\t2.06352E+7\t91.96260403109345\t2001\t360\t8457.120540179685\t0\t43.07346326836582\tUS\n36915\t797\t240.402065227557\t-147.7671844245457\t9215325\t97.04231241302567\t797\t360\t9417.210398467276\t0\t46.31744040150565\tJP\n38700\t743\t250.9228143740153\t-146.7505398114312\t9359550\t99.41833854636162\t743\t360\t9884.006039318974\t0\t52.08613728129206\tCN\n28935\t621\t238.42363161230912\t-145.23522581520768\t7061175\t95.9147143568792\t621\t360\t9199.63243016173\t0\t46.594202898550726\tCA\n22410\t548\t225.39510239139813\t-143.6067812235149\t5580000\t92.25047090372826\t548\t360\t8510.149381959614\t0\t40.894160583941606\tDE\n26865\t521\t256.47334428973056\t-153.34474544136205\t6854175\t102.45452243277316\t521\t360\t10496.929166927619\t0\t51.56429942418426\tIN\n24990\t518\t241.49026645329712\t-145.00377996681067\t6041700\t96.62351160502695\t518\t360\t9336.102994886778\t0\t48.24324324324324\tAU\n24825\t511\t247.13067683929592\t-149.96825022481454\t6242175\t99.27473176602761\t511\t360\t9855.472367216731\t0\t48.5812133072407\tGB\n17685\t407\t232.9068814293633\t-146.0027045251864\t4420575\t94.72739648863742\t407\t360\t8973.279645515518\t0\t43.452088452088454\tKR"
+            "type": "TABLE",
+            "data": "content_length_stats.sum\tdoc_count\tcontent_length_stats.std_deviation_bounds.upper\tcontent_length_stats.std_deviation_bounds.lower\tcontent_length_stats.sum_of_squares\tcontent_length_stats.std_deviation\tcontent_length_stats.count\tcontent_length_stats.max\tcontent_length_stats.variance\tcontent_length_stats.min\tcontent_length_stats.avg\tkey\n108570\t2278\t240.18574288651143\t-144.86528634568617\t2.62836E+7\t96.2627573080494\t2278\t360\t9266.51844454842\t0\t47.660228270412645\tIT\n86190\t2001\t226.99867133055272\t-140.85174479382107\t2.06352E+7\t91.96260403109345\t2001\t360\t8457.120540179685\t0\t43.07346326836582\tUS\n36915\t797\t240.402065227557\t-147.7671844245457\t9215325\t97.04231241302567\t797\t360\t9417.210398467276\t0\t46.31744040150565\tJP\n38700\t743\t250.9228143740153\t-146.7505398114312\t9359550\t99.41833854636162\t743\t360\t9884.006039318974\t0\t52.08613728129206\tCN\n28935\t621\t238.42363161230912\t-145.23522581520768\t7061175\t95.9147143568792\t621\t360\t9199.63243016173\t0\t46.594202898550726\tCA\n22410\t548\t225.39510239139813\t-143.6067812235149\t5580000\t92.25047090372826\t548\t360\t8510.149381959614\t0\t40.894160583941606\tDE\n26865\t521\t256.47334428973056\t-153.34474544136205\t6854175\t102.45452243277316\t521\t360\t10496.929166927619\t0\t51.56429942418426\tIN\n24990\t518\t241.49026645329712\t-145.00377996681067\t6041700\t96.62351160502695\t518\t360\t9336.102994886778\t0\t48.24324324324324\tAU\n24825\t511\t247.13067683929592\t-149.96825022481454\t6242175\t99.27473176602761\t511\t360\t9855.472367216731\t0\t48.5812133072407\tGB\n17685\t407\t232.9068814293633\t-146.0027045251864\t4420575\t94.72739648863742\t407\t360\t8973.279645515518\t0\t43.452088452088454\tKR"
           }
         ]
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"20190723-144530_1859280119",
-      "id":"20190723-144530_1859280119",
-      "dateCreated":"2019-11-04T12:42:10+0000",
-      "status":"FINISHED",
-      "$$hashKey":"object:14211",
-      "runtimeInfos":{
-
-      }
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791258_97607671",
+      "id": "20190723-144530_1859280119",
+      "dateCreated": "2019-11-06 08:59:51.258",
+      "status": "READY"
     },
     {
-      "user":"anonymous",
-      "dateUpdated":"2019-11-04T12:31:27+0000",
-      "config":{
-        "colWidth":12,
-        "fontSize":9,
-        "results":{
-
+      "user": "anonymous",
+      "dateUpdated": "2019-11-06 08:59:51.258",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
         },
-        "enabled":true,
-        "editorSetting":{
-          "language":"scala",
-          "editOnDblClick":false,
-          "completionKey":"TAB",
-          "completionSupport":true
-        },
-        "editorMode":"ace/mode/scala"
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
       },
-      "settings":{
-        "params":{
-
-        },
-        "forms":{
-
-        }
+      "settings": {
+        "params": {},
+        "forms": {}
       },
-      "apps":[
-
-      ],
-      "progressUpdateIntervalMs":500,
-      "jobName":"paragraph_1572870687113_-182260890",
-      "id":"20190723-150214_1628672730",
-      "dateCreated":"2019-11-04T12:31:27+0000",
-      "status":"READY",
-      "$$hashKey":"object:14212"
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1573030791258_-1346885621",
+      "id": "20190723-150214_1628672730",
+      "dateCreated": "2019-11-06 08:59:51.258",
+      "status": "READY"
     }
   ],
-  "name":"ElasticSearch Demo (Queries)",
-  "id":"2ERQ917G8",
-  "defaultInterpreterGroup":"spark",
-  "version":"0.9.0-SNAPSHOT",
-  "permissions":{
-
+  "name": "ElasticSearch Demo (Queries)",
+  "id": "2ESEBEXCG",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-SNAPSHOT",
+  "permissions": {},
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
   },
-  "noteParams":{
-
-  },
-  "noteForms":{
-
-  },
-  "angularObjects":{
-
-  },
-  "config":{
-    "isZeppelinNotebookCronEnable":false,
-    "looknfeel":"default",
-    "personalizedMode":"false"
-  },
-  "info":{
-
-  },
-  "path":"/ElasticSearch Demo (Queries)"
+  "info": {},
+  "path": "/ElasticSearch Demo (Queries)"
 }
