@@ -40,6 +40,7 @@ import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
 import com.trilead.ssh2.SFTPv3FileAttributes;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -315,7 +316,7 @@ public class FileManagerService {
     }
 
     String getFileMimeType(String hostAddress, String newPath) throws SSHCommandException {
-        return sshCommandService.runSSHCommand(hostAddress, "file --brief --mime-type " + newPath);
+        return sshCommandService.runSSHCommand(hostAddress, "file --brief --mime-type " + StringEscapeUtils.escapeXSI(newPath));
     }
 
     boolean isTextMimeType(String fileMimeType) {
