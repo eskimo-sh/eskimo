@@ -32,12 +32,15 @@ public class NodesConfigControllerTest {
 
         ncc.setSystemService(new SystemService() {
             @Override
-            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesSetup();
-            }
-            @Override
             public boolean isProcessingPending() {
                 return false;
+            }
+        });
+
+        ncc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesSetup();
             }
         });
 
@@ -90,12 +93,15 @@ public class NodesConfigControllerTest {
 
         ncc.setSystemService(new SystemService() {
             @Override
-            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-                throw new SystemException("Test Error");
-            }
-            @Override
             public boolean isProcessingPending() {
                 return false;
+            }
+        });
+
+        ncc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
+                throw new SystemException("Test Error");
             }
         });
 
@@ -114,6 +120,19 @@ public class NodesConfigControllerTest {
 
         ncc.setSystemService(new SystemService() {
             @Override
+            public void applyNodesConfig(OperationsCommand command)
+                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+                // No Op
+            }
+
+        });
+
+        ncc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
+                // No Op
+            }
+            @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 return StandardSetupHelpers.getStandard2NodesStatus();
             }
@@ -123,15 +142,6 @@ public class NodesConfigControllerTest {
             }
             @Override
             public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, JSONException, SetupException {
-                // No Op
-            }
-            @Override
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
-                // No Op
-            }
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
                 // No Op
             }
         });
@@ -181,16 +191,18 @@ public class NodesConfigControllerTest {
 
         ncc.setSystemService(new SystemService() {
             @Override
+            public void applyNodesConfig(OperationsCommand command)
+                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+                // No Op
+            }
+        });
+        ncc.setConfigurationService(new ConfigurationService() {
+            @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 return StandardSetupHelpers.getStandard2NodesStatus();
             }
             @Override
             public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, JSONException, SetupException {
-                // No Op
-            }
-            @Override
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
                 // No Op
             }
             @Override

@@ -70,6 +70,9 @@ public class ServicesConfigService {
     private SystemService systemService;
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
     /* For tests */
@@ -84,6 +87,9 @@ public class ServicesConfigService {
     }
     void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
+    }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     private ReentrantLock servicesConfigFileLock = new ReentrantLock();
@@ -138,7 +144,7 @@ public class ServicesConfigService {
             saveServicesConfig (servicesConfig);
 
             if (dirtyServices != null && dirtyServices.length > 0) {
-                NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
+                NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
                 OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
                         servicesDefinition,

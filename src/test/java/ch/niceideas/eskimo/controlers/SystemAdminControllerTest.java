@@ -120,6 +120,15 @@ public class SystemAdminControllerTest {
                 return false;
             }
             @Override
+            public void applyNodesConfig(OperationsCommand command)
+                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+                // No Op
+            }
+
+        });
+
+        sac.setConfigurationService(new ConfigurationService() {
+            @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 ServicesInstallStatusWrapper retWrapper = StandardSetupHelpers.getStandard2NodesStatus();
                 assertTrue(retWrapper.getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13").equals("OK"));
@@ -135,12 +144,6 @@ public class SystemAdminControllerTest {
             public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
                 return StandardSetupHelpers.getStandard2NodesSetup();
             }
-            @Override
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
-                // No Op
-            }
-
         });
 
         sac.setNodeRangeResolver(new NodeRangeResolver() {

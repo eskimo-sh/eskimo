@@ -73,6 +73,8 @@ public abstract class AbstractSystemTest {
 
     protected MemoryComputer memoryComputer = null;
 
+    protected ConfigurationService configurationService = null;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
@@ -101,6 +103,8 @@ public abstract class AbstractSystemTest {
         };
         servicesDefinition.afterPropertiesSet();
 
+        configurationService = createConfigurationService();
+
         nodeRangeResolver = new NodeRangeResolver();
 
         proxyManagerService = new ProxyManagerService();
@@ -119,6 +123,7 @@ public abstract class AbstractSystemTest {
 
         setupService = createSetupService();
         servicesDefinition.setSetupService(setupService);
+        configurationService.setSetupService(setupService);
 
         systemService = createSystemService();
         systemService.setSetupService(setupService);
@@ -154,6 +159,7 @@ public abstract class AbstractSystemTest {
         systemOperationService.setNotificationService(notificationService);;
         systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
+        systemOperationService.setConfigurationService(configurationService);
         systemService.setSystemOperationService (systemOperationService);
 
         systemService.setServicesDefinition(servicesDefinition);
@@ -179,6 +185,10 @@ public abstract class AbstractSystemTest {
         servicesConfigService.setServicesDefinition(servicesDefinition);
 
         systemService.setServicesConfigService(servicesConfigService);
+    }
+
+    protected ConfigurationService createConfigurationService() {
+        return new ConfigurationService();
     }
 
     protected SetupService createSetupService() {

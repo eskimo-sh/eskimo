@@ -187,4 +187,26 @@ public class ServicesController {
         }
     }
 
+    @GetMapping("/get-marathon-services")
+    @ResponseBody
+    public String getMarathonServices() {
+        try {
+
+            Map<String, Object> servicesConfigurations = new HashMap<>();
+
+            servicesDefinition.getAllServices().stream()
+                    .map(name -> servicesDefinition.getService(name))
+                    .filter(service -> service.isMarathon())
+                    .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
+
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("marathonServices", new JSONArray(servicesDefinition.listMarathonServices()));
+                put("marathonServicesConfigurations", new JSONObject(servicesConfigurations));
+            }}).toString(2);
+        } catch (JSONException e) {
+            return ErrorStatusHelper.createErrorStatus(e);
+        }
+    }
+
 }

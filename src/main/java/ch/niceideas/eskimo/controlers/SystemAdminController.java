@@ -70,6 +70,9 @@ public class SystemAdminController {
     private NotificationService notificationService;
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     private ServicesDefinition servicesDefinition;
 
     @Autowired
@@ -85,6 +88,10 @@ public class SystemAdminController {
     void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
     }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
 
     @GetMapping("/interupt-processing")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
@@ -175,7 +182,7 @@ public class SystemAdminController {
 
             String nodeName = address.replaceAll("\\.", "-");
 
-            ServicesInstallStatusWrapper formerServicesInstallationStatus = systemService.loadServicesInstallationStatus();
+            ServicesInstallStatusWrapper formerServicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = ServicesInstallStatusWrapper.empty();
 
@@ -183,9 +190,9 @@ public class SystemAdminController {
                 newServicesInstallationStatus.setValueForPath(is, formerServicesInstallationStatus.getValueForPath(is));
             }
 
-            systemService.saveServicesInstallationStatus(newServicesInstallationStatus);
+            configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
 
-            NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
+            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
                 return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }

@@ -56,6 +56,7 @@ public class Service {
 
     private int configOrder = -1;
     private boolean unique = false;
+    private boolean marathon = false;
 
     private boolean mandatory = false;
 
@@ -186,6 +187,14 @@ public class Service {
         this.unique = unique;
     }
 
+    public boolean isMarathon() {
+        return marathon;
+    }
+
+    public void setMarathon(boolean marathon) {
+        this.marathon = marathon;
+    }
+
     public int getConfigOrder() {
         return configOrder;
     }
@@ -247,6 +256,7 @@ public class Service {
         return new JSONObject(new HashMap<String, Object>() {{
             put("name", getName());
             put("unique", isUnique());
+            put("marathon", isMarathon());
             put("mandatory", isMandatory());
             put("conditional", getConditional().name());
             put("configOrder", configOrder);

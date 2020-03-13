@@ -107,6 +107,9 @@ public class ServicesDefinition implements InitializingBean {
             Boolean unique = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.unique");
             service.setUnique(unique != null && unique); // false by default
 
+            Boolean marathon = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.marathon");
+            service.setMarathon(marathon != null && marathon); // false by default
+
             Boolean mandatory = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.mandatory");
             service.setMandatory(mandatory != null && mandatory);
 
@@ -336,7 +339,7 @@ public class ServicesDefinition implements InitializingBean {
 
     public String[] listMultipleServices() {
         return services.values().stream()
-                .filter(it -> !it.isUnique())
+                .filter(it -> !it.isUnique() && !it.isMarathon())
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
     }
@@ -352,6 +355,14 @@ public class ServicesDefinition implements InitializingBean {
     public String[] listUniqueServices() {
         return services.values().stream()
                 .filter(Service::isUnique)
+                .map(Service::getName)
+                .sorted()
+                .toArray(String[]::new);
+    }
+
+    public String[] listMarathonServices() {
+        return services.values().stream()
+                .filter(Service::isMarathon)
                 .map(Service::getName)
                 .sorted()
                 .toArray(String[]::new);

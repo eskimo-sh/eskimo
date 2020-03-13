@@ -494,6 +494,47 @@
   },
 
 
+  "marathon" : {
+    "config": {
+      "imageName" : "marathon",
+      "order": 12,
+      "unique": true,
+      "group": "Marathon",
+      "name": "App Master",
+      "selectionLayout": { "col": 1, "row": 6  },
+      "memory": "neglectable",
+      "logo" : "images/marathon-logo.png",
+      "icon" : "images/marathon-icon.png"
+    },
+    "ui": {
+      "proxyTargetPort" : 8081,
+      "waitTime": 8000,
+      "title" : "Marathon",
+      "statusPageLinktitle" : "Manage Marathon Services"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "mesos-master",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ],
+    "TODO_EDITABLE_CXONFIGURATION": ""
+  },
+
 
   "flink-app-master" : {
     "config": {
@@ -652,7 +693,7 @@
     "config": {
       "imageName" : "cerebro",
       "order": 15,
-      "unique": true,
+      "marathon": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
       "selectionLayout" : { "row" : 2, "col" : 1},

@@ -58,6 +58,7 @@ eskimo.Main = function() {
     var eskimoNotifications = null;
     var eskimoServices = null;
     var eskimoServicesSelection = null;
+    var eskimoMarathonServicesConfig = null;
     var eskimoServicesConfig = null;
     var eskimoFileManagers = null;
     var eskimoOperationsCommand = null;
@@ -293,6 +294,9 @@ eskimo.Main = function() {
     this.getServicesConfig = function() {
         return eskimoServicesConfig;
     };
+    this.getMarathonServicesConfig = function() {
+        return eskimoMarathonServicesConfig;
+    };
     this.getFileManagers = function() {
         return eskimoFileManagers;
     };
@@ -337,6 +341,8 @@ eskimo.Main = function() {
 
         eskimoServicesConfig = new eskimo.ServicesConfig();
         // loadServicesConfig -> load-services-config
+
+        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();
 
         eskimoOperationsCommand = new eskimo.OperationsCommand();
         // (nothing)

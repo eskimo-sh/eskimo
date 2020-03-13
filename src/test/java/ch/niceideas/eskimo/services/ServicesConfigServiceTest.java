@@ -74,6 +74,8 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
 
         scs.setNodeRangeResolver(nodeRangeResolver);
 
+        scs.setConfigurationService(configurationService);
+
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }
 
@@ -108,7 +110,7 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
     public void testSaveAndApplyServicesConfig() throws Exception {
         //fail ("To Be Implemented");
 
-        systemService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
 
         scs.saveServicesConfig(new ServicesConfigWrapper(jsonConfig));
 

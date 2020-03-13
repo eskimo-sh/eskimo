@@ -209,6 +209,7 @@ public class ServicesControllerTest {
                 "  \"servicesConfigurations\": {\n" +
                 "    \"A\": {\n" +
                 "      \"col\": -1,\n" +
+                "      \"marathon\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -219,6 +220,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"B\": {\n" +
                 "      \"col\": -1,\n" +
+                "      \"marathon\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -229,6 +231,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"C\": {\n" +
                 "      \"col\": -1,\n" +
+                "      \"marathon\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -283,6 +286,7 @@ public class ServicesControllerTest {
                 "  \"servicesConfigurations\": {\n" +
                 "    \"A\": {\n" +
                 "      \"col\": -1,\n" +
+                "      \"marathon\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -293,6 +297,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"B\": {\n" +
                 "      \"col\": -1,\n" +
+                "      \"marathon\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -303,6 +308,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"C\": {\n" +
                 "      \"col\": -1,\n" +
+                "      \"marathon\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +

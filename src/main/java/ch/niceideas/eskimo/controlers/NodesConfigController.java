@@ -78,6 +78,9 @@ public class NodesConfigController {
     private SetupService setupService;
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     private NodesConfigurationChecker nodesConfigChecker;
 
     @Autowired
@@ -102,13 +105,16 @@ public class NodesConfigController {
     void setNodesConfigChecker(NodesConfigurationChecker nodesConfigChecker) {
         this.nodesConfigChecker = nodesConfigChecker;
     }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
 
     @GetMapping("/load-nodes-config")
     @ResponseBody
     public String loadNodesConfig() {
         try {
             setupService.ensureSetupCompleted();
-            NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
+            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
                 return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
@@ -134,7 +140,7 @@ public class NodesConfigController {
 
         try {
 
-            ServicesInstallStatusWrapper servicesInstallStatus = systemService.loadServicesInstallationStatus();
+            ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
             ServicesInstallStatusWrapper newServicesInstallStatus = ServicesInstallStatusWrapper.empty();
 
             NodesConfigWrapper reinstallModelConfig = new NodesConfigWrapper(reinstallModel);
@@ -148,7 +154,7 @@ public class NodesConfigController {
                 }
             }
 
-            NodesConfigWrapper nodesConfig = systemService.loadNodesConfig();
+            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
                 return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
@@ -193,7 +199,7 @@ public class NodesConfigController {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(configAsString);
             nodesConfigChecker.checkServicesConfig(nodesConfig);
 
-            ServicesInstallStatusWrapper serviceInstallStatus = systemService.loadServicesInstallationStatus();
+            ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
             // Create OperationsCommand
             OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
@@ -234,10 +240,10 @@ public class NodesConfigController {
 
             // newNodesStatus is null in case of nodes config change (as opposed to forced reinstall)
             if (newServicesInstallationStatus != null) {
-                systemService.saveServicesInstallationStatus(newServicesInstallationStatus);
+                configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
             }
 
-            systemService.saveNodesConfig(command.getRawConfig());
+            configurationService.saveNodesConfig(command.getRawConfig());
 
             systemService.applyNodesConfig(command);
 

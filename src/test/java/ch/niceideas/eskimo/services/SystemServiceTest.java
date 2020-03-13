@@ -69,7 +69,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Override
     protected SystemService createSystemService() {
-        return new SystemService() {
+        SystemService ss = new SystemService() {
             @Override
             protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
                 File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
@@ -77,6 +77,8 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return retFile;
             }
         };
+        ss.setConfigurationService(configurationService);
+        return ss;
     }
 
     @Override
@@ -101,7 +103,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 put("ntp_installed_on_IP_192-168-10-13", "OK");
         }});
 
-        systemService.saveServicesInstallationStatus(savedStatus);
+        configurationService.saveServicesInstallationStatus(savedStatus);
 
         // testing zookeeper installation
         systemService.installService("zookeeper", "localhost");
@@ -304,7 +306,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = systemService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -313,7 +315,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = systemService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // kafka manager is missing
         assertTrue (new JSONObject(expectedPrevStatus).similar(resultPrevStatus.getJSONObject()));
@@ -349,7 +351,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = systemService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -358,7 +360,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = systemService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // kafka and elasticsearch have been kept
         assertTrue(new JSONObject("{\n" +
@@ -406,7 +408,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = systemService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -415,7 +417,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = systemService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // everything has been removed, including kafka and elasticsearch
         assertTrue(new JSONObject("{\n" +
@@ -510,7 +512,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             put("zookeeper_installed_on_IP_192-168-10-11", "OK");
         }});
 
-        systemService.saveServicesInstallationStatus(savedStatus);
+        configurationService.saveServicesInstallationStatus(savedStatus);
 
         // testing zookeeper installation
         systemService.uninstallService("zookeeper", "192.168.10.11");

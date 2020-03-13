@@ -64,7 +64,7 @@ public class SystemService {
 
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
-    public static final String NODES_STATUS_JSON_PATH = "/nodes-status.json";
+
     public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
     public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
     public static final String SERVICE_PREFIX = "service_";
@@ -106,6 +106,10 @@ public class SystemService {
     @Autowired
     private ServicesConfigService servicesConfigService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
+
     @Value("${system.failedServicesTriggerCount}")
     private int failedServicesTriggerCount = 2;
 
@@ -127,8 +131,6 @@ public class SystemService {
     @Value("${system.baseInstallWaitTimoutSeconds}")
     private int baseInstallWaitTimout = 1000;
 
-    private ReentrantLock statusFileLock = new ReentrantLock();
-    private ReentrantLock nodesConfigFileLock = new ReentrantLock();
     private ReentrantLock prevStatusCheckLock = new ReentrantLock();
     private ReentrantLock systemActionLock = new ReentrantLock();
 
@@ -173,6 +175,9 @@ public class SystemService {
     }
     void setServicesConfigService (ServicesConfigService servicesConfigService) {
         this.servicesConfigService = servicesConfigService;
+    }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
 
@@ -267,10 +272,10 @@ public class SystemService {
         SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
 
         // 1. Load Node Config
-        NodesConfigWrapper rawNodesConfig = loadNodesConfig();
+        NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
 
         // 1.1. Load Node status
-        ServicesInstallStatusWrapper servicesInstallationStatus = loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
         // 1.2 flag services needing restart
         if (rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
@@ -445,7 +450,7 @@ public class SystemService {
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
                 for (Pair<String, String> operation : restarts) {
                     try {
-                        updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
+                        configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
                             String nodeName = ipAddress.replace(".", "-");
@@ -613,71 +618,6 @@ public class SystemService {
                 status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
-    void updateAndSaveServicesInstallationStatus(StatusUpdater statusUpdater) throws FileException, SetupException {
-        statusFileLock.lock();
-        try {
-            ServicesInstallStatusWrapper status = loadServicesInstallationStatus();
-            statusUpdater.updateStatus(status);
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + NODES_STATUS_JSON_PATH), status.getFormattedValue());
-        } finally {
-            statusFileLock.unlock();
-        }
-    }
-
-    public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, SetupException {
-        statusFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + NODES_STATUS_JSON_PATH), status.getFormattedValue());
-        } finally {
-            statusFileLock.unlock();
-        }
-    }
-
-    public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-        statusFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + NODES_STATUS_JSON_PATH);
-            if (!statusFile.exists()) {
-                return ServicesInstallStatusWrapper.empty();
-            }
-
-            return new ServicesInstallStatusWrapper(statusFile);
-        } finally {
-            statusFileLock.unlock();
-        }
-    }
-
-    public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
-        nodesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + "/nodes-config.json"), nodesConfig.getFormattedValue());
-        } finally {
-            nodesConfigFileLock.unlock();
-        }
-    }
-
-    public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-        nodesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File nodesConfigFile = new File(configStoragePath + "/nodes-config.json");
-            if (!nodesConfigFile.exists()) {
-                return null;
-            }
-
-            return new NodesConfigWrapper(FileUtils.readFile(nodesConfigFile));
-        } catch (JSONException | FileException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        } finally {
-            nodesConfigFileLock.unlock();
-        }
-    }
-
     void fetchNodeStatus
             (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<String, String> nbrAndPair,
              ServicesInstallStatusWrapper servicesInstallationStatus)
@@ -813,7 +753,7 @@ public class SystemService {
                 }
 
                 if (changes) {
-                    saveServicesInstallationStatus(servicesInstallationStatus);
+                    configurationService.saveServicesInstallationStatus(servicesInstallationStatus);
                 }
             } catch (JSONException e) {
                 logger.error(e, e);

@@ -59,6 +59,9 @@ public class SystemOperationService {
     private NotificationService notificationService;
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     private SystemService systemService;
 
     /* For tests */
@@ -70,6 +73,9 @@ public class SystemOperationService {
     }
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
+    }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     public void applySystemOperation(String message, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
@@ -95,7 +101,7 @@ public class SystemOperationService {
                 notificationService.addInfo(message + " succeeded");
 
                 if (statusUpdater != null) {
-                    systemService.updateAndSaveServicesInstallationStatus(statusUpdater);
+                    configurationService.updateAndSaveServicesInstallationStatus(statusUpdater);
                 }
 
             } catch (Exception e) {
