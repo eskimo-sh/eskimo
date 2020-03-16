@@ -125,6 +125,8 @@ public abstract class AbstractSystemTest {
         servicesDefinition.setSetupService(setupService);
         configurationService.setSetupService(setupService);
 
+        setupService.setConfigurationService (configurationService);
+
         systemService = createSystemService();
         systemService.setSetupService(setupService);
         systemService.setProxyManagerService(proxyManagerService);

@@ -79,6 +79,9 @@ public class SetupService {
     @Autowired
     private SystemOperationService systemOperationService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     private String storagePathConfDir = System.getProperty("user.dir");
 
     @Value("${system.packageDistributionPath}")
@@ -114,9 +117,14 @@ public class SetupService {
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
     }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
     void setStoragePathConfDir (String storagePathConfDir) {
         this.storagePathConfDir = storagePathConfDir;
     }
+    String getStoragePathConfDir() { return storagePathConfDir; }
 
     @PostConstruct
     public void init() {
@@ -157,7 +165,7 @@ public class SetupService {
 
         // 2. Ensure setup config is stored
         try {
-            loadSetupConfig();
+            configurationService.loadSetupConfig();
         } catch (FileException e) {
             throw new SetupException ("Application is not initialized properly. File 'config.conf' cannot be read");
         }
@@ -205,45 +213,19 @@ public class SetupService {
         }
     }
 
-    public String loadSetupConfig() throws FileException, SetupException {
-        File configFile = new File(getConfigStoragePath() + "/config.json");
-        if (!configFile.exists()) {
-            throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
-        }
-
-        return FileUtils.readFile(configFile);
-    }
-
     public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
 
         logger.info("Got config : " + configAsString);
 
         try {
-            JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
 
-            // First thing first : save storage path
+            JsonWrapper setupConfigJSON = configurationService.saveSetupConfig(configAsString);
+
             String configStoragePath = (String) setupConfigJSON.getValueForPath("setup_storage");
             if (StringUtils.isBlank(configStoragePath)) {
                 throw new SetupException ("config Storage path cannot be empty.");
             }
             configStoragePathInternal = configStoragePath;
-
-            File entryFile = new File(storagePathConfDir + "/storagePath.conf");
-            FileUtils.writeFile(entryFile, configStoragePathInternal);
-
-            File storagePath = new File(configStoragePathInternal);
-            if (!storagePath.exists()) {
-
-                storagePath.mkdirs();
-
-                if (!storagePath.exists()) {
-                    throw new SetupException("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");
-                }
-            }
-            if (!storagePath.canWrite()) {
-                String username = System.getProperty("user.name");
-                throw new SetupException("User " + username + " cannot write in path " + getConfigStoragePath() + " doesn't exist.");
-            }
 
             String sshKeyContent = (String) setupConfigJSON.getValueForPath("content-ssh-key");
             if (StringUtils.isBlank(sshKeyContent)) {

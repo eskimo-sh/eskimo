@@ -87,6 +87,8 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     private SetupService setupService = null;
 
+    private ConfigurationService cs = null;
+
     @Before
     public void setUp() throws Exception {
         setupService = new SetupService();
@@ -109,6 +111,11 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         pms.setConnectionManagerService(cm);
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);
+
+        cs = new ConfigurationService();
+        cs.setSetupService(setupService);
+
+        cm.setConfigurationService(cs);
     }
 
     @Test

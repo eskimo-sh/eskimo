@@ -36,9 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.services.MarathonServicesConfigService;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -52,6 +50,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.security.auth.login.Configuration;
 import java.util.HashMap;
 
 
@@ -63,6 +62,15 @@ public class MarathonServicesConfigController {
     @Autowired
     private MarathonServicesConfigService marathonServicesConfigService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private SetupService setupService;
+
+    @Autowired
+    private SystemService systemService;
+
     /* For tests */
     void setMarathonServicesConfigService(MarathonServicesConfigService marathonServicesConfigService) {
         this.marathonServicesConfigService = marathonServicesConfigService;
@@ -72,15 +80,21 @@ public class MarathonServicesConfigController {
     @ResponseBody
     public String loadMarathonServicesConfig() {
         try {
+            setupService.ensureSetupCompleted();
+            MarathonServicesConfigWrapper msConfig = configurationService.loadMarathonServicesConfig();
+            if (msConfig == null || msConfig.isEmpty()) {
+                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+            }
+            return msConfig.getFormattedValue();
 
-            MarathonServicesConfigWrapper wrapper = marathonServicesConfigService.loadMarathonServicesConfig();
-
-            wrapper.setValueForPath("status", "OK");
-
-            return wrapper.getFormattedValue();
-        } catch (JSONException | FileException | SetupException e) {
+        } catch (SystemException | JSONException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus(e.getMessage());
+
+        } catch (SetupException e) {
+            // this is OK. means application is not yet initialized
+            logger.debug (e, e);
+            return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
         }
     }
 

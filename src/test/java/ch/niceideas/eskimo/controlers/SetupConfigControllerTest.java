@@ -3,6 +3,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
+import ch.niceideas.eskimo.services.ConfigurationService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.SystemService;
@@ -26,12 +27,15 @@ public class SetupConfigControllerTest {
 
         scc.setSetupService(new SetupService() {
             @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-            @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No Op
+            }
+        });
+
+        scc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public String loadSetupConfig() throws FileException, SetupException {
+                return "{\"config\": \"dummy\"}";
             }
         });
 
@@ -46,12 +50,15 @@ public class SetupConfigControllerTest {
 
         scc.setSetupService(new SetupService() {
             @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-            @Override
             public void ensureSetupCompleted() throws SetupException {
                 throw new SetupException("No loaded");
+            }
+        });
+
+        scc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public String loadSetupConfig() throws FileException, SetupException {
+                return "{\"config\": \"dummy\"}";
             }
         });
 
@@ -62,7 +69,7 @@ public class SetupConfigControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setSetupService(new SetupService() {
+        scc.setConfigurationService(new ConfigurationService() {
             @Override
             public String loadSetupConfig() throws FileException, SetupException {
                 throw new SetupException("Setup error");
@@ -77,12 +84,15 @@ public class SetupConfigControllerTest {
 
         scc.setSetupService(new SetupService() {
             @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-            @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No Op
+            }
+        });
+
+        scc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public String loadSetupConfig() throws FileException, SetupException {
+                return "{\"config\": \"dummy\"}";
             }
         });
 

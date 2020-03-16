@@ -61,8 +61,7 @@ public class StatusService {
     public static final String SSH_USERNAME_FIELD = "sshUsername";
 
     @Autowired
-    private SetupService setupService;
-
+    private ConfigurationService configurationService;
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -95,7 +94,7 @@ public class StatusService {
         systemStatus.setValueForPath("buildTimestamp", buildTimestamp);
 
         try {
-            JsonWrapper systemConfig = new JsonWrapper(setupService.loadSetupConfig());
+            JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
             systemStatus.setValueForPath(SSH_USERNAME_FIELD, systemConfig.getValueForPath("ssh_username"));
         } catch (FileException e) {
 

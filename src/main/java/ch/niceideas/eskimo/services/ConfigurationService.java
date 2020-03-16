@@ -34,8 +34,11 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.apache.log4j.Logger;
@@ -59,6 +62,7 @@ public class ConfigurationService {
 
     private ReentrantLock statusFileLock = new ReentrantLock();
     private ReentrantLock nodesConfigFileLock = new ReentrantLock();
+    private ReentrantLock marathonServicesFileLock = new ReentrantLock();
 
     @Autowired
     private SetupService setupService;
@@ -133,4 +137,58 @@ public class ConfigurationService {
         }
     }
 
+    public JsonWrapper saveSetupConfig(String configAsString) throws SetupException, FileException {
+        JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
+
+        // First thing first : save storage path
+        String configStoragePath = (String) setupConfigJSON.getValueForPath("setup_storage");
+        if (StringUtils.isBlank(configStoragePath)) {
+            throw new SetupException ("config Storage path cannot be empty.");
+        }
+
+        File entryFile = new File(setupService.getStoragePathConfDir() + "/storagePath.conf");
+        FileUtils.writeFile(entryFile, configStoragePath);
+
+        File storagePath = new File(configStoragePath);
+        if (!storagePath.exists()) {
+
+            storagePath.mkdirs();
+
+            if (!storagePath.exists()) {
+                throw new SetupException("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");
+            }
+        }
+        if (!storagePath.canWrite()) {
+            String username = System.getProperty("user.name");
+            throw new SetupException("User " + username + " cannot write in path " + storagePath + " doesn't exist.");
+        }
+        return setupConfigJSON;
+    }
+
+    public String loadSetupConfig() throws FileException, SetupException {
+        File configFile = new File(setupService.getConfigStoragePath() + "/config.json");
+        if (!configFile.exists()) {
+            throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
+        }
+
+        return FileUtils.readFile(configFile);
+    }
+
+    public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException, SetupException {
+        marathonServicesFileLock.lock();
+        try {
+            String configStoragePath = setupService.getConfigStoragePath();
+            File marathonServicesConfigFile = new File(configStoragePath + "/marathon-services-config.json");
+            if (!marathonServicesConfigFile.exists()) {
+                return null;
+            }
+
+            return new MarathonServicesConfigWrapper(FileUtils.readFile(marathonServicesConfigFile));
+        } catch (JSONException | FileException e) {
+            logger.error (e, e);
+            throw new SystemException(e);
+        } finally {
+            marathonServicesFileLock.unlock();
+        }
+    }
 }

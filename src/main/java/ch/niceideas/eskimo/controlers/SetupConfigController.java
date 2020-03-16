@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
+import ch.niceideas.eskimo.services.ConfigurationService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.SystemService;
@@ -70,12 +71,18 @@ public class SetupConfigController {
     @Autowired
     private SystemService systemService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     /* For tests */
     void setSystemService(SystemService systemService) {
         this.systemService = systemService;
     }
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
+    }
+    void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
 
@@ -84,7 +91,7 @@ public class SetupConfigController {
     public String loadSetupConfig() {
 
         try {
-            String config = setupService.loadSetupConfig();
+            String config = configurationService.loadSetupConfig();
 
             JsonWrapper configWrapper = new JsonWrapper(config);
 

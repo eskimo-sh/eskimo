@@ -65,6 +65,9 @@ public class ConnectionManagerService {
     @Autowired
     private ProxyManagerService proxyManagerService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @Value("${connectionManager.defaultSSHPort}")
     private int sshPort = 22;
 
@@ -120,6 +123,9 @@ public class ConnectionManagerService {
     }
     void setProxyManagerService (ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
+    }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
@@ -239,7 +245,7 @@ public class ConnectionManagerService {
         connection.setTCPNoDelay(true);
         connection.connect(null, tcpConnectionTimeout, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 
-        JsonWrapper systemConfig = new JsonWrapper(setupService.loadSetupConfig());
+        JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
 
         if (privateSShKeyContent == null) {
             privateSShKeyContent = (String)systemConfig.getValueForPath("content-ssh-key");

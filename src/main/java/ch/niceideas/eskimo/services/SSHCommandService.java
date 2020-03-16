@@ -59,7 +59,7 @@ public class SSHCommandService {
     private ConnectionManagerService connectionManagerService;
 
     @Autowired
-    private SetupService setupService;
+    private ConfigurationService configurationService;
 
     @Value("${connectionManager.sshOperationTimeout}")
     private int sshOperationTimeout = 30000;
@@ -195,7 +195,7 @@ public class SSHCommandService {
 
         try {
 
-            JsonWrapper systemConfig = new JsonWrapper(setupService.loadSetupConfig());
+            JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
 
             Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 

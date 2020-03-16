@@ -110,7 +110,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         SetupCommand command = setupService.saveAndPrepareSetup(setupConfig);
 
-        JsonWrapper setupConfigWrapper = new JsonWrapper(setupService.loadSetupConfig());
+        JsonWrapper setupConfigWrapper = new JsonWrapper(configurationService.loadSetupConfig());
 
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
         assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
@@ -142,6 +142,9 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setPackagesToBuild(packagesToBuild);
         setupService.setMesosPackages(mesosPackages);
+
+        setupService.setConfigurationService(configurationService);
+        configurationService.setSetupService(setupService);
 
         return setupService;
     }
@@ -203,6 +206,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 return new JsonWrapper(packagesVersionFile);
             }
         });
+
         setupService.saveAndPrepareSetup(setupConfig);
 
         setupService.applySetup(new JsonWrapper(setupConfig));
