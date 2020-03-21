@@ -62,8 +62,8 @@ public class NodesConfigController {
 
     private static final Logger logger = Logger.getLogger(NodesConfigController.class);
 
-    public static final String PENDING_OPERATIONS_STATUS_OVERRIDE = "PENDING_OPERATIONS_STATUS_OVERRIDE";
-    public static final String PENDING_OPERATIONS_COMMAND = "PENDING_OPERATIONS_COMMAND";
+    public static final String PENDING_OPERATIONS_STATUS_OVERRIDE = "PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE";
+    public static final String PENDING_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
 
     @Resource
     private MessagingService messagingService;

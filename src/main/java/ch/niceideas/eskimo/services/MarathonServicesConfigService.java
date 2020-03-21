@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.MarathonOperationsCommand;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -39,9 +40,8 @@ public class MarathonServicesConfigService {
     }
 
 
-    public void saveAndApplyMarathonServicesConfig(String configFormAsString) throws FileException, SetupException, SystemException {
+    public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws SystemException {
 
-        // TODO
-
+        throw new UnsupportedOperationException("To Be Implemented");
     }
 }

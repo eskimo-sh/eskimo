@@ -35,7 +35,10 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.MarathonOperationsCommand;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
@@ -50,7 +53,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.security.auth.login.Configuration;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 
@@ -58,6 +62,9 @@ import java.util.HashMap;
 public class MarathonServicesConfigController {
 
     private static final Logger logger = Logger.getLogger(MarathonServicesConfigController.class);
+
+    public static final String PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE = "PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE";
+    public static final String PENDING_MARATHON_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
 
     @Autowired
     private MarathonServicesConfigService marathonServicesConfigService;
@@ -71,9 +78,22 @@ public class MarathonServicesConfigController {
     @Autowired
     private SystemService systemService;
 
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+
+    @Resource
+    private MessagingService messagingService;
+
+    @Autowired
+    private NotificationService notificationService;
+
     /* For tests */
     void setMarathonServicesConfigService(MarathonServicesConfigService marathonServicesConfigService) {
         this.marathonServicesConfigService = marathonServicesConfigService;
+    }
+    void setServicesDefinition (ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
     }
 
     @GetMapping("/load-marathon-services-config")
@@ -98,23 +118,92 @@ public class MarathonServicesConfigController {
         }
     }
 
+    @PostMapping("/save-marathon-services-config")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String saveMarathonServicesConfig(@RequestBody String configAsString, HttpSession session) {
+
+        logger.info ("Got config : " + configAsString);
+
+        try {
+
+            // first of all check nodes config
+            MarathonServicesConfigWrapper marathonServicesConfig = new MarathonServicesConfigWrapper(configAsString);
+
+            // FIXME
+            //marathonServicesConfigChecker.checkServicesConfig(marathonServicesConfig);
+
+            ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
+
+            // Create OperationsCommand
+            MarathonOperationsCommand command = MarathonOperationsCommand.create(servicesDefinition, serviceInstallStatus, marathonServicesConfig);
+
+            // store command and config in HTTP Session
+            session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
+
+            return returnCommand (command);
+
+        } catch (JSONException | SetupException | FileException | MarathonServicesConfigurationException e) {
+            logger.error(e, e);
+            messagingService.addLines (e.getMessage());
+            notificationService.addError("Nodes installation failed !");
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
+        }
+    }
+
+    private String returnCommand(MarathonOperationsCommand command) {
+        try {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("command", command.toJSON());
+            }}).toString(2);
+        } catch (JSONException e) {
+            return ErrorStatusHelper.createErrorStatus(e);
+        }
+    }
+
     @PostMapping("/apply-marathon-services-config")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String saveAndApplyMarathonServicesConfig(@RequestBody String configFormAsString) {
-
-        logger.info("Got config : " + configFormAsString);
+    public String applyMarathonServicesConfig(HttpSession session) {
 
         try {
-            marathonServicesConfigService.saveAndApplyMarathonServicesConfig(configFormAsString);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-            }}).toString(2);
+            if (systemService.isProcessingPending()) {
+                return new JSONObject(new HashMap<String, Object>() {{
+                    put("status", "OK");
+                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                }}).toString(2);
+            }
 
-        } catch (JSONException | FileException | SetupException | SystemException e) {
+            MarathonOperationsCommand command = (MarathonOperationsCommand) session.getAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
+            session.removeAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
+
+            /*
+            ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
+            session.removeAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
+
+            // newNodesStatus is null in case of nodes config change (as opposed to forced reinstall)
+            if (newServicesInstallationStatus != null) {
+                configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
+            }
+            */
+
+            configurationService.saveMarathonServicesConfig(command.getRawConfig());
+
+            marathonServicesConfigService.applyMarathonServicesConfig(command);
+
+            return "{\"status\": \"OK\" }";
+
+        } catch (SystemException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus (e);
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
+
+        } catch (JSONException | SetupException | FileException e) {
+            logger.error(e, e);
+            messagingService.addLines (e.getMessage());
+            notificationService.addError("Marathon Services installation failed !");
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
 

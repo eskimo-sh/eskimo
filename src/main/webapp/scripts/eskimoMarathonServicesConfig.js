@@ -57,7 +57,7 @@ eskimo.MarathonServicesConfig = function() {
 
                     if (checkMarathonSetup(setupConfig)) {
 
-                        proceedWithMarathonInstallation(false, setupConfig);
+                        proceedWithMarathonInstallation(setupConfig);
                     }
 
                     e.preventDefault();
@@ -119,6 +119,7 @@ eskimo.MarathonServicesConfig = function() {
     this.renderMarathonConfig = function (marathonConfig) {
 
         var marathonServicesTableBody = $("#marathon-services-table-body");
+        marathonServicesTableBody.html("");
 
         for (var i = 0; i < MARATHON_SERVICES.length; i++) {
 
@@ -133,13 +134,31 @@ eskimo.MarathonServicesConfig = function() {
                 MARATHON_SERVICES[i]+
                 '</td>'+
                 '<td>' +
-                '    <input  type="checkbox" class="input-md" name="' + MARATHON_SERVICES[i] +'-choice" id="'+MARATHON_SERVICES[i] +'-choice"></input>' +
+                '    <input  type="checkbox" class="input-md" name="' + MARATHON_SERVICES[i] +'_install" id="'+MARATHON_SERVICES[i] +'_install"></input>' +
                 '</td>';
 
 
 
             marathonServiceRow += '<tr>';
             marathonServicesTableBody.append (marathonServiceRow);
+        }
+
+        if (marathonConfig) {
+
+            for (var installFlag in marathonConfig) {
+                var indexOfInstall = installFlag.indexOf("_install");
+                if (indexOfInstall > -1) {
+                    var serviceName = installFlag.substring(0,indexOfInstall);
+                    var flag = marathonConfig[installFlag];
+
+                    console.log (serviceName + " - " + flag);
+
+                    if (flag == "on") {
+                        $('#' + serviceName + '_install').get(0).checked = true;
+                    }
+
+                }
+            }
         }
 
     };
@@ -175,6 +194,8 @@ eskimo.MarathonServicesConfig = function() {
 
                     alert (" TODO missing");
 
+                    that.renderMarathonConfig();
+
                     /*
                     $("#nodes-placeholder").html(''+
                         '<div class="col-lg-4 col-md-6 col-sm-8 col-xs-12">\n' +
@@ -204,6 +225,45 @@ eskimo.MarathonServicesConfig = function() {
         return true;
     }
     this.checkMarathonSetup = checkMarathonSetup;
+
+    function proceedWithMarathonInstallation(model) {
+
+        eskimoMain.showProgressbar();
+
+        // 1 hour timeout
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 1000 * 120,
+            contentType: "application/json; charset=utf-8",
+            url: "save-marathon-services-config",
+            data: JSON.stringify(model),
+            success: function (data, status, jqXHR) {
+
+                eskimoMain.hideProgressbar();
+
+                // OK
+                console.log(data);
+
+                if (!data || data.error) {
+                    console.error(atob(data.error));
+                    alert(atob(data.error));
+                } else {
+
+                    if (!data.command) {
+                        alert ("Expected pending operations command but got none !");
+                    } else {
+                        eskimoMain.getMarathonOperationsCommand().showCommand (data.command);
+                    }
+                }
+            },
+
+            error: function (jqXHR, status) {
+                eskimoMain.hideProgressbar();
+                errorHandler (jqXHR, status);
+            }
+        });
+    }
 
     // call constructor
     this.initialize();

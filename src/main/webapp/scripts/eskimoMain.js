@@ -63,6 +63,7 @@ eskimo.Main = function() {
     var eskimoFileManagers = null;
     var eskimoOperationsCommand = null;
     var eskimoSetupCommand = null;
+    var eskimoMarathonOperationsCommand = null;
     var eskimoAbout = null;
 
     var operationInProgress = false;
@@ -306,6 +307,9 @@ eskimo.Main = function() {
     this.getSetupCommand = function() {
         return eskimoSetupCommand;
     };
+    this.getMarathonOperationsCommand = function() {
+        return eskimoMarathonOperationsCommand;
+    };
     this.getAbout = function() {
         return eskimoAbout;
     };
@@ -345,6 +349,9 @@ eskimo.Main = function() {
         eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();
 
         eskimoOperationsCommand = new eskimo.OperationsCommand();
+        // (nothing)
+
+        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();
         // (nothing)
 
         eskimoSetupCommand = new eskimo.SetupCommand();

@@ -191,4 +191,14 @@ public class ConfigurationService {
             marathonServicesFileLock.unlock();
         }
     }
+
+    public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) throws FileException, SetupException {
+        marathonServicesFileLock.lock();
+        try {
+            String configStoragePath = setupService.getConfigStoragePath();
+            FileUtils.writeFile(new File(configStoragePath + "/marathon-services-config.json"), marathonServicesConfig.getFormattedValue());
+        } finally {
+            marathonServicesFileLock.unlock();
+        }
+    }
 }
