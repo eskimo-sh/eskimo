@@ -72,7 +72,28 @@ sudo rm -f /tmp/marathon_install_log
 #   - https://github.com/moby/moby/issues/38252
 # But eventually I need to do this in anyway to make sure everything is preoperly re-installed
 # I need to make sure I'm doing this before attempting to recreate the directories
-preinstall_unmount_gluster_share /var/lib/marathon/data
+#preinstall_unmount_gluster_share /var/lib/marathon/data
+
+echo " - Creating marathon user (if not exist)"
+export marathon_user_id=`id -u marathon 2>> /tmp/flink_executor_install.log`
+if [[ $marathon_user_id == "" ]]; then
+    sudo useradd -u 3306 marathon
+    marathon_user_id=`id -u marathon 2>> /tmp/flink_executor_install.log`
+    if [[ $marathon_user_id == "" ]]; then
+        echo "Failed to add user marathon"
+        exit -4
+    fi
+fi
+
+# Create shared dir
+echo " - Creating shared directory"
+sudo mkdir -p /var/log/marathon
+sudo chown marathon /var/log/marathon
+sudo mkdir -p /var/log/marathon/log
+sudo chown marathon /var/log/marathon/log
+sudo mkdir -p /var/lib/marathon
+sudo mkdir -p /var/lib/marathon/tmp
+sudo chown -R marathon /var/lib/marathon
 
 
 echo " - Building container marathon"
@@ -100,7 +121,7 @@ fail_if_error $? "/tmp/marathon_install_log" -2
 
 
 echo " - Configuring marathon App Master container"
-docker exec marathon bash /scripts/inContainerSetupMarathon.sh $SELF_IP_ADDRESS | tee -a /tmp/marathon_install_log 2>&1
+docker exec marathon bash /scripts/inContainerSetupMarathon.sh $marathon_user_id $SELF_IP_ADDRESS | tee -a /tmp/marathon_install_log 2>&1
 if [[ `tail -n 1 /tmp/marathon_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/marathon_install_log

@@ -355,7 +355,7 @@ public class SystemService {
         return systemStatus;
     }
 
-    private String sendPing(String ipAddress) throws SSHCommandException {
+    String sendPing(String ipAddress) throws SSHCommandException {
         return sshCommandService.runSSHScript(ipAddress, "echo OK", false);
     }
 
@@ -416,7 +416,7 @@ public class SystemService {
             }
 
             // Nodes setup
-            performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
+            this.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
                         String ipAddress = operation.getValue();
                         if (nodesConfig.getIpAddresses().contains(ipAddress) && liveIps.contains(ipAddress)) {
@@ -522,14 +522,14 @@ public class SystemService {
         }
     }
 
-    private void performPooledOperation(
-            List<Pair<String, String>> operations, int parallelism, long operationWaitTimout, PooledOperation operation)
+    <T> void performPooledOperation(
+            List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
             throws SystemException {
 
         final ExecutorService threadPool = Executors.newFixedThreadPool(parallelism);
         AtomicReference<Exception> error = new AtomicReference<>();
 
-        for (Pair<String, String> opToPerform : operations) {
+        for (T opToPerform : operations) {
 
             if (!isInterrupted()) {
                 threadPool.execute(() -> {
@@ -589,9 +589,14 @@ public class SystemService {
 
     void restartServiceForSystem(String service, String ipAddress) throws SystemException {
         String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
-                builder -> builder.append (sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
-                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
+
+        if (servicesDefinition.getService(service).isMarathon()) {
+            throw new UnsupportedOperationException("Supprt Marathon Service restart");
+        } else {
+            systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
+                    builder -> builder.append(sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
+                    status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
+        }
     }
 
     void uninstallService(String service, String ipAddress) throws SystemException {
@@ -1026,8 +1031,45 @@ public class SystemService {
     private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String service)
             throws IOException, SystemException, SSHCommandException {
 
-        sb.append(" - Creating archive and copying it over\n");
+        String imageName = servicesDefinition.getService(service).getImageName();
 
+        sb.append(" - Creating archive and copying it over\n");
+        File tmpArchiveFile = createRemotePackageFolder(sb, ipAddress, service, imageName);
+
+
+        // 4. call setup script
+        try {
+            exec(ipAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
+        } catch (SSHCommandException e) {
+            logger.debug (e, e);
+            sb.append(e.getMessage());
+            throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.");
+        }
+
+        // 5. cleanup
+        exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
+        exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
+
+        if (StringUtils.isNotBlank(imageName)) {
+            try {
+                sb.append(" - Deleting docker template image");
+                exec(ipAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
+            } catch (SSHCommandException e) {
+                logger.error(e, e);
+                sb.append(e.getMessage());
+                // ignroed any further
+            }
+        }
+
+        try {
+            FileUtils.delete (new File (TMP_PATH_PREFIX + tmpArchiveFile.getName() + ".tgz"));
+        } catch (FileUtils.FileDeleteFailedException e) {
+            logger.error (e, e);
+            throw new SystemException(e);
+        }
+    }
+
+    File createRemotePackageFolder(StringBuilder sb, String ipAddress, String service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist
@@ -1074,8 +1116,6 @@ public class SystemService {
         }
 
         // 3. Copy container image there if any
-
-        String imageName = servicesDefinition.getService(service).getImageName();
         if (StringUtils.isNotBlank(imageName)) {
             String imageFileName = setupService.findLastPackageFile(SetupService.DOCKER_TEMPLATE_PREFIX, imageName);
 
@@ -1093,54 +1133,24 @@ public class SystemService {
                 sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
             }
         }
-
-        // 4. call setup script
-        try {
-            exec(ipAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
-        } catch (SSHCommandException e) {
-            logger.debug (e, e);
-            sb.append(e.getMessage());
-            throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.");
-        }
-
-        // 5. cleanup
-        exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
-        exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
-
-        if (StringUtils.isNotBlank(imageName)) {
-            try {
-                sb.append(" - Deleting docker template image");
-                exec(ipAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
-            } catch (SSHCommandException e) {
-                logger.error(e, e);
-                sb.append(e.getMessage());
-                // ignroed any further
-            }
-        }
-
-        try {
-            FileUtils.delete (new File (TMP_PATH_PREFIX + tmpArchiveFile.getName() + ".tgz"));
-        } catch (FileUtils.FileDeleteFailedException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        }
+        return tmpArchiveFile;
     }
 
-    protected File createTempFile(String service, String ipAddress, String extension) throws IOException {
+    File createTempFile(String service, String ipAddress, String extension) throws IOException {
         return File.createTempFile(service, extension);
     }
 
-    private void exec(String ipAddress, StringBuilder sb, String[] setupScript) throws SSHCommandException {
+    void exec(String ipAddress, StringBuilder sb, String[] setupScript) throws SSHCommandException {
         sb.append(sshCommandService.runSSHCommand(ipAddress, setupScript));
     }
 
-    private void exec(String ipAddress, StringBuilder sb, String command) throws SSHCommandException {
+    void exec(String ipAddress, StringBuilder sb, String command) throws SSHCommandException {
         sb.append(sshCommandService.runSSHCommand(ipAddress, command));
     }
 
 
-    interface PooledOperation {
-        void call(Pair<String, String> operation, AtomicReference<Exception> error)
+    interface PooledOperation<T> {
+        void call(T operation, AtomicReference<Exception> error)
                 throws SystemException, FileException, SetupException, ConnectionManagerException;
     }
 

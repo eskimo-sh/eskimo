@@ -36,57 +36,17 @@
 
 set -e
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $SCRIPT_DIR/common.sh "$@"
+echo " - Injecting topology"
+. /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector.sh marathon
 
-MARATHON_USER_ID=$1
-if [[ $MARATHON_USER_ID == "" ]]; then
-    echo " - Didn't get MARATHON User ID as argument"
-    exit -2
-fi
+# point to your libmesos.so if you use Mesos
+export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
 
-SELF_IP_ADDRESS=$2
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
-    exit -2
-fi
+echo " - Starting service"
 
-
-echo " - Symlinking some RHEL mesos dependencies "
-saved_dir=`pwd`
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-sudo ln -s libsasl2.so.2 libsasl2.so.3
-cd $saved_dir
-
-echo " - Creating marathon user (if not exist) in container"
-set +e
-marathon_user_id=`id -u marathon 2> /tmp/es_install_log`
-set -e
-if [[ $marathon_user_id == "" ]]; then
-    useradd -u $MARATHON_USER_ID flink
-elif [[ $marathon_user_id != $MARATHON_USER_ID ]]; then
-    echo "Docker MARATHON USER ID is $marathon_user_id while requested USER ID is $MARATHON_USER_ID"
-    exit -2
-fi
-
-echo " - Creating user flink home directory"
-mkdir -p /home/flink
-chown flink /home/flink
-
-
-
-# The external address of the host on which the JobManager runs and can be
-# reached by the TaskManagers and any clients which want to connect
-#sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address to which the REST client will connect to
-#sed -i s/"#rest.address: 0.0.0.0"/"rest.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address that the REST & web server binds to
-#sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+# FIXME TODO temporary
+#/usr/local/lib/flink/bin/mesos-appmaster.sh
+bash

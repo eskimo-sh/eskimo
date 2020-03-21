@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -34,59 +32,60 @@
 # Software.
 #
 
-set -e
+[Unit]
+Description=Marathon
+Wants=network-online.target
+After=docker.service
+Requires=docker.service
+After=gluster.service
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $SCRIPT_DIR/common.sh "$@"
+[Service]
+TimeoutStartSec=180sec
+RemainAfterExit=false
 
+# Run ExecStartPre with root-permissions
+PermissionsStartOnly=true
 
-MARATHON_USER_ID=$1
-if [[ $MARATHON_USER_ID == "" ]]; then
-    echo " - Didn't get MARATHON User ID as argument"
-    exit -2
-fi
+ExecStartPre=-/usr/bin/docker kill marathon
+ExecStartPre=-/usr/bin/docker rm -f marathon
 
-SELF_IP_ADDRESS=$2
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
-    exit -2
-fi
+# attempt to recreate  / remount gluster shares
+#ExecStartPre=/bin/bash /usr/local/sbin/setupFlinkGlusterShares.sh
 
+# Find out about version of mesos available
+ExecStartPre=/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/marathon_mesos_environment"
+#EnvironmentFile=/run/system_mesos_environment
 
-echo " - Symlinking some RHEL mesos dependencies "
-saved_dir=`pwd`
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-sudo ln -s libsasl2.so.2 libsasl2.so.3
-cd $saved_dir
+ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run \
+        -i \
+        --name marathon \
+        --user marathon \
+        --network host \
+        -v /var/log/marathon:/var/log/marathon \
+        -v /var/lib/marathon:/var/lib/marathon:rshared \
+        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
+        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        -e NODE_NAME=$HOSTNAME \
+        eskimo:marathon \
+        /usr/local/sbin/inContainerStartService.sh"
 
-echo " - Creating marathon user (if not exist) in container"
-set +e
-marathon_user_id=`id -u marathon 2> /tmp/es_install_log`
-set -e
-if [[ $marathon_user_id == "" ]]; then
-    useradd -u $MARATHON_USER_ID flink
-elif [[ $marathon_user_id != $MARATHON_USER_ID ]]; then
-    echo "Docker MARATHON USER ID is $marathon_user_id while requested USER ID is $MARATHON_USER_ID"
-    exit -2
-fi
+#        -p 6123:6123 \
+#        -p 6130:6130 \
+#        -p 8081:8081 \
+#        -p 8082:8082 \
 
-echo " - Creating user flink home directory"
-mkdir -p /home/flink
-chown flink /home/flink
+ExecStop=/usr/bin/docker stop marathon
 
+Type=simple
 
+Restart=always
+StartLimitBurst=5
+StartLimitInterval=30
 
-# The external address of the host on which the JobManager runs and can be
-# reached by the TaskManagers and any clients which want to connect
-#sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
+StandardOutput=syslog
+StandardError=syslog
 
-# The address to which the REST client will connect to
-#sed -i s/"#rest.address: 0.0.0.0"/"rest.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address that the REST & web server binds to
-#sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+[Install]
+WantedBy=multi-user.target

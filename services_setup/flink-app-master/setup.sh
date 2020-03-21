@@ -75,7 +75,7 @@ sudo rm -f /tmp/flink_install_log
 preinstall_unmount_gluster_share /var/lib/flink/data
 preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
 
-echo " - Configuring host spark config part"
+echo " - Configuring host flink config part"
 . ./setupCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
