@@ -315,7 +315,7 @@ eskimo.Services = function () {
             return;
         }
 
-        console.log ("Hiding " + service);
+        //console.log ("Hiding " + service);
 
         /*
         // menu

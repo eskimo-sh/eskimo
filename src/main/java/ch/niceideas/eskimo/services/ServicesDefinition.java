@@ -130,16 +130,14 @@ public class ServicesDefinition implements InitializingBean {
             service.setStatusName (name);
 
             Integer selectionLayoutRow = (Integer) servicesConfig.getValueForPath(serviceString+".config.selectionLayout.row");
-            if (selectionLayoutRow == null) {
-                throw new ServiceDefinitionException("For service " + serviceString + " selectionLayout Row is null");
+            if (selectionLayoutRow != null) {
+                service.setSelectionLayoutRow(selectionLayoutRow);
             }
-            service.setSelectionLayoutRow(selectionLayoutRow);
 
             Integer selectionLayoutCol = (Integer) servicesConfig.getValueForPath(serviceString+".config.selectionLayout.col");
-            if (selectionLayoutCol == null) {
-                throw new ServiceDefinitionException("For service " + serviceString + " selectionLayout Col is null");
+            if (selectionLayoutCol != null) {
+                service.setSelectionLayoutCol(selectionLayoutCol);
             }
-            service.setSelectionLayoutCol(selectionLayoutCol);
 
             String memoryConsumptionString = (String) servicesConfig.getValueForPath(serviceString+".config.memory");
             service.setMemoryConsumptionSize(StringUtils.isBlank(memoryConsumptionString) ?

@@ -99,6 +99,11 @@ eskimo.ServicesSelection = function() {
         for (var i = 0; i < configuredServices.length; i++) {
 
             var choice = $('#' + configuredServices[i] + "-choice");
+
+            if (!choice.get(0) || choice.get(0) == null) {
+                throw "Couldn't find choice for " + configuredServices[i];
+            }
+
             choice.get(0).checked = false;
             choice.removeClass("disabled")
 

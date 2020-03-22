@@ -45,7 +45,7 @@ eskimo.MarathonServicesConfig = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#inner-content-nodes").load("html/eskimoMarathonServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-marathon-services-config").load("html/eskimoMarathonServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
 
             if (statusTxt == "success") {
 

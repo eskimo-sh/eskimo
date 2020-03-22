@@ -153,6 +153,7 @@ public class ServicesController {
         try {
             servicesDefinition.getAllServices().stream()
                     .map(name -> servicesDefinition.getService(name))
+                    .filter(service -> !service.isMarathon())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
             return new JSONObject(new HashMap<String, Object>() {{

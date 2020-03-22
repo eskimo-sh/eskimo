@@ -81,4 +81,4 @@ fi
 
 
 echo " - Closing and saving image marathon"
-close_and_save_image marathon /tmp/marathon_build_log $MARATHON_VERSION
+close_and_save_image marathon /tmp/marathon_build_log MARATHON_VERSION_SHORT

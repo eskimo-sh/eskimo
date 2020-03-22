@@ -79,7 +79,7 @@
       "unique": true,
       "group" : "Monitoring",
       "name" : "Grafana",
-      "selectionLayout" : { "row" : 6, "col" : 1},
+      "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "small",
       "logo" : "images/grafana-logo.png",
       "icon" : "images/grafana-icon.png"
@@ -260,10 +260,53 @@
 
 
 
+  "marathon" : {
+    "config": {
+      "imageName" : "marathon",
+      "order": 8,
+      "unique": true,
+      "group": "Mesos",
+      "name": "Marathon",
+      "selectionLayout": { "col": 1, "row": 6  },
+      "memory": "neglectable",
+      "logo" : "images/marathon-logo.png",
+      "icon" : "images/marathon-icon.png"
+    },
+    "ui": {
+      "proxyTargetPort" : 8081,
+      "waitTime": 8000,
+      "title" : "Marathon",
+      "statusPageLinktitle" : "Manage Marathon Services"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "mesos-master",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ],
+    "TODO_EDITABLE_CXONFIGURATION": ""
+  },
+
+
+
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 8,
+      "order": 9,
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 6, "col" : 3},
@@ -333,7 +376,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 9,
+      "order": 10,
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
@@ -369,7 +412,7 @@
   "spark-history-server" : {
     "config": {
       "imageName" : "spark",
-      "order": 10,
+      "order": 11,
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
@@ -412,7 +455,7 @@
   "spark-executor" : {
     "config": {
       "imageName" : "spark",
-      "order": 11,
+      "order": 12,
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 4, "col" : 3},
@@ -494,52 +537,10 @@
   },
 
 
-  "marathon" : {
-    "config": {
-      "imageName" : "marathon",
-      "order": 12,
-      "unique": true,
-      "group": "Marathon",
-      "name": "App Master",
-      "selectionLayout": { "col": 1, "row": 6  },
-      "memory": "neglectable",
-      "logo" : "images/marathon-logo.png",
-      "icon" : "images/marathon-icon.png"
-    },
-    "ui": {
-      "proxyTargetPort" : 8081,
-      "waitTime": 8000,
-      "title" : "Marathon",
-      "statusPageLinktitle" : "Manage Marathon Services"
-    },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": false
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "mesos-master",
-        "numberOfMasters": 1,
-        "mandatory": true
-      }
-    ],
-    "TODO_EDITABLE_CXONFIGURATION": ""
-  },
-
-
   "flink-app-master" : {
     "config": {
       "imageName" : "flink",
-      "order": 12,
+      "order": 13,
       "unique": true,
       "group": "Flink",
       "name": "App Master",
@@ -622,7 +623,7 @@
   "flink-worker" : {
     "config": {
       "imageName" : "flink",
-      "order": 13,
+      "order": 14,
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "col": 3, "row": 8  },
@@ -663,7 +664,7 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 14,
+      "order": 15,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -692,11 +693,10 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 15,
+      "order": 16,
       "marathon": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
-      "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/cerebro-logo.png",
       "icon" : "images/cerebro-icon.png"
@@ -723,7 +723,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 16,
+      "order": 17,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 3, "col" : 3},
@@ -767,7 +767,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 17,
+      "order": 18,
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
@@ -821,7 +821,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 18,
+      "order": 19,
       "unique": true,
       "name" : "Zeppelin",
       "selectionLayout" : { "row" : 4, "col" : 1},
