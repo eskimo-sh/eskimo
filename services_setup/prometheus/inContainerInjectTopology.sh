@@ -47,7 +47,7 @@ echo -e "\n"\
 "  - job_name: 'node'\n"\
 "    static_configs:" >> /usr/local/lib/prometheus/prometheus.yml
 
-if [[ "$SELF_IP_ADDRESS" == "$MASTER_GRAFANA_1" ]]; then
+if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
 
     echo " - fetching from all other node exporters"
 

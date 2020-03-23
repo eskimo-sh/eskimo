@@ -97,7 +97,7 @@ public class MarathonServicesConfigService {
 
             // TODO
 
-            String marathonIpAddress = findUniqueServiceNodeName ("marathon");
+            String marathonIpAddress = findUniqueServiceIP("marathon");
             if (StringUtils.isBlank(marathonIpAddress)) {
                 throw new SystemException("Marathon doesn't seem to be installed");
             }
@@ -106,7 +106,6 @@ public class MarathonServicesConfigService {
             Set<String> deadIps = new HashSet<>();
 
             List<Pair<String, String>> nodesSetup = new ArrayList<>();
-
 
 
             // handle potential interruption request
@@ -141,7 +140,7 @@ public class MarathonServicesConfigService {
             // Installation in batches (groups following dependencies)
 
             // TODO deploying on marathon 1 service at a time for now
-            systemService.performPooledOperation (command.getInstallations(), 1, operationWaitTimout,
+            systemService.performPooledOperation(command.getInstallations(), 1, operationWaitTimout,
                     (operation, error) -> {
                         String service = operation;
                         installMarathonService(service, marathonIpAddress);
@@ -170,13 +169,40 @@ public class MarathonServicesConfigService {
             */
 
             success = true;
+        } catch (FileException | SetupException e) {
+            logger.error (e, e);
+            throw new SystemException(e);
         } finally {
             systemService.setLastOperationSuccess (success);
             systemService.releaseProcessingPending();
         }
     }
 
-    private String findUniqueServiceNodeName(String service) {
+    private String findUniqueServiceIP(String service) throws FileException, SetupException {
+
+        String uniqueServiceNodeName = findUniqueServiceNodeName(service);
+        if (StringUtils.isBlank(uniqueServiceNodeName)) {
+            return null;
+        }
+
+        return uniqueServiceNodeName.replace("-", ".");
+    }
+
+    private String findUniqueServiceNodeName(String service) throws FileException, SetupException {
+
+        ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();
+
+        for (String installFlag : installStatus.getRootKeys()) {
+
+            if (installFlag.startsWith(service)
+                    && installStatus.getValueForPathAsString(installFlag) != null
+                    && installStatus.getValueForPathAsString(installFlag).equals("OK")) {
+
+                String ipAddress = installFlag.substring(installFlag.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length());
+                return ipAddress.replace(".", "_");
+            }
+        }
+
         return null;
     }
 
@@ -185,10 +211,15 @@ public class MarathonServicesConfigService {
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on marathon node " + marathonIpAddress,
                 builder -> proceedWithMarathonServiceUninstallation(builder, marathonIpAddress, service),
                 status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
-        proxyManagerService.removeServerForService(service, findMarathonServiceNode(service));
+        try {
+            proxyManagerService.removeServerForService(service, findMarathonServiceNode(service));
+        } catch (FileException | SetupException e) {
+            logger.error(e, e);
+            throw new SystemException(e);
+        }
     }
 
-    private String findMarathonServiceNode(String service) {
+    private String findMarathonServiceNode(String service) throws FileException, SetupException {
         return findUniqueServiceNodeName (service);
     }
 
@@ -263,36 +294,13 @@ public class MarathonServicesConfigService {
         sb.append(" - Creating archive and copying it over to marathon node \n");
         File tmpArchiveFile = systemService.createRemotePackageFolder(sb, marathonIpAddress, service, imageName);
 
-        /*
         // 4. call setup script
-        try {
-            systemService.exec(marathonIpAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", marathonIpAddress});
-        } catch (SSHCommandException e) {
-            logger.debug (e, e);
-            sb.append(e.getMessage());
-            throw new SystemException ("Setup.sh script execution for " + service + " on node " + marathonIpAddress + " failed.");
-        }
+        systemService.installationSetup(sb, marathonIpAddress, service);
+
+        /*
 
         // 5. cleanup
-        systemService.exec(marathonIpAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
-        systemService.exec(marathonIpAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
-
-        if (StringUtils.isNotBlank(imageName)) {
-            try {
-                sb.append(" - Deleting docker template image");
-                systemService.exec(marathonIpAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
-            } catch (SSHCommandException e) {
-                logger.error(e, e);
-                sb.append(e.getMessage());
-                // ignroed any further
-            }
-        }
-
-        try {
-            FileUtils.delete (new File (TMP_PATH_PREFIX + tmpArchiveFile.getName() + ".tgz"));
-        } catch (FileUtils.FileDeleteFailedException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
+        systemService.installationCleanup(sb, ipAddress, service, imageName, tmpArchiveFile);throw new SystemException(e);
         }
         */
     }

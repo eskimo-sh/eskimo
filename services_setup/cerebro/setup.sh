@@ -110,5 +110,19 @@ handle_topology_settings cerebro /tmp/cerebro_install_log
 echo " - Committing changes to local template and exiting container cerebro"
 commit_container cerebro /tmp/cerebro_install_log
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file cerebro /tmp/cerebro_install_log
+
+#echo " - Installing and checking systemd service file"
+#install_and_check_service_file cerebro /tmp/cerebro_install_log
+
+echo " - Deploying Marathon Service"
+docker tag eskimo:cerebro marathon.registry:5000/cerebro
+
+docker push marathon.registry:5000/cerebro
+if [[ $? != 0 ]]; then
+    echo "Image push in docker registry failed !"
+    exit -22
+fi
+
+
+# TODO deploy service in marathon
+

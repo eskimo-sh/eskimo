@@ -34,59 +34,80 @@
 # Software.
 #
 
-set -e
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-MARATHON_USER_ID=$1
-if [[ $MARATHON_USER_ID == "" ]]; then
-    echo " - Didn't get MARATHON User ID as argument"
-    exit -2
+echo "-- INSTALLING DOCKER REGISTRY ------------------------------------------------------"
+
+
+echo " - Changing to temp directory"
+cd /tmp
+
+echo " - Downloading docker-registry_$DOCKER_REGISTRY_VERSION.deb "
+wget http://ftp.debian.org/debian/pool/main/d/docker-registry/docker-registry_$DOCKER_REGISTRY_VERSION.deb >> /tmp/docker_registry_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo " -> Failed to downolad docker-registry_$DOCKER_REGISTRY_VERSION.deb from debian. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/docker-registry_$DOCKER_REGISTRY_VERSION.deb  >> /tmp/docker_registry_install_log 2>&1
+    fail_if_error $? "/tmp/docker_registry_install_log" -1
 fi
 
-SELF_IP_ADDRESS=$2
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
-    exit -2
+echo " - Installing docker registry"
+dpkg -i docker-registry_2.6.2~ds1-2+b21_amd64.deb >> /tmp/docker_registry_install_log 2>&1
+fail_if_error $? "/tmp/docker_registry_install_log" -2
+
+
+echo " - Creating configuration file"
+mkdir -p /etc/docker/registry >> /tmp/docker_registry_install_log 2>&1
+fail_if_error $? "/tmp/docker_registry_install_log" -3
+
+ln -s /etc/docker/registry /etc/docker_registry >> /tmp/docker_registry_install_log 2>&1
+fail_if_error $? "/tmp/docker_registry_install_log" -4
+
+
+cat > /etc/docker_registry/config.yml <<- "EOF"
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/docker_registry
+http:
+  addr: :5000
+  headers:
+    X-Content-Type-Options: [nosniff]
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3
+EOF
+
+
+echo " - Checking startup"
+# check startup
+
+echo "   + starting docker registry"
+docker-registry serve /etc/docker_registry/config.yml > /dev/null 2>&1 &
+
+sleep 5
+
+echo "   + checking startup"
+if [[ `ps -efl | grep docker-registry | grep -v grep` == "" ]]; then
+    echo "Checking startup failed !!"
+    exit -6
 fi
 
-
-echo " - Symlinking some RHEL mesos dependencies "
-saved_dir=`pwd`
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-sudo ln -s libsasl2.so.2 libsasl2.so.3
-cd $saved_dir
-
-echo " - Creating marathon user (if not exist) in container"
-set +e
-marathon_user_id=`id -u marathon 2> /tmp/es_install_log`
-set -e
-if [[ $marathon_user_id == "" ]]; then
-    useradd -u $MARATHON_USER_ID marathon
-elif [[ $marathon_user_id != $MARATHON_USER_ID ]]; then
-    echo "Docker MARATHON USER ID is $marathon_user_id while requested USER ID is $MARATHON_USER_ID"
-    exit -2
-fi
-
-echo " - Creating user marathon home directory"
-mkdir -p /home/marathon
-chown marathon /home/marathon
+echo "   + stopping docker registry"
+killall docker-registry > /dev/null
 
 
-
-# The external address of the host on which the JobManager runs and can be
-# reached by the TaskManagers and any clients which want to connect
-#sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address to which the REST client will connect to
-#sed -i s/"#rest.address: 0.0.0.0"/"rest.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address that the REST & web server binds to
-#sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo " - In container install SUCCESS"
+
+
+

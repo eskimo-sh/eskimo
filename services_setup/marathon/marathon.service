@@ -40,7 +40,7 @@ Requires=docker.service
 After=gluster.service
 
 [Service]
-TimeoutStartSec=180sec
+TimeoutStartSec=0
 RemainAfterExit=false
 
 # Run ExecStartPre with root-permissions
@@ -60,9 +60,12 @@ ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run
         -i \
         --name marathon \
         --user marathon \
-        --network host \
+         -p 28080:28080 \
+         -p 5000:5000 \
         -v /var/log/marathon:/var/log/marathon \
         -v /var/lib/marathon:/var/lib/marathon:rshared \
+        -v /var/lib/docker_registry:/var/lib/docker_registry \
+        -v /var/log/docker_registry:/var/log/docker_registry \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
@@ -71,10 +74,8 @@ ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run
         eskimo:marathon \
         /usr/local/sbin/inContainerStartService.sh"
 
-#        -p 6123:6123 \
-#        -p 6130:6130 \
-#        -p 8081:8081 \
-#        -p 8082:8082 \
+
+#--network host \
 
 ExecStop=/usr/bin/docker stop marathon
 

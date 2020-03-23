@@ -59,14 +59,6 @@
       "logo" : "images/prometheus-logo.png",
       "icon" : "images/prometheus-icon.png"
     },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "RANDOM",
-        "masterService": "grafana",
-        "numberOfMasters": 1,
-        "mandatory": false
-      }
-    ],
     "additionalEnvironment": [ "ALL_NODES_LIST_prometheus" ]
   },
 
@@ -109,6 +101,14 @@
         }
       ]
     },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "prometheus",
+        "numberOfMasters": 1,
+        "mandatory": false
+      }
+    ],
     "additionalEnvironment": [ "CONTEXT_PATH" ]
   },
 
@@ -250,6 +250,12 @@
         "mandatory": true
       },
       {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "marathon",
+        "numberOfMasters": 1,
+        "mandatory": false
+      },
+      {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
@@ -273,10 +279,18 @@
       "icon" : "images/marathon-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 8081,
+      "proxyTargetPort" : 28080,
       "waitTime": 8000,
       "title" : "Marathon",
-      "statusPageLinktitle" : "Manage Marathon Services"
+      "statusPageLinktitle" : "Manage Marathon Services",
+      "proxyReplacements" : [
+        {
+          "comment": "for whatever reason, I need to to get rid of trailing slash",
+          "type" : "PLAIN",
+          "source" : "v2/apps/",
+          "target" : "v2/apps"
+        }
+      ]
     },
     "dependencies": [
       {
@@ -703,7 +717,7 @@
     },
     "ui": {
       "urlTemplate": "./cerebro/#/overview?host=Eskimo",
-      "proxyTargetPort" : 9000,
+      "proxyTargetPort" : 31900,
       "waitTime": 5000,
       "title" : "Cerebro",
       "statusPageLinktitle" : "Administer your data in Elasticsearch"

@@ -1036,8 +1036,14 @@ public class SystemService {
         sb.append(" - Creating archive and copying it over\n");
         File tmpArchiveFile = createRemotePackageFolder(sb, ipAddress, service, imageName);
 
-
         // 4. call setup script
+        installationSetup(sb, ipAddress, service);
+
+        // 5. cleanup
+        installationCleanup(sb, ipAddress, service, imageName, tmpArchiveFile);
+    }
+
+    void installationSetup(StringBuilder sb, String ipAddress, String service) throws SystemException {
         try {
             exec(ipAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
         } catch (SSHCommandException e) {
@@ -1045,8 +1051,9 @@ public class SystemService {
             sb.append(e.getMessage());
             throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.");
         }
+    }
 
-        // 5. cleanup
+    void installationCleanup(StringBuilder sb, String ipAddress, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
         exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
         exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
 

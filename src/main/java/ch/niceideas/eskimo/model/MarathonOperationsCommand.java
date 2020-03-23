@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.SerializablePair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -82,7 +83,8 @@ public class MarathonOperationsCommand implements Serializable {
             String installedService = installation.substring(0, installation.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG));
 
             // search it in config
-            if (!rawMarathonServicesConfig.getValueForPath(installedService + "_install").equals("on") ) {
+            if (!StringUtils.isBlank ((String)rawMarathonServicesConfig.getValueForPath(installedService + "_install"))
+                    &&!rawMarathonServicesConfig.getValueForPath(installedService + "_install").equals("on") ) {
                 retCommand.addUninstallation(installedService);
             }
         }

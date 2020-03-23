@@ -13,7 +13,7 @@ datasources:
   # <int> org id. will default to orgId 1 if not specified
   orgId: 1
   # <string> url
-  url: http://SELF_IP_ADDRESS:9090
+  url: http://MASTER_PROMETHEUS:9090
   # <string> Deprecated, use secureJsonData.password
   #password:
   # <string> database user, if used

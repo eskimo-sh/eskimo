@@ -276,6 +276,19 @@ public class ServicesProxyServlet extends ProxyServlet {
         return input;
     }
 
+    /** Copy proxied response headers back to the servlet client. */
+    @Override
+    protected void copyResponseHeaders(HttpResponse proxyResponse, HttpServletRequest servletRequest,
+                                       HttpServletResponse servletResponse) {
+        for (Header header : proxyResponse.getAllHeaders()) {
+            if (header.getName().equals("X-Frame-Options")) {
+                servletResponse.addHeader(header.getName(), "SAMEORIGIN");
+            } else {
+                copyResponseHeader(servletRequest, servletResponse, header);
+            }
+        }
+    }
+
     /**
      * Reads the request URI from {@code servletRequest} and rewrites it, considering targetUri.
      * It's used to make the new request.

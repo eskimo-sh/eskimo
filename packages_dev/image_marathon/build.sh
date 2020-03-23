@@ -67,6 +67,14 @@ fail_if_error $? "/tmp/marathon_build_log" -3
 #echo " - Installing other python packages"
 #docker exec -i marathon pip install requests filelock >> /tmp/marathon_build_log 2>&1
 
+echo " - Installing Docker Registry"
+docker exec -i marathon bash /scripts/installDockerRegistry.sh | tee -a /tmp/marathon_build_log 2>&1
+if [[ `tail -n 1 /tmp/marathon_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/marathon_build_log
+    exit -103
+fi
+
 echo " - Installing marathon"
 docker exec -i marathon bash /scripts/installMarathon.sh | tee -a /tmp/marathon_build_log 2>&1
 if [[ `tail -n 1 /tmp/marathon_build_log | grep " - In container install SUCCESS"` == "" ]]; then
@@ -81,4 +89,4 @@ fi
 
 
 echo " - Closing and saving image marathon"
-close_and_save_image marathon /tmp/marathon_build_log MARATHON_VERSION_SHORT
+close_and_save_image marathon /tmp/marathon_build_log $MARATHON_VERSION_SHORT

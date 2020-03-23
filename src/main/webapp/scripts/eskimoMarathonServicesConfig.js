@@ -119,10 +119,8 @@ eskimo.MarathonServicesConfig = function() {
     this.renderMarathonConfig = function (marathonConfig) {
 
         var marathonServicesTableBody = $("#marathon-services-table-body");
-        marathonServicesTableBody.html("");
 
         for (var i = 0; i < MARATHON_SERVICES.length; i++) {
-
 
             var marathonServiceRow = '<tr>';
 
@@ -182,7 +180,7 @@ eskimo.MarathonServicesConfig = function() {
 
                 console.log (data);
 
-                $("#nodes-placeholder").html("");
+                $("#marathon-services-table-body").html("");
                 nodes = [];
 
                 if (!data.clear) {
@@ -214,7 +212,7 @@ eskimo.MarathonServicesConfig = function() {
             error: errorHandler
         });
 
-        eskimoMain.showOnlyContent("nodes");
+        eskimoMain.showOnlyContent("marathon-services-config");
     }
     this.showMarathonServicesConfig = showMarathonServicesConfig;
 

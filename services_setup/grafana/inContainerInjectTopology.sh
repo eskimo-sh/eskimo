@@ -43,7 +43,7 @@ echo " - Loading Topology"
 echo " - Replacing markers in provisionning documents"
 for i in `find /usr/local/lib/grafana/conf/provisioning`; do
     if [[ -f $i ]]; then
-        sed -i s/"SELF_IP_ADDRESS"/"$SELF_IP_ADDRESS"/g $i
+        sed -i s/"MASTER_PROMETHEUS"/"$MASTER_PROMETHEUS_1"/g $i
     fi
 done
 

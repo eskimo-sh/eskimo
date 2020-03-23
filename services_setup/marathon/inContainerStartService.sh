@@ -45,8 +45,31 @@ echo " - Inject settings"
 # point to your libmesos.so if you use Mesos
 export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
 
-echo " - Starting service"
+echo " - Starting Docker registry"
+docker-registry serve /etc/docker_registry/config.yml > /var/log/docker_registry/docker_registry.log 2>&1 &
 
-# FIXME TODO temporary
-#/usr/local/lib/flink/bin/mesos-appmaster.sh
-bash
+# TODO put in place some monitoring to kill container if docker registry goes down
+
+echo " - Starting service"
+/usr/local/lib/marathon/bin/marathon \
+    --master zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos \
+    --zk zk://$ZOOKEEPER_IP_ADDRESS:2181/marathon  \
+    --http_port 28080 \
+    --metrics_prometheus \
+    --hostname $SELF_IP_ADDRESS | tee /var/log/marathon/marathon.log
+
+
+# --metrics_prometheus
+# Enable the Prometheus reporter.
+
+# --hostname
+# The advertised hostname that is used for the communication with the Mesos master.
+# The value is also stored in the persistent store so another standby host can redirect to the elected leader.
+
+# --enable_features  <arg>
+# A comma-separated list of features. Available features are:
+# secrets - Enable support for secrets in Marathon (experimental),
+# external_volumes - Enable external volumes support in Marathon,
+# vips - Enable networking VIPs UI,
+# gpu_resources - Enable support for GPU in Marathon (experimental),
+# task_killing - Enable the optional TASK_KILLING state, available in Mesos 0.28 and later

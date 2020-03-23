@@ -98,6 +98,25 @@ function enable_docker() {
         exit -1
     fi
 
+    echo "  - Registering marathon.registry as insecure registry"
+    cat > /tmp/daemon.json <<- "EOF"
+{
+  "insecure-registries" : ["marathon.registry:5000"]
+}
+
+EOF
+
+    sudo mv /tmp/daemon.json /etc/docker/daemon.json
+    sudo chown root. /etc/docker/daemon.json
+
+    echo "  - Reloading docker"
+    sudo systemctl reload docker >>/tmp/install_docker 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to reload docker"
+        cat /tmp/install_docker 1>&2
+        exit -1
+    fi
+
 }
 
 function install_docker_suse_based() {

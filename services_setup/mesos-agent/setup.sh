@@ -84,6 +84,13 @@ if [[ ! -f /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh ]]; then
     sudo ln -s /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh /usr/local/sbin/mesos-init-wrapper.sh
 fi
 
+if [[ ! -f /usr/local/sbin/register-marathon-registry.sh ]]; then
+
+    echo " - Copying register-marathon-registry.sh script"
+    sudo cp $SCRIPT_DIR/register-marathon-registry.sh /usr/local/sbin/
+    sudo chmod 754 /usr/local/sbin/register-marathon-registry.sh
+fi
+
 echo " - Creating mesos slave working directory in /var/lib/mesos/slave"
 sudo mkdir -p /var/lib/mesos/slave
 sudo chmod 755 /var/lib/mesos/slave

@@ -85,6 +85,12 @@ if [[ $marathon_user_id == "" ]]; then
     fi
 fi
 
+echo " - Registering marathon registry"
+# remove any previous definition
+sed -i '/.* marathon.registry/d' /etc/hosts
+echo "$MASTER_MARATHON_1 marathon.registry" >> /etc/hosts
+
+
 # Create shared dir
 echo " - Creating shared directory"
 sudo mkdir -p /var/log/marathon
@@ -95,6 +101,10 @@ sudo mkdir -p /var/lib/marathon
 sudo mkdir -p /var/lib/marathon/tmp
 sudo chown -R marathon /var/lib/marathon
 
+sudo mkdir -p /var/log/docker_registry
+sudo chown -R marathon /var/log/docker_registry
+sudo mkdir -p /var/lib/docker_registry
+sudo chown -R marathon /var/lib/docker_registry
 
 echo " - Building container marathon"
 build_container marathon marathon /tmp/marathon_install_log
@@ -111,6 +121,8 @@ docker run \
         -v /var/log/marathon:/var/log/marathon \
         -v /var/run/marathon:/var/run/marathon \
         -v /var/lib/marathon:/var/lib/marathon \
+        -v /var/lib/docker_registry:/var/lib/docker_registry \
+        -v /var/log/docker_registry:/var/log/docker_registry \
         -i \
         -t eskimo:marathon bash >> /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -2
