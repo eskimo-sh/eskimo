@@ -264,7 +264,7 @@ function install_debian_mesos_dependencies() {
     echo " - Installing other Mesos dependencies"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
             libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/setup_log 2>&1
-     if [[ $? != 0 ]]; then
+    if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
         exit -1
@@ -272,6 +272,75 @@ function install_debian_mesos_dependencies() {
 
 }
 
+function create_common_system_users() {
+
+    echo " - Creating elasticsearch user (if not exist)"
+    elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/setup_log`
+    if [[ $elasticsearch_user_id == "" ]]; then
+        sudo useradd -u 3301 elasticsearch
+        elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/setup_log`
+        if [[ $elasticsearch_user_id == "" ]]; then
+            echo "Failed to add user elasticsearch"
+            exit -4
+        fi
+    fi
+
+    echo " - Creating spark user (if not exist)"
+    export spark_user_id=`id -u spark 2>> /tmp/setup_log`
+    if [[ $spark_user_id == "" ]]; then
+        sudo useradd -u 3302 spark
+        spark_user_id=`id -u spark 2>> /tmp/setup_log`
+        if [[ $spark_user_id == "" ]]; then
+            echo "Failed to add user spark"
+            exit -4
+        fi
+    fi
+
+    echo " - Creating kafka user (if not exist)"
+    kafka_user_id=`id -u kafka 2>> /tmp/setup_log`
+    if [[ $kafka_user_id == "" ]]; then
+        sudo useradd -u 3303 kafka
+        kafka_user_id=`id -u kafka 2>> /tmp/setup_log`
+        if [[ $kafka_user_id == "" ]]; then
+            echo "Failed to add user kafka"
+            exit -4
+        fi
+    fi
+
+    echo " - Creating grafana user (if not exist)"
+    grafana_user_id=`id -u grafana 2>> /tmp/setup_log`
+    if [[ $grafana_user_id == "" ]]; then
+        sudo useradd -u 3304 grafana
+        grafana_user_id=`id -u grafana 2>> /tmp/setup_log`
+        if [[ $grafana_user_id == "" ]]; then
+            echo "Failed to add user grafana"
+            exit -4
+        fi
+    fi
+
+    echo " - Creating flink user (if not exist)"
+    export flink_user_id=`id -u flink 2>> /tmp/setup_log`
+    if [[ $flink_user_id == "" ]]; then
+        sudo useradd -u 3305 flink
+        flink_user_id=`id -u flink 2>> /tmp/setup_log`
+        if [[ $flink_user_id == "" ]]; then
+            echo "Failed to add user flink"
+            exit -4
+        fi
+    fi
+
+    echo " - Creating marathon user (if not exist)"
+    export marathon_user_id=`id -u marathon 2>> /tmp/setup_log`
+    if [[ $marathon_user_id == "" ]]; then
+        sudo useradd -u 3306 marathon
+        marathon_user_id=`id -u marathon 2>> /tmp/setup_log`
+        if [[ $marathon_user_id == "" ]]; then
+            echo "Failed to add user marathon"
+            exit -4
+        fi
+    fi
+
+}
 
 # System Installation
 # ----------------------------------------------------------------------------------------------------------------------
@@ -520,3 +589,6 @@ sudo chmod 755 /usr/local/sbin/handle_gluster_share.sh
 
 # Make sur some required packages are installed
 #echo "  - checking some key packages"
+
+echo "  - Creating common system users"
+create_common_system_users

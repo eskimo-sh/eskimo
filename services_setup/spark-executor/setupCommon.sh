@@ -48,12 +48,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo " - Creating spark user (if not exist)"
 export spark_user_id=`id -u spark 2>> /tmp/spark_executor_install.log`
 if [[ $spark_user_id == "" ]]; then
-    sudo useradd -u 3302 spark
-    spark_user_id=`id -u spark 2>> /tmp/spark_executor_install.log`
-    if [[ $spark_user_id == "" ]]; then
-        echo "Failed to add user spark"
-        exit -4
-    fi
+    echo "User spark should have been added by eskimo-base-system setup script"
+    exit -4
 fi
 
 # Create shared dir

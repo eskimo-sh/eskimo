@@ -4,36 +4,36 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
-import ch.niceideas.eskimo.utils.SystemStatusParser;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class MarathonServicesConfigService {
+public class MarathonService {
 
     private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
 
@@ -99,7 +99,7 @@ public class MarathonServicesConfigService {
         this.configurationService = configurationService;
     }
 
-    public MarathonServicesConfigService () {
+    public MarathonService() {
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setDefaultRequestConfig(buildRequestConfig())
                 .setDefaultSocketConfig(buildSocketConfig());
@@ -125,37 +125,66 @@ public class MarathonServicesConfigService {
                 .build();
     }
 
-    protected String queryMarathon (String endpoint) throws MarathonServicesConfigurationException {
+    protected String queryMarathon (String endpoint) throws MarathonException {
+        return queryMarathon(endpoint, "GET");
+    }
+
+    protected String queryMarathon (String endpoint, String method) throws MarathonException {
 
         try {
             ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
 
             // apps/cerebro
-            BasicHttpRequest request = new BasicHttpRequest("GET", "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
+            BasicHttpRequest request = new BasicHttpRequest(method, "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
 
-            HttpResponse response = httpClient.execute(
-                    new HttpHost("localhost", marathonTunnelConfig.getLocalPort(), "http"),
-                    request);
-
-
-            InputStream result = response.getEntity().getContent();
-
-            Header contentencodingHeader = response.getEntity().getContentEncoding();
-
-            return StreamUtils.getAsString(result, contentencodingHeader != null ? contentencodingHeader.getValue() : "UTF-8");
+            return sendHttpRequestAndGetResult(marathonTunnelConfig, request);
 
         } catch (IOException e) {
             logger.error (e, e);
-            throw new MarathonServicesConfigurationException(e);
+            throw new MarathonException(e);
         }
     }
 
-    private Pair<String,String> getServiceRuntimeNode(String service) throws MarathonServicesConfigurationException {
+    protected String updateMarathon (String endpoint, String method, String content) throws MarathonException {
+
+        try {
+            ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
+
+            // apps/cerebro
+            BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
+            //request.setHeader("Content-Type", "application/json");
+
+            BasicHttpEntity requestContent = new BasicHttpEntity();
+            requestContent.setContentType("application/json");
+            requestContent.setContent(new ByteArrayInputStream(content.getBytes("UTF-8")));
+            request.setEntity(requestContent);
+
+            return sendHttpRequestAndGetResult(marathonTunnelConfig, request);
+
+        } catch (IOException e) {
+            logger.error (e, e);
+            throw new MarathonException(e);
+        }
+    }
+
+    private String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+        HttpResponse response = httpClient.execute(
+                new HttpHost("localhost", marathonTunnelConfig.getLocalPort(), "http"),
+                request);
+
+        InputStream result = response.getEntity().getContent();
+
+        Header contentencodingHeader = response.getEntity().getContentEncoding();
+
+        return StreamUtils.getAsString(result, contentencodingHeader != null ? contentencodingHeader.getValue() : "UTF-8");
+    }
+
+    private Pair<String,String> getServiceRuntimeNode(String service) throws MarathonException {
         return getAndWaitServiceRuntimeNode(service, 1);
     }
 
     private Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
-        MarathonServicesConfigurationException {
+            MarathonException  {
 
         for (int i = 0; i < numberOfAttempts; i++) {
             String serviceJson = queryMarathon("apps/" + service);
@@ -175,6 +204,24 @@ public class MarathonServicesConfigService {
                     logger.debug (e, e);
                 }
                 continue;
+            }
+
+            if (StringUtils.isBlank(nodeIp)) {
+
+                // service is not started by marathon
+                // need to find the previous nodes that was running it
+                try {
+                    String serviceIpAddress = findUniqueServiceIP(service);
+                    if (StringUtils.isNotBlank(serviceIpAddress)) {
+                        nodeIp = serviceIpAddress;
+                    } else {
+                        String marathonIpAddress = findUniqueServiceIP("marathon");
+                        nodeIp = marathonIpAddress;
+                    }
+                } catch (FileException | SetupException e) {
+                    logger.error (e.getMessage());
+                    logger.debug (e, e);
+                }
             }
 
             String status = "notOK";
@@ -321,7 +368,7 @@ public class MarathonServicesConfigService {
                         }
                         installedNodeBuilder.append (nodeNameAndStatus.getKey().replace(".", "-"));
                         proceedWithMarathonServiceUninstallation(builder, marathonIpAddress, service);
-                    } catch (MarathonServicesConfigurationException e) {
+                    } catch (MarathonException e) {
                         logger.error (e, e);
                         throw new SystemException(e);
                     }
@@ -353,7 +400,7 @@ public class MarathonServicesConfigService {
                             throw new SystemException("Service " + service + " isn't found in marathon");
                         }
                         installedNodeBuilder.append (nodeNameAndStatus.getKey().replace(".", "-"));
-                    } catch (MarathonServicesConfigurationException e) {
+                    } catch (MarathonException e) {
                         logger.error (e, e);
                         throw new SystemException(e);
                     }
@@ -442,7 +489,7 @@ public class MarathonServicesConfigService {
 
     public void fetchMarathonServicesStatus
             (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
-            throws MarathonServicesConfigurationException {
+            throws MarathonException {
 
         // 3.1 Node answers
         try {
@@ -488,7 +535,7 @@ public class MarathonServicesConfigService {
             }
         } catch (JSONException | ConnectionManagerException | SystemException | SetupException | FileException e) {
             logger.error(e, e);
-            throw new MarathonServicesConfigurationException(e.getMessage(), e);
+            throw new MarathonException(e.getMessage(), e);
         }
     }
 
@@ -502,5 +549,79 @@ public class MarathonServicesConfigService {
         }
 
         return false;
+    }
+
+    public String showJournalMarathon(Service service) throws MarathonException{
+        StringBuilder log = new StringBuilder();
+        log.append("(Showing journal is not supported for marathon)");
+        return log.toString();
+    }
+
+    public String startServiceMarathon(Service service) throws MarathonException{
+        StringBuilder log = new StringBuilder();
+
+        Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service.getName());
+
+        String nodeIp = nodeNameAndStatus.getKey();
+
+        boolean installed = StringUtils.isNotBlank(nodeIp);
+        boolean running = nodeNameAndStatus.getValue().equals("running");
+
+        if (!installed) {
+            log.append ("ERROR - Service " + service.getName() + " is not installed."+"\n");
+            throw new MarathonException("Service " + service.getName() + " is not installed.");
+
+        } else if (running) {
+
+            log.append ("WARNING - Service " + service.getName() + " is already started"+"\n");
+
+        } else {
+
+            // TODO
+
+            // curl -XPATCH  -H 'Content-Type: application/json' http://$MASTER_MARATHON_1:28080/v2/apps/cerebro -d '{ "id": "/cerebro", "instances": 1}'
+            // {"version":"2020-03-25T17:25:19.572Z","deploymentId":"bd866d4d-5bc0-4097-8385-7b0957143d24"}
+
+            String startResultString = updateMarathon("apps/"+service.getName(), "PATCH", "{ \"id\": \"/"+service.getName()+"\", \"instances\": 1}");
+            JsonWrapper startResult = new JsonWrapper(startResultString);
+
+            String deploymentId = startResult.getValueForPathAsString("deploymentId");
+            if (StringUtils.isBlank(deploymentId)) {
+                log.append("WARNING : Could not find any deployment ID when starting tasks for " + service.getName() + "\n");
+            } else {
+                log.append("Tasks starting deployment ID for " + service.getName() + " is " + deploymentId+"\n");
+            }
+        }
+
+        return log.toString();
+    }
+
+    public String stopServiceMarathon(Service service) throws MarathonException {
+
+        StringBuilder log = new StringBuilder();
+
+        // 1. Kill all tasks for service
+        log.append("Killing tasks for " + service+"\n");
+        String killResultString = queryMarathon("apps/"+service.getName()+"/tasks?scale=true", "DELETE");
+        JsonWrapper killResult = new JsonWrapper(killResultString);
+
+        String deploymentId = killResult.getValueForPathAsString("deploymentId");
+        if (StringUtils.isBlank(deploymentId)) {
+            log.append("WARNING : Could not find any deployment ID when killing tasks for " + service.getName());
+        } else {
+            log.append("Tasks killing deployment ID for " + service.getName() + " is " + deploymentId);
+        }
+
+        return log.toString();
+    }
+
+    public String restartServiceMarathon(Service service) throws MarathonException{
+        StringBuilder log = new StringBuilder();
+
+        log.append(stopServiceMarathon(service));
+        log.append("\n");
+        log.append(startServiceMarathon(service));
+
+        return log.toString();
     }
 }

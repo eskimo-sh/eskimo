@@ -77,12 +77,8 @@ sudo rm -f /tmp/marathon_install_log
 echo " - Creating marathon user (if not exist)"
 export marathon_user_id=`id -u marathon 2>> /tmp/flink_executor_install.log`
 if [[ $marathon_user_id == "" ]]; then
-    sudo useradd -u 3306 marathon
-    marathon_user_id=`id -u marathon 2>> /tmp/flink_executor_install.log`
-    if [[ $marathon_user_id == "" ]]; then
-        echo "Failed to add user marathon"
-        exit -4
-    fi
+    echo "User marathon should have been added by eskimo-base-system setup script"
+    exit -4
 fi
 
 echo " - Registering marathon registry"

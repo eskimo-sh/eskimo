@@ -48,12 +48,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo " - Creating flink user (if not exist)"
 export flink_user_id=`id -u flink 2>> /tmp/flink_executor_install.log`
 if [[ $flink_user_id == "" ]]; then
-    sudo useradd -u 3305 flink
-    flink_user_id=`id -u flink 2>> /tmp/flink_executor_install.log`
-    if [[ $flink_user_id == "" ]]; then
-        echo "Failed to add user flink"
-        exit -4
-    fi
+    echo "User flink should have been added by eskimo-base-system setup script"
+    exit -4
 fi
 
 # Create shared dir

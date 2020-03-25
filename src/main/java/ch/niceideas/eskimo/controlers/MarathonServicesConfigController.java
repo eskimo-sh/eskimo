@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.MarathonOperationsCommand;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -67,7 +66,7 @@ public class MarathonServicesConfigController {
     public static final String PENDING_MARATHON_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
 
     @Autowired
-    private MarathonServicesConfigService marathonServicesConfigService;
+    private MarathonService marathonServicesConfigService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -89,7 +88,7 @@ public class MarathonServicesConfigController {
     private NotificationService notificationService;
 
     /* For tests */
-    void setMarathonServicesConfigService(MarathonServicesConfigService marathonServicesConfigService) {
+    void setMarathonServicesConfigService(MarathonService marathonServicesConfigService) {
         this.marathonServicesConfigService = marathonServicesConfigService;
     }
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
@@ -143,7 +142,7 @@ public class MarathonServicesConfigController {
 
             return returnCommand (command);
 
-        } catch (JSONException | SetupException | FileException | MarathonServicesConfigurationException e) {
+        } catch (JSONException | SetupException | FileException | MarathonException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");

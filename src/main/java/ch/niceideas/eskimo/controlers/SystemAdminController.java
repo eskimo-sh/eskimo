@@ -122,7 +122,7 @@ public class SystemAdminController {
                 put("messages", message);
             }}).toString(2);
 
-        } catch (JSONException | SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException e) {
+        } catch (JSONException | SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException | MarathonException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus(e);
 
@@ -214,7 +214,7 @@ public class SystemAdminController {
 
     private interface Operation {
 
-        void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException;
+        void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException, MarathonException;
     }
 
 }

@@ -34,22 +34,22 @@
 
 package ch.niceideas.eskimo.services;
 
-public class MarathonServicesConfigurationException extends Exception {
+public class MarathonException extends Exception {
 
     static final long serialVersionUID = -3387512211112229248L;
 
-    public MarathonServicesConfigurationException() {
+    public MarathonException() {
     }
 
-    public MarathonServicesConfigurationException(String message) {
+    public MarathonException(String message) {
         super(message);
     }
 
-    public MarathonServicesConfigurationException(String message, Throwable cause) {
+    public MarathonException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public MarathonServicesConfigurationException(Throwable cause) {
+    public MarathonException(Throwable cause) {
         super(cause);
     }
 }

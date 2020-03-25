@@ -42,10 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo " - Creating kafka user (if not exist)"
 kafka_user_id=`id -u kafka 2>> /tmp/kafka_install_log`
 if [[ $kafka_user_id == "" ]]; then
-    sudo useradd -u 3303 kafka
-    kafka_user_id=`id -u kafka 2>> /tmp/kafka_install_log`
-    if [[ $kafka_user_id == "" ]]; then
-        echo "Failed to add user kafka"
-        exit -4
-    fi
+    echo "User kafka should have been added by eskimo-base-system setup script"
+    exit -4
 fi

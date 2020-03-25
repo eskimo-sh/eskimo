@@ -34,19 +34,14 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class MarathonOperationsCommand implements Serializable {
 
@@ -63,7 +58,7 @@ public class MarathonOperationsCommand implements Serializable {
     public static MarathonOperationsCommand create (
             ServicesDefinition servicesDefinition,
             ServicesInstallStatusWrapper servicesInstallStatus,
-            MarathonServicesConfigWrapper rawMarathonServicesConfig) throws MarathonServicesConfigurationException {
+            MarathonServicesConfigWrapper rawMarathonServicesConfig) throws MarathonException {
 
         MarathonOperationsCommand retCommand = new MarathonOperationsCommand(rawMarathonServicesConfig);
 

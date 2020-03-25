@@ -55,12 +55,8 @@ build_container grafana grafana /tmp/grafana_install_log
 echo " - Creating grafana user (if not exist)"
 grafana_user_id=`id -u grafana 2>> /tmp/grafana_install_log`
 if [[ $grafana_user_id == "" ]]; then
-    sudo useradd -u 3304 grafana
-    grafana_user_id=`id -u grafana 2>> /tmp/grafana_install_log`
-    if [[ $grafana_user_id == "" ]]; then
-        echo "Failed to add user grafana"
-        exit -4
-    fi
+    echo "User grafana should have been added by eskimo-base-system setup script"
+    exit -4
 fi
 
 echo " - Creating shared directory"

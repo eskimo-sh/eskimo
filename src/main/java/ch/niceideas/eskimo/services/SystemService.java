@@ -110,7 +110,7 @@ public class SystemService {
     private ConfigurationService configurationService;
 
     @Autowired
-    private MarathonServicesConfigService marathonServicesConfigService;
+    private MarathonService marathonServicesConfigService;
 
 
     @Value("${system.failedServicesTriggerCount}")
@@ -225,20 +225,47 @@ public class SystemService {
         lastOperationSuccess = success;
     }
 
-    public void showJournal(String service, String ipAddress) throws SSHCommandException {
-        applyServiceOperation(service, ipAddress, "Showing journal of", () -> sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + service));
+    public void showJournal(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, ipAddress, "Showing journal of", () -> {
+            Service service = servicesDefinition.getService(serviceName);
+            if (service.isMarathon()) {
+                return marathonServicesConfigService.showJournalMarathon(service);
+            } else {
+                return sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + serviceName);
+            }
+        });
     }
 
-    public void startService(String service, String ipAddress) throws SSHCommandException {
-        applyServiceOperation(service, ipAddress, "Starting", () -> sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + service));
+    public void startService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, ipAddress, "Starting", () -> {
+            Service service = servicesDefinition.getService(serviceName);
+            if (service.isMarathon()) {
+                return marathonServicesConfigService.startServiceMarathon(service);
+            } else {
+                return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + serviceName);
+            }
+        });
     }
 
-    public void stopService(String service, String ipAddress) throws SSHCommandException {
-        applyServiceOperation(service, ipAddress, "Stopping", () -> sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + service));
+    public void stopService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, ipAddress, "Stopping", () -> {
+            Service service = servicesDefinition.getService(serviceName);
+            if (service.isMarathon()) {
+                return marathonServicesConfigService.stopServiceMarathon(service);
+            } else {
+                return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + serviceName);
+            }
+        });
     }
 
-    public void restartService(String service, String ipAddress) throws SSHCommandException {
-        applyServiceOperation(service, ipAddress, "Restarting", () -> sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service));
+    public void restartService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, ipAddress, "Restarting", () -> {Service service = servicesDefinition.getService(serviceName);
+            if (service.isMarathon()) {
+                return marathonServicesConfigService.restartServiceMarathon(service);
+            } else {
+                return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + serviceName);
+            }
+        });
     }
 
     private void logOperationMessage(String operation) {
@@ -247,7 +274,7 @@ public class SystemService {
         });
     }
 
-    void applyServiceOperation(String service, String ipAddress, String opLabel, ServiceOperation<String> operation) throws SSHCommandException {
+    void applyServiceOperation(String service, String ipAddress, String opLabel, ServiceOperation<String> operation) throws SSHCommandException, MarathonException {
 
         boolean success = false;
         setProcessingPending();
@@ -318,7 +345,7 @@ public class SystemService {
             // fetch marathon services status
             try {
                 marathonServicesConfigService.fetchMarathonServicesStatus (statusMap, servicesInstallationStatus);
-            } catch (MarathonServicesConfigurationException e) {
+            } catch (MarathonException e) {
                 logger.debug(e, e);
                 // workaround : flag all marathon services as KO on marathon node
                 String marathonIpAddress = marathonServicesConfigService.findUniqueServiceIP("marathon");
@@ -1186,7 +1213,7 @@ public class SystemService {
     }
 
     interface ServiceOperation<V> {
-        V call() throws SSHCommandException;
+        V call() throws SSHCommandException, MarathonException;
     }
 
     interface StatusUpdater {

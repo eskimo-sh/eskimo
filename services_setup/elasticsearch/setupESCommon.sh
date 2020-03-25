@@ -42,10 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo " - Creating elasticsearch user (if not exist)"
 elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/es_install_log`
 if [[ $elasticsearch_user_id == "" ]]; then
-    sudo useradd -u 3301 elasticsearch
-    elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/es_install_log`
-    if [[ $elasticsearch_user_id == "" ]]; then
-        echo "Failed to add user elasticsearch"
-        exit -4
-    fi
+    echo "User elasticsearch should have been added by eskimo-base-system setup script"
+    exit -4
 fi
