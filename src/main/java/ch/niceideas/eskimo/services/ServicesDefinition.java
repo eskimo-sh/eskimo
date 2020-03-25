@@ -316,14 +316,8 @@ public class ServicesDefinition implements InitializingBean {
         return new JsonWrapper(FileUtils.readFile(envFile));
     }
 
-    public List<String> getAllServices() {
-        return services.values().stream()
-                .map(Service::getName)
-                .collect(Collectors.toList());
-    }
-
     public String getAllServicesString() {
-        return String.join(" ", getAllServices().toArray(new String[0]));
+        return String.join(" ", listAllServices());
     }
 
     public Topology getTopology(NodesConfigWrapper nodesConfig, Set<String> deadIps)
@@ -333,6 +327,12 @@ public class ServicesDefinition implements InitializingBean {
 
     public Service getService(String serviceName) {
         return services.get (serviceName);
+    }
+
+    public String[] listAllServices() {
+        return services.values().stream()
+                .map(Service::getName)
+                .sorted().toArray(String[]::new);
     }
 
     public String[] listMultipleServices() {
@@ -353,6 +353,7 @@ public class ServicesDefinition implements InitializingBean {
     public String[] listUniqueServices() {
         return services.values().stream()
                 .filter(Service::isUnique)
+                .filter(Service::isNotMarathon)
                 .map(Service::getName)
                 .sorted()
                 .toArray(String[]::new);

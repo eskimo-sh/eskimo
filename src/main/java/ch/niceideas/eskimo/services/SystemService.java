@@ -109,6 +109,9 @@ public class SystemService {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private MarathonServicesConfigService marathonServicesConfigService;
+
 
     @Value("${system.failedServicesTriggerCount}")
     private int failedServicesTriggerCount = 2;
@@ -310,6 +313,23 @@ public class SystemService {
                 threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 logger.error(e, e);
+            }
+
+            // fetch marathon services status
+            try {
+                marathonServicesConfigService.fetchMarathonServicesStatus (statusMap, servicesInstallationStatus);
+            } catch (MarathonServicesConfigurationException e) {
+                logger.debug(e, e);
+                // workaround : flag all marathon services as KO on marathon node
+                String marathonIpAddress = marathonServicesConfigService.findUniqueServiceIP("marathon");
+                if (StringUtils.isNotBlank(marathonIpAddress)) {
+                    String marathonNode = marathonIpAddress.replace(".", "-");
+                    for (String service : servicesDefinition.listMarathonServices()) {
+                        if (marathonServicesConfigService.shouldInstall (service)) {
+                            statusMap.put(SERVICE_PREFIX + service + "_" + marathonNode, "KO");
+                        }
+                    }
+                }
             }
 
             // fill in systemStatus
@@ -657,7 +677,7 @@ public class SystemService {
 
                 SystemStatusParser parser = new SystemStatusParser(allServicesStatus);
 
-                for (String service : servicesDefinition.getAllServices()) {
+                for (String service : servicesDefinition.listAllServices()) {
 
                     // should service be installed on node ?
                     boolean shall = nodesConfig.shouldInstall (service, nodeNbr);
@@ -666,43 +686,47 @@ public class SystemService {
                     //check if service installed using SSH
                     String serviceStatus = parser.getServiceStatus(service);
                     boolean installed = !serviceStatus.equals("NA");
+                    boolean running = serviceStatus.equals("running");
 
-                    if (shall) {
-                        if (!installed) {
-
-                            statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "NA");
-
-                        } else {
-
-                            // check if services is running ?
-                            // check if service running using SSH
-                            boolean running = parser.getServiceStatus(service).equals("running");
-
-                            if (!running) {
-                                statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "KO");
-
-                            } else {
-
-                                if (servicesInstallationStatus.isServiceOK(service,nodeName)) {
-                                    statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "OK");
-                                } else {
-                                    statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "restart");
-                                }
-
-                                // configure proxy if required
-                                proxyManagerService.updateServerForService(service, ipAddress);
-                            }
-                        }
-                    } else {
-                        if (installed) {
-                            statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "TD"); // To Be Deleted
-                        }
-                    }
+                    feedInServiceStatus(statusMap, servicesInstallationStatus, ipAddress, nodeName, service, shall, installed, running);
                 }
             }
         } catch (SSHCommandException | JSONException | ConnectionManagerException e) {
             logger.error(e, e);
             throw new SystemException(e.getMessage(), e);
+        }
+    }
+
+    void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, String ipAddress, String nodeName, String service, boolean shall, boolean installed, boolean running) throws ConnectionManagerException {
+        if (shall) {
+            if (!installed) {
+
+                statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "NA");
+
+            } else {
+
+                // check if services is running ?
+                // check if service running using SSH
+
+                if (!running) {
+                    statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "KO");
+
+                } else {
+
+                    if (servicesInstallationStatus.isServiceOK(service,nodeName)) {
+                        statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "OK");
+                    } else {
+                        statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "restart");
+                    }
+
+                    // configure proxy if required
+                    proxyManagerService.updateServerForService(service, ipAddress);
+                }
+            }
+        } else {
+            if (installed) {
+                statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "TD"); // To Be Deleted
+            }
         }
     }
 

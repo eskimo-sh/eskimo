@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,7 +111,7 @@ public class ServicesController {
     public String getUIServicesStatusConfig() {
 
         Map<String, Object> uiServicesStatusConfig = new HashMap<>();
-        servicesDefinition.getAllServices().stream()
+        Arrays.stream(servicesDefinition.listAllServices())
                 .map(name -> servicesDefinition.getService(name))
                 .forEach(service -> uiServicesStatusConfig.put (service.getName(), service.toUiStatusConfigJSON()));
 
@@ -131,7 +132,7 @@ public class ServicesController {
         Map<String, Object> servicesDependencies = new HashMap<>();
 
         try {
-            servicesDefinition.getAllServices().stream()
+            Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesDependencies.put (service.getName(), service.toDependenciesJSON()));
 
@@ -151,7 +152,7 @@ public class ServicesController {
         Map<String, Object> servicesConfigurations = new HashMap<>();
 
         try {
-            servicesDefinition.getAllServices().stream()
+            Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .filter(service -> !service.isMarathon())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
@@ -172,7 +173,7 @@ public class ServicesController {
 
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
-            servicesDefinition.getAllServices().stream()
+            Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
@@ -195,7 +196,7 @@ public class ServicesController {
 
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
-            servicesDefinition.getAllServices().stream()
+            Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .filter(service -> service.isMarathon())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));

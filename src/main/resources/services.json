@@ -709,6 +709,7 @@
       "imageName" : "cerebro",
       "order": 16,
       "marathon": true,
+      "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
       "memory": "neglectable",

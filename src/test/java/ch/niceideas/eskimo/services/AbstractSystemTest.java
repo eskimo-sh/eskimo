@@ -97,8 +97,8 @@ public abstract class AbstractSystemTest {
                 return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster gdash spark-history-server";
             }
             @Override
-            public List<String> getAllServices() {
-                return Arrays.asList(new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-executor", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server", "elasticsearch"});
+            public String[] listAllServices() {
+                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-executor", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server", "elasticsearch"};
             }
         };
         servicesDefinition.afterPropertiesSet();

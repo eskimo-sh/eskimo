@@ -43,6 +43,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class ServicesConfigWrapper extends JsonWrapper implements Serializable {
 
     public static ServicesConfigWrapper initEmpty(ServicesDefinition def) {
 
-        List<JSONObject> allConfigurations = def.getAllServices().stream()
+        List<JSONObject> allConfigurations = Arrays.stream(def.listAllServices())
                 .map(def::getService)
                 .map (Service::getEditableConfigurationsJSON)
                 .collect(Collectors.toList());

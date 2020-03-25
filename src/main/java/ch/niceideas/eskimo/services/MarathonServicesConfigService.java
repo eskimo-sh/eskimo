@@ -1,23 +1,35 @@
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.SystemStatusParser;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHttpRequest;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -70,6 +82,8 @@ public class MarathonServicesConfigService {
     @Value("${system.baseInstallWaitTimoutSeconds}")
     private int baseInstallWaitTimout = 1000;
 
+    private HttpClient httpClient;
+
     void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
     }
@@ -85,6 +99,98 @@ public class MarathonServicesConfigService {
         this.configurationService = configurationService;
     }
 
+    public MarathonServicesConfigService () {
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+                .setDefaultRequestConfig(buildRequestConfig())
+                .setDefaultSocketConfig(buildSocketConfig());
+
+        clientBuilder.setMaxConnTotal(2);
+
+        httpClient = clientBuilder.build();
+    }
+
+    protected RequestConfig buildRequestConfig() {
+        return RequestConfig.custom()
+                .setRedirectsEnabled(true)
+                .setCookieSpec(CookieSpecs.IGNORE_COOKIES) // we handle them in the servlet instead
+                .setConnectTimeout(10000)
+                .setSocketTimeout(20000)
+                .setConnectionRequestTimeout(10000)
+                .build();
+    }
+
+    protected SocketConfig buildSocketConfig() {
+        return SocketConfig.custom()
+                .setSoTimeout(20000)
+                .build();
+    }
+
+    protected String queryMarathon (String endpoint) throws MarathonServicesConfigurationException {
+
+        try {
+            ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
+
+            // apps/cerebro
+            BasicHttpRequest request = new BasicHttpRequest("GET", "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
+
+            HttpResponse response = httpClient.execute(
+                    new HttpHost("localhost", marathonTunnelConfig.getLocalPort(), "http"),
+                    request);
+
+
+            InputStream result = response.getEntity().getContent();
+
+            Header contentencodingHeader = response.getEntity().getContentEncoding();
+
+            return StreamUtils.getAsString(result, contentencodingHeader != null ? contentencodingHeader.getValue() : "UTF-8");
+
+        } catch (IOException e) {
+            logger.error (e, e);
+            throw new MarathonServicesConfigurationException(e);
+        }
+    }
+
+    private Pair<String,String> getServiceRuntimeNode(String service) throws MarathonServicesConfigurationException {
+        return getAndWaitServiceRuntimeNode(service, 1);
+    }
+
+    private Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
+        MarathonServicesConfigurationException {
+
+        for (int i = 0; i < numberOfAttempts; i++) {
+            String serviceJson = queryMarathon("apps/" + service);
+
+            JsonWrapper serviceResult = new JsonWrapper(serviceJson);
+
+            if (StringUtils.isNotBlank(serviceResult.getValueForPathAsString("message"))
+                    && serviceResult.getValueForPathAsString("message").contains("does not exist")) {
+                return new Pair<>(null, "NA");
+            }
+
+            String nodeIp = serviceResult.getValueForPathAsString("app.tasks.0.host");
+            if (StringUtils.isBlank(nodeIp) && i < numberOfAttempts - 1) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    logger.debug (e, e);
+                }
+                continue;
+            }
+
+            String status = "notOK";
+
+            //Integer tasksUnhealthy = (Integer) serviceResult.getValueForPath("app.tasksUnhealthy");
+
+            Integer tasksRunning = (Integer) serviceResult.getValueForPath("app.tasksRunning");
+            if (tasksRunning != null && tasksRunning.intValue() == 1) {
+                status = "running";
+            }
+
+            return new Pair<>(nodeIp, status);
+        }
+
+        return new Pair<>(null, "notOK");
+    }
 
     public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws SystemException {
 
@@ -142,16 +248,14 @@ public class MarathonServicesConfigService {
             // TODO deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getInstallations(), 1, operationWaitTimout,
                     (operation, error) -> {
-                        String service = operation;
-                        installMarathonService(service, marathonIpAddress);
+                        installMarathonService(operation, marathonIpAddress);
                     });
 
             // uninstallations
             // TODO deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getUninstallations(), 1, operationWaitTimout,
                     (operation, error) -> {
-                        String service = operation;
-                        uninstallMarathonService(service, marathonIpAddress);
+                        uninstallMarathonService(operation, marathonIpAddress);
                     });
 
             /*
@@ -178,7 +282,7 @@ public class MarathonServicesConfigService {
         }
     }
 
-    private String findUniqueServiceIP(String service) throws FileException, SetupException {
+    String findUniqueServiceIP(String service) throws FileException, SetupException {
 
         String uniqueServiceNodeName = findUniqueServiceNodeName(service);
         if (StringUtils.isBlank(uniqueServiceNodeName)) {
@@ -199,7 +303,7 @@ public class MarathonServicesConfigService {
                     && installStatus.getValueForPathAsString(installFlag).equals("OK")) {
 
                 String ipAddress = installFlag.substring(installFlag.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length());
-                return ipAddress.replace(".", "_");
+                return ipAddress.replace(".", "-");
             }
         }
 
@@ -207,28 +311,59 @@ public class MarathonServicesConfigService {
     }
 
     void uninstallMarathonService(String service, String marathonIpAddress) throws SystemException {
-        String nodeName = marathonIpAddress.replace(".", "-");
+        StringBuilder installedNodeBuilder = new StringBuilder();
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on marathon node " + marathonIpAddress,
-                builder -> proceedWithMarathonServiceUninstallation(builder, marathonIpAddress, service),
-                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
+                builder -> {
+                    try {
+                        Pair<String, String> nodeNameAndStatus = getServiceRuntimeNode(service);
+                        if (nodeNameAndStatus.getKey() == null) {
+                            throw new SystemException("Service " + service + " isn't found in marathon");
+                        }
+                        installedNodeBuilder.append (nodeNameAndStatus.getKey().replace(".", "-"));
+                        proceedWithMarathonServiceUninstallation(builder, marathonIpAddress, service);
+                    } catch (MarathonServicesConfigurationException e) {
+                        logger.error (e, e);
+                        throw new SystemException(e);
+                    }
+                },
+                status -> {
+                    if (installedNodeBuilder.length() == 0) {
+                        throw new RuntimeException("Unsupported : couldn't find installation node");
+                    }
+                    status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + installedNodeBuilder.toString());
+                });
         try {
-            proxyManagerService.removeServerForService(service, findMarathonServiceNode(service));
+            proxyManagerService.removeServerForService(service, findUniqueServiceNodeName(service));
         } catch (FileException | SetupException e) {
             logger.error(e, e);
             throw new SystemException(e);
         }
     }
 
-    private String findMarathonServiceNode(String service) throws FileException, SetupException {
-        return findUniqueServiceNodeName (service);
-    }
 
     void installMarathonService(String service, String marathonIpAddress)
             throws SystemException {
-        String nodeName = marathonIpAddress.replace(".", "-");
+        StringBuilder installedNodeBuilder = new StringBuilder();
         systemOperationService.applySystemOperation("installation of " + service + " on marathon node " + marathonIpAddress,
-                builder -> proceedWithMarathonServiceInstallation(builder, marathonIpAddress, service),
-                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
+                builder -> {
+                    try {
+                        proceedWithMarathonServiceInstallation(builder, marathonIpAddress, service);
+                        Pair<String, String> nodeNameAndStatus = getAndWaitServiceRuntimeNode(service, 120); // giving it 2 minutes to start
+                        if (nodeNameAndStatus.getKey() == null) {
+                            throw new SystemException("Service " + service + " isn't found in marathon");
+                        }
+                        installedNodeBuilder.append (nodeNameAndStatus.getKey().replace(".", "-"));
+                    } catch (MarathonServicesConfigurationException e) {
+                        logger.error (e, e);
+                        throw new SystemException(e);
+                    }
+                },
+                status -> {
+                    if (installedNodeBuilder.length() == 0) {
+                        throw new RuntimeException("Unsupported : couldn't find installation node");
+                    }
+                    status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + installedNodeBuilder.toString(), "OK");
+                });
     }
 
     private String proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonIpAddress, String service)
@@ -303,5 +438,69 @@ public class MarathonServicesConfigService {
         systemService.installationCleanup(sb, ipAddress, service, imageName, tmpArchiveFile);throw new SystemException(e);
         }
         */
+    }
+
+    public void fetchMarathonServicesStatus
+            (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
+            throws MarathonServicesConfigurationException {
+
+        // 3.1 Node answers
+        try {
+
+            String marathonIpAddress = findUniqueServiceIP("marathon");
+            if (!StringUtils.isBlank(marathonIpAddress)) {
+
+                // find out if SSH connection to host can succeeed
+                String ping = null;
+                try {
+                    ping = systemService.sendPing(marathonIpAddress);
+                } catch (SSHCommandException e) {
+                    logger.warn(e.getMessage());
+                    logger.debug(e, e);
+                }
+
+                if (StringUtils.isNotBlank(ping) && ping.startsWith("OK")) {
+
+                    for (String service : servicesDefinition.listMarathonServices()) {
+
+                        // should service be installed on marathon ?
+                        boolean shall = this.shouldInstall(service);
+
+                        // check if service is installed ?
+                        //check if service installed using SSH
+                        Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service);
+
+                        String nodeIp = nodeNameAndStatus.getKey();
+
+                        boolean installed = StringUtils.isNotBlank(nodeIp);
+                        boolean running = nodeNameAndStatus.getValue().equals("running");
+
+                        String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
+
+                        // uninstalled services are put to the marathon node for now
+                        if (StringUtils.isBlank(nodeName)) {
+                            nodeName = marathonIpAddress.replace(".", "-");
+                        }
+
+                        systemService.feedInServiceStatus(statusMap, servicesInstallationStatus, nodeIp, nodeName, service, shall, installed, running);
+                    }
+                }
+            }
+        } catch (JSONException | ConnectionManagerException | SystemException | SetupException | FileException e) {
+            logger.error(e, e);
+            throw new MarathonServicesConfigurationException(e.getMessage(), e);
+        }
+    }
+
+    boolean shouldInstall(String service) throws SetupException, SystemException {
+        MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+        if (marathonConfig != null) {
+
+            // search it in config
+            return StringUtils.isNotBlank ((String)marathonConfig.getValueForPath(service + "_install"))
+                    && marathonConfig.getValueForPath(service + "_install").equals("on");
+        }
+
+        return false;
     }
 }

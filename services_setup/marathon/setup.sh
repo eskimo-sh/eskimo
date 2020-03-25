@@ -87,7 +87,7 @@ fi
 
 echo " - Registering marathon registry"
 # remove any previous definition
-sed -i '/.* marathon.registry/d' /etc/hosts
+sudo sed -i '/.* marathon.registry/d' /etc/hosts
 echo "$MASTER_MARATHON_1 marathon.registry" >> /etc/hosts
 
 

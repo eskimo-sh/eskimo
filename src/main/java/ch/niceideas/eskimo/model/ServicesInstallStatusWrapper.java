@@ -80,8 +80,8 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
     public boolean isServiceInstalled(String service) {
         try {
             for (String ipAddress : getIpAddresses()) {
-                if ("OK".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "_")))
-                        || "restart".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "_")))) {
+                if ("OK".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "-")))
+                        || "restart".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "-")))) {
                     return true;
                 }
             }

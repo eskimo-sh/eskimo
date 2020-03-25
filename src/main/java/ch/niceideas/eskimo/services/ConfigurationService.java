@@ -77,8 +77,7 @@ public class ConfigurationService {
         try {
             ServicesInstallStatusWrapper status = loadServicesInstallationStatus();
             statusUpdater.updateStatus(status);
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + NODES_STATUS_JSON_PATH), status.getFormattedValue());
+            saveServicesInstallationStatus(status);
         } finally {
             statusFileLock.unlock();
         }

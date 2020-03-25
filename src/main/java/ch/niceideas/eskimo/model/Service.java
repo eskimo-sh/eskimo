@@ -190,6 +190,9 @@ public class Service {
     public boolean isMarathon() {
         return marathon;
     }
+    public boolean isNotMarathon() {
+        return !marathon;
+    }
 
     public void setMarathon(boolean marathon) {
         this.marathon = marathon;

@@ -139,8 +139,8 @@ public class ServicesControllerTest {
 
         sc.setServicesDefinition(new ServicesDefinition() {
             @Override
-            public List<String> getAllServices() {
-                return Arrays.asList(new String[]{"A", "B", "C"});
+            public String[] listAllServices() {
+                return new String[]{"A", "B", "C"};
             }
             @Override
             public Service getService(String serviceName) {
@@ -165,8 +165,8 @@ public class ServicesControllerTest {
 
         sc.setServicesDefinition(new ServicesDefinition() {
             @Override
-            public List<String> getAllServices() {
-                return Arrays.asList(new String[]{"A", "B", "C"});
+            public String[] listAllServices() {
+                return new String[]{"A", "B", "C"};
             }
             @Override
             public Service getService(String serviceName) {
@@ -191,8 +191,8 @@ public class ServicesControllerTest {
 
         sc.setServicesDefinition(new ServicesDefinition() {
             @Override
-            public List<String> getAllServices() {
-                return Arrays.asList(new String[]{"A", "B", "C"});
+            public String[] listAllServices() {
+                return new String[]{"A", "B", "C"};
             }
             @Override
             public Service getService(String serviceName) {
@@ -250,8 +250,8 @@ public class ServicesControllerTest {
 
         sc.setServicesDefinition(new ServicesDefinition() {
             @Override
-            public List<String> getAllServices() {
-                return Arrays.asList(new String[]{"A", "B", "C"});
+            public String[] listAllServices() {
+                return new String[]{"A", "B", "C"};
             }
             @Override
             public Service getService(String serviceName) {

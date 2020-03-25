@@ -169,7 +169,7 @@ public class ServicesConfigService {
         Set<String> dirtyServices = new HashSet<>();
 
         // apply changes, proceed service by service
-        for (String service : servicesDefinition.getAllServices()) {
+        for (String service : servicesDefinition.listAllServices()) {
 
             // get all properties for service
             for (String configKey : configForm.keySet()) {

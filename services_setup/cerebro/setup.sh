@@ -124,5 +124,39 @@ if [[ $? != 0 ]]; then
 fi
 
 
-# TODO deploy service in marathon
+echo " - Removing any previously deployed cerebro service from marathon"
+curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/cerebro >> /tmp/cerebro_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Could not reach marathon"
+    exit -23
+fi
+if [[ `grep "does not exist" /tmp/cerebro_install_log` == "" ]]; then
+    echo "   + Previous instance removed"
+fi
+
+
+echo " - Deploying cerebro service in marathon"
+# 10 attempts with 5 seconds sleep each
+for i in $(seq 1 10); do
+    sleep 5
+    echo "   + Attempt $i"
+    curl  -X POST -H 'Content-Type: application/json' \
+        -d '@cerebro.marathon.json' \
+        http://$MASTER_MARATHON_1:28080/v2/apps 2>&1 | tee /tmp/cerebro_deploy_log >> /tmp/cerebro_install_log
+    if [[ $? != 0 ]]; then
+        echo "   + Could not deploy application in marathon"
+        cat /tmp/cerebro_install_log
+        exit -24
+    fi
+    if [[ `grep "App is locked by one or more deployments" /tmp/cerebro_deploy_log` == "" ]]; then
+        break
+    fi
+    if [[ "$i" == "10" ]]; then
+        echo "   + Failed 10 times !!"
+        exit -25
+    fi
+done
+
+
+#-H "Authorization: token=$(dcos config show core.dcos_acs_token)" \
 
