@@ -1,5 +1,5 @@
 {
-  "id": "cerebro",
+  "id": "kafka-manager",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.2,
   "mem": 300,
@@ -7,28 +7,28 @@
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/cerebro"
+      "image": "marathon.registry:5000/kafka-manager"
     },
     "type": "DOCKER",
     "network": "BRIDGE",
     "portMappings": [
       {
-        "containerPort": 9000,
-        "hostPort": 31900,
+        "containerPort": 22080,
+        "hostPort": 31220,
         "protocol": "tcp",
-        "name": "httpcerebro",
+        "name": "httpkafkamanager",
         "labels": null
       }
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/cerebro",
-        "hostPath": "/var/log/cerebro",
+        "containerPath": "/var/log/kafka-manager",
+        "hostPath": "/var/log/kafka-manager",
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/cerebro",
-        "containerPath": "/var/run/cerebro",
+        "hostPath": "/var/run/kafka-manager",
+        "containerPath": "/var/run/kafka-manager",
         "mode": "RW"
       },
       {
@@ -60,5 +60,5 @@
       "maxConsecutiveFailures": 3
     }
   ],
-  "user": "elasticsearch"
+  "user": "kafka"
 }

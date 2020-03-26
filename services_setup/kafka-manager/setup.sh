@@ -71,8 +71,6 @@ sudo mkdir -p /var/log/kafka-manager
 sudo chown -R kafka /var/log/kafka-manager
 sudo mkdir -p /var/lib/kafka-manager
 sudo chown -R kafka /var/lib/kafka-manager
-sudo mkdir -p /var/run/kafka-manager
-sudo chown -R kafka /var/run/kafka-manager
 
 # create and start container
 echo " - Running docker container"
@@ -120,5 +118,5 @@ echo " - Committing changes to local template and exiting container kafka-manage
 commit_container kafka-manager /tmp/kafka-manager_install_log
 
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file kafka-manager /tmp/kafka-manager_install_log
+echo " - Starting marathon deployment"
+deploy_marathon kafka-manager /tmp/kafka-manager_install_log

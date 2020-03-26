@@ -68,16 +68,16 @@
     "config": {
       "imageName" : "grafana",
       "order": 3,
+      "marathon": true,
       "unique": true,
       "group" : "Monitoring",
       "name" : "Grafana",
-      "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "small",
       "logo" : "images/grafana-logo.png",
       "icon" : "images/grafana-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 3000,
+      "proxyTargetPort" : 31300,
       "waitTime": 8000,
       "title" : "Grafana Monitoring",
       "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
@@ -273,7 +273,7 @@
       "unique": true,
       "group": "Mesos",
       "name": "Marathon",
-      "selectionLayout": { "col": 1, "row": 6  },
+      "selectionLayout": { "col" : 1, "row" : 5 },
       "memory": "neglectable",
       "logo" : "images/marathon-logo.png",
       "icon" : "images/marathon-icon.png"
@@ -391,16 +391,16 @@
     "config": {
       "imageName" : "kafka-manager",
       "order": 10,
+      "marathon": true,
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
-      "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/kafka-manager-logo.png",
       "icon" : "images/kafka-manager-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 22080,
+      "proxyTargetPort" : 31220,
       "waitTime": 8000,
       "title" : "Kafka manager",
       "statusPageLinktitle" : "Administer your kafka topics"
@@ -839,7 +839,7 @@
       "order": 19,
       "unique": true,
       "name" : "Zeppelin",
-      "selectionLayout" : { "row" : 4, "col" : 1},
+      "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "small",
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional__commentedOut": ["spark-executor"],

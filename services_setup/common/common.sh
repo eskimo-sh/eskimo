@@ -87,6 +87,74 @@ function loadTopology() {
     . /etc/eskimo_topology.sh
 }
 
+# Install container in registry and deploy it using marathon
+# Arguments:
+# - $1 the name of the systemd service
+# - $2 the lof file to dump command outputs to
+function deploy_marathon() {
+
+    if [[ $1 == "" ]]; then
+        echo "Container needs to be passed in argument"
+        exit -2
+    fi
+
+    if [[ $2 == "" ]]; then
+        echo "Log file path needs to be passed in argument"
+        exit -3
+    fi
+
+    echo " - Deploying $1 Service in docker registry for marathon"
+    docker tag eskimo:$1 marathon.registry:5000/$1 >> $2 2>&1
+    if [[ $? != 0 ]]; then
+        echo "   + Could not re-tag marathon container image"
+        exit -30
+    fi
+
+    docker push marathon.registry:5000/$1 >> $2 2>&1
+    if [[ $? != 0 ]]; then
+        echo "Image push in docker registry failed !"
+        exit -22
+    fi
+
+
+    echo " - Removing any previously deployed $1 service from marathon"
+    curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$1 >> $2 2>&1
+    if [[ $? != 0 ]]; then
+        echo "   + Could not reach marathon"
+        exit -23
+    fi
+    if [[ `grep "does not exist" $2` == "" ]]; then
+        echo "   + Previous instance removed"
+    fi
+
+
+    echo " - Deploying $1 service in marathon"
+    # 10 attempts with 5 seconds sleep each
+    for i in $(seq 1 10); do
+        sleep 5
+        echo "   + Attempt $i"
+        curl  -X POST -H 'Content-Type: application/json' \
+            -d "@$1.marathon.json" \
+            http://$MASTER_MARATHON_1:28080/v2/apps 2>&1 | tee "$2"_deploy >> $2
+        if [[ $? != 0 ]]; then
+            echo "   + Could not deploy $1 application in marathon"
+            cat $2
+            exit -24
+        fi
+        if [[ `grep "App is locked by one or more deployments" "$2"_deploy` == "" ]]; then
+            break
+        fi
+        if [[ "$i" == "10" ]]; then
+            echo "   + Failed 10 times !!"
+            exit -25
+        fi
+    done
+
+
+    #-H "Authorization: token=$(dcos config show core.dcos_acs_token)" \
+}
+
+
 # Install systemd service and check startup of service
 # Arguments:
 # - $1 the name of the systemd service

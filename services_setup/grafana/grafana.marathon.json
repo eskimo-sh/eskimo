@@ -1,34 +1,34 @@
 {
-  "id": "cerebro",
+  "id": "grafana",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.2,
-  "mem": 300,
+  "mem": 400,
   "disk": 100,
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/cerebro"
+      "image": "marathon.registry:5000/grafana"
     },
     "type": "DOCKER",
     "network": "BRIDGE",
     "portMappings": [
       {
-        "containerPort": 9000,
-        "hostPort": 31900,
+        "containerPort": 3000,
+        "hostPort": 31300,
         "protocol": "tcp",
-        "name": "httpcerebro",
+        "name": "httpgrafana",
         "labels": null
       }
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/cerebro",
-        "hostPath": "/var/log/cerebro",
+        "containerPath": "/var/log/grafana",
+        "hostPath": "/var/log/grafana",
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/cerebro",
-        "containerPath": "/var/run/cerebro",
+        "hostPath": "/var/run/grafana",
+        "containerPath": "/var/run/grafana",
         "mode": "RW"
       },
       {
@@ -60,5 +60,5 @@
       "maxConsecutiveFailures": 3
     }
   ],
-  "user": "elasticsearch"
+  "user": "grafana"
 }

@@ -64,11 +64,11 @@ public class MarathonOperationsCommand implements Serializable {
 
         // 1. Find out about services that need to be installed
         for (String service : servicesDefinition.listMarathonServices()) {
-            if (rawMarathonServicesConfig.getValueForPath(service + "_install").equals("on")
+            if (StringUtils.isNotBlank(rawMarathonServicesConfig.getValueForPathAsString(service + "_install"))
+                    && rawMarathonServicesConfig.getValueForPath(service + "_install").equals("on")
                     && !servicesInstallStatus.isServiceInstalled(service)) {
 
                 retCommand.addInstallation(service);
-
             }
         }
 
@@ -77,10 +77,13 @@ public class MarathonOperationsCommand implements Serializable {
 
             String installedService = installation.substring(0, installation.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG));
 
-            // search it in config
-            if (!StringUtils.isBlank ((String)rawMarathonServicesConfig.getValueForPath(installedService + "_install"))
-                    &&!rawMarathonServicesConfig.getValueForPath(installedService + "_install").equals("on") ) {
-                retCommand.addUninstallation(installedService);
+            if (servicesDefinition.getService(installedService).isMarathon()) {
+
+                // search it in config
+                if (StringUtils.isBlank((String) rawMarathonServicesConfig.getValueForPath(installedService + "_install"))
+                        || !rawMarathonServicesConfig.getValueForPath(installedService + "_install").equals("on")) {
+                    retCommand.addUninstallation(installedService);
+                }
             }
         }
 

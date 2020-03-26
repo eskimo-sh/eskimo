@@ -414,11 +414,8 @@ public class MarathonService {
     }
 
     private String proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonIpAddress, String service)
-            throws SSHCommandException, SystemException {
+            throws SSHCommandException, SystemException, MarathonException {
 
-        throw new UnsupportedOperationException("To Be Implemented !");
-
-        /*
         // 1. Calling uninstall.sh script if it exists
         File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
@@ -438,17 +435,15 @@ public class MarathonService {
         }
 
         // 2. Stop service
-        sb.append(" - Stopping Service\n");
-        sshCommandService.runSSHCommand(marathonIpAddress, "sudo systemctl stop " + service);
+        sb.append("Killing tasks for " + service + "\n");
+        String killResultString = queryMarathon("apps/"+service, "DELETE");
+        JsonWrapper killResult = new JsonWrapper(killResultString);
 
-        // 3. Uninstall systemd service file
-        sb.append(" - Removing systemd Service File\n");
-        // Find systemd unit config files directory
-        String foundStandardFlag = sshCommandService.runSSHScript(marathonIpAddress, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
-        if (foundStandardFlag.contains("found_standard")) {
-            sshCommandService.runSSHCommand(marathonIpAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
+        String deploymentId = killResult.getValueForPathAsString("deploymentId");
+        if (StringUtils.isBlank(deploymentId)) {
+            sb.append("WARNING : Could not find any deployment ID when killing tasks for " + service + "\n");
         } else {
-            sshCommandService.runSSHCommand(marathonIpAddress, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");
+            sb.append("Tasks killing deployment ID for " + service + " is " + deploymentId + "\n");
         }
 
         // 4. Delete docker container
@@ -459,13 +454,7 @@ public class MarathonService {
         sb.append(" - Removing docker image \n");
         sshCommandService.runSSHCommand(marathonIpAddress, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
 
-        // 6. Reloading systemd daemon
-        sb.append(" - Reloading systemd daemon \n");
-        sshCommandService.runSSHCommand(marathonIpAddress, "sudo systemctl daemon-reload");
-        sshCommandService.runSSHCommand(marathonIpAddress, "sudo systemctl reset-failed");
-
         return sb.toString();
-        */
     }
 
     private void proceedWithMarathonServiceInstallation(StringBuilder sb, String marathonIpAddress, String service)
@@ -479,12 +468,8 @@ public class MarathonService {
         // 4. call setup script
         systemService.installationSetup(sb, marathonIpAddress, service);
 
-        /*
-
         // 5. cleanup
-        systemService.installationCleanup(sb, ipAddress, service, imageName, tmpArchiveFile);throw new SystemException(e);
-        }
-        */
+        systemService.installationCleanup(sb, marathonIpAddress, service, imageName, tmpArchiveFile);
     }
 
     public void fetchMarathonServicesStatus
@@ -601,7 +586,7 @@ public class MarathonService {
         StringBuilder log = new StringBuilder();
 
         // 1. Kill all tasks for service
-        log.append("Killing tasks for " + service+"\n");
+        log.append("Killing tasks for " + service.getName() + "\n");
         String killResultString = queryMarathon("apps/"+service.getName()+"/tasks?scale=true", "DELETE");
         JsonWrapper killResult = new JsonWrapper(killResultString);
 

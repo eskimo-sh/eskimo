@@ -98,5 +98,7 @@ handle_topology_settings grafana /tmp/grafana_install_log
 echo " - Committing changes to local template and exiting container grafana"
 commit_container grafana /tmp/grafana_install_log
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file grafana /tmp/grafana_install_log
+
+echo " - Starting marathon deployment"
+deploy_marathon grafana /tmp/grafana_install_log
+

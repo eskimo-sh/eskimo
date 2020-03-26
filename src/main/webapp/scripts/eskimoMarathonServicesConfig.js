@@ -190,7 +190,7 @@ eskimo.MarathonServicesConfig = function() {
 
                 } else if (data.clear == "missing") {
 
-                    alert (" TODO missing");
+                    //alert (" TODO missing");
 
                     that.renderMarathonConfig();
 

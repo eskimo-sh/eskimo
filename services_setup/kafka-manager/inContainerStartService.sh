@@ -42,6 +42,9 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh kafka-manager
 
+sudo mkdir -p /var/run/kafka-manager
+sudo chown -R kafka /var/run/kafka-manager
+
 echo " - Starting service"
 /usr/local/lib/kafka-manager/bin/kafka-manager \
     -Dapplication.home=/usr/local/lib/kafka-manager/ \

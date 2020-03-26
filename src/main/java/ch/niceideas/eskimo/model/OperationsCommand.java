@@ -92,29 +92,32 @@ public class OperationsCommand implements Serializable {
 
             String installedService = installation.substring(0, installation.indexOf(INSTALLED_ON_IP_FLAG));
 
-            String nodeName =  installation.substring(installation.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length());
-            String ipAddress = nodeName.replace("-", ".");
+            if (!servicesDefinition.getService(installedService).isMarathon()) {
 
-            try {
-                int nodeNbr = nodesConfig.getNodeNumber(ipAddress);
-                boolean found = false;
+                String nodeName = installation.substring(installation.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length());
+                String ipAddress = nodeName.replace("-", ".");
 
-                // search it in config
-                for (int nodeNumber : nodesConfig.getNodeNumbers(installedService)) {
+                try {
+                    int nodeNbr = nodesConfig.getNodeNumber(ipAddress);
+                    boolean found = false;
 
-                    if (nodeNumber == nodeNbr) {
-                        found = true;
-                        break;
+                    // search it in config
+                    for (int nodeNumber : nodesConfig.getNodeNumbers(installedService)) {
+
+                        if (nodeNumber == nodeNbr) {
+                            found = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!found) {
+                    if (!found) {
+                        retCommand.addUninstallation(installedService, ipAddress);
+                    }
+
+                } catch (SystemException e) {
+                    logger.debug(e, e);
                     retCommand.addUninstallation(installedService, ipAddress);
                 }
-
-            } catch (SystemException e) {
-                logger.debug (e, e);
-                retCommand.addUninstallation(installedService, ipAddress);
             }
         }
 
