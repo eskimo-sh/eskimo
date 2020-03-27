@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.services.MarathonService;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,7 +80,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public boolean isServiceInstalled(String service) {
         try {
-            for (String ipAddress : getIpAddresses()) {
+            for (String ipAddress : getIpAddressesAndFlags()) {
                 if ("OK".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "-")))
                         || "restart".equals(getValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "-")))) {
                     return true;
@@ -124,11 +125,32 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .collect(Collectors.toList());
     }
 
-    public Set<String> getIpAddresses() {
+    public Set<String> getIpAddressesAndFlags() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(OperationsCommand.INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length()))
                 .map(key -> key.replace("-", "."))
                 .collect(Collectors.toSet());
+    }
+
+    public Set<String> getIpAddresses() {
+        return getRootKeys().stream()
+                .filter(key -> key.contains(OperationsCommand.INSTALLED_ON_IP_FLAG))
+                .map(key -> key.substring(key.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length()))
+                .filter(key -> !key.equals(MarathonService.MARATHON_NODE))
+                .map(key -> key.replace("-", "."))
+                .collect(Collectors.toSet());
+    }
+
+    public String getFirstNodeName(String service) {
+        List<String> allNodes = getRootKeys().stream()
+                .filter(key -> key.contains(OperationsCommand.INSTALLED_ON_IP_FLAG))
+                .filter(key -> key.startsWith(service + "_"))
+                .map(key -> key.substring(key.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length()))
+                .collect(Collectors.toList());
+        if (allNodes.size() <= 0) {
+            return null;
+        }
+        return allNodes.get(0);
     }
 }

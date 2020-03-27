@@ -227,6 +227,14 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                 .collect(Collectors.toList());
     }
 
+    public String getFirstNodeName(String serviceName) {
+        List<String> nodeAddresses = getAllNodeAddressesWithService(serviceName);
+        if (nodeAddresses.size() > 0) {
+            return nodeAddresses.get(0).replace(".", "-");
+        }
+        return null;
+    }
+
     private static final class NodesConfigWrapperException extends RuntimeException {
 
         public NodesConfigWrapperException (Throwable cause) {

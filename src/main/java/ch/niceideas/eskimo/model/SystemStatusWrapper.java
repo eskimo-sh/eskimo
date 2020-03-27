@@ -38,12 +38,14 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.services.SystemService;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -106,5 +108,16 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
                 .map(key -> key.substring(key.indexOf(NODE_ALIVE_FLAG) + NODE_ALIVE_FLAG.length()))
                 .map(key -> key.replace("-", "."))
                 .collect(Collectors.toSet());
+    }
+
+    public String getFirstNodeName(String service) {
+        List<String> allNodes = getRootKeys().stream()
+                .filter(key -> key.startsWith(SystemService.SERVICE_PREFIX + service + "_"))
+                .map(key -> key.substring( (SystemService.SERVICE_PREFIX + service + "_").length()))
+                .collect(Collectors.toList());
+        if (allNodes.size() <= 0) {
+            return null;
+        }
+        return allNodes.get(0);
     }
 }

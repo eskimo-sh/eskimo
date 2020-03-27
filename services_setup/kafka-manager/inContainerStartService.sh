@@ -44,6 +44,7 @@ echo " - Inject settings"
 
 sudo mkdir -p /var/run/kafka-manager
 sudo chown -R kafka /var/run/kafka-manager
+rm -Rf /var/run/kafka-manager/kafka-manager.pid
 
 echo " - Starting service"
 /usr/local/lib/kafka-manager/bin/kafka-manager \

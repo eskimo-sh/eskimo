@@ -78,7 +78,7 @@ echo " - Starting kafka manager to inject eskimo cluster payload"
 KAFKA_MANAGER_PID=$!
 fail_if_error $? "/tmp/kafka_manager_install_log" -5
 
-sleep 10
+sleep 5
 if ps -p $KAFKA_MANAGER_PID > /dev/null; then
     echo " - Kafka Manager successfully started"
 else
@@ -88,7 +88,23 @@ else
     exit -10
 fi
 
-if [[ `curl -XGET http://localhost:22080/clusters/Eskimo 2>/dev/null | grep "Unknown cluster"` != "" ]]; then
+set +e
+for i in $(seq 1 10); do
+    sleep 5
+    echo "   + Attempt $i"
+    clusterSearch=`curl -XGET http://localhost:22080/clusters/Eskimo 2>&1`
+    if [[ $? == 0 ]]; then
+        break
+    fi
+    if [[ "$i" == "10" ]]; then
+        echo "Fetching 10 times of Eskimo cluster page failed"
+        echo $clusterSearch
+    fi
+done
+set -e
+
+
+if [[ `echo $clusterSearch | grep "Unknown cluster"` != "" ]]; then
     echo " - Creating Eskimo Cluster in Kafka Manager"
     payload="name=Eskimo&zkHosts=$MASTER_ZK_IP_ADDRESS%3A2181&kafkaVersion=2.2.0&jmxEnabled=true&jmxUser=&jmxPass=&pollConsumers=true"
     payload+='&filterConsumers=true&tuning.brokerViewUpdatePeriodSeconds=15&tuning.clusterManagerThreadPoolSize=2'
@@ -104,6 +120,8 @@ if [[ `curl -XGET http://localhost:22080/clusters/Eskimo 2>/dev/null | grep "Unk
 
     curl -XPOST http://localhost:22080/clusters -d $payload >> /tmp/kafka_manager_install_log 2>&1
     fail_if_error $? "/tmp/kafka_manager_install_log" -4
+else
+    echo " - (Creating Eskimo Cluster in Kafka Manager"
 fi
 
 echo " - Stopping kafka manager"

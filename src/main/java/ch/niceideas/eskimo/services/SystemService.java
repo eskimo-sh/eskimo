@@ -110,7 +110,7 @@ public class SystemService {
     private ConfigurationService configurationService;
 
     @Autowired
-    private MarathonService marathonServicesConfigService;
+    private MarathonService marathonService;
 
 
     @Value("${system.failedServicesTriggerCount}")
@@ -229,7 +229,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Showing journal of", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonServicesConfigService.showJournalMarathon(service);
+                return marathonService.showJournalMarathon(service);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + serviceName);
             }
@@ -240,7 +240,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Starting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonServicesConfigService.startServiceMarathon(service);
+                return marathonService.startServiceMarathon(service);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + serviceName);
             }
@@ -251,7 +251,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonServicesConfigService.stopServiceMarathon(service);
+                return marathonService.stopServiceMarathon(service);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + serviceName);
             }
@@ -261,7 +261,7 @@ public class SystemService {
     public void restartService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
         applyServiceOperation(serviceName, ipAddress, "Restarting", () -> {Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonServicesConfigService.restartServiceMarathon(service);
+                return marathonService.restartServiceMarathon(service);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + serviceName);
             }
@@ -344,15 +344,15 @@ public class SystemService {
 
             // fetch marathon services status
             try {
-                marathonServicesConfigService.fetchMarathonServicesStatus (statusMap, servicesInstallationStatus);
+                marathonService.fetchMarathonServicesStatus (statusMap, servicesInstallationStatus);
             } catch (MarathonException e) {
                 logger.debug(e, e);
                 // workaround : flag all marathon services as KO on marathon node
-                String marathonIpAddress = marathonServicesConfigService.findUniqueServiceIP("marathon");
+                String marathonIpAddress = marathonService.findUniqueServiceIP("marathon");
                 if (StringUtils.isNotBlank(marathonIpAddress)) {
                     String marathonNode = marathonIpAddress.replace(".", "-");
                     for (String service : servicesDefinition.listMarathonServices()) {
-                        if (marathonServicesConfigService.shouldInstall (service)) {
+                        if (marathonService.shouldInstall (service)) {
                             statusMap.put(SERVICE_PREFIX + service + "_" + marathonNode, "KO");
                         }
                     }
@@ -710,12 +710,14 @@ public class SystemService {
                     boolean shall = nodesConfig.shouldInstall (service, nodeNbr);
 
                     // check if service is installed ?
-                    //check if service installed using SSH
+                    // check if service installed using SSH
                     String serviceStatus = parser.getServiceStatus(service);
                     boolean installed = !serviceStatus.equals("NA");
                     boolean running = serviceStatus.equals("running");
 
-                    feedInServiceStatus(statusMap, servicesInstallationStatus, ipAddress, nodeName, service, shall, installed, running);
+                    feedInServiceStatus (
+                            statusMap, servicesInstallationStatus, ipAddress, nodeName, nodeName,
+                            service, shall, installed, running);
                 }
             }
         } catch (SSHCommandException | JSONException | ConnectionManagerException e) {
@@ -724,7 +726,17 @@ public class SystemService {
         }
     }
 
-    void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, String ipAddress, String nodeName, String service, boolean shall, boolean installed, boolean running) throws ConnectionManagerException {
+    void feedInServiceStatus (
+            Map<String, String> statusMap,
+            ServicesInstallStatusWrapper servicesInstallationStatus,
+            String ipAddress,
+            String nodeName,
+            String referenceNodeName,
+            String service,
+            boolean shall,
+            boolean installed,
+            boolean running) throws ConnectionManagerException {
+
         if (shall) {
             if (!installed) {
 
@@ -740,7 +752,7 @@ public class SystemService {
 
                 } else {
 
-                    if (servicesInstallationStatus.isServiceOK(service,nodeName)) {
+                    if (servicesInstallationStatus.isServiceOK (service, referenceNodeName)) {
                         statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "OK");
                     } else {
                         statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "restart");
@@ -777,6 +789,9 @@ public class SystemService {
                         String savedService = serviceStatusFullString.substring(0, index);
 
                         String nodeName = serviceStatusFullString.substring(index + searchedPattern.length());
+                        if (nodeName.equals(MarathonService.MARATHON_NODE)) {
+                            nodeName = systemStatus.getFirstNodeName (savedService);
+                        }
 
                         Boolean nodeAlive = systemStatus.isNodeAlive (nodeName);
                         // this means that node is not configured anymore ! (no status has been obtained)
