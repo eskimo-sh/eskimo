@@ -128,7 +128,7 @@ public class SystemOperationService {
 
     interface SystemOperation {
         void call(StringBuilder result)
-                throws ProcessHelper.ProcessHelperException, SSHCommandException, SystemException, IOException,
+                throws ProcessHelper.ProcessHelperException, SSHCommandException, SystemException, IOException, SetupException,
                        FileUtils.FileDeleteFailedException;
     }
 }

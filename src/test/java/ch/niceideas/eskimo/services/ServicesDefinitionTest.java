@@ -49,14 +49,16 @@ import static org.junit.Assert.*;
 
 public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
-    private String jsonConfig = null;
+    private String jsonNodesConfig = null;
+    private String jsonMarathonConfig = null;
 
     private MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        jsonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
+        jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
+        jsonMarathonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMarathonConfig.json"));
     }
 
     @Test
@@ -80,7 +82,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRealLifeExample() throws Exception {
 
-        Topology topology = def.getTopology(new NodesConfigWrapper(jsonConfig), new HashSet<>());
+        Topology topology = def.getTopology(
+                new NodesConfigWrapper(jsonNodesConfig),
+                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new HashSet<>(), "192.168.10.11");
 
         assertEquals ("export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
                 "export MASTER_ELASTICSEARCH_1921681012=192.168.10.13\n" +
@@ -99,7 +104,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRealLifeExampleDeadIp() throws Exception {
 
-        Topology topology = def.getTopology(new NodesConfigWrapper(jsonConfig), new HashSet<String>(){{add("192.168.10.13");}});
+        Topology topology = def.getTopology(
+                new NodesConfigWrapper(jsonNodesConfig),
+                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new HashSet<String>(){{add("192.168.10.13");}}, "192.168.10.11");
 
         assertEquals ("export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
                 "export MASTER_ELASTICSEARCH_1921681012=192.168.10.11\n" +
@@ -119,9 +127,12 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRealLifeExampleComplete() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(jsonConfig);
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(jsonNodesConfig);
 
-        Topology topology = def.getTopology(nodesConfig, new HashSet<>());
+        Topology topology = def.getTopology(
+                nodesConfig,
+                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new HashSet<>(), "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
@@ -168,7 +179,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("logstash1", "on");
         }});
 
-        Topology topology = def.getTopology(nodesConfig, new HashSet<>());
+        Topology topology = def.getTopology(
+                nodesConfig,
+                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new HashSet<>(), "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
@@ -351,7 +365,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("prometheus2", "on");
         }});
 
-        Topology topology = def.getTopology(nrr.resolveRanges(nodesConfig), new HashSet<>());
+        Topology topology = def.getTopology(
+                nrr.resolveRanges(nodesConfig),
+                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new HashSet<>(), "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.13\n" +

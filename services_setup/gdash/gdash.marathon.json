@@ -1,0 +1,64 @@
+{
+  "id": "gdash",
+  "cmd": "/usr/local/sbin/inContainerStartService.sh",
+  "cpus": 0.1,
+  "mem": 256,
+  "disk": 100,
+  "instances": 1,
+  "container": {
+    "docker": {
+      "image": "marathon.registry:5000/gdash"
+    },
+    "type": "DOCKER",
+    "network": "BRIDGE",
+    "portMappings": [
+      {
+        "containerPort": 28180,
+        "hostPort": 31180,
+        "protocol": "tcp",
+        "name": "httpgdash",
+        "labels": null
+      }
+    ],
+    "volumes": [
+      {
+        "containerPath": "/var/log/gdash",
+        "hostPath": "/var/log/gdash",
+        "mode": "RW"
+      },
+      {
+        "hostPath": "/var/run/gdash",
+        "containerPath": "/var/run/gdash",
+        "mode": "RW"
+      },
+      {
+        "hostPath": "/etc/eskimo_topology.sh",
+        "containerPath": "/etc/eskimo_topology.sh",
+        "mode": "RO"
+      },
+      {
+        "hostPath": "/etc/eskimo_services-config.json",
+        "containerPath": "/etc/eskimo_services-config.json",
+        "mode": "RO"
+      }
+    ]
+  },
+  "networks": [
+    {
+      "mode": "container/bridge"
+    }
+  ],
+  "env": {},
+  "labels": {},
+  "healthChecks": [
+    {
+      "protocol": "MESOS_TCP",
+      "portIndex": 0,
+      "gracePeriodSeconds": 300,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 20,
+      "maxConsecutiveFailures": 3
+    }
+  ],
+  "user": "eskimo"
+}

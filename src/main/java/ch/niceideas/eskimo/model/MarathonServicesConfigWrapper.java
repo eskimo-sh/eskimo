@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemException;
@@ -73,6 +74,14 @@ public class MarathonServicesConfigWrapper extends JsonWrapper implements Serial
 
     public MarathonServicesConfigWrapper(String jsonString) {
         super(jsonString);
+    }
+
+    public Collection<String> getEnabledServices() {
+        return getRootKeys().stream()
+                .filter(key -> key.contains("_install"))
+                .filter(key -> getValueForPath(key).equals("on"))
+                .map(key -> key.substring(0, key.indexOf("_install")))
+                .collect(Collectors.toList());
     }
 
     private static final class MarathonServicesConfigWrapperException extends RuntimeException {

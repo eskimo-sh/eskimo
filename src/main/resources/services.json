@@ -143,16 +143,16 @@
     "config": {
       "imageName" : "gdash",
       "order": 5,
+      "marathon": true,
       "unique": true,
       "group" : "Gluster",
       "name" : "Dashboard",
-      "selectionLayout" : { "row" : 4, "col" : 2},
       "memory": "neglectable",
       "logo" : "images/gdash-logo.png",
       "icon" : "images/gdash-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 28180,
+      "proxyTargetPort" : 31180,
       "waitTime": 5000,
       "title" : "Gluster Dashboard",
 
@@ -587,6 +587,12 @@
         "masterService": "mesos-agent",
         "numberOfMasters": 1,
         "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "flink-app-master",
+        "numberOfMasters": 1,
+        "mandatory": true
       }
     ],
     "editableConfigurations": [
@@ -649,12 +655,6 @@
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true
-      },
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "flink-app-master",
         "numberOfMasters": 1,
         "mandatory": true
       },

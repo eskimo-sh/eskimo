@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -53,6 +54,7 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
     private ServicesInstallationSorter sio = null;
 
     NodesConfigWrapper nodesConfig = null;
+    MarathonServicesConfigWrapper marathonServicesConfig = null;
 
     @Before
     public void setUp() throws Exception {
@@ -61,6 +63,7 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         sio.setServicesDefinition(def);
 
         nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
     }
 

@@ -420,40 +420,9 @@ public class SystemService {
             Set<String> liveIps = new HashSet<>();
             Set<String> deadIps = new HashSet<>();
 
-            List<Pair<String, String>> nodesSetup = new ArrayList<>();
-
-            // Find out about dead IPs
-            Set<String> ipAddressesToTest = new HashSet<>(command.getAllIpAddresses());
-            ipAddressesToTest.addAll(nodesConfig.getIpAddresses());
-            for (String ipAddress : ipAddressesToTest) {
-
-                // handle potential interruption request
-                if (isInterrupted()) {
-                    return;
-                }
-
-                nodesSetup.add(new Pair<>("node_setup", ipAddress));
-
-                // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
-
-                // find out if SSH connection to host can succeed
-                try {
-                    String ping = sendPing(ipAddress);
-
-                    if (!ping.startsWith("OK")) {
-
-                        handleNodeDead(deadIps, ipAddress);
-                    } else {
-                        liveIps.add(ipAddress);
-                    }
-                } catch (SSHCommandException e) {
-                    logger.debug(e, e);
-                    handleNodeDead(deadIps, ipAddress);
-                }
-            }
-
-            if (!deadIps.isEmpty()) {
-                messagingService.addLines("\n");
+            List<Pair<String, String>> nodesSetup = buildDeadIps(command.getAllIpAddresses(), nodesConfig, liveIps, deadIps);
+            if (nodesSetup == null) {
+                return;
             }
 
             MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
@@ -461,6 +430,8 @@ public class SystemService {
             if (isInterrupted()) {
                 return;
             }
+
+            MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
 
             // Nodes setup
             this.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
@@ -478,7 +449,7 @@ public class SystemService {
                             // topology
                             if (!isInterrupted() && (error.get() == null)) {
                                 systemOperationService.applySystemOperation("Installation of Topology and settings on " + ipAddress,
-                                        builder -> installTopologyAndSettings(nodesConfig, memoryModel, ipAddress, deadIps), null);
+                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, ipAddress, deadIps), null);
                             }
 
                             if (!isInterrupted() && (error.get() == null && !isInstalledOnNode("mesos", ipAddress))) {
@@ -494,7 +465,8 @@ public class SystemService {
                     });
 
             // first thing first, flag nodes that need to be restared as needing to be restarted
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
+            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
+                    command.getRestarts(), nodesConfig, deadIps)) {
                 for (Pair<String, String> operation : restarts) {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
@@ -511,7 +483,8 @@ public class SystemService {
             }
 
             // Installation in batches (groups following dependencies)
-            for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (command.getInstallations(), nodesConfig, deadIps)) {
+            for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (
+                    command.getInstallations(), nodesConfig, deadIps)) {
 
                 performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimout,
                         (operation, error) -> {
@@ -524,7 +497,8 @@ public class SystemService {
             }
 
             // uninstallations
-            List<List<Pair<String, String>>> orderedUninstallations =  servicesInstallationSorter.orderOperations (command.getUninstallations(), nodesConfig, deadIps);
+            List<List<Pair<String, String>>> orderedUninstallations =  servicesInstallationSorter.orderOperations (
+                    command.getUninstallations(), nodesConfig, deadIps);
             Collections.reverse(orderedUninstallations);
 
             for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
@@ -547,7 +521,8 @@ public class SystemService {
             }
 
             // restarts
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
+            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
+                    command.getRestarts(), nodesConfig, deadIps)) {
                 performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimout,
                         (operation, error) -> {
                             String service = operation.getKey();
@@ -567,6 +542,45 @@ public class SystemService {
             setLastOperationSuccess (success);
             releaseProcessingPending();
         }
+    }
+
+    List<Pair<String, String>> buildDeadIps(Set<String> allIpAddresses, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
+        List<Pair<String, String>> nodesSetup = new ArrayList<>();
+
+        // Find out about dead IPs
+        Set<String> ipAddressesToTest = new HashSet<>(allIpAddresses);
+        ipAddressesToTest.addAll(nodesConfig.getIpAddresses());
+        for (String ipAddress : ipAddressesToTest) {
+
+            // handle potential interruption request
+            if (isInterrupted()) {
+                return null;
+            }
+
+            nodesSetup.add(new Pair<>("node_setup", ipAddress));
+
+            // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
+
+            // find out if SSH connection to host can succeed
+            try {
+                String ping = sendPing(ipAddress);
+
+                if (!ping.startsWith("OK")) {
+
+                    handleNodeDead(deadIps, ipAddress);
+                } else {
+                    liveIps.add(ipAddress);
+                }
+            } catch (SSHCommandException e) {
+                logger.debug(e, e);
+                handleNodeDead(deadIps, ipAddress);
+            }
+        }
+
+        if (!deadIps.isEmpty()) {
+            messagingService.addLines("\n");
+        }
+        return nodesSetup;
     }
 
     <T> void performPooledOperation(
@@ -638,7 +652,18 @@ public class SystemService {
         String nodeName = ipAddress.replace(".", "-");
 
         if (servicesDefinition.getService(service).isMarathon()) {
-            throw new UnsupportedOperationException("Supprt Marathon Service restart");
+
+            systemOperationService.applySystemOperation("Restart of " + service + " on marathon node ",
+                    builder -> {
+                        try {
+                            builder.append(marathonService.restartServiceMarathon(servicesDefinition.getService(service)));
+                        } catch (MarathonException e) {
+                            logger.error (e, e);
+                            throw new SystemException (e);
+                        }
+                    },
+                    status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + MarathonService.MARATHON_NODE, "OK") );
+
         } else {
             systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
                     builder -> builder.append(sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
@@ -923,7 +948,7 @@ public class SystemService {
     }
 
 
-    private String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
+    String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
             throws SystemException, SSHCommandException, IOException {
 
         File tempTopologyFile = createTempFile("eskimo_topology", ipAddress, ".sh");
@@ -935,7 +960,7 @@ public class SystemService {
         }
         try {
             FileUtils.writeFile(tempTopologyFile, servicesDefinition
-                    .getTopology(nodesConfig, deadIps)
+                    .getTopology(nodesConfig, marathonConfig, deadIps, ipAddress)
                     .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (ipAddress)));
         } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
             logger.error (e, e);

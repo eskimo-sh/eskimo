@@ -37,10 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 
@@ -95,12 +92,14 @@ public class Topology {
     }
 
     public static Topology create(
-            NodesConfigWrapper nodesConfig, Set<String> deadIps, ServicesDefinition servicesDefinition, String contextPath)
+            NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
+            Set<String> deadIps, ServicesDefinition servicesDefinition, String contextPath, String currentNodeIpAddress)
             throws ServiceDefinitionException, NodesConfigurationException {
 
         Topology topology = new Topology();
 
         try {
+            // Define master for standard services
             for (String key : nodesConfig.getServiceKeys())  {
 
                 Pair<String, Integer> result = parseKeyToServiceConfig (key, nodesConfig);
@@ -115,7 +114,19 @@ public class Topology {
                 topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getValue(), nodesConfig);
             }
 
-        } catch (JSONException | FileException | SetupException e) {
+            // Define master for marathon services
+            if (currentNodeIpAddress != null) {
+                for (String key : marathonConfig.getEnabledServices()) {
+
+                    Service service = servicesDefinition.getService(key);
+
+                    int currentNodeNumber = nodesConfig.getNodeNumber(currentNodeIpAddress);
+
+                    topology.defineMasters(service, deadIps, currentNodeNumber, nodesConfig);
+                }
+            }
+
+        } catch (JSONException | FileException | SetupException | SystemException e) {
             logger.error (e, e);
             throw new NodesConfigurationException(e);
         }

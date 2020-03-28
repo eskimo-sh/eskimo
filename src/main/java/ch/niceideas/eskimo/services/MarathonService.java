@@ -57,6 +57,15 @@ public class MarathonService {
     @Autowired
     private ProxyManagerService proxyManagerService;
 
+    @Autowired
+    private MemoryComputer memoryComputer;
+
+    @Autowired
+    private MessagingService messagingService;
+
+    @Autowired
+    private NotificationService notificationService;
+
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
@@ -235,37 +244,46 @@ public class MarathonService {
             Set<String> liveIps = new HashSet<>();
             Set<String> deadIps = new HashSet<>();
 
-            List<Pair<String, String>> nodesSetup = new ArrayList<>();
-
-
             // handle potential interruption request
             if (systemService.isInterrupted()) {
                 return;
             }
 
-            nodesSetup.add(new Pair<>("node_setup", marathonIpAddress));
+            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
-            // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
+            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<String>(){{add(marathonIpAddress);}}, nodesConfig, liveIps, deadIps);
 
-            // find out if SSH connection to host can succeed
-            try {
-                String ping = systemService.sendPing(marathonIpAddress);
-
-                if (!ping.startsWith("OK")) {
-                    systemService.handleNodeDead(deadIps, marathonIpAddress);
-                }
-            } catch (SSHCommandException e) {
-                logger.debug(e, e);
-                systemService.handleNodeDead(deadIps, marathonIpAddress);
-            }
-
-            if (!deadIps.isEmpty()) {
-                throw new SystemException("At least one configured node was found dead");
+            if (deadIps.contains(marathonIpAddress)) {
+                String message = "The marathon node is dead. cannot proceed any further with installation";
+                notificationService.addError(message);
+                messagingService.addLines(message);
+                throw new SystemException(message);
             }
 
             if (systemService.isInterrupted()) {
                 return;
             }
+
+            if (nodesSetup == null) {
+                return;
+            }
+
+            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
+
+            if (systemService.isInterrupted()) {
+                return;
+            }
+
+            // Nodes re-setup (topology)
+            systemService.performPooledOperation (new ArrayList<String> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+                    (operation, error) -> {
+                        // topology
+                        if (error.get() == null) {
+                            systemOperationService.applySystemOperation("Installation of Topology and settings on " + operation,
+                                    builder -> systemService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation, deadIps), null);
+                        }
+
+                    });
 
             // Installation in batches (groups following dependencies)
 

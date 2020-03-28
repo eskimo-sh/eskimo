@@ -90,5 +90,6 @@ handle_topology_settings gdash /tmp/gdash_install_log
 echo " - Committing changes to local template and exiting container gdash"
 commit_container gdash /tmp/gdash_install_log
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file gdash /tmp/gdash_install_log
+
+echo " - Starting marathon deployment"
+deploy_marathon gdash /tmp/gdash_install_log

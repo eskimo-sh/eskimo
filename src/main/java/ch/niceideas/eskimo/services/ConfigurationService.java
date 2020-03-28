@@ -173,7 +173,7 @@ public class ConfigurationService {
         return FileUtils.readFile(configFile);
     }
 
-    public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException, SetupException {
+    public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
         marathonServicesFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
@@ -183,7 +183,7 @@ public class ConfigurationService {
             }
 
             return new MarathonServicesConfigWrapper(FileUtils.readFile(marathonServicesConfigFile));
-        } catch (JSONException | FileException e) {
+        } catch (JSONException | FileException | SetupException e) {
             logger.error (e, e);
             throw new SystemException(e);
         } finally {

@@ -320,9 +320,9 @@ public class ServicesDefinition implements InitializingBean {
         return String.join(" ", listAllServices());
     }
 
-    public Topology getTopology(NodesConfigWrapper nodesConfig, Set<String> deadIps)
+    public Topology getTopology(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, Set<String> deadIps, String currentNodeIpAddress)
             throws ServiceDefinitionException, NodesConfigurationException {
-        return Topology.create(nodesConfig, deadIps, this, configuredContextPath);
+        return Topology.create(nodesConfig, marathonConfig, deadIps, this, configuredContextPath, currentNodeIpAddress);
     }
 
     public Service getService(String serviceName) {

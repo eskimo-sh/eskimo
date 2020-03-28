@@ -35,10 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.Dependency;
-import ch.niceideas.eskimo.model.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -87,6 +84,8 @@ public class ServicesInstallationSorter {
         // 3. Reprocess and separate master installation
         List<List<Pair<String, String>>> orderedOperationsSteps = new ArrayList<>();
 
+        Topology topology = servicesDefinition.getTopology(nodesConfig, null, deadIps, null);
+
         for (Service service : services) {
 
             List<Pair<String, String>> group = groupedOperations.get(service.getName());
@@ -102,7 +101,7 @@ public class ServicesInstallationSorter {
                     && (dependency.get().getMes().equals(MasterElectionStrategy.FIRST_NODE)
                     || dependency.get().getMes().equals(MasterElectionStrategy.RANDOM))) {
 
-                String[] masters = servicesDefinition.getTopology(nodesConfig, deadIps).getMasters(service);
+                String[] masters = topology.getMasters(service);
 
                 for (String master : masters) {
 

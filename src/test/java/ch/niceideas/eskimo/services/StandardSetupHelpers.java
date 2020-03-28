@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
@@ -129,5 +130,9 @@ public class StandardSetupHelpers {
             put("service_zeppelin_192-168-10-13", "OK");
             put("service_zookeeper_192-168-10-13", "OK");
         }});
+    }
+
+    public static MarathonServicesConfigWrapper getStandardMarathonConfig() {
+        throw new UnsupportedOperationException("To Be Implemented");
     }
 }
