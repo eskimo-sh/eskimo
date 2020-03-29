@@ -166,7 +166,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true
@@ -427,16 +427,16 @@
     "config": {
       "imageName" : "spark",
       "order": 11,
+      "marathon": true,
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
-      "selectionLayout" : { "row" : 1, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/spark-history-server-logo.png",
       "icon" : "images/spark-history-server-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 18080,
+      "proxyTargetPort" : 31810,
       "waitTime": 5000,
       "title" : "Spark Console",
       "statusPageLinktitle" : "Monitor your Spark jobs",
@@ -456,10 +456,10 @@
         "mandatory": true
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "spark-executor",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": true
       }
     ]
   },

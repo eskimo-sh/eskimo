@@ -66,6 +66,11 @@ fail_if_error $? "/tmp/spark_build_log" -6
 
 echo " - Installing other python packages"
 docker exec -i spark pip install requests filelock >> /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -11
+
+echo " - Installing GlusterFS client"
+docker exec -i spark apt-get -y install  glusterfs-client >> /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -10
 
 echo " - Installing spark"
 docker exec -i spark bash /scripts/installSpark.sh | tee -a /tmp/spark_build_log 2>&1

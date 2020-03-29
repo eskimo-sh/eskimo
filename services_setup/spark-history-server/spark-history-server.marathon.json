@@ -1,5 +1,5 @@
 {
-  "id": "gdash",
+  "id": "spark-history-server",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.1,
   "mem": 256,
@@ -7,29 +7,25 @@
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/gdash",
-      "forcePullImage": true
+      "image": "marathon.registry:5000/spark-history-server",
+      "forcePullImage": true,
+      "privileged": true
     },
     "type": "DOCKER",
     "network": "BRIDGE",
     "portMappings": [
       {
-        "containerPort": 28180,
-        "hostPort": 31180,
+        "containerPort": 18080,
+        "hostPort": 31810,
         "protocol": "tcp",
-        "name": "httpgdash",
+        "name": "httpsparkhistoh",
         "labels": null
       }
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/gdash",
-        "hostPath": "/var/log/gdash",
-        "mode": "RW"
-      },
-      {
-        "hostPath": "/var/run/gdash",
-        "containerPath": "/var/run/gdash",
+        "containerPath": "/var/log/spark",
+        "hostPath": "/var/log/spark",
         "mode": "RW"
       },
       {
@@ -61,5 +57,5 @@
       "maxConsecutiveFailures": 3
     }
   ],
-  "user": "eskimo"
+  "user": "spark"
 }

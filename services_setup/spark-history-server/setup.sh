@@ -136,10 +136,16 @@ fail_if_error $? "/tmp/spark_history_server_install_log" -20
 docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySparkHistory.sh" >> /tmp/spark_history_server_install_log 2>&1
 fail_if_error $? "/tmp/spark_history_server_install_log" -21
 
+echo " - Copying inContainerMountGluster.sh scriot"
+docker cp $SCRIPT_DIR/inContainerMountGluster.sh spark-history-server:/usr/local/sbin/inContainerMountGluster.sh >> /tmp/spark_history_server_install_log 2>&1
+fail_if_error $? "/tmp/spark_history_server_install_log" -20
+
+docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> /tmp/spark_history_server_install_log 2>&1
+fail_if_error $? "/tmp/spark_history_server_install_log" -21
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark-history-server /tmp/spark_history_server_install_log
 
-echo " - Handling spark-history-server systemd file (for spark-history-server)"
-install_and_check_service_file spark-history-server /tmp/spark_history_server_install_log
 
+echo " - Starting marathon deployment"
+deploy_marathon spark-history-server /tmp/spark_history_server_install_log

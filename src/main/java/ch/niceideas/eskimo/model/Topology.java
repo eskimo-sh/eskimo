@@ -276,6 +276,9 @@ public class Topology {
 
             case SAME_NODE:
             default:
+                if (service.isMarathon()) {
+                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a SAME_NODE dependency wich ois not supported for marathon services");
+                }
                 // do nothing here. WIll be enforced by checker.
                 break;
         }

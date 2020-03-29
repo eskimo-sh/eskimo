@@ -48,5 +48,9 @@ echo " - Inject settings (spark-history-server)"
 echo " - Inject settings (spark-executor)"
 /usr/local/sbin/settingsInjector.sh spark-executor
 
+echo " - Mounting gluster shares for spark"
+/usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data
+/usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog
+
 echo " - Starting service"
 /usr/local/lib/spark/sbin/start-history-server-wrapper.sh

@@ -36,6 +36,7 @@
 
 /usr/local/lib/spark/sbin/start-history-server.sh
 
+# Keep the calling thread / process waiting
 export do_loop=1
 while [[ $do_loop == 1 ]] ; do
     dispatcher_pid=`ps -efl | grep org.apache.spark.deploy.history.HistoryServer | grep java | awk '{ print $4 }'`

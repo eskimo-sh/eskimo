@@ -132,7 +132,7 @@ public class NodesConfigurationChecker {
             }
         }
 
-        // enforce mandatory nodes
+        // enforce mandatory services
         for (String mandatoryServiceName : servicesDefinition.listMandatoryServices()) {
 
             Service mandatoryService = servicesDefinition.getService(mandatoryServiceName);

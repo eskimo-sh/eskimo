@@ -111,9 +111,6 @@ sudo bash -c "echo -e \"\n#Important configuration directories \"  >> /usr/local
 sudo bash -c "echo -e \"export SPARK_CONF_DIR=/usr/local/lib/spark/conf\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 sudo bash -c "echo -e \"export SPARK_LOG_DIR=/usr/local/lib/spark/logs\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 
-sudo bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
-sudo bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
-sudo bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 
 echo " - Creating spark default configuration file"
 sudo rm -Rf /usr/local/lib/spark/conf/spark-defaults.conf

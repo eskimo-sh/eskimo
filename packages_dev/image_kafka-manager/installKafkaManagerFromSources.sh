@@ -69,7 +69,7 @@ fi
 mv $KAFKA_MANAGER_VERSION.zip kafka-manager-$KAFKA_MANAGER_VERSION.zip
 
 echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
-unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+unzip -f kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 echo " - Building source tree (./sbt clean dist) (this can take a few minutes)"
@@ -84,7 +84,7 @@ cd /tmp/kafka_manager_setup
 
 
 echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
-unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+unzip -f kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 echo " - Installing kafka_managser"

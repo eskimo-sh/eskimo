@@ -1,5 +1,5 @@
 {
-  "id": "gdash",
+  "id": "flink-app-master",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.1,
   "mem": 256,
@@ -7,7 +7,7 @@
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/gdash",
+      "image": "marathon.registry:5000/flink-app-master",
       "forcePullImage": true
     },
     "type": "DOCKER",
@@ -23,15 +23,11 @@
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/gdash",
-        "hostPath": "/var/log/gdash",
+        "containerPath": "/var/log/flink/",
+        "hostPath": "/var/log/flink",
         "mode": "RW"
       },
-      {
-        "hostPath": "/var/run/gdash",
-        "containerPath": "/var/run/gdash",
-        "mode": "RW"
-      },
+
       {
         "hostPath": "/etc/eskimo_topology.sh",
         "containerPath": "/etc/eskimo_topology.sh",
@@ -61,5 +57,5 @@
       "maxConsecutiveFailures": 3
     }
   ],
-  "user": "eskimo"
+  "user": "flink"
 }

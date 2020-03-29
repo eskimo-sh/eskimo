@@ -63,7 +63,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
 fail_if_error $? "/tmp/spark_install_log" -2
 
 echo " - Downloading spark-$SPARK_VERSION"
-wget https://www-eu.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.7.tgz > /tmp/spark_install_log 2>&1
+wget https://downloads.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.7.tgz > /tmp/spark_install_log 2>&1
 
 
 if [[ $? != 0 ]]; then

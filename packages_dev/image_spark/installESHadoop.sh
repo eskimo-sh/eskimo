@@ -70,7 +70,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Extracting elasticsearch-hadoop-$ES_VERSION"
-unzip elasticsearch-hadoop-$ES_VERSION.zip > /tmp/spark_install_log 2>&1
+unzip -f elasticsearch-hadoop-$ES_VERSION.zip > /tmp/spark_install_log 2>&1
 fail_if_error $? "/tmp/spark_install_log" -2
 
 echo " - Installing eshadoop spark (to spark jar folder)"

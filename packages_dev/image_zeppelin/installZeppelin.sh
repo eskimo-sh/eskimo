@@ -127,7 +127,7 @@ fi
 # fail_if_error $? "/tmp/zeppelin_install_log" -1
 #
 # echo "   + extracting spark interpreter"
-# unzip spark-interpreter-$ZEPPELIN_VERSION.jar  >> /tmp/zeppelin_install_log 2>&1
+# unzip -f spark-interpreter-$ZEPPELIN_VERSION.jar  >> /tmp/zeppelin_install_log 2>&1
 # fail_if_error $? "/tmp/zeppelin_install_log" -1
 #
 # rm -Rf spark-interpreter-$ZEPPELIN_VERSION.jar
@@ -137,7 +137,7 @@ fi
 # fail_if_error $? "/tmp/zeppelin_install_log" -1
 #
 # echo "   + extracting spark commons-lang3"
-# unzip -o commons-lang3-3.5.jar >> /tmp/zeppelin_install_log 2>&1
+# unzip .f -o commons-lang3-3.5.jar >> /tmp/zeppelin_install_log 2>&1
 # fail_if_error $? "/tmp/zeppelin_install_log" -1
 #
 # rm commons-lang3-3.5.jar
