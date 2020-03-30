@@ -125,6 +125,9 @@ public class MarathonService {
 
         try {
             ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
+            if (marathonTunnelConfig == null) {
+                return null;
+            }
 
             // apps/cerebro
             BasicHttpRequest request = new BasicHttpRequest(method, "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
@@ -176,10 +179,13 @@ public class MarathonService {
     }
 
     private Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
-            MarathonException, FileException, SetupException {
+            MarathonException  {
 
         for (int i = 0; i < numberOfAttempts; i++) {
             String serviceJson = queryMarathon("apps/" + service);
+            if (StringUtils.isBlank(serviceJson)) {
+                return new Pair<>(null, "NA");
+            }
 
             JsonWrapper serviceResult = new JsonWrapper(serviceJson);
 
@@ -463,46 +469,45 @@ public class MarathonService {
                     logger.warn(e.getMessage());
                     logger.debug(e, e);
                 }
-            }
 
-            for (String service : servicesDefinition.listMarathonServices()) {
+                for (String service : servicesDefinition.listMarathonServices()) {
 
-                // should service be installed on marathon ?
-                boolean shall = this.shouldInstall(service);
+                    // should service be installed on marathon ?
+                    boolean shall = this.shouldInstall(service);
 
-                // check if service is installed ?
-                //check if service installed using SSH
-                Pair<String, String> nodeNameAndStatus = new Pair<>(null, "NA");
-                if (StringUtils.isNotBlank(ping) && ping.startsWith("OK")) {
-                    nodeNameAndStatus = this.getServiceRuntimeNode(service);
-                }
-
-                String nodeIp = nodeNameAndStatus.getKey();
-
-                boolean installed = StringUtils.isNotBlank(nodeIp);
-                boolean running = nodeNameAndStatus.getValue().equals("running");
-
-                String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
-
-                // uninstalled services are identified on the marathon node
-                if (StringUtils.isBlank(nodeName)) {
-                    if (StringUtils.isNotBlank(marathonIpAddress)) {
-                        nodeName = marathonIpAddress.replace(".", "-");
-                    } else {
-                        nodeName = servicesInstallationStatus.getFirstNodeName("marathon");
+                    // check if service is installed ?
+                    //check if service installed using SSH
+                    Pair<String, String> nodeNameAndStatus = new Pair<>(null, "NA");
+                    if (StringUtils.isNotBlank(ping) && ping.startsWith("OK")) {
+                        nodeNameAndStatus = this.getServiceRuntimeNode(service);
                     }
-                    // last attempt, get it from theoretical perspective
+
+                    String nodeIp = nodeNameAndStatus.getKey();
+
+                    boolean installed = StringUtils.isNotBlank(nodeIp);
+                    boolean running = nodeNameAndStatus.getValue().equals("running");
+
+                    String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
+
+                    // uninstalled services are identified on the marathon node
                     if (StringUtils.isBlank(nodeName)) {
-                        nodeName = configurationService.loadNodesConfig().getFirstNodeName("marathon");
+                        if (StringUtils.isNotBlank(marathonIpAddress)) {
+                            nodeName = marathonIpAddress.replace(".", "-");
+                        } else {
+                            nodeName = servicesInstallationStatus.getFirstNodeName("marathon");
+                        }
+                        // last attempt, get it from theoretical perspective
+                        if (StringUtils.isBlank(nodeName)) {
+                            nodeName = configurationService.loadNodesConfig().getFirstNodeName("marathon");
+                        }
                     }
+
+                    systemService.feedInServiceStatus (
+                            statusMap, servicesInstallationStatus, nodeIp, nodeName,
+                            MARATHON_NODE,
+                            service, shall, installed, running);
                 }
-
-                systemService.feedInServiceStatus (
-                        statusMap, servicesInstallationStatus, nodeIp, nodeName,
-                        MARATHON_NODE,
-                        service, shall, installed, running);
             }
-
         } catch (JSONException | ConnectionManagerException | SystemException | SetupException | FileException e) {
             logger.error(e, e);
             throw new MarathonException(e.getMessage(), e);

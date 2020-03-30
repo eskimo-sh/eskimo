@@ -1,35 +1,35 @@
 {
-  "id": "cerebro",
+  "id": "kibana",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.2,
-  "mem": 300,
-  "disk": 100,
+  "cpus": 0.4,
+  "mem": 700,
+  "disk": 250,
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/cerebro",
+      "image": "marathon.registry:5000/kibana",
       "forcePullImage": true
     },
     "type": "DOCKER",
     "network": "BRIDGE",
     "portMappings": [
       {
-        "containerPort": 9000,
-        "hostPort": 31900,
+        "containerPort": 5601,
+        "hostPort": 31561,
         "protocol": "tcp",
-        "name": "httpcerebro",
+        "name": "httpkibana",
         "labels": null
       }
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/cerebro",
-        "hostPath": "/var/log/cerebro",
+        "containerPath": "/var/log/kibana",
+        "hostPath": "/var/log/kibana",
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/cerebro",
-        "containerPath": "/var/run/cerebro",
+        "hostPath": "/var/run/kibana",
+        "containerPath": "/var/run/kibana",
         "mode": "RW"
       },
       {

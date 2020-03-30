@@ -49,7 +49,7 @@ echo " - Building image zookeeper"
 build_image zookeeper /tmp/zookeeper_build_log
 
 echo " - Installing Zookeeper using APT (using plain debian package)"
-docker exec -i zookeeper apt-get install -y zookeeper zookeeperd >> /tmp/zookeeper_build_log 2>&1
+docker exec -i zookeeper apt-get install -y zookeeper zookeeperd zookeeper-bin >> /tmp/zookeeper_build_log 2>&1
 fail_if_error $? "/tmp/zookeeper_build_log" -3
 
 #echo " - TODO"

@@ -294,7 +294,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
@@ -306,7 +306,7 @@
         "mandatory": false
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "mesos-master",
         "numberOfMasters": 1,
         "mandatory": true
@@ -571,7 +571,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
@@ -783,17 +783,17 @@
     "config": {
       "imageName" : "kibana",
       "order": 18,
+      "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
-      "selectionLayout" : { "row" : 3, "col" : 1},
       "memory": "small",
       "logo" : "images/kibana-logo.png",
       "icon" : "images/kibana-icon.png"
     },
     "ui": {
       "urlTemplate": "./kibana/app/kibana",
-      "proxyTargetPort" : 5601,
+      "proxyTargetPort" : 31561,
       "waitTime": 10000,
       "title" : "Kibana",
       "applyStandardProxyReplacements": false,
@@ -837,9 +837,9 @@
     "config": {
       "imageName" : "zeppelin",
       "order": 19,
+      "marathon": true,
       "unique": true,
       "name" : "Zeppelin",
-      "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "small",
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional__commentedOut": ["spark-executor"],
@@ -847,7 +847,7 @@
       "icon" : "images/zeppelin-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 38080,
+      "proxyTargetPort" : 31008,
       "waitTime": 10000,
       "title" : "Zeppelin",
       "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",
@@ -879,13 +879,13 @@
         "mandatory": true
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "logstash",
         "numberOfMasters": 1,
         "mandatory": false

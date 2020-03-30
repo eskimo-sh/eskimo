@@ -82,6 +82,11 @@ if [[ $? != 0 ]]; then
     exit -20
 fi
 
+echo " - Installing setupFlinkGlusterShares.sh to /usr/local/sbin"
+sudo cp setupFlinkGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupFlinkGlusterShares.sh
+
+
 echo " - Building container flink"
 build_container flink-app-master flink /tmp/flink_install_log
 

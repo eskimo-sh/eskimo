@@ -1,33 +1,40 @@
 {
-  "id": "flink-app-master",
+  "id": "zeppelin",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.1,
-  "mem": 256,
-  "disk": 100,
+  "cpus": 0.5,
+  "mem": 800,
+  "disk": 800,
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/flink-app-master",
-      "forcePullImage": true
+      "image": "marathon.registry:5000/zeppelin",
+      "forcePullImage": true,
+      "privileged": true
     },
     "type": "DOCKER",
     "network": "BRIDGE",
     "portMappings": [
       {
-        "containerPort": 28180,
-        "hostPort": 31180,
+        "containerPort": 38080,
+        "hostPort": 31008,
         "protocol": "tcp",
-        "name": "httpgdash",
+        "name": "httpzeppelin1",
+        "labels": null
+      },
+      {
+        "containerPort": 38081,
+        "hostPort": 31009,
+        "protocol": "tcp",
+        "name": "httpzeppelin2",
         "labels": null
       }
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/flink/",
-        "hostPath": "/var/log/flink",
+        "containerPath": "/var/log/zeppelin/",
+        "hostPath": "/var/log/zeppelin",
         "mode": "RW"
       },
-
       {
         "hostPath": "/etc/eskimo_topology.sh",
         "containerPath": "/etc/eskimo_topology.sh",
@@ -57,5 +64,5 @@
       "maxConsecutiveFailures": 3
     }
   ],
-  "user": "flink"
+  "user": "spark"
 }

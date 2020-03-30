@@ -56,7 +56,3 @@ sudo chown -R elasticsearch /var/run/logstash
 sudo mkdir -p /var/log/logstash
 sudo chown -R elasticsearch /var/log/logstash
 
-
-echo " - Installing setupLogstashGlusterShares.sh to /usr/local/sbin"
-sudo cp setupLogstashGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupLogstashGlusterShares.sh

@@ -84,6 +84,11 @@ if [[ $? != 0 ]]; then
     exit -20
 fi
 
+echo " - Installing setupFlinkGlusterShares.sh to /usr/local/sbin"
+sudo cp setupFlinkGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupFlinkGlusterShares.sh
+
+
 echo " - Building docker container for flink worker"
 build_container flink-worker flink /tmp/flink_worker_install_log
 

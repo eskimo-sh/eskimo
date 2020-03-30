@@ -84,6 +84,10 @@ if [[ $? != 0 ]]; then
     exit -20
 fi
 
+echo " - Installing setupSparkGlusterShares.sh to /usr/local/sbin"
+sudo cp setupSparkGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupSparkGlusterShares.sh
+
 
 
 # spark executor part

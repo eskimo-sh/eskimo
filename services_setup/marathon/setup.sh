@@ -84,7 +84,7 @@ fi
 echo " - Registering marathon registry"
 # remove any previous definition
 sudo sed -i '/.* marathon.registry/d' /etc/hosts
-echo "$MASTER_MARATHON_1 marathon.registry" >> /etc/hosts
+sudo bash -c "echo \"$MASTER_MARATHON_1 marathon.registry\" >> /etc/hosts"
 
 
 # Create shared dir

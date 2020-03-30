@@ -61,7 +61,3 @@ sudo chown spark /var/log/spark/logs
 sudo mkdir -p /var/lib/spark
 sudo mkdir -p /var/lib/spark/tmp
 sudo chown -R spark /var/lib/spark
-
-echo " - Installing setupSparkGlusterShares.sh to /usr/local/sbin"
-sudo cp setupSparkGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupSparkGlusterShares.sh

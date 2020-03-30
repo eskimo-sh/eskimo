@@ -105,5 +105,6 @@ handle_topology_settings kibana /tmp/kibana_install_log
 echo " - Committing changes to local template and exiting container kibana"
 commit_container kibana /tmp/kibana_install_log
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file kibana /tmp/kibana_install_log
+
+echo " - Starting marathon deployment"
+deploy_marathon kibana /tmp/kibana_install_log

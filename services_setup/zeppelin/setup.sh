@@ -77,7 +77,6 @@ preinstall_unmount_gluster_share /var/lib/spark/data
 preinstall_unmount_gluster_share /var/lib/flink/data
 preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
 preinstall_unmount_gluster_share /var/lib/logstash/data
-preinstall_unmount_gluster_share /var/lib/zeppelin/data
 
 echo " - Configuring host spark config part"
 . ./setupSparkCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
@@ -108,11 +107,6 @@ if [[ $? != 0 ]]; then
 fi
 
 
-echo " - Installing setupZeppelinGlusterShares.sh to /usr/local/sbin"
-sudo cp setupZeppelinGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupZeppelinGlusterShares.sh
-
-
 echo " - Building container zeppelin"
 build_container zeppelin zeppelin /tmp/zeppelin_install_log
 
@@ -121,10 +115,7 @@ sudo mkdir -p /var/run/zeppelin
 sudo chown -R spark /var/run/zeppelin
 sudo mkdir -p /var/log/zeppelin
 sudo chown -R spark /var/log/zeppelin
-sudo mkdir -p /var/lib/zeppelin
-sudo mkdir -p /var/lib/zeppelin/notebooks
-sudo mkdir -p /var/lib/zeppelin/data
-sudo chown -R spark /var/lib/zeppelin
+sudo mkdir -p /var/lib/spark/data/zeppelin/notebooks
 
 #sudo mkdir -p /usr/local/etc/zeppelin
 #sudo chown -R zeppelin /usr/local/etc/zeppelin
@@ -137,7 +128,7 @@ docker run \
         -d --name zeppelin \
         -v /var/log/zeppelin:/var/log/zeppelin \
         -v /var/run/zeppelin:/var/run/zeppelin \
-        -v /var/lib/zeppelin:/var/lib/zeppelin \
+        -v /var/lib/spark:/var/lib/spark \
         -i \
         -t eskimo:zeppelin bash >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
@@ -227,26 +218,56 @@ if [[ -f /usr/local/bin/logstash-cli ]]; then
     fail_if_error $? /tmp/zeppelin_install_log -24
 fi
 
+echo " - Copying inContainerMountGluster.sh scriot"
+docker cp $SCRIPT_DIR/inContainerMountGluster.sh zeppelin:/usr/local/sbin/inContainerMountGluster.sh >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -20
+
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -21
+
+
+#HACK RAW IMPORT OF ZEPPELIN NOTEBOOKS !!!
+
+echo " - HACK raw import of samples"
+docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/var/lib/spark/data/zeppelin/notebooks/ >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -30
+
+echo " - HACK extract of samples"
+docker exec --user root zeppelin bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && tar xvfz eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -31
+
+echo " - HACK changing owner of samples"
+docker exec --user root zeppelin bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && chown -R spark *" >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -32
+
+echo " - HACK Deleting samples archive"
+docker exec --user root zeppelin bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && rm -Rf eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -32
+
+
 
 echo " - Committing changes to local template and exiting container zeppelin"
 commit_container zeppelin /tmp/zeppelin_install_log
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file zeppelin /tmp/zeppelin_install_log
 
-echo " - Waiting for Zeppelin availability"
-function wait_forZeppelin() {
-    for i in `seq 0 1 60`; do
-        sleep 2
-        eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
-        if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
-            echo " - Zeppelin is available."
-            break
-        fi
-    done
-}
+echo " - Starting marathon deployment"
+deploy_marathon zeppelin /tmp/zeppelin_install_log
 
-wait_forZeppelin
+
+
+#echo " - Waiting for Zeppelin availability"
+#function wait_forZeppelin() {
+#    for i in `seq 0 1 80`; do
+#        sleep 2
+#        eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
+#        if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
+#            echo " - Zeppelin is available."
+#            break
+#        fi
+#    done
+#}
+#
+#wait_forZeppelin
 
 ## FIXME . temporary hack replacing the API import below by an raw import of the samples to address the bug in zeppelin
 ## import in 0.9-SNAPSHOT
@@ -262,23 +283,5 @@ wait_forZeppelin
 #    fi
 #done
 
-echo " - HACK stopping zeppellin"
-sudo systemctl stop zeppelin >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -30
-
-sleep 5
-
-echo " - HACK raw import of samples"
-sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/zeppelin/notebooks/
-cd /var/lib/zeppelin/notebooks/
-
-echo " - HACK extract of samples"
-sudo tar xvfz eskimo_samples.tgz
-sudo chown -R spark *
-sudo rm -Rf eskimo_samples.tgz
-
-echo " - HACK restarting zeppellin"
-sudo systemctl start zeppelin >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -31
 
 

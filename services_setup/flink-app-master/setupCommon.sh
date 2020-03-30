@@ -62,7 +62,3 @@ sudo mkdir -p /var/lib/flink
 sudo mkdir -p /var/lib/flink/tmp
 sudo chown -R flink /var/lib/flink
 
-
-echo " - Installing setupFlinkGlusterShares.sh to /usr/local/sbin"
-sudo cp setupFlinkGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupFlinkGlusterShares.sh

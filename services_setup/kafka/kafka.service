@@ -49,7 +49,8 @@ RemainAfterExit=false
 ExecStartPre=-/usr/bin/docker kill kafka
 ExecStartPre=-/usr/bin/docker rm -f kafka
 
-ExecStart=/bin/bash -c "/usr/bin/docker run \
+# The sleep is to give zookeeper a little time to srart first
+ExecStart=/bin/bash -c "sleep 20 && /usr/bin/docker run \
         -i \
         --name kafka \
         --user kafka \

@@ -83,6 +83,11 @@ echo " - Installing python packages for datascience"
 docker exec -i zeppelin pip install pandas scikit-learn matplotlib nltk plotly filelock py4j >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
+echo " - Installing GlusterFS client"
+docker exec -i zeppelin apt-get -y install glusterfs-client >> /tmp/zeppelin_build_log 2>&1
+fail_if_error $? "/tmp/zeppelin_build_log" -10
+
+
 echo " - Installing flink"
 cp installFlink.sh __installFlinkEff.sh
 docker exec -i zeppelin bash /scripts/__installFlinkEff.sh | tee -a /tmp/zeppelin_build_log 2>&1

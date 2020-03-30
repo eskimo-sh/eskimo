@@ -47,9 +47,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         -i \
         --name zookeeper \
         --user zookeeper \
-        -p 2181:2181 \
-        -p 2888:2888 \
-        -p 3888:3888 \
+        --network host \
         -v /var/log/zookeeper:/var/log/zookeeper \
         -v /var/run/zookeeper:/var/run/zookeeper \
         -v /var/lib/zookeeper:/var/lib/zookeeper \
@@ -60,6 +58,10 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         /usr/local/sbin/inContainerStartService.sh"
 ExecStop=/usr/bin/docker stop zookeeper
 Type=simple
+
+#        -p 2181:2181 \
+#        -p 2888:2888 \
+#        -p 3888:3888 \
 
 Restart=always
 StartLimitBurst=3

@@ -72,6 +72,10 @@ if [[ $? != 0 ]]; then
     exit -21
 fi
 
+echo " - Installing setupLogstashGlusterShares.sh to /usr/local/sbin"
+sudo cp setupLogstashGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupLogstashGlusterShares.sh
+
 
 echo " - Building docker container for logstash"
 build_container logstash logstash /tmp/logstash_install_log

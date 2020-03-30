@@ -54,5 +54,12 @@ echo " - Inject settings (spark-executor)"
 echo " - Inject settings (flink-app-master)"
 /usr/local/sbin/settingsInjector.sh flink-app-master
 
+echo " - Mounting gluster shares for zeppelin"
+/usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data
+/usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog
+/usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/logstash/data
+/usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data
+/usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs
+
 echo " - Starting service"
 bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'

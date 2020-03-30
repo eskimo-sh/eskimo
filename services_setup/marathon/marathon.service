@@ -82,8 +82,8 @@ ExecStop=/usr/bin/docker stop marathon
 Type=simple
 
 Restart=always
-StartLimitBurst=5
-StartLimitInterval=30
+StartLimitBurst=4
+StartLimitInterval=100
 
 StandardOutput=syslog
 StandardError=syslog
