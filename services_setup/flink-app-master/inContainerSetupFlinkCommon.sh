@@ -124,9 +124,14 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/
 sudo bash -c "echo -e \"\n# CPUs to assign to the Mesos workers. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.cpus: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"\n# Memory to assign to the Mesos workers in MB. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"mesos.resourcemanager.tasks.mem: 1024\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+# XXX This is not supported abymore by Flink 1.10
+# Caused by: org.apache.flink.configuration.IllegalConfigurationException: Inconsistent worker memory configuration:
+# both legacy Mesos specific and the newer unified options are configured but they differ
+# - mesos.resourcemanager.tasks.mem: 1024 Mb (1073741824 bytes), taskmanager.memory.process.size: 1568 Mb (1644167168 bytes)
+#sudo bash -c "echo -e \"\n# Memory to assign to the Mesos workers in MB. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"mesos.resourcemanager.tasks.mem: 1024\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
+# XXX This is somewhat legacy, commented out already as of 1.9
 #sudo bash -c "echo -e \"\n#  The amount of memory (in megabytes) that the task manager reserves on-heap or off-heap (in MB). \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 #sudo bash -c "echo -e \"taskmanager.memory.size: 800\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 

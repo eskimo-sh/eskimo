@@ -817,6 +817,9 @@ public class SystemService {
                         if (nodeName.equals(MarathonService.MARATHON_NODE)) {
                             nodeName = systemStatus.getFirstNodeName (savedService);
                         }
+                        if (StringUtils.isBlank(nodeName)) {
+                            nodeName = systemStatus.getFirstNodeName ("marathon");
+                        }
 
                         Boolean nodeAlive = systemStatus.isNodeAlive (nodeName);
                         // this means that node is not configured anymore ! (no status has been obtained)

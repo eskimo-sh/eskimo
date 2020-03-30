@@ -38,8 +38,8 @@
 export ESKIMO_VERSION=0.2
 export DEBIAN_VERSION=debian_09_stretch
 
-export FLINK_VERSION=1.9.1
-export FLINK_HADOOP_VERSION=2.8.3-7.0
+export FLINK_VERSION=1.10.0
+export FLINK_HADOOP_VERSION=2.8.3-10.0
 
 export HADOOP_MAJOR_VERSION=2.8
 
@@ -181,13 +181,13 @@ function close_and_save_image() {
     # save base image
     echo " - Saving image $1_template"
 	set -e
-    docker save eskimo:$1_template | gzip > /tmp/docker_template_$1_TEMP.tar.gz
+    docker save eskimo:$1_template | gzip >  ../../packages_distrib/tmp_image_$1_TEMP.tar.gz
     set +e
 
     echo " - versioning image"
     for i in `seq 1 100`; do
         if [[ ! -f "../../packages_distrib/docker_template_$1_$3_$i.tar.gz" ]]; then
-            mv /tmp/docker_template_$1_TEMP.tar.gz ../../packages_distrib/docker_template_$1_$3_$i.tar.gz
+            mv ../../packages_distrib/tmp_image_$1_TEMP.tar.gz ../../packages_distrib/docker_template_$1_$3_$i.tar.gz
             break;
         fi
     done

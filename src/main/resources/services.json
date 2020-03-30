@@ -294,7 +294,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "SAME_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
@@ -403,7 +403,7 @@
       "proxyTargetPort" : 31220,
       "waitTime": 8000,
       "title" : "Kafka manager",
-      "statusPageLinktitle" : "Administer your kafka topics"
+      "statusPageLinktitle" : "Manage your kafka topics"
     },
     "dependencies": [
       {
@@ -567,11 +567,11 @@
       "proxyTargetPort" : 8081,
       "waitTime": 8000,
       "title" : "Flink App Master",
-      "statusPageLinktitle" : "Monitor your Flink jobs"
+      "statusPageLinktitle" : "Manage and Monitor your Flink jobs"
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "SAME_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
@@ -721,7 +721,7 @@
       "proxyTargetPort" : 31900,
       "waitTime": 5000,
       "title" : "Cerebro",
-      "statusPageLinktitle" : "Administer your data in Elasticsearch"
+      "statusPageLinktitle" : "Manage your data in Elasticsearch"
     },
     "dependencies": [
       {

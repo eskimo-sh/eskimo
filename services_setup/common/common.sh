@@ -116,6 +116,13 @@ function deploy_marathon() {
         exit -22
     fi
 
+    echo " - removing local image"
+    docker image rm eskimo:$1  >> $2 2>&1
+    if [[ $? != 0 ]]; then
+        echo "local image removal failed !"
+        exit -32
+    fi
+
 
     echo " - Removing any previously deployed $1 service from marathon"
     curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$1 >> $2 2>&1
