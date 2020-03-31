@@ -1,14 +1,17 @@
 {
   "id": "kafka-manager",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.2,
+  "cpus": 0.1,
   "mem": 300,
   "disk": 100,
   "instances": 1,
   "container": {
     "docker": {
       "image": "marathon.registry:5000/kafka-manager",
-      "forcePullImage": true
+      "forcePullImage": true,
+      "parameters": [
+        { "key": "user", "value": "kafka" }
+      ]
     },
     "type": "DOCKER",
     "network": "BRIDGE",

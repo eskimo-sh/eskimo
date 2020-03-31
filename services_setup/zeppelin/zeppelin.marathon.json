@@ -1,7 +1,7 @@
 {
   "id": "zeppelin",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.6,
+  "cpus": 0.5,
   "mem": 2500,
   "disk": 800,
   "instances": 1,
@@ -9,7 +9,10 @@
     "docker": {
       "image": "marathon.registry:5000/zeppelin",
       "forcePullImage": true,
-      "privileged": true
+      "privileged": true,
+      "parameters": [
+        { "key": "user", "value": "spark" }
+      ]
     },
     "type": "DOCKER",
     "network": "HOST",
@@ -62,11 +65,11 @@
   "healthChecks": [
     {
       "protocol": "MESOS_TCP",
-      "portIndex": 0,
+      "port": 38080,
       "gracePeriodSeconds": 300,
       "intervalSeconds": 60,
-      "timeoutSeconds": 20,
-      "maxConsecutiveFailures": 3
+      "timeoutSeconds": 30,
+      "maxConsecutiveFailures": 4
     }
   ],
   "user": "spark"

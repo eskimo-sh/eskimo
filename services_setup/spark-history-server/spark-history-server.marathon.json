@@ -9,7 +9,10 @@
     "docker": {
       "image": "marathon.registry:5000/spark-history-server",
       "forcePullImage": true,
-      "privileged": true
+      "privileged": true,
+      "parameters": [
+        { "key": "user", "value": "spark" }
+      ]
     },
     "type": "DOCKER",
     "network": "BRIDGE",

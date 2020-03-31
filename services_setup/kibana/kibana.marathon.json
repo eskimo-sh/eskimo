@@ -1,14 +1,17 @@
 {
   "id": "kibana",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.4,
+  "cpus": 0.3,
   "mem": 700,
   "disk": 250,
   "instances": 1,
   "container": {
     "docker": {
       "image": "marathon.registry:5000/kibana",
-      "forcePullImage": true
+      "forcePullImage": true,
+      "parameters": [
+        { "key": "user", "value": "elasticsearch" }
+      ]
     },
     "type": "DOCKER",
     "network": "BRIDGE",

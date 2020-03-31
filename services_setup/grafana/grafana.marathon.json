@@ -8,7 +8,10 @@
   "container": {
     "docker": {
       "image": "marathon.registry:5000/grafana",
-      "forcePullImage": true
+      "forcePullImage": true,
+      "parameters": [
+        { "key": "user", "value": "grafana" }
+      ]
     },
     "type": "DOCKER",
     "network": "BRIDGE",
