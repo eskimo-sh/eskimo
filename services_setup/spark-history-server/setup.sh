@@ -75,8 +75,8 @@ sudo rm -f /tmp/spark_history_server_install_log
 #   - https://github.com/moby/moby/issues/38252
 # But eventually I need to do this in anyway to make sure everything is preoperly re-installed
 # I need to make sure I'm doing this before attempting to recreate the directories
-preinstall_unmount_gluster_share /var/lib/spark/eventlog
-preinstall_unmount_gluster_share /var/lib/spark/data
+#preinstall_unmount_gluster_share /var/lib/spark/eventlog
+#preinstall_unmount_gluster_share /var/lib/spark/data
 
 echo " - Configuring host spark config part"
 . ./setupCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE

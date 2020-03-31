@@ -2,7 +2,7 @@
   "id": "zeppelin",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.6,
-  "mem": 800,
+  "mem": 2500,
   "disk": 800,
   "instances": 1,
   "container": {
@@ -12,7 +12,7 @@
       "privileged": true
     },
     "type": "DOCKER",
-    "network": "BRIDGE",
+    "network": "HOST",
     "portMappings": [
       {
         "containerPort": 38080,
@@ -44,12 +44,17 @@
         "hostPath": "/etc/eskimo_services-config.json",
         "containerPath": "/etc/eskimo_services-config.json",
         "mode": "RO"
+      },
+      {
+        "hostPath": "/usr/local/lib",
+        "containerPath": "/usr/local/host_lib",
+        "mode": "RO"
       }
     ]
   },
   "networks": [
     {
-      "mode": "container/bridge"
+      "mode": "host"
     }
   ],
   "env": {},

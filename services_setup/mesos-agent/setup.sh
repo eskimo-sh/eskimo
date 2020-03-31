@@ -145,6 +145,9 @@ sudo bash -c "echo -e \"export MESOS_containerizers=docker,mesos\"  >> /usr/loca
 sudo bash -c "echo -e \"# isolation mechanisms to use\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 sudo bash -c "echo -e \"export MESOS_isolation=docker/runtime,filesystem/linux\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
+sudo bash -c "echo -e \"# Giving it a little time do download and extract large docker images\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"export MESOS_executor_registration_timeout=5mins\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+
 
 #echo " - Creating mesos agent resource file to define agent available resources"
 #sudo rm -Rf /usr/local/lib/mesos/etc/mesos/mesos-resources.json

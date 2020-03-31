@@ -21,9 +21,10 @@ fi
 
 . /etc/eskimo_topology.sh
 
-
-echo " - Creating mount point (if not exist) : $MOUNT_POINT"
-sudo mkdir -p $MOUNT_POINT
+if [[ ! -d $MOUNT_POINT ]]; then
+    echo " - Creating mount point: $MOUNT_POINT"
+    sudo mkdir -p $MOUNT_POINT
+fi
 
 ls /dev/fuse > /dev/null 2>&1
 if [[ $? != 0 ]]; then
@@ -39,8 +40,9 @@ echo " - Registering gluster filesystem $VOLUME on $MOUNT_POINT"
 echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
 
 echo " - Mounting $MOUNT_POINT"
-mount $MOUNT_POINT
+mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
 if [[ $? != 0 ]]; then
     echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
+    cat /tmp/mount_$VOLUME
     exit -20
 fi

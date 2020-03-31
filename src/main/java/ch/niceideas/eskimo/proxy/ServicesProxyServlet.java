@@ -289,6 +289,18 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
     }
 
+    @Override
+    protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
+            throws ServletException, IOException {
+        try {
+            super.service(servletRequest, servletResponse);
+        } catch (IllegalStateException e) {
+            logger.warn (e.getMessage());
+            servletResponse.sendError(500);
+        }
+
+    }
+
     /**
      * Reads the request URI from {@code servletRequest} and rewrites it, considering targetUri.
      * It's used to make the new request.

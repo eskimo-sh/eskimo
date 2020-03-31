@@ -109,8 +109,8 @@ EOF
     sudo mv /tmp/daemon.json /etc/docker/daemon.json
     sudo chown root. /etc/docker/daemon.json
 
-    echo "  - Reloading docker"
-    sudo systemctl reload docker >>/tmp/install_docker 2>&1
+    echo "  - Restart docker"
+    sudo systemctl restart docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to reload docker"
         cat /tmp/install_docker 1>&2

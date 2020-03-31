@@ -36,6 +36,13 @@
 
 set -e
 
+echo " - Finding mesos"
+/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
+. /run/zeppelin_mesos_environment
+ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION
+ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos
+
+
 echo " - Injecting topology (Spark)"
 . /usr/local/sbin/inContainerInjectTopologySpark.sh
 

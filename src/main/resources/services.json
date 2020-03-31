@@ -847,7 +847,7 @@
       "icon" : "images/zeppelin-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 31008,
+      "proxyTargetPort" : 38080,
       "waitTime": 10000,
       "title" : "Zeppelin",
       "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",

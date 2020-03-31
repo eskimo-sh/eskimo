@@ -69,6 +69,7 @@ Software.
         <Logger name="com" level="info"></Logger>
         <Logger name="ch" level="info"></Logger>
         <Logger name="ch.niceideas.eskimo.services" level="debug"></Logger>
+        <Logger name="org.apache.juli" level="fatal"></Logger>
     </Loggers>
 
 </Configuration>

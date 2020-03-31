@@ -72,11 +72,11 @@ sudo rm -f /tmp/zeppelin_install_log
 #   - https://github.com/moby/moby/issues/38252
 # But eventually I need to do this in anyway to make sure everything is preoperly re-installed
 # I need to make sure I'm doing this before attempting to recreate the directories
-preinstall_unmount_gluster_share /var/lib/spark/eventlog
-preinstall_unmount_gluster_share /var/lib/spark/data
-preinstall_unmount_gluster_share /var/lib/flink/data
-preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
-preinstall_unmount_gluster_share /var/lib/logstash/data
+#preinstall_unmount_gluster_share /var/lib/spark/eventlog
+#preinstall_unmount_gluster_share /var/lib/spark/data
+#preinstall_unmount_gluster_share /var/lib/flink/data
+#preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
+#preinstall_unmount_gluster_share /var/lib/logstash/data
 
 echo " - Configuring host spark config part"
 . ./setupSparkCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
@@ -115,7 +115,17 @@ sudo mkdir -p /var/run/zeppelin
 sudo chown -R spark /var/run/zeppelin
 sudo mkdir -p /var/log/zeppelin
 sudo chown -R spark /var/log/zeppelin
+
+if [[ ! -d /var/lib/spark/data ]]; then
+    echo "Inconsistency: zeppelin setup is expecting var/lib/spark/data to be created by the spark executor setup (kind of a hack)"
+    exit -41
+fi
+if [[ ! -d /var/lib/spark/eventlog ]]; then
+    echo "Inconsistency: zeppelin setup is expecting var/lib/spark/eventlog to be created by the spark executor setup (kind of a hack)"
+    exit -42
+fi
 sudo mkdir -p /var/lib/spark/data/zeppelin/notebooks
+sudo chown spark /var/lib/spark/data/zeppelin/notebooks
 
 #sudo mkdir -p /usr/local/etc/zeppelin
 #sudo chown -R zeppelin /usr/local/etc/zeppelin
@@ -128,7 +138,7 @@ docker run \
         -d --name zeppelin \
         -v /var/log/zeppelin:/var/log/zeppelin \
         -v /var/run/zeppelin:/var/run/zeppelin \
-        -v /var/lib/spark:/var/lib/spark \
+        -v /var/lib/spark:/var/lib/spark:rshared \
         -i \
         -t eskimo:zeppelin bash >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
@@ -229,19 +239,19 @@ fail_if_error $? "/tmp/zeppelin_install_log" -21
 #HACK RAW IMPORT OF ZEPPELIN NOTEBOOKS !!!
 
 echo " - HACK raw import of samples"
-docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/var/lib/spark/data/zeppelin/notebooks/ >> /tmp/zeppelin_install_log 2>&1
+sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/spark/data/zeppelin/notebooks/ >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -30
 
 echo " - HACK extract of samples"
-docker exec --user root zeppelin bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && tar xvfz eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
+bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && sudo tar xvfz eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -31
 
 echo " - HACK changing owner of samples"
-docker exec --user root zeppelin bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && chown -R spark *" >> /tmp/zeppelin_install_log 2>&1
+bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && sudo chown -R spark *" >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -32
 
 echo " - HACK Deleting samples archive"
-docker exec --user root zeppelin bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && rm -Rf eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
+bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && sudo rm -Rf eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -32
 
 
