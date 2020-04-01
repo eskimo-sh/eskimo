@@ -77,7 +77,7 @@ echo "--------------------------------------------------------------------------
 echo "This is a client command to a remote logstash running in a docker container."
 echo "This is not the actual logstash command"
 echo ""
-echo "CAUTION : ONLY /var/lib/logstash/data IS SHARED BETWEEN HOST AND CONTAINERS"
+echo "CAUTION : ONLY /var/lib/elasticsearch/logstash/data IS SHARED BETWEEN HOST AND CONTAINERS"
 echo "          -> data, configuration files, etc. need to be put in this folder"
 echo ""
 echo "CAUTION : stdin piping is implemented using the -std_in argument where a file"

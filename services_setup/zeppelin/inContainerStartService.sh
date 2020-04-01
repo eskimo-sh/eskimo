@@ -57,7 +57,7 @@ echo " - Inject settings (flink-app-master)"
 echo " - Mounting gluster shares for zeppelin"
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/logstash/data spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
 

@@ -35,4 +35,4 @@
 #
 
 # Handling /var/lib/logstash/data
-/usr/local/sbin/handle_gluster_share.sh logstash_data /var/lib/logstash/data elasticsearch
+/usr/local/sbin/handle_gluster_share.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch

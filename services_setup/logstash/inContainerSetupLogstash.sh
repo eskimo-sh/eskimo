@@ -58,7 +58,7 @@ echo " - Simlinking logstash log directory to /var/log/logstash/"
 sudo rm -Rf /usr/local/lib/logstash/logs
 sudo ln -s /var/log/elasticsearch/logstash /usr/local/lib/logstash/logs
 
-echo " - Simlinking logstash working directory to /var/lib/logstash/"
+echo " - Simlinking logstash working directory to /var/lib/elasticsearch/logstash/"
 sudo rm -Rf /usr/local/lib/logstash/data/
 sudo ln -s /var/lib/elasticsearch/logstash /usr/local/lib/logstash/data
 

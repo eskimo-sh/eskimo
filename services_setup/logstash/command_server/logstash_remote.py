@@ -84,7 +84,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         f = furl(self.path)
         fullArgs = self.rfile.read(int(self.headers['Content-Length']))
 
-        stdin_file = self.headers['stdin_file'];
+        if 'stdin_file' in self.headers:
+            stdin_file = self.headers['stdin_file']
+        else:
+            stdin_file = None
 
         command_line = "/usr/local/lib/logstash/bin/logstash {0} ".format(fullArgs)
         LOG.info('Command Line : %s', command_line)

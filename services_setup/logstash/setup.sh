@@ -56,7 +56,7 @@ sudo rm -f /tmp/logstash_install_log
 #   - https://github.com/moby/moby/issues/38252
 # But eventually I need to do this in anyway to make sure everything is preoperly re-installed
 # I need to make sure I'm doing this before attempting to recreate the directories
-preinstall_unmount_gluster_share /var/lib/logstash/data
+preinstall_unmount_gluster_share /var/lib/elasticsearch/logstash/data
 
 echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh

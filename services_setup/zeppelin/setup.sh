@@ -76,7 +76,7 @@ sudo rm -f /tmp/zeppelin_install_log
 #preinstall_unmount_gluster_share /var/lib/spark/data
 #preinstall_unmount_gluster_share /var/lib/flink/data
 #preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
-#preinstall_unmount_gluster_share /var/lib/logstash/data
+#preinstall_unmount_gluster_share /var/lib/elasticsearch/logstash/data
 
 echo " - Configuring host spark config part"
 . ./setupSparkCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
