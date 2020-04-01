@@ -34,8 +34,13 @@
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/zeppelin/",
-        "hostPath": "/var/log/zeppelin",
+        "containerPath": "/var/log/spark/",
+        "hostPath": "/var/log/spark",
+        "mode": "RW"
+      },
+      {
+        "containerPath": "/var/run/spark/",
+        "hostPath": "/var/run/spark",
         "mode": "RW"
       },
       {

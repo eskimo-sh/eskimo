@@ -295,7 +295,10 @@ public class ServicesProxyServlet extends ProxyServlet {
         try {
             super.service(servletRequest, servletResponse);
         } catch (IllegalStateException e) {
-            logger.warn (e.getMessage());
+            logger.warn (servletRequest.getRequestURI() + " got : " + e.getMessage());
+            servletResponse.sendError(500);
+        } catch (java.net.SocketException e) {
+            logger.error (servletRequest.getRequestURI() + " got : " + e.getMessage());
             servletResponse.sendError(500);
         }
 

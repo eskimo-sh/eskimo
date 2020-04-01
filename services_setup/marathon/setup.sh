@@ -89,18 +89,16 @@ sudo bash -c "echo \"$MASTER_MARATHON_1 marathon.registry\" >> /etc/hosts"
 
 # Create shared dir
 echo " - Creating shared directory"
-sudo mkdir -p /var/log/marathon
-sudo chown marathon /var/log/marathon
 sudo mkdir -p /var/log/marathon/log
 sudo chown marathon /var/log/marathon/log
-sudo mkdir -p /var/lib/marathon
+
 sudo mkdir -p /var/lib/marathon/tmp
 sudo chown -R marathon /var/lib/marathon
 
-sudo mkdir -p /var/log/docker_registry
-sudo chown -R marathon /var/log/docker_registry
-sudo mkdir -p /var/lib/docker_registry
-sudo chown -R marathon /var/lib/docker_registry
+sudo mkdir -p /var/log/marathon/docker_registry
+sudo chown -R marathon /var/log/marathon/docker_registry
+sudo mkdir -p /var/lib/marathon/docker_registry
+sudo chown -R marathon /var/lib/marathon/docker_registry
 
 echo " - Building container marathon"
 build_container marathon marathon /tmp/marathon_install_log

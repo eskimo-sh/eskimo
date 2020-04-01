@@ -57,8 +57,9 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         --name logstash \
         --network host \
         --user elasticsearch \
-        -v /var/lib/logstash:/var/lib/logstash \
-        -v /var/log/logstash:/var/log/logstash \
+        -v /var/lib/elasticsearch:/var/lib/elasticsearch \
+        -v /var/log/elasticsearch:/var/log/elasticsearch \
+        -v /var/run/elasticsearch:/var/run/elasticsearch \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
         -e NODE_NAME=$HOSTNAME \

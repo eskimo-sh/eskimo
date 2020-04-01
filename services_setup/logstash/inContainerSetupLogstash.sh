@@ -56,11 +56,11 @@ sudo ln -s /usr/local/lib/logstash/config /usr/local/etc/logstash
 
 echo " - Simlinking logstash log directory to /var/log/logstash/"
 sudo rm -Rf /usr/local/lib/logstash/logs
-sudo ln -s /var/log/logstash /usr/local/lib/logstash/logs
+sudo ln -s /var/log/elasticsearch/logstash /usr/local/lib/logstash/logs
 
 echo " - Simlinking logstash working directory to /var/lib/logstash/"
 sudo rm -Rf /usr/local/lib/logstash/data/
-sudo ln -s /var/lib/logstash /usr/local/lib/logstash/data
+sudo ln -s /var/lib/elasticsearch/logstash /usr/local/lib/logstash/data
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

@@ -110,11 +110,6 @@ fi
 echo " - Building container zeppelin"
 build_container zeppelin zeppelin /tmp/zeppelin_install_log
 
-echo " - Creating shared directory"
-sudo mkdir -p /var/run/zeppelin
-sudo chown -R spark /var/run/zeppelin
-sudo mkdir -p /var/log/zeppelin
-sudo chown -R spark /var/log/zeppelin
 
 if [[ ! -d /var/lib/spark/data ]]; then
     echo "Inconsistency: zeppelin setup is expecting var/lib/spark/data to be created by the spark executor setup (kind of a hack)"
@@ -139,6 +134,7 @@ docker run \
         -v /var/log/zeppelin:/var/log/zeppelin \
         -v /var/run/zeppelin:/var/run/zeppelin \
         -v /var/lib/spark:/var/lib/spark:rshared \
+        -v /usr/local/lib:/usr/local/host_lib:ro \
         -i \
         -t eskimo:zeppelin bash >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2

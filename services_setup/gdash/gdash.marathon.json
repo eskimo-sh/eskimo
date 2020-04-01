@@ -23,16 +23,6 @@
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/gdash",
-        "hostPath": "/var/log/gdash",
-        "mode": "RW"
-      },
-      {
-        "hostPath": "/var/run/gdash",
-        "containerPath": "/var/run/gdash",
-        "mode": "RW"
-      },
-      {
         "hostPath": "/etc/eskimo_topology.sh",
         "containerPath": "/etc/eskimo_topology.sh",
         "mode": "RO"
@@ -61,5 +51,5 @@
       "maxConsecutiveFailures": 3
     }
   ],
-  "user": "eskimo"
+  "user_COMMENTED_OUT": "eskimo"
 }

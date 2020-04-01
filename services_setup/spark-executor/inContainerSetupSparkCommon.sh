@@ -65,6 +65,10 @@ elif [[ $spark_user_id != $SPARK_USER_ID ]]; then
     exit -2
 fi
 
+echo " - Enabling spark user to mount gluster shares (sudo)"
+echo "spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" > /etc/sudoers.d/spark
+
+
 echo " - Creating user spark home directory"
 mkdir -p /home/spark
 chown spark /home/spark

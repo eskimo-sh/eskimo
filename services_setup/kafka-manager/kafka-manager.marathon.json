@@ -26,13 +26,18 @@
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/kafka-manager",
-        "hostPath": "/var/log/kafka-manager",
+        "containerPath": "/var/log/kafka",
+        "hostPath": "/var/log/kafka",
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/kafka-manager",
-        "containerPath": "/var/run/kafka-manager",
+        "hostPath": "/var/run/kafka",
+        "containerPath": "/var/run/kafka",
+        "mode": "RW"
+      },
+      {
+        "hostPath": "/var/lib/kafka",
+        "containerPath": "/var/lib/kafka",
         "mode": "RW"
       },
       {

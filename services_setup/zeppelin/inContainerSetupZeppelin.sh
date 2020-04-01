@@ -61,6 +61,13 @@ sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
 sudo ln -s libsasl2.so.2 libsasl2.so.3
 cd $saved_dir
 
+echo " - Finding mesos"
+/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
+. /run/zeppelin_mesos_environment
+ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION
+ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos
+
+
 echo " - Creating Zeppelin env file"
 cp /usr/local/lib/zeppelin/conf/zeppelin-env.sh.template /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
@@ -68,8 +75,8 @@ sudo sed -i s/"# export ZEPPELIN_PORT"/"export ZEPPELIN_PORT=38080"/g /usr/local
 sudo sed -i s/"# export ZEPPELIN_ADDR"/"export ZEPPELIN_ADDR=0.0.0.0"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
 
-sudo sed -i s/"# export ZEPPELIN_LOG_DIR"/"export ZEPPELIN_LOG_DIR=\/var\/log\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
-sudo sed -i s/"# export ZEPPELIN_PID_DIR"/"export ZEPPELIN_PID_DIR=\/var\/run\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+sudo sed -i s/"# export ZEPPELIN_LOG_DIR"/"export ZEPPELIN_LOG_DIR=\/var\/log\/spark\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+sudo sed -i s/"# export ZEPPELIN_PID_DIR"/"export ZEPPELIN_PID_DIR=\/var\/run\/spark\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 sudo sed -i s/"# export ZEPPELIN_NOTEBOOK_DIR"/"export ZEPPELIN_NOTEBOOK_DIR=\/var\/lib\/spark\/data\/zeppelin\/notebooks\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
 sudo sed -i s/"# export ZEPPELIN_IDENT_STRING"/"export ZEPPELIN_IDENT_STRING=eskimo"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh

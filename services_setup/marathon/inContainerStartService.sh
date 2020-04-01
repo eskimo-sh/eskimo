@@ -39,6 +39,14 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Creating required directories (as marathon)"
+mkdir -p /var/log/marathon/log
+
+mkdir -p /var/lib/marathon/tmp
+
+mkdir -p /var/log/marathon/docker_registry
+mkdir -p /var/lib/marathon/docker_registry
+
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh marathon
 
@@ -46,7 +54,7 @@ echo " - Inject settings"
 export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
 
 echo " - Starting Docker registry"
-docker-registry serve /etc/docker_registry/config.yml > /var/log/docker_registry/docker_registry.log 2>&1 &
+docker-registry serve /etc/docker_registry/config.yml > /var/log/marathon/docker_registry/docker_registry.log 2>&1 &
 
 # TODO put in place some monitoring to kill container if docker registry goes down
 

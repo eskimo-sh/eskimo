@@ -66,20 +66,15 @@ fi
 echo " - Building container kafka-manager"
 build_container kafka-manager kafka-manager /tmp/kafka-manager_install_log
 
-echo " - Creating shared directory"
-sudo mkdir -p /var/log/kafka-manager
-sudo chown -R kafka /var/log/kafka-manager
-sudo mkdir -p /var/lib/kafka-manager
-sudo chown -R kafka /var/lib/kafka-manager
 
 # create and start container
 echo " - Running docker container"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
-        -v /var/log/kafka-manager:/var/log/kafka-manager \
-        -v /var/lib/kafka-manager:/var/lib/kafka-manager \
-        -v /var/run/kafka-manager:/var/run/kafka-manager \
+        -v /var/log/kafka:/var/log/kafka \
+        -v /var/lib/kafka:/var/lib/kafka \
+        -v /var/run/kafka:/var/run/kafka \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -e NODE_NAME=$HOSTNAME \
         -p 22000:22000 \

@@ -49,7 +49,7 @@ set -e
 
 echo " - Simlinking logs to /var/log/cerebro/"
 sudo rm -Rf /usr/local/lib/cerebro/logs
-sudo ln -s /var/log/cerebro /usr/local/lib/cerebro/logs
+sudo ln -s /var/log/elasticsearch/cerebro /usr/local/lib/cerebro/logs
 
 echo " - Simlinking cerebro binaries and scripts to /usr/local/sbin"
 sudo ln -s /usr/local/lib/cerebro/bin/cerebro /usr/local/sbin/cerebro

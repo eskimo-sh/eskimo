@@ -36,6 +36,11 @@
         "mode": "RW"
       },
       {
+        "hostPath": "/var/lib/grafana",
+        "containerPath": "/var/lib/grafana",
+        "mode": "RW"
+      },
+      {
         "hostPath": "/etc/eskimo_topology.sh",
         "containerPath": "/etc/eskimo_topology.sh",
         "mode": "RO"

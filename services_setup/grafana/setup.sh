@@ -59,12 +59,6 @@ if [[ $grafana_user_id == "" ]]; then
     exit -4
 fi
 
-echo " - Creating shared directory"
-sudo mkdir -p /var/lib/grafana
-sudo chown -R grafana /var/lib/grafana
-sudo mkdir -p /var/log/grafana
-sudo chown -R grafana /var/log/grafana
-
 # create and start container
 echo " - Running docker container"
 docker run \

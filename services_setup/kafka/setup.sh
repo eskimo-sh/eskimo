@@ -81,12 +81,6 @@ fi
 echo " - Building container kafka"
 build_container kafka kafka /tmp/kafka_install_log
 
-echo " - Creating shared directory"
-sudo mkdir -p /var/lib/kafka
-sudo chown -R kafka /var/lib/kafka
-sudo mkdir -p /var/log/kafka
-sudo chown -R kafka /var/log/kafka
-
 # create and start container
 echo " - Running docker container"
 docker run \

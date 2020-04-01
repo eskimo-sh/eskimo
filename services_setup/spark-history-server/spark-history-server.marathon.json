@@ -21,7 +21,7 @@
         "containerPort": 18080,
         "hostPort": 31810,
         "protocol": "tcp",
-        "name": "httpsparkhistoh",
+        "name": "httpsparkhisto",
         "labels": null
       }
     ],

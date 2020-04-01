@@ -39,7 +39,7 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-echo " - Creating elasticsearch user (if not exist)"
+echo " - Checking elasticsearch user"
 elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/es_install_log`
 if [[ $elasticsearch_user_id == "" ]]; then
     echo "User elasticsearch should have been added by eskimo-base-system setup script"

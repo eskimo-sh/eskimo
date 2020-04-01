@@ -36,13 +36,6 @@
 
 set -e
 
-echo " - Finding mesos"
-/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
-. /run/zeppelin_mesos_environment
-ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION
-ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos
-
-
 echo " - Injecting topology (Spark)"
 . /usr/local/sbin/inContainerInjectTopologySpark.sh
 
@@ -62,11 +55,11 @@ echo " - Inject settings (flink-app-master)"
 /usr/local/sbin/settingsInjector.sh flink-app-master
 
 echo " - Mounting gluster shares for zeppelin"
-/usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data
-/usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog
-/usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/logstash/data
-/usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data
-/usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/logstash/data spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
 
 echo " - Starting service"
 bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'

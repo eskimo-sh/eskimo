@@ -76,12 +76,6 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Creating shared directory"
-sudo mkdir -p /var/lib/elasticsearch
-sudo chown -R elasticsearch /var/lib/elasticsearch
-sudo mkdir -p /var/run/elasticsearch
-sudo chown -R elasticsearch /var/run/elasticsearch
-sudo mkdir -p /var/log/elasticsearch
-sudo chown -R elasticsearch /var/log/elasticsearch
 sudo mkdir -p /usr/local/etc/elasticsearch
 sudo chown -R elasticsearch /usr/local/etc/elasticsearch
 

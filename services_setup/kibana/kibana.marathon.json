@@ -2,7 +2,7 @@
   "id": "kibana",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.3,
-  "mem": 700,
+  "mem": 800,
   "disk": 250,
   "instances": 1,
   "container": {
@@ -26,13 +26,13 @@
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/kibana",
-        "hostPath": "/var/log/kibana",
+        "containerPath": "/var/log/elasticsearch",
+        "hostPath": "/var/log/elasticsearch",
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/kibana",
-        "containerPath": "/var/run/kibana",
+        "hostPath": "/var/run/elasticsearch",
+        "containerPath": "/var/run/elasticsearch",
         "mode": "RW"
       },
       {

@@ -52,20 +52,12 @@ sudo rm -f /tmp/gdash_install_log
 echo " - Building container gdash"
 build_container gdash gdash /tmp/gdash_install_log
 
-echo " - Creating shared directory"
-# TODO
-sudo mkdir -p /var/run/gdash
-#sudo chown -R elasticsearch /var/run/gdash
-sudo mkdir -p /var/log/gdash
-#sudo chown -R elasticsearch /var/log/gdash
 
 # create and start container
 echo " - Running docker container"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
-        -v /var/log/gdash:/var/log/gdash \
-        -v /var/run/gdash:/var/run/gdash \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -e NODE_NAME=$HOSTNAME \
         -d --name gdash \

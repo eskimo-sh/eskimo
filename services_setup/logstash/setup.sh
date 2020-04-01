@@ -86,8 +86,8 @@ docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
         -d \
-        -v /var/log/logstash:/var/log/logstash \
-        -v /var/lib/logstash:/var/lib/logstash \
+        -v /var/log/elasticsearch:/var/log/elasticsearch \
+        -v /var/lib/elasticsearch:/var/lib/elasticsearch \
         --name logstash \
         -i \
         -t eskimo:logstash bash >> /tmp/logstash_install_log 2>&1

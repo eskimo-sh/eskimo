@@ -13,6 +13,12 @@ if [[ $2 == "" ]]; then
 fi
 export MOUNT_POINT=$2
 
+if [[ $2 == "" ]]; then
+    echo "Expecting owner as third argument"
+    exit -13
+fi
+export OWNER=$3
+
 echo " - Loading topology"
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
     echo "Cannot find eskimo topology file"
@@ -23,7 +29,7 @@ fi
 
 if [[ ! -d $MOUNT_POINT ]]; then
     echo " - Creating mount point: $MOUNT_POINT"
-    sudo mkdir -p $MOUNT_POINT
+    mkdir -p $MOUNT_POINT
 fi
 
 ls /dev/fuse > /dev/null 2>&1
@@ -46,3 +52,13 @@ if [[ $? != 0 ]]; then
     cat /tmp/mount_$VOLUME
     exit -20
 fi
+
+# give it a little time to actually connect the transport
+sleep 4
+
+if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
+    echo " - Changing owner and rights of $MOUNT_POINT"
+    chown -R $OWNER $MOUNT_POINT
+fi
+
+chmod -R 777 $MOUNT_POINT

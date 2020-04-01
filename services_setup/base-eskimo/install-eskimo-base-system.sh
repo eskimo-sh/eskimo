@@ -272,74 +272,57 @@ function install_debian_mesos_dependencies() {
 
 }
 
+function create_user_infrastructure() {
+
+    if [[ "$1" == "" ]]; then
+        echo "Expecting user name as first argument"
+        exit -41
+    fi
+    USER_NAME=$1
+
+    if [[ "$2" == "" ]]; then
+        echo "Expecting user ID as second argument"
+        exit -42
+    fi
+    USER_ID=$2
+
+    echo " - Creating user $USER_NAME (if not exist)"
+    new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
+    if [[ $new_user_id == "" ]]; then
+        sudo useradd -u $USER_ID $USER_NAME
+        new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
+        if [[ $new_user_id == "" ]]; then
+            echo "Failed to add user $USER_NAME"
+            exit -4
+        fi
+    fi
+
+    echo " - Creating user system folders"
+    sudo mkdir -p /var/lib/$USER_NAME
+    sudo chown -R $USER_NAME /var/lib/$USER_NAME
+
+    sudo mkdir -p /var/log/$USER_NAME
+    sudo chown -R $USER_NAME /var/log/$USER_NAME
+
+    sudo mkdir -p /var/run/$USER_NAME
+    sudo chown -R $USER_NAME /var/run/$USER_NAME
+}
+
 function create_common_system_users() {
 
-    echo " - Creating elasticsearch user (if not exist)"
-    elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/setup_log`
-    if [[ $elasticsearch_user_id == "" ]]; then
-        sudo useradd -u 3301 elasticsearch
-        elasticsearch_user_id=`id -u elasticsearch 2>> /tmp/setup_log`
-        if [[ $elasticsearch_user_id == "" ]]; then
-            echo "Failed to add user elasticsearch"
-            exit -4
-        fi
-    fi
+    create_user_infrastructure elasticsearch 3301
 
-    echo " - Creating spark user (if not exist)"
-    export spark_user_id=`id -u spark 2>> /tmp/setup_log`
-    if [[ $spark_user_id == "" ]]; then
-        sudo useradd -u 3302 spark
-        spark_user_id=`id -u spark 2>> /tmp/setup_log`
-        if [[ $spark_user_id == "" ]]; then
-            echo "Failed to add user spark"
-            exit -4
-        fi
-    fi
+    create_user_infrastructure spark 3302
 
-    echo " - Creating kafka user (if not exist)"
-    kafka_user_id=`id -u kafka 2>> /tmp/setup_log`
-    if [[ $kafka_user_id == "" ]]; then
-        sudo useradd -u 3303 kafka
-        kafka_user_id=`id -u kafka 2>> /tmp/setup_log`
-        if [[ $kafka_user_id == "" ]]; then
-            echo "Failed to add user kafka"
-            exit -4
-        fi
-    fi
+    create_user_infrastructure kafka 3303
 
-    echo " - Creating grafana user (if not exist)"
-    grafana_user_id=`id -u grafana 2>> /tmp/setup_log`
-    if [[ $grafana_user_id == "" ]]; then
-        sudo useradd -u 3304 grafana
-        grafana_user_id=`id -u grafana 2>> /tmp/setup_log`
-        if [[ $grafana_user_id == "" ]]; then
-            echo "Failed to add user grafana"
-            exit -4
-        fi
-    fi
+    create_user_infrastructure grafana 3304
 
-    echo " - Creating flink user (if not exist)"
-    export flink_user_id=`id -u flink 2>> /tmp/setup_log`
-    if [[ $flink_user_id == "" ]]; then
-        sudo useradd -u 3305 flink
-        flink_user_id=`id -u flink 2>> /tmp/setup_log`
-        if [[ $flink_user_id == "" ]]; then
-            echo "Failed to add user flink"
-            exit -4
-        fi
-    fi
+    create_user_infrastructure grafana 3304
 
-    echo " - Creating marathon user (if not exist)"
-    export marathon_user_id=`id -u marathon 2>> /tmp/setup_log`
-    if [[ $marathon_user_id == "" ]]; then
-        sudo useradd -u 3306 marathon
-        marathon_user_id=`id -u marathon 2>> /tmp/setup_log`
-        if [[ $marathon_user_id == "" ]]; then
-            echo "Failed to add user marathon"
-            exit -4
-        fi
-    fi
+    create_user_infrastructure flink 3305
 
+    create_user_infrastructure marathon 3306
 }
 
 # System Installation

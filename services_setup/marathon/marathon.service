@@ -64,8 +64,6 @@ ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run
          -p 5000:5000 \
         -v /var/log/marathon:/var/log/marathon \
         -v /var/lib/marathon:/var/lib/marathon:rshared \
-        -v /var/lib/docker_registry:/var/lib/docker_registry \
-        -v /var/log/docker_registry:/var/log/docker_registry \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \

@@ -60,9 +60,16 @@ if [[ $kafka_user_id == "" ]]; then
 fi
 
 
+echo " - Chaning owber of /var/run/kafka-manager/"
+sudo mkdir -p /var/run/kafka/kafka-manager
+sudo chown -R kafka /var/run/kafka/kafka-manager
+
 echo " - Simlinking logs to /var/log/kafka-manager/"
+sudo mkdir -p /var/log/kafka/kafka-manager
+sudo chown kafka /var/log/kafka/kafka-manager
+
 sudo rm -Rf /usr/local/lib/kafka-manager/logs
-sudo ln -s /var/log/kafka-manager /usr/local/lib/kafka-manager/logs
+sudo ln -s /var/log/kafka/kafka-manager /usr/local/lib/kafka-manager/logs
 
 echo " - Adapting Configuration file"
 

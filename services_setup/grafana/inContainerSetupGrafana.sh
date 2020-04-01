@@ -67,10 +67,9 @@ fi
 echo " - Symlinking grafana directories to system directories"
 sudo rm -Rf /usr/local/lib/grafana/data
 sudo ln -s /var/lib/grafana /usr/local/lib/grafana/data
+
 sudo rm -Rf /usr/local/lib/grafana/data/log
 sudo ln -s /var/log/grafana /usr/local/lib/grafana/data/log
-sudo mkdir -p /usr/local/lib/grafana/data/png
-sudo mkdir -p /usr/local/lib/grafana/data/plugins
 
 
 echo " - Adapting grafana configuration file defaults.ini"

@@ -39,6 +39,14 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Creating required directories (as elasticsearch)"
+mkdir -p /var/lib/elasticsearch/logstash
+mkdir -p /var/lib/elasticsearch/logstash/data
+chmod -R 777 /var/lib/elasticsearch/logstash/data
+
+mkdir -p /var/run/elasticsearch/logstash
+mkdir -p /var/log/elasticsearch/logstash
+
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh logstash
 

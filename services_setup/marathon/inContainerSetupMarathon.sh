@@ -76,7 +76,9 @@ echo " - Creating user marathon home directory"
 mkdir -p /home/marathon
 chown marathon /home/marathon
 
-
+echo " - Updating maathon registry config"
+sudo sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var\/lib\/marathon\/docker_registry"/g /etc/docker_registry/config.yml
+#rootdirectory: /var/lib/docker_registry
 
 # The external address of the host on which the JobManager runs and can be
 # reached by the TaskManagers and any clients which want to connect

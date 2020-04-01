@@ -46,6 +46,10 @@ echo "-- SETTING UP GDASH ------------------------------------------------------
 #echo " - Getting container IP "
 #CONTAINER_IP_ADDRESS=`hostname -i`
 
+sudo mkdir -p /var/run/gdash
+sudo chown -R 777 /var/run/gdash
+sudo mkdir -p /var/log/gdash
+sudo chown -R 777 /var/log/gdash
 
 echo " - Creating in startup script"
 

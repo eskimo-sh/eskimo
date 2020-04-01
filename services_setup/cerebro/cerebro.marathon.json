@@ -26,13 +26,13 @@
     ],
     "volumes": [
       {
-        "containerPath": "/var/log/cerebro",
-        "hostPath": "/var/log/cerebro",
+        "containerPath": "/var/log/elasticsearch",
+        "hostPath": "/var/log/elasticsearch",
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/cerebro",
-        "containerPath": "/var/run/cerebro",
+        "hostPath": "/var/run/elasticsearch",
+        "containerPath": "/var/run/elasticsearch",
         "mode": "RW"
       },
       {

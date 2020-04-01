@@ -39,6 +39,10 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Creating required directories (as elasticsearch)"
+mkdir -p /var/run/elasticsearch/kibana
+mkdir -p /var/log/elasticsearch/kibana
+
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh kibana
 

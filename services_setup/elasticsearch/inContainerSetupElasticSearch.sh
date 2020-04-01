@@ -47,13 +47,14 @@ set +e
 elasticsearch_user_id=`id -u elasticsearch 2> /tmp/es_install_log`
 set -e
 
-echo " - Creating elasticsearch data directory in /var/lib/elasticsearch"
-mkdir -p /var/lib/elasticsearch
-chown -R elasticsearch /var/lib/elasticsearch
+# These should be mounted properly by docker
+#echo " - Creating elasticsearch data directory in /var/lib/elasticsearch"
+#mkdir -p /var/lib/elasticsearch
+#chown -R elasticsearch /var/lib/elasticsearch
 
-echo " - Creating elasticsearch PID file directory"
-mkdir -p /var/run/elasticsearch
-chown -R elasticsearch /var/run/elasticsearch
+#echo " - Creating elasticsearch PID file directory"
+#mkdir -p /var/run/elasticsearch
+#chown -R elasticsearch /var/run/elasticsearch
 
 echo " - Simlinking elasticsearch logs to /var/log/"
 rm -Rf /usr/local/lib/elasticsearch/logs

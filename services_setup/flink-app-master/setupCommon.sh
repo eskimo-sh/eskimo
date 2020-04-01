@@ -45,7 +45,7 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-echo " - Creating flink user (if not exist)"
+echo " - Checking flink user"
 export flink_user_id=`id -u flink 2>> /tmp/flink_executor_install.log`
 if [[ $flink_user_id == "" ]]; then
     echo "User flink should have been added by eskimo-base-system setup script"
@@ -54,11 +54,9 @@ fi
 
 # Create shared dir
 echo " - Creating shared directory"
-sudo mkdir -p /var/log/flink
-sudo chown flink /var/log/flink
 sudo mkdir -p /var/log/flink/log
 sudo chown flink /var/log/flink/log
-sudo mkdir -p /var/lib/flink
 sudo mkdir -p /var/lib/flink/tmp
-sudo chown -R flink /var/lib/flink
+sudo chown flink /var/log/flink/log
+
 

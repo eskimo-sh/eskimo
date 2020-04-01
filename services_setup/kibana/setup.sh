@@ -59,19 +59,14 @@ if [[ $? != 0 ]]; then
     exit -20
 fi
 
-echo " - Creating shared directory"
-sudo mkdir -p /var/run/kibana
-sudo chown -R elasticsearch /var/run/kibana
-sudo mkdir -p /var/log/kibana
-sudo chown -R elasticsearch /var/log/kibana
 
 # create and start container
 echo " - Running docker container"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
-        -v /var/log/kibana:/var/log/kibana \
-        -v /var/run/kibana:/var/run/kibana \
+        -v /var/log/elasticsearch:/var/log/elasticsearch \
+        -v /var/run/elasticsearch:/var/run/elasticsearch \
         -d --name kibana \
         -i \
         -t eskimo:kibana bash >> /tmp/kibana_install_log 2>&1

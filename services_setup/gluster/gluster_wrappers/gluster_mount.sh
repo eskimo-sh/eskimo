@@ -216,7 +216,7 @@ fi
 
 
 # give it a little time to actually connect the transport
-sleep 3
+sleep 4
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
     echo " - Changing owner and rights of $MOUNT_POINT"

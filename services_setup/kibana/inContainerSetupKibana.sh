@@ -58,8 +58,8 @@ echo " - Adapting kibana config"
 sudo sed -i s/"#server.host: \"localhost\""/"server.host: \"0.0.0.0\""/g /usr/local/etc/kibana/kibana.yml
 sudo sed -i s/"#server.name: \"your-hostname\""/"server.name: \"Eskimo\""/g /usr/local/etc/kibana/kibana.yml
 
-sudo sed -i s/"#pid.file: \/var\/run\/kibana.pid"/"pid.file: \/var\/run\/kibana\/kibana.pid"/g /usr/local/etc/kibana//kibana.yml
-sudo sed -i s/"#logging.dest: stdout"/"logging.dest: \/var\/log\/kibana\/kibana.log"/g /usr/local/etc/kibana/kibana.yml
+sudo sed -i s/"#pid.file: \/var\/run\/kibana.pid"/"pid.file: \/var\/run\/elasticsearch\/kibana\/kibana.pid"/g /usr/local/etc/kibana//kibana.yml
+sudo sed -i s/"#logging.dest: stdout"/"logging.dest: \/var\/log\/elasticsearch\/kibana\/kibana.log"/g /usr/local/etc/kibana/kibana.yml
 
 # It runs behind a proxy in eskimo
 sudo sed -i s/"#server.basePath: \"\""/"server.basePath: \"\/kibana\""/g /usr/local/etc/kibana/kibana.yml

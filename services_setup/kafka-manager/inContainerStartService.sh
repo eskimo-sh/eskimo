@@ -42,13 +42,16 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh kafka-manager
 
-sudo mkdir -p /var/run/kafka-manager
-sudo chown -R kafka /var/run/kafka-manager
+echo " - Deleting previous PID"
 rm -Rf /var/run/kafka-manager/kafka-manager.pid
+
+echo " - Creating required directories (as kafka)"
+mkdir -p /var/run/kafka/kafka-manager/
+mkdir -p /var/log/kafka/kafka-manager
 
 echo " - Starting service"
 /usr/local/lib/kafka-manager/bin/kafka-manager \
     -Dapplication.home=/usr/local/lib/kafka-manager/ \
-    -Dpidfile.path=/var/run/kafka-manager/kafka-manager.pid \
+    -Dpidfile.path=/var/run/kafka/kafka-manager/kafka-manager.pid \
     -Dconfig.file=/usr/local/lib/kafka-manager/conf/application.conf \
     -Dhttp.port=22080

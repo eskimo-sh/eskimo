@@ -45,7 +45,7 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-echo " - Creating spark user (if not exist)"
+echo " - Checking spark user"
 export spark_user_id=`id -u spark 2>> /tmp/spark_executor_install.log`
 if [[ $spark_user_id == "" ]]; then
     echo "User spark should have been added by eskimo-base-system setup script"
@@ -54,10 +54,8 @@ fi
 
 # Create shared dir
 echo " - Creating shared directory"
-sudo mkdir -p /var/log/spark
-sudo chown spark /var/log/spark
 sudo mkdir -p /var/log/spark/logs
 sudo chown spark /var/log/spark/logs
-sudo mkdir -p /var/lib/spark
+
 sudo mkdir -p /var/lib/spark/tmp
 sudo chown -R spark /var/lib/spark

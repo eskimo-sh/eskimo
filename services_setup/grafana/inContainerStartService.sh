@@ -39,6 +39,10 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Creating required sub-directories (as user grafana)"
+mkdir -p /usr/local/lib/grafana/data/png
+mkdir -p /usr/local/lib/grafana/data/plugins
+
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh grafana
 

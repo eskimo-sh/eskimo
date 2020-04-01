@@ -59,21 +59,19 @@ if [[ $? != 0 ]]; then
     exit -20
 fi
 
-echo " - Creating shared directory"
-sudo mkdir -p /var/run/cerebro
-sudo chown -R elasticsearch /var/run/cerebro
-sudo mkdir -p /var/log/cerebro
-sudo chown -R elasticsearch /var/log/cerebro
-sudo mkdir -p /usr/local/etc/cerebro
-sudo chown -R elasticsearch /usr/local/etc/cerebro
+echo " - Creating directory cerebro"
+sudo mkdir -p /var/run/elasticsearch/cerebro
+sudo chown -R elasticsearch /var/run/elasticsearch/cerebro
+sudo mkdir -p /var/log/elasticsearch/cerebro
+sudo chown -R elasticsearch /var/log/elasticsearch/cerebro
 
 # create and start container
 echo " - Running docker container"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
-        -v /var/log/cerebro:/var/log/cerebro \
-        -v /var/run/cerebro:/var/run/cerebro \
+        -v /var/log/elasticsearch:/var/log/elasticsearch \
+        -v /var/run/elasticsearch:/var/run/elasticsearch \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -e NODE_NAME=$HOSTNAME \
         -d --name cerebro \
