@@ -53,6 +53,10 @@ chown -R spark /usr/local/lib/zeppelin/conf/
 chown -R spark /usr/local/lib/zeppelin/interpreter/
 chown spark /usr/local/lib/zeppelin/
 
+# zeppelin is not mounting /var/lib/spark from host but gluster shares inside
+# still need to be able to manipulate that directory !
+chown spark /var/lib/spark
+
 echo " - Symlinking some RHEL mesos dependencies "
 saved_dir=`pwd`
 cd /usr/lib/x86_64-linux-gnu/
