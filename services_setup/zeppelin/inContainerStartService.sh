@@ -45,6 +45,10 @@ echo " - Injecting topology (Flink)"
 echo " - Injecting topology (Zeppelin)"
 . /usr/local/sbin/inContainerInjectTopologyZeppelin.sh
 
+echo " - Creating required directories"
+sudo /bin/mkdir /var/lib/spark/tmp
+sudo /bin/chown spark /var/lib/spark/tmp
+
 echo " - Inject settings (Zeppelin)"
 /usr/local/sbin/settingsInjector.sh zeppelin
 

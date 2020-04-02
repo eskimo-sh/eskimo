@@ -68,6 +68,10 @@ fi
 echo " - Enabling spark user to mount gluster shares (sudo)"
 echo "spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" > /etc/sudoers.d/spark
 
+echo " - Enabling spark user to create /var/lib/spark/tmp and chown it"
+echo "spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp" > /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/chown spark /var/lib/spark/tmp" > /etc/sudoers.d/spark
+
 
 echo " - Creating user spark home directory"
 mkdir -p /home/spark

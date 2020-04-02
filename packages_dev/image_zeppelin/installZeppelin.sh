@@ -56,12 +56,12 @@ mkdir -p /tmp/zeppelin_setup/
 cd /tmp/zeppelin_setup/
 
 echo " - Downloading zeppelin-$ZEPPELIN_VERSION"
-wget https://www-eu.apache.org/dist/zeppelin/zeppelin-$ZEPPELIN_VERSION/zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz > /tmp/zeppelin_install_log 2>&1
+export FROM_COMPLETE="1"
+wget https://downloads.apache.org/zeppelin/zeppelin-$ZEPPELIN_VERSION_FULL/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all.tgz > /tmp/zeppelin_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad zeppelin-$ZEPPELIN_VERSION from apache. Trying to download from niceideas.ch"
     wget http://niceideas.ch/mes/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz >> /tmp/zeppelin_install_log 2>&1
     fail_if_error $? "/tmp/zeppelin_install_log" -1
-    export FROM_COMPLETE="1"
 fi
 
 echo " - Extracting zeppelin-$ZEPPELIN_VERSION"

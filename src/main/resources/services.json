@@ -626,7 +626,7 @@
           {
             "name": "mesos.resourcemanager.tasks.mem",
             "comment": "Memory to assign to the Mesos workers in MB. Default value : 1024.",
-            "defaultValue": "1024"
+            "defaultValue": "600"
           },
           {
             "name": "taskmanager.numberOfTaskSlots",

@@ -76,7 +76,15 @@ echo " - Creating Zeppelin env file"
 cp /usr/local/lib/zeppelin/conf/zeppelin-env.sh.template /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
 sudo sed -i s/"# export ZEPPELIN_PORT"/"export ZEPPELIN_PORT=38080"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+#sudo sed -i s/"# export ZEPPELIN_ADDR"/"export ZEPPELIN_ADDR=0.0.0.0"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+
+
+# FIXME ATTEMPT
 sudo sed -i s/"# export ZEPPELIN_ADDR"/"export ZEPPELIN_ADDR=0.0.0.0"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+sudo sed -i s/"# export ZEPPELIN_LOCAL_IP"/"export ZEPPELIN_LOCAL_IP=0.0.0.0"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+
+
+
 
 
 sudo sed -i s/"# export ZEPPELIN_LOG_DIR"/"export ZEPPELIN_LOG_DIR=\/var\/log\/spark\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh

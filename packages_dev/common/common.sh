@@ -74,6 +74,7 @@ export PROMETHEUS_NODE_EXPORTER_VERSION=0.18.1
 export PROMETHEUS_PUSHGATEWAY_VERSION=0.8.0
 
 # Zeppelin
+export ZEPPELIN_VERSION_FULL=0.9.0-preview1
 export ZEPPELIN_VERSION=0.9.0
 export ZEPPELIN_IS_SNAPSHOT="false" # Caution current builld of zeppelin MASTER is broken
 
