@@ -72,8 +72,8 @@
       "protocol": "MESOS_TCP",
       "port": 38080,
       "gracePeriodSeconds": 300,
-      "intervalSeconds": 60,
-      "timeoutSeconds": 30,
+      "intervalSeconds": 80,
+      "timeoutSeconds": 40,
       "maxConsecutiveFailures": 4
     }
   ],

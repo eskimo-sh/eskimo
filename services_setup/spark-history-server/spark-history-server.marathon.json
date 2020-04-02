@@ -56,8 +56,8 @@
       "portIndex": 0,
       "gracePeriodSeconds": 300,
       "intervalSeconds": 60,
-      "timeoutSeconds": 20,
-      "maxConsecutiveFailures": 3
+      "timeoutSeconds": 30,
+      "maxConsecutiveFailures": 4
     }
   ],
   "user": "spark"
