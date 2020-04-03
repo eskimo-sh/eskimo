@@ -47,6 +47,13 @@ set +e
 elasticsearch_user_id=`id -u elasticsearch 2> /tmp/cerebro_install_log`
 set -e
 
+echo " - creating logstash required directory"
+sudo mkdir -p /var/lib/elasticsearch/logstash
+sudo mkdir -p /var/lib/elasticsearch/logstash/data
+sudo chmod -R 777 /var/lib/elasticsearch/logstash/data
+
+sudo mkdir -p /var/run/elasticsearch/logstash
+sudo mkdir -p /var/log/elasticsearch/logstash
 
 echo " - creating logstash wrapper in /usr/local/bin"
 create_binary_wrapper /usr/local/lib/logstash/bin/logstash /usr/local/bin/logstash

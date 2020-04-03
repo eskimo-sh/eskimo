@@ -2,7 +2,7 @@
   "id": "zeppelin",
   "cmd": "/usr/local/sbin/inContainerStartService.sh",
   "cpus": 0.5,
-  "mem": 2500,
+  "mem": 2800,
   "disk": 800,
   "instances": 1,
   "container": {

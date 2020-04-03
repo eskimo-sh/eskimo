@@ -166,16 +166,32 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 sudo sed -i -n '1h;1!H;${;g;s/'\
-'      \"group\": \"flink\",\n'\
-'      \"properties\": {\n'\
+'          \"name\": \"FLINK_HOME\",\n'\
+'          \"value\": \"\",'\
 '/'\
-'      \"group\": \"flink\",\n'\
-'      \"properties\": {\n'\
-'        \"FLINK_HOME\": {\n'\
-'          \"value\": \"\/usr\/local\/lib\/flink\/\",\n'\
-'          \"type\": \"string\"\n'\
-'        },\n'\
+'          \"name\": \"FLINK_HOME\",\n'\
+'          \"value\": \"\/usr\/local\/lib\/flink\/\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"flink.tm.memory\",\n'\
+'          \"value\": \"1024\",'\
+'/'\
+'          \"name\": \"flink.tm.memory\",\n'\
+'          \"value\": \"800m\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+
+echo " - Configuring Shell interpreter"
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"shell.command.timeout.millisecs\",\n'\
+'          \"value\": \"60000\",'\
+'/'\
+'          \"name\": \"shell.command.timeout.millisecs\",\n'\
+'          \"value\": \"1200000\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
 
 
 echo " - Enabling spark to change configuration at runtime"

@@ -122,19 +122,22 @@ sudo bash -c "echo -e \"# This allows for mounting additional volumes into your 
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/flink:/var/log/flink:RW,/var/lib/flink:/var/lib/flink:RW,/etc:/host_etc:RO\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 
-# FIXME temporary debug logs
-sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
-        /usr/local/lib/flink/conf/log4j.properties
+
+# temporary debug logs
+#sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
+#        /usr/local/lib/flink/conf/log4j.properties
 
 
-# FIXME temporary increasing timeotu to workaround
-# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af
-# https://issues.apache.org/jira/browse/FLINK-14074
-
-sudo bash -c "echo -e \"\n# FIXME emporary increasing timeout to workaround \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"\n# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"\n# https://issues.apache.org/jira/browse/FLINK-14074 \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+# This hack was required with FLink 1.9 when a killed task manager made is to that flink was never anymore able to
+# recover some resources from mesos !
+## temporary increasing timeout to workaround
+## https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af
+## https://issues.apache.org/jira/browse/FLINK-14074
+#
+#sudo bash -c "echo -e \"\n# FIXME emporary increasing timeout to workaround \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"\n# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"\n# https://issues.apache.org/jira/browse/FLINK-14074 \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 
 
