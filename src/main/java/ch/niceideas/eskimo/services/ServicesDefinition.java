@@ -137,6 +137,15 @@ public class ServicesDefinition implements InitializingBean {
             Integer selectionLayoutCol = (Integer) servicesConfig.getValueForPath(serviceString+".config.selectionLayout.col");
             if (selectionLayoutCol != null) {
                 service.setSelectionLayoutCol(selectionLayoutCol);
+            } else if (selectionLayoutRow != null) {
+                throw new ServiceDefinitionException("Service " + serviceString + " defined a Row for selection layout but no column");
+            }
+
+            // find out if another service is already defined at same location
+            if (services.values().stream()
+                    .filter(srv -> service.getSelectionLayoutCol() != -1)
+                    .anyMatch(srv -> srv.getSelectionLayoutCol() == selectionLayoutCol && srv.getSelectionLayoutRow() == selectionLayoutRow)) {
+                throw new ServiceDefinitionException("Service " + serviceString + " defines a row and col for selection layout already defined by another service");
             }
 
             String memoryConsumptionString = (String) servicesConfig.getValueForPath(serviceString+".config.memory");

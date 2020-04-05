@@ -260,7 +260,9 @@ echo " - Starting marathon deployment"
 deploy_marathon zeppelin /tmp/zeppelin_install_log
 
 
-
+## FIXME . temporary hack
+# the poroblem now with marathon is that deploying zeppelin first can take time and second will happen ony any random
+# node. I need to query marathon to find where.
 #echo " - Waiting for Zeppelin availability"
 #function wait_forZeppelin() {
 #    for i in `seq 0 1 80`; do
@@ -274,8 +276,8 @@ deploy_marathon zeppelin /tmp/zeppelin_install_log
 #}
 #
 #wait_forZeppelin
-
-## FIXME . temporary hack replacing the API import below by an raw import of the samples to address the bug in zeppelin
+#
+#
 ## import in 0.9-SNAPSHOT
 #echo " - Importing Zeppelin Sample notebooks"
 #sleep 5 # wait a little more

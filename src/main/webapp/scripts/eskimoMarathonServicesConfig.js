@@ -161,6 +161,10 @@ eskimo.MarathonServicesConfig = function() {
 
     };
 
+    this.showReinstallSelection = function() {
+
+    };
+
     function showMarathonServicesConfig () {
 
         if (!eskimoMain.isSetupDone()) {

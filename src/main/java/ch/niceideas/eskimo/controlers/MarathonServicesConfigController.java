@@ -35,9 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.MarathonOperationsCommand;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
@@ -150,6 +148,50 @@ public class MarathonServicesConfigController {
         }
     }
 
+    @PostMapping("/reinstall-marathon-services-config")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String reinstallMarathonServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
+
+        logger.info ("Got model : " + reinstallModel);
+
+        try {
+
+            ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
+            ServicesInstallStatusWrapper newServicesInstallStatus = ServicesInstallStatusWrapper.empty();
+
+            MarathonServicesConfigWrapper reinstallModelConfig = new MarathonServicesConfigWrapper(reinstallModel);
+
+            for (String serviceInstallStatusFlag : servicesInstallStatus.getInstalledServicesFlags()) {
+
+                String serviceInstallation = servicesInstallStatus.getServiceInstallation(serviceInstallStatusFlag);
+
+                if (!reinstallModelConfig.hasServiceConfigured(serviceInstallation)) {
+                    newServicesInstallStatus.copyFrom (serviceInstallStatusFlag, servicesInstallStatus);
+                }
+            }
+
+            MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
+            if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
+                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+            }
+
+            // Create OperationsCommand
+            MarathonOperationsCommand command = MarathonOperationsCommand.create(servicesDefinition, newServicesInstallStatus, marathonServicesConfig);
+
+            // store command and config in HTTP Session
+            session.setAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
+            session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
+
+            return returnCommand (command);
+
+        } catch (JSONException | FileException | MarathonException | SetupException | SystemException e) {
+            logger.error(e, e);
+            messagingService.addLines (e.getMessage());
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
+        }
+    }
+
     private String returnCommand(MarathonOperationsCommand command) {
         try {
             return new JSONObject(new HashMap<String, Object>() {{
@@ -178,7 +220,6 @@ public class MarathonServicesConfigController {
             MarathonOperationsCommand command = (MarathonOperationsCommand) session.getAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
             session.removeAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
 
-            /*
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
             session.removeAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
 
@@ -186,7 +227,6 @@ public class MarathonServicesConfigController {
             if (newServicesInstallationStatus != null) {
                 configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
             }
-            */
 
             configurationService.saveMarathonServicesConfig(command.getRawConfig());
 

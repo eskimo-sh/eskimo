@@ -76,7 +76,7 @@ public class MarathonService {
     private int parallelismInstallThreadCount = 10;
 
     @Value("${system.operationWaitTimoutSeconds}")
-    private int operationWaitTimout = 400;
+    private int operationWaitTimout = 800;
 
     @Value("${system.baseInstallWaitTimoutSeconds}")
     private int baseInstallWaitTimout = 1000;
@@ -233,7 +233,7 @@ public class MarathonService {
 
     public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws SystemException {
 
-
+        logger.info ("Starting Marathon Deployment Operations");
         boolean success = false;
         systemService.setProcessingPending();
         try {
@@ -327,6 +327,7 @@ public class MarathonService {
         } finally {
             systemService.setLastOperationSuccess (success);
             systemService.releaseProcessingPending();
+            logger.info ("Marathon Deployment Operations Completed.");
         }
     }
 

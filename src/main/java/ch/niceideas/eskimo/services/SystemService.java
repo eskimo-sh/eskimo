@@ -126,7 +126,7 @@ public class SystemService {
     private int parallelismInstallThreadCount = 10;
 
     @Value("${system.operationWaitTimoutSeconds}")
-    private int operationWaitTimout = 400;
+    private int operationWaitTimout = 800;
 
     @Value("${system.statusFetchThreadCount}")
     private int parallelismStatusThreadCount = 10;
@@ -410,6 +410,7 @@ public class SystemService {
     public void applyNodesConfig(OperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
 
+        logger.info ("Starting System Deployment Operations.");
         boolean success = false;
         setProcessingPending();
         try {
@@ -541,6 +542,7 @@ public class SystemService {
         } finally {
             setLastOperationSuccess (success);
             releaseProcessingPending();
+            logger.info ("System Deployment Operations Completed.");
         }
     }
 

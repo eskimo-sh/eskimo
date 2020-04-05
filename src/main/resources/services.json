@@ -6,7 +6,7 @@
       "order": 0,
       "mandatory": true,
       "name" : "NTP",
-      "selectionLayout" : { "row" : 1, "col" : 2},
+      "selectionLayout" : { "row" : 1, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/ntp-logo.png",
       "icon" : "images/ntp-icon.png"
@@ -29,7 +29,7 @@
       "order": 1,
       "unique": true,
       "name" : "Zookeeper",
-      "selectionLayout" : { "row" : 2, "col" : 2},
+      "selectionLayout" : { "row" : 1, "col" : 2},
       "memory": "neglectable",
       "logo" : "images/zookeeper-logo.png",
       "icon" : "images/zookeeper-icon.png"
@@ -54,7 +54,7 @@
       "mandatory": true,
       "group" : "Monitoring",
       "name" : "Prometheus",
-      "selectionLayout" : { "row" : 7, "col" : 3},
+      "selectionLayout" : { "row" : 4, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/prometheus-logo.png",
       "icon" : "images/prometheus-icon.png"
@@ -122,7 +122,7 @@
       "conditional": "MULTIPLE_NODES",
       "group" : "Gluster",
       "name" : "FS",
-      "selectionLayout" : { "row" : 1, "col" : 3},
+      "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/gluster-logo.png",
       "icon" : "images/gluster-icon.png"
@@ -183,7 +183,7 @@
       "unique": true,
       "group" : "Mesos",
       "name" : "Master",
-      "selectionLayout" : { "row" : 3, "col" : 2},
+      "selectionLayout" : { "row" : 2, "col" : 2},
       "memory": "neglectable",
       "logo" : "images/mesos-master-logo.png",
       "icon" : "images/mesos-master-icon.png"
@@ -234,7 +234,7 @@
       "order": 7,
       "group" : "Mesos",
       "name" : "Agent",
-      "selectionLayout" : { "row" : 2, "col" : 3},
+      "selectionLayout" : { "row" : 3, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/mesos-agent-logo.png",
       "icon" : "images/mesos-agent-icon.png"
@@ -273,7 +273,7 @@
       "unique": true,
       "group": "Mesos",
       "name": "Marathon",
-      "selectionLayout": { "col" : 1, "row" : 5 },
+      "selectionLayout": { "row" : 3, "col" : 2 },
       "memory": "neglectable",
       "logo" : "images/marathon-logo.png",
       "icon" : "images/marathon-icon.png"
@@ -323,7 +323,7 @@
       "order": 9,
       "group" : "Kafka",
       "name" : "Broker",
-      "selectionLayout" : { "row" : 6, "col" : 3},
+      "selectionLayout" : { "row" : 5, "col" : 3},
       "memory": "medium",
       "logo" : "images/kafka-logo.png",
       "icon" : "images/kafka-icon.png"
@@ -472,7 +472,7 @@
       "order": 12,
       "group" : "Spark",
       "name" : "Executor",
-      "selectionLayout" : { "row" : 4, "col" : 3},
+      "selectionLayout" : { "row" : 3, "col" : 3},
       "memory": "large",
       "logo" : "images/spark-executor-logo.png",
       "icon" : "images/spark-executor-icon.png"
@@ -558,7 +558,7 @@
       "unique": true,
       "group": "Flink",
       "name": "App Master",
-      "selectionLayout": { "col": 2, "row": 5  },
+      "selectionLayout": { "row": 4, "col": 2  },
       "memory": "neglectable",
       "logo" : "images/flink-app-master-logo.png",
       "icon" : "images/flink-app-master-icon.png"
@@ -646,7 +646,7 @@
       "order": 14,
       "group": "Flink",
       "name": "Worker",
-      "selectionLayout": { "col": 3, "row": 8  },
+      "selectionLayout": { "row": 4, "col": 3  },
       "memory": "medium",
       "logo" : "images/flink-worker-logo.png",
       "icon" : "images/flink-worker-icon.png"
@@ -681,7 +681,7 @@
       "order": 15,
       "group" : "Elastic Stack",
       "name" : "Logstash",
-      "selectionLayout" : { "row" : 5, "col" : 3},
+      "selectionLayout" : { "row" : 2, "col" : 3},
       "memory": "small",
       "logo" : "images/logstash-logo.png",
       "icon" : "images/logstash-icon.png"
@@ -741,7 +741,7 @@
       "order": 17,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
-      "selectionLayout" : { "row" : 3, "col" : 3},
+      "selectionLayout" : { "row" : 1, "col" : 3},
       "memory": "large",
       "logo" : "images/elasticsearch-logo.png",
       "icon" : "images/elasticsearch-icon.png"
@@ -856,6 +856,21 @@
           "type" : "PLAIN",
           "source" : "return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws",
           "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws/zeppelin/ws"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "!function(e){var t={};",
+          "target" : "function noOp(){}; !function(e){var t={};"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "console.log(\"Send",
+          "target" : "noOp(\"Send"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "console.log(\"Receive",
+          "target" : "noOp(\"Receive"
         }
       ]
     },

@@ -104,12 +104,14 @@ eskimo.Main = function() {
     this.setOperationInProgress = setOperationInProgress;
 
     function startOperationInProgress () {
+        console.log ("eskimoMain - startOperationInProgress");
         setOperationInProgress (true);
         eskimoMessaging.startOperationInProgress();
     }
     this.startOperationInProgress = startOperationInProgress;
 
     function stopOperationInProgress (success) {
+        console.log ("eskimoMain - stopOperationInProgress");
         eskimoMessaging.stopOperationInProgress (success);
         setOperationInProgress (false);
         hideProgressbar();
@@ -117,6 +119,7 @@ eskimo.Main = function() {
     this.stopOperationInProgress = stopOperationInProgress;
 
     function scheduleStopOperationInProgress (success) {
+        console.log ("eskimoMain - scheduleStopOperationInProgress");
         window.setTimeout (stopOperationInProgress, MESSAGES_POLLING_STOP_DELAY, success);
     }
     this.scheduleStopOperationInProgress = scheduleStopOperationInProgress;

@@ -39,6 +39,8 @@ eskimo.Services = function () {
 
     var PERIODIC_RETRY_SERVICE_MS = 2000;
 
+    var DEBUG = false;
+
     var that = this;
 
     var UI_SERVICES = [];
@@ -225,6 +227,19 @@ eskimo.Services = function () {
     /* For tests */
     this.shouldReinitialize = shouldReinitialize;
 
+    function disableFrameConsole (iFrameId) {
+        if (!DEBUG) {
+            setTimeout(function () {
+                var iFrame = $(iFrameId).get(0);
+                if (iFrame && iFrame != null) {
+                    iFrame.contentWindow.console.log = function () {
+                        // No Op
+                    };
+                }
+            });
+        }
+    }
+
     function handleServiceIsUp(effUIConfig) {
         // remove from retry list
         for (var j = 0; j < uiConfigsToRetry.length; j++) {
@@ -242,6 +257,8 @@ eskimo.Services = function () {
             otherUIConfig.actualUrl = otherUIConfig.targetUrl;
             $("#iframe-content-" + otherUIConfig.service).attr('src', otherUIConfig.actualUrl);
             otherUIConfig.refreshWaiting = false;
+
+            disableFrameConsole("#iframe-content-" + otherUIConfig.service);
 
 
         }, effUIConfig.targetWaitTime, effUIConfig);

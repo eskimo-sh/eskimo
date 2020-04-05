@@ -62,6 +62,10 @@ function getUcfirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function noOp() {
+
+}
+
 $.fn.serializeObject = function() {
     var o = {};
     var a = this.serializeArray();
