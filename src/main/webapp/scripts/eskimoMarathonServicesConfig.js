@@ -163,6 +163,17 @@ eskimo.MarathonServicesConfig = function() {
 
     this.showReinstallSelection = function() {
 
+        eskimoMain.getMarathonServicesSelection().showMarathonServiceSelection();
+
+        var marathonServicesSelectionHTML = $('#marathon-services-container-table').html();
+        marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/marathon\-services/g, "marathon-services-selection");
+        marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/_install/g, "_reinstall");
+
+        $('#marathon-services-selection-body').html(
+            '<form id="marathon-servicesreinstall">' +
+            marathonServicesSelectionHTML +
+            '</form>');
+
     };
 
     function showMarathonServicesConfig () {
@@ -228,7 +239,21 @@ eskimo.MarathonServicesConfig = function() {
     }
     this.checkMarathonSetup = checkMarathonSetup;
 
-    function proceedWithMarathonInstallation(model) {
+    this.proceedWithReinstall = function (reinstallConfig) {
+
+        // rename _reinstall to _install in reinstallConfig
+        var model = {};
+
+        for (var reinstallKey in reinstallConfig) {
+
+            var installKey = reinstallKey.substring(0, reinstallKey.indexOf("_reinstall")) + "_install";
+            model[installKey] = reinstallConfig[reinstallKey];
+        }
+
+        proceedWithMarathonInstallation (model, true);
+    };
+
+    function proceedWithMarathonInstallation(model, reinstall) {
 
         eskimoMain.showProgressbar();
 
@@ -238,7 +263,7 @@ eskimo.MarathonServicesConfig = function() {
             dataType: "json",
             timeout: 1000 * 120,
             contentType: "application/json; charset=utf-8",
-            url: "save-marathon-services-config",
+            url: reinstall ? "reinstall-marathon-services-config" : "save-marathon-services-config",
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {
 
