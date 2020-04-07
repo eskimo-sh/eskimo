@@ -5,7 +5,9 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
+import com.sun.xml.internal.ws.api.server.ServiceDefinition;
 import org.json.JSONException;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,6 +17,13 @@ import static junit.framework.TestCase.*;
 public class SystemAdminControllerTest {
 
     private SystemAdminController sac = new SystemAdminController();
+    private ServicesDefinition sd = new ServicesDefinition();
+
+    @Before
+    public void setUp() throws Exception {
+        sd.afterPropertiesSet();
+        sac.setServicesDefinition(sd);
+    }
 
     @Test
     public void testInterruptProcessing() {

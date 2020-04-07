@@ -532,7 +532,7 @@ public class SystemService {
                         (operation, error) -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
-                            if (liveIps.contains(ipAddress)) {
+                            if (ipAddress.equals(OperationsCommand.MARATHON_FLAG) || liveIps.contains(ipAddress)) {
                                 restartServiceForSystem(service, ipAddress);
                             }
                         });
@@ -735,7 +735,7 @@ public class SystemService {
 
                 SystemStatusParser parser = new SystemStatusParser(allServicesStatus);
 
-                for (String service : servicesDefinition.listAllServices()) {
+                for (String service : servicesDefinition.listAllNodesServices()) {
 
                     // should service be installed on node ?
                     boolean shall = nodesConfig.shouldInstall (service, nodeNbr);
@@ -833,8 +833,8 @@ public class SystemService {
 
                             // => we want to consider removing services in any case if not is not only not configured anymore but down
                             // so if node is down in addition to being not configured anymore, we remove all services from saved install stazus
-                            String nodeIp = nodeName.replace("-", ".");
-                            if (!liveIps.contains(nodeIp)) {
+                            String nodeIp = nodeName == null ? null : nodeName.replace("-", ".");
+                            if (nodeIp == null && !liveIps.contains(nodeIp)) {
                                 if (countErrorAndRemoveServices(servicesInstallationStatus, serviceStatusFullString, savedService, nodeName)) {
                                     changes = true;
                                 }

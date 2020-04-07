@@ -55,6 +55,7 @@ public class OperationsCommand implements Serializable {
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
 
     public static final String INSTALLED_ON_IP_FLAG = "_installed_on_IP_";
+    public static final String MARATHON_FLAG = "(marathon)";
 
     private final NodesConfigWrapper rawNodesConfig;
 
@@ -130,7 +131,7 @@ public class OperationsCommand implements Serializable {
         Set<String> restartedServices = new HashSet<>();
         changedServices.forEach(service -> restartedServices.addAll (servicesDefinition.getDependentServices(service)));
 
-        // also add servicres simply flagged as needed restart previously
+        // also add services simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().stream().forEach(installStatus -> {
             String installedService = installStatus.substring(0, installStatus.indexOf(INSTALLED_ON_IP_FLAG));
             String status = (String) servicesInstallStatus.getValueForPath(installStatus);
@@ -140,12 +141,21 @@ public class OperationsCommand implements Serializable {
         });
 
         for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
-            for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
-                String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+            if (!servicesDefinition.getService(restartedService).isMarathon()) {
+                for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
-                retCommand.addRestart(restartedService, ipAddress);
+                    String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+
+                    retCommand.addRestart(restartedService, ipAddress);
+                }
+
+            } else {
+
+                retCommand.addRestart(restartedService, MARATHON_FLAG);
             }
+
+            //Need to restart marathon services as well !
         }
 
         return retCommand;

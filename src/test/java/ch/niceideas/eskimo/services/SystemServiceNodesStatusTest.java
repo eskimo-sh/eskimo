@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class SystemServiceNodesStatusTest extends AbstractSystemTest {
@@ -89,6 +91,10 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 return StandardSetupHelpers.getStandard2NodesStatus();
             }
+            @Override
+            public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
+                return StandardSetupHelpers.getStandardMarathonConfig();
+            }
         };
     }
 
@@ -123,6 +129,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
         String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), "UTF-8");
 
+        //assertEquals(expectedStatus, systemStatus.getFormattedValue());
         assertTrue(new JsonWrapper(expectedStatus).getJSONObject().similar(systemStatus.getJSONObject()));
     }
 }

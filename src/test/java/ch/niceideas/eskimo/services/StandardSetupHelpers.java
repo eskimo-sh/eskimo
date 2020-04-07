@@ -57,8 +57,9 @@ public class StandardSetupHelpers {
             put("ntp1", "on");
             put("spark-executor1", "on");
             put("action_id2", "192.168.10.13");
-            put("gdash", "2");
+            //put("gdash", "2");
             put("mesos-master", "2");
+            put("marathon", "2");
             //put("spark-history-server", "2");
             //put("zeppelin", "2");
             put("zookeeper", "2");
@@ -89,6 +90,7 @@ public class StandardSetupHelpers {
             put("mesos-agent_installed_on_IP_192-168-10-11", "OK");
             put("mesos-agent_installed_on_IP_192-168-10-13", "OK");
             put("mesos-master_installed_on_IP_192-168-10-13", "OK");
+            put("marathon_installed_on_IP_192-168-10-13", "OK");
             put("ntp_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-13", "OK");
             put("spark-executor_installed_on_IP_192-168-10-11", "OK");
@@ -134,6 +136,11 @@ public class StandardSetupHelpers {
     }
 
     public static MarathonServicesConfigWrapper getStandardMarathonConfig() {
-        throw new UnsupportedOperationException("To Be Implemented");
+        return new MarathonServicesConfigWrapper (new HashMap<String, Object>() {{
+            put("zeppelin_install", "on");
+            put("spark-history-server_install", "on");
+            put("gdash_install", "on");
+            put("kafka-manager_install", "on");
+        }});
     }
 }

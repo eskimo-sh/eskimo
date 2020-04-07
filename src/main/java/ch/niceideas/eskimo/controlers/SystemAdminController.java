@@ -155,12 +155,12 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.showJournalMarathon(service),
-                    service + " has been restarted successfuly on marathon.");
+                    serviceName + " has been restarted successfuly on marathon.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.showJournal(serviceName, address),
-                    service + " journal display from " + address + ".");
+                    serviceName + " journal display from " + address + ".");
         }
 
     }
@@ -173,12 +173,12 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.startServiceMarathon(service),
-                    service + " has been restarted successfuly on marathon.");
+                    serviceName + " has been restarted successfuly on marathon.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.startService(serviceName, address),
-                    service + " has been started successfuly on " + address + ".");
+                    serviceName + " has been started successfuly on " + address + ".");
         }
     }
 
@@ -190,12 +190,12 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.stopServiceMarathon(service),
-                    service + " has been restarted successfuly on marathon.");
+                    serviceName + " has been restarted successfuly on marathon.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.stopService(serviceName, address),
-                    service + " has been stopped successfuly on " + address + ".");
+                    serviceName + " has been stopped successfuly on " + address + ".");
         }
     }
 
@@ -207,12 +207,12 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.restartServiceMarathon(service),
-                    service + " has been restarted successfuly on marathon.");
+                    serviceName + " has been restarted successfuly on marathon.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.restartService(serviceName, address),
-                    service + " has been restarted successfuly on " + address + ".");
+                    serviceName + " has been restarted successfuly on " + address + ".");
         }
     }
 
@@ -261,7 +261,7 @@ public class SystemAdminController {
 
                 return performMarathonOperation(
                         marathonService -> marathonService.applyMarathonServicesConfig(operationsCommand),
-                        service + " has been reinstalled successfuly on marathon.");
+                        serviceName + " has been reinstalled successfuly on marathon.");
 
             } else {
 
@@ -275,7 +275,7 @@ public class SystemAdminController {
 
                 return performSystemOperation(
                         sysService -> sysService.applyNodesConfig(operationsCommand),
-                        service + " has been reinstalled successfuly on " + address + ".");
+                        serviceName + " has been reinstalled successfuly on " + address + ".");
             }
         } catch (SetupException | SystemException | MarathonException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);

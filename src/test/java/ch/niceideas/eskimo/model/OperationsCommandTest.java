@@ -92,7 +92,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
         assertEquals(1, oc.getRestarts().size());
         assertEquals("zeppelin", oc.getRestarts().get(0).getKey());
-        assertEquals("192.168.10.13", oc.getRestarts().get(0).getValue());
+        assertEquals("(marathon)", oc.getRestarts().get(0).getValue());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
         assertEquals(1, oc.getRestarts().size());
         assertEquals("zeppelin", oc.getRestarts().get(0).getKey());
-        assertEquals("192.168.10.13", oc.getRestarts().get(0).getValue());
+        assertEquals("(marathon)", oc.getRestarts().get(0).getValue());
     }
 
     @Test
@@ -149,29 +149,30 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(13, oc.getRestarts().size());
+        assertEquals(14, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=192.168.10.11, " +
+                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
-                "spark-history-server=192.168.10.13, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
+                "marathon=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
     }
 
     @Test
     public void testMoveServices() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<String, Object>() {{
-                put ("cerebro_installed_on_IP_192-168-10-11", "OK");
+                put ("cerebro_installed_on_IP_MARATHON_NODE", "OK");
                 put ("elasticsearch_installed_on_IP_192-168-10-11", "OK");
                 put ("logstash_installed_on_IP_192-168-10-11", "OK");
         }});
@@ -181,26 +182,21 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 put ("action_id2", "192.168.10.13");
                 put ("logstash2", "on");
                 put ("elasticsearch2", "on");
-                put ("cerebro", "2");
         }} );
 
         OperationsCommand oc = OperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
 
-        assertEquals(3, oc.getInstallations().size());
+        assertEquals(2, oc.getInstallations().size());
         assertEquals("elasticsearch", oc.getInstallations().get(0).getKey());
         assertEquals("192.168.10.13", oc.getInstallations().get(0).getValue());
-        assertEquals("cerebro", oc.getInstallations().get(1).getKey());
+        assertEquals("logstash", oc.getInstallations().get(1).getKey());
         assertEquals("192.168.10.13", oc.getInstallations().get(1).getValue());
-        assertEquals("logstash", oc.getInstallations().get(2).getKey());
-        assertEquals("192.168.10.13", oc.getInstallations().get(2).getValue());
 
-        assertEquals(3, oc.getUninstallations().size());
-        assertEquals("cerebro", oc.getUninstallations().get(0).getKey());
+        assertEquals(2, oc.getUninstallations().size());
+        assertEquals("elasticsearch", oc.getUninstallations().get(0).getKey());
         assertEquals("192.168.10.11", oc.getUninstallations().get(0).getValue());
-        assertEquals("elasticsearch", oc.getUninstallations().get(1).getKey());
+        assertEquals("logstash", oc.getUninstallations().get(1).getKey());
         assertEquals("192.168.10.11", oc.getUninstallations().get(1).getValue());
-        assertEquals("logstash", oc.getUninstallations().get(2).getKey());
-        assertEquals("192.168.10.11", oc.getUninstallations().get(2).getValue());
 
     }
 
@@ -288,22 +284,23 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(13, oc.getRestarts().size());
+        assertEquals(14, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=192.168.10.11, " +
+                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
-                "spark-history-server=192.168.10.13, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
+                "marathon=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
 
         // node vanished
         // uninstallation fails in the middle (after zookeeper)
@@ -344,17 +341,17 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "elasticsearch=192.168.10.11, " +
                 "elasticsearch=192.168.10.13, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=192.168.10.11, " +
+                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
-                "spark-history-server=192.168.10.13, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
+                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc2.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc2.getRestarts().toArray()));
     }
 
     @Test
@@ -391,22 +388,23 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(13, oc.getRestarts().size());
+        assertEquals(14, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=192.168.10.11, " +
+                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
-                "spark-history-server=192.168.10.13, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
+                "marathon=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
 
         // node vanished
         // uninstallation fails in the middle (after zookeeper)
@@ -442,23 +440,23 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "elasticsearch=192.168.10.13, " +
-                "cerebro=192.168.10.11, " +
+                "cerebro=(marathon), " +
                 "mesos-master=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=192.168.10.11, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "mesos-agent=192.168.10.13, " +
-                "spark-history-server=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc2.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc2.getRestarts().toArray()));
     }
 
 
     @Test
-    public void testRecoverUninstallationWhenNodeDownMiddéleRestart() throws Exception {
+    public void testRecoverUninstallationWhenNodeDownMiddleRestart() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
         savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
@@ -491,22 +489,23 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(13, oc.getRestarts().size());
+        assertEquals(14, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=192.168.10.11, " +
+                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
-                "spark-history-server=192.168.10.13, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
+                "marathon=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
 
         // node vanished
         // uninstallation fails in the middle (after zookeeper)
@@ -547,14 +546,14 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals(8, oc2.getRestarts().size());
 
         assertEquals ("[" +
-                "kibana=192.168.10.11, " +
+                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=192.168.10.11, " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "mesos-agent=192.168.10.13, " +
-                "spark-history-server=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
-                "zeppelin=192.168.10.13]", Arrays.toString(oc2.getRestarts().toArray()));
+                "zeppelin=(marathon)]", Arrays.toString(oc2.getRestarts().toArray()));
     }
 
 

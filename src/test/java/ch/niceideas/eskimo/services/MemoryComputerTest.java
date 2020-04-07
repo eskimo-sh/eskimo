@@ -117,13 +117,11 @@ public class MemoryComputerTest {
 
         Map<String, Long> memmModel3 = res.get("192.168.10.13");
         assertNotNull(memmModel3);
-        assertEquals(5, memmModel3.size());
+        assertEquals(3, memmModel3.size());
 
-        assertEquals(Long.valueOf(241), memmModel3.get("zeppelin"));
-        assertEquals(Long.valueOf(723), memmModel3.get("elasticsearch"));
-        assertEquals(Long.valueOf(482), memmModel3.get("kafka"));
-        assertEquals(Long.valueOf(723), memmModel3.get("spark-executor"));
-        assertEquals(Long.valueOf(241), memmModel3.get("kibana"));
+        assertEquals(Long.valueOf(867), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(578), memmModel3.get("kafka"));
+        assertEquals(Long.valueOf(867), memmModel3.get("spark-executor"));
 
     }
 

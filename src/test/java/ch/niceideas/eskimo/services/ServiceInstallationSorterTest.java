@@ -81,26 +81,28 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         assertNotNull(orderedInstall);
 
-        assertEquals(13, orderedInstall.size());
+        assertEquals(10, orderedInstall.size());
 
         // Test first, third and last group
         List<Pair<String, String>> group1 = orderedInstall.get(0);
         assertEquals(2, group1.size());
-        assertEquals("zookeeper", group1.get(0).getKey());
-        assertEquals("192.168.10.13", group1.get(0).getValue());
-        assertEquals("ntp", group1.get(1).getKey());
-        assertEquals("192.168.10.11", group1.get(1).getValue());
+        assertEquals("elasticsearch", group1.get(0).getKey());
+        assertEquals("192.168.10.11", group1.get(0).getValue());
+        assertEquals("elasticsearch", group1.get(1).getKey());
+        assertEquals("192.168.10.13", group1.get(1).getValue());
 
-        List<Pair<String, String>> group3 = orderedInstall.get(2);
+        List<Pair<String, String>> group3 = orderedInstall.get(3);
         assertEquals(2, group3.size());
         assertEquals("gluster", group3.get(0).getKey());
         assertEquals("192.168.10.11", group3.get(0).getValue());
         assertEquals("gluster", group3.get(1).getKey());
 
-        List<Pair<String, String>> group13 = orderedInstall.get(12);
-        assertEquals(1, group13.size());
-        assertEquals("zeppelin", group13.get(0).getKey());
-        assertEquals("192.168.10.13", group13.get(0).getValue());
+        List<Pair<String, String>> group9 = orderedInstall.get(9);
+        assertEquals(2, group9.size());
+        assertEquals("spark-executor", group9.get(0).getKey());
+        assertEquals("192.168.10.11", group9.get(0).getValue());
+        assertEquals("spark-executor", group9.get(1).getKey());
+        assertEquals("192.168.10.13", group9.get(1).getValue());
 
 
     }
