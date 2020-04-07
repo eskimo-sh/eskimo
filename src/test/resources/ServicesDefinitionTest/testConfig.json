@@ -2,11 +2,9 @@
   "action_id1": "192.168.10.11",
   "action_id2": "192.168.10.12",
   "action_id3": "192.168.10.13",
-  "cerebro": "2",
   "elasticsearch1": "on",
   "elasticsearch2": "on",
   "elasticsearch3": "on",
-  "gdash": "2",
   "gluster1": "on",
   "gluster2": "on",
   "kafka1": "on",
@@ -15,7 +13,6 @@
   "ntp1": "on",
   "ntp2": "on",
   "ntp3": "on",
-  "kibana": "3",
   "logstash1": "on",
   "logstash2": "on",
   "mesos-agent1": "on",
@@ -25,7 +22,5 @@
   "spark-executor1": "on",
   "spark-executor2": "on",
   "spark-executor3": "on",
-  "spark-history-server": "1",
-  "zeppelin": "3",
   "zookeeper": "1"
 }

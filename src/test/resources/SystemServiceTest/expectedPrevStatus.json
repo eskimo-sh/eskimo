@@ -10,6 +10,7 @@
     "kibana_installed_on_IP_192-168-10-11": "OK",
     "logstash_installed_on_IP_192-168-10-11": "OK",
     "logstash_installed_on_IP_192-168-10-13": "OK",
+    "marathon_installed_on_IP_192-168-10-11": "OK",
     "mesos-agent_installed_on_IP_192-168-10-11": "OK",
     "mesos-agent_installed_on_IP_192-168-10-13": "OK",
     "mesos-master_installed_on_IP_192-168-10-13": "OK",

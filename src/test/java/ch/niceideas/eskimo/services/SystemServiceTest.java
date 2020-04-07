@@ -141,7 +141,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         int nodeNbr = 1;
         String ipAddress = "192.168.10.11";
 
-        Pair<String, String> nbrAndPair = new Pair<>(""+nodeNbr, ipAddress);
+        Pair<String, String> nodeNumnberAndIpAddress = new Pair<>(""+nodeNbr, ipAddress);
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
@@ -167,11 +167,11 @@ public class SystemServiceTest extends AbstractSystemTest {
         });
 
 
-        systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
+        systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
-        assertEquals(9, statusMap.size());
+        assertEquals(8, statusMap.size());
 
-        assertEquals("NA", statusMap.get("service_kafka-manager_192-168-10-11"));
+        assertEquals(null, statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_spark-executor_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
@@ -220,9 +220,9 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
 
-        assertEquals(9, statusMap.size());
+        assertEquals(8, statusMap.size());
 
-        assertEquals("NA", statusMap.get("service_kafka-manager_192-168-10-11"));
+        assertEquals(null, statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
         assertEquals("restart", statusMap.get("service_spark-executor_192-168-10-11"));
         assertEquals("restart", statusMap.get("service_gluster_192-168-10-11"));
@@ -421,12 +421,12 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // everything has been removed, including kafka and elasticsearch
         assertTrue(new JSONObject("{\n" +
-                "    \"cerebro_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"elasticsearch_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kafka-manager_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kafka-manager_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"kafka_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kibana_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kibana_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"logstash_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
@@ -571,5 +571,15 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // no processing anymore
         assertFalse(systemService.isInterrupted());
+    }
+
+    @Test
+    public void testFetchStatusWithMarathon() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testNeedToRestartMarathonServiceFollowingNodeInstallation() {
+        fail ("To Be Implemented");
     }
 }

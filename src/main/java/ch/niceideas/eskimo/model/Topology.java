@@ -115,10 +115,13 @@ public class Topology {
             }
 
             // Define master for marathon services
-            if (currentNodeIpAddress != null) {
+            if (currentNodeIpAddress != null && marathonConfig != null) {
                 for (String key : marathonConfig.getEnabledServices()) {
 
                     Service service = servicesDefinition.getService(key);
+                    if (service == null) {
+                        throw new NodesConfigurationException("Could not find any service definition matching " + key);
+                    }
 
                     int currentNodeNumber = nodesConfig.getNodeNumber(currentNodeIpAddress);
 
@@ -263,7 +266,10 @@ public class Topology {
                 break;
 
             case RANDOM_NODE_AFTER:
-                if ( dep.getNumberOfMasters() > 1) {
+                if (service.isMarathon()) {
+                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services");
+                }
+                if (dep.getNumberOfMasters() > 1) {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
                 }
 
@@ -277,7 +283,7 @@ public class Topology {
             case SAME_NODE:
             default:
                 if (service.isMarathon()) {
-                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a SAME_NODE dependency wich ois not supported for marathon services");
+                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a SAME_NODE dependency which is not supported for marathon services");
                 }
                 // do nothing here. WIll be enforced by checker.
                 break;

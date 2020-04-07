@@ -34,10 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
-import ch.niceideas.eskimo.services.NodeRangeResolver;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.*;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -45,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -68,7 +66,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
     }
 
     private MarathonServicesConfigWrapper createStandardMarathonConfig() {
-        throw new UnsupportedOperationException("To Be Implemented");
+        return new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            put("service_d_install", "on");
+        }});
     }
 
     NodesConfigWrapper createStandardNodesConfig() {
@@ -108,9 +108,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         NodesConfigWrapper nodesConfig = createStandardNodesConfig();
         nodesConfig.setValueForPath("service_b", "1");
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
@@ -124,9 +122,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         NodesConfigWrapper nodesConfig = createStandardNodesConfig();
         nodesConfig.setValueForPath("service_b", "1");
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<String>(){{ add("192.168.10.13"); }}, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<String>(){{ add("192.168.10.13"); }}, def, null, "192.168.10.11");
 
         assertEquals ("export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
@@ -182,9 +178,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c3", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
@@ -213,7 +207,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
@@ -248,9 +242,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("gluster3", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.14\n" +
@@ -274,9 +266,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c3", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<String>(){{ add("192.168.10.13"); }}, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<String>(){{ add("192.168.10.13"); }}, def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1921681012=192.168.10.11\n" +
@@ -297,9 +287,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_b3", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("", topology.getTopologyScript());
     }
@@ -319,9 +307,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c3", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -376,9 +362,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_c1", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -417,9 +401,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_b1", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -465,6 +447,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_C_1=192.168.10.12\n" +
                 "\n" +
                 "#Additional Environment\n" +
                 "export ALL_NODES_LIST_service_a=192.168.10.11,192.168.10.12,192.168.10.15\n" +
@@ -474,6 +457,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
 
         assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_C_1=192.168.10.12\n" +
                 "\n" +
                 "#Additional Environment\n" +
                 "export ALL_NODES_LIST_service_b=192.168.10.11,192.168.10.12,192.168.10.14\n" +
@@ -559,5 +543,111 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
                 "export SELF_NODE_NUMBER=3\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+    }
+
+    @Test
+    public void testMarathonServiceUnsupportedDependencies() throws Exception {
+
+        Service serviceA = new Service();
+        serviceA.setName("service_a");
+        Dependency depA = new Dependency();
+        depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
+        depA.setMasterService("service_b");
+        depA.setNumberOfMasters(1);
+        serviceA.addDependency (depA);
+        def.addService(serviceA);
+
+        Service serviceB = new Service();
+        serviceB.setName("service_b");
+        def.addService(serviceB);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.SAME_NODE);
+        depD.setMasterService("service_b");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("action_id2", "192.168.10.12");
+            put("service_a2", "on");
+            put("action_id3", "192.168.10.13");
+        }});
+
+        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
+
+        ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class, () -> {
+            Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        });
+
+        assertEquals("Service service_d defines a SAME_NODE dependency which is not supported for marathon services", exception.getMessage());
+
+        depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
+
+        exception = assertThrows(ServiceDefinitionException.class, () -> {
+            Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        });
+
+        assertEquals("Service service_d defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services", exception.getMessage());
+    }
+
+    @Test
+    public void testMarathonServiceDependencies() throws Exception {
+
+        initRandomDependenciesFewer();
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("service_c1", "on");
+            put("action_id2", "192.168.10.12");
+            put("action_id3", "192.168.10.13");
+            put("service_c3", "on");
+            put("action_id4", "192.168.10.14");
+            put("service_c4", "on");
+        }});
+
+        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
+
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+
+        assertEquals ("export MASTER_SERVICE_C_1=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
+    }
+
+
+    @Test
+    public void testConsolidatedServiceDependencies() throws Exception {
+
+        initRandomDependencies();
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("service_b1", "on");
+            put("service_c1", "on");
+            put("action_id2", "192.168.10.12");
+            put("service_b2", "on");
+            put("action_id3", "192.168.10.13");
+            put("service_b3", "on");
+            put("service_c3", "on");
+            put("action_id4", "192.168.10.14");
+            put("service_b4", "on");
+            put("service_c4", "on");
+        }});
+
+        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
+
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+
+        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_1=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
     }
 }

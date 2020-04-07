@@ -166,7 +166,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "RANDOM",
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true

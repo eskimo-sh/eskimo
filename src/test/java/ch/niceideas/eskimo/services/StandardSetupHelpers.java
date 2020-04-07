@@ -46,9 +46,9 @@ public class StandardSetupHelpers {
     public static NodesConfigWrapper getStandard2NodesSetup() {
         return new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("action_id1", "192.168.10.11");
-            put("cerebro", "1");
-            put("kafka-manager", "1");
-            put("kibana", "1");
+            //put("cerebro", "1");
+            //put("kafka-manager", "1");
+            //put("kibana", "1");
             put("elasticsearch1", "on");
             put("gluster1", "on");
             put("kafka1", "on");
@@ -59,8 +59,8 @@ public class StandardSetupHelpers {
             put("action_id2", "192.168.10.13");
             put("gdash", "2");
             put("mesos-master", "2");
-            put("spark-history-server", "2");
-            put("zeppelin", "2");
+            //put("spark-history-server", "2");
+            //put("zeppelin", "2");
             put("zookeeper", "2");
             put("elasticsearch2", "on");
             put("gluster2", "on");
@@ -74,16 +74,16 @@ public class StandardSetupHelpers {
 
     public static ServicesInstallStatusWrapper getStandard2NodesStatus() {
         return new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
-            put("cerebro_installed_on_IP_192-168-10-11", "OK");
+            put("cerebro_installed_on_IP_MARATHON_NODE", "OK");
             put("elasticsearch_installed_on_IP_192-168-10-11", "OK");
             put("elasticsearch_installed_on_IP_192-168-10-13", "OK");
-            put("gdash_installed_on_IP_192-168-10-13", "OK");
+            put("gdash_installed_on_IP_MARATHON_NODE", "OK");
             put("gluster_installed_on_IP_192-168-10-11", "OK");
             put("gluster_installed_on_IP_192-168-10-13", "OK");
-            put("kafka-manager_installed_on_IP_192-168-10-11", "OK");
+            put("kafka-manager_installed_on_IP_MARATHON_NODE", "OK");
             put("kafka_installed_on_IP_192-168-10-11", "OK");
             put("kafka_installed_on_IP_192-168-10-13", "OK");
-            put("kibana_installed_on_IP_192-168-10-11", "OK");
+            put("kibana_installed_on_IP_MARATHON_NODE", "OK");
             put("logstash_installed_on_IP_192-168-10-11", "OK");
             put("logstash_installed_on_IP_192-168-10-13", "OK");
             put("mesos-agent_installed_on_IP_192-168-10-11", "OK");
@@ -93,8 +93,8 @@ public class StandardSetupHelpers {
             put("ntp_installed_on_IP_192-168-10-13", "OK");
             put("spark-executor_installed_on_IP_192-168-10-11", "OK");
             put("spark-executor_installed_on_IP_192-168-10-13", "OK");
-            put("spark-history-server_installed_on_IP_192-168-10-13", "OK");
-            put("zeppelin_installed_on_IP_192-168-10-13", "OK");
+            put("spark-history-server_installed_on_IP_MARATHON_NODE", "OK");
+            put("zeppelin_installed_on_IP_MARATHON_NODE", "OK");
             put("zookeeper_installed_on_IP_192-168-10-13", "OK");
         }});
     }
@@ -113,6 +113,7 @@ public class StandardSetupHelpers {
             put("service_gdash_192-168-10-13", "OK");
             put("service_gluster_192-168-10-11", "OK");
             put("service_gluster_192-168-10-13", "OK");
+            put("service_marathon_192-168-10-11", "OK");
             put("service_kafka_192-168-10-11", "OK");
             put("service_kafka_192-168-10-13", "OK");
             put("service_kafka-manager_192-168-10-11", "OK");

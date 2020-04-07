@@ -90,6 +90,27 @@ public class MarathonService {
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setSshCommandService(SSHCommandService sshCommandService) {
+        this.sshCommandService = sshCommandService;
+    }
+    void setSystemOperationService(SystemOperationService systemOperationService) {
+        this.systemOperationService = systemOperationService;
+    }
+    void setProxyManagerService(ProxyManagerService proxyManagerService) {
+        this.proxyManagerService = proxyManagerService;
+    }
+    void setMemoryComputer(MemoryComputer memoryComputer) {
+        this.memoryComputer = memoryComputer;
+    }
+    void setMessagingService(MessagingService messagingService) {
+        this.messagingService = messagingService;
+    }
+    void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     public MarathonService() {
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
@@ -527,13 +548,19 @@ public class MarathonService {
         return false;
     }
 
-    public String showJournalMarathon(Service service) throws MarathonException{
-        StringBuilder log = new StringBuilder();
-        log.append("(Showing journal is not supported for marathon)");
-        return log.toString();
+    public void showJournalMarathon(Service service) throws MarathonException, SSHCommandException {
+        systemService.applyServiceOperation(service.getName(), "marathon node", "Showing journal", () -> {
+            StringBuilder log = new StringBuilder();
+            log.append("(Showing journal is not supported for marathon)");
+            return log.toString();
+        });
     }
 
-    public String startServiceMarathon(Service service) throws MarathonException {
+    public void startServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+        systemService.applyServiceOperation(service.getName(), "marathon node", "Starting", () -> startServiceMarathonInternal(service));
+    }
+
+    String startServiceMarathonInternal(Service service) throws MarathonException {
         try {
             StringBuilder log = new StringBuilder();
 
@@ -577,7 +604,11 @@ public class MarathonService {
         }
     }
 
-    public String stopServiceMarathon(Service service) throws MarathonException {
+    public void  stopServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+        systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> stopServiceMarathonInternal(service));
+    }
+
+    String stopServiceMarathonInternal(Service service) throws MarathonException {
 
         StringBuilder log = new StringBuilder();
 
@@ -596,12 +627,43 @@ public class MarathonService {
         return log.toString();
     }
 
-    public String restartServiceMarathon(Service service) throws MarathonException {
+    public void restartServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+        systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> {
+            return restartServiceMarathonInternal(service);
+        });
+    }
+
+    String restartServiceMarathonInternal(Service service) throws MarathonException {
         StringBuilder log = new StringBuilder();
 
-        log.append(stopServiceMarathon(service));
+        log.append(stopServiceMarathonInternal(service));
+
+        try {
+            for (int i = 0; i < 100; i++) { // 100 attemots
+                Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service.getName());
+
+                String nodeIp = nodeNameAndStatus.getKey();
+
+                boolean installed = StringUtils.isNotBlank(nodeIp);
+                boolean running = nodeNameAndStatus.getValue().equals("running");
+                if (!running) {
+                    break;
+                }
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    logger.debug(e.getMessage());
+                }
+            }
+        } catch (SetupException | FileException e) {
+            logger.error (e, e);
+            throw new MarathonException(e);
+        }
+
+
         log.append("\n");
-        log.append(startServiceMarathon(service));
+        log.append(startServiceMarathonInternal(service));
 
         return log.toString();
     }

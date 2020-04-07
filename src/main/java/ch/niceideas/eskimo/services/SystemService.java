@@ -182,6 +182,9 @@ public class SystemService {
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    void setMarathonService (MarathonService marathonService) {
+        this.marathonService = marathonService;
+    }
 
 
     public boolean isProcessingPending() {
@@ -229,7 +232,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Showing journal of", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonService.showJournalMarathon(service);
+                throw new UnsupportedOperationException("Showing marathon service journal for " + serviceName + " should not happen from here.");
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + serviceName);
             }
@@ -240,7 +243,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Starting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonService.startServiceMarathon(service);
+                throw new UnsupportedOperationException("Starting marathon service " + serviceName + " should not happen from here.");
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + serviceName);
             }
@@ -251,7 +254,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonService.stopServiceMarathon(service);
+                throw new UnsupportedOperationException("Stopping marathon service " + serviceName + " should not happen from here.");
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + serviceName);
             }
@@ -259,9 +262,10 @@ public class SystemService {
     }
 
     public void restartService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
-        applyServiceOperation(serviceName, ipAddress, "Restarting", () -> {Service service = servicesDefinition.getService(serviceName);
+        applyServiceOperation(serviceName, ipAddress, "Restarting", () -> {
+            Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                return marathonService.restartServiceMarathon(service);
+                throw new UnsupportedOperationException("Restarting marathon service " + serviceName + " should not happen from here.");
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + serviceName);
             }
@@ -658,7 +662,7 @@ public class SystemService {
             systemOperationService.applySystemOperation("Restart of " + service + " on marathon node ",
                     builder -> {
                         try {
-                            builder.append(marathonService.restartServiceMarathon(servicesDefinition.getService(service)));
+                            builder.append(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(service)));
                         } catch (MarathonException e) {
                             logger.error (e, e);
                             throw new SystemException (e);

@@ -35,9 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
@@ -62,6 +60,9 @@ public class SystemAdminController {
 
     @Autowired
     private SystemService systemService;
+
+    @Autowired
+    private MarathonService marathonService;
 
     @Resource
     private MessagingService messagingService;
@@ -112,7 +113,24 @@ public class SystemAdminController {
         }
     }
 
-    private String performOperation(Operation operation, String message) {
+    private String performMarathonOperation(MarathonOperation operation, String message) {
+
+        try {
+            operation.performOperation(marathonService);
+
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("messages", message);
+            }}).toString(2);
+
+        } catch (JSONException | ServiceDefinitionException | SSHCommandException | SystemException | MarathonException e) {
+            logger.error(e, e);
+            return ErrorStatusHelper.createErrorStatus(e);
+
+        }
+    }
+
+    private String performSystemOperation(SystemOperation operation, String message) {
 
         try {
             operation.performOperation(systemService);
@@ -132,44 +150,76 @@ public class SystemAdminController {
     @GetMapping("/show-journal")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String showJournal(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-        return performOperation(
-                sysService -> sysService.showJournal(service, address),
-                service + " journal display from " + address  + ".");
+    public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+        Service service = servicesDefinition.getService(serviceName);
+        if (service.isMarathon()) {
+            return performMarathonOperation(
+                    marathonService -> marathonService.showJournalMarathon(service),
+                    service + " has been restarted successfuly on marathon.");
+
+        } else {
+            return performSystemOperation(
+                    sysService -> sysService.showJournal(serviceName, address),
+                    service + " journal display from " + address + ".");
+        }
 
     }
 
     @GetMapping("/start-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String startService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-        return performOperation(
-                sysService -> sysService.startService(service, address),
-                service + " has been started successfuly on " + address  + ".");
+    public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+        Service service = servicesDefinition.getService(serviceName);
+        if (service.isMarathon()) {
+            return performMarathonOperation(
+                    marathonService -> marathonService.startServiceMarathon(service),
+                    service + " has been restarted successfuly on marathon.");
+
+        } else {
+            return performSystemOperation(
+                    sysService -> sysService.startService(serviceName, address),
+                    service + " has been started successfuly on " + address + ".");
+        }
     }
 
     @GetMapping("/stop-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String stopService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-        return performOperation(
-                sysService -> sysService.stopService(service, address),
-                service + " has been stopped successfuly on " + address  + ".");
+    public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+        Service service = servicesDefinition.getService(serviceName);
+        if (service.isMarathon()) {
+            return performMarathonOperation(
+                    marathonService -> marathonService.stopServiceMarathon(service),
+                    service + " has been restarted successfuly on marathon.");
+
+        } else {
+            return performSystemOperation(
+                    sysService -> sysService.stopService(serviceName, address),
+                    service + " has been stopped successfuly on " + address + ".");
+        }
     }
 
     @GetMapping("/restart-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String restartService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
-        return performOperation(
-                sysService -> sysService.restartService(service, address),
-                service + " has been restarted successfuly on " + address  + ".");
+    public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+        Service service = servicesDefinition.getService(serviceName);
+        if (service.isMarathon()) {
+            return performMarathonOperation(
+                    marathonService -> marathonService.restartServiceMarathon(service),
+                    service + " has been restarted successfuly on marathon.");
+
+        } else {
+            return performSystemOperation(
+                    sysService -> sysService.restartService(serviceName, address),
+                    service + " has been restarted successfuly on " + address + ".");
+        }
     }
 
     @GetMapping("/reinstall-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String reinstallService(@RequestParam(name="service") String service, @RequestParam(name="address") String address) {
+    public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
 
         try {
 
@@ -180,31 +230,54 @@ public class SystemAdminController {
                 }}).toString(2);
             }
 
-            String nodeName = address.replaceAll("\\.", "-");
+            Service service = servicesDefinition.getService(serviceName);
+
+            String nodeName = null;
+            if (service.isMarathon()) {
+                nodeName = MarathonService.MARATHON_NODE;
+            } else {
+                nodeName = address.replaceAll("\\.", "-");
+            }
 
             ServicesInstallStatusWrapper formerServicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = ServicesInstallStatusWrapper.empty();
 
-            for (String is : formerServicesInstallationStatus.getAllInstallStatusesExceptServiceOnNode(service, nodeName)) {
+            for (String is : formerServicesInstallationStatus.getAllInstallStatusesExceptServiceOnNode(serviceName, nodeName)) {
                 newServicesInstallationStatus.setValueForPath(is, formerServicesInstallationStatus.getValueForPath(is));
             }
 
             configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
 
-            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
-            if (nodesConfig == null || nodesConfig.isEmpty()) {
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+            if (service.isMarathon()) {
+
+                MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
+                if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
+                    return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                }
+
+                MarathonOperationsCommand operationsCommand = MarathonOperationsCommand.create(
+                        servicesDefinition, newServicesInstallationStatus, marathonServicesConfig);
+
+                return performMarathonOperation(
+                        marathonService -> marathonService.applyMarathonServicesConfig(operationsCommand),
+                        service + " has been reinstalled successfuly on marathon.");
+
+            } else {
+
+                NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
+                if (nodesConfig == null || nodesConfig.isEmpty()) {
+                    return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                }
+
+                OperationsCommand operationsCommand = OperationsCommand.create(
+                        servicesDefinition, nodeRangeResolver, newServicesInstallationStatus, nodesConfig);
+
+                return performSystemOperation(
+                        sysService -> sysService.applyNodesConfig(operationsCommand),
+                        service + " has been reinstalled successfuly on " + address + ".");
             }
-
-            OperationsCommand operationsCommand = OperationsCommand.create (
-                    servicesDefinition, nodeRangeResolver, newServicesInstallationStatus, nodesConfig);
-
-            return performOperation(
-                    sysService -> sysService.applyNodesConfig (operationsCommand),
-                    service + " has been reinstalled successfuly on " + address  + ".");
-
-        } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
+        } catch (SetupException | SystemException | MarathonException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
@@ -212,9 +285,12 @@ public class SystemAdminController {
         }
     }
 
-    private interface Operation {
-
+    private interface SystemOperation {
         void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException, MarathonException;
+    }
+
+    private interface MarathonOperation {
+        void performOperation (MarathonService marathonService) throws ServiceDefinitionException, SSHCommandException, SystemException, MarathonException;
     }
 
 }

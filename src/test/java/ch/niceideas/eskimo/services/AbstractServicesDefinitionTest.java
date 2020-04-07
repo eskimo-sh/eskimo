@@ -79,6 +79,17 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceC = new Service();
         serviceC.setName("service_c");
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.FIRST_NODE);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
     }
 
     public void initSameNodeOrRandomDependencies() throws Exception {
@@ -104,6 +115,17 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceC = new Service();
         serviceC.setName("service_c");
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.FIRST_NODE);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
     }
 
     public void initRandomDependencies() throws Exception {
@@ -129,6 +151,48 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceC = new Service();
         serviceC.setName("service_c");
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.FIRST_NODE);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(2);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
+    }
+
+    public void initRandomDependenciesFewer() throws Exception {
+
+        Service serviceA = new Service();
+        serviceA.setName("service_a");
+        def.addService(serviceA);
+
+        Service serviceB = new Service();
+        serviceB.setName("service_b");
+        Dependency depB = new Dependency();
+        depB.setMes(MasterElectionStrategy.RANDOM);
+        depB.setMasterService("service_c");
+        depB.setNumberOfMasters(2);
+        serviceB.addDependency (depB);
+        def.addService(serviceB);
+
+        Service serviceC = new Service();
+        serviceC.setName("service_c");
+        def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.FIRST_NODE);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(2);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
     }
 
     public void initRandomNodeAfterDependencies() throws Exception {
@@ -154,6 +218,17 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceC = new Service();
         serviceC.setName("service_c");
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.RANDOM);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
     }
 
     public void initAdditionalEnvironment() throws Exception {
@@ -171,6 +246,11 @@ public abstract class AbstractServicesDefinitionTest {
         serviceC.setName("service_c");
         serviceC.addAdditionalEnvironment("SERVICE_NUMBER_1_BASED");
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+        serviceD.setMarathon(true);
+        def.addService(serviceD);
     }
 
     public void initAdditionalNodeList() throws Exception {
@@ -191,6 +271,17 @@ public abstract class AbstractServicesDefinitionTest {
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
         serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLECTABLE);
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.FIRST_NODE);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
     }
 
 
@@ -213,5 +304,16 @@ public abstract class AbstractServicesDefinitionTest {
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
         serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLECTABLE);
         def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.FIRST_NODE);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
     }
 }

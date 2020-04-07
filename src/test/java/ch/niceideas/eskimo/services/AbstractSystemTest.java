@@ -75,6 +75,8 @@ public abstract class AbstractSystemTest {
 
     protected ConfigurationService configurationService = null;
 
+    protected MarathonService marathonService = null;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
@@ -187,6 +189,24 @@ public abstract class AbstractSystemTest {
         servicesConfigService.setServicesDefinition(servicesDefinition);
 
         systemService.setServicesConfigService(servicesConfigService);
+
+        marathonService = new MarathonService() {
+            @Override
+            protected String queryMarathon (String endpoint, String method) throws MarathonException {
+                return "{}";
+            }
+        };
+        marathonService.setServicesDefinition(servicesDefinition);
+        marathonService.setConfigurationService (configurationService);
+        marathonService.setSystemService(systemService);
+        marathonService.setSshCommandService(sshCommandService);
+        marathonService.setSystemOperationService(systemOperationService);
+        marathonService.setProxyManagerService(proxyManagerService);
+        marathonService.setMemoryComputer(memoryComputer);
+        marathonService.setMessagingService(messagingService);
+        marathonService.setNotificationService(notificationService);
+
+        systemService.setMarathonService(marathonService);
     }
 
     protected ConfigurationService createConfigurationService() {
