@@ -59,8 +59,16 @@ if [[ $kafka_user_id == "" ]]; then
     exit -2
 fi
 
+echo " - Enabling kafka user to create kafka directories and chown them"
+echo "spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp" >> /etc/sudoers.d/spark
 
-echo " - Chaning owber of /var/run/kafka-manager/"
+echo "kafka  ALL = NOPASSWD: /bin/mkdir -p /var/run/kafka/kafka-manager" >> /etc/sudoers.d/kafka
+echo "kafka  ALL = NOPASSWD: /bin/chown kafka /var/run/kafka/kafka-manager" >> /etc/sudoers.d/kafka
+echo "kafka  ALL = NOPASSWD: /bin/mkdir -p /var/log/kafka/kafka-manager" >> /etc/sudoers.d/kafka
+echo "kafka  ALL = NOPASSWD: /bin/chown kafka /var/log/kafka/kafka-manager" >> /etc/sudoers.d/kafka
+
+
+echo " - Chaning owner of /var/run/kafka-manager/"
 sudo mkdir -p /var/run/kafka/kafka-manager
 sudo chown -R kafka /var/run/kafka/kafka-manager
 

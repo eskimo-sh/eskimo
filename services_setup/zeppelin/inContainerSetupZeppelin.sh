@@ -53,6 +53,10 @@ chown -R spark /usr/local/lib/zeppelin/conf/
 chown -R spark /usr/local/lib/zeppelin/interpreter/
 chown spark /usr/local/lib/zeppelin/
 
+echo " - Enabling spark user to create /var/run/spark/zeppelin and chown it"
+echo "spark  ALL = NOPASSWD: /bin/mkdir -p /var/run/spark/zeppelin" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/chown spark /var/run/spark/zeppelin" >> /etc/sudoers.d/spark
+
 # zeppelin is not mounting /var/lib/spark from host but gluster shares inside
 # still need to be able to manipulate that directory !
 chown spark /var/lib/spark

@@ -74,7 +74,6 @@ docker run \
         -v $PWD/../common:/common \
         -v /var/log/kafka:/var/log/kafka \
         -v /var/lib/kafka:/var/lib/kafka \
-        -v /var/run/kafka:/var/run/kafka \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -e NODE_NAME=$HOSTNAME \
         -p 22000:22000 \

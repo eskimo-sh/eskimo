@@ -213,7 +213,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         oc.addUninstallation("kibana", "192.168.10.13");
         oc.addUninstallation("logstash", "192.168.10.13");
 
-        oc.addRestart("zeppelin", "192.168.10.13");
+        oc.addRestartIfNotInstalled("zeppelin", "192.168.10.13");
 
         assertTrue(new JSONObject("{\n" +
                 "  \"installations\": [\n" +

@@ -39,11 +39,6 @@
         "mode": "RW"
       },
       {
-        "containerPath": "/var/run/spark/",
-        "hostPath": "/var/run/spark",
-        "mode": "RW"
-      },
-      {
         "hostPath": "/etc/eskimo_topology.sh",
         "containerPath": "/etc/eskimo_topology.sh",
         "mode": "RO"

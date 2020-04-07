@@ -147,12 +147,14 @@ public class OperationsCommand implements Serializable {
 
                     String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
 
-                    retCommand.addRestart(restartedService, ipAddress);
+                    retCommand.addRestartIfNotInstalled(restartedService, ipAddress);
                 }
 
             } else {
 
-                retCommand.addRestart(restartedService, MARATHON_FLAG);
+                if (servicesInstallStatus.isServiceInstalled(restartedService)) {
+                    retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
+                }
             }
 
             //Need to restart marathon services as well !
@@ -176,7 +178,7 @@ public class OperationsCommand implements Serializable {
 
                 String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
 
-                retCommand.addRestart(restartedService, ipAddress);
+                retCommand.addRestartIfNotInstalled(restartedService, ipAddress);
             }
         }
 
@@ -200,7 +202,7 @@ public class OperationsCommand implements Serializable {
         uninstallations.add(new SerializablePair<>(service, ipAddress));
     }
 
-    void addRestart(String service, String ipAddress) {
+    void addRestartIfNotInstalled(String service, String ipAddress) {
         SerializablePair<String, String> addedPair = new SerializablePair<>(service, ipAddress);
         if (!installations.contains(addedPair)) {
             restarts.add(addedPair);

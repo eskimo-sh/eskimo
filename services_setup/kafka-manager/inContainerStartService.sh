@@ -46,8 +46,11 @@ echo " - Deleting previous PID"
 rm -Rf /var/run/kafka-manager/kafka-manager.pid
 
 echo " - Creating required directories (as kafka)"
-mkdir -p /var/run/kafka/kafka-manager/
-mkdir -p /var/log/kafka/kafka-manager
+sudo /bin/mkdir -p /var/run/kafka/kafka-manager
+sudo /bin/chown kafka /var/run/kafka/kafka-manager
+sudo /bin/mkdir -p /var/log/kafka/kafka-manager
+sudo /bin/chown kafka /var/log/kafka/kafka-manager
+
 
 echo " - Starting service"
 /usr/local/lib/kafka-manager/bin/kafka-manager \

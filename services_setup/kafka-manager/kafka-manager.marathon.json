@@ -31,11 +31,6 @@
         "mode": "RW"
       },
       {
-        "hostPath": "/var/run/kafka",
-        "containerPath": "/var/run/kafka",
-        "mode": "RW"
-      },
-      {
         "hostPath": "/var/lib/kafka",
         "containerPath": "/var/lib/kafka",
         "mode": "RW"
