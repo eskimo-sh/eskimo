@@ -155,9 +155,9 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
+                "      {\"marathon\": \"192.168.10.13\"},\n" +
                 "      {\"gdash\": \"(marathon)\"},\n" +
                 "      {\"spark-history-server\": \"(marathon)\"},\n" +
-                "      {\"marathon\": \"192.168.10.13\"},\n" +
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [],\n" +
@@ -228,15 +228,14 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
-                "      {\"grafana\": \"(marathon)\"},\n" +
                 "      {\"kafka\": \"192.168.10.11\"},\n" +
                 "      {\"kafka\": \"192.168.10.13\"},\n" +
-                "      {\"kafka-manager\": \"(marathon)\"},\n" +
-                "      {\"spark-history-server\": \"(marathon)\"},\n" +
                 "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
                 "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
                 "      {\"spark-executor\": \"192.168.10.11\"},\n" +
                 "      {\"spark-executor\": \"192.168.10.13\"},\n" +
+                "      {\"kafka-manager\": \"(marathon)\"},\n" +
+                "      {\"spark-history-server\": \"(marathon)\"},\n" +
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [\n" +

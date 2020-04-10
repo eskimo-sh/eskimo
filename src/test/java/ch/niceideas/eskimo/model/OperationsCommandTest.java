@@ -154,17 +154,17 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "marathon=192.168.10.13, " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "cerebro=(marathon), " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
     }
 
@@ -289,17 +289,17 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "marathon=192.168.10.13, " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "cerebro=(marathon), " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
 
         // node vanished
@@ -341,16 +341,16 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "elasticsearch=192.168.10.11, " +
                 "elasticsearch=192.168.10.13, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "cerebro=(marathon), " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc2.getRestarts().toArray()));
     }
 
@@ -393,17 +393,17 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "marathon=192.168.10.13, " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "cerebro=(marathon), " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
 
         // node vanished
@@ -440,17 +440,17 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "elasticsearch=192.168.10.13, " +
-                "cerebro=(marathon), " +
                 "mesos-master=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "cerebro=(marathon), " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc2.getRestarts().toArray()));
     }
 
@@ -494,17 +494,17 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
-                "cerebro=(marathon), " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "marathon=192.168.10.13, " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "cerebro=(marathon), " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc.getRestarts().toArray()));
 
         // node vanished
@@ -546,13 +546,13 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals(8, oc2.getRestarts().size());
 
         assertEquals ("[" +
-                "kibana=(marathon), " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "kafka-manager=(marathon), " +
-                "spark-history-server=(marathon), " +
                 "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "kibana=(marathon), " +
+                "kafka-manager=(marathon), " +
+                "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)]", Arrays.toString(oc2.getRestarts().toArray()));
     }
 

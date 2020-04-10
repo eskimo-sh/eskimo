@@ -137,10 +137,12 @@ public class StandardSetupHelpers {
 
     public static MarathonServicesConfigWrapper getStandardMarathonConfig() {
         return new MarathonServicesConfigWrapper (new HashMap<String, Object>() {{
-            put("zeppelin_install", "on");
+            put("cerebro_install", "on");
+            put("kibana_install", "on");
             put("spark-history-server_install", "on");
             put("gdash_install", "on");
             put("kafka-manager_install", "on");
+            put("zeppelin_install", "on");
         }});
     }
 }

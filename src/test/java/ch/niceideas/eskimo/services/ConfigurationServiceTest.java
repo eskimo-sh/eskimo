@@ -26,7 +26,6 @@ public class ConfigurationServiceTest {
 
     private ConfigurationService configurationService = null;
 
-
     @Before
     public void setUp() throws Exception {
         try {
