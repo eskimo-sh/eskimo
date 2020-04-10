@@ -190,12 +190,7 @@ public abstract class AbstractSystemTest {
 
         systemService.setServicesConfigService(servicesConfigService);
 
-        marathonService = new MarathonService() {
-            @Override
-            protected String queryMarathon (String endpoint, String method) throws MarathonException {
-                return "{}";
-            }
-        };
+        marathonService = createMarathonService();
         marathonService.setServicesDefinition(servicesDefinition);
         marathonService.setConfigurationService (configurationService);
         marathonService.setSystemService(systemService);
@@ -219,6 +214,15 @@ public abstract class AbstractSystemTest {
 
     protected SystemService createSystemService() {
         return new SystemService();
+    }
+
+    protected MarathonService createMarathonService() {
+        return new MarathonService() {
+            @Override
+            protected String queryMarathon (String endpoint, String method) throws MarathonException {
+                return "{}";
+            }
+        };
     }
 
     protected void clearCommandScript() {

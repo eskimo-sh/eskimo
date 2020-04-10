@@ -40,7 +40,7 @@ eskimo.SystemStatus = function() {
     var that = this;
 
     // constants
-    var STATUS_UPDATE_INTERVAL = 4000;
+    var STATUS_UPDATE_INTERVAL = 5000;
 
     // initialized by backend
     var STATUS_SERVICES = [];

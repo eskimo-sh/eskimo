@@ -558,28 +558,31 @@ public class SystemService {
         ipAddressesToTest.addAll(nodesConfig.getIpAddresses());
         for (String ipAddress : ipAddressesToTest) {
 
-            // handle potential interruption request
-            if (isInterrupted()) {
-                return null;
-            }
+            if (!ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
 
-            nodesSetup.add(new Pair<>("node_setup", ipAddress));
-
-            // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
-
-            // find out if SSH connection to host can succeed
-            try {
-                String ping = sendPing(ipAddress);
-
-                if (!ping.startsWith("OK")) {
-
-                    handleNodeDead(deadIps, ipAddress);
-                } else {
-                    liveIps.add(ipAddress);
+                // handle potential interruption request
+                if (isInterrupted()) {
+                    return null;
                 }
-            } catch (SSHCommandException e) {
-                logger.debug(e, e);
-                handleNodeDead(deadIps, ipAddress);
+
+                nodesSetup.add(new Pair<>("node_setup", ipAddress));
+
+                // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
+
+                // find out if SSH connection to host can succeed
+                try {
+                    String ping = sendPing(ipAddress);
+
+                    if (!ping.startsWith("OK")) {
+
+                        handleNodeDead(deadIps, ipAddress);
+                    } else {
+                        liveIps.add(ipAddress);
+                    }
+                } catch (SSHCommandException e) {
+                    logger.debug(e, e);
+                    handleNodeDead(deadIps, ipAddress);
+                }
             }
         }
 
@@ -619,10 +622,11 @@ public class SystemService {
         try {
             threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error (e, e);
+            logger.debug (e, e);
         }
 
         if (error.get() != null) {
+            logger.warn ("Throwing " + error.get().getClass() + ":" + error.get().getMessage() + " as SystemException") ;
             throw new SystemException(error.get().getMessage(), error.get());
         }
     }

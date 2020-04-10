@@ -136,7 +136,7 @@ public class ConfigurationService {
         }
     }
 
-    public JsonWrapper saveSetupConfig(String configAsString) throws SetupException, FileException {
+    public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException {
         JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
 
         // First thing first : save storage path
@@ -162,6 +162,11 @@ public class ConfigurationService {
             throw new SetupException("User " + username + " cannot write in path " + storagePath + " doesn't exist.");
         }
         return setupConfigJSON;
+    }
+
+    public void saveSetupConfig(String configAsString) throws SetupException, FileException {
+        File configFile = new File(setupService.getConfigStoragePath() + "/config.json");
+        FileUtils.writeFile(configFile, configAsString);
     }
 
     public String loadSetupConfig() throws FileException, SetupException {

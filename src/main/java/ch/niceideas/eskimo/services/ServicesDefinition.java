@@ -426,6 +426,16 @@ public class ServicesDefinition implements InitializingBean {
     }
 
     int compareServices(Service one, Service other) {
+
+        // marathon services are always last
+        if (one.isMarathon() && !other.isMarathon()) {
+            return 1;
+        }
+        if (!one.isMarathon() && other.isMarathon()) {
+            return -1;
+        }
+
+        // compare based on dependencies
         if (one.getRelevantDependenciesCount() > other.getRelevantDependenciesCount()) {
             return 1;
         }

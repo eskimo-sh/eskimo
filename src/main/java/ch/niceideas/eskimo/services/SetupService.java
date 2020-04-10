@@ -219,7 +219,7 @@ public class SetupService {
 
         try {
 
-            JsonWrapper setupConfigJSON = configurationService.saveSetupConfig(configAsString);
+            JsonWrapper setupConfigJSON = configurationService.createSetupConfigAndSaveStoragePath(configAsString);
 
             String configStoragePath = (String) setupConfigJSON.getValueForPath("setup_storage");
             if (StringUtils.isBlank(configStoragePath)) {
@@ -253,8 +253,7 @@ public class SetupService {
                 logger.debug("Coudln't add user readable flag from key file. Moving on.");
             }
 
-            File configFile = new File(getConfigStoragePath() + "/config.json");
-            FileUtils.writeFile(configFile, configAsString);
+            configurationService.saveSetupConfig(configAsString);
 
             return SetupCommand.create(setupConfigJSON, this);
 

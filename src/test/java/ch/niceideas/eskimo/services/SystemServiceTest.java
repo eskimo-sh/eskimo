@@ -38,10 +38,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -89,6 +86,27 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return prefix+"_"+packageName+"_dummy_1.dummy";
             }
         };
+    }
+
+    @Override
+    protected MarathonService createMarathonService() {
+        MarathonService marathonService = new MarathonService() {
+            @Override
+            Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
+                return new Pair<>("192.168.10.11", "running");
+            }
+            @Override
+            protected String queryMarathon (String endpoint, String method) throws MarathonException {
+                return "{}";
+            }
+            @Override
+            protected String restartServiceMarathonInternal(Service service) throws MarathonException {
+                // No Op
+                return "";
+            }
+        };
+
+        return marathonService;
     }
 
     @Test

@@ -195,17 +195,26 @@ public class MarathonService {
         return StreamUtils.getAsString(result, contentencodingHeader != null ? contentencodingHeader.getValue() : "UTF-8");
     }
 
-    private Pair<String,String> getServiceRuntimeNode(String service) throws MarathonException, FileException, SetupException  {
+    private Pair<String,String> getServiceRuntimeNode(String service) throws MarathonException {
         return getAndWaitServiceRuntimeNode(service, 1);
     }
 
-    private Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
+    Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
             MarathonException  {
 
         for (int i = 0; i < numberOfAttempts; i++) {
             String serviceJson = queryMarathon("apps/" + service);
             if (StringUtils.isBlank(serviceJson)) {
-                return new Pair<>(null, "NA");
+                if (i < numberOfAttempts - 1) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        logger.debug (e, e);
+                    }
+                    continue;
+                } else {
+                    return new Pair<>(null, "NA");
+                }
             }
 
             JsonWrapper serviceResult = new JsonWrapper(serviceJson);
@@ -385,7 +394,7 @@ public class MarathonService {
         try {
             Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service);
             nodeIp = nodeNameAndStatus.getKey();
-        } catch (MarathonException | FileException | SetupException e) {
+        } catch (MarathonException e) {
             logger.warn (e.getMessage());
             logger.debug (e, e);
         }
@@ -561,47 +570,38 @@ public class MarathonService {
     }
 
     String startServiceMarathonInternal(Service service) throws MarathonException {
-        try {
-            StringBuilder log = new StringBuilder();
 
-            Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service.getName());
+        StringBuilder log = new StringBuilder();
 
-            String nodeIp = nodeNameAndStatus.getKey();
+        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 10);
 
-            boolean installed = StringUtils.isNotBlank(nodeIp);
-            boolean running = nodeNameAndStatus.getValue().equals("running");
+        String nodeIp = nodeNameAndStatus.getKey();
 
-            if (!installed) {
-                log.append("ERROR - Service " + service.getName() + " is not installed." + "\n");
-                throw new MarathonException("Service " + service.getName() + " is not installed.");
+        boolean installed = StringUtils.isNotBlank(nodeIp);
+        boolean running = nodeNameAndStatus.getValue().equals("running");
 
-            } else if (running) {
+        if (!installed) {
+            log.append("ERROR - Service " + service.getName() + " is not installed." + "\n");
+            throw new MarathonException("Service " + service.getName() + " is not installed.");
 
-                log.append("WARNING - Service " + service.getName() + " is already started" + "\n");
+        } else if (running) {
 
+            log.append("WARNING - Service " + service.getName() + " is already started" + "\n");
+
+        } else {
+
+            String startResultString = updateMarathon("apps/" + service.getName(), "PATCH", "{ \"id\": \"/" + service.getName() + "\", \"instances\": 1}");
+            JsonWrapper startResult = new JsonWrapper(startResultString);
+
+            String deploymentId = startResult.getValueForPathAsString("deploymentId");
+            if (StringUtils.isBlank(deploymentId)) {
+                log.append("WARNING : Could not find any deployment ID when starting tasks for " + service.getName() + "\n");
             } else {
-
-                // TODO
-
-                // curl -XPATCH  -H 'Content-Type: application/json' http://$MASTER_MARATHON_1:28080/v2/apps/cerebro -d '{ "id": "/cerebro", "instances": 1}'
-                // {"version":"2020-03-25T17:25:19.572Z","deploymentId":"bd866d4d-5bc0-4097-8385-7b0957143d24"}
-
-                String startResultString = updateMarathon("apps/" + service.getName(), "PATCH", "{ \"id\": \"/" + service.getName() + "\", \"instances\": 1}");
-                JsonWrapper startResult = new JsonWrapper(startResultString);
-
-                String deploymentId = startResult.getValueForPathAsString("deploymentId");
-                if (StringUtils.isBlank(deploymentId)) {
-                    log.append("WARNING : Could not find any deployment ID when starting tasks for " + service.getName() + "\n");
-                } else {
-                    log.append("Tasks starting deployment ID for " + service.getName() + " is " + deploymentId + "\n");
-                }
+                log.append("Tasks starting deployment ID for " + service.getName() + " is " + deploymentId + "\n");
             }
-
-            return log.toString();
-        } catch (FileException | SetupException e) {
-            logger.error (e, e);
-            throw new MarathonException(e);
         }
+
+        return log.toString();
     }
 
     public void  stopServiceMarathon(Service service) throws MarathonException, SSHCommandException {
@@ -612,39 +612,61 @@ public class MarathonService {
 
         StringBuilder log = new StringBuilder();
 
-        // 1. Kill all tasks for service
-        log.append("Killing tasks for " + service.getName() + "\n");
-        String killResultString = queryMarathon("apps/"+service.getName()+"/tasks?scale=true", "DELETE");
-        JsonWrapper killResult = new JsonWrapper(killResultString);
+        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 20); // 20 attempts
+        String nodeIp = nodeNameAndStatus.getKey();
 
-        String deploymentId = killResult.getValueForPathAsString("deploymentId");
-        if (StringUtils.isBlank(deploymentId)) {
-            log.append("WARNING : Could not find any deployment ID when killing tasks for " + service.getName());
+        boolean installed = StringUtils.isNotBlank(nodeIp);
+        if (!installed) {
+            log.append ("Warning : Service " + service.getName() + " is not installed");
+
         } else {
-            log.append("Tasks killing deployment ID for " + service.getName() + " is " + deploymentId);
+
+            boolean running = nodeNameAndStatus.getValue().equals("running");
+            if (!running) {
+                log.append("Info: Service " + service.getName() + " was not running");
+            } else {
+
+                // 1. Kill all tasks for service
+                log.append("Killing tasks for " + service.getName() + "\n");
+                String killResultString = queryMarathon("apps/" + service.getName() + "/tasks?scale=true", "DELETE");
+                JsonWrapper killResult = new JsonWrapper(killResultString);
+
+                String deploymentId = killResult.getValueForPathAsString("deploymentId");
+                if (StringUtils.isBlank(deploymentId)) {
+                    log.append("WARNING : Could not find any deployment ID when killing tasks for " + service.getName());
+                } else {
+                    log.append("Tasks killing deployment ID for " + service.getName() + " is " + deploymentId);
+                }
+            }
         }
 
         return log.toString();
     }
 
     public void restartServiceMarathon(Service service) throws MarathonException, SSHCommandException {
-        systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> {
-            return restartServiceMarathonInternal(service);
-        });
+        systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> restartServiceMarathonInternal(service));
     }
 
-    String restartServiceMarathonInternal(Service service) throws MarathonException {
+    protected String restartServiceMarathonInternal(Service service) throws MarathonException {
         StringBuilder log = new StringBuilder();
 
-        log.append(stopServiceMarathonInternal(service));
+        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 50); // 50 attempts
+        String nodeIp = nodeNameAndStatus.getKey();
 
-        try {
+        boolean installed = StringUtils.isNotBlank(nodeIp);
+        if (!installed) {
+            log.append ("Warning : Service " + service.getName() + " is not installed");
+
+        } else {
+
+            log.append(stopServiceMarathonInternal(service));
+
+            // wait for it to stop
             for (int i = 0; i < 100; i++) { // 100 attemots
-                Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service.getName());
+                nodeNameAndStatus = this.getServiceRuntimeNode(service.getName());
 
-                String nodeIp = nodeNameAndStatus.getKey();
+                nodeIp = nodeNameAndStatus.getKey();
 
-                boolean installed = StringUtils.isNotBlank(nodeIp);
                 boolean running = nodeNameAndStatus.getValue().equals("running");
                 if (!running) {
                     break;
@@ -656,14 +678,11 @@ public class MarathonService {
                     logger.debug(e.getMessage());
                 }
             }
-        } catch (SetupException | FileException e) {
-            logger.error (e, e);
-            throw new MarathonException(e);
+
+
+            log.append("\n");
+            log.append(startServiceMarathonInternal(service));
         }
-
-
-        log.append("\n");
-        log.append(startServiceMarathonInternal(service));
 
         return log.toString();
     }

@@ -39,7 +39,7 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 eskimo.Main = function() {
 
     // constants
-    var MESSAGES_POLLING_STOP_DELAY = 10000;
+    var MESSAGES_POLLING_STOP_DELAY = 12000;
 
 
     var that = this;

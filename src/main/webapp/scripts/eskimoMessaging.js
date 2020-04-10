@@ -37,7 +37,7 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.Messaging = function() {
 
-    var MESSAGING_POLLING_DELAY = 2000;
+    var MESSAGING_POLLING_DELAY = 3000;
 
     var that = this;
 
