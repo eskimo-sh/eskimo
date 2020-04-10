@@ -16,9 +16,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -75,8 +73,8 @@ public class MarathonService {
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
 
-    @Value("${system.operationWaitTimoutSeconds}")
-    private int operationWaitTimout = 800;
+    @Value("${system.marathonOperationWaitTimoutSeconds}")
+    private int marathonOperationWaitTimoutSeconds = 100 * 60; // 100 minutes
 
     @Value("${system.baseInstallWaitTimoutSeconds}")
     private int baseInstallWaitTimout = 1000;
@@ -165,6 +163,9 @@ public class MarathonService {
 
         try {
             ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
+            if (marathonTunnelConfig == null) {
+                throw new MarathonException("Marathon is not detected as present (in proxy)");
+            }
 
             // apps/cerebro
             BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
@@ -183,7 +184,7 @@ public class MarathonService {
         }
     }
 
-    private String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+    protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
         HttpResponse response = httpClient.execute(
                 new HttpHost("localhost", marathonTunnelConfig.getLocalPort(), "http"),
                 request);
@@ -199,7 +200,7 @@ public class MarathonService {
         return getAndWaitServiceRuntimeNode(service, 1);
     }
 
-    Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
+    protected Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
             MarathonException  {
 
         for (int i = 0; i < numberOfAttempts; i++) {
@@ -311,7 +312,7 @@ public class MarathonService {
             }
 
             // Nodes re-setup (topology)
-            systemService.performPooledOperation (new ArrayList<String> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+            systemService.performPooledOperation (new ArrayList<> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
                         // topology
                         if (error.get() == null) {
@@ -321,17 +322,14 @@ public class MarathonService {
 
                     });
 
-            // Installation in batches (groups following dependencies)
-
-            // TODO deploying on marathon 1 service at a time for now
-            systemService.performPooledOperation(command.getInstallations(), 1, operationWaitTimout,
+            // Installation in batches (groups following dependencies) - deploying on marathon 1 service at a time for now
+            systemService.performPooledOperation(command.getInstallations(), 1, marathonOperationWaitTimoutSeconds,
                     (operation, error) -> {
                         installMarathonService(operation, marathonIpAddress);
                     });
 
-            // uninstallations
-            // TODO deploying on marathon 1 service at a time for now
-            systemService.performPooledOperation(command.getUninstallations(), 1, operationWaitTimout,
+            // uninstallations - deploying on marathon 1 service at a time for now
+            systemService.performPooledOperation(command.getUninstallations(), 1, marathonOperationWaitTimoutSeconds,
                     (operation, error) -> {
                         uninstallMarathonService(operation, marathonIpAddress);
                     });
@@ -339,7 +337,7 @@ public class MarathonService {
             /*
             // restarts
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
-                performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimout,
+                performPooledOperation(restarts, parallelismInstallThreadCount, marathonOperationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
@@ -372,21 +370,8 @@ public class MarathonService {
     }
 
     private String findUniqueServiceNodeName(String service) throws FileException, SetupException {
-
         ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();
-
-        for (String installFlag : installStatus.getRootKeys()) {
-
-            if (installFlag.startsWith(service)
-                    && installStatus.getValueForPathAsString(installFlag) != null
-                    && installStatus.getValueForPathAsString(installFlag).equals("OK")) {
-
-                String ipAddress = installFlag.substring(installFlag.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG) + OperationsCommand.INSTALLED_ON_IP_FLAG.length());
-                return ipAddress.replace(".", "-");
-            }
-        }
-
-        return null;
+        return installStatus.getFirstNodeName(service);
     }
 
     void uninstallMarathonService(String service, String marathonIpAddress) throws SystemException {
@@ -445,7 +430,7 @@ public class MarathonService {
         }
 
         // 2. Stop service
-        sb.append("Killing tasks for " + service + "\n");
+        sb.append("Deleting marathon application for " + service + "\n");
         String killResultString = queryMarathon("apps/"+service, "DELETE");
         JsonWrapper killResult = new JsonWrapper(killResultString);
 
@@ -456,13 +441,23 @@ public class MarathonService {
             sb.append("Tasks killing deployment ID for " + service + " is " + deploymentId + "\n");
         }
 
+        // 3. Wait for service to be stopped
+        waitForServiceShutdown(service);
+
         // 4. Delete docker container
-        sb.append(" - Removing docker container \n");
+        sb.append(" - TODO Removing docker image from registry \n");
+
+        /*
+
+        NEED TO REMOVE IMAGE FROM REPOSITORY
+        https://medium.com/better-programming/cleanup-your-docker-registry-ef0527673e3a
+
         sshCommandService.runSSHCommand(marathonIpAddress, "sudo docker rm -f " + service + " || true ");
 
         // 5. Delete docker image
         sb.append(" - Removing docker image \n");
         sshCommandService.runSSHCommand(marathonIpAddress, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
+        */
 
         return sb.toString();
     }
@@ -661,29 +656,38 @@ public class MarathonService {
 
             log.append(stopServiceMarathonInternal(service));
 
-            // wait for it to stop
-            for (int i = 0; i < 100; i++) { // 100 attemots
-                nodeNameAndStatus = this.getServiceRuntimeNode(service.getName());
-
-                nodeIp = nodeNameAndStatus.getKey();
-
-                boolean running = nodeNameAndStatus.getValue().equals("running");
-                if (!running) {
-                    break;
-                }
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    logger.debug(e.getMessage());
-                }
-            }
-
+            waitForServiceShutdown(service.getName());
 
             log.append("\n");
             log.append(startServiceMarathonInternal(service));
         }
 
         return log.toString();
+    }
+
+    private void waitForServiceShutdown(String service) throws MarathonException {
+        Pair<String, String> nodeNameAndStatus;
+        String nodeIp;// wait for it to stop
+        int i;
+        // FIXME make it a property (TODO use as well in exception below)
+        for (i = 0; i < 200; i++) { // 200 attemots
+            nodeNameAndStatus = this.getServiceRuntimeNode(service);
+
+            nodeIp = nodeNameAndStatus.getKey();
+
+            boolean running = nodeNameAndStatus.getValue().equals("running");
+            if (!running) {
+                break;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                logger.debug(e.getMessage());
+            }
+        }
+        if (i == 100) {
+            throw new MarathonException("Could not stop service " + service + " in 10 seconds.");
+        }
     }
 }

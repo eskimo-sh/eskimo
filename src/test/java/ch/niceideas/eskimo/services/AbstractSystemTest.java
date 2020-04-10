@@ -77,6 +77,8 @@ public abstract class AbstractSystemTest {
 
     protected MarathonService marathonService = null;
 
+    protected SSHCommandService sshCommandService = null;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
@@ -109,7 +111,7 @@ public abstract class AbstractSystemTest {
 
         nodeRangeResolver = new NodeRangeResolver();
 
-        proxyManagerService = new ProxyManagerService();
+        proxyManagerService = createProxyManagerService();
         proxyManagerService.setServicesDefinition(servicesDefinition);
 
         proxyManagerService.setConnectionManagerService(new ConnectionManagerService() {
@@ -135,7 +137,7 @@ public abstract class AbstractSystemTest {
 
         systemService.setNodeRangeResolver(nodeRangeResolver);
 
-        SSHCommandService sshCommandService = new SSHCommandService() {
+        sshCommandService = new SSHCommandService() {
             @Override
             public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
                 testSSHCommandScript.append(script + "\n");
@@ -202,6 +204,10 @@ public abstract class AbstractSystemTest {
         marathonService.setNotificationService(notificationService);
 
         systemService.setMarathonService(marathonService);
+    }
+
+    protected ProxyManagerService createProxyManagerService() {
+        return new ProxyManagerService();
     }
 
     protected ConfigurationService createConfigurationService() {

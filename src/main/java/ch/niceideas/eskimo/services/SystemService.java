@@ -126,7 +126,7 @@ public class SystemService {
     private int parallelismInstallThreadCount = 10;
 
     @Value("${system.operationWaitTimoutSeconds}")
-    private int operationWaitTimout = 800;
+    private int operationWaitTimoutSeconds = 800; // ~ 13 minutes (for an individual step)
 
     @Value("${system.statusFetchThreadCount}")
     private int parallelismStatusThreadCount = 10;
@@ -341,7 +341,7 @@ public class SystemService {
 
             threadPool.shutdown();
             try {
-                threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS);
+                threadPool.awaitTermination(operationWaitTimoutSeconds, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 logger.error(e, e);
             }
@@ -491,7 +491,7 @@ public class SystemService {
             for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (
                     command.getInstallations(), nodesConfig, deadIps)) {
 
-                performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimout,
+                performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
@@ -507,7 +507,7 @@ public class SystemService {
             Collections.reverse(orderedUninstallations);
 
             for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
-                performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimout,
+                performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
@@ -528,7 +528,7 @@ public class SystemService {
             // restarts
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
                     command.getRestarts(), nodesConfig, deadIps)) {
-                performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimout,
+                performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
@@ -597,7 +597,7 @@ public class SystemService {
             throws SystemException {
 
         final ExecutorService threadPool = Executors.newFixedThreadPool(parallelism);
-        AtomicReference<Exception> error = new AtomicReference<>();
+        final AtomicReference<Exception> error = new AtomicReference<>();
 
         for (T opToPerform : operations) {
 
@@ -608,10 +608,12 @@ public class SystemService {
 
                         try {
                             operation.call(opToPerform, error);
-                        } catch (SystemException | JSONException | FileException | SetupException | ConnectionManagerException e) {
+                        } catch (Exception e) {
                             logger.error(e, e);
+                            logger.warn ("Storing error - " + e.getClass()+":"+e.getMessage());
                             error.set(e);
-                            throw new PooledOperationException(e);
+                            // actually killing the thread is perhaps not a good idea
+                            //throw new PooledOperationException(e.getMessage());
                         }
                     }
                 });
@@ -1276,6 +1278,10 @@ public class SystemService {
     public static class PooledOperationException extends RuntimeException {
 
         static final long serialVersionUID = -3317632123352229248L;
+
+        PooledOperationException(String message) {
+            super(message);
+        }
 
         PooledOperationException(Throwable cause) {
             super(cause);

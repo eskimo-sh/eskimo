@@ -105,7 +105,8 @@ public class SystemOperationService {
                 }
 
             } catch (Exception e) {
-                logger.error(e, e);
+                logger.debug(e.getMessage());
+                logger.warn ("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
 
                 messagingService.addLines("\nDone : "
                         + message
