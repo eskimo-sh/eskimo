@@ -72,7 +72,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
         //page.executeJavaScript("nodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
+        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\"];");
         page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -87,8 +87,8 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testGetService() throws Exception {
 
-        assertJavascriptEquals("spark-history-server", "eskimoServicesSelection.getService(1, 1).name");
-        assertJavascriptEquals ("elasticsearch", "eskimoServicesSelection.getService(3, 3).name");
+        assertJavascriptEquals("ntp", "eskimoServicesSelection.getService(1, 1).name");
+        assertJavascriptEquals("spark-executor", "eskimoServicesSelection.getService(3, 3).name");
 
     }
 
@@ -97,9 +97,9 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServicesSelection.initModalServicesConfig()");
 
-        assertJavascriptEquals("1.0", "$('#cerebro-choice').length");
-        assertJavascriptEquals("1.0", "$('#kibana-choice').length");
-        assertJavascriptEquals("1.0", "$('#grafana-choice').length");
+        assertJavascriptEquals("1.0", "$('#flink-app-master-choice').length");
+        assertJavascriptEquals("1.0", "$('#mesos-master-choice').length");
+        assertJavascriptEquals("1.0", "$('#zookeeper-choice').length");
     }
 
     @Test
@@ -110,22 +110,16 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         page.executeJavaScript("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
                 "return {\n" +
                 "  \"action_id1\": \"192.168.10.11\",\n" +
-                "  \"cerebro\": \"1\",\n" +
                 "  \"elasticsearch1\": \"on\",\n" +
                 "  \"flink-app-master\": \"1\",\n" +
                 "  \"flink-worker1\": \"on\",\n" +
-                "  \"grafana\": \"1\",\n" +
                 "  \"kafka1\": \"on\",\n" +
-                "  \"kafka-manager\": \"1\",\n" +
-                "  \"kibana\": \"1\",\n" +
                 "  \"logstash1\": \"on\",\n" +
                 "  \"mesos-agent1\": \"on\",\n" +
                 "  \"mesos-master\": \"1\",\n" +
                 "  \"ntp1\": \"on\",\n" +
                 "  \"prometheus1\": \"on\",\n" +
                 "  \"spark-executor1\": \"on\",\n" +
-                "  \"spark-history-server\": \"1\",\n" +
-                "  \"zeppelin\": \"1\",\n" +
                 "  \"zookeeper\": \"1\"\n" +
                 "};" +
                 "}");
@@ -136,27 +130,18 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("" +
-                "{" +
-                "\"spark-history-server\":\"1\"," +
-                "\"ntp1\":\"on\"," +
-                "\"gluster1\":\"on\"," +
-                "\"cerebro\":\"1\"," +
+        assertJavascriptEquals("{\"ntp1\":\"on\"," +
                 "\"zookeeper\":\"1\"," +
-                "\"mesos-agent1\":\"on\"," +
-                "\"kibana\":\"1\"," +
-                "\"mesos-master\":\"1\"," +
                 "\"elasticsearch1\":\"on\"," +
-                "\"zeppelin\":\"1\"," +
-                "\"spark-executor1\":\"on\"," +
-                "\"kafka-manager\":\"1\"," +
-                "\"kafka1\":\"on\"," +
+                "\"gluster1\":\"on\"," +
+                "\"mesos-master\":\"1\"," +
                 "\"logstash1\":\"on\"," +
-                "\"grafana\":\"1\"," +
+                "\"mesos-agent1\":\"on\"," +
+                "\"spark-executor1\":\"on\"," +
                 "\"prometheus1\":\"on\"," +
+                "\"flink-app-master\":\"1\"," +
                 "\"flink-worker1\":\"on\"," +
-                "\"flink-app-master1\":\"on\"" +
-                "}", "JSON.stringify (result)");
+                "\"kafka1\":\"on\"}", "JSON.stringify (result)");
     }
 
     @Test
@@ -172,26 +157,18 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{" +
-                "\"spark-history-server\":\"on\"," +
-                "\"ntp\":\"on\"," +
-                "\"gluster\":\"on\"," +
-                "\"cerebro\":\"on\"," +
+        assertJavascriptEquals("{\"ntp\":\"on\"," +
                 "\"zookeeper\":\"on\"," +
-                "\"mesos-agent\":\"on\"," +
-                "\"kibana\":\"on\"," +
-                "\"mesos-master\":\"on\"," +
                 "\"elasticsearch\":\"on\"," +
-                "\"zeppelin\":\"on\"," +
-                "\"gdash\":\"on\"," +
-                "\"spark-executor\":\"on\"," +
-                "\"kafka-manager\":\"on\"," +
-                "\"kafka\":\"on\"," +
+                "\"gluster\":\"on\"," +
+                "\"mesos-master\":\"on\"," +
                 "\"logstash\":\"on\"," +
-                "\"grafana\":\"on\"," +
+                "\"mesos-agent\":\"on\"," +
+                "\"marathon\":\"on\"," +
+                "\"spark-executor\":\"on\"," +
                 "\"prometheus\":\"on\"," +
+                "\"flink-app-master\":\"on\"," +
                 "\"flink-worker\":\"on\"," +
-                "\"flink-app-master\":\"on\"" +
-                "}", "JSON.stringify (result)");
+                "\"kafka\":\"on\"}", "JSON.stringify (result)");
     }
 }

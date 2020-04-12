@@ -5,7 +5,6 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
-import com.sun.xml.internal.ws.api.server.ServiceDefinition;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;

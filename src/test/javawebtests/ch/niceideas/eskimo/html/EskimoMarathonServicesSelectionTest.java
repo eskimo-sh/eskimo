@@ -41,41 +41,26 @@ import static junit.framework.TestCase.fail;
 
 public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
-    private String jsonServices = null;
-
     @Before
     public void setUp() throws Exception {
-
-        //jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoMarathonServicesSelection.js");
 
-        /*
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
-        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
-        page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
-
         // instantiate test object
-        page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
-        */
+        page.executeJavaScript("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();");
 
-        waitForElementIdInDOM("TODO");
 
-        /*
-
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
-
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
-
-        // set services for tests
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfigForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
-        */
+        waitForElementIdInDOM("marathon-services-selection-body");
     }
 
     @Test
-    public void testDummy() throws Exception {
+    public void testNominal() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testSelectAll() throws Exception {
         fail ("To Be Implemented");
     }
 }
