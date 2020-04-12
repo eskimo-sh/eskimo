@@ -65,23 +65,21 @@ eskimo.MarathonServicesSelection = function() {
 
     function marathonServicesSelectionSelectAll() {
 
-        alert ("Implement me");
-
-        /*
         var allSelected = true;
 
+        var marathonServices = eskimoMain.getMarathonServicesConfig().getMarathonServices();
+
         // are they all selected already
-        for (var i = 0; i < configuredServices.length; i++) {
-            if (!$('#' + configuredServices[i] + "-choice").get(0).checked) {
+        for (var i = 0; i < marathonServices.length; i++) {
+            if (!$('#' + marathonServices[i] + "_reinstall").get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
-        for (var i = 0; i < configuredServices.length; i++) {
-            $('#' + configuredServices[i] + "-choice").get(0).checked = !allSelected;
+        for (var i = 0; i < marathonServices.length; i++) {
+            $('#' + marathonServices[i] + "_reinstall").get(0).checked = !allSelected;
         }
-        */
     }
     this.marathonServicesSelectionSelectAll = marathonServicesSelectionSelectAll;
 

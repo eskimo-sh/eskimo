@@ -107,6 +107,11 @@ eskimo.MarathonServicesConfig = function() {
         MARATHON_SERVICES = testServics;
     };
 
+    this.getMarathonServices = function() {
+        return MARATHON_SERVICES;
+    };
+
+
     this.getServiceLogoPath = function (service) {
         var serviceConfig = SERVICES_CONFIGURATION[service];
         if (serviceConfig == null) {
@@ -114,6 +119,23 @@ eskimo.MarathonServicesConfig = function() {
             return "undefined";
         }
         return serviceConfig.logo;
+    };
+
+    this.selectAll = function() {
+
+        var allSelected = true;
+
+        // are they all selected already
+        for (var i = 0; i < MARATHON_SERVICES.length; i++) {
+            if (!$('#' + MARATHON_SERVICES[i] + "_install").get(0).checked) {
+                allSelected = false;
+            }
+        }
+
+        // select all boxes
+        for (var i = 0; i < MARATHON_SERVICES.length; i++) {
+            $('#' + MARATHON_SERVICES[i] + "_install").get(0).checked = !allSelected;
+        }
     };
 
     this.renderMarathonConfig = function (marathonConfig) {

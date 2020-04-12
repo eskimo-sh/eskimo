@@ -37,12 +37,16 @@ public class ConfigurationServiceTest {
             throw new SetupException(e);
         }
         configurationService = new ConfigurationService();
-        configurationService.setSetupService(new SetupService() {
+
+        SetupService setupService = new SetupService() {
             @Override
             public String getConfigStoragePath() throws SetupException {
                 return tmpFile.getAbsolutePath();
             }
-        });
+        };
+        configurationService.setSetupService(setupService);
+
+        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }
 
     @Test
