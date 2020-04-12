@@ -92,7 +92,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     protected MarathonService createMarathonService() {
         MarathonService marathonService = new MarathonService() {
             @Override
-            Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
+            protected Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
                 return new Pair<>("192.168.10.11", "running");
             }
             @Override

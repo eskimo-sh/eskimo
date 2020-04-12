@@ -49,8 +49,11 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.fail;
 
 public class MarathonServiceTest extends AbstractSystemTest {
@@ -151,6 +154,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testUninstallMarathonService () throws Exception {
 
+        final List<String> marathonApiCalls = new ArrayList<>();
+
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -158,24 +163,61 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
             }
         });
 
         marathonService.uninstallMarathonService("cerebro", "192.168.10.11");
 
+        assertEquals(1, marathonApiCalls.size());
+        assertEquals("http://localhost:12345/v2/apps/cerebro", marathonApiCalls.get(0));
+
+        assertTrue(testSSHCommandScript.toString().contains("docker exec -i --user root marathon bash -c \"rm -Rf /var/lib/marathon/docker_registry/docker/registry/v2/repositories/cerebro\""));
+        assertTrue(testSSHCommandScript.toString().contains("docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\""));
+
+        /*
         System.out.println(testSSHCommandResultBuilder);
         System.err.println(testSSHCommandScript);
-
-        // TODO test proper call to marathon API
-
-
-        fail ("To Be Implemented");
+        System.err.println(String.join(",", marathonApiCalls));
+        */
     }
 
     @Test
     public void testInstallMarathonService () throws Exception {
-        fail ("To Be Implemented");
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>("192.168.10.13", "running");
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        marathonService.installMarathonService("cerebro", "192.168.10.11");
+
+        // Just testing a few commands
+        assertTrue(testSSHCommandScript.toString().contains("tar xfz /tmp/cerebro.tgz --directory=/tmp/"));
+        assertTrue(testSSHCommandScript.toString().contains("chmod 755 /tmp/cerebro/setup.sh"));
+        assertTrue(testSSHCommandScript.toString().contains("bash /tmp/cerebro/setup.sh 192.168.10.11"));
+        assertTrue(testSSHCommandScript.toString().contains("docker image rm eskimo:cerebro_template"));
+
+        // no API calls from backend (it's actually done by setup script)
+        assertEquals(0, marathonApiCalls.size());
     }
 
     @Test

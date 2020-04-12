@@ -37,6 +37,8 @@ public class MarathonService {
 
     public static final String MARATHON_NODE = "MARATHON_NODE";
 
+    public static final int MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS = 200;
+
     @Autowired
     private ServicesDefinition servicesDefinition;
 
@@ -447,17 +449,17 @@ public class MarathonService {
         // 4. Delete docker container
         sb.append(" - TODO Removing docker image from registry \n");
 
-        /*
+        // 5. remove blobs
+        sb.append(" - Removing service from docker repository \n");
 
-        NEED TO REMOVE IMAGE FROM REPOSITORY
-        https://medium.com/better-programming/cleanup-your-docker-registry-ef0527673e3a
+        // 5.1 remove repository for service
+        sshCommandService.runSSHCommand(marathonIpAddress,
+                "docker exec -i --user root marathon bash -c \"rm -Rf /var/lib/marathon/docker_registry/docker/registry/v2/repositories/" + service + "\"");
 
-        sshCommandService.runSSHCommand(marathonIpAddress, "sudo docker rm -f " + service + " || true ");
-
-        // 5. Delete docker image
-        sb.append(" - Removing docker image \n");
-        sshCommandService.runSSHCommand(marathonIpAddress, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
-        */
+        // 5.2 run garbage collection to remove blobs
+        sb.append(" - Running garbage collection \n");
+        sshCommandService.runSSHCommand(marathonIpAddress,
+                "docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
 
         return sb.toString();
     }
@@ -665,12 +667,12 @@ public class MarathonService {
         return log.toString();
     }
 
-    private void waitForServiceShutdown(String service) throws MarathonException {
+    protected void waitForServiceShutdown(String service) throws MarathonException {
         Pair<String, String> nodeNameAndStatus;
         String nodeIp;// wait for it to stop
+
         int i;
-        // FIXME make it a property (TODO use as well in exception below)
-        for (i = 0; i < 200; i++) { // 200 attemots
+        for (i = 0; i < MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS; i++) { // 200 attemots
             nodeNameAndStatus = this.getServiceRuntimeNode(service);
 
             nodeIp = nodeNameAndStatus.getKey();
@@ -686,8 +688,8 @@ public class MarathonService {
                 logger.debug(e.getMessage());
             }
         }
-        if (i == 100) {
-            throw new MarathonException("Could not stop service " + service + " in 10 seconds.");
+        if (i == MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS) {
+            throw new MarathonException("Could not stop service " + service + " in " + (MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS * 100 / 60) +  " seconds.");
         }
     }
 }
