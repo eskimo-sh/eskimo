@@ -60,8 +60,7 @@ ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run
         -i \
         --name marathon \
         --user marathon \
-         -p 28080:28080 \
-         -p 5000:5000 \
+        --network host \
         -v /var/log/marathon:/var/log/marathon \
         -v /var/lib/marathon:/var/lib/marathon:rshared \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
@@ -73,7 +72,9 @@ ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run
         /usr/local/sbin/inContainerStartService.sh"
 
 
-#--network host \
+# Unfotunately "-network host" is requires since random ports are created to communicate with mesos.
+#         -p 28080:28080 \
+#          -p 5000:5000 \
 
 ExecStop=/usr/bin/docker stop marathon
 

@@ -123,9 +123,11 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/
 
 
 
+
 # temporary debug logs
 #sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
 #        /usr/local/lib/flink/conf/log4j.properties
+
 
 
 # This hack was required with FLink 1.9 when a killed task manager made is to that flink was never anymore able to

@@ -71,6 +71,7 @@ sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: $SELF_IP_ADDRESS"/g /
 sudo bash -c "echo -e \"\n# CPUs to assign to the Mesos workers. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"mesos.resourcemanager.tasks.cpus: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
+
 # XXX This is not supported abymore by Flink 1.10
 # Caused by: org.apache.flink.configuration.IllegalConfigurationException: Inconsistent worker memory configuration:
 # both legacy Mesos specific and the newer unified options are configured but they differ

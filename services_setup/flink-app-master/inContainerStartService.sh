@@ -42,8 +42,12 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh flink-app-master
 
+echo " - Basic mesos configuration for mesos Scheduler (set env vars)"
 # point to your libmesos.so if you use Mesos
 export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
+# Set external IP for Mesos Scheduler used by Flink / Marathon / etc. to reach mesos (required for mesos callback to succeed)
+export LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS
+
 
 echo " - Starting service"
 /usr/local/lib/flink/bin/mesos-appmaster.sh

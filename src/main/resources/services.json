@@ -294,7 +294,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
@@ -571,7 +571,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
