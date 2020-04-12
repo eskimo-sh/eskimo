@@ -56,9 +56,17 @@ public class EskimoMarathonOperationsCommandTest extends AbstractWebTest {
         waitForElementIdInDOM("marathon-operations-command-body");
     }
 
+
     @Test
-    public void testDummy() throws Exception {
-        fail ("To Be Implemented");
+    public void testShowCommand() throws Exception {
+
+        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonOperationsCommandTest/command.json"));
+
+        page.executeJavaScript("eskimoMarathonOperationsCommand.showCommand("+command+".command)");
+
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonOperationsCommandTest/expectedResult.html"));
+
+        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#marathon-operations-command-body').html()");
     }
 }
 

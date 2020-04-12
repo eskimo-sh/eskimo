@@ -266,6 +266,9 @@ eskimo.NodesConfig = function() {
                 }
 
                 //console.log ('#'+serviceName+nbr);
+                if ($('#' + serviceName + nbr).get(0) == null) {
+                    throw "No node found for service name " + serviceName + " and node nbr " + nbr;
+                }
                 $('#' + serviceName + nbr).get(0).checked = true;
 
             }

@@ -57,7 +57,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoNodesConfig.js");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
+        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\" ];");
         page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -78,9 +78,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @Test
     public void testServicesConfigMethods() throws Exception {
 
-        assertJavascriptEquals("kibana.png", "eskimoNodesConfig.getServiceLogoPath('kibana')");
-        assertJavascriptEquals("kibana.png", "eskimoNodesConfig.getServiceIconPath('kibana')");
-        assertJavascriptEquals("true", "eskimoNodesConfig.isServiceUnique('kibana')");
+        assertJavascriptEquals("images/flink-app-master-logo.png", "eskimoNodesConfig.getServiceLogoPath('flink-app-master')");
+        assertJavascriptEquals("images/flink-app-master-icon.png", "eskimoNodesConfig.getServiceIconPath('flink-app-master')");
+        assertJavascriptEquals("true", "eskimoNodesConfig.isServiceUnique('flink-app-master')");
 
         assertJavascriptEquals("false", "eskimoNodesConfig.isServiceUnique('gluster')");
 
@@ -121,7 +121,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("eskimoNodesConfig.onServicesSelectedForNode({\n" +
                 "\"elasticsearch2\": \"on\",\n" +
                 "\"flink-worker2\": \"on\",\n" +
-                "\"gdash\": \"2\",\n" +
+                "\"flink-app-master\": \"2\",\n" +
                 "\"gluster2\": \"on\",\n" +
                 "\"kafka2\": \"on\",\n" +
                 "\"logstash2\": \"on\",\n" +
@@ -133,7 +133,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         assertJavascriptEquals("1.0", "$('#prometheus2:checked').length");
 
-        assertJavascriptEquals("1.0", "$('#gdash2:checked').length");
+        assertJavascriptEquals("1.0", "$('#flink-app-master2:checked').length");
     }
 
 
@@ -146,7 +146,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // manipulate node 2
         page.executeJavaScript("$('#action_id2').attr('value', '192.168.10.11')");
-        page.executeJavaScript("$('#zeppelin2').get(0).checked = true");
+        page.executeJavaScript("$('#flink-app-master2').get(0).checked = true");
         page.executeJavaScript("$('#elasticsearch2').get(0).checked = true");
 
         // remove node 1
@@ -155,7 +155,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         // ensure values are found in node 1
         assertAttrValue("#action_id1", "value", "192.168.10.11");
 
-        assertJavascriptEquals("true", "$('#zeppelin1').get(0).checked");
+        assertJavascriptEquals("true", "$('#flink-app-master1').get(0).checked");
         assertJavascriptEquals("true", "$('#elasticsearch1').get(0).checked");
     }
 
@@ -167,32 +167,17 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertNotNull (page.getElementById("action_id1"));
         assertTagName ("action_id1", "input");
 
-        assertNotNull (page.getElementById("spark-history-server1"));
-        assertTagName ("spark-history-server1", "input");
-
         assertNotNull (page.getElementById("zookeeper1"));
         assertTagName ("zookeeper1", "input");
 
         assertNotNull (page.getElementById("gluster1"));
         assertTagName ("gluster1", "input");
 
-        assertNotNull (page.getElementById("cerebro1"));
-        assertTagName ("cerebro1", "input");
-
         assertNotNull (page.getElementById("mesos-master1"));
         assertTagName ("mesos-master1", "input");
 
-        assertNotNull (page.getElementById("kibana1"));
-        assertTagName ("kibana1", "input");
-
-        assertNotNull (page.getElementById("gdash1"));
-        assertTagName ("gdash1", "input");
-
         assertNotNull (page.getElementById("elasticsearch1"));
         assertTagName ("elasticsearch1", "input");
-
-        assertNotNull (page.getElementById("zeppelin1"));
-        assertTagName ("zeppelin1", "input");
 
         assertNotNull (page.getElementById("spark-executor1"));
         assertTagName ("spark-executor1", "input");
