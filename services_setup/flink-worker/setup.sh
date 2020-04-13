@@ -77,8 +77,8 @@ sudo rm -f /tmp/flink_worker_install_log
 preinstall_unmount_gluster_share /var/lib/flink/data
 preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
 
-echo " - Configuring host glink common part"
-. ./setupCommon.sh $SELF_IP_ADDRESS
+echo " - Configuring host flink common part"
+. ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20
@@ -109,7 +109,7 @@ fail_if_error $? "/tmp/flink_worker_install_log" -2
 #docker exec -it flink-worker bash
 
 echo " - Configuring flink-worker container (config script)"
-docker exec flink-worker bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $SELF_IP_ADDRESS \
+docker exec flink-worker bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
         | tee -a /tmp/flink_worker_install_log 2>&1
 if [[ `tail -n 1 /tmp/flink_worker_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"

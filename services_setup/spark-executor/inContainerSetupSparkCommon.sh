@@ -45,12 +45,6 @@ if [[ $SPARK_USER_ID == "" ]]; then
     exit -2
 fi
 
-SELF_IP_ADDRESS=$2
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
-    exit -2
-fi
-
 
 echo "-- SETTING UP SPARK (COMMON PART) --------------------------------------"
 
@@ -134,7 +128,7 @@ sudo bash -c "echo -e \"\n#Limiting the driver (client) memory\"  >> /usr/local/
 sudo bash -c "echo -e \"spark.driver.memory=800m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n#This seems to help spark messing with hostnames instead of adresses and really helps\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.driver.host=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.driver.host=RUNTIME_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.driver.bindAddress=0.0.0.0\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Number of times to retry before an RPC task gives up. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

@@ -34,11 +34,6 @@
 # Software.
 #
 
-export SELF_IP_ADDRESS=$1
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address in argument"
-    exit -2
-fi
 
 echoerr() { echo "$@" 1>&2; }
 

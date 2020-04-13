@@ -66,7 +66,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Configuring host logstash config part"
-. ./setupLogstashCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupLogstashCommon.sh
 if [[ $? != 0 ]]; then
     echo "Logstash Common configuration part failed !"
     exit -21

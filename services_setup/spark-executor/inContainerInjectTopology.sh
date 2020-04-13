@@ -56,3 +56,6 @@ if [[ $MEMORY_SPARK_EXECUTOR != "" ]]; then
     bash -c "echo -e \"\n#Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
     bash -c "echo -e \"spark.executor.memory=\"$MEMORY_SPARK_EXECUTOR\"m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 fi
+
+# replacing driver bind IP address at runtime
+sed -i s/"spark.driver.host=RUNTIME_IP_ADDRESS"/"spark.driver.host="$SELF_IP_ADDRESS""/g  /usr/local/lib/spark/conf/spark-defaults.conf

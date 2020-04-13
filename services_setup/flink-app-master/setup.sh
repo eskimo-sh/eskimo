@@ -76,7 +76,7 @@ preinstall_unmount_gluster_share /var/lib/flink/data
 preinstall_unmount_gluster_share /var/lib/flink/completed_jobs
 
 echo " - Configuring host flink config part"
-. ./setupCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20
@@ -112,7 +112,7 @@ fail_if_error $? "/tmp/flink_install_log" -2
 
 
 echo " - Configuring flink (Flink Common part)"
-docker exec flink-app-master bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $SELF_IP_ADDRESS | tee -a /tmp/flink_install_log 2>&1
+docker exec flink-app-master bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee -a /tmp/flink_install_log 2>&1
 if [[ `tail -n 1 /tmp/flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/flink_install_log

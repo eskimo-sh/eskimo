@@ -79,7 +79,7 @@ sudo rm -f /tmp/spark_history_server_install_log
 #preinstall_unmount_gluster_share /var/lib/spark/data
 
 echo " - Configuring host spark config part"
-. ./setupCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20
@@ -105,7 +105,7 @@ fail_if_error $? "/tmp/spark_history_server_install_log" -2
 #docker exec -it spark bash
 
 echo " - Configuring spark-history-server container (config script)"
-docker exec spark-history-server bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
+docker exec spark-history-server bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
         | tee -a /tmp/spark_history_server_install_log 2>&1
 if [[ `tail -n 1 /tmp/spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"

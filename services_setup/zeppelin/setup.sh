@@ -79,28 +79,28 @@ sudo rm -f /tmp/zeppelin_install_log
 #preinstall_unmount_gluster_share /var/lib/elasticsearch/logstash/data
 
 echo " - Configuring host spark config part"
-. ./setupSparkCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupSparkCommon.sh
 if [[ $? != 0 ]]; then
     echo "Spark Common configuration part failed !"
     exit -20
 fi
 
 echo " - Configuring host flink config part"
-. ./setupFlinkCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupFlinkCommon.sh
 if [[ $? != 0 ]]; then
     echo "FLink Common configuration part failed !"
     exit -20
 fi
 
 echo " - Configuring host ElasticSearch config part"
-. ./setupESCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "ES Common configuration part failed !"
     exit -20
 fi
 
 echo " - Configuring host logstash config part"
-. ./setupLogstashCommon.sh $SELF_IP_ADDRESS $GLUSTER_AVAILABLE
+. ./setupLogstashCommon.sh
 if [[ $? != 0 ]]; then
     echo "Logstash Common configuration part failed !"
     exit -20
@@ -147,7 +147,7 @@ fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 
 echo " - Configuring zeppelin container (config spark script)"
-docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
+docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
         | tee -a /tmp/zeppelin_install_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
@@ -156,7 +156,7 @@ if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" 
 fi
 
 echo " - Configuring zeppelin container (config flink script)"
-docker exec zeppelin bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $SELF_IP_ADDRESS \
+docker exec zeppelin bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
         | tee -a /tmp/zeppelin_install_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
@@ -165,7 +165,7 @@ if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" 
 fi
 
 echo " - Configuring zeppelin container"
-docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh $SELF_IP_ADDRESS | tee -a /tmp/zeppelin_install_log 2>&1
+docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee -a /tmp/zeppelin_install_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/zeppelin_install_log

@@ -78,7 +78,7 @@ preinstall_unmount_gluster_share /var/lib/spark/eventlog
 preinstall_unmount_gluster_share /var/lib/spark/data
 
 echo " - Configuring host spark common part"
-. ./setupCommon.sh $SELF_IP_ADDRESS
+. ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
     exit -20

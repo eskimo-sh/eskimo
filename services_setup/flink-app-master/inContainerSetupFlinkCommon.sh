@@ -45,12 +45,6 @@ if [[ $FLINK_USER_ID == "" ]]; then
     exit -2
 fi
 
-SELF_IP_ADDRESS=$2
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
-    exit -2
-fi
-
 
 echo "-- SETTING UP FLINK (COMMON PART) --------------------------------------"
 

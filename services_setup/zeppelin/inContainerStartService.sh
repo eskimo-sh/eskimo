@@ -53,6 +53,15 @@ echo " - Creating required directory /var/run/spark/zeppelin (as spark)"
 sudo /bin/mkdir -p /var/run/spark/zeppelin
 sudo /bin/chown spark /var/run/spark/zeppelin
 
+echo " - Basic mesos configuration for mesos Scheduler (set env vars)"
+# point to your libmesos.so if you use Mesos
+export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so
+# Set external IP for Mesos Scheduler used by Flink / Marathon / etc. to reach mesos (required for mesos callback to succeed)
+export LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS
+# Adding it to spark-env as well
+bash -c "echo -e \"\n# Set external IP for Mesos Scheduler used by Flink / Marathon / etc. to reach mesos (required for mesos callback to succeed)\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+bash -c "echo -e \"export LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+
 echo " - Inject settings (Zeppelin)"
 /usr/local/sbin/settingsInjector.sh zeppelin
 
