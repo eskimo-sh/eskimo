@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
@@ -51,9 +52,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 public class MarathonServiceTest extends AbstractSystemTest {
@@ -83,6 +88,17 @@ public class MarathonServiceTest extends AbstractSystemTest {
             @Override
             public ProxyTunnelConfig getTunnelConfig(String serviceId) {
                 return new ProxyTunnelConfig(12345, "192.178.10.11", 5050);
+            }
+        };
+    }
+
+    @Override
+    protected SystemService createSystemService() {
+        return new SystemService() {
+            @Override
+            String sendPing(String ipAddress) throws SSHCommandException {
+                super.sendPing(ipAddress);
+                return "OK";
             }
         };
     }
@@ -222,12 +238,57 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
     @Test
     public void testFetchMarathonServicesStatus () throws Exception {
-        fail ("To Be Implemented");
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>("192.168.10.13", "running");
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+
+        marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
+
+        assertEquals(7, statusMap.size());
+        assertEquals("OK", statusMap.get("service_cerebro_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_kibana_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_spark-history-server_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_gdash_192-168-10-13"));
+        assertEquals("TD", statusMap.get("service_grafana_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_zeppelin_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_kafka-manager_192-168-10-13"));
     }
 
     @Test
     public void testShouldInstall () throws Exception {
-        fail ("To Be Implemented");
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+
+        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "cerebro"));
+        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "kibana"));
+        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "spark-history-server"));
+        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "gdash"));
+        assertFalse (marathonService.shouldInstall(marathonServicesConfig, "grafana"));
+        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "zeppelin"));
+        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "kafka-manager"));
     }
 
     @Test
@@ -237,16 +298,94 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
     @Test
     public void testStartServiceMarathon () throws Exception {
-        fail ("To Be Implemented");
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>("192.168.10.13", "OK");
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        marathonService.startServiceMarathon(servicesDefinition.getService("cerebro"));
+
+        System.out.println(testSSHCommandResultBuilder);
+        System.err.println(testSSHCommandScript);
+        System.err.println(String.join(",", marathonApiCalls));
+
+        assertEquals(1, marathonApiCalls.size());
+        assertEquals("http://localhost:12345/v2/apps/cerebro", marathonApiCalls.get(0));
+
     }
 
     @Test
     public void testStopServiceMarathon () throws Exception {
-        fail ("To Be Implemented");
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>("192.168.10.13", "running");
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        marathonService.stopServiceMarathon(servicesDefinition.getService("cerebro"));
+
+        assertEquals(1, marathonApiCalls.size());
+        assertEquals("http://localhost:12345/v2/apps/cerebro/tasks?scale=true", marathonApiCalls.get(0));
     }
 
     @Test
     public void testRestartServiceMarathon() throws Exception {
-        fail ("To Be Implemented");
+
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+        final AtomicInteger callCounter = new AtomicInteger(0);
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                if (callCounter.incrementAndGet() > 2) {
+                    return new Pair<>("192.168.10.13", "OK");
+                }
+                return new Pair<>("192.168.10.13", "running");
+
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        marathonService.restartServiceMarathon(servicesDefinition.getService("cerebro"));
+
+        assertEquals(2, marathonApiCalls.size());
+        assertEquals("http://localhost:12345/v2/apps/cerebro/tasks?scale=true", marathonApiCalls.get(0));
+        assertEquals("http://localhost:12345/v2/apps/cerebro", marathonApiCalls.get(1));
     }
 }

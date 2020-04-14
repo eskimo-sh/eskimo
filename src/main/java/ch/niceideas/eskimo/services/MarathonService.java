@@ -498,10 +498,11 @@ public class MarathonService {
                     logger.debug(e, e);
                 }
 
+                MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
                 for (String service : servicesDefinition.listMarathonServices()) {
 
                     // should service be installed on marathon ?
-                    boolean shall = this.shouldInstall(service);
+                    boolean shall = this.shouldInstall(marathonConfig, service);
 
                     // check if service is installed ?
                     //check if service installed using SSH
@@ -542,8 +543,7 @@ public class MarathonService {
         }
     }
 
-    boolean shouldInstall(String service) throws SetupException, SystemException {
-        MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+    boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) throws SetupException, SystemException {
         if (marathonConfig != null) {
 
             // search it in config

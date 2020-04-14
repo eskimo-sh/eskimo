@@ -46,7 +46,10 @@ public class ConfigurationServiceTest {
         };
         configurationService.setSetupService(setupService);
 
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+        File storagePathConfDir = File.createTempFile("eskimo_storage", "");
+        storagePathConfDir.delete();
+        storagePathConfDir.mkdirs();
+        setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
     }
 
     @Test

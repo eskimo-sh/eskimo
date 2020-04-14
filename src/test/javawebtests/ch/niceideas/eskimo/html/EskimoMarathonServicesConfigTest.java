@@ -62,11 +62,12 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        // instantiate test object
-        page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
         */
 
-        waitForElementIdInDOM("reset-nodes-config");
+        // instantiate test object
+        page.executeJavaScript("eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();");
+
+        waitForElementIdInDOM("reset-marathon-servicesconfig");
 
         /*
 

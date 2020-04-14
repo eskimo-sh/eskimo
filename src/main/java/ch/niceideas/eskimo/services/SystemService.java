@@ -355,8 +355,9 @@ public class SystemService {
                 String marathonIpAddress = marathonService.findUniqueServiceIP("marathon");
                 if (StringUtils.isNotBlank(marathonIpAddress)) {
                     String marathonNode = marathonIpAddress.replace(".", "-");
+                    MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
                     for (String service : servicesDefinition.listMarathonServices()) {
-                        if (marathonService.shouldInstall (service)) {
+                        if (marathonService.shouldInstall (marathonConfig, service)) {
                             statusMap.put(SERVICE_PREFIX + service + "_" + marathonNode, "KO");
                         }
                     }

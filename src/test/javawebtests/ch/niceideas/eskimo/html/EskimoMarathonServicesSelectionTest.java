@@ -34,10 +34,12 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.*;
 
 public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
@@ -52,15 +54,39 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
 
         waitForElementIdInDOM("marathon-services-selection-body");
+
+        String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesSelectionTest/form.html"));
+
+        page.executeJavaScript("INNER_FORM = '" + htmlForm.replace("\n", " ") + "';");
+
+        page.executeJavaScript("$('#marathon-services-selection-body').html(INNER_FORM);");
     }
 
     @Test
     public void testNominal() throws Exception {
-        fail ("To Be Implemented");
+
+        // this is just to ensure everything has been properly loaded by setup
+        assertNotNull (page.getElementById("select-all-marathon-services-button"));
     }
 
     @Test
     public void testSelectAll() throws Exception {
-        fail ("To Be Implemented");
+
+        page.executeJavaScript("eskimoMain.marathonServicesConfig = {};");
+        page.executeJavaScript("eskimoMain.getMarathonServicesConfig = function () { return eskimoMain.marathonServicesConfig;} ");
+
+        // leaving gdash out intentionally
+        page.executeJavaScript("eskimoMain.getMarathonServicesConfig().getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana', 'zeppelin']};");
+
+        page.executeJavaScript("eskimoMarathonServicesSelection.marathonServicesSelectionSelectAll();");
+
+        assertTrue ((Boolean)page.executeJavaScript("$('#cerebro_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)page.executeJavaScript("$('#kibana_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)page.executeJavaScript("$('#kafka-manager_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)page.executeJavaScript("$('#spark-history-server_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)page.executeJavaScript("$('#grafana_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)page.executeJavaScript("$('#zeppelin_reinstall').get(0).checked").getJavaScriptResult());
+
+        assertFalse ((Boolean)page.executeJavaScript("$('#gdash_reinstall').get(0).checked").getJavaScriptResult());
     }
 }
