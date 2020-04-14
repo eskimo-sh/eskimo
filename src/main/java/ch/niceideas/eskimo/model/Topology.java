@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 
@@ -54,34 +55,27 @@ public class Topology {
     public static final String SELF_MASTER_PREFIX = "SELF_MASTER_";
     public static final String NODE_NBR_PREFIX = "NODE_NBR_";
 
-    private static Pattern serviceParser = Pattern.compile("([a-zA-Z_\\-]+)([0-9]*)");
-
     private final Map<String, String> definedMasters = new HashMap<>();
     private final Map<String, Map<String, String>> additionalEnvironment = new HashMap<>();
 
-    public static Pair<String, Integer> parseKeyToServiceConfig (String key, NodesConfigWrapper nodesConfig)
+    public static ParsedNodesConfigProperty parseKeyToServiceConfig (String key, NodesConfigWrapper nodesConfig)
             throws NodesConfigurationException {
-        Matcher matcher = serviceParser.matcher(key);
 
-        if (!matcher.matches()) {
+        ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
+        if (property == null) {
             throw new NodesConfigurationException(("Could not parse service config key " + key));
         }
 
-        String serviceName = matcher.group(1);
+        int nodeNbr = getNodeNbr(key, nodesConfig, property);
 
-        int nodeNbr = getNodeNbr(key, nodesConfig, matcher);
-
-        return new Pair<>(serviceName, nodeNbr > -1 ? nodeNbr : null);
+        return new ParsedNodesConfigProperty(property.getServiceName(), nodeNbr > -1 ? nodeNbr : null);
     }
 
-    public static int getNodeNbr(String key, NodesConfigWrapper nodesConfig, Matcher matcher) throws NodesConfigurationException {
+    public static int getNodeNbr(String key, NodesConfigWrapper nodesConfig, ParsedNodesConfigProperty property) throws NodesConfigurationException {
 
         try {
-            if (matcher.groupCount() > 1) {
-                String nbrAsString = matcher.group(2);
-                if (StringUtils.isNotBlank(nbrAsString)) {
-                    return Integer.parseInt(nbrAsString);
-                }
+            if (property != null && property.getNodeNumber() != null) {
+                return property.getNodeNumber().intValue();
             }
 
             return Integer.parseInt((String) nodesConfig.getValueForPath(key));
@@ -102,16 +96,16 @@ public class Topology {
             // Define master for standard services
             for (String key : nodesConfig.getServiceKeys())  {
 
-                Pair<String, Integer> result = parseKeyToServiceConfig (key, nodesConfig);
+                ParsedNodesConfigProperty result = parseKeyToServiceConfig (key, nodesConfig);
 
-                Service service = servicesDefinition.getService(result.getKey());
+                Service service = servicesDefinition.getService(result.getServiceName());
                 if (service == null) {
-                    throw new NodesConfigurationException("Could not find any service definition matching " + result.getKey());
+                    throw new NodesConfigurationException("Could not find any service definition matching " + result.getServiceName());
                 }
 
-                topology.defineMasters(service, deadIps, result.getValue(), nodesConfig);
+                topology.defineMasters(service, deadIps, result.getNodeNumber(), nodesConfig);
 
-                topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getValue(), nodesConfig);
+                topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getNodeNumber(), nodesConfig);
             }
 
             // Define master for marathon services
@@ -444,18 +438,16 @@ public class Topology {
         Set<String> serviceNames = new HashSet<>();
         for (String key : nodesConfig.getRootKeys()) {
 
-            Matcher matcher = serviceParser.matcher(key);
+            ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
 
-            if (!matcher.matches()) {
+            if (property == null) {
                 throw new NodesConfigurationException("Could not parse service config key " + key);
             }
 
-            String serviceName = matcher.group(1);
+            int otherNodeNbr = getNodeNbr(key, nodesConfig, property);
 
-            int other = getNodeNbr(key, nodesConfig, matcher);
-
-            if (other == nodeNbr) {
-                serviceNames.add (serviceName);
+            if (otherNodeNbr == nodeNbr) {
+                serviceNames.add (property.getServiceName());
             }
         }
 

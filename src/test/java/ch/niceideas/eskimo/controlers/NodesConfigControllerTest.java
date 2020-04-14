@@ -46,7 +46,7 @@ public class NodesConfigControllerTest {
 
         assertEquals ("{\n" +
                 "    \"mesos-master\": \"2\",\n" +
-                "    \"marathon\": \"2\",\n" +
+                "    \"marathon\": \"1\",\n" +
                 "    \"zookeeper\": \"2\",\n" +
                 "    \"elasticsearch1\": \"on\",\n" +
                 "    \"elasticsearch2\": \"on\",\n" +
@@ -155,7 +155,7 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
-                "      {\"marathon\": \"192.168.10.13\"},\n" +
+                "      {\"marathon\": \"192.168.10.11\"},\n" +
                 "      {\"gdash\": \"(marathon)\"},\n" +
                 "      {\"spark-history-server\": \"(marathon)\"},\n" +
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
@@ -216,7 +216,7 @@ public class NodesConfigControllerTest {
 
         ncc.setNodesConfigChecker(new NodesConfigurationChecker() {
             @Override
-            public void checkServicesConfig(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
+            public void checkNodesSetup(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
                 // No Op
             }
         });
@@ -239,7 +239,7 @@ public class NodesConfigControllerTest {
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [\n" +
-                "      {\"marathon\": \"192.168.10.13\"},\n" +
+                "      {\"marathon\": \"192.168.10.11\"},\n" +
                 "      {\"mesos-master\": \"192.168.10.13\"},\n" +
                 "      {\"zookeeper\": \"192.168.10.13\"}\n" +
                 "    ],\n" +

@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.Topology;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -80,15 +81,14 @@ public class NodeRangeResolver  {
 
         // 2. Generate retConfig
         for (String key : rawNodesConfig.getRootKeys()) {
-            Pair<String, Integer> serviceConfig = Topology.parseKeyToServiceConfig(key, rawNodesConfig);
+            ParsedNodesConfigProperty property = Topology.parseKeyToServiceConfig(key, rawNodesConfig);
 
             String value = (String) rawNodesConfig.getValueForPath(key);
-            Integer nodeNbr = serviceConfig.getValue();
 
-            if (toBeResolvedNumbers.containsKey(nodeNbr)) {
+            if (toBeResolvedNumbers.containsKey(property.getNodeNumber())) {
                 if (key.startsWith(ACTION_ID_FLAG)) {
 
-                    Map<String, String> generatedConfig = generateRange(rawNodesConfig, nodeNbr, maxNodeNbr, value);
+                    Map<String, String> generatedConfig = generateRange(rawNodesConfig, property.getNodeNumber(), maxNodeNbr, value);
 
                     if (generatedConfig.size() <= 0) {
                         throw new NodesConfigurationException("Range resolves to empty address set : " + value);
@@ -136,13 +136,11 @@ public class NodeRangeResolver  {
         Map<String, String> generatedConfig = new HashMap<>();
 
         for (String key : rawNodesConfig.getRootKeys()) {
-            Pair<String, Integer> serviceConfig = Topology.parseKeyToServiceConfig(key, rawNodesConfig);
+            ParsedNodesConfigProperty property = Topology.parseKeyToServiceConfig(key, rawNodesConfig);
 
-            String service = serviceConfig.getKey();
             String value = (String) rawNodesConfig.getValueForPath(key);
-            Integer nodeNbr = serviceConfig.getValue();
 
-            if (nodeNbr.equals(rangeNodeNbr)) {
+            if (property.getNodeNumber().equals(rangeNodeNbr)) {
 
                 List<String> rangeIps = generateRangeIps (rangeValue);
 
@@ -155,7 +153,7 @@ public class NodeRangeResolver  {
                         actualNbr++;
                     }
 
-                    String newKey = key.endsWith(rangeNodeNbr.toString()) ? service + actualNbr : service;
+                    String newKey = key.endsWith(rangeNodeNbr.toString()) ? property.getServiceName() + actualNbr : property.getServiceName();
                     String newValue;
                     if (key.endsWith(rangeNodeNbr.toString())) {
                         newValue = key.startsWith(ACTION_ID_FLAG) ? ipAddress : value;

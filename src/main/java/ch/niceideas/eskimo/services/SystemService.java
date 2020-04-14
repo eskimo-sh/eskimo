@@ -832,9 +832,12 @@ public class SystemService {
                         }
                         if (StringUtils.isBlank(nodeName)) {
                             nodeName = systemStatus.getFirstNodeName ("marathon");
+                            if (StringUtils.isBlank(nodeName)) {
+                                notificationService.addError("Marathon inconsistency.");
+                            }
                         }
 
-                        Boolean nodeAlive = systemStatus.isNodeAlive (nodeName);
+                        Boolean nodeAlive = StringUtils.isNotBlank(nodeName) ? systemStatus.isNodeAlive (nodeName) : Boolean.FALSE;
                         // this means that node is not configured anymore ! (no status has been obtained)
                         if (nodeAlive == null) {
 

@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.SystemException;
 import org.apache.log4j.Logger;
@@ -50,11 +51,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
+
+    private static Pattern nodesConfigPropertyRE = Pattern.compile("([a-zA-Z\\-_]+)([0-9]*)");
 
     public static final String ACTION_ID_FIELD = "action_id";
 
@@ -115,10 +120,10 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                     }
                 })
                 .filter(Objects::nonNull)
-                .filter(serviceConfig -> serviceConfig.getKey().equals(serviceName))
+                .filter(serviceConfig -> serviceConfig.getServiceName().equals(serviceName))
                 .map(serviceConfig -> {
                     try {
-                        return getNodeAddress (serviceConfig.getValue());
+                        return getNodeAddress (serviceConfig.getNodeNumber());
                     } catch (JSONException e) {
                         logger.debug (e, e);
                         return null;
@@ -147,6 +152,28 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
         return getServicesForNode(getNodeNumber(ipAddress));
     }
 
+    public static ParsedNodesConfigProperty parseProperty (String property) {
+        Matcher matcher = nodesConfigPropertyRE.matcher(property);
+
+        if (matcher.matches()) {
+
+            if (matcher.groupCount() >= 2 && StringUtils.isNotBlank(matcher.group(2))) {
+
+                return new ParsedNodesConfigProperty (matcher.group(1), Integer.valueOf (matcher.group(2)));
+
+            } else if (matcher.groupCount() >= 1) {
+
+                return new ParsedNodesConfigProperty (matcher.group(1), null);
+
+            } else {
+
+                return new ParsedNodesConfigProperty (null, null);
+            }
+        }
+
+        return null;
+    }
+
     public List<String> getServicesForNode (int number) {
         return getServiceKeys().stream()
                 .map (key -> {
@@ -158,8 +185,8 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                     }
                 })
                 .filter(Objects::nonNull)
-                .filter(serviceConfig -> serviceConfig.getValue() == number)
-                .map(Pair::getKey)
+                .filter(serviceConfig -> serviceConfig.getNodeNumber() == number)
+                .map(ParsedNodesConfigProperty::getServiceName)
                 .collect(Collectors.toList());
     }
 
@@ -221,8 +248,8 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
                         throw new TopologyException(e);
                     }
                 })
-                .filter(result -> result.getKey().equals(service))
-                .map(result -> result.getValue() == null ? -1 : result.getValue())
+                .filter(result -> result.getServiceName().equals(service))
+                .map(result -> result.getNodeNumber() == null ? -1 : result.getNodeNumber())
                 .filter (value -> value != -1)
                 .collect(Collectors.toList());
     }
@@ -241,5 +268,24 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
             super (cause);
         }
 
+    }
+
+    public static final class ParsedNodesConfigProperty {
+
+        private final String serviceName;
+        private final Integer nodeNumber;
+
+        public ParsedNodesConfigProperty(String serviceName, Integer nodeNumber) {
+            this.serviceName = serviceName;
+            this.nodeNumber = nodeNumber;
+        }
+
+        public String getServiceName() {
+            return serviceName;
+        }
+
+        public Integer getNodeNumber() {
+            return nodeNumber;
+        }
     }
 }

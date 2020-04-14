@@ -35,18 +35,17 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import com.gargoylesoftware.htmlunit.ScriptResult;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-public class EskimoServicesConfigCheckerTest  {
+public class NodesConfigurationCheckerTest {
 
     private NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
 
@@ -67,7 +66,7 @@ public class EskimoServicesConfigCheckerTest  {
             put("prometheus1", "on");
         }});
 
-        nodeConfigChecker.checkServicesConfig(nodesConfig);
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
     }
 
     @Test
@@ -80,7 +79,7 @@ public class EskimoServicesConfigCheckerTest  {
                 put("prometheus1", "on");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Node 1 has IP configured as blabla which is not an IP address or a range.", exception.getMessage());
@@ -92,7 +91,7 @@ public class EskimoServicesConfigCheckerTest  {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("action_id2", "192.168.10.12");
-                put("cerebro", "2");
+                put("marathon", "2");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -103,8 +102,6 @@ public class EskimoServicesConfigCheckerTest  {
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("kibana", "2");
-                put("gdash", "1");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -112,12 +109,10 @@ public class EskimoServicesConfigCheckerTest  {
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "2");
                 put("zookeeper", "1");
         }});
 
-        nodeConfigChecker.checkServicesConfig(nodesConfig);
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
     }
 
     @Test
@@ -126,7 +121,7 @@ public class EskimoServicesConfigCheckerTest  {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("action_id2", "192.168.10.12-192.160.10.15");
-                put("cerebro", "1");
+                put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -137,8 +132,6 @@ public class EskimoServicesConfigCheckerTest  {
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("kibana", "1");
-                put("gdash", "1");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -146,12 +139,10 @@ public class EskimoServicesConfigCheckerTest  {
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
         }});
 
-        nodeConfigChecker.checkServicesConfig(nodesConfig);
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
     }
 
     @Test
@@ -159,22 +150,19 @@ public class EskimoServicesConfigCheckerTest  {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
+                put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
                 put("ntp1", "on");
                 put("prometheus1", "on");
-                put("kibana", "1");
                 put("logstash1", "on");
                 put("mesos-agent1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
         }});
 
-        nodeConfigChecker.checkServicesConfig(nodesConfig);
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
     }
 
     @Test
@@ -184,7 +172,7 @@ public class EskimoServicesConfigCheckerTest  {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                     put("action_id1", "192.168.10.11");
                     put("action_id2", "192.168.10.12-192.160.10.15");
-                    put("cerebro", "1");
+                    put("marathon", "2");
                     put("elasticsearch1", "on");
                     put("elasticsearch2", "on");
                     put("kafka1", "on");
@@ -195,8 +183,6 @@ public class EskimoServicesConfigCheckerTest  {
                     put("prometheus2", "on");
                     put("gluster1", "on");
                     put("gluster2", "on");
-                    put("kibana", "1");
-                    put("gdash", "2");
                     put("logstash1", "on");
                     put("logstash2", "on");
                     put("mesos-agent1", "on");
@@ -204,15 +190,13 @@ public class EskimoServicesConfigCheckerTest  {
                     put("mesos-master", "1");
                     put("spark-executor1", "on");
                     put("spark-executor2", "on");
-                    put("spark-history-server", "1");
-                    put("zeppelin", "1");
                     put("zookeeper", "1");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Node 2 is a range an declares service gdash which is a unique service, hence forbidden on a range.", exception.getMessage());
+        assertEquals("Node 2 is a range an declares service marathon which is a unique service, hence forbidden on a range.", exception.getMessage());
     }
 
     @Test
@@ -222,15 +206,13 @@ public class EskimoServicesConfigCheckerTest  {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                     put("action_id1", "192.168.10.11");
                     put("action_id2", "192.168.10.12");
-                    put("cerebro", "2");
+                    put("marathon", "2");
                     put("elasticsearch1", "on");
                     put("elasticsearch2", "on");
                     put("kafka1", "on");
                     put("kafka2", "on");
                     put("ntp1", "on");
                     put("ntp2", "on");
-                    put("kibana", "2");
-                    put("gdash", "1");
                     put("logstash1", "on");
                     put("logstash2", "on");
                     put("mesos-agent1", "on");
@@ -238,17 +220,14 @@ public class EskimoServicesConfigCheckerTest  {
                     put("mesos-master", "1");
                     put("spark-executor1", "on");
                     put("spark-executor2", "on");
-                    put("spark-history-server", "1");
-                    put("zeppelin", "2");
                     put("zookeeper", "1");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
     }
-
 
     @Test
     public void testNoIPConfigured() throws Exception {
@@ -258,7 +237,7 @@ public class EskimoServicesConfigCheckerTest  {
                         put("action_id1", "");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Node 1 has no IP configured.", exception.getMessage());
@@ -272,14 +251,16 @@ public class EskimoServicesConfigCheckerTest  {
                         put("action_id2", "192.168.10.11");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : got key action_id2 which is greater than node number 1", exception.getMessage());
     }
 
     @Test
-    public void testOneCerebroNutNoES() throws Exception {
+    public void testOneCerebroButNoES() throws Exception {
+
+        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
@@ -289,7 +270,7 @@ public class EskimoServicesConfigCheckerTest  {
                     put("prometheus1", "on");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : Service cerebro expects 1 elasticsearch instance(s). But only 0 has been found !", exception.getMessage());
@@ -304,7 +285,7 @@ public class EskimoServicesConfigCheckerTest  {
                     put("ntp1", "on");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : service prometheus is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
@@ -325,7 +306,7 @@ public class EskimoServicesConfigCheckerTest  {
                     put("spark-executor2", "on");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
@@ -333,6 +314,8 @@ public class EskimoServicesConfigCheckerTest  {
 
     @Test
     public void testGdashButNoGluster() throws Exception {
+
+        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
@@ -345,7 +328,7 @@ public class EskimoServicesConfigCheckerTest  {
                     put("logstash1", "on");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : Service gdash was expecting a service gluster on same node, but none were found !", exception.getMessage());
@@ -357,7 +340,7 @@ public class EskimoServicesConfigCheckerTest  {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
+                put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
                 put("ntp1", "on");
@@ -367,12 +350,10 @@ public class EskimoServicesConfigCheckerTest  {
                 put("mesos-agent1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : Service gluster expects 1 gluster instance(s). But only 0 has been found !", exception.getMessage());
@@ -387,13 +368,13 @@ public class EskimoServicesConfigCheckerTest  {
                 //put("mesos-agent1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
+                put("marathon", "1");
                 put("ntp1", "on");
                 put("prometheus1", "on");
                 put("zookeeper", "1");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : Service spark-executor was expecting a service mesos-agent on same node, but none were found !", exception.getMessage());
@@ -408,20 +389,19 @@ public class EskimoServicesConfigCheckerTest  {
                 put("mesos-agent1", "on");
                 //put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
                 put("zookeeper", "1");
                 put("ntp1", "on");
                 put("prometheus1", "on");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : Service mesos-agent expects 1 mesos-master instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
-    public void testNoMesosMasterButNoZookeeper() throws Exception {
+    public void testMesosMasterButNoZookeeper() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
@@ -431,18 +411,41 @@ public class EskimoServicesConfigCheckerTest  {
                 put("spark-executor1", "on");
                 put("ntp1", "on");
                 put("prometheus1", "on");
-                put("spark-history-server", "1");
                 //put("zookeeper", "1");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
         assertEquals("Inconsistency found : Service mesos-agent expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
-    public void testFlinkAndZookeeperSeparated() throws Exception {
+    public void testFlinkAndZookeeperSeparatedIsNowOK() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("action_id2", "192.168.10.12");
+            put("ntp1", "on");
+            put("ntp2", "on");
+            put("mesos-agent1", "on");
+            put("mesos-agent2", "on");
+            put("prometheus1", "on");
+            put("prometheus2", "on");
+            put("gluster1", "on");
+            put("gluster2", "on");
+            put("mesos-master", "1");
+            put("zookeeper", "1");
+            put("flink-worker1", "on");
+            put("flink-worker2", "on");
+            put("flink-app-master", "2");
+        }});
+
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
+    }
+
+    @Test
+    public void testNoMarathonServiceCanBeSelected() throws Exception {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
@@ -457,15 +460,14 @@ public class EskimoServicesConfigCheckerTest  {
                 put("gluster2", "on");
                 put("mesos-master", "1");
                 put("zookeeper", "1");
-                put("flink-worker1", "on");
-                put("flink-worker2", "on");
-                put("flink-app-master", "2");
+                put("cerebro", "2");
             }});
 
-            nodeConfigChecker.checkServicesConfig(nodesConfig);
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
+
         });
 
-        assertEquals("Inconsistency found : Service flink-app-master was expecting a service zookeeper on same node, but none were found !", exception.getMessage());
+        assertEquals("Inconsistency found : service cerebro is a marathon service which should not be selectable here.", exception.getMessage());
     }
 
 }

@@ -197,7 +197,7 @@ public class NodesConfigController {
 
             // first of all check nodes config
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(configAsString);
-            nodesConfigChecker.checkServicesConfig(nodesConfig);
+            nodesConfigChecker.checkNodesSetup(nodesConfig);
 
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 

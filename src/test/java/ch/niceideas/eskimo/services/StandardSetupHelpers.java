@@ -59,7 +59,7 @@ public class StandardSetupHelpers {
             put("action_id2", "192.168.10.13");
             //put("gdash", "2");
             put("mesos-master", "2");
-            put("marathon", "2");
+            put("marathon", "1");
             //put("spark-history-server", "2");
             //put("zeppelin", "2");
             put("zookeeper", "2");
@@ -90,7 +90,7 @@ public class StandardSetupHelpers {
             put("mesos-agent_installed_on_IP_192-168-10-11", "OK");
             put("mesos-agent_installed_on_IP_192-168-10-13", "OK");
             put("mesos-master_installed_on_IP_192-168-10-13", "OK");
-            put("marathon_installed_on_IP_192-168-10-13", "OK");
+            put("marathon_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-13", "OK");
             put("spark-executor_installed_on_IP_192-168-10-11", "OK");

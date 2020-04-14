@@ -128,7 +128,7 @@ public class MarathonServicesConfigController {
             MarathonServicesConfigWrapper marathonServicesConfig = new MarathonServicesConfigWrapper(configAsString);
 
             // FIXME
-            //marathonServicesConfigChecker.checkServicesConfig(marathonServicesConfig);
+            //marathonServicesConfigChecker.checkNodesSetup(marathonServicesConfig);
 
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 

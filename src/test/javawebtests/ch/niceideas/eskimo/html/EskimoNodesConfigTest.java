@@ -55,6 +55,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
         loadScript(page, "eskimoUtils.js");
+        loadScript(page, "eskimoNodesConfigurationChecker.js");
         loadScript(page, "eskimoNodesConfig.js");
 
         page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\" ];");

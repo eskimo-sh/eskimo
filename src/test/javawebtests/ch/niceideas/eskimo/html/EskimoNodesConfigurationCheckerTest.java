@@ -37,6 +37,8 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.gargoylesoftware.htmlunit.ScriptResult;
 import org.json.JSONObject;
@@ -45,10 +47,12 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
-public class NodesConfigCheckSetupTest extends AbstractWebTest {
+public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
     private String jsonServices = null;
 
@@ -57,7 +61,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
-        loadScript(page, "eskimoNodesConfig.js");
+        loadScript(page, "eskimoNodesConfigurationChecker.js");
 
         ServicesController sc = new ServicesController();
 
@@ -68,23 +72,18 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         String servicesDependencies = sc.getServicesDependencies();
 
-        page.executeJavaScript("SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
+        page.executeJavaScript("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"];");
-        page.executeJavaScript("MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
-        page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        page.executeJavaScript("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"marathon\" ];");
+        page.executeJavaScript("var MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
+        page.executeJavaScript("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        page.executeJavaScript("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        page.executeJavaScript("var SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        // instantiate test object
-        page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
-
-
-        // set services for tests
-        page.executeJavaScript("eskimoNodesConfig.setServicesDependenciesForTest (SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);");
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfigForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
+        page.executeJavaScript("function callCheckNodeSetup(config) {\n" +
+                "   return checkNodesSetup(config, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
+                "}");
 
     }
 
@@ -97,7 +96,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -109,7 +108,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -118,7 +117,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("action_id1", "192.168.10.11");
             put("action_id2", "192.168.10.12");
-            put("cerebro", "2");
+            put("marathon", "2");
             put("elasticsearch1", "on");
             put("elasticsearch2", "on");
             put("kafka1", "on");
@@ -127,8 +126,6 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("ntp2", "on");
             put("gluster1", "on");
             put("gluster2", "on");
-            put("kibana", "2");
-            put("gdash", "1");
             put("logstash1", "on");
             put("logstash2", "on");
             put("mesos-agent1", "on");
@@ -136,12 +133,10 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("mesos-master", "1");
             put("spark-executor1", "on");
             put("spark-executor2", "on");
-            put("spark-history-server", "1");
-            put("zeppelin", "2");
             put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -150,7 +145,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("action_id2", "192.168.10.12-192.160.10.15");
-                put("cerebro", "1");
+                put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -161,8 +156,6 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("kibana", "1");
-                put("gdash", "1");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -170,12 +163,10 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -183,23 +174,19 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
+                put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
                 put("ntp1", "on");
-                put("kibana", "1");
                 put("logstash1", "on");
                 put("mesos-agent1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("true", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
-
 
     @Test
     public void testUniqueServiceOnRange() throws Exception {
@@ -207,7 +194,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("action_id2", "192.168.10.12-192.160.10.15");
-                put("cerebro", "1");
+                put("marathon", "2");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -218,8 +205,6 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("kibana", "1");
-                put("gdash", "2");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -227,14 +212,37 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
+    @Test
+    public void testMissingGluster() throws Exception {
+
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("action_id2", "192.168.10.12");
+            put("marathon", "2");
+            put("elasticsearch1", "on");
+            put("elasticsearch2", "on");
+            put("kafka1", "on");
+            put("kafka2", "on");
+            put("ntp1", "on");
+            put("ntp2", "on");
+            put("logstash1", "on");
+            put("logstash2", "on");
+            put("mesos-agent1", "on");
+            put("mesos-agent2", "on");
+            put("mesos-master", "1");
+            put("spark-executor1", "on");
+            put("spark-executor2", "on");
+            put("zookeeper", "1");
+        }});
+
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+    }
 
     @Test
     public void testNoIPConfigured() throws Exception {
@@ -243,7 +251,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("action_id1", "");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");    }
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");    }
 
     @Test
     public void testKeyGreaterThanNodeNumber() throws Exception {
@@ -252,11 +260,13 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("action_id2", "192.168.10.11");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
     public void testOneCerebroButNoES() throws Exception {
+
+        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckSetupTest");
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
@@ -264,7 +274,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("ntp1", "on");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -279,11 +289,13 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("ntp2", "on");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
     public void testGdashButNoGluster() throws Exception {
+
+        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
@@ -294,7 +306,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("logstash1", "on");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -302,7 +314,7 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
+                put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("ntp1", "on");
                 put("kafka1", "on");
@@ -311,12 +323,10 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("mesos-agent1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
-                put("zeppelin", "1");
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -327,11 +337,11 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("mesos-master", "1");
                 put("ntp", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
+                put("marathon", "1");
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -341,11 +351,10 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("action_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -357,14 +366,13 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
                 put("ntp1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-                put("spark-history-server", "1");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
-    public void testFlinkAndZookeeperSeparated() throws Exception {
+    public void testFlinkAndZookeeperSeparatedIsNowOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("action_id1", "192.168.10.11");
@@ -384,7 +392,30 @@ public class NodesConfigCheckSetupTest extends AbstractWebTest {
             put("flink-app-master", "2");
         }});
 
-        assertJavascriptEquals("false", "eskimoNodesConfig.checkNodesSetup(" + nodesConfig.toString() + ")");
+        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
+
+
+    @Test
+    public void testNoMarathonServiceCanBeSelected() throws Exception {
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("action_id2", "192.168.10.12");
+            put("ntp1", "on");
+            put("ntp2", "on");
+            put("mesos-agent1", "on");
+            put("mesos-agent2", "on");
+            put("prometheus1", "on");
+            put("prometheus2", "on");
+            put("gluster1", "on");
+            put("gluster2", "on");
+            put("mesos-master", "1");
+            put("zookeeper", "1");
+            put("cerebro", "2");
+        }});
+
+        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+    }
+
 
 }

@@ -34,8 +34,10 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -48,8 +50,6 @@ import java.util.regex.Pattern;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class NodesConfigurationChecker {
 
-    private static Pattern re = Pattern.compile("([a-zA-Z\\-_]+)([0-9]*)");
-
     private static Pattern ipAddressCheck = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+){0,1}");
 
     @Autowired
@@ -60,7 +60,205 @@ public class NodesConfigurationChecker {
     }
 
 
-    public void checkServicesConfig(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
+    public void checkNodesSetup(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
+
+        // check IP addresses and ranges configuration
+        int nodeCount = checkIPAddressesAndRanges(nodesConfig);
+
+        // foolproof bug check : make sure all ids are within node count
+        checkIDSWithinNodeRanges(nodesConfig, nodeCount);
+
+        // foolproof bug check : make sure no marathon service can be selected here
+        checkNoMarathonServicesSelected(nodesConfig);
+
+        // enforce mandatory services
+        enforceMandatoryServices(nodesConfig, nodeCount);
+
+        // enforce dependencies
+        enforceDependencies(nodesConfig);
+    }
+
+    void enforceDependencies(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
+
+        // enforce dependencies
+        for (String key : nodesConfig.getServiceKeys()) {
+
+            ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
+            if (property != null && StringUtils.isNotBlank(property.getServiceName())) {
+
+                int nodeNbr = Topology.getNodeNbr(key, nodesConfig, property);
+
+                Service service = servicesDefinition.getService(property.getServiceName());
+
+                for (Dependency dependency : service.getDependencies()) {
+
+                    Service otherService = servicesDefinition.getService(dependency.getMasterService());
+                    if (otherService.isMarathon()) {
+                        throw new NodesConfigurationException(
+                                "Inconsistency found : Service " + property.getServiceName() + " is defining a dependency on a marathon service :  " +
+                                        dependency.getMasterService() + ", which is disallowed");
+                    }
+
+                    // I want the dependency on same node if dependency is mandatory
+                    if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)) {
+
+                        enforceDependencySameNode(nodesConfig, property, nodeNbr, dependency);
+                    }
+
+                    // I want the dependency somewhere
+                    else if (dependency.isMandatory()) {
+
+                        // ensure count of dependencies are available
+                        enforceMandatoryDependency(nodesConfig, property, nodeNbr, dependency);
+                    }
+                }
+            }
+        }
+    }
+
+    private void enforceMandatoryDependency(NodesConfigWrapper nodesConfig, NodesConfigWrapper.ParsedNodesConfigProperty property, int nodeNbr, Dependency dependency) throws NodesConfigurationException {
+
+        // ensure count of dependencies are available
+        int expectedCount = dependency.getNumberOfMasters();
+        int actualCount = 0;
+
+        for (String otherKey : nodesConfig.keySet()) {
+            NodesConfigWrapper.ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
+            if (otherProperty != null && StringUtils.isNotBlank(otherProperty.getServiceName())) {
+
+                if (otherProperty.getServiceName().equals(dependency.getMasterService())) {
+
+                    // RANDOM_NODE_AFTER wants a different node, I need to check IPs
+                    if (dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
+
+                        int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
+                        if (otherNodeNbr == nodeNbr) {
+                            continue;
+                        }
+                    }
+
+                    actualCount++;
+                }
+            }
+        }
+
+        if (actualCount < expectedCount) {
+            throw new NodesConfigurationException(
+                    "Inconsistency found : Service " + property.getServiceName() + " expects " + expectedCount
+                            + " " + dependency.getMasterService() + " instance(s). " +
+                            "But only " + actualCount + " has been found !");
+        }
+    }
+
+    private void enforceDependencySameNode(NodesConfigWrapper nodesConfig, NodesConfigWrapper.ParsedNodesConfigProperty property, int nodeNbr, Dependency dependency) throws NodesConfigurationException {
+        boolean serviceFound = false;
+        for (String otherKey : nodesConfig.keySet()) {
+
+            NodesConfigWrapper.ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
+            if (otherProperty != null && StringUtils.isNotBlank(otherProperty.getServiceName())) {
+
+                if (otherProperty.getServiceName().equals(dependency.getMasterService())) {
+
+                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
+                    if (otherNodeNbr == nodeNbr) {
+
+                        serviceFound = true;
+                    }
+                }
+            }
+        }
+
+        if (!serviceFound && dependency.isMandatory()) {
+            throw new NodesConfigurationException(
+                    "Inconsistency found : Service " + property.getServiceName() + " was expecting a service " +
+                            dependency.getMasterService() + " on same node, but none were found !");
+        }
+    }
+
+    void enforceMandatoryServices(NodesConfigWrapper nodesConfig, int nodeCount) throws NodesConfigurationException {
+
+        // enforce mandatory services
+        for (String mandatoryServiceName : servicesDefinition.listMandatoryServices()) {
+
+            Service mandatoryService = servicesDefinition.getService(mandatoryServiceName);
+
+            ConditionalInstallation conditional = mandatoryService.getConditional();
+
+            if (conditional.equals(ConditionalInstallation.NONE) ||
+                    (conditional.equals(ConditionalInstallation.MULTIPLE_NODES) && nodeCount > 1)) {
+
+                int foundNodes = 0;
+                // just make sure it is installed on every node
+                for (String key : nodesConfig.keySet()) {
+
+                    ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
+
+                    if (property != null && StringUtils.isNotBlank(property.getServiceName())) {
+
+                        if (property.getServiceName().equals(mandatoryServiceName)) {
+                            foundNodes++;
+                        }
+                    }
+                }
+
+                if (foundNodes != nodeCount) {
+                    throw new NodesConfigurationException("Inconsistency found : service " + mandatoryServiceName + " is mandatory on all nodes but some nodes are lacking it.");
+                }
+            }
+        }
+    }
+
+    void checkNoMarathonServicesSelected(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
+
+        // foolproof bug check : make sure no marathon service can be selected here
+        for (String key : nodesConfig.keySet()) {
+
+            ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
+            if (property != null) {
+
+                if (property != null && StringUtils.isNotBlank(property.getServiceName()) && !property.getServiceName().equals("action_id")) {
+                    Service service = servicesDefinition.getService(property.getServiceName());
+                    if (service.isMarathon()) {
+                        throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName() + " is a marathon service which should not be selectable here.");
+                    }
+                }
+            }
+        }
+    }
+
+    void checkIDSWithinNodeRanges(NodesConfigWrapper nodesConfig, int nodeCount) throws NodesConfigurationException {
+
+        // foolproof bug check : make sure all ids are within node count
+        for (String key : nodesConfig.keySet()) {
+
+            ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
+            if (property != null) {
+
+                if (property.getNodeNumber() != null) {
+
+                    if (!StringUtils.isNumericValue(property.getNodeNumber())) {
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + property.getNodeNumber() + " which is not a numeric value");
+                    }
+
+                    if (property.getNodeNumber() > nodeCount) {
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " which is greater than node number " + nodeCount);
+                    }
+                } else {
+                    String nbr = (String) nodesConfig.getValueForPath(key);
+
+                    if (!StringUtils.isNumericValue(nbr)) {
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + nbr + " which is not a numeric value");
+                    }
+
+                    if (Integer.parseInt(nbr) > nodeCount) {
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + nbr + " which is greater than node number " + nodeCount);
+                    }
+                }
+            }
+        }
+    }
+
+    int checkIPAddressesAndRanges(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
 
         int nodeCount = 0;
 
@@ -83,16 +281,15 @@ public class NodesConfigurationChecker {
 
                         // just make sure it is installed on every node
                         for (String otherKey : nodesConfig.keySet()) {
-                            Matcher otherMatcher = re.matcher(otherKey);
 
-                            if (otherMatcher.matches() && otherMatcher.groupCount() >= 1) {
+                            ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
+                            if (otherProperty != null) {
 
-                                String serviceName = otherMatcher.group(1);
-                                if (serviceName.equals(uniqueServiceName)) {
+                                if (otherProperty.getServiceName().equals(uniqueServiceName)) {
 
-                                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
+                                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
                                     if (otherNodeNbr == nodeNbr) {
-                                        throw new NodesConfigurationException("Node " + key.substring(9) + " is a range an declares service " + serviceName + " which is a unique service, hence forbidden on a range.");
+                                        throw new NodesConfigurationException("Node " + key.substring(9) + " is a range an declares service " + otherProperty.getServiceName() + " which is a unique service, hence forbidden on a range.");
                                     }
                                 }
                             }
@@ -101,149 +298,7 @@ public class NodesConfigurationChecker {
                 }
             }
         }
-
-        // foolproof bug check : make sure all ids are within node count
-        for (String key : nodesConfig.keySet()) {
-
-            Matcher matcher = re.matcher(key);
-
-            if (matcher.matches()) {
-
-                if (matcher.groupCount() >= 2 && StringUtils.isNotBlank(matcher.group(2))) {
-
-                    if (!StringUtils.isNumericValue(matcher.group(2))) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + matcher.group(2) + " which is not a numeric value");
-                    }
-
-                    if (Integer.parseInt(matcher.group(2)) > nodeCount) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " which is greater than node number " + nodeCount);
-                    }
-                } else {
-                    String nbr = (String) nodesConfig.getValueForPath(key);
-
-                    if (!StringUtils.isNumericValue(nbr)) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + nbr + " which is not a numeric value");
-                    }
-
-                    if (Integer.parseInt(nbr) > nodeCount) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + nbr + " which is greater than node number " + nodeCount);
-                    }
-                }
-            }
-        }
-
-        // enforce mandatory services
-        for (String mandatoryServiceName : servicesDefinition.listMandatoryServices()) {
-
-            Service mandatoryService = servicesDefinition.getService(mandatoryServiceName);
-
-            ConditionalInstallation conditional = mandatoryService.getConditional();
-
-            if (conditional.equals(ConditionalInstallation.NONE) ||
-                    (conditional.equals(ConditionalInstallation.MULTIPLE_NODES) && nodeCount > 1)) {
-
-                int foundNodes = 0;
-                // just make sure it is installed on every node
-                for (String key : nodesConfig.keySet()) {
-                    Matcher matcher = re.matcher(key);
-
-                    if (matcher.matches() && matcher.groupCount() >= 1) {
-
-                        String serviceName = matcher.group(1);
-                        if (serviceName.equals(mandatoryServiceName)) {
-                            foundNodes++;
-                        }
-                    }
-                }
-
-                if (foundNodes != nodeCount) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + mandatoryServiceName + " is mandatory on all nodes but some nodes are lacking it.");
-                }
-            }
-        }
-
-        // enforce dependencies
-        for (String key : nodesConfig.getServiceKeys()) {
-            Matcher matcher = re.matcher(key);
-
-            if (matcher.matches()) {
-                if (matcher.groupCount() >= 1) {
-
-                    String serviceName = matcher.group(1);
-                    int nodeNbr = Topology.getNodeNbr(key, nodesConfig, matcher);
-
-                    Service service = servicesDefinition.getService(serviceName);
-
-                    for (Dependency dependency : service.getDependencies()) {
-
-                        // I want the dependency on same node if dependency is mandatory
-                        if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)) {
-
-                            boolean serviceFound = false;
-                            for (String otherKey : nodesConfig.keySet()) {
-                                Matcher otherMatcher = re.matcher(otherKey);
-
-                                if (otherMatcher.matches() && otherMatcher.groupCount() >= 1) {
-
-                                    String otherServiceName = otherMatcher.group(1);
-                                    if (otherServiceName.equals(dependency.getMasterService())) {
-
-                                        int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
-                                        if (otherNodeNbr == nodeNbr) {
-
-                                            serviceFound = true;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (!serviceFound && dependency.isMandatory()) {
-                                throw new NodesConfigurationException(
-                                        "Inconsistency found : Service " + serviceName + " was expecting a service " +
-                                                dependency.getMasterService() + " on same node, but none were found !");
-                            }
-                        }
-
-                        // I want the dependency somewhere
-                        else if (dependency.isMandatory()) {
-
-                            // ensure count of dependencies are available
-                            int expectedCount = dependency.getNumberOfMasters();
-                            int actualCount = 0;
-
-                            for (String otherKey : nodesConfig.keySet()) {
-                                Matcher otherMatcher = re.matcher(otherKey);
-
-                                if (otherMatcher.matches() && otherMatcher.groupCount() >= 1) {
-
-                                    String otherServiceName = otherMatcher.group(1);
-                                    if (otherServiceName.equals(dependency.getMasterService())) {
-
-                                        // RANDOM_NODE_AFTER wants a different node, I need to check IPs
-                                        if (dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
-
-                                            int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherMatcher);
-                                            if (otherNodeNbr == nodeNbr) {
-                                                continue;
-                                            }
-                                        }
-
-                                        actualCount++;
-                                    }
-                                }
-                            }
-
-                            if (actualCount < expectedCount) {
-                                throw new NodesConfigurationException(
-                                        "Inconsistency found : Service " + serviceName + " expects " + expectedCount
-                                                + " " + dependency.getMasterService() + " instance(s). " +
-                                                "But only " + actualCount + " has been found !");
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        return nodeCount;
     }
 
 }

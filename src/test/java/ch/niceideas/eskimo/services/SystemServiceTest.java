@@ -187,7 +187,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
-        assertEquals(8, statusMap.size());
+        assertEquals(9, statusMap.size());
 
         assertEquals(null, statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
@@ -238,7 +238,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
 
-        assertEquals(8, statusMap.size());
+        assertEquals(9, statusMap.size());
 
         assertEquals(null, statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
@@ -381,17 +381,19 @@ public class SystemServiceTest extends AbstractSystemTest {
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // kafka and elasticsearch have been kept
+        //System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
-                "    \"cerebro_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"elasticsearch_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"elasticsearch_installed_on_IP_192-168-10-13\": \"OK\",\n" +
                 "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kafka-manager_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kafka-manager_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"kafka_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"kafka_installed_on_IP_192-168-10-13\": \"OK\",\n" +
-                "    \"kibana_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kibana_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"logstash_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"marathon_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"spark-executor_installed_on_IP_192-168-10-11\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
@@ -438,6 +440,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // everything has been removed, including kafka and elasticsearch
+        System.err.println(resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
                 "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"elasticsearch_installed_on_IP_192-168-10-11\": \"OK\",\n" +
@@ -447,6 +450,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "    \"kibana_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"logstash_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"marathon_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"spark-executor_installed_on_IP_192-168-10-11\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));

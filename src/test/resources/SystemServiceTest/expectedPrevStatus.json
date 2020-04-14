@@ -1,13 +1,13 @@
 {
-    "cerebro_installed_on_IP_192-168-10-11": "OK",
+    "cerebro_installed_on_IP_MARATHON_NODE": "OK",
     "elasticsearch_installed_on_IP_192-168-10-11": "OK",
     "elasticsearch_installed_on_IP_192-168-10-13": "OK",
-    "gdash_installed_on_IP_192-168-10-13": "OK",
+    "gdash_installed_on_IP_MARATHON_NODE": "OK",
     "gluster_installed_on_IP_192-168-10-11": "OK",
     "gluster_installed_on_IP_192-168-10-13": "OK",
     "kafka_installed_on_IP_192-168-10-11": "OK",
     "kafka_installed_on_IP_192-168-10-13": "OK",
-    "kibana_installed_on_IP_192-168-10-11": "OK",
+    "kibana_installed_on_IP_MARATHON_NODE": "OK",
     "logstash_installed_on_IP_192-168-10-11": "OK",
     "logstash_installed_on_IP_192-168-10-13": "OK",
     "marathon_installed_on_IP_192-168-10-11": "OK",
@@ -18,7 +18,7 @@
     "ntp_installed_on_IP_192-168-10-13": "OK",
     "spark-executor_installed_on_IP_192-168-10-11": "OK",
     "spark-executor_installed_on_IP_192-168-10-13": "OK",
-    "spark-history-server_installed_on_IP_192-168-10-13": "OK",
-    "zeppelin_installed_on_IP_192-168-10-13": "OK",
+    "spark-history-server_installed_on_IP_MARATHON_NODE": "OK",
+    "zeppelin_installed_on_IP_MARATHON_NODE": "OK",
     "zookeeper_installed_on_IP_192-168-10-13": "OK"
 }
