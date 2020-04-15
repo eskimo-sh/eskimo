@@ -258,25 +258,6 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testOneCerebroButNoES() throws Exception {
-
-        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                    put("action_id1", "192.168.10.11");
-                    put("cerebro", "1");
-                    put("ntp1", "on");
-                    put("prometheus1", "on");
-            }});
-
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : Service cerebro expects 1 elasticsearch instance(s). But only 0 has been found !", exception.getMessage());
-    }
-
-    @Test
     public void testNoPrometheus() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
@@ -310,28 +291,6 @@ public class NodesConfigurationCheckerTest {
         });
 
         assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
-    }
-
-    @Test
-    public void testGdashButNoGluster() throws Exception {
-
-        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                    put("action_id1", "192.168.10.11");
-                    put("cerebro", "1");
-                    put("elasticsearch1", "on");
-                    put("gdash1", "on");
-                    put("ntp1", "on");
-                    put("prometheus1", "on");
-                    put("logstash1", "on");
-            }});
-
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : Service gdash was expecting a service gluster on same node, but none were found !", exception.getMessage());
     }
 
     @Test

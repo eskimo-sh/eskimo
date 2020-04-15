@@ -37,6 +37,9 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.MarathonServicesConfigException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import org.apache.log4j.Logger;
@@ -48,6 +51,7 @@ import java.util.HashMap;
 
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
@@ -62,6 +66,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
         loadScript(page, "eskimoNodesConfigurationChecker.js");
+        loadScript(page, "eskimoMarathonServicesConfigChecker.js");
 
         ServicesController sc = new ServicesController();
 
@@ -74,31 +79,30 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         page.executeJavaScript("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        page.executeJavaScript("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"marathon\" ];");
-        page.executeJavaScript("var MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
-        page.executeJavaScript("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        page.executeJavaScript("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
-
-        page.executeJavaScript("var SERVICES_CONFIGURATION = " + jsonServices + ";");
-
-        page.executeJavaScript("function callCheckNodeSetup(config) {\n" +
-                "   return checkNodesSetup(config, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
+        page.executeJavaScript("function callCheckMarathonSetup(nodesConfig, marathonConfig) {\n" +
+                "   return doCheckMarathonSetup(nodesConfig, marathonConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
                 "}");
-
     }
 
 
     @Test
-    public void testCheckMarathonSetupeOK() throws Exception {
+    public void testCheckMarathonSetupOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("cerebro", "1");
+            put("ntp1", "on");
+            put("prometheus1", "on");
+            put("elasticsearch1", "on");
+        }});
+
+        JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
             put("cerebro_installed", "on");
             put("kibana_install", "on");
             put("grafana_install", "on");
-            put("zeppelin_install", "on");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
     }
 
 
@@ -110,35 +114,41 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
                 put("action_id1", "192.168.10.11");
                 put("cerebro", "1");
                 put("ntp1", "on");
+                put("prometheus1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("cerebro_installed", "on");
+            }});
+
+            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("TODO"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service cerebro expects 1 elasticsearch instance(s). But only 0 has been found !"));
     }
 
     @Test
     public void testGdashButNoGluster() throws Exception {
 
-        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
-
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
-                put("ntp1", "on");
                 put("elasticsearch1", "on");
-                put("gdash", "on");
+                put("ntp1", "on");
+                put("prometheus1", "on");
                 put("logstash1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("gdash_installed", "on");
+            }});
+
+            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("TODO"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service gdash expects 1 gluster instance(s). But only 0 has been found !"));
     }
 
     @Test
@@ -147,46 +157,19 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
-                put("mesos-master", "1");
-                put("ntp", "1");
-                put("spark-executor1", "on");
-                put("marathon", "1");
-                put("zookeeper", "1");
-            }});
-
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-executor was expecting a service mesos-agent on same node, but none were found !"));
-    }
-
-    @Test
-    public void testNonMarathonServiceCanBeSelected() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.12");
                 put("ntp1", "on");
-                put("ntp2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
                 put("prometheus1", "on");
-                put("prometheus2", "on");
-                put("gluster1", "on");
-                put("gluster2", "on");
-                put("mesos-master", "1");
-                put("zookeeper", "1");
-                put("cerebro", "2");
+                put("elasticsearch1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("zeppelin_installed", "on");
+            }});
+
+            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : service cerebro is either undefined or a marathon service which should not be selectable here."));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
-
-
 }

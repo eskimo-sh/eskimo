@@ -291,25 +291,6 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testOneCerebroButNoES() throws Exception {
-
-        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckSetupTest");
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
-                put("ntp1", "on");
-            }});
-
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("TODO"));
-    }
-
-    @Test
     public void testTwoSparkNodesAndNoGLuster() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
@@ -327,28 +308,6 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         logger.debug (exception.getMessage());
         assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
-    }
-
-    @Test
-    public void testGdashButNoGluster() throws Exception {
-
-        fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("cerebro", "1");
-                put("ntp1", "on");
-                put("elasticsearch1", "on");
-                put("gdash", "on");
-                put("logstash1", "on");
-            }});
-
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("TODO"));
     }
 
     @Test
