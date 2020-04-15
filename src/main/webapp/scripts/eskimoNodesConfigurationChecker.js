@@ -34,6 +34,7 @@ Software.
 
 
 var nodesConfigPropertyRE = /([a-zA-Z\-_]+)([0-9]*)/;
+var ipAddressCheck = /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+){0,1}/;
 
 
 function parseProperty (key) {
@@ -53,18 +54,205 @@ function parseProperty (key) {
 
 function checkNodesSetup (setupConfig, uniqueServices, mandatoryServices, servicesConfiguration, servicesDependencies) {
 
-    var ipAddressCheck = /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+){0,1}/;
+    // check IP addresses and ranges configuration
+    var nodeCount = checkIPAddressesAndRanges(setupConfig, uniqueServices);
+
+    // foolproof bug check : make sure all ids are within node count
+    checkIDSWithinNodeRanges(setupConfig, nodeCount);
+
+    // foolproof bug check : make sure no marathon service can be selected here
+    checkNoMarathonServicesSelected(setupConfig, servicesConfiguration);
+
+    // enforce mandatory services
+    enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, setupConfig);
+
+    // check service dependencies
+    enforceDependencies(setupConfig, servicesDependencies);
+}
+
+function enforceDependencies(setupConfig, servicesDependencies) {
+
+    // check service dependencies
+    for (var key in setupConfig) {
+        var re = /([a-zA-Z\-_]+)([0-9]*)/;
+
+        var property = parseProperty(key);
+        if (property != null) {
+
+            var nodeNbr = -1;
+            if (property != null && property.nodeNumber != null) {
+                nodeNbr = parseInt(property.nodeNumber);
+            } else {
+                var nbr = setupConfig[key];
+                nodeNbr = parseInt(nbr);
+            }
+
+            if (property.serviceName != "action_id") {
+
+                var serviceDeps = servicesDependencies[property.serviceName];
+
+                for (var i = 0; i < serviceDeps.length; i++) {
+                    var dependency = serviceDeps[i];
+
+                    // I want the dependency on same node
+                    if (dependency.mes == "SAME_NODE") {
+
+                        enforceDependencySameNode(setupConfig, dependency, nodeNbr, property);
+                    }
+
+                    // I want the dependency somewhere
+                    else if (dependency.mandatory) {
+
+                        // ensure count of dependencies are available
+                        enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property);
+                    }
+                }
+            }
+        }
+    }
+}
+
+function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property) {
+
+    // ensure count of dependencies are available
+    var expectedCount = dependency.numberOfMasters;
+    var actualCount = 0;
+
+    for (var otherKey in setupConfig) {
+
+        var otherProperty = parseProperty(otherKey);
+        if (otherProperty != null) {
+
+            if (otherProperty.serviceName == dependency.masterService) {
+
+                // RANDOM_NODE_AFTER wants a different node, I need to check IPs
+                if (dependency.mes == "RANDOM_NODE_AFTER") {
+
+                    var otherNodeNbr = otherProperty.nodeNumber;
+                    if (otherNodeNbr == nodeNbr) {
+                        continue;
+                    }
+                }
+
+                actualCount++;
+            }
+        }
+    }
+
+    if (actualCount < expectedCount) {
+        throw "Inconsistency found : Service " + property.serviceName + " expects " + expectedCount
+        + " " + dependency.masterService + " instance(s). " +
+        "But only " + actualCount + " has been found !";
+    }
+}
+
+function enforceDependencySameNode(setupConfig, dependency, nodeNbr, property) {
+    var serviceFound = false;
+
+    for (var otherKey in setupConfig) {
+
+        var otherProperty = parseProperty(otherKey);
+        if (otherProperty != null) {
+
+            if (otherProperty.serviceName == dependency.masterService) {
+
+                var otherNodeNbr = -1;
+                if (otherProperty.nodeNumber != null) {
+                    otherNodeNbr = otherProperty.nodeNumber;
+                } else {
+                    var otherNbr = setupConfig[otherKey];
+                    otherNodeNbr = parseInt(otherNbr);
+                }
+                if (otherNodeNbr == nodeNbr) {
+                    serviceFound = true;
+                }
+            }
+        }
+    }
+
+    if (!serviceFound && dependency.mandatory) {
+        throw "Inconsistency found : Service " + property.serviceName + " was expecting a service " +
+        dependency.masterService + " on same node, but none were found !";
+    }
+}
+
+function enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, setupConfig) {
+
+    // enforce mandatory services
+    for (var i = 0; i < mandatoryServices.length; i++) {
+        var mandatoryServiceName = mandatoryServices[i];
+
+        var serviceConfig = servicesConfiguration[mandatoryServiceName];
+        if (serviceConfig.conditional == "NONE" ||
+            (serviceConfig.conditional == "MULTIPLE_NODES") && nodeCount > 1) {
+
+            var foundNodes = 0;
+            // just make sure it is installed on every node
+            for (var key in setupConfig) {
+
+                var property = parseProperty(key);
+                if (property != null && property.serviceName == mandatoryServiceName) {
+                    foundNodes++;
+                }
+            }
+
+            if (foundNodes != nodeCount) {
+                throw "Inconsistency found : service " + mandatoryServiceName + " is mandatory on all nodes but some nodes are lacking it.";
+            }
+        }
+    }
+}
+
+function checkNoMarathonServicesSelected(setupConfig, servicesConfiguration) {
+
+    // foolproof bug check : make sure no marathon service can be selected here
+    for (var key in setupConfig) {
+
+        var property = parseProperty(key);
+        if (property != null) {
+
+            if (property != null && property.serviceName != "action_id") {
+                var serviceConfig = servicesConfiguration[property.serviceName];
+
+                if (serviceConfig == null || serviceConfig.marathon) {
+                    throw "Inconsistency found : service " + property.serviceName + " is either undefined or a marathon service which should not be selectable here."
+                }
+            }
+        }
+    }
+}
+
+function checkIDSWithinNodeRanges(setupConfig, nodeCount) {
+
+    // foolproof bug check : make sure all ids are within node count
+    for (var key in setupConfig) {
+        //var re = /([a-zA-Z\-_]+)([0-9]+)/;
+        var property = parseProperty(key);
+        if (property.nodeNumber != null) {
+            if (property.nodeNumber > nodeCount) {
+                throw "Inconsistency found : got key " + key + " which is greater than node number " + nodeCount;
+            }
+        } else {
+            var nbr = setupConfig[key];
+            if (parseInt(nbr) > nodeCount) {
+                throw "Inconsistency found : got key " + key + " with nbr " + nbr + " which is greater than node number " + nodeCount;
+            }
+        }
+    }
+}
+
+function checkIPAddressesAndRanges(setupConfig, uniqueServices) {
+
+    var nodeCount = 0;
 
     // check IP addresses and ranges configuration
-    var nodeCount = 0;
     for (var key in setupConfig) {
         if (key.indexOf("action_id") > -1) {
             nodeCount++;
             var nodeNbr = parseInt(key.substring(9));
             var ipAddress = setupConfig[key];
             if (ipAddress == null || ipAddress == "") {
-                alert ("Node " + key.substring(9) + " has no IP configured.");
-                return false;
+                throw "Node " + key.substring(9) + " has no IP configured."
             } else {
 
                 var match = ipAddress.match(ipAddressCheck);
@@ -80,16 +268,15 @@ function checkNodesSetup (setupConfig, uniqueServices, mandatoryServices, servic
                             // just make sure it is installed on every node
                             for (var otherKey in setupConfig) {
 
-                                var otherProperty = parseProperty (otherKey);
+                                var otherProperty = parseProperty(otherKey);
                                 if (otherProperty != null) {
 
                                     if (otherProperty.serviceName == uniqueServiceName) {
 
-                                        var otherNodeNbr = parseInt (setupConfig[otherKey]);
-                                        console.log ("  - " + otherNodeNbr + " - " + nodeNbr);
+                                        var otherNodeNbr = parseInt(setupConfig[otherKey]);
+                                        console.log("  - " + otherNodeNbr + " - " + nodeNbr);
                                         if (otherNodeNbr == nodeNbr) {
-                                            alert("Node " + key.substring(9) + " is a range an declares service " + otherProperty.serviceName + " which is a unique service, hence forbidden on a range.");
-                                            return false;
+                                            throw "Node " + key.substring(9) + " is a range an declares service " + otherProperty.serviceName + " which is a unique service, hence forbidden on a range.";
                                         }
                                     }
                                 }
@@ -98,168 +285,10 @@ function checkNodesSetup (setupConfig, uniqueServices, mandatoryServices, servic
                     }
 
                 } else {
-                    alert ("Node " + key.substring(9) + " has IP configured as " + ipAddress + " which is not an IP address or a range.");
-                    return false;
+                    throw "Node " + key.substring(9) + " has IP configured as " + ipAddress + " which is not an IP address or a range.";
                 }
             }
         }
     }
-
-    // foolproof bug check : make sure all ids are within node count
-    for (var key in setupConfig) {
-        //var re = /([a-zA-Z\-_]+)([0-9]+)/;
-        var property = parseProperty (key);
-        if (property.nodeNumber != null) {
-            if (property.nodeNumber > nodeCount) {
-                alert ("Inconsistency found : got key " + key + " which is greater than node number " + nodeCount);
-                return false;
-            }
-        } else {
-            var nbr = setupConfig[key];
-            if (parseInt (nbr) > nodeCount) {
-                alert ("Inconsistency found : got key " + key + " with nbr " + nbr + " which is greater than node number " + nodeCount);
-                return false;
-            }
-        }
-    }
-
-    // foolproof bug check : make sure no marathon service can be selected here
-    for (var key in setupConfig) {
-
-        var property = parseProperty (key);
-        if (property != null) {
-
-            if (property != null && property.serviceName != "action_id") {
-                var serviceConfig = servicesConfiguration[property.serviceName];
-
-                if (serviceConfig == null || serviceConfig.marathon) {
-                    alert ("Inconsistency found : service " + property.serviceName + " is either undefined or a marathon service which should not be selectable here.");
-                    return false;
-                }
-            }
-        }
-    }
-
-    // enforce mandatory nodes
-    for (var i = 0 ; i < mandatoryServices.length; i++) {
-        var mandatoryServiceName = mandatoryServices[i];
-
-        var serviceConfig = servicesConfiguration[mandatoryServiceName];
-        if (serviceConfig.conditional == "NONE" ||
-            (serviceConfig.conditional == "MULTIPLE_NODES") && nodeCount > 1) {
-
-            var foundNodes = 0;
-            // just make sure it is installed on every node
-            for (var key in setupConfig) {
-
-                var property = parseProperty (key);
-                if (property != null && property.serviceName == mandatoryServiceName) {
-                    foundNodes++;
-                }
-            }
-
-            if (foundNodes != nodeCount) {
-                alert ("Inconsistency found : service " + mandatoryServiceName + " is mandatory on all nodes but some nodes are lacking it.");
-                return false;
-            }
-        }
-    }
-
-    // check service dependencies
-    for (var key in setupConfig) {
-        var re = /([a-zA-Z\-_]+)([0-9]*)/;
-
-        var property = parseProperty (key);
-        if (property != null) {
-
-            var nodeNbr = -1;
-            if (property != null && property.nodeNumber != null) {
-                nodeNbr = parseInt (property.nodeNumber);
-            } else {
-                var nbr = setupConfig[key];
-                nodeNbr = parseInt (nbr);
-            }
-
-            if (property.serviceName != "action_id") {
-
-                var serviceDeps = servicesDependencies[property.serviceName];
-
-                for (var i = 0; i < serviceDeps.length; i++) {
-                    var dependency = serviceDeps[i];
-
-                    // I want the dependency on same node
-                    if (dependency.mes == "SAME_NODE") {
-
-                        var serviceFound = false;
-
-                        for (var otherKey in setupConfig) {
-
-                            var otherProperty = parseProperty (otherKey);
-                            if (otherProperty != null) {
-
-                                if (otherProperty.serviceName == dependency.masterService) {
-
-                                    var otherNodeNbr = -1;
-                                    if (otherProperty.nodeNumber != null) {
-                                        otherNodeNbr = otherProperty.nodeNumber;
-                                    } else {
-                                        var otherNbr = setupConfig[otherKey];
-                                        otherNodeNbr = parseInt(otherNbr);
-                                    }
-                                    if (otherNodeNbr == nodeNbr) {
-                                        serviceFound = true;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!serviceFound && dependency.mandatory) {
-                            alert ("Inconsistency found : Service " + property.serviceName + " was expecting a service " +
-                                dependency.masterService + " on same node, but none were found !");
-                            return false;
-                        }
-                    }
-
-                    // I want the dependency somewhere
-                    else if (dependency.mandatory) {
-
-                        // ensure count of dependencies are available
-                        var expectedCount = dependency.numberOfMasters;
-                        var actualCount = 0;
-
-                        for (var otherKey in setupConfig) {
-
-                            var otherProperty = parseProperty (otherKey);
-                            if (otherProperty != null) {
-
-                                if (otherProperty.serviceName == dependency.masterService) {
-
-                                    // RANDOM_NODE_AFTER wants a different node, I need to check IPs
-                                    if (dependency.mes == "RANDOM_NODE_AFTER") {
-
-                                        var otherNodeNbr = otherProperty.nodeNumber;
-                                        if (otherNodeNbr == nodeNbr) {
-                                            continue;
-                                        }
-                                    }
-
-                                    actualCount++;
-                                }
-                            }
-                        }
-
-                        if (actualCount < expectedCount) {
-                            alert ("Inconsistency found : Service " + property.serviceName + " expects " + expectedCount
-                                + " " + dependency.masterService + " instance(s). " +
-                                "But only " + actualCount + " has been found !");
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
+    return nodeCount;
 }
-

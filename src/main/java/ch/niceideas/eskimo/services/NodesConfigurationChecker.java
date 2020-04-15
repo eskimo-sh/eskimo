@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
@@ -102,21 +101,21 @@ public class NodesConfigurationChecker {
                     // I want the dependency on same node if dependency is mandatory
                     if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)) {
 
-                        enforceDependencySameNode(nodesConfig, property, nodeNbr, dependency);
+                        enforceDependencySameNode(nodesConfig, property.getServiceName(), nodeNbr, dependency);
                     }
 
                     // I want the dependency somewhere
                     else if (dependency.isMandatory()) {
 
                         // ensure count of dependencies are available
-                        enforceMandatoryDependency(nodesConfig, property, nodeNbr, dependency);
+                        enforceMandatoryDependency(nodesConfig, property.getServiceName(), nodeNbr, dependency);
                     }
                 }
             }
         }
     }
 
-    private void enforceMandatoryDependency(NodesConfigWrapper nodesConfig, NodesConfigWrapper.ParsedNodesConfigProperty property, int nodeNbr, Dependency dependency) throws NodesConfigurationException {
+    static void enforceMandatoryDependency(NodesConfigWrapper nodesConfig, String serviceName, Integer nodeNbr, Dependency dependency) throws NodesConfigurationException {
 
         // ensure count of dependencies are available
         int expectedCount = dependency.getNumberOfMasters();
@@ -129,7 +128,7 @@ public class NodesConfigurationChecker {
                 if (otherProperty.getServiceName().equals(dependency.getMasterService())) {
 
                     // RANDOM_NODE_AFTER wants a different node, I need to check IPs
-                    if (dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
+                    if (nodeNbr != null && dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
 
                         int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
                         if (otherNodeNbr == nodeNbr) {
@@ -144,13 +143,13 @@ public class NodesConfigurationChecker {
 
         if (actualCount < expectedCount) {
             throw new NodesConfigurationException(
-                    "Inconsistency found : Service " + property.getServiceName() + " expects " + expectedCount
+                    "Inconsistency found : Service " + serviceName + " expects " + expectedCount
                             + " " + dependency.getMasterService() + " instance(s). " +
                             "But only " + actualCount + " has been found !");
         }
     }
 
-    private void enforceDependencySameNode(NodesConfigWrapper nodesConfig, NodesConfigWrapper.ParsedNodesConfigProperty property, int nodeNbr, Dependency dependency) throws NodesConfigurationException {
+    static void enforceDependencySameNode(NodesConfigWrapper nodesConfig, String serviceName, int nodeNbr, Dependency dependency) throws NodesConfigurationException {
         boolean serviceFound = false;
         for (String otherKey : nodesConfig.keySet()) {
 
@@ -170,7 +169,7 @@ public class NodesConfigurationChecker {
 
         if (!serviceFound && dependency.isMandatory()) {
             throw new NodesConfigurationException(
-                    "Inconsistency found : Service " + property.getServiceName() + " was expecting a service " +
+                    "Inconsistency found : Service " + serviceName + " was expecting a service " +
                             dependency.getMasterService() + " on same node, but none were found !");
         }
     }

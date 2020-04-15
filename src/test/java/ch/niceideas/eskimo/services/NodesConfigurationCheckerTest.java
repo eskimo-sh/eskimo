@@ -360,6 +360,26 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
+    public void testNoGlusterOnSingleNode() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("marathon", "1");
+            put("elasticsearch1", "on");
+            put("kafka1", "on");
+            put("ntp1", "on");
+            put("prometheus1", "on");
+            put("logstash1", "on");
+            put("mesos-agent1", "on");
+            put("mesos-master", "1");
+            put("spark-executor1", "on");
+            put("zookeeper", "1");
+        }});
+
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
+    }
+
+    @Test
     public void testSparkButNoMesosAgent() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {

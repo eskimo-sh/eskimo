@@ -73,9 +73,11 @@ eskimo.NodesConfig = function() {
 
                     console.log(setupConfig);
 
-                    if (checkNodesSetup(setupConfig, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES)) {
-
+                    try {
+                        checkNodesSetup(setupConfig, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES);
                         proceedWithInstallation(false, setupConfig);
+                    } catch (error) {
+                        alert (error);
                     }
 
                     e.preventDefault();

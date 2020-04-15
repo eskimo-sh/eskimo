@@ -50,7 +50,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
@@ -78,8 +77,10 @@ public class MarathonServicesConfigController {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
+    @Autowired
+    private MarathonServicesConfigChecker marathonServicesConfigChecker;
 
-    @Resource
+    @Autowired
     private MessagingService messagingService;
 
     @Autowired
@@ -126,9 +127,7 @@ public class MarathonServicesConfigController {
 
             // first of all check nodes config
             MarathonServicesConfigWrapper marathonServicesConfig = new MarathonServicesConfigWrapper(configAsString);
-
-            // FIXME
-            //marathonServicesConfigChecker.checkNodesSetup(marathonServicesConfig);
+            marathonServicesConfigChecker.checkMarathonServicesSetup(marathonServicesConfig);
 
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
@@ -140,7 +139,7 @@ public class MarathonServicesConfigController {
 
             return returnCommand (command);
 
-        } catch (JSONException | SetupException | FileException | MarathonException e) {
+        } catch (JSONException | SetupException | FileException | MarathonException | MarathonServicesConfigException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");

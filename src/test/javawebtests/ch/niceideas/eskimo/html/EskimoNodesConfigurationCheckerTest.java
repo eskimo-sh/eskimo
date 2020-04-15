@@ -37,22 +37,23 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import com.gargoylesoftware.htmlunit.ScriptResult;
+import com.gargoylesoftware.htmlunit.ScriptException;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
+
+    private static final Logger logger = Logger.getLogger(EskimoNodesConfigurationCheckerTest.class);
 
     private String jsonServices = null;
 
@@ -96,19 +97,24 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript ("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
     public void testNotAnIpAddress() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "blabla");
-            put("ntp1", "on");
-            put("prometheus1", "on");
-        }});
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("action_id1", "blabla");
+                put("ntp1", "on");
+                put("prometheus1", "on");
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Node 1 has IP configured as blabla which is not an IP address or a range."));
     }
 
     @Test
@@ -136,7 +142,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -166,7 +172,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -185,13 +191,14 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
     public void testUniqueServiceOnRange() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("action_id2", "192.168.10.12-192.160.10.15");
                 put("marathon", "2");
@@ -213,54 +220,74 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
                 put("zookeeper", "1");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Node 2 is a range an declares service marathon which is a unique service, hence forbidden on a range."));
     }
 
     @Test
     public void testMissingGluster() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
-            put("action_id2", "192.168.10.12");
-            put("marathon", "2");
-            put("elasticsearch1", "on");
-            put("elasticsearch2", "on");
-            put("kafka1", "on");
-            put("kafka2", "on");
-            put("ntp1", "on");
-            put("ntp2", "on");
-            put("logstash1", "on");
-            put("logstash2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("mesos-master", "1");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("zookeeper", "1");
-        }});
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("action_id1", "192.168.10.11");
+                put("action_id2", "192.168.10.12");
+                put("marathon", "2");
+                put("elasticsearch1", "on");
+                put("elasticsearch2", "on");
+                put("kafka1", "on");
+                put("kafka2", "on");
+                put("ntp1", "on");
+                put("ntp2", "on");
+                put("logstash1", "on");
+                put("logstash2", "on");
+                put("mesos-agent1", "on");
+                put("mesos-agent2", "on");
+                put("mesos-master", "1");
+                put("spark-executor1", "on");
+                put("spark-executor2", "on");
+                put("zookeeper", "1");
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking i"));
     }
 
     @Test
     public void testNoIPConfigured() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");    }
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Node 1 has no IP configured."));
+
+    }
 
     @Test
     public void testKeyGreaterThanNodeNumber() throws Exception {
-
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id2", "192.168.10.11");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : got key action_id2 which is greater than node number 1"));
     }
 
     @Test
@@ -268,28 +295,38 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         fail ("This needs to be moved to EskimoMarathonServicesConfigCheckSetupTest");
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("cerebro", "1");
                 put("ntp1", "on");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("TODO"));
     }
 
     @Test
     public void testTwoSparkNodesAndNoGLuster() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("action_id2", "192.168.10.12");
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
     }
 
     @Test
@@ -297,22 +334,28 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         fail ("This needs to be moved to EskimoMarathonServicesConfigCheckerTest");
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("cerebro", "1");
                 put("ntp1", "on");
                 put("elasticsearch1", "on");
                 put("gdash", "on");
                 put("logstash1", "on");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("TODO"));
     }
 
     @Test
     public void testGlusterDisabledOnSingleNode() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("marathon", "1");
                 put("elasticsearch1", "on");
@@ -324,51 +367,90 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("zookeeper", "1");
+            }});
+
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service gluster expects 1 gluster instance(s). But only 0 has been found !"));
+    }
+
+    @Test
+    public void testNoGlusterOnSingleNode() throws Exception {
+
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("marathon", "1");
+            put("elasticsearch1", "on");
+            put("ntp1", "on");
+            put("kafka1", "on");
+            put("logstash1", "on");
+            put("mesos-agent1", "on");
+            put("mesos-master", "1");
+            put("spark-executor1", "on");
+            put("zookeeper", "1");
         }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
     public void testSparkButNoMesosAgent() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("mesos-master", "1");
                 put("ntp", "1");
                 put("spark-executor1", "on");
                 put("marathon", "1");
                 put("zookeeper", "1");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-executor was expecting a service mesos-agent on same node, but none were found !"));
     }
 
     @Test
-    public void testoMesosAgentButNoMesosMaster() throws Exception {
+    public void testMesosAgentButNoMesosMaster() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
                 put("spark-executor1", "on");
                 put("zookeeper", "1");
-        }});
+                put("ntp1", "on");
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent expects 1 mesos-master instance(s). But only 0 has been found !"));
     }
 
     @Test
     public void testMesosMasterButNoZookeeper() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("action_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
                 put("ntp1", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
-        }});
+            }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
 
     @Test
@@ -392,29 +474,35 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("flink-app-master", "2");
         }});
 
-        assertJavascriptEquals("true", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
 
     @Test
     public void testNoMarathonServiceCanBeSelected() throws Exception {
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
-            put("action_id2", "192.168.10.12");
-            put("ntp1", "on");
-            put("ntp2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
-            put("gluster1", "on");
-            put("gluster2", "on");
-            put("mesos-master", "1");
-            put("zookeeper", "1");
-            put("cerebro", "2");
-        }});
 
-        assertJavascriptEquals("false", "callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("action_id1", "192.168.10.11");
+                put("action_id2", "192.168.10.12");
+                put("ntp1", "on");
+                put("ntp2", "on");
+                put("mesos-agent1", "on");
+                put("mesos-agent2", "on");
+                put("prometheus1", "on");
+                put("prometheus2", "on");
+                put("gluster1", "on");
+                put("gluster2", "on");
+                put("mesos-master", "1");
+                put("zookeeper", "1");
+                put("cerebro", "2");
+            }});
+
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : service cerebro is either undefined or a marathon service which should not be selectable here."));
     }
 
 
