@@ -58,8 +58,6 @@ function checkMarathonSetup (marathonSetupConfig, servicesDependencies, successC
         error: errorHandler
     });
 
-    alert (" TODO check setup")
-
     return true;
 }
 
