@@ -180,6 +180,9 @@ eskimo.NodesConfig = function() {
     this.setServicesDependenciesForTest = function(testServiceDeps) {
         SERVICES_DEPENDENCIES = testServiceDeps;
     };
+    this.getServicesDependencies = function() {
+        return SERVICES_DEPENDENCIES;
+    };
 
     this.setServicesConfigForTest = function (uniqueServices, multiplesServices, configuredServices, mandatoryServices) {
         UNIQUE_SERVICES = uniqueServices;

@@ -33,3 +33,70 @@ Software.
 */
 
 
+function checkMarathonSetup (marathonSetupConfig, serviceDependencies, successCallback) {
+
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "load-nodes-config",
+        success: function (data, status, jqXHR) {
+
+            try {
+
+                if (!data.clear) {
+
+                    // data is nodesConfig
+
+                    // check service dependencies
+                    for (var key in marathonSetupConfig) {
+                        var re = /([a-zA-Z\-]+)_install/;
+
+                        var matcher = key.match(re);
+
+                        var serviceName = matcher[1];
+
+                        var serviceDeps = servicesDependencies[property.serviceName];
+
+                        for (var i = 0; i < serviceDeps.length; i++) {
+                            var dependency = serviceDeps[i];
+
+                            // I want the dependency on same node
+                            if (dependency.mes == "SAME_NODE") {
+
+                                throw "Inconsistency found : Service " + serviceName + " is a marathon service and defines a dependency SAME_NODE which is disallowed"
+                            }
+
+                            // I want the dependency somewhere
+                            else if (dependency.mandatory) {
+
+                                // ensure count of dependencies are available
+                                enforceMandatoryDependency(dependency, data, null, property);
+                            }
+                        }
+                    }
+
+                    if(successCallback && successCallback != null && successCallback instanceof Function) {
+                        successCallback();
+                    } else {
+                        throw "TECHNICAL ERROR : successCallback is not a function.";
+                    }
+
+                } else if (data.clear == "missing") {
+                    throw "No Nodes Configuration is available";
+
+                } else if (data.clear == "setup") {
+                    throw "Setup is not completed";
+                }
+
+            } catch (error) {
+                alert(error);
+            }
+
+        },
+        error: errorHandler
+    });
+
+    alert (" TODO check setup")
+
+    return true;
+}

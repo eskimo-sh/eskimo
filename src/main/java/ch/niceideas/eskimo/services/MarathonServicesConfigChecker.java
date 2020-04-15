@@ -56,11 +56,25 @@ public class MarathonServicesConfigChecker {
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
 
     public void checkMarathonServicesSetup(MarathonServicesConfigWrapper marathonConfig) throws MarathonServicesConfigException {
 
         try {
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
+            if (nodesConfig == null) {
+                throw new MarathonServicesConfigException("Inconsistency found : No node configuration is found");
+            }
+
+            // ensure only marathon services
+            for (String serviceName : marathonConfig.getEnabledServices()) {
+                Service service = servicesDefinition.getService(serviceName);
+                if (!service.isMarathon()) {
+                    throw new MarathonServicesConfigException("Inconsistency found : service " + serviceName + " is not a marathon service");
+                }
+            }
 
             // enforce dependencies
             for (String serviceName : marathonConfig.getEnabledServices()) {
@@ -92,7 +106,7 @@ public class MarathonServicesConfigChecker {
                         } catch (NodesConfigurationException e) {
                             logger.debug (e, e);
                             logger.warn (e.getMessage());
-                            throw new MarathonServicesConfigException(e);
+                            throw new MarathonServicesConfigException(e.getMessage(), e);
                         }
                     }
                 }

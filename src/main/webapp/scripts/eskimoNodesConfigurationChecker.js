@@ -97,14 +97,14 @@ function enforceDependencies(setupConfig, servicesDependencies) {
                     // I want the dependency on same node
                     if (dependency.mes == "SAME_NODE") {
 
-                        enforceDependencySameNode(setupConfig, dependency, nodeNbr, property);
+                        enforceDependencySameNode(setupConfig, dependency, nodeNbr, property.serviceName);
                     }
 
                     // I want the dependency somewhere
                     else if (dependency.mandatory) {
 
                         // ensure count of dependencies are available
-                        enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property);
+                        enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property.serviceName);
                     }
                 }
             }
@@ -112,7 +112,7 @@ function enforceDependencies(setupConfig, servicesDependencies) {
     }
 }
 
-function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property) {
+function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, serviceName) {
 
     // ensure count of dependencies are available
     var expectedCount = dependency.numberOfMasters;
@@ -126,7 +126,7 @@ function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property) 
             if (otherProperty.serviceName == dependency.masterService) {
 
                 // RANDOM_NODE_AFTER wants a different node, I need to check IPs
-                if (dependency.mes == "RANDOM_NODE_AFTER") {
+                if (nodeNbr != null && dependency.mes == "RANDOM_NODE_AFTER") {
 
                     var otherNodeNbr = otherProperty.nodeNumber;
                     if (otherNodeNbr == nodeNbr) {
@@ -140,13 +140,13 @@ function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property) 
     }
 
     if (actualCount < expectedCount) {
-        throw "Inconsistency found : Service " + property.serviceName + " expects " + expectedCount
+        throw "Inconsistency found : Service " + serviceName + " expects " + expectedCount
         + " " + dependency.masterService + " instance(s). " +
         "But only " + actualCount + " has been found !";
     }
 }
 
-function enforceDependencySameNode(setupConfig, dependency, nodeNbr, property) {
+function enforceDependencySameNode(setupConfig, dependency, nodeNbr, serviceName) {
     var serviceFound = false;
 
     for (var otherKey in setupConfig) {
@@ -171,7 +171,7 @@ function enforceDependencySameNode(setupConfig, dependency, nodeNbr, property) {
     }
 
     if (!serviceFound && dependency.mandatory) {
-        throw "Inconsistency found : Service " + property.serviceName + " was expecting a service " +
+        throw "Inconsistency found : Service " + serviceName + " was expecting a service " +
         dependency.masterService + " on same node, but none were found !";
     }
 }

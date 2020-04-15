@@ -55,9 +55,14 @@ eskimo.MarathonServicesConfig = function() {
 
                     console.log(setupConfig);
 
-                    if (checkMarathonSetup(setupConfig)) {
-
-                        proceedWithMarathonInstallation(setupConfig);
+                    try {
+                        checkMarathonSetup(setupConfig, eskimoMain.getNodesConfig().getServicesDependencies(),
+                            function () {
+                                // callback if setup is OK
+                                proceedWithMarathonInstallation(setupConfig);
+                            });
+                    } catch (error) {
+                        alert ("error");
                     }
 
                     e.preventDefault();
@@ -253,12 +258,6 @@ eskimo.MarathonServicesConfig = function() {
     }
     this.showMarathonServicesConfig = showMarathonServicesConfig;
 
-    function checkMarathonSetup (setupConfig) {
-
-        alert (" TODO check setup")
-
-        return true;
-    }
     this.checkMarathonSetup = checkMarathonSetup;
 
     this.proceedWithReinstall = function (reinstallConfig) {
