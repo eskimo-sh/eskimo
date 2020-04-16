@@ -69,18 +69,3 @@ echo " - Starting service"
     --metrics_prometheus \
     --hostname $SELF_IP_ADDRESS | tee /var/log/marathon/marathon.log
 
-
-# --metrics_prometheus
-# Enable the Prometheus reporter.
-
-# --hostname
-# The advertised hostname that is used for the communication with the Mesos master.
-# The value is also stored in the persistent store so another standby host can redirect to the elected leader.
-
-# --enable_features  <arg>
-# A comma-separated list of features. Available features are:
-# secrets - Enable support for secrets in Marathon (experimental),
-# external_volumes - Enable external volumes support in Marathon,
-# vips - Enable networking VIPs UI,
-# gpu_resources - Enable support for GPU in Marathon (experimental),
-# task_killing - Enable the optional TASK_KILLING state, available in Mesos 0.28 and later

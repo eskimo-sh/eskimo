@@ -27,38 +27,53 @@ fi
 
 . /etc/eskimo_topology.sh
 
+
 if [[ ! -d $MOUNT_POINT ]]; then
     echo " - Creating mount point: $MOUNT_POINT"
     mkdir -p $MOUNT_POINT
 fi
 
-ls /dev/fuse > /dev/null 2>&1
-if [[ $? != 0 ]]; then
-    echo " - Creating fuse device"
-    mknod /dev/fuse c 10 229
+
+# find out if gluster is available
+if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
+    export GLUSTER_AVAILABLE=1
+else
+    export GLUSTER_AVAILABLE=0
+fi
+
+# Only if gluster is enabled
+if [[ $GLUSTER_AVAILABLE == 1 ]]; then
+
+    ls /dev/fuse > /dev/null 2>&1
     if [[ $? != 0 ]]; then
-        echo "FAILED to to create /dev/fuse node file"
-        exit -21
+        echo " - Creating fuse device"
+        mknod /dev/fuse c 10 229
+        if [[ $? != 0 ]]; then
+            echo "FAILED to to create /dev/fuse node file"
+            exit -21
+        fi
     fi
+
+    echo " - Registering gluster filesystem $VOLUME on $MOUNT_POINT"
+    echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
+
+    echo " - Mounting $MOUNT_POINT"
+    mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
+    if [[ $? != 0 ]]; then
+        echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
+        cat /tmp/mount_$VOLUME
+        exit -20
+    fi
+
+    # give it a little time to actually connect the transport
+    sleep 4
+
+    if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
+        echo " - Changing owner and rights of $MOUNT_POINT"
+        chown -R $OWNER $MOUNT_POINT
+    fi
+
 fi
 
-echo " - Registering gluster filesystem $VOLUME on $MOUNT_POINT"
-echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
-
-echo " - Mounting $MOUNT_POINT"
-mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
-if [[ $? != 0 ]]; then
-    echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
-    cat /tmp/mount_$VOLUME
-    exit -20
-fi
-
-# give it a little time to actually connect the transport
-sleep 4
-
-if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
-    echo " - Changing owner and rights of $MOUNT_POINT"
-    chown -R $OWNER $MOUNT_POINT
-fi
 
 chmod -R 777 $MOUNT_POINT

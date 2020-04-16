@@ -100,6 +100,10 @@ sudo chown -R marathon /var/log/marathon/docker_registry
 sudo mkdir -p /var/lib/marathon/docker_registry
 sudo chown -R marathon /var/lib/marathon/docker_registry
 
+echo " - Installing setupMarathonGlusterShares.sh to /usr/local/sbin"
+sudo cp setupMarathonGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupMarathonGlusterShares.sh
+
 echo " - Building container marathon"
 build_container marathon marathon /tmp/marathon_install_log
 

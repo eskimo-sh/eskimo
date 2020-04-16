@@ -76,19 +76,10 @@ echo " - Creating user marathon home directory"
 mkdir -p /home/marathon
 chown marathon /home/marathon
 
-echo " - Updating maathon registry config"
+echo " - Updating marathon registry config"
 sudo sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var\/lib\/marathon\/docker_registry"/g /etc/docker_registry/config.yml
 #rootdirectory: /var/lib/docker_registry
 
-# The external address of the host on which the JobManager runs and can be
-# reached by the TaskManagers and any clients which want to connect
-#sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address to which the REST client will connect to
-#sed -i s/"#rest.address: 0.0.0.0"/"rest.address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-# The address that the REST & web server binds to
-#sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: $SELF_IP_ADDRESS"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

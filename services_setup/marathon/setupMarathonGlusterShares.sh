@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,60 +34,5 @@
 # Software.
 #
 
-[Unit]
-Description=Marathon
-Wants=network-online.target
-After=docker.service
-Requires=docker.service
-After=gluster.service
-
-[Service]
-TimeoutStartSec=0
-RemainAfterExit=false
-
-# Run ExecStartPre with root-permissions
-PermissionsStartOnly=true
-
-ExecStartPre=-/usr/bin/docker kill marathon
-ExecStartPre=-/usr/bin/docker rm -f marathon
-
-# attempt to recreate  / remount gluster shares
-ExecStartPre=/bin/bash /usr/local/sbin/setupMarathonGlusterShares.sh
-
-# Find out about version of mesos available
-ExecStartPre=/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/marathon_mesos_environment"
-#EnvironmentFile=/run/system_mesos_environment
-
-ExecStart=/bin/bash -c ". /run/marathon_mesos_environment && /usr/bin/docker run \
-        -i \
-        --name marathon \
-        --user marathon \
-        --network host \
-        -v /var/log/marathon:/var/log/marathon \
-        -v /var/lib/marathon:/var/lib/marathon:rshared \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:marathon \
-        /usr/local/sbin/inContainerStartService.sh"
-
-
-# Unfotunately "-network host" is requires since random ports are created to communicate with mesos.
-#         -p 28080:28080 \
-#          -p 5000:5000 \
-
-ExecStop=/usr/bin/docker stop marathon
-
-Type=simple
-
-Restart=always
-StartLimitBurst=3
-StartLimitInterval=100
-
-StandardOutput=syslog
-StandardError=syslog
-
-[Install]
-WantedBy=multi-user.target
+# Handling /var/lib/logstash/data
+/usr/local/sbin/handle_gluster_share.sh marathon_registry /var/lib/marathon/docker_registry marathon

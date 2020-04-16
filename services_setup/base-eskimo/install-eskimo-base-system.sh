@@ -129,8 +129,6 @@ function install_docker_suse_based() {
         cat /tmp/install_docker 1>&2
         exit -1
     fi
-
-    enable_docker
 }
 
 
@@ -172,8 +170,6 @@ function install_docker_redhat_based() {
         cat /tmp/install_docker 1>&2
         exit -1
     fi
-
-    enable_docker
 }
 
 function install_docker_debian_based() {
@@ -231,8 +227,6 @@ function install_docker_debian_based() {
         cat /tmp/install_docker 1>&2
         exit -1
     fi
-
-    enable_docker
 }
 
 function install_suse_mesos_dependencies() {
@@ -335,32 +329,6 @@ export LINUX_DISTRIBUTION=`awk -F= '/^NAME/{print $2}' /etc/os-release | cut -d 
 echo "  - Linux distribution is $LINUX_DISTRIBUTION"
 
 
-# Check if docker is installed
-echo "  - checking if docker is installed"
-docker -v 2>/dev/null
-if [[ $? != 0 ]]; then
-
-    echo "  - docker is not installed. attempting installation"
-    if [[ -f "/etc/debian_version" ]]; then
-        install_docker_debian_based
-
-    elif [[ -f "/etc/redhat-release" ]]; then
-
-        install_docker_redhat_based
-
-    elif [[ -f "/etc/SUSE-brand" ]]; then
-
-        install_docker_suse_based
-    else
-
-        echo " - !! ERROR : Could not find any brand marker file "
-        echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
-        exit -101
-
-    fi
-fi
-
-
 if [[ -f "/etc/debian_version" ]]; then
 
     echo "  - updating apt package index"
@@ -452,6 +420,35 @@ else
     echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
     exit -101    
 fi
+
+
+# Check if docker is installed
+echo "  - checking if docker is installed"
+docker -v 2>/dev/null
+if [[ $? != 0 ]]; then
+
+    echo "  - docker is not installed. attempting installation"
+    if [[ -f "/etc/debian_version" ]]; then
+        install_docker_debian_based
+
+    elif [[ -f "/etc/redhat-release" ]]; then
+
+        install_docker_redhat_based
+
+    elif [[ -f "/etc/SUSE-brand" ]]; then
+
+        install_docker_suse_based
+    else
+
+        echo " - !! ERROR : Could not find any brand marker file "
+        echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+        exit -101
+
+    fi
+fi
+
+echo "  - Enabling docker"
+enable_docker
 
 
 echo " - Disabling IPv6"
