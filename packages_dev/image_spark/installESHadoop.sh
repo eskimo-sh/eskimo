@@ -57,6 +57,7 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/eshadoop_setup
 mkdir -p /tmp/eshadoop_setup
 cd /tmp/eshadoop_setup
 
@@ -70,7 +71,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Extracting elasticsearch-hadoop-$ES_VERSION"
-unzip -f elasticsearch-hadoop-$ES_VERSION.zip > /tmp/spark_install_log 2>&1
+unzip elasticsearch-hadoop-$ES_VERSION.zip > /tmp/spark_install_log 2>&1
 fail_if_error $? "/tmp/spark_install_log" -2
 
 echo " - Installing eshadoop spark (to spark jar folder)"

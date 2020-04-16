@@ -54,37 +54,39 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/kafka_manager_source_setup
 mkdir -p /tmp/kafka_manager_source_setup
+rm -Rf /tmp/kafka_manager_setup
 mkdir -p /tmp/kafka_manager_setup
 cd /tmp/kafka_manager_source_setup
 
 echo " - Downloading kafka-manager-$KAFKA_MANAGER_VERSION"
-wget https://github.com/yahoo/kafka-manager/archive/$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+wget https://github.com/yahoo/CMAK/archive/$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad kafka-manager-$KAFKA_MANAGER_VERSION from github. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kafka-manager-src-$KAFKA_MANAGER_VERSION.zip  >> /tmp/kafka_manager_install_log 2>&1
+    wget http://niceideas.ch/mes/CMAK-$KAFKA_MANAGER_VERSION.zip  >> /tmp/kafka_manager_install_log 2>&1
     fail_if_error $? "/tmp/kafka_manager_install_log" -1
 fi
 
 mv $KAFKA_MANAGER_VERSION.zip kafka-manager-$KAFKA_MANAGER_VERSION.zip
 
 echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
-unzip -f kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 echo " - Building source tree (./sbt clean dist) (this can take a few minutes)"
-cd ./kafka-manager-$KAFKA_MANAGER_VERSION/
+cd ./CMAK-$KAFKA_MANAGER_VERSION/
 ./sbt clean dist   >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -1
 
 
-mv /tmp/kafka_manager_source_setup/kafka-manager-$KAFKA_MANAGER_VERSION/target/universal/kafka-manager-$KAFKA_MANAGER_VERSION.zip \
+mv /tmp/kafka_manager_source_setup/CMAK-$KAFKA_MANAGER_VERSION/target/universal/kafka-manager-$KAFKA_MANAGER_VERSION.zip \
    /tmp/kafka_manager_setup/kafka-manager-$KAFKA_MANAGER_VERSION.zip
 cd /tmp/kafka_manager_setup
 
 
 echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
-unzip -f kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 echo " - Installing kafka_managser"

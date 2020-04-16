@@ -63,6 +63,10 @@ fi
 echo " - Building image gdash"
 build_image gdash /tmp/gdash_build_log
 
+
+#echo " - TODO"
+#docker exec -it gdash bash
+
 echo " - Installing gdash"
 docker exec -i gdash bash /scripts/installGdash.sh | tee -a /tmp/gdash_build_log 2>&1
 if [[ `tail -n 1 /tmp/gdash_build_log | grep " - In container install SUCCESS"` == "" ]]; then
@@ -70,9 +74,6 @@ if [[ `tail -n 1 /tmp/gdash_build_log | grep " - In container install SUCCESS"` 
     cat /tmp/gdash_build_log
     exit -102
 fi
-
-#echo " - TODO"
-#docker exec -i gdash bash
 
 
 echo " - Closing and saving image gdash"

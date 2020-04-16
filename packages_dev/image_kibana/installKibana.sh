@@ -110,10 +110,10 @@ trap check_stop_es_kibana EXIT
 echo " - Starting Kibana"
 
 # ES 6.x
-/usr/local/lib/kibana-$ES_VERSION/bin/kibana  > /tmp/kibana_run_log 2>&1 &
+#/usr/local/lib/kibana-$ES_VERSION/bin/kibana  > /tmp/kibana_run_log 2>&1 &
 
 # ES 7.x
-#/usr/local/lib/kibana-$ES_VERSION/bin/kibana --allow-root > /tmp/kibana_run_log 2>&1 &
+/usr/local/lib/kibana-$ES_VERSION/bin/kibana --allow-root > /tmp/kibana_run_log 2>&1 &
 
 export KIBANA_PROC_ID=$!
 

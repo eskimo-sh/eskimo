@@ -152,6 +152,7 @@ elif [[ $package == "all_images" ]]; then
         elasticsearch\
         logstash\
         cerebro\
+        marathon\
         kibana\
         kafka\
         flink\

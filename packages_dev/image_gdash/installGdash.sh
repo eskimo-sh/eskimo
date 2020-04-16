@@ -50,9 +50,10 @@ echo " - Changing to temp directory"
 mkdir -p /tmp/gdash_setup
 cd /tmp/gdash_setup
 
+# OLD GDASH
 
 echo " - Configuring nodejs repo"
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -  > /tmp/gdash_install_log 2>&1
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -  > /tmp/gdash_install_log 2>&1
 fail_if_error $? "/tmp/gdash_install_log" -2
 
 echo " - Installing nodejs"
@@ -71,6 +72,10 @@ echo " - Installing gdash from python repo"
 pip install gdash > /tmp/gdash_install_log 2>&1
 fail_if_error $? "/tmp/gdash_install_log" -2
 
+echo " - Forcing install of previous version of werkzeug python package"
+pip install "werkzeug==0.16.1" > /tmp/gdash_install_log 2>&1
+fail_if_error $? "/tmp/gdash_install_log" -2
+
 echo " - Fixing flask.ext.cache -> flask_cache"
 sed -i s/"flask.ext.cache"/"flask_cache"/g /usr/local/lib/python2.7/dist-packages/gdash/app.py
 rm -f /usr/local/lib/python2.7/dist-packages/gdash/app.pyc
@@ -78,8 +83,57 @@ rm -f /usr/local/lib/python2.7/dist-packages/gdash/app.pyc
 sed -i s/"flask.ext.cache"/"flask_cache"/g /usr/local/lib/python2.7/dist-packages/flask_cache/jinja2ext.py
 rm -f /usr/local/lib/python2.7/dist-packages/flask_cache/jinja2ext.pyc
 
-
 # run with /usr/local/bin/gdash --port 28180 --host 192.168.10.11 --gluster /usr/local/sbin/gluster
+
+
+
+# NEW GDASH based on gluster web interface
+# https://github.com/oss2016summer/gluster-web-interface
+
+# ON HOLD FOR NOW SINCE IT WOUKD REQUIRES SIGNIFICANT FIXES
+
+#echo " - Configuring nodejs repo"
+#curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -  > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+
+#echo " - Installing buildessentials and nodejs"
+#apt-get -y install build-essential curl nodejs  > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+
+#echo " - Installing bower"
+#npm install -g bower  > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+
+#echo " - Installing Ruby"
+#apt-get -y install ruby-full rbenv ruby-build  > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+
+#echo " - Downloading GDASH (master from github)"
+#wget https://github.com/oss2016summer/gluster-web-interface/archive/master.zip > /tmp/gdash_install_log 2>&1
+#if [[ $? != 0 ]]; then
+#    echo " -> Failed to downolad gluster Dashboard from https://hithub.com/. Trying to download from niceideas.ch"
+#    exit -1
+#    #wget http://niceideas.ch/mes/kafka-$KAFKA_VERSION.tar.gz >> /tmp/gdash_install_log 2>&1
+#    #fail_if_error $? "/tmp/gdash_install_log" -1
+#fi
+
+#echo " - Extracting GDASH (gluster-web-interface)"
+#unzip master.zip > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+
+#cd gluster-web-interface-master/
+
+#echo " - Tampering with build script"
+#sed -i s/"python-software-properties"/"software-properties-common"/g ./script/setup.sh
+#sed -i s/"rbenv install 2.3.3"/"#rbenv install 2.3.3"/g ./script/setup.sh
+#sed -i s/"rbenv local 2.3.3"/"#rbenv local 2.3.3"/g ./script/setup.sh
+
+#echo " - Building GDASH (gluster-web-interface) [This can take several minutes]"
+#./script/setup.sh > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+
+
+
 
 
 sudo rm -Rf /tmp/gdash_setup
