@@ -42,5 +42,39 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh zookeeper
 
-echo " - Starting service"
-/usr/share/zookeeper/bin/zkServer.sh start-foreground
+echo " - Starting zookeeper service"
+/usr/share/zookeeper/bin/zkServer.sh start-foreground &
+export zk_pid=$!
+
+# giving it a little time to start
+sleep 5
+
+# First checking if process is up and running
+echo " - Ensuring that zookeeper started successfully"
+if [[ `ps -p $zk_pid -o comm=` == "" ]]; then
+    echo "Could not find any process running with PID $zk_pid". Will be exiting
+
+    echo " - Searching for specific error conditions"
+    if [[ `tail -n 50 /var/log/zookeeper/zookeeper.log | grep "Unexpected exception, exiting abnormally"` != "" ]]; then
+
+
+        if [[ `tail -n 50 /var/log/zookeeper/zookeeper.log | grep "Last transaction was partial"` != "" ]]; then
+
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            echo "Detected a data corruption situation (log reported below). Will wipe out the data for next restart"
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            tail -n 50
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            rm -Rf /var/lib/zookeeper/version-2
+            echo "DATA IN /var/lib/zookeeper/version-2 IS DELETED"
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        fi
+
+    fi
+
+    echo " - EXITING ABNORMALLY !"
+    exit -5
+fi
+
+wait $zk_pid
+

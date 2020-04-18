@@ -72,6 +72,9 @@ else
     # ES 7.x
     sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\]"/g \
         /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    # Likely single node
+    sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$SELF_IP_ADDRESS\"\]"/g \
+        /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
 fi
 

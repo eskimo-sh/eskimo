@@ -277,7 +277,10 @@ public class MarathonService {
 
             String marathonIpAddress = findUniqueServiceIP("marathon");
             if (StringUtils.isBlank(marathonIpAddress)) {
-                throw new SystemException("Marathon doesn't seem to be installed");
+                String message = "Marathon doesn't seem to be installed";
+                notificationService.addError(message);
+                messagingService.addLines(message);
+                throw new SystemException(message);
             }
 
             Set<String> liveIps = new HashSet<>();
