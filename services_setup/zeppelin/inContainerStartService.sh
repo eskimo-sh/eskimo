@@ -78,16 +78,25 @@ if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_
     exit -20
 fi
 
+export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_GLUSTER_$SELF_IP_ADDRESS | tr -d .)`
+
 echo " - Mounting gluster shares for zeppelin"
+echo "   + mounting spark shares"
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
 
 
-THOSE ARE NOT MANDATORY !!! I SHOULD NOT MOUNT THEM IF THEY ARE NOT AVAILABLRE !!
+if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:18999/?command=volume&subcommand=list" 2>/dev/null | grep "logstash"` != "" ]]; then
+    echo "   + mounting logstash shares"
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
+fi
 
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
+
+if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:18999/?command=volume&subcommand=list" 2>/dev/null | grep "flink"` != "" ]]; then
+    echo "   + mounting flink shares"
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
+fi
 
 echo " - Starting service"
 bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'
