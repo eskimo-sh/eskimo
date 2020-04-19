@@ -57,13 +57,6 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 
-# find out if gluster is available
-if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
-    export GLUSTER_AVAILABLE=1
-else
-    export GLUSTER_AVAILABLE=0
-fi
-
 # reinitializing log
 sudo rm -f /tmp/flink_install_log
 

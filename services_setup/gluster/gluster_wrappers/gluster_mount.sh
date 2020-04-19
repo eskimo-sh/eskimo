@@ -91,15 +91,9 @@ fi
 
 
 # find out if gluster is available
-if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
-    export GLUSTER_AVAILABLE=1
-else
-    export GLUSTER_AVAILABLE=0
-fi
-
-if [[ $GLUSTER_AVAILABLE == 0 ]]; then
-    echo "Gluster doesn't seem to be available on eskimo cluster"
-    exit -5
+if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
+    echo "ERROR: No gluster master defined"
+    exit -20
 fi
 
 set +e

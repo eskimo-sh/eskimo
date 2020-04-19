@@ -186,6 +186,47 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
     }
 
     @Test
+    public void testMasterElectionStrategyRandomNodeAfterOrSame() throws Exception {
+
+        initRandomNodeAfterOrSameDependencies();
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("service_c1", "on");
+            put("action_id2", "192.168.10.12");
+            put("service_b", "1");
+            put("action_id3", "192.168.10.13");
+            put("service_b3", "on");
+            put("service_c3", "on");
+        }});
+
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+
+        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
+                "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
+                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript());
+    }
+
+    @Test
+    public void testMasterElectionStrategyRandomNodeAfterOrSameSingleNode() throws Exception {
+
+        initRandomNodeAfterOrSameDependencies();
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("service_b1", "on");
+            put("service_c1", "on");
+        }});
+
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+
+        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
+    }
+
+    @Test
     public void testMasterElectionStrategyRandomNodeAfterChain() throws Exception {
 
         initRandomNodeAfterDependencies();

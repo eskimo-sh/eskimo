@@ -513,54 +513,15 @@ if [[ $3 == "" ]]; then
 fi
 export SHARE_USER=$3
 
-# find out if gluster is available
-if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
-    export GLUSTER_AVAILABLE=1
-else
-    export GLUSTER_AVAILABLE=0
+# Ensure gluster is available
+if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
+    echo "ERROR: No Gluster master is defined"
+    exit -20
 fi
 
-# Only if gluster is enabled
-if [[ $GLUSTER_AVAILABLE == 1 ]]; then
+echo " - Proceeding with gluster mount of $SHARE_PATH"
+/usr/local/sbin/gluster_mount.sh $SHARE_NAME $SHARE_PATH $SHARE_USER `/usr/bin/id -u $SHARE_USER`
 
-    echo " - Proceeding with gluster mount of $SHARE_PATH"
-    /usr/local/sbin/gluster_mount.sh $SHARE_NAME $SHARE_PATH $SHARE_USER `/usr/bin/id -u $SHARE_USER`
-    
-else
-
-    echo " - Not mounting gluster shares since not working in cluster mode"
-
-    echo " - Getting rid of former gluster mount of $SHARE_PATH if any"
-
-    if [[ `grep $SHARE_NAME /etc/mtab` != "" ]]; then
-        echo "   + umounting gluster $SHARE_NAME"
-        umount $SHARE_PATH
-        if [[ $? != 0 ]]; then
-            umount -l $SHARE_PATH
-        fi
-    fi
-
-    if [[ `grep $SHARE_NAME /etc/fstab` != "" ]]; then
-        echo "   + removing gluster $SHARE_NAME from /etc/fstab"
-        sed -i "/$SHARE_NAME/d" /etc/fstab
-    fi
-
-    if [[ ! -d $SHARE_PATH ]]; then
-        echo " - Creating $SHARE_PATH"
-        mkdir -p $SHARE_PATH
-    fi
-
-    if [[ `stat -c '%U' $SHARE_PATH` != "$SHARE_USER" ]]; then
-        echo " - Changing owner of $SHARE_PATH"
-        chown -R $SHARE_USER $SHARE_PATH
-    fi
-
-    if [[ `ls -ld $SHARE_PATH | grep drwxrwxrw` == "" ]]; then
-        echo " - Changing rights of $SHARE_PATH"
-        chmod -R 777 $SHARE_PATH
-    fi   
-
-fi
 EOF
 
 sudo mv /tmp/handle_gluster_share.sh /usr/local/sbin/handle_gluster_share.sh

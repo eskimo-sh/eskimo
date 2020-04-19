@@ -260,6 +260,7 @@ public class Topology {
                 break;
 
             case RANDOM_NODE_AFTER:
+            case RANDOM_NODE_AFTER_OR_SAME:
                 if (service.isMarathon()) {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services");
                 }
@@ -268,6 +269,10 @@ public class Topology {
                 }
 
                 String masterIp = findRandomServiceIPAfter(nodesConfig, deadIps, dep.getMasterService(), nodeNbr);
+
+                if (dep.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME) && StringUtils.isBlank(masterIp)) {
+                    masterIp = findRandomOtherServiceIP(nodesConfig, deadIps, dep.getMasterService(), otherMasters);
+                }
                 if (StringUtils.isNotBlank(masterIp)) {
                     masterIp = handleMissingMaster(dep, service, masterIp);
                     definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + ipAddress.replace(".", ""), masterIp);

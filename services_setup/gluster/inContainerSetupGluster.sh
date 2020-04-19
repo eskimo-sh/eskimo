@@ -158,50 +158,57 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
     exit -3
 fi
 
-# add other master if not done
-if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+if [[ $SELF_IP_ADDRESS == $MASTER_IP_ADDRESS ]]; then
 
-   # 3 attempts (to address concurrency issues coming from parallel installations)
-   set +e
-   for i in 1 2 3 ; do
-       echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS"
-       /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
-       if [[ $? != 0 ]]; then
-           sleep 2
-           continue
-       fi
-       break
-   done
+    echo " - NO NEED TO ADD ANY PEER - Master is self node - likely only one node in gluster cluster"
 
-   # Trying the other way around
-   if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+else
+
+    # add other master if not done
+    if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+
+       # 3 attempts (to address concurrency issues coming from parallel installations)
+       set +e
        for i in 1 2 3 ; do
-           echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
-           /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS
+           echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS"
+           /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
            if [[ $? != 0 ]]; then
                sleep 2
                continue
            fi
            break
        done
-   fi
 
-   # checking
-   sleep 1
-   if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
-       echo "Failed to add $SELF_IP_ADDRESS to cluster where master is $MASTER_IP_ADDRESS"
-       exit -101
-   fi
+       # Trying the other way around
+       if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+           for i in 1 2 3 ; do
+               echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
+               /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS
+               if [[ $? != 0 ]]; then
+                   sleep 2
+                   continue
+               fi
+               break
+           done
+       fi
 
-   set -e
-fi
+       # checking
+       sleep 1
+       if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+           echo "Failed to add $SELF_IP_ADDRESS to cluster where master is $MASTER_IP_ADDRESS"
+           exit -101
+       fi
 
-# ensure peer is well connected
-sleep 1
-if [[ `gluster peer status | grep $MASTER_IP_ADDRESS` == "" ]]; then
-   echo "Error : $MASTER_IP_ADDRESS not found in peers"
-   gluster peer status
-   exit -1
+       set -e
+    fi
+
+    # ensure peer is well connected
+    sleep 1
+    if [[ `gluster peer status | grep $MASTER_IP_ADDRESS` == "" ]]; then
+       echo "Error : $MASTER_IP_ADDRESS not found in peers"
+       gluster peer status
+       exit -1
+    fi
 fi
 
 EOF
@@ -235,7 +242,12 @@ fi
 
 mkdir -p /var/lib/gluster/volume_bricks/
 
-# define share with replicas 2 if not done
+# define share with replicas 2 unless single node on cluster
+if [[ $MASTER_IP_ADDRESS == $SELF_IP_ADDRESS ]]; then
+    export NBR_REPLICAS="1"
+else
+    export NBR_REPLICAS="2"
+fi
 
 set +e
 
@@ -245,12 +257,22 @@ for i in 1 2 3 ; do
 
         rm -Rf /var/lib/gluster/volume_bricks/$VOL_NAME
 
-        gluster volume create $VOL_NAME replica 2 transport tcp \
-               $SELF_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME \
-               $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME
-        if [[ $? != 0 ]]; then
-            sleep 2
-            continue
+        if [[ "$NBR_REPLICAS" == "1" ]]; then
+            gluster volume create $VOL_NAME transport tcp \
+                    $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME
+            if [[ $? != 0 ]]; then
+                sleep 2
+                continue
+            fi
+        else
+            echo " - Creating single replica since likely single node in cluster"
+            gluster volume create $VOL_NAME replica $NBR_REPLICAS transport tcp \
+                    $SELF_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME \
+                    $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME
+            if [[ $? != 0 ]]; then
+                sleep 2
+                continue
+            fi
         fi
 
         if [[ $UIDTOSET != "" ]]; then

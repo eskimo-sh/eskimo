@@ -195,6 +195,42 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
+    public void initRandomNodeAfterOrSameDependencies() throws Exception {
+
+        Service serviceA = new Service();
+        serviceA.setName("service_a");
+        Dependency depA = new Dependency();
+        depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
+        depA.setMasterService("service_b");
+        depA.setNumberOfMasters(1);
+        serviceA.addDependency (depA);
+        def.addService(serviceA);
+
+        Service serviceB = new Service();
+        serviceB.setName("service_b");
+        Dependency depB = new Dependency();
+        depB.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
+        depB.setMasterService("service_c");
+        depB.setNumberOfMasters(1);
+        serviceB.addDependency (depB);
+        def.addService(serviceB);
+
+        Service serviceC = new Service();
+        serviceC.setName("service_c");
+        def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setMarathon(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.RANDOM);
+        depD.setMasterService("service_c");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
+    }
+
     public void initRandomNodeAfterDependencies() throws Exception {
 
         Service serviceA = new Service();

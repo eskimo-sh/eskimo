@@ -52,21 +52,6 @@
         "hostPath": "/usr/local/lib",
         "containerPath": "/usr/local/host_lib",
         "mode": "RO"
-      },
-      {
-        "hostPath": "/var/lib/spark",
-        "containerPath": "/var/lib/host_spark",
-        "mode": "RW"
-      },
-      {
-        "hostPath": "/var/lib/flink",
-        "containerPath": "/var/lib/host_flink",
-        "mode": "RW"
-      },
-      {
-        "hostPath": "/var/lib/elasticsearch",
-        "containerPath": "/var/lib/host_elasticsearch",
-        "mode": "RW"
       }
     ]
   },

@@ -129,7 +129,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "RANDOM_NODE_AFTER",
+        "masterElectionStrategy": "RANDOM_NODE_AFTER_OR_SAME",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true

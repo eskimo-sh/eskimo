@@ -49,22 +49,15 @@ echo " - Inject settings (spark-executor)"
 /usr/local/sbin/settingsInjector.sh spark-executor
 
 # find out if gluster is available
-if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
-    export GLUSTER_AVAILABLE=1
-else
-    export GLUSTER_AVAILABLE=0
+if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
+    echo "ERROR: No gluster master defined"
+    exit -20
 fi
 
-# Only if gluster is enabled
-if [[ $GLUSTER_AVAILABLE == 1 ]]; then
-    echo " - Mounting gluster shares for spark console"
-    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
-    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
-else
-    echo " - Linking host /var/lib folders for sparh console"
-    sudo /bin/rm -Rf /var/lib/spark
-    sudo /bin/ln -s /var/lib/host_spark /var/lib/spark
-fi
+echo " - Mounting gluster shares for spark console"
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
+
 
 echo " - Starting service"
 /usr/local/lib/spark/sbin/start-history-server-wrapper.sh

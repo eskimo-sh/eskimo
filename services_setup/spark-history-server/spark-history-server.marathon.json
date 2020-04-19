@@ -40,11 +40,6 @@
         "hostPath": "/etc/eskimo_services-config.json",
         "containerPath": "/etc/eskimo_services-config.json",
         "mode": "RO"
-      },
-      {
-        "hostPath": "/var/lib/spark",
-        "containerPath": "/var/lib/host_spark",
-        "mode": "RW"
       }
     ]
   },
