@@ -52,6 +52,12 @@ echo " - Enabling spark user to create /var/run/spark/zeppelin and chown it"
 echo "spark  ALL = NOPASSWD: /bin/mkdir -p /var/run/spark/zeppelin" >> /etc/sudoers.d/spark
 echo "spark  ALL = NOPASSWD: /bin/chown spark /var/run/spark/zeppelin" >> /etc/sudoers.d/spark
 
+echo " - Enabling spark user to use host folders"
+echo "spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/flink" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_flink /var/lib/flink" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/elasticsearch" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_elasticsearch /var/lib/elasticsearch" >> /etc/sudoers.d/spark
+
 # zeppelin is not mounting /var/lib/spark from host but gluster shares inside
 # still need to be able to manipulate that directory !
 chown spark /var/lib/spark

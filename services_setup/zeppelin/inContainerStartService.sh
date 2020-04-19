@@ -71,12 +71,31 @@ echo " - Inject settings (spark-executor)"
 echo " - Inject settings (flink-app-master)"
 /usr/local/sbin/settingsInjector.sh flink-app-master
 
-echo " - Mounting gluster shares for zeppelin"
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
+
+# find out if gluster is available
+if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` != "" ]]; then
+    export GLUSTER_AVAILABLE=1
+else
+    export GLUSTER_AVAILABLE=0
+fi
+
+# Only if gluster is enabled
+if [[ $GLUSTER_AVAILABLE == 1 ]]; then
+    echo " - Mounting gluster shares for zeppelin"
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
+    sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
+else
+    echo " - Linking host /var/lib folders for zeppelin"
+    sudo /bin/rm -Rf /var/lib/spark
+    sudo /bin/ln -s /var/lib/host_spark /var/lib/spark
+    sudo /bin/rm -Rf /var/lib/flink
+    sudo /bin/ln -s /var/lib/host_flink /var/lib/flink
+    sudo /bin/rm -Rf /var/lib/elasticsearch
+    sudo /bin/ln -s /var/lib/host_elasticsearch /var/lib/elasticsearch
+fi
 
 echo " - Starting service"
 bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'
