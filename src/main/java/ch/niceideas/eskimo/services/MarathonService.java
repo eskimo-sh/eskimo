@@ -207,7 +207,7 @@ public class MarathonService {
 
         for (int i = 0; i < numberOfAttempts; i++) {
             String serviceJson = queryMarathon("apps/" + service);
-            if (StringUtils.isBlank(serviceJson)) {
+            if (StringUtils.isBlank(serviceJson) || !serviceJson.startsWith("{")) {
                 if (i < numberOfAttempts - 1) {
                     try {
                         Thread.sleep(500);
@@ -230,7 +230,7 @@ public class MarathonService {
             String nodeIp = serviceResult.getValueForPathAsString("app.tasks.0.host");
             if (StringUtils.isBlank(nodeIp) && i < numberOfAttempts - 1) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     logger.debug (e, e);
                 }

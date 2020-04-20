@@ -242,6 +242,16 @@ public class ServicesDefinition implements InitializingBean {
                 }
             }
 
+            // Marathon services have an implicit dependency on marathon
+            if (service.isMarathon()) {
+                Dependency marathonDependency = new Dependency();
+                marathonDependency.setMes(MasterElectionStrategy.RANDOM);
+                marathonDependency.setMasterService("marathon");
+                marathonDependency.setNumberOfMasters(1);
+                marathonDependency.setMandatory(true);
+                service.addDependency(marathonDependency);
+            }
+
             if (servicesConfig.hasPath(serviceString+".additionalEnvironment")) {
                 JSONArray addEnvConf = servicesConfig.getSubJSONObject(serviceString).getJSONArray("additionalEnvironment");
                 for (int i = 0; i < addEnvConf.length(); i++) {

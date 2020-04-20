@@ -59,6 +59,14 @@
       "logo" : "images/prometheus-logo.png",
       "icon" : "images/prometheus-icon.png"
     },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "prometheus",
+        "numberOfMasters": 1,
+        "mandatory": true
+      }
+    ],
     "additionalEnvironment": [ "ALL_NODES_LIST_prometheus" ]
   },
 
@@ -106,7 +114,7 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "prometheus",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": true
       }
     ],
     "additionalEnvironment": [ "CONTEXT_PATH" ]
@@ -250,6 +258,7 @@
         "mandatory": true
       },
       {
+        "___comment": "This dependency is required since mesos-agent is used to register marathon registry in /etc/host",
         "masterElectionStrategy": "RANDOM",
         "masterService": "marathon",
         "numberOfMasters": 1,

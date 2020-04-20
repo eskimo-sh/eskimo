@@ -470,7 +470,7 @@ public class SystemService {
                         }
                     });
 
-            // first thing first, flag nodes that need to be restared as needing to be restarted
+            // first thing first, flag nodes that need to be restated as needing to be restarted
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
                     command.getRestarts(), nodesConfig, deadIps)) {
                 for (Pair<String, String> operation : restarts) {
@@ -479,6 +479,9 @@ public class SystemService {
                             String service = operation.getKey();
                             String ipAddress = operation.getValue();
                             String nodeName = ipAddress.replace(".", "-");
+                            if (ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
+                                nodeName = MarathonService.MARATHON_NODE;
+                            }
                             servicesInstallationStatus.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "restart");
                         });
                     } catch (FileException | SetupException e) {
