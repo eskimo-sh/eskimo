@@ -139,7 +139,7 @@ touch /var/lib/gluster/volume_management_lock_$VOLUME
 
 # We first attempt mounting on two sides using __gluster-prepare-mount.sh
 # - __gluster-prepare-mount-sh calls
-#  + in container detect-gluster-inconsistency.sh which does
+#  + in container address-gluster-inconsistency.sh which does
 #    - ensures that the master is not in the pool of the local node and the local node not in the pool of the master
 #    - or that both are in each others pool
 #    - fix the situation if it is incoherent
@@ -169,7 +169,7 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
     fi
 
     if [[ $failedSys != 0 && $failedTrans != 0 ]]; then
-        echo " - Mount failed. Need to Prepare gluster mount $MOUNT_POINT"
+        echo " - Mount failed. Need to Prepare gluster mount $MOUNT_POINT (no further logs if success)"
         /usr/local/sbin/__gluster-prepare-mount.sh $VOLUME $OWNER_ID >> /tmp/gluster_mount_$1_log 2>&1
         if [[ $? != 0 ]]; then
             echo "Failed to prepare gluster mount $MOUNT_POINT"

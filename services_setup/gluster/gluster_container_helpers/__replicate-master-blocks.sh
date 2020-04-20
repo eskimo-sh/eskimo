@@ -35,9 +35,11 @@
 #
 
 
-# Handling /var/lib/flink/data
-/usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink
+# Find out about volumes that have only one brick and create a new brick here
+MASTER_IP_ADDRESS=$1
+if [[ $MASTER_IP_ADDRESS == "" ]]; then
+   echo "Expecting Gluster master IP address as first argument"
+   exit -1
+fi
 
-# Handling /var/lib/flink/completed_jobs
-/usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink
-
+# TODO Implement me

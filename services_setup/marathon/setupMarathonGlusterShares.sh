@@ -35,4 +35,4 @@
 #
 
 # Handling /var/lib/logstash/data
-/usr/local/sbin/handle_gluster_share.sh marathon_registry /var/lib/marathon/docker_registry marathon
+/usr/local/sbin/gluster_mount.sh marathon_registry /var/lib/marathon/docker_registry marathon

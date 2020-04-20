@@ -103,6 +103,16 @@ for i in `find ./command_server`; do
     fi
 done
 
+echo " - Gluster in container helpers"
+for i in `find ./gluster_container_helpers`; do
+    if [[ -f $SCRIPT_DIR/$i ]]; then
+        filename=`basename $i`
+        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
+        docker exec gluster chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
+        fail_if_error $? /tmp/gluster_install_log -30
+    fi
+done
+
 echo " - Configuring gluster container"
 docker exec gluster bash /scripts/inContainerSetupGluster.sh $SELF_IP_ADDRESS | tee -a /tmp/gluster_install_log 2>&1
 if [[ `tail -n 1 /tmp/gluster_install_log` != " - In container config SUCCESS" ]]; then

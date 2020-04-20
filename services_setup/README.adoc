@@ -100,8 +100,8 @@ These standard conventions are as follows (illustrated for a service called `ser
 * If the service required a file to track its PID, that file should be stored under `/var/run/serviceX`
 * Whenever a service `serviceX` requires a subfolder of `/var/log/serviceX` to be shared among cluster nodes, a script
 `setupServiceXGlusterSares.sh` should be defined that calls the common helper script (define at eskimo base system
-installation on every node) `/usr/local/sbin/handle_gluster_share.sh` in the following way, for instance to define
- the _flink data_ share : `/usr/local/sbin/handle_gluster_share.sh flink_data /var/lib/flink/data flink`
+installation on every node) `/usr/local/sbin/gluster_mount.sh` in the following way, for instance to define
+ the _flink data_ share : `/usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink`
 
 At the end of the day, it's really plain old Unix standards. The only challenge comes from the use of docker which
 requires to play with docker mounts a little. +

@@ -35,9 +35,53 @@
 #
 
 
-# Handling /var/lib/flink/data
-/usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink
+# Remove all bricks I believe the shabow has and then force remove the shadow from my peers
+SHADOW_IP_ADDRESS=$1
+if [[ $SHADOW_IP_ADDRESS == "" ]]; then
+   echo "Expecting Gluster Shadow (vanished !) IP address as first argument"
+   exit -1
+fi
 
-# Handling /var/lib/flink/completed_jobs
-/usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink
+echo " - Forcing removal of $SHADOW_IP_ADDRESS from local peer list"
+
+echo "    + Listing local volumes"
+volumes=`gluster volume list 2>/tmp/volume_list_log`
+if [[ $? != 0 ]]; then
+    echo "Failed to list local volumes"
+    echo $volumes
+    cat /tmp/volume_list_log
+    exit -2
+fi
+
+echo "    + Removing all bricks from $SHADOW_IP_ADDRESS"
+for vol in $volumes; do
+
+    echo "    + Listing volume bricks for $vol"
+    brick=`gluster volume info $vol  | grep Brick | grep $SHADOW_IP_ADDRESS | cut -d ' ' -f 2  2>/tmp/bricks_log`
+    if [[ $? != 0 ]]; then
+        echo "Failed to get volume info for $vol"
+        echo $brick
+        cat /tmp/bricks_log
+        exit -3
+    fi
+
+    echo "   + Removing brick $brick"
+    share_name=`echo $brick | rev | cut -d'/' -f 1 | rev`
+    echo "y" | gluster volume remove-brick $share_name replica 1 $brick force >/tmp/remove_brick 2>&1
+    if [[ $? != 0 ]]; then
+        echo "Failed to remove brick $brick"
+        cat /tmp/remove_brick
+        exit -4
+    fi
+
+done
+
+echo "    + Detaching peer $SHADOW_IP_ADDRESS"
+gluster peer detach $SHADOW_IP_ADDRESS >/tmp/peer_detach 2>&1
+if [[ $? != 0 ]]; then
+    echo "Failed to detach peer $SHADOW_IP_ADDRESS"
+    cat /tmp/peer_detach
+    exit -5
+fi
+
 

@@ -36,8 +36,8 @@
 
 
 # Handling /var/lib/spark/data
-/usr/local/sbin/handle_gluster_share.sh spark_data /var/lib/spark/data spark
+/usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark
 
 # Handling /var/lib/spark/eventlog
-/usr/local/sbin/handle_gluster_share.sh spark_eventlog /var/lib/spark/eventlog spark
+/usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/spark/eventlog spark
 

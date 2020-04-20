@@ -41,14 +41,14 @@ echo "Configuring peers"
 /usr/bin/docker exec \
         -i \
         gluster \
-        /usr/local/sbin/detect-gluster-inconsistency.sh
+        /usr/local/sbin/gluster-address-peer-inconsistency.sh
 
 # Ensure gluster in container configuration
 echo "Configuring peers"
 /usr/bin/docker exec \
         -i \
         gluster \
-        /usr/local/sbin/configure-general-gluster.sh
+        /usr/local/sbin/gluster-update-peers.sh
 
 # Perform in container mount of share
 echo "Preparing volumes"

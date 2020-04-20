@@ -34,10 +34,27 @@
 # Software.
 #
 
+# Delete the local blocks that are found on master (they are de-synchronized !)
+MASTER_IP_ADDRESS=$1
+if [[ $MASTER_IP_ADDRESS == "" ]]; then
+   echo "Expecting Gluster master IP address as first argument"
+   exit -1
+fi
 
-# Handling /var/lib/flink/data
-/usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink
 
-# Handling /var/lib/flink/completed_jobs
-/usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink
+echo " - Removing de-synchronized local blocks"
 
+master_volumes=`/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS volume list 2>/tmp/remote_volumes_log`
+if [[ $? != 0 ]]; then
+    echo "    + Failed to fetch remote volumes"
+    echo $master_volumes
+    cat /tmp/remote_volumes_log
+    exit -1
+fi
+
+for vol in $master_volumes; do
+    if [[ -d /var/lib/gluster/volume_bricks/$vol ]]; then
+        echo "   + Deleting /var/lib/gluster/volume_bricks/$vol"
+        rm -Rf /var/lib/gluster/volume_bricks/$vol
+    fi
+done

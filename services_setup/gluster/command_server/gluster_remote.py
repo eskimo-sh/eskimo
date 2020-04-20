@@ -81,8 +81,12 @@ class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         LOG.info(subcommand)
         LOG.info(options)
 
-        command_line = "/usr/sbin/gluster {0} {1} {2}".format(command, subcommand, options)
-        LOG.info('Command Line : %s', command_line)
+        if command == "force-remove-peer":
+            command_line = "/usr/local/sbin/__force-remove-peer.sh {0}".format(options)
+        else:
+            command_line = "/usr/sbin/gluster {0} {1} {2}".format(command, subcommand, options)
+
+        LOG.info('About to execute command : %s', command_line)
 
         # execute command
         try:

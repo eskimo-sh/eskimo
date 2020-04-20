@@ -67,6 +67,7 @@ public class SystemService {
 
     public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
     public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
+    public static final String USR_LOCAL_SBIN_GLUSTER_MOUNT_SH = "/usr/local/sbin/gluster_mount.sh";
     public static final String SERVICE_PREFIX = "service_";
     public static final String TMP_PATH_PREFIX = "/tmp/";
 
@@ -1086,6 +1087,9 @@ public class SystemService {
 
         sb.append(" - Copying mesos-cli script\n");
         copyCommand ("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, ipAddress);
+
+        sb.append(" - Copying gluster-mount script\n");
+        copyCommand ("gluster-mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, ipAddress);
 
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
     }
