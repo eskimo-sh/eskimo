@@ -68,6 +68,7 @@ Software.
         <Logger name="org" level="info"></Logger>
         <Logger name="com" level="info"></Logger>
         <Logger name="ch" level="info"></Logger>
+        <Logger name="org.apache.http.impl.execchain" level="warn"></Logger>
         <Logger name="ch.niceideas.eskimo.services" level="debug"></Logger>
         <Logger name="org.apache.juli" level="fatal"></Logger>
     </Loggers>
