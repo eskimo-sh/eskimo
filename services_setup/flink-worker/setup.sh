@@ -155,6 +155,11 @@ echo " - Creating flink-workers containers cleaner"
 sudo bash -c 'echo "for i in \`docker ps -aq --no-trunc -f status=exited -f ancestor=eskimo:flink-worker\` ; do docker rm --force \$i; done" > /usr/local/sbin/clean-flink-worker-containers.sh'
 sudo chmod 755 /usr/local/sbin/clean-flink-worker-containers.sh
 
-echo " - Scheduling flink-workers containers cleaner"
-echo "* * * * * bash /usr/local/sbin/clean-flink-worker-containers.sh >> /var/log/flink/clean-flink-worker-containers.log 2>&1" > /tmp/clean-flink-worker-containers_crontab
-sudo crontab /tmp/clean-flink-worker-containers_crontab
+
+if [[ `sudo crontab -u root -l 2>/dev/null | grep clean-flink-worker-containers.sh` == "" ]]; then
+    echo " - Scheduling flink-workers containers cleaner"
+    sudo rm -f /tmp/crontab
+    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+    sudo bash -c "echo \"* * * * * bash /usr/local/sbin/clean-flink-worker-containers.sh >> /var/log/flink/clean-flink-worker-containers.log 2>&1\" >> /tmp/crontab"
+    sudo crontab -u root /tmp/crontab
+fi

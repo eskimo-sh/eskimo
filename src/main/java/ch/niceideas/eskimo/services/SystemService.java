@@ -471,7 +471,7 @@ public class SystemService {
                         }
                     });
 
-            // first thing first, flag nodes that need to be restated as needing to be restarted
+            // first thing first, flag services that need to be restarted as "needing to be restarted"
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
                     command.getRestarts(), nodesConfig, deadIps)) {
                 for (Pair<String, String> operation : restarts) {
@@ -832,12 +832,24 @@ public class SystemService {
 
                         String nodeName = serviceStatusFullString.substring(index + searchedPattern.length());
                         if (nodeName.equals(MarathonService.MARATHON_NODE)) {
-                            nodeName = systemStatus.getFirstNodeName (savedService);
-                        }
-                        if (StringUtils.isBlank(nodeName)) {
-                            nodeName = systemStatus.getFirstNodeName ("marathon");
+                            // get first node actually running service
+                            nodeName = systemStatus.getFirstNodeName(savedService);
                             if (StringUtils.isBlank(nodeName)) {
-                                notificationService.addError("Marathon inconsistency.");
+                                // if none, consider marathon node as DEFAULT node running service
+                                nodeName = systemStatus.getFirstNodeName("marathon");
+
+                                if (StringUtils.isBlank(nodeName)) {
+                                    // if marathon is not found, don't touch anything. Let's wait for it to come back.
+                                    //notificationService.addError("Marathon inconsistency.");
+                                    //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                                    continue;
+                                } else {
+                                    String marathonStatus = systemStatus.getValueForPathAsString(SystemService.SERVICE_PREFIX + "marathon" + "_" + nodeName);
+                                    if (StringUtils.isBlank(marathonStatus) || marathonStatus.equals("NA")) {
+                                        //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                                        continue;
+                                    }
+                                }
                             }
                         }
 
@@ -922,6 +934,7 @@ public class SystemService {
                 servicesInstallationStatus.removeRootKey(serviceStatusFullString);
                 serviceMissingCounter.remove(serviceStatusFullString);
                 notificationService.addError("Service " + savedService + " on " + nodeName + " vanished!");
+                logger.warn ("Service " + savedService + " on " + nodeName + " has been removed from ServiceInstallationStatus!");
 
                 // unconfigure proxy if required
                 proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
@@ -1089,7 +1102,7 @@ public class SystemService {
         copyCommand ("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, ipAddress);
 
         sb.append(" - Copying gluster-mount script\n");
-        copyCommand ("gluster-mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, ipAddress);
+        copyCommand ("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, ipAddress);
 
         connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
     }

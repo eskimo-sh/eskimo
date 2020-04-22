@@ -73,23 +73,48 @@ if [[ ! -d /var/log/mesos ]]; then
     sudo chmod -R 777 /var/log/mesos
 fi
 
-if [[ ! -f /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh ]]; then
-
-    echo " - Copying mesos-init-wrapper script"
-    sudo cp $SCRIPT_DIR/mesos-init-wrapper.sh /usr/local/lib/mesos/sbin/
-    sudo chmod 754 /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh
-
-    echo " - Symlinking mesos-init-wrapper script to /usr/local/sbin/"
-    sudo rm -f /usr/local/sbin/mesos-init-wrapper.sh
-    sudo ln -s /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh /usr/local/sbin/mesos-init-wrapper.sh
+if [[ -f /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh ]]; then
+    echo " - Removing existing mesos-init-wrapper script (will be rewritten)"
+    sudo rm -f /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh
 fi
 
-if [[ ! -f /usr/local/sbin/register-marathon-registry.sh ]]; then
+echo " - Copying mesos-init-wrapper script"
+sudo cp $SCRIPT_DIR/mesos-init-wrapper.sh /usr/local/lib/mesos/sbin/
+sudo chmod 754 /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh
 
-    echo " - Copying register-marathon-registry.sh script"
-    sudo cp $SCRIPT_DIR/register-marathon-registry.sh /usr/local/sbin/
-    sudo chmod 754 /usr/local/sbin/register-marathon-registry.sh
+echo " - Symlinking mesos-init-wrapper script to /usr/local/sbin/"
+sudo rm -f /usr/local/sbin/mesos-init-wrapper.sh
+sudo ln -s /usr/local/lib/mesos/sbin/mesos-init-wrapper.sh /usr/local/sbin/mesos-init-wrapper.sh
+
+
+if [[ -f /usr/local/sbin/register-marathon-registry.sh ]]; then
+    echo " - Removing existing register-marathon-registry.sh (will be rewritten)"
+    sudo rm -f /usr/local/sbin/register-marathon-registry.sh
 fi
+
+echo " - Copying register-marathon-registry.sh script"
+sudo cp $SCRIPT_DIR/register-marathon-registry.sh /usr/local/sbin/
+sudo chmod 754 /usr/local/sbin/register-marathon-registry.sh
+
+
+if [[ -f /usr/local/sbin/kill-orphan-marathon-container-HACK.sh ]]; then
+    echo " - Removing existing kill-orphan-marathon-container-HACK.sh (will be rewritten)"
+    sudo rm -f /usr/local/sbin/kill-orphan-marathon-container-HACK.sh
+fi
+
+echo " - Copying kill-orphan-marathon-container-HACK.sh script"
+sudo cp $SCRIPT_DIR/kill-orphan-marathon-container-HACK.sh /usr/local/sbin/
+sudo chmod 754 /usr/local/sbin/kill-orphan-marathon-container-HACK.sh
+
+
+if [[ `sudo crontab -u root -l 2>/dev/null | grep kill-orphan-marathon-container-HACK.sh` == "" ]]; then
+    echo " - Scheduling periodic execution of kill-orphan-marathon-container-HACK.sh using crontab"
+    sudo rm -f /tmp/crontab
+    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+    sudo bash -c "echo \"* * * * * /usr/local/sbin/kill-orphan-marathon-container-HACK.sh\" >> /tmp/crontab"
+    sudo crontab -u root /tmp/crontab
+fi
+
 
 echo " - Creating mesos slave working directory in /var/lib/mesos/slave"
 sudo mkdir -p /var/lib/mesos/slave

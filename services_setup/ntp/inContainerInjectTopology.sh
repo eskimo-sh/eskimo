@@ -83,9 +83,14 @@ else
     sudo bash -c "echo -e \"\n\n#enabling mes_master to set time\" >> /etc/ntp.conf"
     sudo bash -c "echo \"restrict $MASTER_IP_ADDRESS mask 255.255.255.255 notrap \" >> /etc/ntp.conf"
 
-    echo " - Scheduling periodical ntpdate force update"
-    echo "* * * * * /usr/sbin/ntpdate -u $MASTER_IP_ADDRESS >> /var/log/ntp/ntpdate.log 2>&1" > /tmp/ntpdate_crontab
-    crontab /tmp/ntpdate_crontab
+
+    if [[ `sudo crontab -u root -l 2>/dev/null | grep ntpdate` == "" ]]; then
+        echo " - Scheduling periodical ntpdate force update"
+        sudo rm -f /tmp/crontab
+        sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+        sudo bash -c "echo \"* * * * * /usr/sbin/ntpdate -u $MASTER_IP_ADDRESS >> /var/log/ntp/ntpdate.log 2>&1\" >> /tmp/crontab"
+        sudo crontab -u root /tmp/crontab
+    fi
 
 fi
 

@@ -35,6 +35,9 @@
 #
 
 
+# Inject topology
+. /etc/eskimo_topology.sh
+
 # Remove all bricks I believe the shabow has and then force remove the shadow from my peers
 SHADOW_IP_ADDRESS=$1
 if [[ $SHADOW_IP_ADDRESS == "" ]]; then
@@ -42,7 +45,7 @@ if [[ $SHADOW_IP_ADDRESS == "" ]]; then
    exit -1
 fi
 
-echo " - Forcing removal of $SHADOW_IP_ADDRESS from local peer list"
+echo " - Forcing removal of $SHADOW_IP_ADDRESS from local ($SELF_IP_ADDRESS) peer list"
 
 echo "    + Listing local volumes"
 volumes=`gluster volume list 2>/tmp/volume_list_log`
@@ -65,13 +68,39 @@ for vol in $volumes; do
         exit -3
     fi
 
-    echo "   + Removing brick $brick"
-    share_name=`echo $brick | rev | cut -d'/' -f 1 | rev`
-    echo "y" | gluster volume remove-brick $share_name replica 1 $brick force >/tmp/remove_brick 2>&1
-    if [[ $? != 0 ]]; then
-        echo "Failed to remove brick $brick"
-        cat /tmp/remove_brick
-        exit -4
+
+    if [[ "$brick" != "" ]]; then
+        echo "   + Removing brick $brick"
+        share_name=`echo $brick | rev | cut -d'/' -f 1 | rev`
+        echo "y" | gluster volume remove-brick $share_name replica 1 $brick force >/tmp/remove_brick 2>&1
+        if [[ $? != 0 ]]; then
+
+            # If the shadow node was the only owner, then just delete the volume all together
+            # (This is identified by an error saying
+            #  e.g volume remove-brick commit force: failed: replica count (1) option given for non replicate volume flink_completed_jobs
+            # )
+            if [[ `grep "option given for non replicate" /tmp/remove_brick` != "" ]]; then
+
+                echo "y" | gluster volume stop $share_name >/tmp/remove_brick 2>&1
+                if [[ $? != 0 ]]; then
+                    echo "Failed to stop volume $share_name"
+                    cat /tmp/remove_brick
+                    exit -4
+                fi
+
+                echo "y" | gluster volume delete $share_name >/tmp/remove_brick 2>&1
+                if [[ $? != 0 ]]; then
+                    echo "Failed to delete volume $share_name"
+                    cat /tmp/remove_brick
+                    exit -4
+                fi
+
+            else
+                echo "Failed to remove brick $brick"
+                cat /tmp/remove_brick
+                exit -4
+            fi
+        fi
     fi
 
 done

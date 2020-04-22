@@ -155,9 +155,15 @@ echo " - Creating spark-executors containers cleaner"
 sudo bash -c 'echo "for i in \`docker ps -aq --no-trunc -f status=exited -f ancestor=eskimo:spark-executor\` ; do docker rm --force \$i; done" > /usr/local/sbin/clean-spark-executor-containers.sh'
 sudo chmod 755 /usr/local/sbin/clean-spark-executor-containers.sh
 
-echo " - Scheduling spark-executors containers cleaner"
-echo "* * * * * bash /usr/local/sbin/clean-spark-executor-containers.sh >> /var/log/spark/clean-spark-executor-containers.log 2>&1" > /tmp/clean-spark-executor-containers_crontab
-sudo crontab /tmp/clean-spark-executor-containers_crontab
+
+if [[ `sudo crontab -u root -l 2>/dev/null | grep clean-spark-executor-containers.sh` == "" ]]; then
+    echo " - Scheduling spark-executors containers cleaner"
+    sudo rm -f /tmp/crontab
+    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+    sudo bash -c "echo \"* * * * * bash /usr/local/sbin/clean-spark-executor-containers.sh >> /var/log/spark/clean-spark-executor-containers.log 2>&1\" >> /tmp/crontab"
+    sudo crontab -u root /tmp/crontab
+fi
+
 
 # spark mesos shuffle service part
 # ----------------------------------------------------------------------------------------------------------------------

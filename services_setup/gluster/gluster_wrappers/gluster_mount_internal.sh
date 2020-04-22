@@ -105,7 +105,9 @@ echo " - Checking existing mount of $MOUNT_POINT"
 rm -Rf /tmp/gluster_error_$1
 ls -la $MOUNT_POINT >/dev/null 2>/tmp/gluster_error_$1
 if [[ $? != 0 ]]; then
-    if [[ `grep "Transport endpoint is not connected" /tmp/gluster_error_$1` != "" || `grep "Too many levels of symbolic links" /tmp/gluster_error_$1` != "" ]]; then
+    if [[ `grep "Transport endpoint is not connected" /tmp/gluster_error_$1` != "" \
+         || `grep "Too many levels of symbolic links" /tmp/gluster_error_$1` != "" \
+         || `grep "No such device" /tmp/gluster_error_$1` != "" ]]; then
         echo " - There is an issue with $MOUNT_POINT (Transport endpoint is not connected / too many levels of symbolic links), unmounting ..."
         /bin/umount -f $MOUNT_POINT  >> /tmp/gluster_mount_$1_log 2>&1
         if [[ $? != 0 ]]; then
