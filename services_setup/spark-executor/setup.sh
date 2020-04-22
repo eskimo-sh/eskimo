@@ -84,7 +84,7 @@ sudo chmod 755 /usr/local/sbin/setupSparkGlusterShares.sh
 
 # spark executor part
 # ----------------------------------------------------------------------------------------------------------------------
-echo " ---> Spark executor part"
+echo " ---> Spark executor part ----------------------------------------------------"
 
 echo " - Building docker container for spark executor"
 build_container spark-executor spark /tmp/spark_executor_install_log
@@ -167,7 +167,7 @@ fi
 
 # spark mesos shuffle service part
 # ----------------------------------------------------------------------------------------------------------------------
-echo " ---> Spark mesos shuffle sevice part"
+echo " ---> Spark mesos shuffle sevice part ----------------------------------------"
 
 echo " - Building docker container for spark mesos shuffle service"
 build_container spark-mesos-shuffle-service spark /tmp/spark_executor_install_log

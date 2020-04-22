@@ -92,9 +92,10 @@ for candidate in $candidate_containers;  do
                 >> /var/log/mesos/mesos-marathon-container-killer-hack.log
 
         # taking 5 seconds reserve to avoid killing a container that has actually just been started
-        let date_reserve_s=$($started_date_s)+10
+        let date_reserve_s=$started_date_s+10
+        echo `date +"%Y-%m-%d %H:%M:%S"`"   + docker container date reserve : $date_reserve_s" \
 
-        if [ $date_reserve_s < $candidate_date_s ]; then
+        if [[ $date_reserve_s < $candidate_date_s ]]; then
 
             echo `date +"%Y-%m-%d %H:%M:%S"`"   + container_date_reserve=$date_reserve_s is before candidate_date=$candidate_date_s, killing container $docker_container_id" \
                     >> /var/log/mesos/mesos-marathon-container-killer-hack.log
