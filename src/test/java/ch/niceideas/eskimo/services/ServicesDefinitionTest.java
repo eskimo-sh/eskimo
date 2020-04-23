@@ -92,6 +92,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
+                "export MASTER_MARATHON_1=192.168.10.11\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
                 "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
@@ -100,7 +101,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_ELASTICSEARCH_1921681012=192.168.10.12\n" +
                 "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n", topology.getTopologyScript());
+                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
+                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
     }
 
     @Test
@@ -116,6 +118,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
+                "export MASTER_MARATHON_1=192.168.10.11\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
                 "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
@@ -124,7 +127,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_ELASTICSEARCH_1921681012=192.168.10.12\n" +
                 "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n", topology.getTopologyScript());
+                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
+                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
     }
 
 
@@ -144,6 +148,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
+                "export MASTER_MARATHON_1=192.168.10.11\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
                 "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
@@ -153,6 +158,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
+                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
                 "export NODE_NBR_KAFKA_1921681011=0\n" +
@@ -173,6 +179,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("action_id1", "192.168.10.11");
             put("zookeeper", "1");
             put("mesos-master", "1");
+            put("marathon", "1");
             put("mesos-agent1", "on");
             put("ntp", "1");
             put("elasticsearch1", "on");
@@ -194,12 +201,14 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 new HashSet<>(), "192.168.10.11");
 
         assertEquals ("#Topology\n" +
+                "export MASTER_MARATHON_1=192.168.10.11\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
                 "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
                 "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
                 "export SELF_MASTER_ELASTICSEARCH_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
+                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
                 "export NODE_NBR_KAFKA_1921681011=0\n" +
@@ -380,7 +389,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         }});
 
         MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
-            put("gdash_install", "on");
         }});
 
         Topology topology = def.getTopology(
@@ -393,8 +401,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_GLUSTER_1921681013=192.168.10.14\n" +
                 "export MASTER_GLUSTER_1921681014=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
+                "export MASTER_PROMETHEUS_1=192.168.10.11\n" +
                 "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
                 "export ALL_NODES_LIST_prometheus=192.168.10.11,192.168.10.13,192.168.10.14\n" +

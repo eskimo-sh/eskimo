@@ -6,6 +6,7 @@
   "kafka-manager": "1",
   "kibana": "1",
   "mesos-master": "1",
+  "marathon": "1",
   "spark-history-server": "1",
   "zeppelin": "1",
   "zookeeper": "1",

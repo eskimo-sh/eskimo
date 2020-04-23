@@ -86,8 +86,7 @@ bash /tmp/zeppelin/setup.sh 192.168.10.15
 rm -Rf /tmp/zeppelin
 rm -f /tmp/zeppelin.tgz
 docker image rm eskimo:zeppelin_template
-sudo systemctl restart cerebro
-sudo systemctl restart kibana
+
 sudo systemctl restart logstash
 sudo systemctl restart logstash
 sudo systemctl restart flink-app-master

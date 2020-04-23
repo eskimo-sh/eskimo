@@ -294,28 +294,24 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testGlusterDisabledOnSingleNode() throws Exception {
+    public void testGlusterNoMoreDisabledOnSingleNode() throws Exception {
 
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("marathon", "1");
-                put("elasticsearch1", "on");
-                put("kafka1", "on");
-                put("ntp1", "on");
-                put("prometheus1", "on");
-                put("gluster1", "on");
-                put("logstash1", "on");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("zookeeper", "1");
-            }});
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("marathon", "1");
+            put("elasticsearch1", "on");
+            put("kafka1", "on");
+            put("ntp1", "on");
+            put("prometheus1", "on");
+            put("gluster1", "on");
+            put("logstash1", "on");
+            put("mesos-agent1", "on");
+            put("mesos-master", "1");
+            put("spark-executor1", "on");
+            put("zookeeper", "1");
+        }});
 
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : Service gluster expects 1 gluster instance(s). But only 0 has been found !", exception.getMessage());
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
     }
 
     @Test

@@ -79,7 +79,7 @@ public class MarathonServicesConfigCheckerTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("action_id1", "192.168.10.11");
-            put("cerebro", "1");
+            put("marathon", "1");
             put("ntp1", "on");
             put("prometheus1", "on");
             put("elasticsearch1", "on");

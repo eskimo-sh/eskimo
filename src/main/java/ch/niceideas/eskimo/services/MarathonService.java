@@ -16,7 +16,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -27,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.*;
 
 @Component
@@ -142,6 +145,29 @@ public class MarathonService {
         return queryMarathon(endpoint, "GET");
     }
 
+    protected String queryMesosAgent (String host, String endpoint) throws MarathonException {
+        return queryMesosAgent(host, endpoint, "GET");
+    }
+
+    protected String queryMesosAgent (String host, String endpoint, String method) throws MarathonException {
+
+        try {
+            ProxyTunnelConfig mesosAgentTunnelConfig = proxyManagerService.getTunnelConfig(servicesDefinition.getService("mesos-agent").getServiceId(host));
+            if (mesosAgentTunnelConfig == null) {
+                return null;
+            }
+
+            // apps/cerebro
+            BasicHttpRequest request = new BasicHttpRequest(method, "http://localhost:" + mesosAgentTunnelConfig.getLocalPort() + "/" + endpoint);
+
+            return sendHttpRequestAndGetResult(mesosAgentTunnelConfig, request);
+
+        } catch (IOException e) {
+            logger.debug (e, e);
+            throw new MarathonException(e);
+        }
+    }
+
     protected String queryMarathon (String endpoint, String method) throws MarathonException {
 
         try {
@@ -186,9 +212,9 @@ public class MarathonService {
         }
     }
 
-    protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+    protected String sendHttpRequestAndGetResult(ProxyTunnelConfig tunnelConfig, BasicHttpRequest request) throws IOException {
         HttpResponse response = httpClient.execute(
-                new HttpHost("localhost", marathonTunnelConfig.getLocalPort(), "http"),
+                new HttpHost("localhost", tunnelConfig.getLocalPort(), "http"),
                 request);
 
         InputStream result = response.getEntity().getContent();
@@ -559,11 +585,144 @@ public class MarathonService {
     }
 
     public void showJournalMarathon(Service service) throws MarathonException, SSHCommandException {
-        systemService.applyServiceOperation(service.getName(), "marathon node", "Showing journal", () -> {
-            StringBuilder log = new StringBuilder();
-            log.append("(Showing journal is not supported for marathon)");
-            return log.toString();
-        });
+        systemService.applyServiceOperation(service.getName(), "marathon node", "Showing journal", () -> showJournalMarathonInternal(service));
+    }
+
+    String showJournalMarathonInternal(Service service) {
+
+        StringBuilder resultBuilder = new StringBuilder();
+
+        JsonWrapper mesosInfo = null;
+        try {
+            String mesosInfoResult = queryMarathon("info");
+
+            if (StringUtils.isBlank (mesosInfoResult)) {
+                resultBuilder.append ("Failed to fetch marathon information  ! \n");
+                resultBuilder.append ("(Got empty marathon information)\n");
+                return resultBuilder.toString();
+            }
+
+            mesosInfo = new JsonWrapper(mesosInfoResult);
+
+        } catch (MarathonException e) {
+            logger.error (e, e);
+            resultBuilder.append ("Failed to fetch marathon information  ! \n");
+            resultBuilder.append ("Got exception\n");
+            resultBuilder.append (e.getMessage());
+
+            // Stopping here
+            return resultBuilder.toString();
+        }
+
+        try {
+            String serviceJson = queryMarathon("apps/" + service.getName());
+
+            JsonWrapper serviceResult = new JsonWrapper(serviceJson);
+
+            resultBuilder.append ("Marathon Service Definition for " + service.getName() + ":\n");
+            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append(serviceResult.getFormattedValue());
+            resultBuilder.append ("\n\n");
+
+            String mesosNodeIp = serviceResult.getValueForPathAsString("app.tasks.0.host"); // 0
+            String mesosSlaveId= serviceResult.getValueForPathAsString("app.tasks.0.slaveId"); // 1
+
+            String frameworkId = mesosInfo.getValueForPathAsString("frameworkId"); // 2
+
+            String mesosTaskId = serviceResult.getValueForPathAsString("app.tasks.0.id"); // 3
+
+            JsonWrapper mesosAgentState = null;
+            try {
+
+                String mesosAgentStateString = queryMesosAgent (mesosNodeIp, "state");
+
+                if (StringUtils.isBlank (mesosAgentStateString)) {
+                    resultBuilder.append ("Failed to mesos agent information  !\n");
+                    resultBuilder.append ("(Got empty mesos agent information)\n");
+                    return resultBuilder.toString();
+                }
+
+                mesosAgentState = new JsonWrapper(mesosAgentStateString);
+
+            } catch (MarathonException e) {
+                logger.error (e, e);
+                resultBuilder.append ("Failed to fetch mesos agent information for " + mesosNodeIp + " !\n");
+                resultBuilder.append ("Got exception\n");
+                resultBuilder.append (e.getMessage());
+
+                // Stopping here
+                return resultBuilder.toString();
+            }
+
+            String mesosContainerId = null; // 4
+            String mesosContainerDirectory = null; // TOTAL
+
+            JSONArray frameworks = mesosAgentState.getSubJSONArray("frameworks");
+            for (int j = 0; j < frameworks.length(); j++) {
+
+                JSONObject framework = frameworks.getJSONObject(j);
+
+                if (framework.getString("id").equals(frameworkId)) {
+
+                    JSONArray executors = framework.getJSONArray("executors");
+
+                    for (int i = 0; i < executors.length(); i++) {
+
+                        JSONObject executor = executors.getJSONObject(i);
+                        String executorId = executor.getString("id");
+                        if (executorId.equals(mesosTaskId)) {
+                            mesosContainerId = executor.getString("container");
+                            mesosContainerDirectory  = executor.getString("directory");
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            resultBuilder.append ("Mesos Information for service " + service.getName() + " :\n");
+            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (" - Mesos Node IP              : " + mesosNodeIp + "\n");
+            resultBuilder.append (" - Mesos Slave ID             : " + mesosSlaveId + "\n");
+            resultBuilder.append (" - Marathon framework ID      : " + frameworkId + "\n");
+            resultBuilder.append (" - Mesos Task ID              : " + mesosTaskId + "\n");
+            resultBuilder.append (" - Mesos Container ID         : " + mesosContainerId + "\n");
+            resultBuilder.append (" - Mesos Container directory  : " + mesosContainerDirectory + "\n\n");
+
+            String stdOutContent = queryMesosAgent(mesosNodeIp, "/files/download?path=" + mesosContainerDirectory + "/stdout");
+
+            resultBuilder.append ("STDOUT :\n");
+            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (stdOutContent);
+            resultBuilder.append ("\n");
+
+
+            String stdErrContent = queryMesosAgent(mesosNodeIp, "/files/download?path=" + mesosContainerDirectory + "/stderr");
+
+            resultBuilder.append ("STDERR :\n");
+            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (stdErrContent);
+            resultBuilder.append ("\n");
+
+            // http://192.168.10.11:5051/files/download?path=/var/lib/mesos/slave/slaves/
+            // de95d2e8-22c5-4a74-8b3a-915f16b12bfb-S0/
+            // frameworks/
+            // de95d2e8-22c5-4a74-8b3a-915f16b12bfb-0000/
+            // executors/
+            // zeppelin.instance-70446d82-854d-11ea-92ab-0242bf9b78f7._app.1/
+            // runs/
+            // 75f7c509-6237-43db-9119-8ecdffb165c7/stderr
+
+
+        } catch (MarathonException e) {
+            logger.error (e, e);
+            resultBuilder.append ("Failed to fetch journal for " + service.getName() + " !\n");
+            resultBuilder.append ("Got exception\n");
+            resultBuilder.append (e.getMessage());
+        }
+
+        return resultBuilder.toString();
     }
 
     public void startServiceMarathon(Service service) throws MarathonException, SSHCommandException {

@@ -226,35 +226,39 @@ public class NodesConfigControllerTest {
         ncc.setServicesDefinition(sd);
 
         assertEquals ("{\n" +
-                "  \"command\": {\n" +
-                "    \"restarts\": [\n" +
-                "      {\"kafka\": \"192.168.10.11\"},\n" +
-                "      {\"kafka\": \"192.168.10.13\"},\n" +
-                "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
-                "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
-                "      {\"spark-executor\": \"192.168.10.11\"},\n" +
-                "      {\"spark-executor\": \"192.168.10.13\"},\n" +
-                "      {\"kafka-manager\": \"(marathon)\"},\n" +
-                "      {\"spark-history-server\": \"(marathon)\"},\n" +
-                "      {\"zeppelin\": \"(marathon)\"}\n" +
-                "    ],\n" +
-                "    \"uninstallations\": [\n" +
-                "      {\"marathon\": \"192.168.10.11\"},\n" +
-                "      {\"mesos-master\": \"192.168.10.13\"},\n" +
-                "      {\"zookeeper\": \"192.168.10.13\"}\n" +
-                "    ],\n" +
-                "    \"installations\": [\n" +
-                "      {\"zookeeper\": \"192.168.10.11\"},\n" +
-                "      {\"prometheus\": \"192.168.10.11\"},\n" +
-                "      {\"prometheus\": \"192.168.10.13\"},\n" +
-                "      {\"mesos-master\": \"192.168.10.11\"},\n" +
-                "      {\"flink-worker\": \"192.168.10.11\"},\n" +
-                "      {\"flink-worker\": \"192.168.10.13\"},\n" +
-                "      {\"flink-app-master\": \"192.168.10.11\"}\n" +
-                "    ]\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}", ncc.saveNodesConfig("" +
+                        "  \"command\": {\n" +
+                        "    \"restarts\": [\n" +
+                        "      {\"kafka\": \"192.168.10.11\"},\n" +
+                        "      {\"kafka\": \"192.168.10.13\"},\n" +
+                        "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
+                        "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
+                        "      {\"spark-executor\": \"192.168.10.11\"},\n" +
+                        "      {\"spark-executor\": \"192.168.10.13\"},\n" +
+                        "      {\"gdash\": \"(marathon)\"},\n" +
+                        "      {\"cerebro\": \"(marathon)\"},\n" +
+                        "      {\"kibana\": \"(marathon)\"},\n" +
+                        "      {\"kafka-manager\": \"(marathon)\"},\n" +
+                        "      {\"spark-history-server\": \"(marathon)\"},\n" +
+                        "      {\"zeppelin\": \"(marathon)\"}\n" +
+                        "    ],\n" +
+                        "    \"uninstallations\": [\n" +
+                        "      {\"marathon\": \"192.168.10.11\"},\n" +
+                        "      {\"mesos-master\": \"192.168.10.13\"},\n" +
+                        "      {\"zookeeper\": \"192.168.10.13\"}\n" +
+                        "    ],\n" +
+                        "    \"installations\": [\n" +
+                        "      {\"zookeeper\": \"192.168.10.11\"},\n" +
+                        "      {\"prometheus\": \"192.168.10.11\"},\n" +
+                        "      {\"prometheus\": \"192.168.10.13\"},\n" +
+                        "      {\"mesos-master\": \"192.168.10.11\"},\n" +
+                        "      {\"flink-worker\": \"192.168.10.11\"},\n" +
+                        "      {\"flink-worker\": \"192.168.10.13\"},\n" +
+                        "      {\"flink-app-master\": \"192.168.10.11\"}\n" +
+                        "    ]\n" +
+                        "  },\n" +
+                        "  \"status\": \"OK\"\n" +
+                        "}",
+                ncc.saveNodesConfig("" +
                 "{\"action_id1\":\"192.168.10.11\"," +
                 "\"flink-app-master\":\"1\"," +
                 "\"mesos-master\":\"1\"," +

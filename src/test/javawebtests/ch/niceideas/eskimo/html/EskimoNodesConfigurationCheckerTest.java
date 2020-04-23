@@ -311,28 +311,23 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testGlusterDisabledOnSingleNode() throws Exception {
+    public void testGlusterNoMoreDisabledOnSingleNode() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("marathon", "1");
-                put("elasticsearch1", "on");
-                put("ntp1", "on");
-                put("kafka1", "on");
-                put("gluster1", "on");
-                put("logstash1", "on");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("zookeeper", "1");
-            }});
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("action_id1", "192.168.10.11");
+            put("marathon", "1");
+            put("elasticsearch1", "on");
+            put("ntp1", "on");
+            put("kafka1", "on");
+            put("gluster1", "on");
+            put("logstash1", "on");
+            put("mesos-agent1", "on");
+            put("mesos-master", "1");
+            put("spark-executor1", "on");
+            put("zookeeper", "1");
+        }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service gluster expects 1 gluster instance(s). But only 0 has been found !"));
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test

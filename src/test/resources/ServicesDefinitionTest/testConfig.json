@@ -22,5 +22,6 @@
   "spark-executor1": "on",
   "spark-executor2": "on",
   "spark-executor3": "on",
-  "zookeeper": "1"
+  "zookeeper": "1",
+  "marathon": "1"
 }

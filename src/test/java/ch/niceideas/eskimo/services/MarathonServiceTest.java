@@ -34,11 +34,9 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
@@ -50,6 +48,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -293,7 +292,43 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournalMarathon () throws Exception {
-        fail ("To Be Implemented");
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String queryMarathon (String endpoint) throws MarathonException {
+                try {
+                    if (endpoint.equals("info")) {
+                        return StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-info.json"));
+                    } else if (endpoint.equals("apps/zeppelin")) {
+                        return StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/zeppelin-framework-info.json"));
+                    }
+                } catch (IOException e) {
+                    throw new MarathonException(e);
+                }
+                return null;
+            }
+            @Override
+            protected String queryMesosAgent (String host, String endpoint) throws MarathonException {
+                try {
+                    if (endpoint.equals("state")) {
+                        return StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/mesos-agent-info.json"));
+                    } else if (endpoint.endsWith("stderr")) {
+                        return "(STDOUT)";
+                    } else if (endpoint.endsWith("stdout")) {
+                        return "(STDERR)";
+                    }
+                } catch (IOException e) {
+                    throw new MarathonException(e);
+                }
+                return null;
+            }
+        });
+
+        String expectedResults = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/expected-result.txt"));
+        String result = marathonService.showJournalMarathonInternal(servicesDefinition.getService("zeppelin"));
+        assertEquals(expectedResults, result);
     }
 
     @Test

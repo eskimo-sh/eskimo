@@ -54,6 +54,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         //jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
         loadScript(page, "eskimoUtils.js");
+        loadScript(page, "eskimoMarathonServicesConfigChecker.js");
         loadScript(page, "eskimoMarathonServicesConfig.js");
 
         /*
