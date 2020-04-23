@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.http.HttpHost;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -57,6 +58,8 @@ import java.util.stream.Collectors;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ProxyManagerService {
+
+    private static final Logger logger = Logger.getLogger(ProxyManagerService.class);
 
     public static final int LOCAL_PORT_RANGE_START = 39152;
 
@@ -140,11 +143,15 @@ public class ProxyManagerService {
             if (prevConfig == null || !prevConfig.getRemoteAddress().equals(ipAddress)) {
 
                 // Handle host has changed !
-                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(generateLocalPort(), ipAddress, service.getUiConfig().getProxyTargetPort());
+                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(serviceName, generateLocalPort(), ipAddress, service.getUiConfig().getProxyTargetPort());
                 proxyTunnelConfigs.put(serviceId, newConfig);
 
                 if (prevConfig != null) {
                     connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
+                    logger.info ("Updating server config for service " + serviceName + ". Will recreate connection of "
+                            + ipAddress + " and " + prevConfig.getRemoteAddress() + " (dropping service)");
+                } else {
+                    logger.info ("Updating server config for service " + serviceName + ". Will recreate connection of " + ipAddress);
                 }
 
                 connectionManagerService.recreateTunnels (ipAddress);

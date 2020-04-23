@@ -87,7 +87,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
         return new ProxyManagerService() {
             @Override
             public ProxyTunnelConfig getTunnelConfig(String serviceId) {
-                return new ProxyTunnelConfig(12345, "192.178.10.11", 5050);
+                return new ProxyTunnelConfig("dummyService", 12345, "192.178.10.11", 5050);
             }
         };
     }

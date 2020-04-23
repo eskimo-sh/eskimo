@@ -115,9 +115,9 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     public void testLocalPortForwarderWrapper() throws Exception {
 
         final List<ProxyTunnelConfig> forwarderConfig = new ArrayList<ProxyTunnelConfig>(){{
-            add (new ProxyTunnelConfig(6123, "localhost", 123));
-            add (new ProxyTunnelConfig(6124, "localhost", 124));
-            add (new ProxyTunnelConfig(6125, "localhost", 125));
+            add (new ProxyTunnelConfig("dummyService", 6123, "localhost", 123));
+            add (new ProxyTunnelConfig("dummyService",6124, "localhost", 124));
+            add (new ProxyTunnelConfig("dummyService",6125, "localhost", 125));
         }};
 
         final List<String> createCalledFor = new ArrayList<>();
@@ -172,9 +172,9 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertEquals(1, dropCalledFor.size());
 
         forwarderConfig.clear();
-        forwarderConfig.add (new ProxyTunnelConfig(20123, "localhost", 11123));
-        forwarderConfig.add (new ProxyTunnelConfig(20124, "localhost", 11124));
-        forwarderConfig.add (new ProxyTunnelConfig(20125, "localhost", 11125));
+        forwarderConfig.add (new ProxyTunnelConfig("dummyService", 20123, "localhost", 11123));
+        forwarderConfig.add (new ProxyTunnelConfig("dummyService",20124, "localhost", 11124));
+        forwarderConfig.add (new ProxyTunnelConfig("dummyService",20125, "localhost", 11125));
 
         createCalledFor.clear();
         dropCalledFor.clear();

@@ -160,6 +160,18 @@ public class ConnectionManagerService {
             connectionMap.remove(ipAddress);
             connectionAges.remove(ipAddress);
 
+            // tunnels should be closed immediately !
+            final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
+            try {
+                for (LocalPortForwarderWrapper forwarder : previousForwarders) {
+                    forwarder.close();
+                }
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+                logger.debug(e, e);
+            }
+            portForwardersMap.remove(connection);
+
         } finally  {
             connectionMapLock.unlock();
         }
@@ -266,7 +278,7 @@ public class ConnectionManagerService {
         try {
             logger.info ("Closing connection to " + connection.getHostname());
 
-            for (LocalPortForwarderWrapper localPortForwarder : portForwardersMap.get(connection)) {
+            for (LocalPortForwarderWrapper localPortForwarder : getForwarders(connection)) {
                 localPortForwarder.close();
             }
 
@@ -279,13 +291,13 @@ public class ConnectionManagerService {
 
     protected void dropTunnels(Connection connection, String ipAddress) {
 
-        // Find out about declared forwarders to be handled
-        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
+        // Find out about declared forwarders to be handled (those that need to stay)
+        List<ProxyTunnelConfig> keptTunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
 
         // close port forwarders that are not declared anymore
         final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
         List<LocalPortForwarderWrapper> toBeClosed = previousForwarders.stream()
-                .filter(forwarder -> notIn (forwarder, tunnelConfigs))
+                .filter(forwarder -> notIn (forwarder, keptTunnelConfigs))
                 .collect(Collectors.toList());
 
         try {
@@ -315,7 +327,7 @@ public class ConnectionManagerService {
 
         for (ProxyTunnelConfig config : toBeCreated) {
             previousForwarders.add (new LocalPortForwarderWrapper(
-                    connection, config.getLocalPort(), config.getRemoteAddress(), config.getRemotePort()));
+                    config.getServiceName(), connection, config.getLocalPort(), config.getRemoteAddress(), config.getRemotePort()));
         }
     }
 
@@ -355,16 +367,18 @@ public class ConnectionManagerService {
 
         private final LocalPortForwarder forwarder;
 
+        private final String serviceName;
         private final int localPort;
         private final String targetHost;
         private final int targetPort;
 
-        public LocalPortForwarderWrapper (Connection connection, int localPort, String targetHost, int targetPort) throws ConnectionManagerException {
+        public LocalPortForwarderWrapper (String serviceName, Connection connection, int localPort, String targetHost, int targetPort) throws ConnectionManagerException {
+            this.serviceName = serviceName;
             this.localPort = localPort;
             this.targetHost = targetHost;
             this.targetPort = targetPort;
             try {
-                logger.info ("Creating tunnel from " + localPort + " to " + targetHost + ":" + targetPort);
+                logger.info ("Creating tunnel for service " + serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort);
                 this.forwarder = connection.createLocalPortForwarder(localPort, targetHost, targetPort);
             } catch (IOException e) {
                 logger.error (e, e);
@@ -374,7 +388,7 @@ public class ConnectionManagerService {
 
         public void close() {
             try {
-                logger.info ("CLOSING tunnel from " + localPort + " to " + targetHost + ":" + targetPort);
+                logger.info ("CLOSING tunnel for service " + serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort);
                 if (forwarder != null) {
                     forwarder.close();
                 }
@@ -390,6 +404,10 @@ public class ConnectionManagerService {
 
         public boolean matches(ProxyTunnelConfig config) {
             return matches(config.getRemoteAddress(), config.getRemotePort());
+        }
+
+        public String getServiceName() {
+            return serviceName;
         }
 
         @Override

@@ -831,25 +831,29 @@ public class SystemService {
                         String savedService = serviceStatusFullString.substring(0, index);
 
                         String nodeName = serviceStatusFullString.substring(index + searchedPattern.length());
+
+                        // if service is a marathon service
                         if (nodeName.equals(MarathonService.MARATHON_NODE)) {
+
+                            // if marathon is not available, don't do anything
+                            String marathonNodeName = systemStatus.getFirstNodeName("marathon");
+                            if (StringUtils.isBlank(marathonNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
+                                //notificationService.addError("Marathon inconsistency.");
+                                //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                                continue;
+                            }
+
+                            String marathonStatus = systemStatus.getValueForPathAsString(SystemService.SERVICE_PREFIX + "marathon" + "_" + marathonNodeName);
+                            if (StringUtils.isBlank(marathonStatus) || marathonStatus.equals("NA")) {
+                                //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                                continue;
+                            }
+
                             // get first node actually running service
                             nodeName = systemStatus.getFirstNodeName(savedService);
                             if (StringUtils.isBlank(nodeName)) {
                                 // if none, consider marathon node as DEFAULT node running service
-                                nodeName = systemStatus.getFirstNodeName("marathon");
-
-                                if (StringUtils.isBlank(nodeName)) {
-                                    // if marathon is not found, don't touch anything. Let's wait for it to come back.
-                                    //notificationService.addError("Marathon inconsistency.");
-                                    //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
-                                    continue;
-                                } else {
-                                    String marathonStatus = systemStatus.getValueForPathAsString(SystemService.SERVICE_PREFIX + "marathon" + "_" + nodeName);
-                                    if (StringUtils.isBlank(marathonStatus) || marathonStatus.equals("NA")) {
-                                        //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
-                                        continue;
-                                    }
-                                }
+                                nodeName = marathonNodeName;
                             }
                         }
 
