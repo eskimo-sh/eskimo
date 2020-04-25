@@ -197,9 +197,9 @@ public class NodesConfigurationService {
                             String ipAddress = operation.getValue();
                             String nodeName = ipAddress.replace(".", "-");
                             if (ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
-                                nodeName = MarathonService.MARATHON_NODE;
+                                nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
                             }
-                            servicesInstallationStatus.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "restart");
+                            servicesInstallationStatus.setInstallationFlag(service, nodeName, "restart");
                         });
                     } catch (FileException | SetupException e) {
                         logger.error (e, e);
@@ -332,7 +332,7 @@ public class NodesConfigurationService {
         sshChmod755(ipAddress, "/etc/eskimo_topology.sh");
 
         try {
-            ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfigNoLock();
+            ServicesConfigWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
             File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-config", ipAddress, ".json");
             try {
@@ -383,7 +383,7 @@ public class NodesConfigurationService {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 builder -> proceedWithServiceUninstallation(builder, ipAddress, service),
-                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
+                status -> status.removeInstallationFlag(service, nodeName));
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
@@ -391,7 +391,7 @@ public class NodesConfigurationService {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
                 builder -> {},
-                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
+                status -> status.removeInstallationFlag(service, nodeName));
         proxyManagerService.removeServerForService(service, ipAddress);
     }
 
@@ -400,7 +400,7 @@ public class NodesConfigurationService {
         String nodeName = ipAddress.replace(".", "-");
         systemOperationService.applySystemOperation("installation of " + service + " on " + ipAddress,
                 builder -> proceedWithServiceInstallation(builder, ipAddress, service),
-                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
+                status -> status.setInstallationFlag(service, nodeName, "OK"));
     }
 
     void restartServiceForSystem(String service, String ipAddress) throws SystemException {
@@ -417,12 +417,12 @@ public class NodesConfigurationService {
                             throw new SystemException (e);
                         }
                     },
-                    status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + MarathonService.MARATHON_NODE, "OK") );
+                    status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
 
         } else {
             systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
                     builder -> builder.append(sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
-                    status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
+                    status -> status.setInstallationFlag(service, nodeName, "OK"));
         }
     }
 

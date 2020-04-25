@@ -130,6 +130,7 @@ public abstract class AbstractSystemTest {
         setupService = createSetupService();
         servicesDefinition.setSetupService(setupService);
         configurationService.setSetupService(setupService);
+        configurationService.setServicesDefinition (servicesDefinition);
 
         setupService.setConfigurationService (configurationService);
 
@@ -185,8 +186,6 @@ public abstract class AbstractSystemTest {
 
         servicesConfigService = new ServicesConfigService();
         servicesConfigService.setNodeRangeResolver(nodeRangeResolver);
-        servicesConfigService.setSetupService(setupService);
-        servicesConfigService.setSystemService(systemService);
         servicesConfigService.setServicesDefinition(servicesDefinition);
 
         marathonService = createMarathonService();

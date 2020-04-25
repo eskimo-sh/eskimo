@@ -40,6 +40,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -59,18 +60,63 @@ public class ConfigurationService {
     private static final Logger logger = Logger.getLogger(ConfigurationService.class);
 
     public static final String SERVICE_INSTALLATION_STATUS_PATH = "/service-install-status.json";
+    public static final String SERVICES_CONFIG_JSON_PATH = "/services-config.json";
 
     private ReentrantLock statusFileLock = new ReentrantLock();
     private ReentrantLock nodesConfigFileLock = new ReentrantLock();
     private ReentrantLock marathonServicesFileLock = new ReentrantLock();
+    private ReentrantLock servicesConfigFileLock = new ReentrantLock();
 
     @Autowired
     private SetupService setupService;
 
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
     /* For tests */
-    public void setSetupService(SetupService setupService) {
+    void setSetupService(SetupService setupService) {
         this.setupService = setupService;
     }
+    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
+    }
+
+
+    public void saveServicesConfig(ServicesConfigWrapper status) throws FileException, SetupException {
+        servicesConfigFileLock.lock();
+        try {
+            String configStoragePath = setupService.getConfigStoragePath();
+            FileUtils.writeFile(new File(configStoragePath + SERVICES_CONFIG_JSON_PATH), status.getFormattedValue());
+        } finally {
+            servicesConfigFileLock.unlock();
+        }
+    }
+
+    public ServicesConfigWrapper loadServicesConfig() throws FileException, SetupException {
+        servicesConfigFileLock.lock();
+        try {
+            String configStoragePath = setupService.getConfigStoragePath();
+            File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_PATH);
+            if (!statusFile.exists()) {
+                return ServicesConfigWrapper.initEmpty(servicesDefinition);
+            }
+
+            return new ServicesConfigWrapper(statusFile);
+        } finally {
+            servicesConfigFileLock.unlock();
+        }
+    }
+
+    public ServicesConfigWrapper loadServicesConfigNoLock() throws FileException, SetupException {
+        String configStoragePath = setupService.getConfigStoragePath();
+        File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_PATH);
+        if (!statusFile.exists()) {
+            return ServicesConfigWrapper.initEmpty(servicesDefinition);
+        }
+
+        return new ServicesConfigWrapper(statusFile);
+    }
+
 
     void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater) throws FileException, SetupException {
         statusFileLock.lock();
@@ -205,4 +251,5 @@ public class ConfigurationService {
             marathonServicesFileLock.unlock();
         }
     }
+
 }

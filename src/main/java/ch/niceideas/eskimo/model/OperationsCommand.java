@@ -54,7 +54,6 @@ public class OperationsCommand implements Serializable {
 
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
 
-    public static final String INSTALLED_ON_IP_FLAG = "_installed_on_IP_";
     public static final String MARATHON_FLAG = "(marathon)";
 
     private final NodesConfigWrapper rawNodesConfig;
@@ -89,13 +88,14 @@ public class OperationsCommand implements Serializable {
         }
 
         // 2. Find out about services that need to be uninstalled
-        for (String installation : servicesInstallStatus.getRootKeys()) {
 
-            String installedService = installation.substring(0, installation.indexOf(INSTALLED_ON_IP_FLAG));
+        for (Pair<String, String> installationPairs : servicesInstallStatus.getAllServiceAndNodeNameInstallationPairs()) {
+
+            String installedService = installationPairs.getKey();
+            String nodeName = installationPairs.getValue();
 
             if (!servicesDefinition.getService(installedService).isMarathon()) {
 
-                String nodeName = installation.substring(installation.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length());
                 String ipAddress = nodeName.replace("-", ".");
 
                 try {
@@ -132,9 +132,10 @@ public class OperationsCommand implements Serializable {
         changedServices.forEach(service -> restartedServices.addAll (servicesDefinition.getDependentServices(service)));
 
         // also add services simply flagged as needed restart previously
-        servicesInstallStatus.getRootKeys().stream().forEach(installStatus -> {
-            String installedService = installStatus.substring(0, installStatus.indexOf(INSTALLED_ON_IP_FLAG));
-            String status = (String) servicesInstallStatus.getValueForPath(installStatus);
+        servicesInstallStatus.getRootKeys().stream().forEach(installStatusFlag -> {
+            Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
+            String installedService = serviceAndNodePair.getKey();
+            String status = (String) servicesInstallStatus.getValueForPath(installStatusFlag);
             if (status.equals("restart")) {
                 restartedServices.add (installedService);
             }
@@ -152,7 +153,7 @@ public class OperationsCommand implements Serializable {
 
             } else {
 
-                if (servicesInstallStatus.isServiceInstalled(restartedService)) {
+                if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
                     retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
                 }
             }

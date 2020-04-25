@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
@@ -48,7 +47,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,16 +56,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ServicesConfigService {
 
     private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
-    public static final String SERVICES_CONFIG_JSON_FILE = "/services-config.json";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
-
-    @Autowired
-    private SetupService setupService;
-
-    @Autowired
-    private SystemService systemService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -76,17 +67,13 @@ public class ServicesConfigService {
     private NodeRangeResolver nodeRangeResolver;
 
     @Autowired
-    NodesConfigurationService nodesConfigurationService;
+    private NodesConfigurationService nodesConfigurationService;
+
+    private ReentrantLock servicesConfigApplyLock = new ReentrantLock();
 
     /* For tests */
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
-    }
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
     }
     void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
@@ -98,56 +85,18 @@ public class ServicesConfigService {
         this.nodesConfigurationService = nodesConfigurationService;
     }
 
-    private ReentrantLock servicesConfigFileLock = new ReentrantLock();
-
-
-    public void saveServicesConfig(ServicesConfigWrapper status) throws FileException, SetupException {
-        servicesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + SERVICES_CONFIG_JSON_FILE), status.getFormattedValue());
-        } finally {
-            servicesConfigFileLock.unlock();
-        }
-    }
-
-    public ServicesConfigWrapper loadServicesConfig() throws FileException, SetupException {
-        servicesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_FILE);
-            if (!statusFile.exists()) {
-                return ServicesConfigWrapper.initEmpty(servicesDefinition);
-            }
-
-            return new ServicesConfigWrapper(statusFile);
-        } finally {
-            servicesConfigFileLock.unlock();
-        }
-    }
-
-    public ServicesConfigWrapper loadServicesConfigNoLock() throws FileException, SetupException {
-        String configStoragePath = setupService.getConfigStoragePath();
-        File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_FILE);
-        if (!statusFile.exists()) {
-            return ServicesConfigWrapper.initEmpty(servicesDefinition);
-        }
-
-        return new ServicesConfigWrapper(statusFile);
-    }
-
     public void saveAndApplyServicesConfig(String configFormAsString)  throws FileException, SetupException, SystemException  {
 
-        servicesConfigFileLock.lock();
+        servicesConfigApplyLock.lock();
         try {
 
 
             // 1. load saved config (or initialized one)
-            ServicesConfigWrapper servicesConfig = loadServicesConfig();
+            ServicesConfigWrapper servicesConfig = configurationService.loadServicesConfig();
 
             String[] dirtyServices = fillInEditedConfigs(new JSONObject(configFormAsString), servicesConfig.getSubJSONArray("configs"));
 
-            saveServicesConfig (servicesConfig);
+            configurationService.saveServicesConfig (servicesConfig);
 
             if (dirtyServices != null && dirtyServices.length > 0) {
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
@@ -166,7 +115,7 @@ public class ServicesConfigService {
             throw new SystemException(e);
 
         } finally {
-            servicesConfigFileLock.unlock();
+            servicesConfigApplyLock.unlock();
         }
     }
 

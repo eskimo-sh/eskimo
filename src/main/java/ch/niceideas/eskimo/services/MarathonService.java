@@ -38,8 +38,6 @@ public class MarathonService {
 
     private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
 
-    public static final String MARATHON_NODE = "MARATHON_NODE";
-
     public static final int MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS = 200;
 
     @Autowired
@@ -237,6 +235,14 @@ public class MarathonService {
     protected Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
             MarathonException  {
 
+        ServicesInstallStatusWrapper servicesInstallStatus = null;
+        try {
+            servicesInstallStatus = configurationService.loadServicesInstallationStatus();
+        } catch (FileException | SetupException e) {
+            logger.error (e, e);
+            throw new MarathonException(e);
+        }
+
         for (int i = 0; i < numberOfAttempts; i++) {
             String serviceJson = queryMarathon("apps/" + service);
             if (StringUtils.isBlank(serviceJson) || !serviceJson.startsWith("{")) {
@@ -273,12 +279,8 @@ public class MarathonService {
 
                 // service is not started by marathon
                 // need to find the previous nodes that was running it
-                try {
-                    nodeIp = findUniqueServiceIP("marathon");
-                } catch (FileException | SetupException e) {
-                    logger.error (e.getMessage());
-                    logger.debug (e, e);
-                }
+                nodeIp = servicesInstallStatus.getFirstIpAddress("marathon");
+
             }
 
             String status = "notOK";
@@ -304,10 +306,9 @@ public class MarathonService {
         try {
 
             // Find out node running marathon
+            ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            // TODO
-
-            String marathonIpAddress = findUniqueServiceIP("marathon");
+            String marathonIpAddress = servicesInstallStatus.getFirstIpAddress("marathon");
             if (StringUtils.isBlank(marathonIpAddress)) {
                 String message = "Marathon doesn't seem to be installed";
                 notificationService.addError(message);
@@ -396,21 +397,6 @@ public class MarathonService {
         }
     }
 
-    String findUniqueServiceIP(String service) throws FileException, SetupException {
-
-        String uniqueServiceNodeName = findUniqueServiceNodeName(service);
-        if (StringUtils.isBlank(uniqueServiceNodeName)) {
-            return null;
-        }
-
-        return uniqueServiceNodeName.replace("-", ".");
-    }
-
-    private String findUniqueServiceNodeName(String service) throws FileException, SetupException {
-        ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();
-        return installStatus.getFirstNodeName(service);
-    }
-
     void uninstallMarathonService(String service, String marathonIpAddress) throws SystemException {
         String nodeIp = null;
         try {
@@ -429,7 +415,7 @@ public class MarathonService {
                         throw new SystemException(e);
                     }
                 },
-                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + MARATHON_NODE));
+                status -> status.removeInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE));
         if (nodeIp != null) {
             proxyManagerService.removeServerForService(service, nodeIp);
         } else {
@@ -442,7 +428,7 @@ public class MarathonService {
             throws SystemException {
         systemOperationService.applySystemOperation("installation of " + service + " on marathon node " + marathonIpAddress,
                 builder -> proceedWithMarathonServiceInstallation(builder, marathonIpAddress, service),
-                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + MARATHON_NODE, "OK") );
+                status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
     }
 
     private String proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonIpAddress, String service)
@@ -521,7 +507,7 @@ public class MarathonService {
         // 3.1 Node answers
         try {
 
-            String marathonIpAddress = findUniqueServiceIP("marathon");
+            String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress("marathon");
 
             String ping = null;
             if (!StringUtils.isBlank(marathonIpAddress)) {
@@ -570,10 +556,10 @@ public class MarathonService {
 
                 systemService.feedInServiceStatus (
                         statusMap, servicesInstallationStatus, nodeIp, nodeName,
-                        MARATHON_NODE,
+                        ServicesInstallStatusWrapper.MARATHON_NODE,
                         service, shall, installed, running);
             }
-        } catch (JSONException | ConnectionManagerException | SystemException | SetupException | FileException e) {
+        } catch (JSONException | ConnectionManagerException | SystemException | SetupException  e) {
             logger.error(e, e);
             throw new MarathonException(e.getMessage(), e);
         }

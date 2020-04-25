@@ -73,7 +73,7 @@ public class StandardSetupHelpers {
         }});
     }
 
-    public static ServicesInstallStatusWrapper getStandard2NodesStatus() {
+    public static ServicesInstallStatusWrapper getStandard2NodesInstallStatus() {
         return new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
             put("cerebro_installed_on_IP_MARATHON_NODE", "OK");
             put("elasticsearch_installed_on_IP_192-168-10-11", "OK");

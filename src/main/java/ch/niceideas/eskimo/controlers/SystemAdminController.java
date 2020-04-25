@@ -234,7 +234,7 @@ public class SystemAdminController {
 
             String nodeName = null;
             if (service.isMarathon()) {
-                nodeName = MarathonService.MARATHON_NODE;
+                nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
             } else {
                 nodeName = address.replaceAll("\\.", "-");
             }

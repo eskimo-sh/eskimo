@@ -134,7 +134,7 @@ public class NodesConfigControllerTest {
             }
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus(){
-                return StandardSetupHelpers.getStandard2NodesStatus();
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
             public NodesConfigWrapper loadNodesConfig() {
@@ -207,7 +207,7 @@ public class NodesConfigControllerTest {
         ncc.setConfigurationService(new ConfigurationService() {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesStatus();
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
             public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, JSONException, SetupException {

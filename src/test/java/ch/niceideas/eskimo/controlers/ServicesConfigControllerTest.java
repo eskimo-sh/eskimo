@@ -23,7 +23,7 @@ public class ServicesConfigControllerTest {
     @Test
     public void testLoadServicesConfig() throws Exception {
 
-        scc.setServicesConfigService(new ServicesConfigService() {
+        scc.setConfigurationService(new ConfigurationService() {
             @Override
             public ServicesConfigWrapper loadServicesConfig() throws FileException, SetupException {
                 try {
@@ -39,7 +39,7 @@ public class ServicesConfigControllerTest {
         assertTrue(StringUtils.isNotBlank(expectedResult));
         assertEquals (expectedResult, scc.loadServicesConfig());
 
-        scc.setServicesConfigService(new ServicesConfigService() {
+        scc.setConfigurationService(new ConfigurationService() {
             @Override
             public ServicesConfigWrapper loadServicesConfig() throws FileException, SetupException {
                 throw new SetupException("Test Error");

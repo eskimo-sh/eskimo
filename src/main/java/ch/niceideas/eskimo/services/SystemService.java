@@ -67,7 +67,6 @@ public class SystemService {
 
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
-    public static final String SERVICE_PREFIX = "service_";
     public static final String TMP_PATH_PREFIX = "/tmp/";
 
     @Autowired
@@ -389,13 +388,13 @@ public class SystemService {
                 } catch (MarathonException e) {
                     logger.debug(e, e);
                     // workaround : flag all marathon services as KO on marathon node
-                    String marathonIpAddress = marathonService.findUniqueServiceIP("marathon");
+                    String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress("marathon");
                     if (StringUtils.isNotBlank(marathonIpAddress)) {
                         String marathonNode = marathonIpAddress.replace(".", "-");
                         MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
                         for (String service : servicesDefinition.listMarathonServices()) {
                             if (marathonService.shouldInstall(marathonConfig, service)) {
-                                statusMap.put(SERVICE_PREFIX + service + "_" + marathonNode, "KO");
+                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + marathonNode, "KO");
                             }
                         }
                     }
@@ -570,7 +569,7 @@ public class SystemService {
         if (shall) {
             if (!installed) {
 
-                statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "NA");
+                statusMap.put(SystemStatusWrapper.buildStatusFlag(service, nodeName), "NA");
 
             } else {
 
@@ -578,14 +577,14 @@ public class SystemService {
                 // check if service running using SSH
 
                 if (!running) {
-                    statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "KO");
+                    statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "KO");
 
                 } else {
 
                     if (servicesInstallationStatus.isServiceOK (service, referenceNodeName)) {
-                        statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "OK");
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "OK");
                     } else {
-                        statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "restart");
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "restart");
                     }
 
                     // configure proxy if required
@@ -594,7 +593,7 @@ public class SystemService {
             }
         } else {
             if (installed) {
-                statusMap.put(SERVICE_PREFIX + service + "_" + nodeName, "TD"); // To Be Deleted
+                statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "TD"); // To Be Deleted
             }
         }
     }
@@ -611,95 +610,89 @@ public class SystemService {
 
                 boolean changes = false;
 
-                for (String serviceStatusFullString : servicesInstallationStatus.getRootKeys()) {
+                for (Pair<String, String> installationPairs : servicesInstallationStatus.getAllServiceAndNodeNameInstallationPairs()) {
 
-                    String searchedPattern = OperationsCommand.INSTALLED_ON_IP_FLAG;
-                    int index = serviceStatusFullString.indexOf(searchedPattern);
-                    if (index > -1) {
+                    String savedService = installationPairs.getKey();
+                    String nodeName = installationPairs.getValue();
+                    String originalNodeName = nodeName;
 
-                        String savedService = serviceStatusFullString.substring(0, index);
+                    // if service is a marathon service
+                    if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)) {
 
-                        String nodeName = serviceStatusFullString.substring(index + searchedPattern.length());
-
-                        // if service is a marathon service
-                        if (nodeName.equals(MarathonService.MARATHON_NODE)) {
-
-                            // if marathon is not available, don't do anything
-                            String marathonNodeName = systemStatus.getFirstNodeName("marathon");
-                            if (StringUtils.isBlank(marathonNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
-                                //notificationService.addError("Marathon inconsistency.");
-                                //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
-                                continue;
-                            }
-
-                            String marathonStatus = systemStatus.getValueForPathAsString(SystemService.SERVICE_PREFIX + "marathon" + "_" + marathonNodeName);
-                            if (StringUtils.isBlank(marathonStatus) || !marathonStatus.equals("OK")) {
-                                //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
-                                continue;
-                            }
-
-                            // get first node actually running service
-                            nodeName = systemStatus.getFirstNodeName(savedService);
-                            if (StringUtils.isBlank(nodeName)) {
-                                // if none, consider marathon node as DEFAULT node running service
-                                nodeName = marathonNodeName;
-                            }
+                        // if marathon is not available, don't do anything
+                        String marathonNodeName = systemStatus.getFirstNodeName("marathon");
+                        if (StringUtils.isBlank(marathonNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
+                            //notificationService.addError("Marathon inconsistency.");
+                            //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                            continue;
                         }
 
-                        String nodeIp = nodeName == null ? null : nodeName.replace("-", ".");
-
-                        Boolean nodeAlive = StringUtils.isNotBlank(nodeName) ? systemStatus.isNodeAlive (nodeName) : Boolean.FALSE;
-
-                        // A. In case target node both configured and up, check services actual statuses before doing anything
-                        if (    // nodes is configured and responding (up and running
-                                (
-                                        nodeAlive != null && nodeAlive.booleanValue()
-                                )
-                             ||
-                                // node is not configured anymore (has been removed, but it is still up and responding and it runs services)
-                                // in this case we want to attempt uninstallation, thus not removing services if they are up
-                                ((nodeAlive == null || !nodeAlive.booleanValue()) && configuredAddressesAndOtherLiveAddresses.contains(nodeIp) ) ) {
-
-
-                            if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
-                                changes = true;
-                            }
+                        if (!systemStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
+                            //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                            continue;
                         }
 
-                        // B. if node is both down and not configured anymore, we just remove all services whatever their statuses
-                        if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
-                            if (countErrorAndRemoveServices(servicesInstallationStatus, serviceStatusFullString, savedService, nodeName)) {
-                                changes = true;
-                            }
+                        // get first node actually running service
+                        nodeName = systemStatus.getFirstNodeName(savedService);
+                        if (StringUtils.isBlank(nodeName)) {
+                            // if none, consider marathon node as DEFAULT node running service
+                            nodeName = marathonNodeName;
                         }
-
-                        // C. In other cases, node is configued but down => don't touch anything
-
-                        /*
-                        // this means that node is not configured anymore ! (no status has been obtained)
-                        if (nodeAlive == null) {
-
-                            // => we want to consider removing services in any case if not is not only not configured anymore but down
-                            // so if node is down in addition to being not configured anymore, we remove all services from saved install stazus
-                            if (nodeIp == null && !configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
-
-                            }
-                            // on the other hand if node is not configured but up,
-                            else {
-                                if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
-                                    changes = true;
-                                }
-                            }
-
-                        }
-                        else if (nodeAlive) { // this means that the node is configured and up
-
-                            if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
-                                changes = true;
-                            }
-                        } // else if node is configured but down, don't do anything
-                        */
                     }
+
+                    String nodeIp = nodeName == null ? null : nodeName.replace("-", ".");
+
+                    Boolean nodeAlive = StringUtils.isNotBlank(nodeName) ? systemStatus.isNodeAlive (nodeName) : Boolean.FALSE;
+
+                    // A. In case target node both configured and up, check services actual statuses before doing anything
+                    if (    // nodes is configured and responding (up and running
+                            (
+                                    nodeAlive != null && nodeAlive.booleanValue()
+                            )
+                         ||
+                            // node is not configured anymore (has been removed, but it is still up and responding and it runs services)
+                            // in this case we want to attempt uninstallation, thus not removing services if they are up
+                            ((nodeAlive == null || !nodeAlive.booleanValue()) && configuredAddressesAndOtherLiveAddresses.contains(nodeIp) ) ) {
+
+
+                        if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, nodeName, originalNodeName)) {
+                            changes = true;
+                        }
+                    }
+
+                    // B. if node is both down and not configured anymore, we just remove all services whatever their statuses
+                    if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
+                        if (countErrorAndRemoveServices(servicesInstallationStatus, savedService, nodeName, originalNodeName)) {
+                            changes = true;
+                        }
+                    }
+
+                    // C. In other cases, node is configued but down => don't touch anything
+
+                    /*
+                    // this means that node is not configured anymore ! (no status has been obtained)
+                    if (nodeAlive == null) {
+
+                        // => we want to consider removing services in any case if not is not only not configured anymore but down
+                        // so if node is down in addition to being not configured anymore, we remove all services from saved install stazus
+                        if (nodeIp == null && !configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
+
+                        }
+                        // on the other hand if node is not configured but up,
+                        else {
+                            if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
+                                changes = true;
+                            }
+                        }
+
+                    }
+                    else if (nodeAlive) { // this means that the node is configured and up
+
+                        if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
+                            changes = true;
+                        }
+                    } // else if node is configured but down, don't do anything
+                    */
                 }
 
                 if (changes) {
@@ -713,20 +706,16 @@ public class SystemService {
     }
 
     boolean handleRemoveServiceIfDown(
-            ServicesInstallStatusWrapper savedSystemStatusWrapper, SystemStatusWrapper systemStatusWrapper,
-            String serviceStatusFullString, String savedService, String nodeName) {
+            ServicesInstallStatusWrapper servicesInstallStatus, SystemStatusWrapper systemStatusWrapper,
+            String savedService, String nodeName, String originalNodeName) {
 
         boolean changes = false;
 
-        // make sure service for node name is found in new status
-        String serviceStatus = (String) systemStatusWrapper.getValueForPath(SERVICE_PREFIX + savedService + "_" + nodeName);
-
-        // if OK reset error count
-        if (StringUtils.isNotBlank(serviceStatus) && !serviceStatus.equals("NA")) {
-            serviceMissingCounter.remove(savedService);
+        if (systemStatusWrapper.isServiceAvailableOnNode(savedService, nodeName)) {
+            serviceMissingCounter.remove(savedService + "-" + nodeName);
 
         } else {
-            if (countErrorAndRemoveServices(savedSystemStatusWrapper, serviceStatusFullString, savedService, nodeName)) {
+            if (countErrorAndRemoveServices(servicesInstallStatus, savedService, nodeName, originalNodeName)) {
                 changes = true;
             }
         }
@@ -734,14 +723,14 @@ public class SystemService {
     }
 
     boolean countErrorAndRemoveServices(
-            ServicesInstallStatusWrapper servicesInstallationStatus, String serviceStatusFullString,
-            String savedService, String nodeName) {
+            ServicesInstallStatusWrapper servicesInstallationStatus,
+            String savedService, String nodeName, String originalNodeName) {
         boolean changes = false;
         // otherwise count error
-        Integer counter = serviceMissingCounter.get(serviceStatusFullString);
+        Integer counter = serviceMissingCounter.get(savedService + "-" + nodeName);
         if (counter == null) {
             counter = 0;
-            serviceMissingCounter.put(serviceStatusFullString, counter);
+            serviceMissingCounter.put(savedService + "-" + nodeName, counter);
 
         } else {
 
@@ -750,8 +739,8 @@ public class SystemService {
             // if error count > 2 (i.e. 3), consider service uninstalled, remove it from saved status
             if (counter > failedServicesTriggerCount) {
 
-                servicesInstallationStatus.removeRootKey(serviceStatusFullString);
-                serviceMissingCounter.remove(serviceStatusFullString);
+                servicesInstallationStatus.removeInstallationFlag(savedService, originalNodeName);
+                serviceMissingCounter.remove(savedService + "-" + nodeName);
                 notificationService.addError("Service " + savedService + " on " + nodeName + " vanished!");
                 logger.warn ("Service " + savedService + " on " + nodeName + " has been removed from ServiceInstallationStatus!");
 
@@ -761,7 +750,7 @@ public class SystemService {
                 changes = true;
 
             } else {
-                serviceMissingCounter.put(serviceStatusFullString, counter);
+                serviceMissingCounter.put(savedService + "-" + nodeName, counter);
             }
         }
         return changes;
@@ -771,13 +760,15 @@ public class SystemService {
 
         if (lastStatus != null) {
 
-            for (String service : systemStatus.getRootKeys()) {
+            for (String serviceStatusFlag : systemStatus.getRootKeys()) {
 
                 // if service is currently not OK but was previously OK
-                if (!systemStatus.isServiceOK(service) && lastStatus.isServiceOK(service)) {
+                if (!systemStatus.isServiceOK(serviceStatusFlag) && lastStatus.isServiceOK(serviceStatusFlag)) {
 
-                    logger.warn("For service " + service + " - previous status was OK and status is " + systemStatus.getValueForPath(service));
-                    notificationService.addError("Service " + service + " got into problem");
+                    logger.warn("For service " + serviceStatusFlag + " - previous status was OK and status is " + systemStatus.getValueForPath(serviceStatusFlag));
+                    notificationService.addError("Service " + SystemStatusWrapper.getServiceName(serviceStatusFlag)
+                            + " on " +  SystemStatusWrapper.getNodeName(serviceStatusFlag).replace("-", ".")
+                            + " got into problem");
                 }
             }
         }

@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.model.UIConfig;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;

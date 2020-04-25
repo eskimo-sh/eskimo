@@ -63,7 +63,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testNoChanges() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
@@ -77,7 +77,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testInstallationLogstash() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("logstash_installed_on_IP_192-168-10-13");
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
@@ -98,7 +98,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testUninstallationLogstash() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         nodesConfig.getJSONObject().remove("logstash2");
@@ -119,7 +119,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRestartMany() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
 
 
@@ -253,7 +253,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRecoverUninstallationWhenNodeDownMiddleUninstall() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved
@@ -357,7 +357,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRecoverUninstallationWhenNodeDownAfterUninstall() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved
@@ -458,7 +458,7 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
     @Test
     public void testRecoverUninstallationWhenNodeDownMiddleRestart() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved

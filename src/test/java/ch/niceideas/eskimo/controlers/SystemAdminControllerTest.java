@@ -137,7 +137,7 @@ public class SystemAdminControllerTest {
         sac.setConfigurationService(new ConfigurationService() {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                ServicesInstallStatusWrapper retWrapper = StandardSetupHelpers.getStandard2NodesStatus();
+                ServicesInstallStatusWrapper retWrapper = StandardSetupHelpers.getStandard2NodesInstallStatus();
                 assertTrue(retWrapper.getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13").equals("OK"));
                 return retWrapper;
             }

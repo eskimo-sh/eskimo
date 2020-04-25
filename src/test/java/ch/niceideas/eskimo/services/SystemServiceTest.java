@@ -36,10 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
-import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -124,7 +121,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         Map<String, String> statusMap = new HashMap<>();
 
@@ -173,7 +170,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         Map<String, String> statusMap = new HashMap<>();
 
@@ -241,9 +238,9 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertEquals(2, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service cerebro on 192.168.10.11 got into problem\"}", notifications.getValue().get(0).toString());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service kibana on 192.168.10.11 got into problem\"}", notifications.getValue().get(1).toString());
     }
 
     @Test
@@ -273,9 +270,9 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertEquals(2, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_cerebro_192-168-10-11 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service cerebro on 192.168.10.11 got into problem\"}", notifications.getValue().get(0).toString());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service service_kibana_192-168-10-11 got into problem\"}", notifications.getValue().get(1).toString());
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service kibana on 192.168.10.11 got into problem\"}", notifications.getValue().get(1).toString());
     }
 
     @Test
@@ -289,7 +286,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         systemStatus.getJSONObject().remove("service_kafka_192-168-10-11");
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
 
@@ -306,6 +303,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // kafka is missing
+        //System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue (new JSONObject(expectedPrevStatus).similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -320,7 +318,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
 
@@ -356,7 +354,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
         systemStatus.getJSONObject().put("service_marathon_192-168-10-11", "KO");
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
 
@@ -391,7 +389,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         logger.debug (systemStatus.getIpAddresses());
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         logger.debug (servicesInstallStatus.getIpAddresses());
 
         // remove all status for node 2 : 192-168-10-13 EXCEPT KAFKA AND ELASTICSEARCH
@@ -450,7 +448,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         logger.debug (systemStatus.getIpAddresses());
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         logger.debug (servicesInstallStatus.getIpAddresses());
 
         // remove all status for node 2 : 192-168-10-13 EXCEPT KAFKA AND ELASTICSEARCH

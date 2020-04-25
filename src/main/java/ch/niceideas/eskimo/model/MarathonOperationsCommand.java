@@ -34,7 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -67,18 +67,20 @@ public class MarathonOperationsCommand implements Serializable {
         // 1. Find out about services that need to be installed
         for (String service : servicesDefinition.listMarathonServices()) {
             if (rawMarathonServicesConfig.isServiceInstallRequired(service)
-                    && !servicesInstallStatus.isServiceInstalled(service)) {
+                    && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
 
                 retCommand.addInstallation(service);
             }
         }
 
         // 2. Find out about services that need to be uninstalled
-        for (String installation : servicesInstallStatus.getRootKeys()) {
+        for (String installStatusFlag : servicesInstallStatus.getRootKeys()) {
 
-            String installedService = installation.substring(0, installation.indexOf(OperationsCommand.INSTALLED_ON_IP_FLAG));
+            Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
+            String installedService = serviceAndNodePair.getKey();
+            String nodeName = serviceAndNodePair.getValue();
 
-            if (servicesDefinition.getService(installedService).isMarathon()) {
+            if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)) {
 
                 // search it in config
                 if (!rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
@@ -88,7 +90,7 @@ public class MarathonOperationsCommand implements Serializable {
         }
 
         // 3. If Marathon is not available, issue a warning in regards to what is going to happen
-
+        // TODO
 
         return retCommand;
     }

@@ -34,19 +34,14 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
 import ch.niceideas.eskimo.services.NodeRangeResolver;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemService;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -68,7 +63,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     @Test
     public void testNoChanges() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
@@ -81,7 +76,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     @Test
     public void testInstallation() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("gdash_installed_on_IP_MARATHON_NODE");
         savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_MARATHON_NODE");
 
@@ -98,7 +93,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     @Test
     public void testUninstallation() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
         marathonConfig.getJSONObject().remove("gdash_install");

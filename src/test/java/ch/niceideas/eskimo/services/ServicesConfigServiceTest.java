@@ -68,10 +68,6 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
 
         scs.setServicesDefinition(servicesDefinition);
 
-        scs.setSystemService(systemService);
-
-        scs.setSetupService(setupService);
-
         scs.setNodeRangeResolver(nodeRangeResolver);
 
         scs.setConfigurationService(configurationService);
@@ -91,34 +87,16 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testSaveAndReload() throws Exception {
-
-        scs.saveServicesConfig(new ServicesConfigWrapper(jsonConfig));
-
-        ServicesConfigWrapper newConfig = scs.loadServicesConfig();
-
-        // test elasticsearch config
-        assertEquals ("elasticsearch.yml", newConfig.getValueForPath("configs.9.configs.0.filename"));
-        assertEquals ("elasticsearch", newConfig.getValueForPath("configs.9.configs.0.service"));
-        assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("configs.9.configs.0.properties.0.name"));
-
-        // test kafka config
-        assertEquals ("server.properties", newConfig.getValueForPath("configs.12.configs.0.filename"));
-        assertEquals ("kafka", newConfig.getValueForPath("configs.12.configs.0.service"));
-        assertEquals ("num.network.threads", newConfig.getValueForPath("configs.12.configs.0.properties.0.name"));
-    }
-
-    @Test
     public void testSaveAndApplyServicesConfig() throws Exception {
         //fail ("To Be Implemented");
 
         configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
 
-        scs.saveServicesConfig(new ServicesConfigWrapper(jsonConfig));
+        configurationService.saveServicesConfig(new ServicesConfigWrapper(jsonConfig));
 
         scs.saveAndApplyServicesConfig(testForm);
 
-        ServicesConfigWrapper newConfig = scs.loadServicesConfig();
+        ServicesConfigWrapper newConfig = configurationService.loadServicesConfig();
 
         // test elasticsearch config
         assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("configs.9.configs.0.properties.0.name"));

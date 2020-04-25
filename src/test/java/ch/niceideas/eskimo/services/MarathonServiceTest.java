@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
@@ -48,11 +47,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertEquals;
@@ -155,18 +152,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testFindUniqueServiceIP () throws Exception {
-        marathonService.setConfigurationService(new ConfigurationService() {
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                return new ServicesInstallStatusWrapper("{\"cerebro_installed_on_IP_192-168-10-11\": \"OK\"}");
-            }
-        });
-
-        assertEquals ("192.168.10.11", marathonService.findUniqueServiceIP("cerebro"));
-    }
-
-    @Test
     public void testUninstallMarathonService () throws Exception {
 
         final List<String> marathonApiCalls = new ArrayList<>();
@@ -258,7 +243,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
 
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
         MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();

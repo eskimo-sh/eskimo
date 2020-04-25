@@ -37,24 +37,19 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemException;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MarathonServicesConfigWrapper extends JsonWrapper implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
+    private static final Logger logger = Logger.getLogger(MarathonServicesConfigWrapper.class);
 
     public MarathonServicesConfigWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));

@@ -53,6 +53,9 @@ import java.util.stream.Collectors;
 public class SystemStatusWrapper extends JsonWrapper implements Serializable {
 
     private static final Logger logger = Logger.getLogger(SystemStatusWrapper.class);
+
+    public static final String SERVICE_PREFIX = "service_";
+
     public static final String NODE_ALIVE_FLAG = "node_alive_";
 
     public SystemStatusWrapper(File statusFile) throws FileException {
@@ -73,6 +76,24 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
 
     public SystemStatusWrapper(String jsonString) {
         super(jsonString);
+    }
+
+    public static String getServiceName (String serviceStatusFlag) {
+        if (StringUtils.isBlank(serviceStatusFlag)) {
+            return null;
+        }
+        return serviceStatusFlag.substring(SERVICE_PREFIX.length(), serviceStatusFlag.indexOf("_", SERVICE_PREFIX.length() + 1));
+    }
+
+    public static String getNodeName (String serviceStatusFlag) {
+        if (StringUtils.isBlank(serviceStatusFlag)) {
+            return null;
+        }
+        return serviceStatusFlag.substring(serviceStatusFlag.indexOf("_", SERVICE_PREFIX.length() + 1) + 1);
+    }
+
+    public static String buildStatusFlag (String serviceName, String nodeName) {
+        return SERVICE_PREFIX + serviceName + "_" + nodeName;
     }
 
     public Boolean isNodeAlive(String nodeName) {
@@ -102,6 +123,20 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         }
     }
 
+    public boolean isServiceOKOnNode(String serviceName, String marathonNodeName) {
+        String marathonStatus = getValueForPathAsString(SERVICE_PREFIX + serviceName  + "_" + marathonNodeName);
+        return StringUtils.isNotBlank(marathonStatus) && marathonStatus.equals("OK");
+    }
+
+
+    public boolean isServiceAvailableOnNode(String serviceName, String nodeName) {
+        // make sure service for node name is found in new status
+        String serviceStatus = (String) getValueForPath(SERVICE_PREFIX + serviceName + "_" + nodeName);
+
+        // if OK reset error count
+        return StringUtils.isNotBlank(serviceStatus) && !serviceStatus.equals("NA");
+    }
+
     public Set<String> getIpAddresses() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(NODE_ALIVE_FLAG))
@@ -112,8 +147,8 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
 
     public String getFirstNodeName(String service) {
         List<String> allNodes = getRootKeys().stream()
-                .filter(key -> key.startsWith(SystemService.SERVICE_PREFIX + service + "_"))
-                .map(key -> key.substring( (SystemService.SERVICE_PREFIX + service + "_").length()))
+                .filter(key -> key.startsWith(SERVICE_PREFIX + service + "_"))
+                .map(key -> key.substring( (SERVICE_PREFIX + service + "_").length()))
                 .collect(Collectors.toList());
         if (allNodes.size() <= 0) {
             return null;

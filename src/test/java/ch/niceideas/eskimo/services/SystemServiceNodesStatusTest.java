@@ -89,7 +89,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
             }
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesStatus();
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
             public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {

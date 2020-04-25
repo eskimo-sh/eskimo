@@ -109,6 +109,14 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
         return (String) getValueForPath(ACTION_ID_FIELD + nodeNbr);
     }
 
+    public String getNodeName(int nodeNbr) {
+        String nodeAddress = (String) getValueForPath(ACTION_ID_FIELD + nodeNbr);
+        if (StringUtils.isNotBlank(nodeAddress)) {
+            return nodeAddress.replace(".", "-");
+        }
+        return null;
+    }
+
     public List<String> getAllNodeAddressesWithService(String serviceName) {
         return getRootKeys().stream()
                 .map (key -> {

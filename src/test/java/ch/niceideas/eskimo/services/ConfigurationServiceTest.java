@@ -3,7 +3,9 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import com.sun.xml.internal.ws.api.server.ServiceDefinition;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -12,9 +14,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
@@ -38,6 +38,9 @@ public class ConfigurationServiceTest {
         }
         configurationService = new ConfigurationService();
 
+        ServicesDefinition sd = new ServicesDefinition();
+        sd.afterPropertiesSet();
+
         SetupService setupService = new SetupService() {
             @Override
             public String getConfigStoragePath() throws SetupException {
@@ -45,11 +48,26 @@ public class ConfigurationServiceTest {
             }
         };
         configurationService.setSetupService(setupService);
+        configurationService.setServicesDefinition(sd);
 
         File storagePathConfDir = File.createTempFile("eskimo_storage", "");
         storagePathConfDir.delete();
         storagePathConfDir.mkdirs();
         setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
+    }
+
+    @Test
+    public void testLoadAndSaveServicesConfig() throws Exception {
+
+        ServicesConfigWrapper sc = configurationService.loadServicesConfig();
+        assertNotNull(sc);
+        assertFalse(sc.isEmpty()); // services config is initialized with defaults
+
+        sc = new ServicesConfigWrapper("{\"test\": \"OK\"}");
+        configurationService.saveServicesConfig(sc);
+
+        ServicesConfigWrapper sc2 = configurationService.loadServicesConfig();
+        assertTrue(sc.getJSONObject().similar(sc2.getJSONObject()));
     }
 
     @Test

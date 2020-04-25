@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesConfigWrapper;
+import ch.niceideas.eskimo.services.ConfigurationService;
 import ch.niceideas.eskimo.services.ServicesConfigService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SystemException;
@@ -63,9 +64,15 @@ public class ServicesConfigController {
     @Autowired
     private ServicesConfigService servicesConfigService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     /* For tests */
     void setServicesConfigService(ServicesConfigService servicesConfigService) {
         this.servicesConfigService = servicesConfigService;
+    }
+    void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     @GetMapping("/load-services-config")
@@ -73,7 +80,7 @@ public class ServicesConfigController {
     public String loadServicesConfig() {
         try {
 
-            ServicesConfigWrapper wrapper = servicesConfigService.loadServicesConfig();
+            ServicesConfigWrapper wrapper = configurationService.loadServicesConfig();
 
             wrapper.setValueForPath("status", "OK");
 

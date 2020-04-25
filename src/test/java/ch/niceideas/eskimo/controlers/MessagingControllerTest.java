@@ -1,13 +1,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.MessagingService;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
 import org.json.JSONException;
 import org.junit.Test;
-
-import java.util.HashMap;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThrows;
