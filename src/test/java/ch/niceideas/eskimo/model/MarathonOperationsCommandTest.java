@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
 import ch.niceideas.eskimo.services.NodeRangeResolver;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import ch.niceideas.eskimo.services.SystemService;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +53,10 @@ import static org.junit.Assert.*;
 public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTest {
 
     private NodeRangeResolver nrr;
+
+    private SystemService systemService = new SystemService() {
+
+    };
 
     @Before
     @Override
@@ -67,7 +72,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, savedServicesInstallStatus, marathonConfig);
+        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, systemService, savedServicesInstallStatus, marathonConfig);
 
         assertEquals(0, moc.getInstallations().size());
         assertEquals(0, moc.getUninstallations().size());
@@ -82,7 +87,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, savedServicesInstallStatus, marathonConfig);
+        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, systemService, savedServicesInstallStatus, marathonConfig);
 
         assertEquals(2, moc.getInstallations().size());
         assertEquals(0, moc.getUninstallations().size());
@@ -99,7 +104,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         marathonConfig.getJSONObject().remove("gdash_install");
         marathonConfig.getJSONObject().remove("kafka-manager_install");
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, savedServicesInstallStatus, marathonConfig);
+        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, systemService, savedServicesInstallStatus, marathonConfig);
 
         assertEquals(0, moc.getInstallations().size());
         assertEquals(2, moc.getUninstallations().size());

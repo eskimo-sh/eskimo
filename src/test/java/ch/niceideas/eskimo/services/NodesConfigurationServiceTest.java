@@ -183,6 +183,15 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         memoryComputer.setSshCommandService(sshCommandService);
 
+        nodesConfigurationService.setSshCommandService(sshCommandService);
+
+        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
+            public void forceRecreateConnection(String ipAddress) {
+                // no Op
+            }
+        });
+
         nodesConfigurationService.applyNodesConfig(command);
 
         String expectedCommandStart = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsStart.txt"), "UTF-8");

@@ -581,12 +581,8 @@ public class MarathonService {
 
     boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) throws SetupException, SystemException {
         if (marathonConfig != null) {
-
-            // search it in config
-            return StringUtils.isNotBlank ((String)marathonConfig.getValueForPath(service + "_install"))
-                    && marathonConfig.getValueForPath(service + "_install").equals("on");
+            return marathonConfig.isServiceInstallRequired(service);
         }
-
         return false;
     }
 

@@ -84,14 +84,10 @@ public class MarathonServicesConfigWrapper extends JsonWrapper implements Serial
                 .collect(Collectors.toList());
     }
 
-    public boolean hasServiceConfigured(String serviceName) {
-        try {
-            return getEnabledServices().stream()
-                    .anyMatch(serviceName::equals);
-        } catch (JSONException e) {
-            logger.debug (e, e);
-            return false;
-        }
+
+    public boolean isServiceInstallRequired( String service) {
+        return StringUtils.isNotBlank(getValueForPathAsString(service + "_install"))
+                && getValueForPath(service + "_install").equals("on");
     }
 
     private static final class MarathonServicesConfigWrapperException extends RuntimeException {

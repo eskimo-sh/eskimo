@@ -257,7 +257,7 @@ public class SystemAdminController {
                 }
 
                 MarathonOperationsCommand operationsCommand = MarathonOperationsCommand.create(
-                        servicesDefinition, newServicesInstallationStatus, marathonServicesConfig);
+                        servicesDefinition, systemService, newServicesInstallationStatus, marathonServicesConfig);
 
                 return performMarathonOperation(
                         marathonService -> marathonService.applyMarathonServicesConfig(operationsCommand),

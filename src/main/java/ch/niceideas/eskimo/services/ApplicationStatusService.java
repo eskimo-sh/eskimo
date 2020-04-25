@@ -83,7 +83,7 @@ public class ApplicationStatusService {
 
     private ReentrantLock statusUpdateLock = new ReentrantLock();
     private final Timer timer;
-    private JSONObject lastStatus = null;
+    private JsonWrapper lastStatus = null;
 
 
     // constructor for spring
@@ -105,7 +105,7 @@ public class ApplicationStatusService {
         timer.cancel();
     }
 
-    public JSONObject getStatus() throws SystemService.StatusExceptionWrapperException {
+    public JsonWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
         try {
             statusUpdateLock.lock();
 
@@ -176,7 +176,7 @@ public class ApplicationStatusService {
 
             systemStatus.getJSONObject().put("links", linkArray);
 
-            lastStatus = systemStatus.getJSONObject();
+            lastStatus = systemStatus;
 
         } finally {
             statusUpdateLock.unlock();

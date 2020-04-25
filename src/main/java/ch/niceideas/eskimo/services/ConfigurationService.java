@@ -58,7 +58,7 @@ public class ConfigurationService {
 
     private static final Logger logger = Logger.getLogger(ConfigurationService.class);
 
-    public static final String NODES_STATUS_JSON_PATH = "/nodes-status.json";
+    public static final String SERVICE_INSTALLATION_STATUS_PATH = "/service-install-status.json";
 
     private ReentrantLock statusFileLock = new ReentrantLock();
     private ReentrantLock nodesConfigFileLock = new ReentrantLock();
@@ -87,7 +87,7 @@ public class ConfigurationService {
         statusFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + NODES_STATUS_JSON_PATH), status.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + SERVICE_INSTALLATION_STATUS_PATH), status.getFormattedValue());
         } finally {
             statusFileLock.unlock();
         }
@@ -97,7 +97,7 @@ public class ConfigurationService {
         statusFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + NODES_STATUS_JSON_PATH);
+            File statusFile = new File(configStoragePath + SERVICE_INSTALLATION_STATUS_PATH);
             if (!statusFile.exists()) {
                 return ServicesInstallStatusWrapper.empty();
             }

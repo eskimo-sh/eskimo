@@ -209,11 +209,11 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService.setMessagingService(messagingService);
         nodesConfigurationService.setNodeRangeResolver(nodeRangeResolver);
         nodesConfigurationService.setProxyManagerService(proxyManagerService);
-        nodesConfigurationService.setNotificationService(notificationService);
         nodesConfigurationService.setServicesConfigService(servicesConfigService);
         nodesConfigurationService.setServicesDefinition(servicesDefinition);
         nodesConfigurationService.setServicesInstallationSorter(servicesInstallationSorter);
         nodesConfigurationService.setSetupService(setupService);
+        nodesConfigurationService.setSystemService (systemService);
         nodesConfigurationService.setSshCommandService(sshCommandService);
         nodesConfigurationService.setSystemOperationService(systemOperationService);
     }

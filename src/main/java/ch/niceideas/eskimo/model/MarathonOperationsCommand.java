@@ -58,6 +58,7 @@ public class MarathonOperationsCommand implements Serializable {
 
     public static MarathonOperationsCommand create (
             ServicesDefinition servicesDefinition,
+            SystemService systemService,
             ServicesInstallStatusWrapper servicesInstallStatus,
             MarathonServicesConfigWrapper rawMarathonServicesConfig) throws MarathonException {
 
@@ -65,8 +66,7 @@ public class MarathonOperationsCommand implements Serializable {
 
         // 1. Find out about services that need to be installed
         for (String service : servicesDefinition.listMarathonServices()) {
-            if (StringUtils.isNotBlank(rawMarathonServicesConfig.getValueForPathAsString(service + "_install"))
-                    && rawMarathonServicesConfig.getValueForPath(service + "_install").equals("on")
+            if (rawMarathonServicesConfig.isServiceInstallRequired(service)
                     && !servicesInstallStatus.isServiceInstalled(service)) {
 
                 retCommand.addInstallation(service);
@@ -81,8 +81,7 @@ public class MarathonOperationsCommand implements Serializable {
             if (servicesDefinition.getService(installedService).isMarathon()) {
 
                 // search it in config
-                if (StringUtils.isBlank((String) rawMarathonServicesConfig.getValueForPath(installedService + "_install"))
-                        || !rawMarathonServicesConfig.getValueForPath(installedService + "_install").equals("on")) {
+                if (!rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
                     retCommand.addUninstallation(installedService);
                 }
             }
@@ -93,7 +92,6 @@ public class MarathonOperationsCommand implements Serializable {
 
         return retCommand;
     }
-
 
     MarathonOperationsCommand(MarathonServicesConfigWrapper rawMarathonServicesConfig) {
         this.rawMarathonServicesConfig = rawMarathonServicesConfig;

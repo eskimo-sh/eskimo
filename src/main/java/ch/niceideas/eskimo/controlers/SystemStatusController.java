@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -96,7 +97,7 @@ public class SystemStatusController {
 
             SystemStatusWrapper nodeServicesStatus = systemService.getStatus();
 
-            JSONObject systemStatus = statusService.getStatus();
+            JsonWrapper systemStatus = statusService.getStatus();
 
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
@@ -105,7 +106,7 @@ public class SystemStatusController {
                 } else {
                     put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
                 }
-                put("systemStatus", systemStatus);
+                put("systemStatus", systemStatus.getJSONObject());
                 put("processingPending", systemService.isProcessingPending());
             }}).toString(2);
 

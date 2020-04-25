@@ -52,9 +52,6 @@ public class NodesConfigurationService {
     private MessagingService messagingService;
 
     @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
     private ServicesConfigService servicesConfigService;
 
     @Autowired
@@ -122,11 +119,14 @@ public class NodesConfigurationService {
     void setProxyManagerService(ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
     }
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
     void setMarathonService (MarathonService marathonService) {
         this.marathonService = marathonService;
+    }
+    void setSystemService (SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
+        this.connectionManagerService = connectionManagerService;
     }
 
     public void applyNodesConfig(OperationsCommand command)

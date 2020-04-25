@@ -132,7 +132,8 @@ public class MarathonServicesConfigController {
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
             // Create OperationsCommand
-            MarathonOperationsCommand command = MarathonOperationsCommand.create(servicesDefinition, serviceInstallStatus, marathonServicesConfig);
+            MarathonOperationsCommand command = MarathonOperationsCommand.create(
+                    servicesDefinition, systemService, serviceInstallStatus, marathonServicesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
@@ -165,7 +166,7 @@ public class MarathonServicesConfigController {
 
                 String serviceInstallation = servicesInstallStatus.getServiceInstallation(serviceInstallStatusFlag);
 
-                if (!reinstallModelConfig.hasServiceConfigured(serviceInstallation)) {
+                if (!reinstallModelConfig.isServiceInstallRequired(serviceInstallation)) {
                     newServicesInstallStatus.copyFrom (serviceInstallStatusFlag, servicesInstallStatus);
                 }
             }
@@ -176,7 +177,8 @@ public class MarathonServicesConfigController {
             }
 
             // Create OperationsCommand
-            MarathonOperationsCommand command = MarathonOperationsCommand.create(servicesDefinition, newServicesInstallStatus, marathonServicesConfig);
+            MarathonOperationsCommand command = MarathonOperationsCommand.create(
+                    servicesDefinition, systemService, newServicesInstallStatus, marathonServicesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);

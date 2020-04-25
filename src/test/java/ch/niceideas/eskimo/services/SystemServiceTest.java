@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
+import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -224,8 +225,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
 
-        File prevStatusFile = new File(setupService.getConfigStoragePath() + "/nodes-status-check-previous.json");
-        FileUtils.writeFile(prevStatusFile, prevSystemStatus.getFormattedValue());
+        systemService.setLastStatusForTest(prevSystemStatus);
 
         // we'll make it so that kibana and cerebro seem to have disappeared
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -252,8 +252,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
 
-        File prevStatusFile = new File(setupService.getConfigStoragePath() + "/nodes-status-check-previous.json");
-        FileUtils.writeFile(prevStatusFile, prevSystemStatus.getFormattedValue());
+        systemService.setLastStatusForTest(prevSystemStatus);
 
         // we'll make it so that kibana and cerebro seem to have disappeared
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -288,7 +287,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
+        systemStatus.getJSONObject().remove("service_kafka_192-168-10-11");
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
 
@@ -306,8 +305,74 @@ public class SystemServiceTest extends AbstractSystemTest {
         // now I have changes
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
-        // kafka manager is missing
+        // kafka is missing
         assertTrue (new JSONObject(expectedPrevStatus).similar(resultPrevStatus.getJSONObject()));
+    }
+
+    @Test
+    public void testHandleStatusChangesMarathonService() throws Exception {
+
+        Set<String> liveIps = new HashSet<String>(){{
+            add("192.168.10.11");
+            add("192.168.10.13");
+        }};
+
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+
+        // no changes so empty (since not saved !)
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        assertEquals ("{}", resultPrevStatus.getFormattedValue());
+
+        // run it four more times
+        for (int i = 0 ; i < 6; i++) {
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        }
+
+        // now I have changes
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+
+        JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatus);
+        expectedPrevStatusJson.put("kafka_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatus is for another test
+        expectedPrevStatusJson.remove("cerebro_installed_on_IP_MARATHON_NODE");
+
+        // kafka manager is missing
+        assertTrue (expectedPrevStatusJson.similar(resultPrevStatus.getJSONObject()));
+    }
+
+    @Test
+    public void testHandleStatusChangesMarathonServiceWhenMarathonDown() throws Exception {
+
+        Set<String> liveIps = new HashSet<String>(){{
+            add("192.168.10.11");
+            add("192.168.10.13");
+        }};
+
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
+        systemStatus.getJSONObject().put("service_marathon_192-168-10-11", "KO");
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesStatus();
+
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+
+        // no changes so empty (since not saved !)
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        assertEquals ("{}", resultPrevStatus.getFormattedValue());
+
+        // run it four more times
+        for (int i = 0 ; i < 6; i++) {
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        }
+
+        // Since the marathon service status change has not been saved (since marazthon is down), it's still empty !!
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+
+        assertEquals("{}", resultPrevStatus.getJSONObject().toString(2));
     }
 
     @Test
@@ -352,7 +417,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         // kafka and elasticsearch have been kept
-        //System.err.println (resultPrevStatus.getFormattedValue());
+        System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
                 "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
                 "    \"elasticsearch_installed_on_IP_192-168-10-11\": \"OK\",\n" +

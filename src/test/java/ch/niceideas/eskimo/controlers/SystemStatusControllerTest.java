@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.*;
@@ -59,8 +60,8 @@ public class SystemStatusControllerTest {
 
         ssc.setStatusService(new ApplicationStatusService() {
             @Override
-            public JSONObject getStatus() {
-                return new JSONObject("{\"status\":\"OK\"}");
+            public JsonWrapper getStatus() {
+                return new JsonWrapper( new JSONObject("{\"status\":\"OK\"}"));
             }
         });
 

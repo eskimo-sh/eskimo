@@ -120,6 +120,13 @@ public class NodesConfigControllerTest {
             }
         });
 
+        ncc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+
         ncc.setConfigurationService(new ConfigurationService() {
             @Override
             public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
@@ -187,6 +194,13 @@ public class NodesConfigControllerTest {
             @Override
             public void applyNodesConfig(OperationsCommand command) {
                 // No Op
+            }
+        });
+
+        ncc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
             }
         });
 

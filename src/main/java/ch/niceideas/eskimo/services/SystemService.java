@@ -118,7 +118,6 @@ public class SystemService {
     @Value("${system.statusUpdatePeriodSeconds}")
     private int statusUpdatePeriodSeconds = 5;
 
-    private ReentrantLock prevStatusCheckLock = new ReentrantLock();
     private ReentrantLock systemActionLock = new ReentrantLock();
 
     private ReentrantLock statusUpdateLock = new ReentrantLock();
@@ -331,13 +330,14 @@ public class SystemService {
         }
     }
 
+    void setLastStatusForTest(SystemStatusWrapper lastStatusForTest) {
+        this.lastStatus = lastStatusForTest;
+    }
+
     public void updateStatus() {
 
         try {
             statusUpdateLock.lock();
-
-            lastStatusException = null;
-            lastStatus = null;
 
             // 0. Build returned status
             SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
@@ -440,12 +440,15 @@ public class SystemService {
 
             handleStatusChanges(servicesInstallationStatus, systemStatus, configuredAddressesAndOtherLiveAddresses);
 
+            lastStatusException = null;
             lastStatus = systemStatus;
 
         } catch (SystemException | NodesConfigurationException | FileException | SetupException  e) {
 
             logger.error (e, e);
+
             lastStatusException = e;
+            lastStatus = null;
 
         } finally {
             statusUpdateLock.unlock();
@@ -649,14 +652,14 @@ public class SystemService {
 
                         // A. In case target node both configured and up, check services actual statuses before doing anything
                         if (    // nodes is configured and responding (up and running
-//                                (
+                                (
                                         nodeAlive != null && nodeAlive.booleanValue()
-//                                )
-//                             ||
+                                )
+                             ||
                                 // node is not configured anymore (has been removed, but it is still up and responding and it runs services)
                                 // in this case we want to attempt uninstallation, thus not removing services if they are up
-//                                (nodeIp != null && configuredAddressesAndOtherLiveAddresses.contains(nodeIp) ) ) {
-) {
+                                ((nodeAlive == null || !nodeAlive.booleanValue()) && configuredAddressesAndOtherLiveAddresses.contains(nodeIp) ) ) {
+
 
                             if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
                                 changes = true;
@@ -766,36 +769,17 @@ public class SystemService {
 
     void checkServiceDisappearance(SystemStatusWrapper systemStatus) throws FileException, SetupException {
 
-        prevStatusCheckLock.lock();
-        try {
+        if (lastStatus != null) {
 
-            String configStoragePath = setupService.getConfigStoragePath();
+            for (String service : systemStatus.getRootKeys()) {
 
-            // load last statusWrapper
-            File prevStatusFile = new File(configStoragePath + "/nodes-status-check-previous.json");
-            if (prevStatusFile.exists()) {
+                // if service is currently not OK but was previously OK
+                if (!systemStatus.isServiceOK(service) && lastStatus.isServiceOK(service)) {
 
-                String prevStatusAsString = FileUtils.readFile(prevStatusFile);
-
-                if (StringUtils.isNotBlank(prevStatusAsString)) {
-                    SystemStatusWrapper previousStatus = new SystemStatusWrapper(prevStatusAsString);
-
-                    for (String service : systemStatus.getRootKeys()) {
-
-                        if (!systemStatus.isServiceOK(service)
-                            && previousStatus.isServiceOK(service)) {
-
-                            logger.warn("For service " + service + " - previous status was OK and status is " + systemStatus.getValueForPath(service));
-                            notificationService.addError("Service " + service + " got into problem");
-                        }
-                    }
+                    logger.warn("For service " + service + " - previous status was OK and status is " + systemStatus.getValueForPath(service));
+                    notificationService.addError("Service " + service + " got into problem");
                 }
             }
-
-            // store statusWrapper for next run
-            FileUtils.writeFile(new File(configStoragePath + "/nodes-status-check-previous.json"), systemStatus.getFormattedValue());
-        } finally {
-            prevStatusCheckLock.unlock();
         }
     }
 
@@ -958,6 +942,7 @@ public class SystemService {
     File createTempFile(String service, String ipAddress, String extension) throws IOException {
         return File.createTempFile(service, extension);
     }
+
 
     interface PooledOperation<T> {
         void call(T operation, AtomicReference<Exception> error)

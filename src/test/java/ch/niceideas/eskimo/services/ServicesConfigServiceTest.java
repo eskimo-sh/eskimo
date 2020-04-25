@@ -76,13 +76,15 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
 
         scs.setConfigurationService(configurationService);
 
+        scs.setNodesConfigurationService(createNodesConfiguratioNService());
+
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }
 
-    protected SystemService createSystemService() {
-        return new SystemService(false) {
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+    protected NodesConfigurationService createNodesConfiguratioNService() {
+        return new NodesConfigurationService() {
+            @Override
+            public void applyNodesConfig(OperationsCommand command) {
                 processedCommand.set(command);
             }
         };
