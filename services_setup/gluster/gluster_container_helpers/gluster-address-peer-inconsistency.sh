@@ -46,56 +46,73 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
     exit -3
 fi
 
-echo " - Checking out if master is in local pool"
-if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
-    MASTER_IN_LOCAL=0
+# typical single node cluster or back to single node cluster
+if [[ "$MASTER_IP_ADDRESS" == "$SELF_IP_ADDRESS" ]]; then
+
+    echo "Specific situation: master is self node. Need to ensure no other peer remain in the pool"
+    gluster_peers=`gluster pool list  | sed -E 's/[a-zA-Z0-9\-]+[ \t]+([0-9\.]+|localhost)[^.]+/\1/;t;d'`
+
+    for peer in $gluster_peers; do
+        if [[ $peer != "localhost" ]]; then
+            echo "Deleting peer $peer from pool list"
+            /usr/local/sbin/__force-remove-peer.sh $peer
+        fi
+    done
+
+# multiple nodes in cluster, fixing inconsistencies between local and master
 else
-    MASTER_IN_LOCAL=1
-fi
 
-echo " - Checking if local in master pool"
-remote_result=`/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
-if [[ `echo $remote_result | grep $SELF_IP_ADDRESS` == "" ]]; then
-    LOCAL_IN_MASTER=0
-else
-    LOCAL_IN_MASTER=1
-fi
-
-set +e
-
-echo " - Checking consistency "
-if [[ $MASTER_IN_LOCAL == 0 ]]; then
-    if [[ $LOCAL_IN_MASTER == 0 ]] ; then
-        echo " -> gluster cluster is consistent. Neither local nor master know each others"
+    echo " - Checking out if master is in local pool"
+    if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+        MASTER_IN_LOCAL=0
     else
-        # CAUTION : THIS LOG STATEMENT NEEDS TO STAY EXACTLY AS IS. IT IS DETECTED FOR FURTHER PROCESSING
-        echo " -> gluster cluster is inconsistent. Local doesn't know master but master knows local"
-
-        echo " - Attempting to remove local from master pool list"
-        /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS force-remove-peer now $SELF_IP_ADDRESS
-        if [[ $? != 0 ]] ; then
-            echo " - FAILED to remove local from master pool list"
-            exit -1
-        fi
-
-        echo " - Deleting corresponding local blocks"
-        __delete-local-blocks.sh $MASTER_IP_ADDRESS
-         if [[ $? != 0 ]] ; then
-            echo " - FAILED to delete corresponding local blocks"
-            exit -1
-        fi
-
+        MASTER_IN_LOCAL=1
     fi
-else
-    if [[ $LOCAL_IN_MASTER == 0 ]] ; then
-        echo " -> gluster cluster is inconsistent. Master doesn't know local but local knows master"
-        echo " - Attempting to remove master from local pool list"
-        /usr/local/sbin/__force-remove-peer.sh $MASTER_IP_ADDRESS
-        if [[ $? != 0 ]] ; then
-            echo " - FAILED to remove master from local pool list"
-            exit -1
+
+    echo " - Checking if local in master pool"
+    remote_result=`/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
+    if [[ `echo $remote_result | grep $SELF_IP_ADDRESS` == "" ]]; then
+        LOCAL_IN_MASTER=0
+    else
+        LOCAL_IN_MASTER=1
+    fi
+
+    set +e
+
+    echo " - Checking consistency "
+    if [[ $MASTER_IN_LOCAL == 0 ]]; then
+        if [[ $LOCAL_IN_MASTER == 0 ]] ; then
+            echo " -> gluster cluster is consistent. Neither local nor master know each others"
+        else
+            # CAUTION : THIS LOG STATEMENT NEEDS TO STAY EXACTLY AS IS. IT IS DETECTED FOR FURTHER PROCESSING
+            echo " -> gluster cluster is inconsistent. Local doesn't know master but master knows local"
+
+            echo " - Attempting to remove local from master pool list"
+            /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS force-remove-peer now $SELF_IP_ADDRESS
+            if [[ $? != 0 ]] ; then
+                echo " - FAILED to remove local from master pool list"
+                exit -1
+            fi
+
+            echo " - Deleting corresponding local blocks"
+            __delete-local-blocks.sh $MASTER_IP_ADDRESS
+             if [[ $? != 0 ]] ; then
+                echo " - FAILED to delete corresponding local blocks"
+                exit -1
+            fi
+
         fi
     else
-        echo " -> gluster cluster is consistent. both local and master know each others"
+        if [[ $LOCAL_IN_MASTER == 0 ]] ; then
+            echo " -> gluster cluster is inconsistent. Master doesn't know local but local knows master"
+            echo " - Attempting to remove master from local pool list"
+            /usr/local/sbin/__force-remove-peer.sh $MASTER_IP_ADDRESS
+            if [[ $? != 0 ]] ; then
+                echo " - FAILED to remove master from local pool list"
+                exit -1
+            fi
+        else
+            echo " -> gluster cluster is consistent. both local and master know each others"
+        fi
     fi
 fi
