@@ -48,6 +48,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -100,6 +101,7 @@ public class ConnectionManagerService {
     public ConnectionManagerService() {
         this.timer = new Timer(true);
 
+        logger.info ("Initializing connection closer scheduler ...");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -110,6 +112,12 @@ public class ConnectionManagerService {
                 connectionsToCloseLazily.clear();
             }
         }, sshOperationTimeout, sshOperationTimeout);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        logger.info ("Cancelling connection closer scheduler");
+        timer.cancel();
     }
 
     // constructor for tests

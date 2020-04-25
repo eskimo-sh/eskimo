@@ -80,7 +80,7 @@ public class ServicesConfigServiceTest extends AbstractSystemTest {
     }
 
     protected SystemService createSystemService() {
-        return new SystemService() {
+        return new SystemService(false) {
             public void applyNodesConfig(OperationsCommand command)
                     throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
                 processedCommand.set(command);

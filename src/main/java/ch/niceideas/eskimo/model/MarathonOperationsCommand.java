@@ -51,6 +51,7 @@ public class MarathonOperationsCommand implements Serializable {
 
     private ArrayList<String> installations = new ArrayList<>();
     private ArrayList<String> uninstallations = new ArrayList<>();
+    private String warnings = null;
 
     // TODO marathon dependent services not supported for now
     //private ArrayList<String> restarts = new ArrayList<>();
@@ -87,8 +88,8 @@ public class MarathonOperationsCommand implements Serializable {
             }
         }
 
-        // 3. If a services changed, dependent services need to be restarted
-        // TODO Find ouy if this needs to be supported
+        // 3. If Marathon is not available, issue a warning in regards to what is going to happen
+
 
         return retCommand;
     }

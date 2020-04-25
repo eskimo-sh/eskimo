@@ -27,7 +27,7 @@ public class SystemAdminControllerTest {
     @Test
     public void testInterruptProcessing() {
 
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void interruptProcessing() {
                 // No Op
@@ -36,7 +36,7 @@ public class SystemAdminControllerTest {
 
         assertEquals ("{\"status\": \"OK\"}", sac.interruptProcessing());
 
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void interruptProcessing() {
                 throw new JSONException("Test Error");
@@ -51,7 +51,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testShowJournal() {
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void showJournal(String service, String ipAddress) throws SSHCommandException {
                 // No Op
@@ -65,7 +65,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testStartService() {
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void startService(String service, String ipAddress) throws SSHCommandException {
                 // No Op
@@ -76,7 +76,7 @@ public class SystemAdminControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", sac.startService("zookeeper", "192.168.10.11"));
 
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void startService(String service, String ipAddress) throws SSHCommandException {
                 throw new SSHCommandException("Test Error");
@@ -91,7 +91,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testStopService() {
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void stopService(String service, String ipAddress) throws SSHCommandException {
                 // No Op
@@ -105,7 +105,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testRestartService() {
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public void restartService(String service, String ipAddress) throws SSHCommandException {
                 // No Op
@@ -122,14 +122,13 @@ public class SystemAdminControllerTest {
 
         AtomicBoolean called = new AtomicBoolean(false);
 
-        sac.setSystemService(new SystemService() {
+        sac.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return false;
             }
             @Override
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+            public void delegateApplyNodesConfig(OperationsCommand command)  {
                 // No Op
             }
 

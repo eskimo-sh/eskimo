@@ -66,7 +66,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Override
     protected SystemService createSystemService() {
-        SystemService ss = new SystemService() {
+        SystemService ss = new SystemService(false) {
             @Override
             protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
                 File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
@@ -109,36 +109,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         return marathonService;
     }
 
-    @Test
-    public void testInstallService() throws Exception {
-
-        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
-                put("mesos_installed_on_IP_192-168-10-11", "OK");
-                put("mesos_installed_on_IP_192-168-10-13", "OK");
-                put("node_check_IP_192-168-10-11", "OK");
-                put("node_check_IP_192-168-10-13", "OK");
-                put("ntp_installed_on_IP_192-168-10-11", "OK");
-                put("ntp_installed_on_IP_192-168-10-13", "OK");
-        }});
-
-        configurationService.saveServicesInstallationStatus(savedStatus);
-
-        // testing zookeeper installation
-        systemService.installService("zookeeper", "localhost");
-
-        assertTrue(testSSHCommandScript.toString().startsWith("rm -Rf /tmp/zookeeper\n" +
-                "rm -f /tmp/zookeeper.tgz\n"));
-
-        assertTrue(testSSHCommandScript.toString().contains(
-                "tar xfz /tmp/zookeeper.tgz --directory=/tmp/\n" +
-                "chmod 755 /tmp/zookeeper/setup.sh\n"));
-        assertTrue(testSSHCommandScript.toString().contains(
-                "bash /tmp/zookeeper/setup.sh localhost \n" +
-                "rm -Rf /tmp/zookeeper\n" +
-                "rm -f /tmp/zookeeper.tgz\n"));
-    }
-
-   public static String createTempStoragePath() throws Exception {
+    public static String createTempStoragePath() throws Exception {
         File dtempFileName = File.createTempFile("test_systemservice_", "config_storage");
         FileUtils.delete (dtempFileName); // delete file to create directory below
 
@@ -454,99 +425,6 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"spark-executor_installed_on_IP_192-168-10-11\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
-    }
-
-    @Test
-    public void testApplyNodesConfig() throws Exception {
-
-        OperationsCommand command = OperationsCommand.create(
-                servicesDefinition,
-                nodeRangeResolver,
-                new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8")),
-                new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"))
-        );
-
-        SSHCommandService sshCommandService = new SSHCommandService() {
-            @Override
-            public synchronized String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
-                    return "debian";
-                }
-                if (script.equals("sudo cat /proc/meminfo | grep MemTotal")) {
-                    return "MemTotal:        9982656 kB";
-                }
-
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public synchronized String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
-                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
-                    return "OK";
-                }
-
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public synchronized void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
-                // just do nothing
-            }
-        };
-
-        systemService.setSshCommandService(sshCommandService);
-
-        memoryComputer.setSshCommandService(sshCommandService);
-
-        systemService.applyNodesConfig(command);
-
-
-        String expectedCommandStart = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsStart.txt"), "UTF-8");
-        expectedCommandStart = expectedCommandStart.replace("{UUID}", testRunUUID);
-
-        String expectedCommandEnd = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsEnd.txt"), "UTF-8");
-        expectedCommandEnd = expectedCommandEnd.replace("{UUID}", testRunUUID);
-
-        String commandString = testSSHCommandScript.toString();
-
-        for (String commandStart : expectedCommandStart.split("\n")) {
-            assertTrue (commandStart + "\nis contained in \n" + commandString, commandString.contains(commandStart));
-        }
-
-        for (String commandEnd : expectedCommandEnd.split("\n")) {
-            assertTrue (commandEnd + "\nis contained in \n" + commandString, commandString.contains(commandEnd));
-        }
-    }
-
-    @Test
-    public void testUninstallation() throws Exception {
-
-        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
-            put("mesos_installed_on_IP_192-168-10-11", "OK");
-            put("mesos_installed_on_IP_192-168-10-13", "OK");
-            put("node_check_IP_192-168-10-11", "OK");
-            put("node_check_IP_192-168-10-13", "OK");
-            put("ntp_installed_on_IP_192-168-10-11", "OK");
-            put("ntp_installed_on_IP_192-168-10-13", "OK");
-            put("zookeeper_installed_on_IP_192-168-10-11", "OK");
-        }});
-
-        configurationService.saveServicesInstallationStatus(savedStatus);
-
-        // testing zookeeper installation
-        systemService.uninstallService("zookeeper", "192.168.10.11");
-
-        assertTrue(testSSHCommandScript.toString().contains(
-                "sudo systemctl stop zookeeper\n" +
-                "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi\n" +
-                "sudo rm -f  /usr/lib/systemd/system/zookeeper.service\n" +
-                "sudo docker rm -f zookeeper || true \n" +
-                "sudo docker image rm -f eskimo:zookeeper\n" +
-                "sudo systemctl daemon-reload\n" +
-                "sudo systemctl reset-failed\n"));
     }
 
     @Test

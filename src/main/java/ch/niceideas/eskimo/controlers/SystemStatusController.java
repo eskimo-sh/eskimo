@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -61,7 +60,7 @@ public class SystemStatusController {
     private SystemService systemService;
 
     @Autowired
-    private StatusService statusService;
+    private ApplicationStatusService statusService;
 
     /* For tests */
     void setSetupService(SetupService setupService) {
@@ -70,7 +69,7 @@ public class SystemStatusController {
     void setSystemService(SystemService systemService) {
         this.systemService = systemService;
     }
-    void setStatusService(StatusService statusService) {
+    void setStatusService(ApplicationStatusService statusService) {
         this.statusService = statusService;
     }
 
@@ -106,18 +105,26 @@ public class SystemStatusController {
                 } else {
                     put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
                 }
-                put ("systemStatus", systemStatus);
+                put("systemStatus", systemStatus);
                 put("processingPending", systemService.isProcessingPending());
             }}).toString(2);
 
-        } catch (JSONException | FileException | SystemException | NodesConfigurationException | ConnectionManagerException e) {
-            logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus (e);
-
         } catch (SetupException e) {
+
             // this is OK. means application is not yet initialized
-            logger.debug (e, e);
+            logger.debug (e.getCause(), e.getCause());
             return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+
+        } catch (SystemService.StatusExceptionWrapperException e) {
+
+            if (e.getCause() instanceof SetupException) {
+                // this is OK. means application is not yet initialized
+                logger.debug (e.getCause(), e.getCause());
+                return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            } else {
+                logger.debug(e.getCause(), e.getCause());
+                return ErrorStatusHelper.createErrorStatus ((Exception)e.getCause());
+            }
         }
     }
 

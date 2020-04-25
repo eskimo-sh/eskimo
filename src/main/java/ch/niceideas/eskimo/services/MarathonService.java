@@ -69,6 +69,9 @@ public class MarathonService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private NodesConfigurationService nodesConfigurationService;
+
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
@@ -113,6 +116,9 @@ public class MarathonService {
     }
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
+    }
+    void setNodesConfigurationService(NodesConfigurationService nodesConfigurationService) {
+        this.nodesConfigurationService = nodesConfigurationService;
     }
 
     public MarathonService() {
@@ -348,7 +354,7 @@ public class MarathonService {
                         // topology
                         if (error.get() == null) {
                             systemOperationService.applySystemOperation("Installation of Topology and settings on " + operation,
-                                    builder -> systemService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation, deadIps), null);
+                                    builder -> nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation, deadIps), null);
                         }
 
                     });
@@ -810,7 +816,7 @@ public class MarathonService {
     protected String restartServiceMarathonInternal(Service service) throws MarathonException {
         StringBuilder log = new StringBuilder();
 
-        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 50); // 50 attempts
+        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 70); // 70 attempts
         String nodeIp = nodeNameAndStatus.getKey();
 
         boolean installed = StringUtils.isNotBlank(nodeIp);

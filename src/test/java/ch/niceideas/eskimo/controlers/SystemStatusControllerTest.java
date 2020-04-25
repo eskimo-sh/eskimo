@@ -17,7 +17,7 @@ public class SystemStatusControllerTest {
     @Test
     public void testgetLastOperationResult() {
 
-        ssc.setSystemService(new SystemService() {
+        ssc.setSystemService(new SystemService(false) {
             public boolean getLastOperationSuccess() {
                 return true;
             }
@@ -28,7 +28,7 @@ public class SystemStatusControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getLastOperationResult());
 
-        ssc.setSystemService(new SystemService() {
+        ssc.setSystemService(new SystemService(false) {
             public boolean getLastOperationSuccess() {
                 throw new JSONException("Test Error");
             }
@@ -51,13 +51,13 @@ public class SystemStatusControllerTest {
             }
         });
 
-        ssc.setSystemService(new SystemService() {
-            public SystemStatusWrapper getStatus() throws SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
+        ssc.setSystemService(new SystemService(false) {
+            public SystemStatusWrapper getStatus() {
                 return new SystemStatusWrapper("{\"status\":\"OK\"}");
             }
         });
 
-        ssc.setStatusService(new StatusService() {
+        ssc.setStatusService(new ApplicationStatusService() {
             @Override
             public JSONObject getStatus() {
                 return new JSONObject("{\"status\":\"OK\"}");
@@ -71,8 +71,8 @@ public class SystemStatusControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getStatus());
 
-        ssc.setSystemService(new SystemService() {
-            public SystemStatusWrapper getStatus() throws SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
+        ssc.setSystemService(new SystemService(false) {
+            public SystemStatusWrapper getStatus()  {
                 return new SystemStatusWrapper("{}");
             }
         });

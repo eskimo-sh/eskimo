@@ -64,4 +64,7 @@ for app in $APPS; do
     echo "    + deployment Id is $deploymentId"
 done
 
+# give them a little time to shut down
+sleep 10
+
 

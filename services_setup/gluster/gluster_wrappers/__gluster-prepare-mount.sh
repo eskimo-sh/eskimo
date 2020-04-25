@@ -37,7 +37,7 @@
 set -e
 
 # Detecting cluster incoherence and fixing
-echo "Configuring peers"
+echo "Checking peer inconsistency"
 /usr/bin/docker exec \
         -i \
         gluster \

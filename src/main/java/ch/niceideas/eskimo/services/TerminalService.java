@@ -47,6 +47,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -85,6 +86,7 @@ public class TerminalService {
 
         this.timer = new Timer(true);
 
+        logger.info ("Initializing terminal closer scheduler ...");
         timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -101,6 +103,12 @@ public class TerminalService {
                     }
                 }
             }, idleTimeoutSeconds / (long) 10 * 1000, idleTimeoutSeconds / (long) 10 * 1000);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        logger.info ("Cancelling terminal closer scheduler");
+        timer.cancel();
     }
 
     /** For tests */

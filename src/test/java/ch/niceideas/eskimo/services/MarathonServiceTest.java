@@ -93,7 +93,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
     @Override
     protected SystemService createSystemService() {
-        return new SystemService() {
+        return new SystemService(false) {
             @Override
             String sendPing(String ipAddress) throws SSHCommandException {
                 super.sendPing(ipAddress);

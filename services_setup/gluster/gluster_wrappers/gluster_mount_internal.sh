@@ -177,6 +177,8 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
             echo "Failed to prepare gluster mount $MOUNT_POINT"
             cat /tmp/gluster_mount_$1_log
             exit -5
+        else
+            echo "  + Prepare mount success."
         fi
     fi
 fi

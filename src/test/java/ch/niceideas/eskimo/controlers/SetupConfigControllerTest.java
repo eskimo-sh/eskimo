@@ -39,7 +39,7 @@ public class SetupConfigControllerTest {
             }
         });
 
-        scc.setSystemService(new SystemService() {
+        scc.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return false;
@@ -96,7 +96,7 @@ public class SetupConfigControllerTest {
             }
         });
 
-        scc.setSystemService(new SystemService() {
+        scc.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return true;
@@ -140,7 +140,7 @@ public class SetupConfigControllerTest {
             }
         });
 
-        scc.setSystemService(new SystemService() {
+        scc.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return false;

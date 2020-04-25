@@ -79,6 +79,8 @@ public abstract class AbstractSystemTest {
 
     protected SSHCommandService sshCommandService = null;
 
+    protected NodesConfigurationService nodesConfigurationService = null;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
@@ -166,7 +168,6 @@ public abstract class AbstractSystemTest {
         systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
-        systemService.setSystemOperationService (systemOperationService);
 
         systemService.setServicesDefinition(servicesDefinition);
 
@@ -178,19 +179,15 @@ public abstract class AbstractSystemTest {
         };
         memoryComputer.setServicesDefinition(servicesDefinition);
         memoryComputer.setSshCommandService(sshCommandService);
-        systemService.setMemoryComputer(memoryComputer);
 
         servicesInstallationSorter = new ServicesInstallationSorter ();
         servicesInstallationSorter.setServicesDefinition(servicesDefinition);
-        systemService.setServicesInstallationSorter(servicesInstallationSorter);
 
         servicesConfigService = new ServicesConfigService();
         servicesConfigService.setNodeRangeResolver(nodeRangeResolver);
         servicesConfigService.setSetupService(setupService);
         servicesConfigService.setSystemService(systemService);
         servicesConfigService.setServicesDefinition(servicesDefinition);
-
-        systemService.setServicesConfigService(servicesConfigService);
 
         marathonService = createMarathonService();
         marathonService.setServicesDefinition(servicesDefinition);
@@ -204,6 +201,21 @@ public abstract class AbstractSystemTest {
         marathonService.setNotificationService(notificationService);
 
         systemService.setMarathonService(marathonService);
+
+        nodesConfigurationService = createNodesConfigurationService();
+        nodesConfigurationService.setConfigurationService(configurationService);
+        nodesConfigurationService.setMarathonService(marathonService);
+        nodesConfigurationService.setMemoryComputer(memoryComputer);
+        nodesConfigurationService.setMessagingService(messagingService);
+        nodesConfigurationService.setNodeRangeResolver(nodeRangeResolver);
+        nodesConfigurationService.setProxyManagerService(proxyManagerService);
+        nodesConfigurationService.setNotificationService(notificationService);
+        nodesConfigurationService.setServicesConfigService(servicesConfigService);
+        nodesConfigurationService.setServicesDefinition(servicesDefinition);
+        nodesConfigurationService.setServicesInstallationSorter(servicesInstallationSorter);
+        nodesConfigurationService.setSetupService(setupService);
+        nodesConfigurationService.setSshCommandService(sshCommandService);
+        nodesConfigurationService.setSystemOperationService(systemOperationService);
     }
 
     protected ProxyManagerService createProxyManagerService() {
@@ -219,7 +231,11 @@ public abstract class AbstractSystemTest {
     }
 
     protected SystemService createSystemService() {
-        return new SystemService();
+        return new SystemService(false);
+    }
+
+    protected NodesConfigurationService createNodesConfigurationService () {
+        return new NodesConfigurationService();
     }
 
     protected MarathonService createMarathonService() {

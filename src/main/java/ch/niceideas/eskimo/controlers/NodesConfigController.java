@@ -89,6 +89,9 @@ public class NodesConfigController {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
+    @Autowired
+    private NodesConfigurationService nodesConfigurationService;
+
     /* For tests */
     void setSystemService(SystemService systemService) {
         this.systemService = systemService;
@@ -107,6 +110,9 @@ public class NodesConfigController {
     }
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
+    }
+    void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
+        this.nodesConfigurationService = nodesConfigurationService;
     }
 
     @GetMapping("/load-nodes-config")
@@ -245,7 +251,7 @@ public class NodesConfigController {
 
             configurationService.saveNodesConfig(command.getRawConfig());
 
-            systemService.applyNodesConfig(command);
+            nodesConfigurationService.applyNodesConfig(command);
 
             return "{\"status\": \"OK\" }";
 

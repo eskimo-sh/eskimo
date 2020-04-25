@@ -68,7 +68,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
     @Override
     protected SystemService createSystemService() {
-        SystemService ss = new SystemService() {
+        SystemService ss = new SystemService(false) {
             @Override
             protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
                 File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
@@ -125,6 +125,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
             }
         });
 
+        systemService.updateStatus();
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
         String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), "UTF-8");

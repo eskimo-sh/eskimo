@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
+import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -64,10 +67,6 @@ public class SystemService {
 
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
-
-    public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
-    public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
-    public static final String USR_LOCAL_SBIN_GLUSTER_MOUNT_SH = "/usr/local/sbin/gluster_mount.sh";
     public static final String SERVICE_PREFIX = "service_";
     public static final String TMP_PATH_PREFIX = "/tmp/";
 
@@ -90,22 +89,7 @@ public class SystemService {
     private ServicesDefinition servicesDefinition;
 
     @Autowired
-    private ConnectionManagerService connectionManagerService;
-
-    @Autowired
     private NodeRangeResolver nodeRangeResolver;
-
-    @Autowired
-    private MemoryComputer memoryComputer;
-
-    @Autowired
-    private ServicesInstallationSorter servicesInstallationSorter;
-
-    @Autowired
-    private SystemOperationService systemOperationService;
-
-    @Autowired
-    private ServicesConfigService servicesConfigService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -113,18 +97,11 @@ public class SystemService {
     @Autowired
     private MarathonService marathonService;
 
+    @Autowired
+    private NodesConfigurationService nodesConfigurationService;
 
     @Value("${system.failedServicesTriggerCount}")
-    private int failedServicesTriggerCount = 2;
-
-    @Value("${system.packageDistributionPath}")
-    private String packageDistributionPath = "./packages_distrib";
-
-    @Value("${system.servicesSetupPath}")
-    private String servicesSetupPath = "./services_setup";
-
-    @Value("${system.parallelismInstallThreadCount}")
-    private int parallelismInstallThreadCount = 10;
+    private int failedServicesTriggerCount = 5;
 
     @Value("${system.operationWaitTimoutSeconds}")
     private int operationWaitTimoutSeconds = 800; // ~ 13 minutes (for an individual step)
@@ -132,11 +109,22 @@ public class SystemService {
     @Value("${system.statusFetchThreadCount}")
     private int parallelismStatusThreadCount = 10;
 
-    @Value("${system.baseInstallWaitTimoutSeconds}")
-    private int baseInstallWaitTimout = 1000;
+    @Value("${system.packageDistributionPath}")
+    private String packageDistributionPath = "./packages_distrib";
+
+    @Value("${system.servicesSetupPath}")
+    private String servicesSetupPath = "./services_setup";
+
+    @Value("${system.statusUpdatePeriodSeconds}")
+    private int statusUpdatePeriodSeconds = 5;
 
     private ReentrantLock prevStatusCheckLock = new ReentrantLock();
     private ReentrantLock systemActionLock = new ReentrantLock();
+
+    private ReentrantLock statusUpdateLock = new ReentrantLock();
+    private final Timer timer;
+    private SystemStatusWrapper lastStatus = null;
+    private Exception lastStatusException = null;
 
     private AtomicBoolean interruption = new AtomicBoolean(false);
     private AtomicBoolean interruptionNotified = new AtomicBoolean(false);
@@ -165,26 +153,45 @@ public class SystemService {
     void setProxyManagerService(ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
     }
-    void setSystemOperationService(SystemOperationService systemOperationService) {
-        this.systemOperationService = systemOperationService;
-    }
     void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
-    }
-    void setMemoryComputer (MemoryComputer memoryComputer) {
-        this.memoryComputer = memoryComputer;
-    }
-    void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
-        this.servicesInstallationSorter = servicesInstallationSorter;
-    }
-    void setServicesConfigService (ServicesConfigService servicesConfigService) {
-        this.servicesConfigService = servicesConfigService;
     }
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
     void setMarathonService (MarathonService marathonService) {
         this.marathonService = marathonService;
+    }
+    void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
+        this.nodesConfigurationService = nodesConfigurationService;
+    }
+
+    // constructor for spring
+    public SystemService() {
+        this (true);
+    }
+    public SystemService(boolean createUpdateScheduler) {
+        if (createUpdateScheduler) {
+            this.timer = new Timer(true);
+
+            logger.info("Initializing Status fetcher scheduler ...");
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    updateStatus();
+                }
+            }, statusUpdatePeriodSeconds * 1000, statusUpdatePeriodSeconds * 1000);
+        } else {
+            this.timer = null;
+        }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        logger.info ("Cancelling connection closer scheduler");
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 
 
@@ -227,6 +234,11 @@ public class SystemService {
 
     void setLastOperationSuccess(boolean success) {
         lastOperationSuccess = success;
+    }
+
+    public void delegateApplyNodesConfig(OperationsCommand command)
+            throws SystemException, ServiceDefinitionException, NodesConfigurationException {
+        nodesConfigurationService.applyNodesConfig(command);
     }
 
     public void showJournal(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
@@ -301,300 +313,147 @@ public class SystemService {
         }
     }
 
-    public SystemStatusWrapper getStatus() throws SystemException, NodesConfigurationException, FileException, SetupException, ConnectionManagerException {
-
-        // 0. Build returned status
-        SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
-
-        // 1. Load Node Config
-        NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
-
-        // 1.1. Load Node status
-        ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
-
-        // 1.2 flag services needing restart
-        if (rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
-
-            NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
-
-            // 2. Build merged status
-            final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
-            final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismStatusThreadCount);
-
-            for (Pair<String, String> nbrAndPair : nodesConfig.getNodeAdresses()) {
-
-                int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
-                String ipAddress = nbrAndPair.getValue();
-                String nodeName = ipAddress.replace(".", "-");
-
-                statusMap.put(("node_nbr_" + nodeName), "" + nodeNbr);
-                statusMap.put(("node_address_" + nodeName), ipAddress);
-
-                threadPool.execute(() -> {
-                    try {
-                        fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);
-                    } catch (SystemException e) {
-                        logger.error(e, e);
-                        throw new PooledOperationException(e);
-                    }
-                });
-            }
-
-            threadPool.shutdown();
-            try {
-                threadPool.awaitTermination(operationWaitTimoutSeconds, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                logger.error(e, e);
-            }
-
-            // fetch marathon services status
-            try {
-                marathonService.fetchMarathonServicesStatus (statusMap, servicesInstallationStatus);
-            } catch (MarathonException e) {
-                logger.debug(e, e);
-                // workaround : flag all marathon services as KO on marathon node
-                String marathonIpAddress = marathonService.findUniqueServiceIP("marathon");
-                if (StringUtils.isNotBlank(marathonIpAddress)) {
-                    String marathonNode = marathonIpAddress.replace(".", "-");
-                    MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
-                    for (String service : servicesDefinition.listMarathonServices()) {
-                        if (marathonService.shouldInstall (marathonConfig, service)) {
-                            statusMap.put(SERVICE_PREFIX + service + "_" + marathonNode, "KO");
-                        }
-                    }
-                }
-            }
-
-            // fill in systemStatus
-            for (String key : statusMap.keySet()) {
-                String value = statusMap.get(key);
-                systemStatus.setValueForPath(key, value);
-            }
-        }
-
-        // 4. If a service disappeared, post notification
+    public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
         try {
-            checkServiceDisappearance(systemStatus);
-        } catch (JSONException e) {
-            logger.warn(e, e);
-        }
+            statusUpdateLock.lock();
 
-        // 5. Handle status update if a service seem to have disappeared
-
-        // 5.1 Test if any additional node should be check for being live
-        Set<String> systemStatusIpAddresses = systemStatus.getIpAddresses();
-        Set<String> additionalIpToTests = servicesInstallationStatus.getIpAddresses().stream()
-                .filter(ip -> !systemStatusIpAddresses.contains(ip))
-                .collect(Collectors.toSet());
-
-        Set<String> liveIps = new HashSet<>(systemStatusIpAddresses);
-        for (String ipAddress : additionalIpToTests) {
-
-            // find out if SSH connection to host can succeed
-            try {
-                String ping = sendPing(ipAddress);
-
-                if (ping.startsWith("OK")) {
-                    liveIps.add(ipAddress);
-                }
-            } catch (SSHCommandException e) {
-                logger.debug(e, e);
+            // special case at application startup : if the UI request comes before the first status update
+            if (lastStatusException == null && lastStatus == null) {
+                updateStatus();
             }
+
+            if (lastStatusException != null) {
+                throw new StatusExceptionWrapperException (lastStatusException);
+            }
+            return lastStatus;
+        } finally {
+            statusUpdateLock.unlock();
         }
-
-        handleStatusChanges (servicesInstallationStatus, systemStatus, liveIps);
-
-        // 6. return result
-        return systemStatus;
     }
 
-    String sendPing(String ipAddress) throws SSHCommandException {
-        return sshCommandService.runSSHScript(ipAddress, "echo OK", false);
-    }
+    public void updateStatus() {
 
-
-    public void applyNodesConfig(OperationsCommand command)
-            throws SystemException, ServiceDefinitionException, NodesConfigurationException {
-
-        logger.info ("Starting System Deployment Operations.");
-        boolean success = false;
-        setProcessingPending();
         try {
+            statusUpdateLock.lock();
 
-            NodesConfigWrapper rawNodesConfig = command.getRawConfig();
-            NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
+            lastStatusException = null;
+            lastStatus = null;
 
-            Set<String> liveIps = new HashSet<>();
-            Set<String> deadIps = new HashSet<>();
+            // 0. Build returned status
+            SystemStatusWrapper systemStatus = SystemStatusWrapper.empty();
 
-            List<Pair<String, String>> nodesSetup = buildDeadIps(command.getAllIpAddresses(), nodesConfig, liveIps, deadIps);
-            if (nodesSetup == null) {
-                return;
-            }
+            // 1. Load Node Config
+            NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
 
-            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
+            // 1.1. Load Node status
+            ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
-            if (isInterrupted()) {
-                return;
-            }
+            // 1.2 flag services needing restart
+            if (rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
 
-            MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
+                NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-            // Nodes setup
-            this.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
-                    (operation, error) -> {
-                        String ipAddress = operation.getValue();
-                        if (nodesConfig.getIpAddresses().contains(ipAddress) && liveIps.contains(ipAddress)) {
+                // 2. Build merged status
+                final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
+                final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismStatusThreadCount);
 
-                            if (!isInterrupted() && (error.get() == null && !isInstalledOnNode("base_system", ipAddress))) {
-                                systemOperationService.applySystemOperation("Installation of Base System on " + ipAddress,
-                                        builder -> installEskimoBaseSystem(builder, ipAddress), null);
+                for (Pair<String, String> nbrAndPair : nodesConfig.getNodeAdresses()) {
 
-                                flagInstalledOnNode("base_system", ipAddress);
-                            }
+                    int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
+                    String ipAddress = nbrAndPair.getValue();
+                    String nodeName = ipAddress.replace(".", "-");
 
-                            // topology
-                            if (!isInterrupted() && (error.get() == null)) {
-                                systemOperationService.applySystemOperation("Installation of Topology and settings on " + ipAddress,
-                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, ipAddress, deadIps), null);
-                            }
+                    statusMap.put(("node_nbr_" + nodeName), "" + nodeNbr);
+                    statusMap.put(("node_address_" + nodeName), ipAddress);
 
-                            if (!isInterrupted() && (error.get() == null && !isInstalledOnNode("mesos", ipAddress))) {
-                                systemOperationService.applySystemOperation("Installation of Mesos on " + ipAddress,
-                                        builder -> {
-                                            uploadMesos(ipAddress);
-                                            builder.append (installMesos(ipAddress));
-                                        }, null);
-
-                                flagInstalledOnNode("mesos", ipAddress);
-                            }
+                    threadPool.execute(() -> {
+                        try {
+                            fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);
+                        } catch (SystemException e) {
+                            logger.error(e, e);
+                            throw new PooledOperationException(e);
                         }
                     });
+                }
 
-            // first thing first, flag services that need to be restarted as "needing to be restarted"
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
-                    command.getRestarts(), nodesConfig, deadIps)) {
-                for (Pair<String, String> operation : restarts) {
-                    try {
-                        configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                            String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            String nodeName = ipAddress.replace(".", "-");
-                            if (ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
-                                nodeName = MarathonService.MARATHON_NODE;
+                threadPool.shutdown();
+                try {
+                    threadPool.awaitTermination(operationWaitTimoutSeconds, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    logger.error(e, e);
+                }
+
+                // fetch marathon services status
+                try {
+                    marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallationStatus);
+                } catch (MarathonException e) {
+                    logger.debug(e, e);
+                    // workaround : flag all marathon services as KO on marathon node
+                    String marathonIpAddress = marathonService.findUniqueServiceIP("marathon");
+                    if (StringUtils.isNotBlank(marathonIpAddress)) {
+                        String marathonNode = marathonIpAddress.replace(".", "-");
+                        MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+                        for (String service : servicesDefinition.listMarathonServices()) {
+                            if (marathonService.shouldInstall(marathonConfig, service)) {
+                                statusMap.put(SERVICE_PREFIX + service + "_" + marathonNode, "KO");
                             }
-                            servicesInstallationStatus.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "restart");
-                        });
-                    } catch (FileException | SetupException e) {
-                        logger.error (e, e);
-                        throw new SystemException(e);
+                        }
                     }
                 }
-            }
 
-            // Installation in batches (groups following dependencies)
-            for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (
-                    command.getInstallations(), nodesConfig, deadIps)) {
-
-                performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
-                        (operation, error) -> {
-                            String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (liveIps.contains(ipAddress)) {
-                                installService(service, ipAddress);
-                            }
-                        });
-            }
-
-            // uninstallations
-            List<List<Pair<String, String>>> orderedUninstallations =  servicesInstallationSorter.orderOperations (
-                    command.getUninstallations(), nodesConfig, deadIps);
-            Collections.reverse(orderedUninstallations);
-
-            for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
-                performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
-                        (operation, error) -> {
-                            String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (!deadIps.contains(ipAddress)) {
-                                uninstallService(service, ipAddress);
-                            } else {
-                                if (!liveIps.contains(ipAddress)) {
-                                    // this means that the node has been de-configured
-                                    // (since if it is neither dead nor alive then it just hasn't been tested since it's not
-                                    // in the config anymore)
-                                    // just consider it uninstalled
-                                    uninstallServiceNoOp(service, ipAddress);
-                                }
-                            }
-                        });
-            }
-
-            // restarts
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
-                    command.getRestarts(), nodesConfig, deadIps)) {
-                performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
-                        (operation, error) -> {
-                            String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (ipAddress.equals(OperationsCommand.MARATHON_FLAG) || liveIps.contains(ipAddress)) {
-                                restartServiceForSystem(service, ipAddress);
-                            }
-                        });
-            }
-
-            if (!isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getIpAddresses()))) {
-                throw new SystemException("At least one configured node was found dead");
-            }
-
-            success = true;
-        } finally {
-            setLastOperationSuccess (success);
-            releaseProcessingPending();
-            logger.info ("System Deployment Operations Completed.");
-        }
-    }
-
-    List<Pair<String, String>> buildDeadIps(Set<String> allIpAddresses, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
-        List<Pair<String, String>> nodesSetup = new ArrayList<>();
-
-        // Find out about dead IPs
-        Set<String> ipAddressesToTest = new HashSet<>(allIpAddresses);
-        ipAddressesToTest.addAll(nodesConfig.getIpAddresses());
-        for (String ipAddress : ipAddressesToTest) {
-
-            if (!ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
-
-                // handle potential interruption request
-                if (isInterrupted()) {
-                    return null;
+                // fill in systemStatus
+                for (String key : statusMap.keySet()) {
+                    String value = statusMap.get(key);
+                    systemStatus.setValueForPath(key, value);
                 }
+            }
 
-                nodesSetup.add(new Pair<>("node_setup", ipAddress));
+            // 4. If a service disappeared, post notification
+            try {
+                checkServiceDisappearance(systemStatus);
+            } catch (JSONException e) {
+                logger.warn(e, e);
+            }
 
-                // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
+            // 5. Handle status update if a service seem to have disappeared
+
+            // 5.1 Test if any additional node should be check for being live
+            Set<String> systemStatusIpAddresses = systemStatus.getIpAddresses();
+            Set<String> additionalIpToTests = servicesInstallationStatus.getIpAddresses().stream()
+                    .filter(ip -> !systemStatusIpAddresses.contains(ip))
+                    .collect(Collectors.toSet());
+
+            Set<String> configuredAddressesAndOtherLiveAddresses = new HashSet<>(systemStatusIpAddresses);
+            for (String ipAddress : additionalIpToTests) {
 
                 // find out if SSH connection to host can succeed
                 try {
                     String ping = sendPing(ipAddress);
 
-                    if (!ping.startsWith("OK")) {
-
-                        handleNodeDead(deadIps, ipAddress);
-                    } else {
-                        liveIps.add(ipAddress);
+                    if (ping.startsWith("OK")) {
+                        configuredAddressesAndOtherLiveAddresses.add(ipAddress);
                     }
                 } catch (SSHCommandException e) {
                     logger.debug(e, e);
-                    handleNodeDead(deadIps, ipAddress);
                 }
             }
-        }
 
-        if (!deadIps.isEmpty()) {
-            messagingService.addLines("\n");
+            handleStatusChanges(servicesInstallationStatus, systemStatus, configuredAddressesAndOtherLiveAddresses);
+
+            lastStatus = systemStatus;
+
+        } catch (SystemException | NodesConfigurationException | FileException | SetupException  e) {
+
+            logger.error (e, e);
+            lastStatusException = e;
+
+        } finally {
+            statusUpdateLock.unlock();
         }
-        return nodesSetup;
+    }
+
+    String sendPing(String ipAddress) throws SSHCommandException {
+        return sshCommandService.runSSHScript(ipAddress, "echo OK", false);
     }
 
     <T> void performPooledOperation(
@@ -636,80 +495,6 @@ public class SystemService {
             logger.warn ("Throwing " + error.get().getClass() + ":" + error.get().getMessage() + " as SystemException") ;
             throw new SystemException(error.get().getMessage(), error.get());
         }
-    }
-
-    void handleNodeDead(Set<String> deadIps, String ipAddress) {
-        messagingService.addLines("\nNode seems dead " + ipAddress);
-        notificationService.addError("Node " + ipAddress + " is dead.");
-        deadIps.add(ipAddress);
-    }
-
-    private void flagInstalledOnNode(String installation, String ipAddress) throws SystemException {
-        try {
-            sshCommandService.runSSHCommand(ipAddress, "sudo bash -c \"echo OK > /etc/eskimo_flag_" + installation + "_installed\"");
-        } catch (SSHCommandException e) {
-            logger.error(e, e);
-            throw new SystemException(e.getMessage(), e);
-        }
-    }
-
-    private boolean isInstalledOnNode(String installation, String ipAddress) {
-
-        try {
-            messagingService.addLine("\nChecking " + installation + " on node " + ipAddress);
-            String result = sshCommandService.runSSHCommand(ipAddress, "cat /etc/eskimo_flag_" + installation + "_installed");
-            return result.contains("OK");
-        } catch (SSHCommandException e) {
-            logger.debug(e, e);
-            return false;
-        }
-    }
-
-    void restartServiceForSystem(String service, String ipAddress) throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-
-        if (servicesDefinition.getService(service).isMarathon()) {
-
-            systemOperationService.applySystemOperation("Restart of " + service + " on marathon node ",
-                    builder -> {
-                        try {
-                            builder.append(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(service)));
-                        } catch (MarathonException e) {
-                            logger.error (e, e);
-                            throw new SystemException (e);
-                        }
-                    },
-                    status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + MarathonService.MARATHON_NODE, "OK") );
-
-        } else {
-            systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
-                    builder -> builder.append(sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
-                    status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
-        }
-    }
-
-    void uninstallService(String service, String ipAddress) throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
-                builder -> proceedWithServiceUninstallation(builder, ipAddress, service),
-                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
-        proxyManagerService.removeServerForService(service, ipAddress);
-    }
-
-    void uninstallServiceNoOp(String service, String ipAddress) throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
-                builder -> {},
-                status -> status.removeRootKey(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName));
-        proxyManagerService.removeServerForService(service, ipAddress);
-    }
-
-    void installService(String service, String ipAddress)
-            throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("installation of " + service + " on " + ipAddress,
-                builder -> proceedWithServiceInstallation(builder, ipAddress, service),
-                status -> status.setValueForPath(service + OperationsCommand.INSTALLED_ON_IP_FLAG + nodeName, "OK"));
     }
 
     void fetchNodeStatus
@@ -812,8 +597,9 @@ public class SystemService {
     }
 
     public void handleStatusChanges(
-            ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> liveIps)
-            throws FileException, SetupException {
+            ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus,
+            Set<String> configuredAddressesAndOtherLiveAddresses)
+                throws FileException, SetupException {
 
         // If there is some processing pending, then nothing is reliable, just move on
         if (!isProcessingPending()) {
@@ -844,7 +630,7 @@ public class SystemService {
                             }
 
                             String marathonStatus = systemStatus.getValueForPathAsString(SystemService.SERVICE_PREFIX + "marathon" + "_" + marathonNodeName);
-                            if (StringUtils.isBlank(marathonStatus) || marathonStatus.equals("NA")) {
+                            if (StringUtils.isBlank(marathonStatus) || !marathonStatus.equals("OK")) {
                                 //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
                                 continue;
                             }
@@ -857,33 +643,59 @@ public class SystemService {
                             }
                         }
 
+                        String nodeIp = nodeName == null ? null : nodeName.replace("-", ".");
+
                         Boolean nodeAlive = StringUtils.isNotBlank(nodeName) ? systemStatus.isNodeAlive (nodeName) : Boolean.FALSE;
+
+                        // A. In case target node both configured and up, check services actual statuses before doing anything
+                        if (    // nodes is configured and responding (up and running
+//                                (
+                                        nodeAlive != null && nodeAlive.booleanValue()
+//                                )
+//                             ||
+                                // node is not configured anymore (has been removed, but it is still up and responding and it runs services)
+                                // in this case we want to attempt uninstallation, thus not removing services if they are up
+//                                (nodeIp != null && configuredAddressesAndOtherLiveAddresses.contains(nodeIp) ) ) {
+) {
+
+                            if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
+                                changes = true;
+                            }
+                        }
+
+                        // B. if node is both down and not configured anymore, we just remove all services whatever their statuses
+                        if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
+                            if (countErrorAndRemoveServices(servicesInstallationStatus, serviceStatusFullString, savedService, nodeName)) {
+                                changes = true;
+                            }
+                        }
+
+                        // C. In other cases, node is configued but down => don't touch anything
+
+                        /*
                         // this means that node is not configured anymore ! (no status has been obtained)
                         if (nodeAlive == null) {
 
                             // => we want to consider removing services in any case if not is not only not configured anymore but down
                             // so if node is down in addition to being not configured anymore, we remove all services from saved install stazus
-                            String nodeIp = nodeName == null ? null : nodeName.replace("-", ".");
-                            if (nodeIp == null && !liveIps.contains(nodeIp)) {
-                                if (countErrorAndRemoveServices(servicesInstallationStatus, serviceStatusFullString, savedService, nodeName)) {
-                                    changes = true;
-                                }
-                            }
+                            if (nodeIp == null && !configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
 
-                            // on the other hand if node is not configured but up, we want to attempt uninstallation, thus
-                            // not removing services if they are up
+                            }
+                            // on the other hand if node is not configured but up,
                             else {
                                 if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
                                     changes = true;
                                 }
                             }
 
-                        } else if (nodeAlive) { // this means that the node is configured and up
+                        }
+                        else if (nodeAlive) { // this means that the node is configured and up
 
                             if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
                                 changes = true;
                             }
                         } // else if node is configured but down, don't do anything
+                        */
                     }
                 }
 
@@ -987,196 +799,6 @@ public class SystemService {
         }
     }
 
-
-    String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
-            throws SystemException, SSHCommandException, IOException {
-
-        File tempTopologyFile = createTempFile("eskimo_topology", ipAddress, ".sh");
-        try {
-            FileUtils.delete(tempTopologyFile);
-        } catch (FileUtils.FileDeleteFailedException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        }
-        try {
-            FileUtils.writeFile(tempTopologyFile, servicesDefinition
-                    .getTopology(nodesConfig, marathonConfig, deadIps, ipAddress)
-                    .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (ipAddress)));
-        } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        }
-        sshCommandService.copySCPFile(ipAddress, tempTopologyFile.getAbsolutePath());
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempTopologyFile.getName(), "/etc/eskimo_topology.sh"});
-        sshChmod755(ipAddress, "/etc/eskimo_topology.sh");
-
-        try {
-            ServicesConfigWrapper servicesConfig = servicesConfigService.loadServicesConfigNoLock();
-
-            File tempServicesSettingsFile = createTempFile("eskimo_services-config", ipAddress, ".json");
-            try {
-                FileUtils.delete(tempServicesSettingsFile);
-            } catch (FileUtils.FileDeleteFailedException e) {
-                logger.error (e, e);
-                throw new SystemException(e);
-            }
-
-            FileUtils.writeFile(tempServicesSettingsFile, servicesConfig.getFormattedValue());
-
-            sshCommandService.copySCPFile(ipAddress, tempServicesSettingsFile.getAbsolutePath());
-            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-config.json"});
-            sshChmod755(ipAddress, "/etc/eskimo_services-config.json");
-
-
-        } catch (FileException | SetupException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        }
-
-        return null;
-    }
-
-    private void sshChmod755 (String ipAddress, String file) throws SSHCommandException {
-        sshChmod (ipAddress, file, "755");
-    }
-
-    private void sshChmod (String ipAddress, String file, String mode) throws SSHCommandException {
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", mode, file});
-    }
-
-    private void uploadMesos(String ipAddress) throws SSHCommandException, SystemException {
-
-        messagingService.addLines(" - Uploading mesos distribution");
-        String mesosFlavour = "mesos-" + getNodeFlavour(ipAddress);
-
-        File packageDistributionDir = new File (packageDistributionPath);
-
-        String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
-        File mesosDistrib = new File (packageDistributionDir, mesosFileName);
-
-        sshCommandService.copySCPFile(ipAddress, mesosDistrib.getAbsolutePath());
-    }
-
-    private String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
-        // Find out if debian or RHEL or SUSE
-        String flavour = null;
-        String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-        if (rawIsDebian.contains("debian")) {
-            flavour = "debian";
-        }
-
-        if (flavour == null) {
-            String rawIsRedHat = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
-            if (rawIsRedHat.contains("redhat")) {
-                flavour = "redhat";
-            }
-        }
-
-        if (flavour == null) {
-            String rawIsSuse = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
-            if (rawIsSuse.contains("suse")) {
-                flavour = "suse";
-            }
-        }
-
-        if (flavour == null) {
-            throw new SystemException ("Unknown OS flavour. None of the known OS type marker files has been found.");
-        }
-        return flavour;
-    }
-
-    private String installMesos(String ipAddress) throws SSHCommandException {
-        return sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-mesos.sh");
-    }
-
-    private void copyCommand (String source, String target, String ipAddress) throws SSHCommandException {
-        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/" + source);
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", source, target});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", target});
-        sshChmod755(ipAddress, target);
-    }
-
-    private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
-        sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
-
-        sb.append(" - Copying jq program\n");
-        copyCommand ("jq-1.6-linux64", USR_LOCAL_BIN_JQ, ipAddress);
-
-        sb.append(" - Copying mesos-cli script\n");
-        copyCommand ("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, ipAddress);
-
-        sb.append(" - Copying gluster-mount script\n");
-        copyCommand ("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, ipAddress);
-
-        connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
-    }
-
-    private String proceedWithServiceUninstallation(StringBuilder sb, String ipAddress, String service)
-            throws SSHCommandException, SystemException {
-
-        // 1. Calling uninstall.sh script if it exists
-        File containerFolder = new File(servicesSetupPath + "/" + service);
-        if (!containerFolder.exists()) {
-            throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
-        }
-
-        try {
-            File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
-            if (uninstallScriptFile.exists()) {
-                sb.append(" - Calling uninstall script\n");
-
-                sb.append(sshCommandService.runSSHScriptPath(ipAddress, uninstallScriptFile.getAbsolutePath()));
-            }
-        } catch (SSHCommandException e) {
-            logger.warn (e, e);
-            sb.append (e.getMessage());
-        }
-
-        // 2. Stop service
-        sb.append(" - Stopping Service\n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + service);
-
-        // 3. Uninstall systemd service file
-        sb.append(" - Removing systemd Service File\n");
-        // Find systemd unit config files directory
-        String foundStandardFlag = sshCommandService.runSSHScript(ipAddress, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
-        if (foundStandardFlag.contains("found_standard")) {
-            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
-        } else {
-            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");
-        }
-
-        // 4. Delete docker container
-        sb.append(" - Removing docker container \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo docker rm -f " + service + " || true ");
-
-        // 5. Delete docker image
-        sb.append(" - Removing docker image \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
-
-        // 6. Reloading systemd daemon
-        sb.append(" - Reloading systemd daemon \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl daemon-reload");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl reset-failed");
-
-        return sb.toString();
-    }
-
-    private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String service)
-            throws IOException, SystemException, SSHCommandException {
-
-        String imageName = servicesDefinition.getService(service).getImageName();
-
-        sb.append(" - Creating archive and copying it over\n");
-        File tmpArchiveFile = createRemotePackageFolder(sb, ipAddress, service, imageName);
-
-        // 4. call setup script
-        installationSetup(sb, ipAddress, service);
-
-        // 5. cleanup
-        installationCleanup(sb, ipAddress, service, imageName, tmpArchiveFile);
-    }
-
     void installationSetup(StringBuilder sb, String ipAddress, String service) throws SystemException {
         try {
             exec(ipAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
@@ -1210,6 +832,62 @@ public class SystemService {
         }
     }
 
+    void exec(String ipAddress, StringBuilder sb, String[] setupScript) throws SSHCommandException {
+        sb.append(sshCommandService.runSSHCommand(ipAddress, setupScript));
+    }
+
+    void exec(String ipAddress, StringBuilder sb, String command) throws SSHCommandException {
+        sb.append(sshCommandService.runSSHCommand(ipAddress, command));
+    }
+
+    List<Pair<String, String>> buildDeadIps(Set<String> allIpAddresses, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
+        List<Pair<String, String>> nodesSetup = new ArrayList<>();
+
+        // Find out about dead IPs
+        Set<String> ipAddressesToTest = new HashSet<>(allIpAddresses);
+        ipAddressesToTest.addAll(nodesConfig.getIpAddresses());
+        for (String ipAddress : ipAddressesToTest) {
+
+            if (!ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
+
+                // handle potential interruption request
+                if (isInterrupted()) {
+                    return null;
+                }
+
+                nodesSetup.add(new Pair<>("node_setup", ipAddress));
+
+                // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
+
+                // find out if SSH connection to host can succeed
+                try {
+                    String ping = sendPing(ipAddress);
+
+                    if (!ping.startsWith("OK")) {
+
+                        handleNodeDead(deadIps, ipAddress);
+                    } else {
+                        liveIps.add(ipAddress);
+                    }
+                } catch (SSHCommandException e) {
+                    logger.debug(e, e);
+                    handleNodeDead(deadIps, ipAddress);
+                }
+            }
+        }
+
+        if (!deadIps.isEmpty()) {
+            messagingService.addLines("\n");
+        }
+        return nodesSetup;
+    }
+
+    void handleNodeDead(Set<String> deadIps, String ipAddress) {
+        messagingService.addLines("\nNode seems dead " + ipAddress);
+        notificationService.addError("Node " + ipAddress + " is dead.");
+        deadIps.add(ipAddress);
+    }
+
     File createRemotePackageFolder(StringBuilder sb, String ipAddress, String service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
@@ -1234,7 +912,7 @@ public class SystemService {
         File archive = new File(tempDir + "/" + tmpArchiveFile.getName());
         FileUtils.createTarFile(servicesSetupPath + "/" + service, archive);
         if (!archive.exists()) {
-            throw new SystemException("Could not create archive for service " + service + " : " + TMP_PATH_PREFIX +  tmpArchiveFile.getName());
+            throw new SystemException("Could not create archive for service " + service + " : " + SystemService.TMP_PATH_PREFIX +  tmpArchiveFile.getName());
         }
 
         // 2. copy it over to target node and extract it
@@ -1242,11 +920,11 @@ public class SystemService {
         // 2.1
         sshCommandService.copySCPFile(ipAddress, archive.getAbsolutePath());
 
-        exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
-        exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
-        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " " + TMP_PATH_PREFIX + service + ".tgz");
-        exec(ipAddress, sb, "tar xfz " + TMP_PATH_PREFIX + service + ".tgz --directory=" + TMP_PATH_PREFIX);
-        exec(ipAddress, sb, "chmod 755 " + TMP_PATH_PREFIX + service + "/setup.sh");
+        exec(ipAddress, sb, "rm -Rf " +SystemService. TMP_PATH_PREFIX + service);
+        exec(ipAddress, sb, "rm -f " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
+        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
+        exec(ipAddress, sb, "tar xfz " + SystemService.TMP_PATH_PREFIX + service + ".tgz --directory=" + SystemService.TMP_PATH_PREFIX);
+        exec(ipAddress, sb, "chmod 755 " + SystemService.TMP_PATH_PREFIX + service + "/setup.sh");
 
         // 2.2 delete local archive
         try {
@@ -1266,9 +944,9 @@ public class SystemService {
                 sb.append(" - Copying over docker image " + imageFileName + "\n");
                 sshCommandService.copySCPFile(ipAddress, packageDistributionPath + "/" + imageFileName);
 
-                exec(ipAddress, sb, new String[]{"mv", imageFileName, TMP_PATH_PREFIX + service + "/"});
+                exec(ipAddress, sb, new String[]{"mv", imageFileName, SystemService.TMP_PATH_PREFIX + service + "/"});
 
-                exec(ipAddress, sb, new String[]{"ln", "-s", TMP_PATH_PREFIX + service + "/" + imageFileName, TMP_PATH_PREFIX + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
+                exec(ipAddress, sb, new String[]{"ln", "-s", SystemService.TMP_PATH_PREFIX + service + "/" + imageFileName, SystemService.TMP_PATH_PREFIX + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
 
             } else {
                 sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
@@ -1280,15 +958,6 @@ public class SystemService {
     File createTempFile(String service, String ipAddress, String extension) throws IOException {
         return File.createTempFile(service, extension);
     }
-
-    void exec(String ipAddress, StringBuilder sb, String[] setupScript) throws SSHCommandException {
-        sb.append(sshCommandService.runSSHCommand(ipAddress, setupScript));
-    }
-
-    void exec(String ipAddress, StringBuilder sb, String command) throws SSHCommandException {
-        sb.append(sshCommandService.runSSHCommand(ipAddress, command));
-    }
-
 
     interface PooledOperation<T> {
         void call(T operation, AtomicReference<Exception> error)
@@ -1314,5 +983,15 @@ public class SystemService {
         PooledOperationException(Throwable cause) {
             super(cause);
         }
+    }
+
+    public static class StatusExceptionWrapperException extends Exception {
+
+        static final long serialVersionUID = -3317632123352221248L;
+
+        StatusExceptionWrapperException(Exception cause) {
+            super(cause);
+        }
+
     }
 }

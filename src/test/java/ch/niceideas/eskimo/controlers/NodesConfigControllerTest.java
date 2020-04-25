@@ -30,7 +30,7 @@ public class NodesConfigControllerTest {
             }
         });
 
-        ncc.setSystemService(new SystemService() {
+        ncc.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return false;
@@ -86,7 +86,7 @@ public class NodesConfigControllerTest {
             }
         });
 
-        ncc.setSystemService(new SystemService() {
+        ncc.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return false;
@@ -113,30 +113,28 @@ public class NodesConfigControllerTest {
 
         HttpSession session = createHttpSession(sessionContent);
 
-        ncc.setSystemService(new SystemService() {
+        ncc.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+            public void applyNodesConfig(OperationsCommand command) {
                 // No Op
             }
-
         });
 
         ncc.setConfigurationService(new ConfigurationService() {
             @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
+            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
                 // No Op
             }
             @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus(){
                 return StandardSetupHelpers.getStandard2NodesStatus();
             }
             @Override
-            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
+            public NodesConfigWrapper loadNodesConfig() {
                 return StandardSetupHelpers.getStandard2NodesSetup();
             }
             @Override
-            public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, JSONException, SetupException {
+            public void saveNodesConfig(NodesConfigWrapper nodesConfig) {
                 // No Op
             }
         });
@@ -185,13 +183,13 @@ public class NodesConfigControllerTest {
 
         HttpSession session = createHttpSession(sessionContent);
 
-        ncc.setSystemService(new SystemService() {
+        ncc.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
-            public void applyNodesConfig(OperationsCommand command)
-                    throws SystemException, JSONException, ServiceDefinitionException, NodesConfigurationException {
+            public void applyNodesConfig(OperationsCommand command) {
                 // No Op
             }
         });
+
         ncc.setConfigurationService(new ConfigurationService() {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
