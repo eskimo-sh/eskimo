@@ -192,6 +192,7 @@ function install_and_check_service_file() {
     sudo chmod 644 $systemd_units_dir/$1.service
 
     echo " - Reloading systemd config"
+    sleep 1 # hacky hack - I get weird and unexplainable errors here sometimes.
     sudo systemctl daemon-reload >> $2 2>&1
     fail_if_error $? "$2" -6
 

@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -49,8 +50,8 @@ public class MarathonOperationsCommand implements Serializable {
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
 
-    private ArrayList<String> installations = new ArrayList<>();
-    private ArrayList<String> uninstallations = new ArrayList<>();
+    private final ArrayList<String> installations = new ArrayList<>();
+    private final ArrayList<String> uninstallations = new ArrayList<>();
     private String warnings = null;
 
     // TODO marathon dependent services not supported for now
@@ -90,7 +91,33 @@ public class MarathonOperationsCommand implements Serializable {
         }
 
         // 3. If Marathon is not available, issue a warning in regards to what is going to happen
-        // TODO
+        if (retCommand.hasChanges()) {
+            try {
+                SystemStatusWrapper lastStatus = systemService.getStatus();
+
+                String marathonNodeName = lastStatus.getFirstNodeName("marathon");
+                if (StringUtils.isBlank(marathonNodeName)) {
+                    retCommand.setWarnings("Marathon is not available. The changes in marathon services configuration and " +
+                            "deployments will be saved but they will <b>need to be applied again</b> another time when " +
+                            "marathon is available");
+
+                } else {
+
+                    if (!lastStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
+
+                        retCommand.setWarnings("Marathon is not properly running. The changes in marathon services configuration and " +
+                                "deployments will be saved but they will <b>need to be applied again</b> another time when " +
+                                "marathon is available");
+                    }
+                }
+
+            } catch (SystemService.StatusExceptionWrapperException e) {
+
+                String warnings = "Couldn't get last marathon Service status to assess feasibility of marathon setup\n";
+                warnings += e.getCause().getCause() + ":" + e.getCause().getMessage();
+                retCommand.setWarnings(warnings);
+            }
+        }
 
         return retCommand;
     }
@@ -119,10 +146,23 @@ public class MarathonOperationsCommand implements Serializable {
         return uninstallations;
     }
 
+    public String getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(String warnings) {
+        this.warnings = warnings;
+    }
+
+    public boolean hasChanges() {
+        return installations.size() > 0 || uninstallations.size() > 0;
+    }
+
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("installations", new JSONArray(installations));
             put("uninstallations", new JSONArray(uninstallations));
+            put("warnings", warnings);
         }});
     }
 }

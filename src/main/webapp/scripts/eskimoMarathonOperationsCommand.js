@@ -96,6 +96,17 @@ eskimo.MarathonOperationsCommand = function() {
         commandDescription += "<br>";
         */
 
+        if (command.warnings && command.warnings != null && command.warnings.trim() != "") {
+
+            commandDescription = commandDescription +
+                '<div class="col-xs-12 col-md-12">' +
+                '<div class="alert alert-warning" role="alert">' +
+                command.warnings
+                '</div>' +
+                '</div>';
+
+        }
+
         $("#marathon-operations-command-body").html(commandDescription);
 
         $('#marathon-operations-command-modal').modal("show");

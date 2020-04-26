@@ -38,7 +38,6 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
-import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
@@ -763,7 +761,7 @@ public class SystemService {
             for (String serviceStatusFlag : systemStatus.getRootKeys()) {
 
                 // if service is currently not OK but was previously OK
-                if (!systemStatus.isServiceOK(serviceStatusFlag) && lastStatus.isServiceOK(serviceStatusFlag)) {
+                if (!systemStatus.isServiceStatusFlagOK(serviceStatusFlag) && lastStatus.isServiceStatusFlagOK(serviceStatusFlag)) {
 
                     logger.warn("For service " + serviceStatusFlag + " - previous status was OK and status is " + systemStatus.getValueForPath(serviceStatusFlag));
                     notificationService.addError("Service " + SystemStatusWrapper.getServiceName(serviceStatusFlag)

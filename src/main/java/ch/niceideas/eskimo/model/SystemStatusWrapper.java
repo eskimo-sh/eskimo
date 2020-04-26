@@ -112,11 +112,11 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         return nodeAliveFlag.equals("OK") ? Boolean.TRUE : Boolean.FALSE;
     }
 
-    public boolean isServiceOK(String service) {
+    public boolean isServiceStatusFlagOK(String serviceStatusFlag) {
         try {
-            return getValueForPath(service) != null
-                    && (getValueForPath(service).equals("OK")
-                    || getValueForPath(service).equals("restart"));
+            return getValueForPath(serviceStatusFlag) != null
+                    && (getValueForPath(serviceStatusFlag).equals("OK")
+                    || getValueForPath(serviceStatusFlag).equals("restart"));
         } catch (JSONException e) {
             logger.debug (e, e);
             return false;

@@ -224,7 +224,7 @@ public class MarathonServicesConfigController {
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
             session.removeAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
 
-            // newNodesStatus is null in case of nodes config change (as opposed to forced reinstall)
+            // newNodesStatus is null in case of marathon services config update (as opposed to forced reinstall)
             if (newServicesInstallationStatus != null) {
                 configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
             }
@@ -235,7 +235,7 @@ public class MarathonServicesConfigController {
 
             return "{\"status\": \"OK\" }";
 
-        } catch (SystemException e) {
+        } catch (MarathonException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createEncodedErrorStatus(e);
 

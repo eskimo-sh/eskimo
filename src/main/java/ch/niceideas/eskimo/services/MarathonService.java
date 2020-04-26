@@ -298,7 +298,7 @@ public class MarathonService {
         return new Pair<>(null, "notOK");
     }
 
-    public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws SystemException {
+    public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws MarathonException {
 
         logger.info ("Starting Marathon Deployment Operations");
         boolean success = false;
@@ -313,6 +313,7 @@ public class MarathonService {
                 String message = "Marathon doesn't seem to be installed";
                 notificationService.addError(message);
                 messagingService.addLines(message);
+                messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
                 throw new SystemException(message);
             }
 
@@ -329,11 +330,18 @@ public class MarathonService {
             List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<String>(){{add(marathonIpAddress);}}, nodesConfig, liveIps, deadIps);
 
             if (deadIps.contains(marathonIpAddress)) {
-                String message = "The marathon node is dead. cannot proceed any further with installation";
+                String message = "The marathon node is dead. cannot proceed any further with installation.";
                 notificationService.addError(message);
                 messagingService.addLines(message);
-                throw new SystemException(message);
+                messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
+                throw new MarathonException(message);
             }
+
+            if (systemService.isInterrupted()) {
+                return;
+            }
+
+            ensureMarathonAvailability();
 
             if (systemService.isInterrupted()) {
                 return;
@@ -387,13 +395,51 @@ public class MarathonService {
             */
 
             success = true;
-        } catch (FileException | SetupException e) {
+        } catch (FileException | SetupException | SystemException e) {
             logger.error (e, e);
-            throw new SystemException(e);
+            messagingService.addLines (e.getMessage());
+            notificationService.addError("Marathon Services installation failed !");
+            throw new MarathonException(e);
         } finally {
             systemService.setLastOperationSuccess (success);
             systemService.releaseProcessingPending();
             logger.info ("Marathon Deployment Operations Completed.");
+        }
+    }
+
+    void ensureMarathonAvailability() throws MarathonException {
+        try {
+            SystemStatusWrapper lastStatus = systemService.getStatus();
+
+            String marathonNodeName = lastStatus.getFirstNodeName("marathon");
+            if (StringUtils.isBlank(marathonNodeName)) {
+                String message = "Marathon is not available";
+                notificationService.addError(message);
+                messagingService.addLines("Marathon is not available. The changes in marathon services configuration and " +
+                        "deployments are saved but they will need to be applied again another time when " +
+                        "marathon is available");
+                throw new MarathonException(message);
+            } else {
+
+                if (!lastStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
+
+                    String message = "Marathon is not properly running";
+                    notificationService.addError(message);
+                    messagingService.addLines("Marathon is not properly running. The changes in marathon services configuration and " +
+                            "deployments are saved but they will need to be applied again another time when " +
+                            "marathon is available");
+                    throw new MarathonException(message);
+                }
+            }
+
+        } catch (SystemService.StatusExceptionWrapperException e) {
+
+            String message = "Couldn't get last marathon Service status";
+            notificationService.addError(message);
+            String warnings = "Couldn't get last marathon Service status to assess feasibility of marathon setup\n";
+            warnings += e.getCause().getCause() + ":" + e.getCause().getMessage();
+            messagingService.addLines(warnings);
+            throw new MarathonException(message);
         }
     }
 
@@ -573,6 +619,7 @@ public class MarathonService {
     }
 
     public void showJournalMarathon(Service service) throws MarathonException, SSHCommandException {
+        ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), "marathon node", "Showing journal", () -> showJournalMarathonInternal(service));
     }
 
@@ -714,6 +761,7 @@ public class MarathonService {
     }
 
     public void startServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+        ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), "marathon node", "Starting", () -> startServiceMarathonInternal(service));
     }
 
@@ -753,6 +801,7 @@ public class MarathonService {
     }
 
     public void  stopServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+        ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> stopServiceMarathonInternal(service));
     }
 
@@ -792,6 +841,7 @@ public class MarathonService {
     }
 
     public void restartServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+        ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> restartServiceMarathonInternal(service));
     }
 
