@@ -332,8 +332,9 @@ Variables")
 In order to run eskimo, one needs to have
 
 * At least 8Gb of disk storage space on the machine running Eskimo
-* At least one linux machine available on the network (can be the same machine than the one running Eskimo). See next
-section regarding requirements for that node.
+* *At least one linux machine* available on the network (can be the same machine than the one running Eskimo) that will
+be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
+the eskimo cluster.
 
 ==== Prerequisites on eskimo cluster nodes
 
@@ -346,6 +347,31 @@ Linux distributions successfully tested with Eskimo and officially supported are
 * OpenSUSE 15.1 and greater
 
 Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far.
+
+===== Minimum hardware
+
+The minimum hardware capacity requirements to run eskimo are as follows:
+
+*Multiple Nodes in the Eskimo cluster, minimum requirement for one node*
+
+In cases where the eskimo cluster runs on multiples nodes (two or more nodes), the minimum hardware capacity for one of these
+nodes is as follows:
+
+* 20 GB HDD storage space for the system, additional storage space depending on the data to be manipulated and the
+replication factor.
+* 4 CPUs (8 CPUs recommended)
+* 16 GB RAM (31 GB RAM recommended)
+
+*Single Machine Eskimo deployment, minimum requirement for the single node*
+
+In cases where Eskimo is deployed on a single node (such as the host node running Eskimo itself), the minumum hardware
+capacity for this node is as follows:
+
+* 30 GB HDD storage space for the system, additional storage space depending on the data to be manipulated.
+* 8 CPUs (16 CPUs recommended)
+* 32 GB RAM (64 GB RAM recommended)
+
+
 
 ===== Firewall open ports on eskimo nodes
 

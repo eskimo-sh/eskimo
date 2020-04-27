@@ -119,8 +119,11 @@ cd zeppelin/
 su $USER_TO_USE -c "./dev/change_scala_version.sh $SCALA_VERSION"  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
+echo " - HACK - Fixing ElasticSearch interpreter"
+sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
+
 echo " - build zeppelin with all interpreters"
-for i in `seq 1 5`; do
+for i in `seq 1 5`; do  # 5 attempts since sometimes download of packages fails
     echo "   + attempt $i"
     su $USER_TO_USE -c "mvn clean install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
     if [[ $? == 0 ]]; then
@@ -160,6 +163,28 @@ sudo ln -s /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT /usr/local/lib/zep
 #sudo /usr/local/lib/zeppelin/bin/install-interpreter.sh --name md,shell,jdbc,python,angular,elasticsearch,flink >> /tmp/zeppelin_install_log 2>&1
 #fail_if_error $? "/tmp/zeppelin_install_log" -1
 
+echo " - Removing unused interpreters"
+rm -Rf /usr/local/lib/zeppelin/interpreter/alluxio
+rm -Rf /usr/local/lib/zeppelin/interpreter/beam
+rm -Rf /usr/local/lib/zeppelin/interpreter/bigquery
+rm -Rf /usr/local/lib/zeppelin/interpreter/cassandra
+rm -Rf /usr/local/lib/zeppelin/interpreter/geode
+rm -Rf /usr/local/lib/zeppelin/interpreter/hazelcastjet
+rm -Rf /usr/local/lib/zeppelin/interpreter/hbase
+rm -Rf /usr/local/lib/zeppelin/interpreter/ignite
+rm -Rf /usr/local/lib/zeppelin/interpreter/kylin
+rm -Rf /usr/local/lib/zeppelin/interpreter/kotlin
+rm -Rf /usr/local/lib/zeppelin/interpreter/ksql
+rm -Rf /usr/local/lib/zeppelin/interpreter/lens
+rm -Rf /usr/local/lib/zeppelin/interpreter/livy
+rm -Rf /usr/local/lib/zeppelin/interpreter/mongodb
+rm -Rf /usr/local/lib/zeppelin/interpreter/neo4j
+rm -Rf /usr/local/lib/zeppelin/interpreter/pig
+rm -Rf /usr/local/lib/zeppelin/interpreter/sap
+rm -Rf /usr/local/lib/zeppelin/interpreter/scalding
+rm -Rf /usr/local/lib/zeppelin/interpreter/scio
+rm -Rf /usr/local/lib/zeppelin/interpreter/submarine
+
 
 
 echo " - Registering test cleaning traps"
@@ -179,7 +204,7 @@ echo " - Starting Zeppelin"
 export ZEPPELIN_PROC_ID=$!
 
 echo " - Checking Zeppelin startup"
-sleep 10
+sleep 30
 if [[ `ps -e | grep $ZEPPELIN_PROC_ID` == "" ]]; then
     echo " !! Failed to start Zeppelin !!"
     exit -8
@@ -191,9 +216,9 @@ export ZEPPELIN_PROC_ID=-1
 
 echo " - Cleaning up"
 returned_to_saved_dir
-sudo rm -Rf /tmp/zeppelin_setup
-sudo rm -Rf /tmp/zeppelin_build
-sudo rm -Rf /home/$USER_TO_USE
+#sudo rm -Rf /tmp/zeppelin_setup
+#sudo rm -Rf /tmp/zeppelin_build
+#sudo rm -Rf /home/$USER_TO_USE
 
 
 

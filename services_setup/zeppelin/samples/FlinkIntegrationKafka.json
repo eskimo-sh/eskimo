@@ -45,7 +45,7 @@
       "dateFinished": "2019-12-29T23:56:58+0000",
       "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:450"
+      "$$hashKey": "object:2512"
     },
     {
       "text": "%md\n\n### A) First program : reading Data from berka-payments index and periodically sending it to kafka input topic while also dumping on the console whatever comes on the kafka output topic\n\nThis first python program generates the input transactions by reading them from ElasticSearch. It takes care of sending these input transactions to the input kafka topic and also to read the results from the kafka output topic and dump these results on the console.\n\n**Important Notes**:\n\n* **The dataset used from ElasticSearch is the dataset computed by the “Spark Integration ES” Demo notebook**\n* **The constants `KAFKA_BOOTSTRAP_SERVER` and `ELASTICSEARCH_SERVER` must be redefined to point on one (or many) of your nodes running Kafka, respectively to one of your node running elasticsearch**\n* In order to stop this program, just cancel it's execution using the pause icon on the top right corner of the paragraph.\n",
@@ -91,12 +91,12 @@
       "dateStarted": "2019-12-29T23:08:51+0000",
       "dateFinished": "2019-12-29T23:08:51+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:451"
+      "$$hashKey": "object:2513"
     },
     {
-      "text": "%python\n\nfrom elasticsearch import Elasticsearch\nimport time, requests, json, sys, threading\nfrom threading import Thread, Lock\nfrom kafka import KafkaProducer, KafkaConsumer\nfrom kafka.errors import KafkaError\n\n\nKAFKA_BOOTSTRAP_SERVER=[\"192.168.10.13:9092\"]\nELASTICSEARCH_SERVER=\"localhost\"\n\ndef connect_kafka_producer():\n    _producer = None\n    try:\n        _producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER, api_version=(0, 10, 1))\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _producer\n\ndef connect_kafka_consumer():\n    _consumer = None\n    try:\n        _consumer = KafkaConsumer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,\n                         auto_offset_reset='latest',\n                         consumer_timeout_ms=3600000)\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _consumer\n\n\n# Cache reader class thread\nclass ReaderClass(threading.Thread):\n    def __init__(self):\n        threading.Thread.__init__(self)\n        self.event = threading.Event()\n        self.consumer = connect_kafka_consumer()\n        self.consumer.subscribe(['berka-payments-aggregate'])\n\n    def run(self):\n        for message in self.consumer:\n            if self.event.is_set():\n                if self.consumer is not None:\n                    self.consumer.close()\n                break\n            event = json.loads (message.value)\n            print (json.dumps (event))\n\n    def stop(self):\n        self.event.set()\n\ndef publish_message(producer_instance, topic_name, key, value):\n    try:\n        key_bytes = key.encode ('utf-8')\n        value_bytes = value.encode ('utf-8')\n        #print('sending')\n        producer_instance.send(topic_name, key=key_bytes, value=value_bytes)\n        #print('flushing')\n        producer_instance.flush()\n        #print('Message published successfully.')\n    except Exception as ex:\n        print('Exception in publishing message')\n        print ex  \n        sys.exit (-1);\n\n\nes = Elasticsearch([{'host': ELASTICSEARCH_SERVER, 'port': 9200}])\n\nkafka_producer = connect_kafka_producer()\n\n# Launch reader thread\nreader = ReaderClass()\nreader.start()\n\n\nres = es.search(index=\"berka-payments\", body={\"query\": {\"match_all\": {}}}, scroll='15m', search_type='query_then_fetch', size=10000)\n\nprint(\"%d documents found - %d fetchable\" % (res['hits']['total']['value'], len(res['hits']['hits'])) )\n\nsid = res['_scroll_id']\nscroll_size = res['hits']['total']['value']\n\ncounter = 0\nprint (\"Sending payments to kafka ...\")\n\n# Start scrolling\nwhile (scroll_size > 0):\n\n    page = es.scroll(scroll_id=sid, scroll='2m')\n\n    # Update the scroll ID\n    sid = page['_scroll_id']\n\n    # Get the number of results that we returned in the last scroll\n    scroll_size = len(page['hits']['hits'])\n\n    for cur in page[\"hits\"][\"hits\"]:\n        data = cur[\"_source\"]\n\n        publish_message(kafka_producer, 'berka-payments', data['trans_id'], json.dumps(data))\n\n        #print(\"(%s) - %s\" % (data['trans_id'], json.dumps(data)))\n\n        if counter % 10 == 0: \n            print (\"Sent %d payments. waiting 2 seconds\" % counter)\n            time.sleep(2) \n\n        counter = counter + 1 \n\nif kafka_producer is not None:\n    kafka_producer.close()\n    \ntime.sleep(8)     \n\nif reader is not None:\n    reader.stop()\n\n\n",
+      "text": "%python\n\nfrom elasticsearch import Elasticsearch\nimport time, requests, json, sys, threading\nfrom threading import Thread, Lock\nfrom kafka import KafkaProducer, KafkaConsumer\nfrom kafka.errors import KafkaError\n\n\nKAFKA_BOOTSTRAP_SERVER=[\"192.168.10.21:9092\",\"192.168.10.22:9092\"]\nELASTICSEARCH_SERVER=\"localhost\"\n\ndef connect_kafka_producer():\n    _producer = None\n    try:\n        _producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER, api_version=(0, 10, 1))\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _producer\n\ndef connect_kafka_consumer():\n    _consumer = None\n    try:\n        _consumer = KafkaConsumer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,\n                         auto_offset_reset='latest',\n                         consumer_timeout_ms=3600000)\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _consumer\n\n\n# Cache reader class thread\nclass ReaderClass(threading.Thread):\n    def __init__(self):\n        threading.Thread.__init__(self)\n        self.event = threading.Event()\n        self.consumer = connect_kafka_consumer()\n        self.consumer.subscribe(['berka-payments-aggregate'])\n\n    def run(self):\n        for message in self.consumer:\n            if self.event.is_set():\n                if self.consumer is not None:\n                    self.consumer.close()\n                break\n            event = json.loads (message.value)\n            print (json.dumps (event))\n\n    def stop(self):\n        self.event.set()\n\ndef publish_message(producer_instance, topic_name, key, value):\n    try:\n        key_bytes = key.encode ('utf-8')\n        value_bytes = value.encode ('utf-8')\n        #print('sending')\n        producer_instance.send(topic_name, key=key_bytes, value=value_bytes)\n        #print('flushing')\n        producer_instance.flush()\n        #print('Message published successfully.')\n    except Exception as ex:\n        print('Exception in publishing message')\n        print ex  \n        sys.exit (-1);\n\n\nes = Elasticsearch([{'host': ELASTICSEARCH_SERVER, 'port': 9200}])\n\nkafka_producer = connect_kafka_producer()\n\n# Launch reader thread\nreader = ReaderClass()\nreader.start()\n\n\nres = es.search(index=\"berka-payments\", body={\"query\": {\"match_all\": {}}}, scroll='15m', search_type='query_then_fetch', size=10000)\n\nprint(\"%d documents found - %d fetchable\" % (res['hits']['total']['value'], len(res['hits']['hits'])) )\n\nsid = res['_scroll_id']\nscroll_size = res['hits']['total']['value']\n\ncounter = 0\nprint (\"Sending payments to kafka ...\")\n\n# Start scrolling\nwhile (scroll_size > 0):\n\n    page = es.scroll(scroll_id=sid, scroll='2m')\n\n    # Update the scroll ID\n    sid = page['_scroll_id']\n\n    # Get the number of results that we returned in the last scroll\n    scroll_size = len(page['hits']['hits'])\n\n    for cur in page[\"hits\"][\"hits\"]:\n        data = cur[\"_source\"]\n\n        publish_message(kafka_producer, 'berka-payments', data['trans_id'], json.dumps(data))\n\n        #print(\"(%s) - %s\" % (data['trans_id'], json.dumps(data)))\n\n        if counter % 10 == 0: \n            print (\"Sent %d payments. waiting 2 seconds\" % counter)\n            time.sleep(2) \n\n        counter = counter + 1 \n\nif kafka_producer is not None:\n    kafka_producer.close()\n    \ntime.sleep(8)     \n\nif reader is not None:\n    reader.stop()\n\n\n",
       "user": "anonymous",
-      "dateUpdated": "2020-04-16T09:16:47+0000",
+      "dateUpdated": "2020-04-27T10:15:31+0000",
       "config": {
         "lineNumbers": true,
         "editorSetting": {
@@ -125,10 +125,10 @@
       "jobName": "paragraph_1576247582148_823706921",
       "id": "paragraph_1575994097569_-232881020",
       "dateCreated": "2019-12-13T14:33:02+0000",
-      "dateStarted": "2020-04-16T09:16:35+0000",
-      "dateFinished": "2020-04-16T09:17:05+0000",
+      "dateStarted": "2020-04-27T10:15:31+0000",
+      "dateFinished": "2020-04-27T10:15:53+0000",
       "status": "ABORT",
-      "$$hashKey": "object:452"
+      "$$hashKey": "object:2514"
     },
     {
       "text": "%md\n\n### B) Flink Streaming Program : reading from kafka input topic, computing aggregate and sending result to kafka output topic\n\nThis Flink Streaming programs reads some transactions from the Berka Dataset (resulting from the “Spark Integration ES” Demo notebook) from a kafka input topic as sent by the program A above. It then enriches them slightly and sends them back to a kafka output topic. The program above then dumps the resulting (enriched) transactions to the console.\n\n**Important Notes**:\n\n* **redefine the property definition  \"bootstrap.servers\" to point on your actual kafka node(s)**\n\n",
@@ -174,12 +174,12 @@
       "dateStarted": "2020-04-16T09:17:46+0000",
       "dateFinished": "2020-04-16T09:17:48+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:453"
+      "$$hashKey": "object:2515"
     },
     {
-      "text": "%flink\n\nimport org.apache.flink.streaming.api.functions.sink.PrintSinkFunction\nimport org.apache.flink.api.java.utils.ParameterTool\nimport org.apache.flink.api.common.functions._\nimport org.apache.flink.api.common.typeinfo.TypeInformation\nimport org.apache.flink.api.scala._\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaProducer}\nimport org.apache.flink.streaming.util.serialization.SerializationSchema\nimport org.apache.flink.formats.json.JsonNodeDeserializationSchema\nimport scala.collection.JavaConverters.asScalaIteratorConverter\nimport java.util.Properties\nimport org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode\nimport java.beans.Transient\n\nclass ObjectNodeSerSchema extends SerializationSchema[ObjectNode] with Serializable {\n    override def serialize(t: ObjectNode): Array[Byte] = t.toString().getBytes(\"UTF-8\")   \n}\n\nclass BerkaPaymentsDemo extends Serializable {\n\n    val properties = new Properties()\n    properties.setProperty(\"bootstrap.servers\", \"192.168.10.11:9092\")\n    properties.setProperty(\"group.id\", \"test\")\n    \n    @Transient lazy val timestampParseFormat = new java.text.SimpleDateFormat(\"yyyy-MM-dd'T'HH:mm:ssZ\")\n    // 1997-10-10T00:00:00+0000\n    \n    @Transient lazy val dayOfWeekFormat = new java.text.SimpleDateFormat(\"E\")\n    @Transient lazy val dayOfMonthFormat = new java.text.SimpleDateFormat(\"dd\")\n    \n    implicit val typeInfoObjectNode = TypeInformation.of(classOf[org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode])\n    implicit val typeInfoString = TypeInformation.of(classOf[String])\n    \n    @Transient lazy val aggregatePaymentsKafkaProducer = new FlinkKafkaProducer[ObjectNode](\n        \"192.168.10.11:9092\",     // broker list\n        \"berka-payments-aggregate\",               // target topic\n        new ObjectNodeSerSchema())   // serialization schema\n    \n    //: DataStream[ObjectNode]\n    @Transient lazy val kafkaBerkaPaymentsStream = senv.addSource(\n                    new FlinkKafkaConsumer(\"berka-payments\", new JsonNodeDeserializationSchema(), properties))\n\n    def addDayOfWeek(node: ObjectNode) : ObjectNode = {\n        val timestampDate = timestampParseFormat.parse(node.get(\"@timestamp\").asText())\n        node.put(\"day_of_week\", dayOfWeekFormat.format(timestampDate))\n        return node\n    }\n    \n    def addDayOfMonth(node: ObjectNode) : ObjectNode = {\n        val timestampDate = timestampParseFormat.parse(node.get(\"@timestamp\").asText())\n        node.put(\"day_of_month\", dayOfMonthFormat.format(timestampDate))\n        return node\n    }\n\n    def main(args: Array[String]) {\n\n        senv.setParallelism(1);\n                            \n        kafkaBerkaPaymentsStream\n            .map(node => addDayOfWeek(node))\n            .map(node => addDayOfMonth(node))\n            .addSink(aggregatePaymentsKafkaProducer)\n            //.print()\n\n        senv.execute(\"Berka Payment Transformation\")\n        \n    }\n\n}\n\nnew BerkaPaymentsDemo().main(Array())        \n",
+      "text": "%flink\n\nimport org.apache.flink.streaming.api.functions.sink.PrintSinkFunction\nimport org.apache.flink.api.java.utils.ParameterTool\nimport org.apache.flink.api.common.functions._\nimport org.apache.flink.api.common.typeinfo.TypeInformation\nimport org.apache.flink.api.scala._\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaProducer}\nimport org.apache.flink.streaming.util.serialization.SerializationSchema\nimport org.apache.flink.formats.json.JsonNodeDeserializationSchema\nimport scala.collection.JavaConverters.asScalaIteratorConverter\nimport java.util.Properties\nimport org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode\nimport java.beans.Transient\n\nclass ObjectNodeSerSchema extends SerializationSchema[ObjectNode] with Serializable {\n    override def serialize(t: ObjectNode): Array[Byte] = t.toString().getBytes(\"UTF-8\")   \n}\n\nclass BerkaPaymentsDemo extends Serializable {\n\n    var kafkaServer = \"192.168.10.21:9092\"\n\n    val properties = new Properties()\n    properties.setProperty(\"bootstrap.servers\", kafkaServer)\n    properties.setProperty(\"group.id\", \"test\")\n    \n    @Transient lazy val timestampParseFormat = new java.text.SimpleDateFormat(\"yyyy-MM-dd'T'HH:mm:ssZ\")\n    // 1997-10-10T00:00:00+0000\n    \n    @Transient lazy val dayOfWeekFormat = new java.text.SimpleDateFormat(\"E\")\n    @Transient lazy val dayOfMonthFormat = new java.text.SimpleDateFormat(\"dd\")\n    \n    implicit val typeInfoObjectNode = TypeInformation.of(classOf[org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode])\n    implicit val typeInfoString = TypeInformation.of(classOf[String])\n    \n    @Transient lazy val aggregatePaymentsKafkaProducer = new FlinkKafkaProducer[ObjectNode](\n        kafkaServer,     // broker list\n        \"berka-payments-aggregate\",               // target topic\n        new ObjectNodeSerSchema())   // serialization schema\n    \n    //: DataStream[ObjectNode]\n    @Transient lazy val kafkaBerkaPaymentsStream = senv.addSource(\n                    new FlinkKafkaConsumer(\"berka-payments\", new JsonNodeDeserializationSchema(), properties))\n\n    def addDayOfWeek(node: ObjectNode) : ObjectNode = {\n        val timestampDate = timestampParseFormat.parse(node.get(\"@timestamp\").asText())\n        node.put(\"day_of_week\", dayOfWeekFormat.format(timestampDate))\n        return node\n    }\n    \n    def addDayOfMonth(node: ObjectNode) : ObjectNode = {\n        val timestampDate = timestampParseFormat.parse(node.get(\"@timestamp\").asText())\n        node.put(\"day_of_month\", dayOfMonthFormat.format(timestampDate))\n        return node\n    }\n\n    def main(args: Array[String]) {\n\n        senv.setParallelism(1);\n                            \n        kafkaBerkaPaymentsStream\n            .map(node => addDayOfWeek(node))\n            .map(node => addDayOfMonth(node))\n            .addSink(aggregatePaymentsKafkaProducer)\n            //.print()\n\n        senv.execute(\"Berka Payment Transformation\")\n        \n    }\n\n}\n\nnew BerkaPaymentsDemo().main(Array())        \n",
       "user": "anonymous",
-      "dateUpdated": "2020-04-16T09:15:11+0000",
+      "dateUpdated": "2020-04-27T10:15:06+0000",
       "config": {
         "lineNumbers": true,
         "tableHide": false,
@@ -204,38 +204,15 @@
         "forms": {}
       },
       "apps": [],
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "FLINK JOB",
-          "tooltip": "View in Flink web UI",
-          "group": "flink",
-          "values": [
-            {
-              "jobUrl": "http://192.168.10.13:8081#/job/cb2af0a0bd1342ac5afeda1b075d733e",
-              "$$hashKey": "object:1024"
-            }
-          ],
-          "interpreterSettingId": "flink"
-        }
-      },
+      "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1576315842571_1475844155",
       "id": "paragraph_1576315842571_1475844155",
       "dateCreated": "2019-12-14T09:30:42+0000",
-      "dateStarted": "2020-04-16T09:15:11+0000",
-      "dateFinished": "2020-04-16T09:17:04+0000",
+      "dateStarted": "2020-04-27T10:15:06+0000",
+      "dateFinished": "2020-04-27T10:15:50+0000",
       "status": "ABORT",
-      "$$hashKey": "object:454",
-      "results": {
-        "code": "ERROR",
-        "msg": [
-          {
-            "type": "TEXT",
-            "data": "import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction\nimport org.apache.flink.api.java.utils.ParameterTool\nimport org.apache.flink.api.common.functions._\nimport org.apache.flink.api.common.typeinfo.TypeInformation\nimport org.apache.flink.api.scala._\nimport org.apache.flink.streaming.api.scala._\nimport org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaProducer}\nimport org.apache.flink.streaming.util.serialization.SerializationSchema\nimport org.apache.flink.formats.json.JsonNodeDeserializationSchema\nimport scala.collection.JavaConverters.asScalaIteratorConverter\nimport java.util.Properties\nimport org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode\nimport java.beans.Transient\n\u001b[33mwarning: \u001b[0mthere was one deprecation warning; re-run with -deprecation for details\ndefined class ObjectNodeSerSchema\n\u001b[33mwarning: \u001b[0mthere was one deprecation warning; re-run with -deprecation for details\ndefined class BerkaPaymentsDemo\norg.apache.flink.client.program.ProgramInvocationException: Job failed (JobID: cb2af0a0bd1342ac5afeda1b075d733e)\n  at org.apache.flink.client.deployment.ClusterClientJobClientAdapter.lambda$null$6(ClusterClientJobClientAdapter.java:112)\n  at java.util.concurrent.CompletableFuture.uniApply(CompletableFuture.java:616)\n  at java.util.concurrent.CompletableFuture$UniApply.tryFire(CompletableFuture.java:591)\n  at java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:488)\n  at java.util.concurrent.CompletableFuture.complete(CompletableFuture.java:1975)\n  at org.apache.flink.client.program.rest.RestClusterClient.lambda$pollResourceAsync$21(RestClusterClient.java:565)\n  at java.util.concurrent.CompletableFuture.uniWhenComplete(CompletableFuture.java:774)\n  at java.util.concurrent.CompletableFuture$UniWhenComplete.tryFire(CompletableFuture.java:750)\n  at java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:488)\n  at java.util.concurrent.CompletableFuture.complete(CompletableFuture.java:1975)\n  at org.apache.flink.runtime.concurrent.FutureUtils.lambda$retryOperationWithDelay$8(FutureUtils.java:291)\n  at java.util.concurrent.CompletableFuture.uniWhenComplete(CompletableFuture.java:774)\n  at java.util.concurrent.CompletableFuture$UniWhenComplete.tryFire(CompletableFuture.java:750)\n  at java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:488)\n  at java.util.concurrent.CompletableFuture.postFire(CompletableFuture.java:575)\n  at java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:943)\n  at java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:456)\n  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n  at java.lang.Thread.run(Thread.java:748)\nCaused by: org.apache.flink.runtime.client.JobCancellationException: Job was cancelled.\n  at org.apache.flink.runtime.jobmaster.JobResult.toJobExecutionResult(JobResult.java:149)\n  at org.apache.flink.client.deployment.ClusterClientJobClientAdapter.lambda$null$6(ClusterClientJobClientAdapter.java:110)\n  ... 19 more\n"
-          }
-        ]
-      }
+      "$$hashKey": "object:2516"
     },
     {
       "text": "%md\n\n#### Congrats ! You ran a flink streaming program reading from and writing to kafka\n",
@@ -281,7 +258,7 @@
       "dateStarted": "2019-12-15T20:37:18+0000",
       "dateFinished": "2019-12-15T20:37:18+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:455"
+      "$$hashKey": "object:2517"
     }
   ],
   "name": "Flink Integration Kafka",
@@ -299,6 +276,6 @@
   "info": {},
   "path": "/Flink Integration Kafka",
   "checkpoint": {
-    "message": "test"
+    "message": "Test"
   }
 }

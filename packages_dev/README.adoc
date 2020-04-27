@@ -227,9 +227,30 @@ These both commands require vagrant and VirtualBox, respectively libvirt, kvm an
 installed.
 
 
+=== Specific and various notes related to individual components shipped with Eskimo
+
+This section presents different important notes related to some specific services shipped with Eskimo building aspects.
+
+==== Zeppelin building
+
+Zeppelin can be built from a checkout of the latest git repository master or from an official release.
+
+The file `common/common.sh` defines a variable `ZEPPELIN_IS_SNAPSHOT` which, when defined to true, causes the build
+system to work from git and rebuilt zeppelin from the sources instead of downloading a released package.
+
+----
+export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master
+----
+
+Importantly, zeppelin will be build in the folder `/tmp/` of the host machine running eskimo (using a docker container
+though) which maps `/tmp` to its own `/tmp`). +
+*At least 20 GB of storage space needs to be available in `/tmp` of the machine running eskimo for the build to
+succeed.*
+
+
 === Setting up a remote packages repository
 
-When runnign eskimo, software packages - either service docker images or mesos binary packages - can be either built
+When running eskimo, software packages - either service docker images or mesos binary packages - can be either built
 or downloaded from a *remote packages repository*.
 
 Setting up a remote packages repository is extremely simple:

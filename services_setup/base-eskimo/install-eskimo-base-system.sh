@@ -491,6 +491,12 @@ if [[ -f /etc/selinux/config ]]; then
     sudo setenforce 0 2>/dev/null # ignoring errors
 fi
 
+if [[ `mount | grep /sys/fs/cgroup/systemd` == "" ]]; then
+    echo " - cgroup creation hack"
+    sudo mkdir /sys/fs/cgroup/systemd
+    sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+fi
+
 # Make sur some required packages are installed
 #echo "  - checking some key packages"
 

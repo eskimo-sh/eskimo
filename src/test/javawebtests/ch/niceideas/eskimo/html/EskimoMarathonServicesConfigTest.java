@@ -41,17 +41,20 @@ import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertNotNull;
 
 public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
-    private String jsonServices = null;
+    private String expectedMarathonConfigTableContent = null;
+    private String expectedMarathonSelectionTableContent = null;
 
     @Before
     public void setUp() throws Exception {
 
-        //jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
+        expectedMarathonConfigTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesConfigTest/expectedMarathonConfigTableContent.html"));
+        expectedMarathonSelectionTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesConfigTest/expectedMarathonSelectionTableContent.html"));
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoMarathonServicesConfigChecker.js");
@@ -70,6 +73,16 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         waitForElementIdInDOM("reset-marathon-servicesconfig");
 
+        page.executeJavaScript("eskimoMarathonServicesConfig.setMarathonServicesForTest([\n" +
+                "    \"cerebro\",\n" +
+                "    \"gdash\",\n" +
+                "    \"grafana\",\n" +
+                "    \"kafka-manager\",\n" +
+                "    \"kibana\",\n" +
+                "    \"spark-history-server\",\n" +
+                "    \"zeppelin\"\n" +
+                "  ]);");
+
         /*
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
@@ -83,6 +96,43 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
     @Test
     public void testDummy() throws Exception {
+        // implement other tests
         fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testRenderMarathonConfig() throws Exception {
+        page.executeJavaScript("eskimoMarathonServicesConfig.renderMarathonConfig({\n" +
+                "    \"cerebro_install\": \"on\",\n" +
+                "    \"zeppelin_install\": \"on\",\n" +
+                "    \"kafka-manager_install\": \"on\",\n" +
+                "    \"kibana_install\": \"on\",\n" +
+                "    \"gdash_install\": \"on\",\n" +
+                "    \"spark-history-server_install\": \"on\",\n" +
+                "    \"grafana_install\": \"on\"\n" +
+                "})");
+
+        //System.err.println (page.getElementById("marathon-services-table-body").asXml());
+        assertEquals(
+                expectedMarathonConfigTableContent.replace("  ", ""),
+                page.getElementById("marathon-services-table-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+    }
+
+    @Test
+    public void testSowReinstallSelection() throws Exception {
+
+        testRenderMarathonConfig();
+
+        // mocking stuff
+        page.executeJavaScript("eskimoMain.getMarathonServicesSelection = function() { return { 'showMarathonServiceSelection' : function() {} } }");
+
+        page.executeJavaScript("$('#main-content').append($('<div id=\"marathon-services-selection-body\"></div>'))");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.showReinstallSelection()");
+
+        System.err.println (page.getElementById("marathon-services-selection-body").asXml());
+        assertEquals(
+                expectedMarathonSelectionTableContent.replace("  ", ""),
+                page.getElementById("marathon-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
     }
 }

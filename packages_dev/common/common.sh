@@ -74,9 +74,9 @@ export PROMETHEUS_NODE_EXPORTER_VERSION=0.18.1
 export PROMETHEUS_PUSHGATEWAY_VERSION=0.8.0
 
 # Zeppelin
-export ZEPPELIN_VERSION_FULL=0.9.0-preview1
+export ZEPPELIN_VERSION_FULL=0.9.0-eskimo
 export ZEPPELIN_VERSION=0.9.0
-export ZEPPELIN_IS_SNAPSHOT="false" # Caution current builld of zeppelin MASTER is broken
+export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master
 
 # This functions ensures that internet is available on host machine (the one running eskimo)
 # Internet is indeed required to download source packages for services.
@@ -243,7 +243,6 @@ function build_image() {
             -v $PWD:/scripts \
             -v $PWD/../common:/common  \
             -v /tmp:/tmp \
-            -v /data:/data \
             -d --name $1 \
             -i \
             -t eskimo:$1_template bash  >> $2 2>&1

@@ -60,7 +60,7 @@ export FROM_COMPLETE="1"
 wget https://downloads.apache.org/zeppelin/zeppelin-$ZEPPELIN_VERSION_FULL/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all.tgz > /tmp/zeppelin_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad zeppelin-$ZEPPELIN_VERSION from apache. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz >> /tmp/zeppelin_install_log 2>&1
+    wget http://niceideas.ch/mes/zeppelin-$ZEPPELIN_VERSION_FULL.tar.gz >> /tmp/zeppelin_install_log 2>&1
     fail_if_error $? "/tmp/zeppelin_install_log" -1
 fi
 
@@ -97,6 +97,9 @@ if [[ $FROM_COMPLETE == "1" ]]; then
     rm -Rf /usr/local/lib/zeppelin/interpreter/scalding
     rm -Rf /usr/local/lib/zeppelin/interpreter/scio
     rm -Rf /usr/local/lib/zeppelin/interpreter/submarine
+
+    # FIXME temporary removing ES interpreter (as lon as it is not adapted to ES 7.x)
+    rm -Rf /usr/local/lib/zeppelin/interpreter/elasticsearch
 
 else
     echo " - Installing required interpreters"
