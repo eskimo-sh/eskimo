@@ -97,7 +97,7 @@ Eskimo also enables the user to develop his own services very easily.
 
 === The Service Developer Guide
 
-This documentation is related to the last of the key features presented above : The Services Framework. +
+This documentation is related to the last of the key features presented above : The Services Development Framework. +
 It presents everything a developer needs to understand and know to develop his own services and let eskimo distribute
 and operate them, or extend current services.
 
@@ -108,6 +108,24 @@ The *Service Development framework* is actually composed by two distinct parts:
 * The <<docker_images_development_framework>> which is used to *build* the docker images deployed on the eskimo cluster
 nodes
 * The <<services_installation_framework>> which is used to *install and setup* these images as services on the eskimo cluster nodes.
+
+
+
+=== Principle schema
+
+The whole services development framework can be represented as follows:
+
+image::pngs/services-development-framework.png[800, 800, align="center"]
+
+* The <<docker_images_development_framework>> is used to develop and build Container templates images that are later
+used to build the actual docker containers images that are fine-tuned to Eskimo deployed on invidiual Eskimo cluster
+nodes
+* The <<services_installation_framework>> which create the actual container image from the template and adapts it to the
+specific situation of the eskimo node it is running on.
+
+The different scripts involved in the different stages are presented on the schema above alon with their
+responsibilities and the environment in which they are executed (outside of the container - on the eskimo host machine
+or the eskimo cluster node - or from within the docker container).
 
 
 === Core principles
@@ -122,21 +140,36 @@ are built are as follows:
 * Everything - from building the docker image to installing it on cluster nodes - is done using simple shell scripts.
 With Eskimo a system administrator desiring to leverage on eskimo to implement his own services in order to integrate
 additional software components on Eskimo doesn't need to learn any new and fancy technology, just plain old shell
-scripting, docker and systemd. Period.
+scripting, docker, systemd and perhaps a little bit of marathon configuration; that's it.
 * Eskimo leverages on unix standards. Software components are installed in `/usr/local`, log files are in sub-folders of
 `/var/log`, persistent data is in sub-folders of `/var/lib`, etc.
+
+=== A note on images template download.
+
+At eskimo first start, the user (administrator) needs to choose whether he wants to build the services images (docker
+container templates images) locally or download them from _eskimo.sh_.
+
+* *Buidling the images locally* means creating each and every docker template image using the `build.sh` script. Only
+the vanilly software packages are downloaded from internet (such as the elasticsearch distribution, spark, flink, etc.). +
+This can take a significant time, several dozens of minutes.
+* *Downloading the images from internet* means downloading _ready-to-use_ docker template images from _eskimo.sh_
+
+The whole setup process when downloading the images from internet can be represented this way:
+
+image::pngs/services-download.png[800, 800, align="center"]
+
 
 
 
 // included package developer README
 
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..310]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..340]
 
 
 
 // included service developer README
 
-include::../../../services_setup/README.adoc[leveloffset=0,lines=60..600]
+include::../../../services_setup/README.adoc[leveloffset=0,lines=60..650]
 
 
 

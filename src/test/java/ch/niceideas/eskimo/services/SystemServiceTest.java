@@ -278,7 +278,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testHandleStatusChanges() throws Exception {
 
-        Set<String> liveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -288,7 +288,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
         ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
@@ -296,7 +296,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // run it four more times
         for (int i = 0 ; i < 6; i++) {
-            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
         // now I have changes
@@ -304,13 +304,53 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // kafka is missing
         //System.err.println (resultPrevStatus.getFormattedValue());
-        assertTrue (new JSONObject(expectedPrevStatus).similar(resultPrevStatus.getJSONObject()));
+        assertTrue (new JSONObject(expectedPrevStatusServicesRemoved).similar(resultPrevStatus.getJSONObject()));
+    }
+
+    @Test
+    public void testHandleStatusChangesNodeDown() throws Exception {
+
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+            add("192.168.10.11");
+            add("192.168.10.13");
+        }};
+
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+
+        // remove all status for node 2 (except node down and node nbr)
+        List<String> toBeremoved = new ArrayList<>();
+        systemStatus.getRootKeys().stream()
+                .filter(key -> key.contains("192-168-10-13") && !key.contains("nbr")  && !key.contains("alive"))
+                .forEach(toBeremoved::add);
+        toBeremoved.stream()
+                .forEach(systemStatus::removeRootKey);
+        systemStatus.setValueForPath("node_alive_192-168-10-13", "KO");
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
+
+        // no changes so empty (since not saved !)
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        assertEquals ("{}", resultPrevStatus.getFormattedValue());
+
+        // run it four more times
+        for (int i = 0 ; i < 6; i++) {
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
+        }
+
+        // now I have changes
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+
+        // nothing is removed (don't act on node down)
+        System.err.println (resultPrevStatus.getFormattedValue());
+        assertTrue (new JSONObject(expectedPrevStatusAllServicesStay).similar(resultPrevStatus.getJSONObject()));
     }
 
     @Test
     public void testHandleStatusChangesMarathonService() throws Exception {
 
-        Set<String> liveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -320,7 +360,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
         ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
@@ -328,14 +368,14 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // run it four more times
         for (int i = 0 ; i < 6; i++) {
-            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
         // now I have changes
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
-        JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatus);
-        expectedPrevStatusJson.put("kafka_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatus is for another test
+        JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatusServicesRemoved);
+        expectedPrevStatusJson.put("kafka_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatusServicesRemoved is for another test
         expectedPrevStatusJson.remove("cerebro_installed_on_IP_MARATHON_NODE");
 
         // kafka manager is missing
@@ -345,7 +385,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testHandleStatusChangesMarathonServiceWhenMarathonDown() throws Exception {
 
-        Set<String> liveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -356,7 +396,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
         ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
@@ -364,7 +404,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // run it four more times
         for (int i = 0 ; i < 6; i++) {
-            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
         // Since the marathon service status change has not been saved (since marazthon is down), it's still empty !!
@@ -374,9 +414,9 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testHandleStatusChangeWhenNodeVanishes() throws Exception {
+    public void testHandleStatusChangeMoreServicesRemoved() throws Exception {
 
-        Set<String> liveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -387,20 +427,21 @@ public class SystemServiceTest extends AbstractSystemTest {
         // IMPORTANT : they should be kept if they are still there to be properly uninstalled indeed !
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        logger.debug (systemStatus.getIpAddresses());
-
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        logger.debug (servicesInstallStatus.getIpAddresses());
+        //logger.debug (systemStatus.getIpAddresses());
 
         // remove all status for node 2 : 192-168-10-13 EXCEPT KAFKA AND ELASTICSEARCH
         List<String> toBeremoved = new ArrayList<>();
         systemStatus.getRootKeys().stream()
-                .filter(key -> key.contains("192-168-10-13") && !key.contains("kafka") && !key.contains("elasticsearch"))
+                .filter(key -> key.contains("192-168-10-13") && !key.contains("kafka") && !key.contains("elasticsearch") && !key.contains("nbr")  && !key.contains("alive"))
                 .forEach(toBeremoved::add);
         toBeremoved.stream()
                 .forEach(systemStatus::removeRootKey);
 
-        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        //logger.debug (servicesInstallStatus.getIpAddresses());
+
+
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
         ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
@@ -408,7 +449,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // run it four more times
         for (int i = 0 ; i < 6; i++) {
-            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
         // now I have changes
@@ -434,9 +475,57 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testHandleStatusChangeWhenNodeVanishesAndNodeIsDown() throws Exception {
+    public void testHandleStatusChangeWhenNodeRemovedFromConfig() throws Exception {
 
-        Set<String> liveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+            add("192.168.10.11");
+            add("192.168.10.13");
+        }};
+
+        // the objective here is to make sur that when a node entirely vanishes from configuration,
+        // if it is still referenced by status, then it is checked for services and services are removed from it
+        // if they are down
+        // IMPORTANT : they should be kept if they are still there to be properly uninstalled indeed !
+
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        //logger.debug (systemStatus.getIpAddresses());
+
+        // remove all status for node 2 (really means it has been removed from config)
+        List<String> toBeremoved = new ArrayList<>();
+        systemStatus.getRootKeys().stream()
+                .filter(key -> key.contains("192-168-10-13"))
+                .forEach(toBeremoved::add);
+        toBeremoved.stream()
+                .forEach(systemStatus::removeRootKey);
+
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        //logger.debug (servicesInstallStatus.getIpAddresses());
+
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
+
+        // no changes so empty (since not saved !)
+        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        assertEquals ("{}", resultPrevStatus.getFormattedValue());
+
+        // run it four more times
+        for (int i = 0 ; i < 6; i++) {
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
+        }
+
+        // now I have changes
+        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+
+        // kafka and elasticsearch have been kept
+        System.err.println (resultPrevStatus.getFormattedValue());
+        JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatusAllServicesStay);
+        assertTrue(expectedPrevStatusJson.similar(resultPrevStatus.getJSONObject()));
+    }
+
+    @Test
+    public void testHandleStatusChangeWhenNodeRemovedFromConfigAndNodeIsDown() throws Exception {
+
+        Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
         }};
 
@@ -451,7 +540,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         logger.debug (servicesInstallStatus.getIpAddresses());
 
-        // remove all status for node 2 : 192-168-10-13 EXCEPT KAFKA AND ELASTICSEARCH
+        // remove all status for node 2
         List<String> toBeremoved = new ArrayList<>();
         systemStatus.getRootKeys().stream()
                 .filter(key -> key.contains("192-168-10-13"))
@@ -459,7 +548,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         toBeremoved.stream()
                 .forEach(systemStatus::removeRootKey);
 
-        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+        systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
         ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
@@ -467,13 +556,13 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         // run it four more times
         for (int i = 0 ; i < 6; i++) {
-            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, liveIps);
+            systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
         // now I have changes
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
-        // everything has been removed, including kafka and elasticsearch
+        // everything has been removed
         System.err.println(resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
                 "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +

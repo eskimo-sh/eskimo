@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
@@ -337,6 +338,18 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+                SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
+                retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "marathon_192-168-10-11", "OK");
+                return retStatus;
+            }
+        };
+        ss.setNotificationService(notificationService);
+        ss.setMessagingService(messagingService);
+        marathonService.setSystemService(ss);
+
         marathonService.startServiceMarathon(servicesDefinition.getService("cerebro"));
 
         System.out.println(testSSHCommandResultBuilder);
@@ -368,6 +381,18 @@ public class MarathonServiceTest extends AbstractSystemTest {
                 // No Op
             }
         });
+
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+                SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
+                retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "marathon_192-168-10-11", "OK");
+                return retStatus;
+            }
+        };
+        ss.setNotificationService(notificationService);
+        ss.setMessagingService(messagingService);
+        marathonService.setSystemService(ss);
 
         marathonService.stopServiceMarathon(servicesDefinition.getService("cerebro"));
 
@@ -401,6 +426,17 @@ public class MarathonServiceTest extends AbstractSystemTest {
                 // No Op
             }
         });
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+                SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
+                retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "marathon_192-168-10-11", "OK");
+                return retStatus;
+            }
+        };
+        ss.setNotificationService(notificationService);
+        ss.setMessagingService(messagingService);
+        marathonService.setSystemService(ss);
 
         marathonService.restartServiceMarathon(servicesDefinition.getService("cerebro"));
 

@@ -644,28 +644,29 @@ public class SystemService {
 
                     // A. In case target node both configured and up, check services actual statuses before doing anything
                     if (    // nodes is configured and responding (up and running
-                            (
-                                    nodeAlive != null && nodeAlive.booleanValue()
-                            )
-                         ||
-                            // node is not configured anymore (has been removed, but it is still up and responding and it runs services)
-                            // in this case we want to attempt uninstallation, thus not removing services if they are up
-                            ((nodeAlive == null || !nodeAlive.booleanValue()) && configuredAddressesAndOtherLiveAddresses.contains(nodeIp) ) ) {
 
+                            nodeAlive != null && nodeAlive.booleanValue()
+                            ) {
 
                         if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, nodeName, originalNodeName)) {
                             changes = true;
                         }
                     }
 
-                    // B. if node is both down and not configured anymore, we just remove all services whatever their statuses
+                    // B. node is not configured anymore (has been removed, but it is still up and responding and it runs services)
+                    //    in this case we want to attempt uninstallation, thus not removing services if they are up
+                    // => so nothing to do, don't touch anything in installed services registry
+
+                    // c. if node is both down and not configured anymore, we just remove all services whatever their statuses
                     if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
                         if (countErrorAndRemoveServices(servicesInstallationStatus, savedService, nodeName, originalNodeName)) {
                             changes = true;
                         }
                     }
 
-                    // C. In other cases, node is configued but down => don't touch anything
+                    // D. In other cases, node is configured but down. We don't make any assumption on node down.
+                    //    Admin is left with uninstalling it if he wants.
+                    // => so nothing to do, don't touch anything in installed services registry
 
                     /*
                     // this means that node is not configured anymore ! (no status has been obtained)

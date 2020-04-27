@@ -43,8 +43,6 @@ import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractSystemTest {
@@ -85,14 +83,16 @@ public abstract class AbstractSystemTest {
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
     protected String systemStatusTest = null;
-    protected String expectedPrevStatus = null;
+    protected String expectedPrevStatusServicesRemoved = null;
+    protected String expectedPrevStatusAllServicesStay = null;
 
 
     @Before
     public void setUp() throws Exception {
 
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), "UTF-8");
-        expectedPrevStatus  = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatus.json"), "UTF-8");
+        expectedPrevStatusServicesRemoved = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusServicesRemoved.json"), "UTF-8");
+        expectedPrevStatusAllServicesStay = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusAllServicesStay.json"), "UTF-8");
 
         clearResultBuilder();
         clearCommandScript();

@@ -244,7 +244,16 @@ public class MarathonService {
         }
 
         for (int i = 0; i < numberOfAttempts; i++) {
-            String serviceJson = queryMarathon("apps/" + service);
+            String serviceJson = null;
+            try {
+                serviceJson = queryMarathon("apps/" + service);
+            } catch (MarathonException e) {
+                if (e.getCause() != null) {
+                    logger.warn("getAndWaitServiceRuntimeNode - Got " + e.getCause().getClass() + ":" + e.getCause().getMessage());
+                } else {
+                    logger.warn("getAndWaitServiceRuntimeNode - Got " + e.getClass() + ":" + e.getMessage());
+                }
+            }
             if (StringUtils.isBlank(serviceJson) || !serviceJson.startsWith("{")) {
                 if (i < numberOfAttempts - 1) {
                     try {
@@ -848,7 +857,7 @@ public class MarathonService {
     protected String restartServiceMarathonInternal(Service service) throws MarathonException {
         StringBuilder log = new StringBuilder();
 
-        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 70); // 70 attempts
+        Pair<String, String> nodeNameAndStatus = this.getAndWaitServiceRuntimeNode(service.getName(), 60); // 60 attempts
         String nodeIp = nodeNameAndStatus.getKey();
 
         boolean installed = StringUtils.isNotBlank(nodeIp);

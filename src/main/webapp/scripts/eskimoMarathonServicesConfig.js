@@ -104,26 +104,12 @@ eskimo.MarathonServicesConfig = function() {
         });
     }
 
-    this.getNodesCount = function() {
-        return !nodes || nodes == null ? 0 : nodes.length;
-    };
-
     this.setMarathonServicesForTest = function(testServics) {
         MARATHON_SERVICES = testServics;
     };
 
     this.getMarathonServices = function() {
         return MARATHON_SERVICES;
-    };
-
-
-    this.getServiceLogoPath = function (service) {
-        var serviceConfig = SERVICES_CONFIGURATION[service];
-        if (serviceConfig == null) {
-            console.error ("Could not find logo for service " + service);
-            return "undefined";
-        }
-        return serviceConfig.logo;
     };
 
     this.selectAll = function() {
@@ -223,7 +209,6 @@ eskimo.MarathonServicesConfig = function() {
                 console.log (data);
 
                 $("#marathon-services-table-body").html("");
-                nodes = [];
 
                 if (!data.clear) {
 
@@ -232,16 +217,8 @@ eskimo.MarathonServicesConfig = function() {
 
                 } else if (data.clear == "missing") {
 
-                    //alert (" TODO missing");
-
+                    // render with no selections
                     that.renderMarathonConfig();
-
-                    /*
-                    $("#nodes-placeholder").html(''+
-                        '<div class="col-lg-4 col-md-6 col-sm-8 col-xs-12">\n' +
-                        '    <address>(No nodes / services configured yet)</address>\n' +
-                        '</div>');
-                    */
 
                 } else if (data.clear == "setup"){
 

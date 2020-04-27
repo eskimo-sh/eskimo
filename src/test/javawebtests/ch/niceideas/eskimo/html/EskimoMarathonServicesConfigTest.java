@@ -82,22 +82,37 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                 "    \"spark-history-server\",\n" +
                 "    \"zeppelin\"\n" +
                 "  ]);");
-
-        /*
-
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
-
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
-
-        // set services for tests
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfigForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
-        */
     }
 
     @Test
-    public void testDummy() throws Exception {
-        // implement other tests
-        fail ("To Be Implemented");
+    public void testSelectAll() throws Exception {
+
+        testRenderMarathonConfig();
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.selectAll()");
+
+        assertEquals (false, page.executeJavaScript("$('#kibana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#gdash_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#grafana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.selectAll()");
+
+        assertEquals (true, page.executeJavaScript("$('#kibana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#gdash_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#grafana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.selectAll()");
+
+        assertEquals (false, page.executeJavaScript("$('#kibana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#gdash_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#grafana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+
     }
 
     @Test

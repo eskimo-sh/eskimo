@@ -82,7 +82,14 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, systemService, savedServicesInstallStatus, marathonConfig);
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+                return StandardSetupHelpers.getStandard2NodesSystemStatus();
+            }
+        };
+
+        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
 
         assertEquals(2, moc.getInstallations().size());
         assertEquals(0, moc.getUninstallations().size());
@@ -99,7 +106,15 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         marathonConfig.getJSONObject().remove("gdash_install");
         marathonConfig.getJSONObject().remove("kafka-manager_install");
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, systemService, savedServicesInstallStatus, marathonConfig);
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+                return StandardSetupHelpers.getStandard2NodesSystemStatus();
+            }
+        };
+
+
+        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
 
         assertEquals(0, moc.getInstallations().size());
         assertEquals(2, moc.getUninstallations().size());

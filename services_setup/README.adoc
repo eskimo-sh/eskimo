@@ -64,14 +64,19 @@ This document presents "2. The *Services Installation Framework*"
 The Services Installation Framework provides tools and standards to install the packaged docker images containing the
 target software component on the eskimo cluster nodes.
 
-Eskimo is leveraging on both docker and systemd to deploy the services on the cluster nodes and to operate them.
+Eskimo is leveraging on _docker_ to run the the services on the cluster nodes and either _SystemD_ or _Marathon_ to
+operate them. Marathon is used specifically to provide HA - High Availability - and resilience to UI applications and
+other single instances services
 
 * An eskimo package has to be a docker image
-* An eskimo package has to provide a systemd unit configuration file to enable eskimo to operate the component on the cluster.
+* An eskimo package has to provide
+** either a systemd unit configuration file to enable eskimo to operate the component on the cluster.
+** or a marathon JSON configuration file to delegate this marathon
 
 The Eskimo Nodes Configuration process takes care of installing the services defined in the _services.json_
 configuration file and and copies them over to the nodes where they are intended to run. After the proper installation,
-eskimo relies on plain old _systemctl_ commands to operate (start / stop / restart / query / etc.) the services.
+eskimo relies either on plain old `systemctl` commands to operate (start / stop / restart / query / etc.) the services
+or on _marathon_
 
 === Principle
 
@@ -81,9 +86,10 @@ The principle is pretty straightforward:
 `services_setup/serviceX`, copies that archive over to the node and extracts it in a subfolder of `/tmp`.
 * Then eskimo calls the script `setup.sh` from within that folder. The script `setup.sh` can do whatever it wants but has
 to respect the following constraint:
-** After that `setup.sh` script is properly executed, a systemd system service configuration file with name
-`serviceX.service` has to exist in such a way that commands such as `systemctl start serviceX` can be used to control
-serviceX.
+* After that `setup.sh` script is properly executed, the service should be
+** either installed on the node along with a systemd system unit file with name `serviceX.service` which is used for
+commands such as `systemctl start serviceX` to be able to control service _serviceX_,
+** or properly registered in marathon and operated by marathon with ID _serviceX_.
 
 Aside from the above, nothing is enforced and service developers can implement services the way they want.
 
@@ -115,9 +121,10 @@ The setup process implemented as a standard in the `setup.sh` script has three d
 
 . The container instantiation from the pre-packaged image performed from outside the container
 . The software component setup performed from inside the container
-. The software component configuration applied at runtime, i.e. at the time the containr starts, re-applied everytime.
+- The registration of the service to _SystemD_ or _marathon_
+. The software component configuration applied at runtime, i.e. at the time the container starts, re-applied everytime.
 
-The third phase is most of the time required to apply configurations depending on environment dynamically at startup
+The fourth phase is most of the time required to apply configurations depending on environment dynamically at startup
 time and not statically at setup time. +
 The goal is to address situations where, for instance,  master services are moved to another node. In this case,
 applying the master setup configuration at service startup time instead of statically enables to simply restart a slave
@@ -185,6 +192,12 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 
     ## [mandatory] whether or not it has to be instaled on every node
     "mandatory": [true,false],
+
+    ## [unique] whether the service is a unique service (singpe instance) or multiple
+    "unique": [true,false],
+
+    ## [unique] whether the service is managed through marathon (true) or SystemD (false)
+    "marathon": [true,false],
 
     ## [optional] name of the group to associate it in the status table
     "group" : "{group name}",
@@ -263,7 +276,7 @@ A service declaration in `services.json` for instance for `serviceX` would be de
         ## [mandatory] replacement text
         "target" : "{proxied_URL}" ## e.g. "/eskimo/kibana/API"
       }
-  }
+  },
 
   ## [optional] array of dependencies that need to be available and configured
   "dependencies": [
@@ -283,6 +296,46 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       "mandatory": [true,false],
     }
   ]
+
+  ## [optional] array of configuration properties that should be editable using the Eskim UI
+  ## These configuration properties are injected
+  "editableConfigurations": [
+    {
+
+      ## the name of the configuration file to search for in the software installation
+      ## directory (and sub-folders)
+      "filename": "{configuration file name}", ## e.g. "server.properties"
+
+      ## the name of the service installation folder under /usr/local/lib
+      ## (eskimo standard installation path)
+      "filesystemService": "{folder name}", ## e.g. "kafka"
+
+      ## the type of the property syntax
+      ## Currently only "variable" supported
+      "propertyType": "variable",
+
+      ## The format of the property definition in the configuration file
+      ## e.g. "{name}: {value}" or "{name}={value}"
+      "propertyFormat": "property format",
+
+      ## The prefix to use in the configuration file for comments
+      "commentPrefix": "#",
+
+      ## The list of properties to be editable by administrators using the eskimo UI
+      "properties": [
+        {
+
+          ## name of the property
+          "name": "{property name}", ## e.g. "num.network.threads"
+
+          ## the description to show in the UI
+          "comment": "{property description}",
+
+          ## the default value to use if undefined by administrators
+          "defaultValue": "{default property value}" ## e.g. "3"
+        }
+      ]
+    },
 }
 ----
 
@@ -594,10 +647,7 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-
-
-
-// marker for exclusion : line 600
+// marker for exclusion : line 650
 
 
 
