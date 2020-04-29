@@ -166,6 +166,48 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testUpdateStatus() throws Exception {
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        configurationService.saveNodesConfig(nodesConfig);
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+
+        systemService.setSshCommandService(new SSHCommandService() {
+            @Override
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                testSSHCommandScript.append(script).append("\n");
+                if (script.equals("echo OK")) {
+                    return "OK";
+                }
+                if (script.startsWith("sudo systemctl status --no-pager -al")) {
+                    return systemStatusTest;
+                }
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+                testSSHCommandScript.append(command + "\n");
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+                // just do nothing
+            }
+        });
+
+        systemService.updateStatus();
+
+        SystemStatusWrapper systemStatus = systemService.getStatus();
+
+        assertTrue(new JSONObject(expectedFullStatus).similar(systemStatus.getJSONObject()));
+    }
+
+    @Test
     public void testFetchNodeStatusWithRestarts() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
@@ -257,7 +299,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.setValueForPath("service_cerebro_192-168-10-11", "NA");
         systemStatus.setValueForPath("service_kibana_192-168-10-11", "KO");
 
-        // flag a few services as restart => shoiuld not be reported as in issue
+        // flag a few services as restart => should not be reported as in issue
         systemStatus.setValueForPath("service_kafka_192-168-10-11", "restart");
         systemStatus.setValueForPath("service_kafka_192-168-10-13", "restart");
         systemStatus.setValueForPath("service_kafka-manager_192-168-10-11", "restart");
@@ -273,6 +315,34 @@ public class SystemServiceTest extends AbstractSystemTest {
         assertEquals("{\"type\":\"Error\",\"message\":\"Service cerebro on 192.168.10.11 got into problem\"}", notifications.getValue().get(0).toString());
 
         assertEquals("{\"type\":\"Error\",\"message\":\"Service kibana on 192.168.10.11 got into problem\"}", notifications.getValue().get(1).toString());
+    }
+
+    @Test
+    public void testCheckServiceDisappearanceNodeDown() throws Exception {
+
+        SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+
+        systemService.setLastStatusForTest(prevSystemStatus);
+
+        // we'll make it so that kibana and cerebro seem to have disappeared
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        List<String> toBeremoved = new ArrayList<>();
+        systemStatus.getRootKeys().stream()
+                .filter(key -> key.contains("192-168-10-13") && !key.contains("nbr")  && !key.contains("alive"))
+                .forEach(toBeremoved::add);
+        toBeremoved.stream()
+                .forEach(systemStatus::removeRootKey);
+        systemStatus.setValueForPath(SystemStatusWrapper.NODE_ALIVE_FLAG + "192-168-10-13", "KO");
+
+        systemService.checkServiceDisappearance (systemStatus);
+
+        Pair<Integer, List<JSONObject>> notifications = notificationService.fetchElements(0);
+
+        assertNotNull (notifications);
+
+        assertEquals(1, notifications.getKey().intValue());
+
+        assertEquals("{\"type\":\"Error\",\"message\":\"Service Node Alive on 192.168.10.13 got into problem\"}", notifications.getValue().get(0).toString());
     }
 
     @Test
@@ -625,13 +695,4 @@ public class SystemServiceTest extends AbstractSystemTest {
         assertFalse(systemService.isInterrupted());
     }
 
-    @Test
-    public void testFetchStatusWithMarathon() {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testNeedToRestartMarathonServiceFollowingNodeInstallation() {
-        fail ("To Be Implemented");
-    }
 }

@@ -39,6 +39,7 @@ public class MarathonService {
     private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
 
     public static final int MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS = 200;
+    public static final String MARATHON_NA_FLAG = "MARATHON_NA";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -186,7 +187,7 @@ public class MarathonService {
             return sendHttpRequestAndGetResult(marathonTunnelConfig, request);
 
         } catch (IOException e) {
-            logger.debug (e, e);
+            //logger.debug (e, e);
             throw new MarathonException(e);
         }
     }
@@ -263,7 +264,7 @@ public class MarathonService {
                     }
                     continue;
                 } else {
-                    return new Pair<>(null, "NA");
+                    return new Pair<>(MARATHON_NA_FLAG, "NA");
                 }
             }
 
@@ -271,6 +272,9 @@ public class MarathonService {
 
             if (StringUtils.isNotBlank(serviceResult.getValueForPathAsString("message"))
                     && serviceResult.getValueForPathAsString("message").contains("does not exist")) {
+
+                // This is now the sitatiuon where marathon knows nothing about the service
+                // in this only case we return null as nodeIp to identify this
                 return new Pair<>(null, "NA");
             }
 
@@ -286,8 +290,7 @@ public class MarathonService {
 
             if (StringUtils.isBlank(nodeIp)) {
 
-                // service is not started by marathon
-                // need to find the previous nodes that was running it
+                // service is not started by marathon, assuming it on marathon node
                 nodeIp = servicesInstallStatus.getFirstIpAddress("marathon");
 
             }
@@ -582,14 +585,22 @@ public class MarathonService {
                 // should service be installed on marathon ?
                 boolean shall = this.shouldInstall(marathonConfig, service);
 
-                // check if service is installed ?
-                //check if service installed using SSH
-                Pair<String, String> nodeNameAndStatus = new Pair<>(null, "NA");
+                Pair<String, String> nodeNameAndStatus = new Pair<>(MARATHON_NA_FLAG, "NA");
                 if (StringUtils.isNotBlank(ping) && ping.startsWith("OK")) {
                     nodeNameAndStatus = this.getServiceRuntimeNode(service);
                 }
 
                 String nodeIp = nodeNameAndStatus.getKey();
+
+                // if marathon is not answering, we assume service is still installed if it has been installed before
+                // we identify it on marathon node then.
+                if (nodeIp != null && nodeIp.equals(MARATHON_NA_FLAG)) {
+                    if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstIpAddress(service))) {
+                        nodeIp = marathonIpAddress;
+                    } else {
+                        nodeIp = null;
+                    }
+                }
 
                 boolean installed = StringUtils.isNotBlank(nodeIp);
                 boolean running = nodeNameAndStatus.getValue().equals("running");

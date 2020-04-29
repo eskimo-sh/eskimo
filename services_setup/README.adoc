@@ -213,7 +213,10 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     },
 
     ## memory to allocate to the service
-    "memory": "[neglectable|small|medium|large]",
+    ## (mesos and neglectable means the service is excluded from the hardware
+    ## memory split computation. Meos services are put in the 'mesos-agent' memory
+    ## share)
+    "memory": "[mesos|neglectable|small|medium|large|verylarge]",
 
     ## [mandatory] The logo to use whenever displaying the service in the UI is
     ##     required

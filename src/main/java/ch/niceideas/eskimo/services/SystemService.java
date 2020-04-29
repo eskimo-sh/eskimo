@@ -119,8 +119,8 @@ public class SystemService {
 
     private ReentrantLock statusUpdateLock = new ReentrantLock();
     private final Timer timer;
-    private SystemStatusWrapper lastStatus = null;
-    private Exception lastStatusException = null;
+    private final AtomicReference<SystemStatusWrapper> lastStatus = new AtomicReference<>();
+    private final AtomicReference<Exception> lastStatusException = new AtomicReference<>();
 
     private AtomicBoolean interruption = new AtomicBoolean(false);
     private AtomicBoolean interruptionNotified = new AtomicBoolean(false);
@@ -310,25 +310,20 @@ public class SystemService {
     }
 
     public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
-        try {
-            statusUpdateLock.lock();
 
             // special case at application startup : if the UI request comes before the first status update
-            if (lastStatusException == null && lastStatus == null) {
-                updateStatus();
+            if (lastStatusException.get() == null && lastStatus.get() == null) {
+                return new SystemStatusWrapper("{ \"clear\" : \"initializing\"}");
             }
 
-            if (lastStatusException != null) {
-                throw new StatusExceptionWrapperException (lastStatusException);
+            if (lastStatusException.get() != null) {
+                throw new StatusExceptionWrapperException (lastStatusException.get());
             }
-            return lastStatus;
-        } finally {
-            statusUpdateLock.unlock();
-        }
+            return lastStatus.get();
     }
 
     void setLastStatusForTest(SystemStatusWrapper lastStatusForTest) {
-        this.lastStatus = lastStatusForTest;
+        this.lastStatus.set (lastStatusForTest);
     }
 
     public void updateStatus() {
@@ -437,15 +432,15 @@ public class SystemService {
 
             handleStatusChanges(servicesInstallationStatus, systemStatus, configuredAddressesAndOtherLiveAddresses);
 
-            lastStatusException = null;
-            lastStatus = systemStatus;
+            lastStatus.set (systemStatus);
+            lastStatusException.set (null);
 
         } catch (SystemException | NodesConfigurationException | FileException | SetupException  e) {
 
             logger.error (e, e);
 
-            lastStatusException = e;
-            lastStatus = null;
+            lastStatusException.set (e);
+            lastStatus.set (null);
 
         } finally {
             statusUpdateLock.unlock();
@@ -757,12 +752,12 @@ public class SystemService {
 
     void checkServiceDisappearance(SystemStatusWrapper systemStatus) throws FileException, SetupException {
 
-        if (lastStatus != null) {
+        if (lastStatus.get() != null) {
 
             for (String serviceStatusFlag : systemStatus.getRootKeys()) {
 
                 // if service is currently not OK but was previously OK
-                if (!systemStatus.isServiceStatusFlagOK(serviceStatusFlag) && lastStatus.isServiceStatusFlagOK(serviceStatusFlag)) {
+                if (!systemStatus.isServiceStatusFlagOK(serviceStatusFlag) && lastStatus.get().isServiceStatusFlagOK(serviceStatusFlag)) {
 
                     logger.warn("For service " + serviceStatusFlag + " - previous status was OK and status is " + systemStatus.getValueForPath(serviceStatusFlag));
                     notificationService.addError("Service " + SystemStatusWrapper.getServiceName(serviceStatusFlag)

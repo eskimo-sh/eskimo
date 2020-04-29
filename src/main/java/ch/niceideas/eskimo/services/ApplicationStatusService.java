@@ -51,6 +51,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Component
@@ -82,7 +83,7 @@ public class ApplicationStatusService {
 
     private ReentrantLock statusUpdateLock = new ReentrantLock();
     private final Timer timer;
-    private JsonWrapper lastStatus = null;
+    private final AtomicReference<JsonWrapper> lastStatus = new AtomicReference<>();
 
 
     // constructor for spring
@@ -105,18 +106,13 @@ public class ApplicationStatusService {
     }
 
     public JsonWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
-        try {
-            statusUpdateLock.lock();
 
-            // special case at application startup : if the UI request comes before the first status update
-            if (lastStatus == null) {
-                updateStatus();
-            }
-
-            return lastStatus;
-        } finally {
-            statusUpdateLock.unlock();
+        // special case at application startup : if the UI request comes before the first status update
+        if (lastStatus.get() == null) {
+            updateStatus();
         }
+
+        return lastStatus.get();
     }
 
     public void updateStatus() {
@@ -175,7 +171,7 @@ public class ApplicationStatusService {
 
             systemStatus.getJSONObject().put("links", linkArray);
 
-            lastStatus = systemStatus;
+            lastStatus.set (systemStatus);
 
         } finally {
             statusUpdateLock.unlock();

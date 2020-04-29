@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.model;
 
 public enum MemoryConsumptionSize {
 
-    NEGLECTABLE(0), SMALL(1), MEDIUM(2), LARGE(3);
+    MESOS(0), NEGLECTABLE(0), SMALL(1), MEDIUM(2), LARGE(3), VERYLARGE (5);
 
     private final int nbrParts;
 

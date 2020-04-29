@@ -80,7 +80,7 @@
       "unique": true,
       "group" : "Monitoring",
       "name" : "Grafana",
-      "memory": "small",
+      "memory": "mesos",
       "logo" : "images/grafana-logo.png",
       "icon" : "images/grafana-icon.png"
     },
@@ -155,7 +155,7 @@
       "unique": true,
       "group" : "Gluster",
       "name" : "Dashboard",
-      "memory": "neglectable",
+      "memory": "mesos",
       "logo" : "images/gdash-logo.png",
       "icon" : "images/gdash-icon.png"
     },
@@ -243,7 +243,7 @@
       "group" : "Mesos",
       "name" : "Agent",
       "selectionLayout" : { "row" : 3, "col" : 1},
-      "memory": "neglectable",
+      "memory": "verylarge",
       "logo" : "images/mesos-agent-logo.png",
       "icon" : "images/mesos-agent-icon.png"
     },
@@ -269,6 +269,27 @@
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
+      }
+    ],
+    "editableConfigurations": [
+      {
+        "filename": "agent-resources-temporary-file.properties",
+        "filesystemService": "mesos",
+        "propertyType": "variable",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
+        "properties": [
+          {
+            "name": "cpu_additional",
+            "comment": "The number of additional CPUs to declare in mesos agent on every node running it.",
+            "defaultValue": "1"
+          },
+          {
+            "name": "ram_additional",
+            "comment": "The number of additional RAM (in MB) to declare in mesos agent on every node running it.",
+            "defaultValue": "1024"
+          }
+        ]
       }
     ]
   },
@@ -404,7 +425,7 @@
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
-      "memory": "neglectable",
+      "memory": "mesos",
       "logo" : "images/kafka-manager-logo.png",
       "icon" : "images/kafka-manager-icon.png"
     },
@@ -440,7 +461,7 @@
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
-      "memory": "neglectable",
+      "memory": "mesos",
       "logo" : "images/spark-history-server-logo.png",
       "icon" : "images/spark-history-server-icon.png"
     },
@@ -482,7 +503,7 @@
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 3, "col" : 3},
-      "memory": "large",
+      "memory": "mesos",
       "logo" : "images/spark-executor-logo.png",
       "icon" : "images/spark-executor-icon.png"
     },
@@ -656,7 +677,7 @@
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "row": 4, "col": 3  },
-      "memory": "medium",
+      "memory": "mesos",
       "logo" : "images/flink-worker-logo.png",
       "icon" : "images/flink-worker-icon.png"
     },
@@ -721,7 +742,7 @@
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
-      "memory": "neglectable",
+      "memory": "mesos",
       "logo" : "images/cerebro-logo.png",
       "icon" : "images/cerebro-icon.png"
     },
@@ -796,7 +817,7 @@
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
-      "memory": "small",
+      "memory": "mesos",
       "logo" : "images/kibana-logo.png",
       "icon" : "images/kibana-icon.png"
     },
@@ -849,7 +870,7 @@
       "marathon": true,
       "unique": true,
       "name" : "Zeppelin",
-      "memory": "small",
+      "memory": "mesos",
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional__commentedOut": ["spark-executor"],
       "logo" : "images/zeppelin-logo.png",

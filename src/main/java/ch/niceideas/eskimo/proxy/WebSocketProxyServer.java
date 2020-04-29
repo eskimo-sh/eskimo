@@ -72,7 +72,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
     }
 
     public void removeForwarders(String serviceId) {
-        logger.info ("Dropping all forwarders for  service ID " + serviceId);
+        logger.info ("Dropping all forwarders for  service ID " + serviceId + " (will be recreated lazily)");
         Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.get(serviceId);
         if (forwardersForService != null) {
             for (Map<String, WebSocketProxyForwarder> forwardersForSession : forwardersForService.values()) {

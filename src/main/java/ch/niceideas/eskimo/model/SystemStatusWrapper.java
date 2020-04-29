@@ -82,7 +82,12 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         if (StringUtils.isBlank(serviceStatusFlag)) {
             return null;
         }
-        return serviceStatusFlag.substring(SERVICE_PREFIX.length(), serviceStatusFlag.indexOf("_", SERVICE_PREFIX.length() + 1));
+        if (serviceStatusFlag.startsWith(SERVICE_PREFIX)) {
+            return serviceStatusFlag.substring(SERVICE_PREFIX.length(), serviceStatusFlag.indexOf("_", SERVICE_PREFIX.length() + 1));
+        } else if (serviceStatusFlag.startsWith(NODE_ALIVE_FLAG)) {
+            return "Node Alive";
+        }
+        return serviceStatusFlag;
     }
 
     public static String getNodeName (String serviceStatusFlag) {

@@ -48,6 +48,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -147,11 +148,16 @@ public class ProxyManagerService {
                 proxyTunnelConfigs.put(serviceId, newConfig);
 
                 if (prevConfig != null) {
-                    connectionManagerService.recreateTunnels (prevConfig.getRemoteAddress());
-                    logger.info ("Updating server config for service " + serviceName + ". Will recreate connection of "
+                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to "
                             + ipAddress + " and " + prevConfig.getRemoteAddress() + " (dropping service)");
+                    try {
+                        connectionManagerService.recreateTunnels(prevConfig.getRemoteAddress());
+                    } catch (ConnectionManagerException e) {
+                        logger.error ("Couldn't drop former tunnels for " + serviceName + " on " + prevConfig.getRemoteAddress() +
+                                " - got " + e.getClass() + ":" + e.getMessage());
+                    }
                 } else {
-                    logger.info ("Updating server config for service " + serviceName + ". Will recreate connection of " + ipAddress);
+                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to " + ipAddress);
                 }
 
                 connectionManagerService.recreateTunnels (ipAddress);

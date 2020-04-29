@@ -248,7 +248,7 @@ public class ConnectionManagerService {
             return connection;
 
         } catch (IOException | JSONException | FileException | SetupException e) {
-            logger.error (e.getMessage());
+            logger.error ("When recreating connection to " + ipAddress +" - got " + e.getClass() + ":" + e.getMessage());
             logger.debug (e, e);
             throw new ConnectionManagerException(e);
 

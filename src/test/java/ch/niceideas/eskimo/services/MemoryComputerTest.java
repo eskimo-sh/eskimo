@@ -101,27 +101,29 @@ public class MemoryComputerTest {
         assertNotNull(memmModel1);
         assertEquals(4, memmModel1.size());
 
-        assertEquals(Long.valueOf(438), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(1314), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(876), memmModel1.get("kafka"));
-        assertEquals(Long.valueOf(1314), memmModel1.get("spark-executor"));
+        assertEquals(Long.valueOf(370), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(1110), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(740), memmModel1.get("kafka"));
+        assertEquals(null, memmModel1.get("spark-executor"));
+        assertEquals(Long.valueOf(1850), memmModel1.get("mesos-agent"));
 
         Map<String, Long> memmModel2 = res.get("192.168.10.12");
         assertNotNull(memmModel2);
         assertEquals(4, memmModel2.size());
 
-        assertEquals(Long.valueOf(422), memmModel2.get("logstash"));
-        assertEquals(Long.valueOf(1266), memmModel2.get("elasticsearch"));
-        assertEquals(Long.valueOf(844), memmModel2.get("kafka"));
-        assertEquals(Long.valueOf(1266), memmModel2.get("spark-executor"));
+        assertEquals(Long.valueOf(357), memmModel2.get("logstash"));
+        assertEquals(Long.valueOf(1071), memmModel2.get("elasticsearch"));
+        assertEquals(Long.valueOf(714), memmModel2.get("kafka"));
+        assertEquals(null, memmModel2.get("spark-executor"));
 
         Map<String, Long> memmModel3 = res.get("192.168.10.13");
         assertNotNull(memmModel3);
         assertEquals(3, memmModel3.size());
 
-        assertEquals(Long.valueOf(867), memmModel3.get("elasticsearch"));
-        assertEquals(Long.valueOf(578), memmModel3.get("kafka"));
-        assertEquals(Long.valueOf(867), memmModel3.get("spark-executor"));
+        assertEquals(Long.valueOf(723), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(482), memmModel3.get("kafka"));
+        assertEquals(null, memmModel3.get("spark-executor"));
+        assertEquals(Long.valueOf(1205), memmModel3.get("mesos-agent"));
 
     }
 
@@ -181,19 +183,23 @@ public class MemoryComputerTest {
 
         Map<String, Long> memmModel1 = res.get("192.168.10.11");
         assertNotNull(memmModel1);
-        assertEquals(7, memmModel1.size());
+        assertEquals(4, memmModel1.size());
 
         assertEquals(null, memmModel1.get("ntp"));
         assertEquals(null, memmModel1.get("prometheus"));
         assertEquals(null, memmModel1.get("gluster"));
-        assertEquals(null, memmModel1.get("mesos-agent"));
-        assertEquals(Long.valueOf(3465), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(1155), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(2310), memmModel1.get("kafka"));
-        assertEquals(Long.valueOf(3465), memmModel1.get("spark-executor"));
-        assertEquals(Long.valueOf(2310), memmModel1.get("flink-worker"));
+        assertEquals(null, memmModel1.get("cerebro"));
+        assertEquals(null, memmModel1.get("grafana"));
+        assertEquals(null, memmModel1.get("kafka-manager"));
+        assertEquals(null, memmModel1.get("zeppelin"));
+        assertEquals(null, memmModel1.get("kibana"));
+        assertEquals(null, memmModel1.get("gdash"));
+        assertEquals(Long.valueOf(3960), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(1320), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(2640), memmModel1.get("kafka"));
+        assertEquals(null, memmModel1.get("spark-executor"));
+        assertEquals(null, memmModel1.get("flink-worker"));
+        assertEquals(Long.valueOf(6600), memmModel1.get("mesos-agent"));
         assertEquals(null, memmModel1.get("zookeeper"));
-        assertEquals(Long.valueOf(1155), memmModel1.get("kibana"));
-        assertEquals(Long.valueOf(1155), memmModel1.get("zeppelin"));
     }
 }

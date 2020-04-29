@@ -39,6 +39,7 @@ Wants=network.target
 
 [Service]
 ExecStartPre=/usr/local/sbin/register-marathon-registry.sh
+ExecStartPre=/usr/local/sbin/injectMesosAgentSettings.sh
 
 ExecStart=/usr/local/sbin/mesos-init-wrapper.sh slave
 KillMode=mixed

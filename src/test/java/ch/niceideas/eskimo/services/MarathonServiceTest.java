@@ -35,28 +35,27 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.*;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.ProxyTunnelConfig;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class MarathonServiceTest extends AbstractSystemTest {
 
@@ -149,7 +148,76 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
     @Test
     public void testApplyMarathonServicesConfig () throws Exception {
-        fail ("To Be Implemented");
+
+        ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        serviceInstallStatus.removeInstallationFlag("cerebro", "MARATHON_NODE");
+        serviceInstallStatus.removeInstallationFlag("gdash", "MARATHON_NODE");
+        serviceInstallStatus.removeInstallationFlag("kafka-manager", "MARATHON_NODE");
+        serviceInstallStatus.removeInstallationFlag("kibana", "MARATHON_NODE");
+        serviceInstallStatus.removeInstallationFlag("spark-history-server", "MARATHON_NODE");
+        serviceInstallStatus.removeInstallationFlag("zeppelin", "MARATHON_NODE");
+        serviceInstallStatus.setValueForPath("grafana_installed_on_IP_MARATHON_NODE", "OK");
+
+        MarathonOperationsCommand command = MarathonOperationsCommand.create (
+                servicesDefinition,
+                systemService,
+                serviceInstallStatus,
+                new MarathonServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"))
+        );
+
+        final List<String> installList = new LinkedList<>();
+        final List<String> uninstallList = new LinkedList<>();
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                if (request instanceof BasicHttpEntityEnclosingRequest) {
+                    return StreamUtils.getAsString(((BasicHttpEntityEnclosingRequest)request).getEntity().getContent());
+                }
+                return request.getRequestLine().getUri();
+            }
+            @Override
+            void installMarathonService(String service, String marathonIpAddress) {
+                installList.add (service+"-"+marathonIpAddress);
+            }
+            @Override
+            void uninstallMarathonService(String service, String marathonIpAddress) throws SystemException {
+                uninstallList.add (service+"-"+marathonIpAddress);
+            }
+        });
+
+        MarathonException exception = assertThrows(MarathonException.class, () -> {
+            marathonService.applyMarathonServicesConfig(command);
+        });
+        assertNotNull(exception);
+        assertEquals("ch.niceideas.eskimo.services.SystemException: Marathon doesn't seem to be installed", exception.getMessage());
+
+        configurationService.saveServicesInstallationStatus(serviceInstallStatus);
+
+        configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+
+        systemService.setLastStatusForTest(StandardSetupHelpers.getStandard2NodesSystemStatus());
+
+        marathonService.setNodesConfigurationService(new NodesConfigurationService() {
+            @Override
+            String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
+                                              MemoryModel memoryModel, String ipAddress, Set<String> deadIps) {
+                // No-Op
+                return "OK";
+            }
+        });
+
+        marathonService.applyMarathonServicesConfig(command);
+
+        assertEquals(6, installList.size());
+        assertEquals("cerebro-192.168.10.11," +
+                "gdash-192.168.10.11," +
+                "kafka-manager-192.168.10.11," +
+                "kibana-192.168.10.11," +
+                "spark-history-server-192.168.10.11," +
+                "zeppelin-192.168.10.11", String.join(",", installList));
+
+        assertEquals(1, uninstallList.size());
+        assertEquals("grafana-192.168.10.11", String.join(",", uninstallList));
     }
 
     @Test
@@ -222,7 +290,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testFetchMarathonServicesStatus () throws Exception {
+    public void testFetchMarathonServicesStatusNominal () throws Exception {
 
         final List<String> marathonApiCalls = new ArrayList<>();
 
@@ -260,6 +328,159 @@ public class MarathonServiceTest extends AbstractSystemTest {
         assertEquals("TD", statusMap.get("service_grafana_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_zeppelin_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_kafka-manager_192-168-10-13"));
+    }
+
+    @Test
+    public void testFetchMarathonServicesStatusServiceDown () throws Exception {
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                if (service.equals("cerebro") || service.equals("gdash")) {
+                    return new Pair<>("192.168.10.13", "notOK");
+                } else {
+                    return new Pair<>("192.168.10.13", "running");
+                }
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+
+        marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
+
+        assertEquals(7, statusMap.size());
+        assertEquals("KO", statusMap.get("service_cerebro_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_kibana_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_spark-history-server_192-168-10-13"));
+        assertEquals("KO", statusMap.get("service_gdash_192-168-10-13"));
+        assertEquals("TD", statusMap.get("service_grafana_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_zeppelin_192-168-10-13"));
+        assertEquals("OK", statusMap.get("service_kafka-manager_192-168-10-13"));
+    }
+
+    @Test
+    public void testFetchMarathonServicesStatusMarathonServiceDown () throws Exception {
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>(MarathonService.MARATHON_NA_FLAG, "NA");
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+
+        marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
+
+        // grafana is away !
+        //assertEquals(7, statusMap.size());
+        assertEquals(6, statusMap.size());
+
+        assertEquals("KO", statusMap.get("service_cerebro_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_spark-history-server_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_gdash_192-168-10-11"));
+        // This one is not referenced anymore in this case
+        //assertEquals("KO", statusMap.get("service_grafana_192-168-10-13"));
+        assertEquals("KO", statusMap.get("service_zeppelin_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_kafka-manager_192-168-10-11"));
+    }
+
+    @Test
+    public void testFetchMarathonServicesStatusMarathonNodeDown () throws Exception {
+
+
+        final List<String> marathonApiCalls = new ArrayList<>();
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>("192.168.10.13", "running");
+            }
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                marathonApiCalls.add(request.getRequestLine().getUri());
+                return "{\"deploymentId\": \"1234\"}";
+            }
+            @Override
+            protected void waitForServiceShutdown(String service) throws MarathonException {
+                // No Op
+            }
+        });
+
+        systemService = new SystemService(false) {
+            @Override
+            String sendPing(String ipAddress) throws SSHCommandException {
+                super.sendPing(ipAddress);
+                throw new SSHCommandException("Node dead");
+            }
+        };
+        systemService.setNodeRangeResolver(nodeRangeResolver);
+        systemService.setSetupService(setupService);
+        systemService.setProxyManagerService(proxyManagerService);
+        systemService.setSshCommandService(sshCommandService);
+        systemService.setServicesDefinition(servicesDefinition);
+        systemService.setMarathonService(marathonService);
+        systemService.setMessagingService(messagingService);
+        systemService.setNotificationService(notificationService);
+        marathonService.setSystemService(systemService);
+
+        final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+
+        marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
+
+        // grafana is away !
+        //assertEquals(7, statusMap.size());
+        assertEquals(6, statusMap.size());
+
+        assertEquals("KO", statusMap.get("service_cerebro_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_spark-history-server_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_gdash_192-168-10-11"));
+        // This one is not referenced anymore in this case
+        //assertEquals("KO", statusMap.get("service_grafana_192-168-10-13"));
+        assertEquals("KO", statusMap.get("service_zeppelin_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_kafka-manager_192-168-10-11"));
     }
 
     @Test

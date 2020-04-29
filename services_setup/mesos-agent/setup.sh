@@ -106,6 +106,14 @@ echo " - Copying kill-orphan-marathon-container-HACK.sh script"
 sudo cp $SCRIPT_DIR/kill-orphan-marathon-container-HACK.sh /usr/local/sbin/
 sudo chmod 754 /usr/local/sbin/kill-orphan-marathon-container-HACK.sh
 
+echo " - Copying settingsInjector.sh script"
+sudo cp $SCRIPT_DIR/settingsInjector.sh /usr/local/sbin/
+sudo chmod 754 /usr/local/sbin/settingsInjector.sh
+
+echo " - Copying injectMesosAgentSettings.sh script"
+sudo cp $SCRIPT_DIR/injectMesosAgentSettings.sh /usr/local/sbin/
+sudo chmod 754 /usr/local/sbin/injectMesosAgentSettings.sh
+
 
 if [[ `sudo crontab -u root -l 2>/dev/null | grep kill-orphan-marathon-container-HACK.sh` == "" ]]; then
     echo " - Scheduling periodic execution of kill-orphan-marathon-container-HACK.sh using crontab"
@@ -147,7 +155,7 @@ sudo bash -c "echo -e \". /etc/eskimo_topology.sh\"  >> /usr/local/etc/mesos/mes
 sudo bash -c "echo 'export MESOS_master=zk://\$MASTER_ZOOKEEPER_1:2181/mesos\' >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
 sudo bash -c "echo -e \"\n# file path containing the JSON-formatted Total consumable resources per agent.\" >> /usr/local/etc/mesos/mesos-slave-env.sh"
-#sudo bash -c "echo \"export MESOS_resources=file:///usr/local/lib/mesos/etc/mesos/mesos-resources.json\" >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo \"export MESOS_resources=file:///usr/local/lib/mesos/etc/mesos/mesos-resources.json\" >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
 sudo bash -c "echo -e \"\n#Avoid issues with systems that have multiple ethernet interfaces when the Master or Slave\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 sudo bash -c "echo -e \"#registers with a loopback or otherwise undesirable interface.\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
@@ -163,41 +171,20 @@ sudo bash -c "echo -e \"\n#Enabling docker image provider.\"  >> /usr/local/etc/
 #sudo bash -c "echo -e \"#Comma-separated list of supported image providers.\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 #sudo bash -c "echo -e \"export MESOS_image_providers=docker,appc\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
-sudo bash -c "echo -e \"# Comma-separated list of containerizer implementations to compose in order to provide containerization\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"\n# Comma-separated list of containerizer implementations to compose in order to provide containerization\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 sudo bash -c "echo -e \"# Available options are mesos and docker\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 sudo bash -c "echo -e \"export MESOS_containerizers=docker,mesos\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
-sudo bash -c "echo -e \"# isolation mechanisms to use\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"\n# isolation mechanisms to use\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 sudo bash -c "echo -e \"export MESOS_isolation=docker/runtime,filesystem/linux\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
-sudo bash -c "echo -e \"# Giving it a little time do download and extract large docker images\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"\n# Giving it a little time do download and extract large docker images\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 sudo bash -c "echo -e \"export MESOS_executor_registration_timeout=5mins\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
-
-#echo " - Creating mesos agent resource file to define agent available resources"
-#sudo rm -Rf /usr/local/lib/mesos/etc/mesos/mesos-resources.json
-#
-#cat > /tmp/mesos-resources.json <<- "EOF"
-#[
-#  {
-#    "name": "cpus",
-#    "type": "SCALAR",
-#    "scalar": {
-#      "value": 2
-#    }
-#  },
-#  {
-#    "name": "mem",#
-#    "type": "SCALAR",
-#    "scalar": {
-#      "value": 2800
-#    }
-#  }
-#]
-#EOF
-#sudo mv /tmp/mesos-resources.json /usr/local/lib/mesos/etc/mesos/mesos-resources.json
-#sudo chmod 755 /usr/local/lib/mesos/etc/mesos/mesos-resources.json
-#sudo chown root.staff /usr/local/lib/mesos/etc/mesos/mesos-resources.json
+sudo bash -c "echo -e \"\n# This flag controls which agent configuration changes are considered acceptable when recovering the previous agent state.\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"# additive: The new state must be a superset of the old state: it is permitted to add additional resources, attributes \"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"# and domains but not to remove or to modify existing ones.\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
+sudo bash -c "echo -e \"export MESOS_reconfiguration_policy=additive\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
 
 echo " - Reloading systemd config"

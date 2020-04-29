@@ -83,6 +83,7 @@ public abstract class AbstractSystemTest {
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
     protected String systemStatusTest = null;
+    protected String expectedFullStatus = null;
     protected String expectedPrevStatusServicesRemoved = null;
     protected String expectedPrevStatusAllServicesStay = null;
 
@@ -91,6 +92,7 @@ public abstract class AbstractSystemTest {
     public void setUp() throws Exception {
 
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), "UTF-8");
+        expectedFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatus.json"), "UTF-8");
         expectedPrevStatusServicesRemoved = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusServicesRemoved.json"), "UTF-8");
         expectedPrevStatusAllServicesStay = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusAllServicesStay.json"), "UTF-8");
 
@@ -135,14 +137,20 @@ public abstract class AbstractSystemTest {
         setupService.setConfigurationService (configurationService);
 
         systemService = createSystemService();
-        systemService.setSetupService(setupService);
-        systemService.setProxyManagerService(proxyManagerService);
-
-        systemService.setNodeRangeResolver(nodeRangeResolver);
 
         sshCommandService = new SSHCommandService() {
             @Override
             public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                if (script.equals("sudo cat /proc/meminfo | grep MemTotal")) {
+                    switch (hostAddress) {
+                        case "192.168.10.11":
+                            return "MemTotal:        5969796 kB";
+                        case "192.168.10.12":
+                            return "MemTotal:        5799444 kB";
+                        default:
+                            return "MemTotal:        3999444 kB";
+                    }
+                }
                 testSSHCommandScript.append(script + "\n");
                 return testSSHCommandResultBuilder.toString();
             }
@@ -156,21 +164,16 @@ public abstract class AbstractSystemTest {
                 // just do nothing
             }
         };
-        systemService.setSshCommandService(sshCommandService);
 
         messagingService = new MessagingService();
-        systemService.setMessagingService(messagingService);
 
         notificationService = new NotificationService();
-        systemService.setNotificationService(notificationService);
 
         systemOperationService = new SystemOperationService();
         systemOperationService.setNotificationService(notificationService);;
         systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
-
-        systemService.setServicesDefinition(servicesDefinition);
 
         memoryComputer = new MemoryComputer() {
             @Override
@@ -199,7 +202,15 @@ public abstract class AbstractSystemTest {
         marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
 
+        systemService.setNodeRangeResolver(nodeRangeResolver);
+        systemService.setSetupService(setupService);
+        systemService.setProxyManagerService(proxyManagerService);
+        systemService.setSshCommandService(sshCommandService);
+        systemService.setServicesDefinition(servicesDefinition);
         systemService.setMarathonService(marathonService);
+        systemService.setMessagingService(messagingService);
+        systemService.setNotificationService(notificationService);
+        systemService.setConfigurationService(configurationService);
 
         nodesConfigurationService = createNodesConfigurationService();
         nodesConfigurationService.setConfigurationService(configurationService);
