@@ -41,19 +41,31 @@ Software.
 
 == Eskimo Introduction
 
-Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
-*Big Data 2.0* clusters using *Docker* and *Mesos*.
+A state of the art _Big Data Infrastructure_ and _Management Web Console_ to _build_, _manage_ and _operate_
+*Big Data 2.0 Analytics clusters*
+
 
 image::doc/guides/eskimo-guide/pngs/eskimo-status.png[800, 800, align="center"]
 
-Eskimo is in a certain way the *Operating System* of your Big Data Cluster:
+Eskimo is in a certain way the Operating System of your Big Data Cluster:
 
-* an Administration Application aimed at drastically simplifying the deployment, administration and operation of your
-  Big Data Cluster
-* a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Spark, Flink,
-  Kafka and ElasticSearch* with all the required tools and consoles to manage them such as *Cerebro, Kibana, Zeppelin,
-  Kafka-Manager, Grafana and Prometheus*.
-* a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services
+* A _plug and play_, working _out of the Box_, *Big Data Analytics platform* fulfilling _enterprise environment
+requirements_.
+* A *state of the art Big Data 2.0 platform*
+** based on _Docker_, _Marathon_, _Mesos_ and _Systemd_
+** packaging _Gluster_, _Spark_, _Kafka_, _Flink_, _Nifi_ and _ElasticSearch_
+** with all the administration and management consoles such as _Cerebro_, _Kibana_, _Zeppelin_, _Kafka-Manager_,
+_Grafana_ and _Prometheus_.
+* An _Administration Application_ aimed at drastically simplifying the *deployment, administration and operation* of
+your Big Data Cluster
+* A _Data Science Laboratory_ and _Production environment_ where Data Analytics is both
+** developed and
+** operated in production
+
+Eskimo is as well:
+
+* a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
+  all the _nuts and bolds_ required to make them work well together.
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
 
 Eskimo Packages all the componentds above and takes care of all the nuts and bolts required to make them work together
@@ -66,9 +78,11 @@ image::doc/guides/eskimo-guide/pngs/eskimo_platform.png[800, 800, align="center"
 *Travis CI Integration Build Status* +
 image:https://travis-ci.com/eskimo-sh/eskimo.svg?branch=master["Build Status", link="https://travis-ci.com/eskimo-sh/eskimo"]
 
+// Hiden for now as long as I don't know what's going on.
+////
 *SonarCloud Quality Checks Status* +
 image:https://sonarcloud.io/api/project_badges/measure?project=eskimo-sh_eskimo&metric=alert_status["Sonarcloud Status", link="https://sonarcloud.io/dashboard?id=eskimo-sh_eskimo"]
-
+////
 
 == Information
 

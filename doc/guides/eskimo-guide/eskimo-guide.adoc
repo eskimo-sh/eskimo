@@ -40,11 +40,18 @@ Software.
 = Eskimo User and Administration Guide
 
 [[chap-introduction]]
+
 == Eskimo Introduction
+
+A state of the art _Big Data Infrastructure_ and _Management Web Console_ to _build_, _manage_ and _operate_
+*Big Data 2.0 Analytics clusters*
+
+
+image::pngs/eskimo.jpg[50, 50, align="center"]
 
 Eskimo is in a certain way the Operating System of your Big Data Cluster:
 
-* A _plug and pla_y, working _out of the Box_, *Big Data Analytics platform* fulfilling _enterprise environment
+* A _plug and play_, working _out of the Box_, *Big Data Analytics platform* fulfilling _enterprise environment
 requirements_.
 * A *state of the art Big Data 2.0 platform*
 ** based on _Docker_, _Marathon_, _Mesos_ and _Systemd_
