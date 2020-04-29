@@ -42,18 +42,23 @@ Software.
 [[chap-introduction]]
 == Eskimo Introduction
 
-Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
-*Big Data 2.0* clusters using *Docker*, *SystemD* and *Mesos*.
-
-image::pngs/eskimo.jpg[50, 50, align="center"]
-
 Eskimo is in a certain way the Operating System of your Big Data Cluster:
 
-* a *Web Based Administration Application* aimed at drastically simplifying the deployment, administration and
-  operation of your Big Data Cluster
-* a state of the art *Big Data 2.0* platform based on *Docker, Mesos and Systemd* and packaging *Gluster, Zookeeper, Spark,
-  Kafka, Flink and ElasticSearch* with all the required tools and consoles required to use and  manage them such
-  as *Cerebro, Kibana, Zeppelin, Kafka-Manager, Grafana and Prometheus*.
+* A _plug and pla_y, working _out of the Box_, *Big Data Analytics platform* fulfilling _enterprise environment
+requirements_.
+* A *state of the art Big Data 2.0 platform*
+** based on _Docker_, _Marathon_, _Mesos_ and _Systemd_
+** packaging _Gluster_, _Spark_, _Kafka_, _Flink_, _Nifi_ and _ElasticSearch_
+** with all the administration and management consoles such as _Cerebro_, _Kibana_, _Zeppelin_, _Kafka-Manager_,
+_Grafana_ and _Prometheus_.
+* An _Administration Application_ aimed at drastically simplifying the *deployment, administration and operation* of
+your Big Data Cluster
+* A _Data Science Laboratory_ and _Production environment_ where Data Analytics is both
+** developed and
+** operated in production
+
+Eskimo is as well:
+
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
   all the _nuts and bolds_ required to make them work well together.
 * a framework for building and deploying Big Data and NoSQL services based on docker and systemd
@@ -227,27 +232,31 @@ image::pngs/technical_architecture.png[800, 800, align="center"]
 
 Three components are available in the storage layer
 
-* ElasticSearch
-* Gluster FS
-* Zookeeper
+* *ElasticSearch*: a real-time, scalable, document-oriented and REST operated NoSQL Database
+* *Gluster FS*: the distributed filesystem in use with Eskimo
+* *Apache Zookeeper*: the distributed configuration, synchronization and orchestration system
 
 The processing layer makes the following services available:
 
-* Kafka : used for real-time integration and streaming abilities
-* Spark : the large scale very versatile computation engine
-* Flink : distributed processing engine for stateful computations over data stream
+* *Apache Kafka* : used for real-time data integration and streaming processing
+* *Apache Spark* : the large scale very versatile computation engine
+* *Apache Flink* : a distributed processing engine for real-time and streaming stateful computations over data stream
+* *Elastic Logstash* : used for data ingestion, processing and dispatching
 * As a sidenote, ElasticSearch can also be considered part of the processing tier since it provides many processing
 abilities (ppeline computations, aggregations, etc.)
-* logstash : used for data processing and ingestion
 
-Spark and Flink are operated by mesos to achieve optimal cluster resources booking and negotiation.
+Spark and Flink are operated by *Apache Mesos* to achieve optimal cluster resources booking and negotiation.
 
 The user layer is intended for data / result visualizations and platform administration with the following components:
 
-* Kibana, Grafana and Zeppelin for data and result visualizations
-* Cerebro, The Spark Console, The Flink Dashboard, the Kafka Manager and the Mesos UI for platform administration
+* *Elastic Kibana*, *Grafana* and *Apache Zeppelin* for data and result visualizations
+** Grafana is also used natively for platform monitoring concerns
+* *Cerebro*, The Spark Console, The Flink Dashboard, the *Kafka Manager*, the *Mesos Console* and the *Marathon
+Console* for platform administration.
 
-Docker is used to operate and manage services and components along with systemd.
+Each and every software components is executed with Docker and packaged as a docker container.
+Runtime operation is ensured using Mesos and Marathon for most services and static services are handled with SystemD
+directly and defined as SyystemD units.
 
 ==== Typical Application architecture
 
@@ -263,21 +272,22 @@ This is an example of a possible deployment of Eskimo on a 6 nodes cluster:
 
 image::pngs/system_architecture.png[800, 800, align="center"]
 
-The Eskimo application itself can be deployed on any of the cluster nodes or on another machine, as in the example
-above.
+The Eskimo application itself can be deployed on any of the cluster nodes or on another, separated machine (as in the
+example above),
 
 [[ssh-tunneling]]
 === SSH Tunelling
 
 One of the most important feature of the Eskimo Web Console is its ability to provide in a single and consistent
-Graphical User Interface al the underlying components administration Consoles such as the mesos Console or the Kafka
-Manager, just as the essential Data Science Application such as Kibana and Zeppelin.
+Graphical User Interface al the underlying components administration Consoles such as the _Mesos Console_ or the _Kafka
+Manager_, just as the essential Data Science Applications such as _Kibana_ and _Zeppelin_.
 
-The Eskimo Frontend wraps these other web applications in it's own User Interface and the Eskimo backend proxies their
-HTTP data flows to their respective backend, in a transparent way. The actual localization of these console backends is
-only known by the eskimo backend and is handled automatically.
-Whenever such a console or service is moved from a node to another node, that is completely transparent to the end
-user.
+The Eskimo Frontend wraps these other web applications in it's own _User Interface_ and the Eskimo backend proxies their
+HTTP data flows to their respective backend through SSH, in a transparent and secured way. +
+The actual location of these software components (the runtime cluster node on which they are actually executed) is only
+known by the eskimo backend and is handled automatically. +
+Whenever such a console or service is moved from a node to another node, either manually or automatically by Marathon,
+that is completely transparent to the end user.
 
 image::pngs/ssh-tunneling.png[800, 800, align="center"]
 
@@ -331,7 +341,7 @@ Variables")
 
 In order to run eskimo, one needs to have
 
-* At least 8Gb of disk storage space on the machine running Eskimo
+* At least 10Gb of disk storage space on the machine running Eskimo
 * *At least one linux machine* available on the network (can be the same machine than the one running Eskimo) that will
 be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
 the eskimo cluster.
@@ -346,7 +356,8 @@ Linux distributions successfully tested with Eskimo and officially supported are
 * Fedora 29 and greater
 * OpenSUSE 15.1 and greater
 
-Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far.
+Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far and may require the
+administrator to adapt the setup scripts.
 
 ===== Minimum hardware
 
@@ -373,32 +384,48 @@ capacity for this node is as follows:
 
 
 
-===== Firewall open ports on eskimo nodes
+===== Protecting eskimo nodes with a firewall
+
+The different sevices operated by Eskimo require different set of ports to communicate with each others.
 
 In case a firewall (firewalld or simple iptables configuration) is installed on eskimo cluster nodes, then
-the following port numbers need to be explicitly open (for both UDP and TCP) on every single node for inside eskimo
-cluster communications to work properly:
+the following port numbers need to be explicitly open (for both UDP and TCP) on every single node in the cluster for
+eskimo access:
 
-* [cerebro] : 9000
+*IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE MESOS MASTER. MESOS AGENTS,
+MARATHON, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE FLY
+AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
+
+*For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
+firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
+Every eskimo node should have wide accedd to every other eskimo node. Period.*
+
+However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
+only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
+Eskimo console to the nodes from the Eskimo cluster happens through SSH tunnels.
+
+For the sake of precision, the list of static ports used by the different services are listed here:
+
+* [cerebro] : 9000, 31900
 * [elasticsearch] : 9200, 9300
-* [gdash] : 28180
+* [gdash] : 28180, 31180
 * [gluster] : 24007, 24008, 24009, 24010, 49152, 38465, 38466, 38467
-* [grafana] : 3000
+* [grafana] : 3000, 31300
 * [kafka] : 9092, 9093, 9999
-* [kafka-manager] : 22080
-* [kibana] : 5601
+* [kafka-manager] : 22080, 31220
+* [kibana] : 5601, 31561
 * [mesos] : 53, 61003, 61003, 61091, 61420, 62080, 62501, 64000, 5050, 7070, 8101, 8123, 8200, 8201, 8443, 8888, 9090,
 9443, 9990, 15055, 15201, 61053, 61430, 61053
 * [ntp] 123
 * [prometheus] : 9090, 9091, 9093, 9094, 9100
 * [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
 * [flink] : 6121, 6122, 6123, 6130, 8081
-* [spark-history-server] : 18080
-* [zeppelin] : 38080, 38081
+* [spark-history-server] : 18080, 31810
+* [zeppelin] : 38080, 38081, 31008, 31009
 * [zookeeper] : 2181, 2888, 3888
+* [marathon] : 5000, 28080
 
-Again, most of these ports need to be opened only for internal eskimo cluster node communications. +
-Exteral access is performed through SSH proxying - see <<ssh-tunneling>> - a flagship feature provided by eskimo.
+Again, this list is incomplete since it doesn't reveal the dyxnamic port ranges mentionned above.
 
 ===== Eskimo system user
 
@@ -680,7 +707,7 @@ they need to be *downloaded* from the remote packages repository (by default htt
 
 Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
 and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
-connection and/or the eskimp host machine processing abilities.
+connection and/or the eskimo host machine processing abilities.
 
 Rgerading the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
 to enable eskimo to reach the cluster nodes.
@@ -702,7 +729,7 @@ for service docker images or mesos packages.
 ==== Introduction
 
 Public key authentication is a way of logging into an SSH/SFTP account using a cryptographic key rather than a
-password. This ia a strong requirement in the current version of eskimo.
+password. This is a strong requirement in the current version of eskimo.
 
 ==== How Public Key Authentication Works
 
@@ -955,6 +982,8 @@ for the time being, administrators need to configure eskimo using IP addresses a
 With all nodes from the cluster to be managed by eskimo properly identified either as single node or as part of a range
 of nodes, services can be configured and deployed.
 
+image::pngs/multiple-services.png[600, 600, align="center"]
+
 ==== Master services
 
 Some service are considered *master services* and are identified on the _services selection_ window as unique services
@@ -964,8 +993,6 @@ a radio button
 These "_Master services_" - considered unique - can only be configured in single node configuration and only once for
 the whole cluster:
 
-image::pngs/unique-services.png[600, 600, align="center"]
-
 ==== Slave services
 
 Some other services are considered *slave services* and can be deployed at will, on one single or all nodes of the
@@ -973,8 +1000,6 @@ cluster (understand services that can be deployed multiple times, e.g. elasticse
 configured using a checkbox on the _services selection_ window.
 
 These "_Slave Services_" - considered multiple - can be configured at will:
-
-image::pngs/multiple-services.png[600, 600, align="center"]
 
 [[apply_configuration]]
 ==== Applying nodes configuration
@@ -1314,8 +1339,16 @@ Eskimo provides a specific command line tool for manipulating mesos frameworks: 
 on all nodes of the eskimo cluster. +
 This tool can be used to list running frameworks, force kill them in a reliable way, etc.
 
+=== Mesosphere Marathon
 
+image::pngs/marathon-logo.png[80, 80, align="center"]
 
+Marathon is a production-grade container orchestration platform for Apache Mesos.
+
+Eskimo leverages on Marathon to distribute services, consoles and Web Applications accross Eskimo cluster nodes. Eskimo
+provides virtual routing to the runtime node running services and wraps the HTTP traffic through SSH tunnels.
+
+https://mesosphere.github.io/marathon/
 
 === Apache Spark
 
