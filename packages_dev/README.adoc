@@ -320,7 +320,7 @@ The file `eskimo_packages_versions.json` describes the repository of packages an
 }
 ----
 
-It's content should be aligned with the followin properties from the configuration file `eskimo.properties`:
+It's content should be aligned with the following properties from the configuration file `eskimo.properties`:
 
 * `system.packagesToBuild` giving the set of docker images for packages to be or downloaded
 * `system.mesosPackages` giving the name of the mesos packages to built or downloaded
