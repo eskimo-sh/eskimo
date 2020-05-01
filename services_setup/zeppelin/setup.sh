@@ -196,7 +196,6 @@ fail_if_error $? /tmp/zeppelin_install_log -23
 docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? /tmp/zeppelin_install_log -24
 
-
 echo " - Copying Topology Injection Script (Zeppelin)"
 docker cp $SCRIPT_DIR/inContainerInjectTopologyZeppelin.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyZeppelin.sh >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -20
@@ -204,6 +203,15 @@ fail_if_error $? "/tmp/zeppelin_install_log" -20
 docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyZeppelin.sh" >> /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -21
 
+
+if [[ -f /usr/local/bin/mesos-cli.sh ]]; then
+    echo " - Copying mesos-cli"
+    docker cp /usr/local/bin/mesos-cli.sh zeppelin:/usr/local/bin/mesos-cli.sh >> /tmp/zeppelin_install_log 2>&1
+    fail_if_error $? "/tmp/zeppelin_install_log" -20
+
+    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/mesos-cli.sh" >> /tmp/zeppelin_install_log 2>&1
+    fail_if_error $? "/tmp/zeppelin_install_log" -21
+fi
 
 # if /usr/local/bin/logstash-cli is found, then copy it to container
 if [[ -f /usr/local/bin/logstash-cli ]]; then
