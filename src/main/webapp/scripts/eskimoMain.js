@@ -111,17 +111,13 @@ eskimo.Main = function() {
     }
     this.startOperationInProgress = startOperationInProgress;
 
-    function stopOperationInProgress (success) {
-        console.log ("eskimoMain - stopOperationInProgress");
-        eskimoMessaging.stopOperationInProgress (success);
-        setOperationInProgress (false);
-        hideProgressbar();
-    }
-    this.stopOperationInProgress = stopOperationInProgress;
-
     function scheduleStopOperationInProgress (success) {
         console.log ("eskimoMain - scheduleStopOperationInProgress");
-        window.setTimeout (stopOperationInProgress, MESSAGES_POLLING_STOP_DELAY, success);
+        eskimoMessaging.stopOperationInProgress (success, function() {
+            setOperationInProgress (false);
+            hideProgressbar();
+        });
+
     }
     this.scheduleStopOperationInProgress = scheduleStopOperationInProgress;
 
@@ -337,7 +333,10 @@ eskimo.Main = function() {
         eskimoMessaging = new eskimo.Messaging();
         // loadLastLine -> get-lastline-messaging
 
-        eskimoConsoles = new eskimo.Consoles();
+        eskimoConsoles = new eskimo.Consoles({eskimoMain: this});
+        // (nothing)
+
+        eskimoFileManagers = new eskimo.FileManagers({eskimoMain: this});
         // (nothing)
 
         eskimoServices = new eskimo.Services();
@@ -361,13 +360,10 @@ eskimo.Main = function() {
         eskimoOperationsCommand = new eskimo.OperationsCommand();
         // (nothing)
 
-        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();
+        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({eskimoMain: this});
         // (nothing)
 
         eskimoSetupCommand = new eskimo.SetupCommand();
-        // (nothing)
-
-        eskimoFileManagers = new eskimo.FileManagers();
         // (nothing)
 
         eskimoSystemStatus = new eskimo.SystemStatus();

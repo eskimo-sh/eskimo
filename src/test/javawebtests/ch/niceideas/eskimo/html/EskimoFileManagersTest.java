@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
@@ -58,7 +59,13 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         page.executeJavaScript("var dirContent = " + dirContent + "");
 
         // instantiate test object
-        page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers();");
+        page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers({" +
+                "    eskimoMain: {" +
+                "        isSetupDone: function() { return true; }," +
+                "        showOnlyContent: function() {}," +
+                "        hideProgressbar: function() {}" +
+                "    }" +
+                "});");
 
         waitForElementIdInDOM("file-managers-file-manager-content");
 
@@ -67,8 +74,8 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         // set services for tests
         page.executeJavaScript("eskimoFileManagers.setAvailableNodes (" +
-                "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"'192.168.10.11\"}, " +
-                " {\"nbr\": 2, \"nodeName\": \"192-168-10-13\", \"nodeAddress\": \"'192.168.10.13\"} ] );");
+                "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"}, " +
+                " {\"nbr\": 2, \"nodeName\": \"192-168-10-13\", \"nodeAddress\": \"192.168.10.13\"} ] );");
 
         page.executeJavaScript("eskimoFileManagers.openFolder = function (nodeAddress, nodeName, currentFolder, subFolder) {" +
                 "    eskimoFileManagers.listFolder (nodeAddress, nodeName, currentFolder+'/'+subFolder, dirContent);\n" +
@@ -79,6 +86,9 @@ public class EskimoFileManagersTest extends AbstractWebTest {
                 "    eskimoFileManagers.getOpenedFileManagers().push({\"nodeName\" : nodeName, \"nodeAddress\": nodeAddress, \"current\": \"/\"});" +
                 "    eskimoFileManagers.listFolder (nodeAddress, nodeName, '/', dirContent);\n" +
                 "}");
+
+        page.executeJavaScript("$('#inner-content-file-managers').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-file-managers').css('visibility', 'visible')");
     }
 
     @Test
@@ -165,9 +175,43 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoFileManagers.selectFileManager('192.168.10.11', '192-168-10-11');");
 
+        System.err.println (page.asXml());
+
         page.getElementById("file-manager-close-192-168-10-11").click();
 
         assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
         assertJavascriptEquals("192-168-10-13", "eskimoFileManagers.getOpenedFileManagers()[0].nodeName");
+    }
+
+    @Test
+    public void testShowFileManagers() {
+        page.executeJavaScript("eskimoFileManagers.showFileManagers()");
+
+        assertNotNull (page.getElementById("file_manager_open_192-168-10-11"));
+        assertEquals ("192.168.10.11", page.getElementById("file_manager_open_192-168-10-11").getTextContent().trim());
+
+        assertNotNull (page.getElementById("file_manager_open_192-168-10-13"));
+        assertEquals ("192.168.10.13", page.getElementById("file_manager_open_192-168-10-13").getTextContent().trim());
+    }
+
+    @Test
+    public void testClickOpenFileManagers() throws Exception {
+
+        testShowFileManagers();
+
+        page.getElementById("file_manager_open_192-168-10-13").click();
+
+        //System.err.println (page.asXml());
+
+        assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "inherit");
+        assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "inherit");
+
+        page.getElementById("file_manager_open_192-168-10-11").click();
+
+        assertCssValue ("#file-managers-file-manager-192-168-10-11", "visibility", "inherit");
+        assertCssValue ("#file-managers-file-manager-192-168-10-11", "display", "inherit");
+
+        assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "hidden");
+        assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "none");
     }
 }

@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
@@ -55,7 +56,13 @@ public class EskimoConsolesTest extends AbstractWebTest {
                 "}\n");
 
         // instantiate test object
-        page.executeJavaScript("eskimoConsoles = new eskimo.Consoles();");
+        page.executeJavaScript("eskimoConsoles = new eskimo.Consoles({" +
+                "   eskimoMain: {" +
+                "       isSetupDone: function() {return true; }," +
+                "       showOnlyContent: function() {}," +
+                "       hideProgressbar: function() {}" +
+                "   }" +
+                "});");
 
         waitForElementIdInDOM("consoles-console-content");
 
@@ -67,6 +74,8 @@ public class EskimoConsolesTest extends AbstractWebTest {
                 "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"}, " +
                 " {\"nbr\": 2, \"nodeName\": \"192-168-10-13\", \"nodeAddress\": \"192.168.10.13\"} ] );");
 
+        page.executeJavaScript("$('#inner-content-consoles').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-consoles').css('visibility', 'visible')");
     }
 
     @Test
@@ -79,6 +88,37 @@ public class EskimoConsolesTest extends AbstractWebTest {
         } catch (Throwable e) {
             fail ("No error expected ");
         }
+    }
+
+    @Test
+    public void testShowConsoles() {
+        page.executeJavaScript("eskimoConsoles.showConsoles()");
+
+        assertNotNull (page.getElementById("console_open_192-168-10-11"));
+        assertEquals ("192.168.10.11", page.getElementById("console_open_192-168-10-11").getTextContent());
+
+        assertNotNull (page.getElementById("console_open_192-168-10-13"));
+        assertEquals ("192.168.10.13", page.getElementById("console_open_192-168-10-13").getTextContent());
+    }
+
+    @Test
+    public void testClickOpenConsle() throws Exception {
+
+        testShowConsoles();
+
+        page.getElementById("console_open_192-168-10-13").click();
+
+
+        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "inherit");
+        assertCssValue ("#consoles-console-192-168-10-13", "display", "inherit");
+
+        page.getElementById("console_open_192-168-10-11").click();
+
+        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "inherit");
+        assertCssValue ("#consoles-console-192-168-10-11", "display", "inherit");
+
+        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "hidden");
+        assertCssValue ("#consoles-console-192-168-10-13", "display", "none");
     }
 
     @Test

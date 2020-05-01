@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.MarathonOperationsCommand = function() {
+eskimo.MarathonOperationsCommand = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -45,7 +48,9 @@ eskimo.MarathonOperationsCommand = function() {
 
             if (statusTxt == "success") {
 
-                //
+                $('#marathon-operations-command-header-cancel').click(cancelMarathonOperationsCommand);
+                $('#marathon-operations-command-button-cancel').click(cancelMarathonOperationsCommand);
+                $('#marathon-operations-command-button-validate').click(validateMarathonOperationsCommand);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -115,9 +120,9 @@ eskimo.MarathonOperationsCommand = function() {
 
     function validateMarathonOperationsCommand() {
 
-        eskimoMain.getMessaging().showMessages();
+        that.eskimoMain.getMessaging().showMessages();
 
-        eskimoMain.startOperationInProgress();
+        that.eskimoMain.startOperationInProgress();
 
         // 1 hour timeout
         $.ajax({
@@ -133,15 +138,15 @@ eskimo.MarathonOperationsCommand = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    eskimoMain.scheduleStopOperationInProgress (false);
+                    that.eskimoMain.scheduleStopOperationInProgress (false);
                 } else {
-                    eskimoMain.scheduleStopOperationInProgress (true);
+                    that.eskimoMain.scheduleStopOperationInProgress (true);
                 }
             },
 
             error: function (jqXHR, status) {
                 errorHandler (jqXHR, status);
-                eskimoMain.scheduleStopOperationInProgress (false);
+                that.eskimoMain.scheduleStopOperationInProgress (false);
             }
         });
 
@@ -154,6 +159,10 @@ eskimo.MarathonOperationsCommand = function() {
     }
     this.cancelMarathonOperationsCommand = cancelMarathonOperationsCommand;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constriuctor
     this.initialize();

@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Consoles = function() {
+eskimo.Consoles = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -73,18 +76,28 @@ eskimo.Consoles = function() {
         return availableNodes;
     };
 
+    function getNodeAddress(nodeName) {
+        for (var i = 0; i < availableNodes.length; i++) {
+            if (availableNodes[i].nodeName == nodeName) {
+                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+                return availableNodes[i].nodeAddress;
+            }
+        }
+        return null;
+    }
+
     function showConsoles() {
 
-        if (!eskimoMain.isSetupDone()) {
+        if (!this.eskimoMain.isSetupDone()) {
 
-            eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
+            this.eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
 
         } else {
 
             // maybe progress bar was shown previously
-            eskimoMain.hideProgressbar();
+            this.eskimoMain.hideProgressbar();
 
-            eskimoMain.showOnlyContent("consoles");
+            this.eskimoMain.showOnlyContent("consoles");
 
             // Find available nodes and add them to open console dropdown
             // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
@@ -93,10 +106,17 @@ eskimo.Consoles = function() {
             for (var i = 0; i < availableNodes.length; i++) {
                 var nodeObject = availableNodes[i];
                 var newLi = ''+
-                    '<li><a href="javascript:eskimoMain.getConsoles().openConsole(\'' + nodeObject.nodeAddress + '\', \'' + nodeObject.nodeName + '\');">' +
+                    '<li><a id="console_open_' + nodeObject.nodeName + '" href="#">' +
                     nodeObject.nodeAddress +
                     '</a></li>';
+
                 actionOpenConsole.append($(newLi));
+
+                // register on click handler to actually open console
+                $('#console_open_' + nodeObject.nodeName).click(function() {
+                    var nodeName = this.id.substring("console_open_".length);
+                    openConsole(getNodeAddress(nodeName), nodeName);
+                });
             }
         }
     }
@@ -193,7 +213,7 @@ eskimo.Consoles = function() {
     }
     this.showNextTab = showNextTab;
 
-    this.closeConsole = function (nodeName, terminalToClose) {
+    function closeConsole (nodeName, terminalToClose) {
 
         console.log (terminalToClose);
 
@@ -254,7 +274,8 @@ eskimo.Consoles = function() {
                 }
             }
         }
-    };
+    }
+    this.closeConsole = closeConsole;
 
     function openConsole (nodeAddress, nodeName) {
 
@@ -271,7 +292,7 @@ eskimo.Consoles = function() {
             // Add tab entry
             consoleTabList.append($(''+
                 '<li id="console_' + nodeName + '">'+
-                '<a href="javascript:eskimoMain.getConsoles().selectConsole(\'' + nodeAddress + '\', \'' + nodeName + '\');">' + nodeAddress +
+                '<a id="select_console_' + nodeName + '" href="#">' + nodeAddress +
                 '</a></li>'));
 
             var consoleContent = '<div class="col-md-12 ajaxterminal" id="consoles-console-' + nodeName + '">\n' +
@@ -286,7 +307,7 @@ eskimo.Consoles = function() {
 
             $("#console-close-" + nodeName).click(function () {
                 var terminalToClose = this.id.substring("console-close-".length);
-                that.closeConsole (nodeName, terminalToClose);
+                closeConsole (nodeName, terminalToClose);
             });
 
             var t = new ajaxterm.Terminal("term_"+nodeName, {
@@ -299,11 +320,21 @@ eskimo.Consoles = function() {
 
             openedConsoles.push({"nodeName" : nodeName, "nodeAddress": nodeAddress, "terminal" : t});
 
+            // register on click handler to actually open console
+            $('#select_console_' + nodeName).click(function() {
+                var nodeName = this.id.substring("select_console_".length);
+                selectConsole(getNodeAddress(nodeName), nodeName);
+            });
+
         }
         selectConsole(nodeAddress, nodeName);
     }
     this.openConsole = openConsole;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

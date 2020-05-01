@@ -36,7 +36,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.FileManagers = function() {
+eskimo.FileManagers = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -53,6 +56,15 @@ eskimo.FileManagers = function() {
 
             if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
+
+            } else {
+
+                $("#file-manager-viewer-header-close").click(closeFileViewer);
+                $("#file-manager-viewer-button-close").click(closeFileViewer);
+
+                $("#file-manager-input-header-close").click(closeFilenameInput);
+                $("#file-manager-input-button-cancel").click(closeFilenameInput);
+                $("#file-manager-input-button-validate").click(validateCreateFile);
             }
 
         });
@@ -76,18 +88,28 @@ eskimo.FileManagers = function() {
         return availableNodes;
     };
 
+    function getNodeAddress(nodeName) {
+        for (var i = 0; i < availableNodes.length; i++) {
+            if (availableNodes[i].nodeName == nodeName) {
+                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+                return availableNodes[i].nodeAddress;
+            }
+        }
+        return null;
+    }
+
     function showFileManagers() {
 
-        if (!eskimoMain.isSetupDone()) {
+        if (!this.eskimoMain.isSetupDone()) {
 
-            eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
+            this.eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
 
         } else {
 
             // maybe progress bar was shown previously
-            eskimoMain.hideProgressbar();
+            this.eskimoMain.hideProgressbar();
 
-            eskimoMain.showOnlyContent("file-managers");
+            this.eskimoMain.showOnlyContent("file-managers");
 
             // Find available nodes and add them to open sftp dropdown
             // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
@@ -95,13 +117,16 @@ eskimo.FileManagers = function() {
             actionOpen.html("");
             for (var i = 0; i < availableNodes.length; i++) {
                 var nodeObject = availableNodes[i];
-                var newLi = '<li><a href="javascript:eskimoMain.getFileManagers().openFileManager(\''
-                    + nodeObject.nodeAddress
-                    + '\', \''
-                    + nodeObject.nodeName
-                    + '\');">'
+                var newLi = '<li><a id="file_manager_open_' + nodeObject.nodeName + '" href="#">'
                     + nodeObject.nodeAddress + '</a></li>';
+
                 actionOpen.append($(newLi));
+
+                // register on click handler to actually open console
+                $('#file_manager_open_' + nodeObject.nodeName).click(function() {
+                    var nodeName = this.id.substring("file_manager_open_".length);
+                    openFileManager(getNodeAddress(nodeName), nodeName);
+                });
             }
         }
     }
@@ -147,7 +172,7 @@ eskimo.FileManagers = function() {
     }
     this.findFileManager = findFileManager;
 
-    this.updateCurrentFolder = function (nodeName, folderName) {
+    function updateCurrentFolder (nodeName, folderName) {
         // update current folder in openedFileManager
         var openedFileManager = findFileManager(nodeName);
 
@@ -155,11 +180,12 @@ eskimo.FileManagers = function() {
             openedFileManager.previous = openedFileManager.current;
         }
         openedFileManager.current = folderName;
-    };
+    }
+    this.updateCurrentFolder = updateCurrentFolder;
 
-    this.listFolder = function (nodeAddress, nodeName, folderName, content) {
+    function listFolder (nodeAddress, nodeName, folderName, content) {
 
-        this.updateCurrentFolder (nodeName, folderName);
+        updateCurrentFolder (nodeName, folderName);
 
         // Create current path links
         var foldersLinkWrapper = '<a href="javascript:eskimoMain.getFileManagers().openFolder(\''+ nodeAddress + '\', \'' + nodeName + '\', \'/\', \'.\');"> / </a>';
@@ -236,11 +262,13 @@ eskimo.FileManagers = function() {
             '        </div>';
 
         $("#file-manager-folder-content-"+nodeName).html(folderContentHeader + folderContentFiles + folderContentFooter);
-    };
+    }
+    this.listFolder = listFolder;
 
-    this.closeFileViewer = function () {
+    function closeFileViewer() {
         $('#file-viewer-modal').modal("hide");
-    };
+    }
+    this.closeFileViewer = closeFileViewer;
 
     this.openFile = function (nodeAddress, nodeName, currentFolder, file) {
 
@@ -309,7 +337,7 @@ eskimo.FileManagers = function() {
 
                     if (data.status == "OK") {
 
-                        this.openFolder(nodeAddress, nodeName, currentFolder, ".");
+                        that.openFolder(nodeAddress, nodeName, currentFolder, ".");
 
                     } else {
                         alert(data.error);
@@ -322,12 +350,12 @@ eskimo.FileManagers = function() {
         }
     };
 
-    this.showRoot = function (nodeAddress, nodeName) {
-        this.openFolder (nodeAddress, nodeName, "/", ".");
+    function showRoot (nodeAddress, nodeName) {
+        that.openFolder (nodeAddress, nodeName, "/", ".");
+    }
+    this.showRoot = showRoot;
 
-    };
-
-    this.showParent = function (nodeAddress, nodeName) {
+    function showParent (nodeAddress, nodeName) {
 
         var openedFileManager = findFileManager(nodeName);
 
@@ -345,18 +373,20 @@ eskimo.FileManagers = function() {
             parentFolder = openedFileManager.current.substring(0, indexOfLastSlash);
         }
 
-        this.openFolder (nodeAddress, nodeName, parentFolder, ".");
-    };
+        that.openFolder (nodeAddress, nodeName, parentFolder, ".");
+    }
+    this.showParent = showParent;
 
-    this.showPrevious = function (nodeAddress, nodeName) {
+    function showPrevious (nodeAddress, nodeName) {
 
         var openedFileManager = findFileManager(nodeName);
 
         if (openedFileManager.previous != null && openedFileManager.previous != "") {
 
-            this.openFolder(nodeAddress, nodeName, openedFileManager.previous, ".");
+            that.openFolder(nodeAddress, nodeName, openedFileManager.previous, ".");
         }
-    };
+    }
+    this.showPrevious = showPrevious;
 
     function refreshFolder (nodeAddress, nodeName) {
 
@@ -378,7 +408,7 @@ eskimo.FileManagers = function() {
     }
     this.createFile = createFile;
 
-    this.validateCreateFile = function () {
+    function validateCreateFile() {
 
         var nodeName = $('#filename-input-nodeName').val();
         var nodeAddress = $('#filename-input-nodeAddress').val();
@@ -388,14 +418,13 @@ eskimo.FileManagers = function() {
         $.ajax({
             type: "GET",
             dataType: "json",
-            context: this,
             contentType: "application/json; charset=utf-8",
             url: "file-manager-create-file?address=" + nodeAddress + "&folder=" + currentFolder + "&fileName=" + newFileName,
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
 
-                    this.listFolder (nodeAddress, nodeName, data.folder, data.content);
+                    listFolder (nodeAddress, nodeName, data.folder, data.content);
 
                 } else {
                     alert(data.error);
@@ -406,26 +435,27 @@ eskimo.FileManagers = function() {
             error: errorHandler
         });
 
-
         $('#filename-input-modal').modal("hide");
-    };
+    }
+    this.validateCreateFile = validateCreateFile;
 
-    this.closeFilenameInput = function () {
+    function closeFilenameInput() {
         $('#filename-input-modal').modal("hide");
-    };
+    }
+    this.closeFilenameInput = closeFilenameInput;
 
     this.openFolder = function (nodeAddress, nodeName, currentFolder, subFolder) {
+        console.log ("Opening folder for " + nodeName + " - " + currentFolder + "/" + subFolder);
         $.ajax({
             type: "GET",
             dataType: "json",
-            context: this,
             contentType: "application/json; charset=utf-8",
             url: "file-manager-navigate?address=" + nodeAddress + "&folder=" + currentFolder + "&subFolder=" + subFolder ,
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
 
-                    this.listFolder (nodeAddress, nodeName, data.folder, data.content);
+                    listFolder (nodeAddress, nodeName, data.folder, data.content);
 
                 } else {
                     alert(data.error);
@@ -437,14 +467,15 @@ eskimo.FileManagers = function() {
         });
     };
 
-    this.uploadFile = function (nodeAddress, nodeName) {
+    function uploadFile (nodeAddress, nodeName) {
 
         var openedFileManager = findFileManager(nodeName);
 
         $("#file-manager-hidden-folder-"+nodeName).val(openedFileManager.current);
 
         $("#file-manager-hidden-file-"+nodeName).trigger('click');
-    };
+    }
+    this.uploadFile = uploadFile;
 
     function registerSubmitFormFileUpload (e, nodeName, nodeAddress) {
         $("#file-manager-upload-form-"+nodeName).on('submit',(function(event) {
@@ -541,7 +572,7 @@ eskimo.FileManagers = function() {
 
             // Add tab entry
             fileManagersTabList.append($('<li id="file-manager_' + nodeName + '">'+
-                '<a href="javascript:eskimoMain.getFileManagers().selectFileManager(\'' + nodeAddress + '\', \'' + nodeName + '\');">' + nodeAddress + '</a></li>'));
+                '<a id="select_file_manager_' + nodeName  + '" href="#">' + nodeAddress + '</a></li>'));
 
             var fileManagerContent = '<div class="col-md-12 file-manager-view" id="file-managers-file-manager-' + nodeName + '">\n' +
                 '    <div id="file-manager-actions-' + nodeName + '">\n' +
@@ -550,25 +581,25 @@ eskimo.FileManagers = function() {
                 '                <button id="file-manager-close-' + nodeName + '" name="file-manager-close-' + nodeName + '" class="btn btn-primary">Close</button>\n' +
                 '            </div>' +
                 '            <div class="btn-group">' +
-                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().showRoot(\'' + nodeAddress + '\', \'' +nodeName + '\');" class="btn btn-default"><i class="fa fa-home"></i> Root</button>\n' +
+                '                <button type="button" id="show_root_' + nodeName + '" class="btn btn-default"><i class="fa fa-home"></i> Root</button>\n' +
                 '            </div>' +
                 '            <div class="btn-group">' +
-                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().showParent(\'' + nodeAddress + '\', \'' + nodeName + '\');" class="btn btn-default"><i class="fa fa-arrow-up"></i> Parent</button>\n' +
+                '                <button type="button" id="show_parent_' + nodeName + '" class="btn btn-default"><i class="fa fa-arrow-up"></i> Parent</button>\n' +
                 '            </div>' +
                 '            <div class="btn-group">' +
-                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().showPrevious(\'' + nodeAddress + '\', \'' + nodeName + '\');" class="btn btn-default"><i class="fa fa-arrow-left"></i> Previous</button>\n' +
+                '                <button type="button" id="show_previous_' + nodeName + '" class="btn btn-default"><i class="fa fa-arrow-left"></i> Previous</button>\n' +
                 '            </div>' +
                 '            <div class="btn-group">' +
-                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().refreshFolder(\'' + nodeAddress + '\', \'' + nodeName + '\');" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>\n' +
+                '                <button type="button" id="refresh_folder_' + nodeName + '" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>\n' +
                 '            </div>' +
                 '            <div class="btn-group"><form target="_blank" id="file-manager-upload-form-' + nodeName + '" method="POST" enctype="multipart/form-data">' +
                 '                <div style="visibility: hidden; display: none;"><input type="file" id="file-manager-hidden-file-' + nodeName + '" name="file"></div>' +
-                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().uploadFile(\'' + nodeAddress + '\', \'' + nodeName + '\');" class="btn btn-default"><i class="fa fa-arrow-circle-up"></i> Upload file</button>\n' +
+                '                <button type="button" id="upload_file_' + nodeName + '" class="btn btn-default"><i class="fa fa-arrow-circle-up"></i> Upload file</button>\n' +
                 '                <input type="hidden" id="file-manager-hidden-folder-' + nodeName + '" name="folder">' +
                 '                <input type="hidden" id="file-manager-hidden-filename-' + nodeName + '" name="filename">' +
                 '            </form></div>' +
                 '            <div class="btn-group">' +
-                '                <button type="button" onclick="javascript:eskimoMain.getFileManagers().createFile(\'' + nodeAddress + '\', \'' + nodeName + '\');" class="btn btn-default"><i class="fa fa-file"></i> Create file</button>\n' +
+                '                <button type="button" id="create_file_' + nodeName + '" class="btn btn-default"><i class="fa fa-file"></i> Create file</button>\n' +
                 '            </div>' +
                 '           <div class="btn-group">' +
                 '                <label id="file-manager-folder-current-' + nodeName + '" class="btn"></label>' +
@@ -654,6 +685,42 @@ eskimo.FileManagers = function() {
 
             });
 
+            // register on click handlers
+            $('#select_file_manager_' + nodeName).click(function() {
+                var nodeName = this.id.substring("select_file_manager_".length);
+                selectFileManager(getNodeAddress(nodeName), nodeName);
+            });
+
+            $('#show_root_' + nodeName).click(function() {
+                var nodeName = this.id.substring("show_root_".length);
+                showRoot(getNodeAddress(nodeName), nodeName);
+            });
+
+            $('#show_parent_' + nodeName).click(function() {
+                var nodeName = this.id.substring("show_parent_".length);
+                showParent(getNodeAddress(nodeName), nodeName);
+            });
+
+            $('#show_previous_' + nodeName).click(function() {
+                var nodeName = this.id.substring("show_previous_".length);
+                showPrevious(getNodeAddress(nodeName), nodeName);
+            });
+
+            $('#refresh_folder_' + nodeName).click(function() {
+                var nodeName = this.id.substring("refresh_folder_".length);
+                refreshFolder(getNodeAddress(nodeName), nodeName);
+            });
+
+            $('#upload_file_' + nodeName).click(function() {
+                var nodeName = this.id.substring("upload_file_".length);
+                uploadFile(getNodeAddress(nodeName), nodeName);
+            });
+
+            $('#create_file_' + nodeName).click(function() {
+                var nodeName = this.id.substring("create_file_".length);
+                createFile(getNodeAddress(nodeName), nodeName);
+            });
+
             that.connectFileManager (nodeAddress, nodeName);
 
         }
@@ -661,6 +728,10 @@ eskimo.FileManagers = function() {
     }
     this.openFileManager = openFileManager;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

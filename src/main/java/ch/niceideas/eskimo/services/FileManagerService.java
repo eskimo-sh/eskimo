@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.StringUtils;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
@@ -141,6 +142,10 @@ public class FileManagerService {
     public Pair<String, JSONObject> createFile(String hostAddress, String folder, String fileName) throws IOException {
 
         try {
+
+            if (StringUtils.isBlank(fileName)) {
+                throw new IOException("Passed fileName is blank");
+            }
 
             SFTPv3Client client = getClient(hostAddress);
 

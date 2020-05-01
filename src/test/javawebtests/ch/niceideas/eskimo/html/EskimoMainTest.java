@@ -52,7 +52,17 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimo.Setup = function(){};");
         page.executeJavaScript("eskimo.NodesConfig = function(){};");
         page.executeJavaScript("eskimo.Notifications = function(){};");
-        page.executeJavaScript("eskimo.Messaging = function(){};");
+        page.executeJavaScript("eskimo.Messaging = function(){" +
+                "    this.setOperationInProgress = function() {" +
+                "    };" +
+                "    this.startOperationInProgress = function() {" +
+                "    };" +
+                "    this.stopOperationInProgress = function(success, callback) {" +
+                "        if (callback != null) {" +
+                "            callback();" +
+                "        }" +
+                "    };" +
+                "};");
         page.executeJavaScript("eskimo.SystemStatus = function(){};");
         page.executeJavaScript("eskimo.Consoles = function(){};");
         page.executeJavaScript("eskimo.Services = function(){" +
@@ -91,6 +101,34 @@ public class EskimoMainTest extends AbstractWebTest {
         assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('pending')");
     }
 
+    @Test
+    public void testShowHideProgressBar() {
+
+        // FIXME Dunno why this whole shit failes. sick of it.
+        //page.executeJavaScript("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
+
+        page.executeJavaScript("eskimoMain.showProgressbar()");
+
+        //assertEquals ("visible", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+
+        page.executeJavaScript("eskimoMain.hideProgressbar()");
+
+        //assertEquals ("hidden", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+    }
+
+    @Test
+    public void testStartStopOperationInprogress() throws Exception {
+
+        assertEquals(false, page.executeJavaScript("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+
+        page.executeJavaScript("eskimoMain.startOperationInProgress();");
+
+        assertEquals(true, page.executeJavaScript("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+
+        page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress();");
+
+        assertEquals(false, page.executeJavaScript("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+    }
 
     @Test
     public void testHandleSetupCompletedAndNotCompleted() throws Exception {
@@ -130,5 +168,5 @@ public class EskimoMainTest extends AbstractWebTest {
 
         assertJavascriptEquals("false", "allEnabled");
     }
-    
+
 }

@@ -1372,3 +1372,8 @@ table.system-information tr td.info-label {
 }
 /*Header color with theme color bg9  Close*/
 
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    font-weight: bolder;
+}

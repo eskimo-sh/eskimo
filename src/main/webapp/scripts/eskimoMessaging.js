@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Messaging = function() {
+eskimo.Messaging = function(constructorObject) {
 
     var MESSAGING_POLLING_DELAY = 3000;
 
@@ -130,6 +130,44 @@ eskimo.Messaging = function() {
     }
     this.setOperationInProgress = setOperationInProgress;
 
+    function fetchLastMessages(callback) {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            url: "fetch-messaging?last_line="+lastLineMessaging,
+            success: function (data, status, jqXHR) {
+
+                // OK
+                //console.log(data);
+
+                if (data && data.status) {
+                    //console.log (atob(data.lines));
+
+                    addMessage(atob(data.lines));
+
+                    lastLineMessaging = data.lastLine;
+
+                } else {
+                    console.error("No data received");
+                }
+
+                if (callback != null && typeof callback === "function") {
+                    callback();
+                }
+            },
+            error: function (jqXHR, status) {
+
+                if (callback != null && typeof callback === "function") {
+                    callback();
+                }
+
+                errorHandler(jqXHR, status);
+            }
+        });
+    }
+    this.fetchLastMessages = fetchLastMessages;
+
     function startOperationInProgress() {
         var pendingBarWrapper = $("#progress-bar-pending-wrapper");
         pendingBarWrapper.css("visibility", "inherit");
@@ -139,32 +177,9 @@ eskimo.Messaging = function() {
 
         $("#pending-message-content").html("");
 
-        messagingPollingHandle = setInterval(function() {
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                url: "fetch-messaging?last_line="+lastLineMessaging,
-                success: function (data, status, jqXHR) {
-
-                    // OK
-                    //console.log(data);
-
-                    if (data && data.status) {
-                        //console.log (atob(data.lines));
-
-                        addMessage(atob(data.lines));
-
-                        lastLineMessaging = data.lastLine;
-
-                    } else {
-                        console.error("No data received");
-                    }
-                },
-                error: errorHandler
-            });
-
-        }, MESSAGING_POLLING_DELAY);
+        messagingPollingHandle = setInterval(
+            fetchLastMessages,
+            MESSAGING_POLLING_DELAY);
     }
     this.startOperationInProgress = startOperationInProgress;
 
@@ -173,21 +188,35 @@ eskimo.Messaging = function() {
     }
     this.addMessage = addMessage;
 
-    function stopOperationInProgress (success) {
+    function stopOperationInProgress (success, callback) {
 
-        if (!success) {
-            $("#pending-message-title").html("<h3><span class='processing-error'>Processing completed in error !</span></h3>");
-        } else {
-            $("#pending-message-title").html("<h3>Processing completed successfully.</h3>");
-        }
-
-        var pendingBarWrapper = $("#progress-bar-pending-wrapper");
-        pendingBarWrapper.css("visibility", "hidden");
-        pendingBarWrapper.css("display", "none");
-
+        // cancel periodic message fetching
         clearInterval (messagingPollingHandle);
+
+        // fetch messages one last time and close OperationInProgress in the end
+        that.fetchLastMessages (function() {
+
+            if (!success) {
+                $("#pending-message-title").html("<h3><span class='processing-error'>Processing completed in error !</span></h3>");
+            } else {
+                $("#pending-message-title").html("<h3>Processing completed successfully.</h3>");
+            }
+
+            var pendingBarWrapper = $("#progress-bar-pending-wrapper");
+            pendingBarWrapper.css("visibility", "hidden");
+            pendingBarWrapper.css("display", "none");
+
+            if (callback != null && typeof callback === "function") {
+                callback();
+            }
+        });
     }
     this.stopOperationInProgress = stopOperationInProgress;
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

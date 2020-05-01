@@ -85,6 +85,11 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
+    public void testSaveMarathonServicesButtonClick() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testSelectAll() throws Exception {
 
         testRenderMarathonConfig();

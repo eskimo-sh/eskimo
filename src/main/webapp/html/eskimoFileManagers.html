@@ -65,13 +65,13 @@ Software.
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" onclick="javascript:eskimoMain.getFileManagers().closeFileViewer();">&times;</button>
+                    <button type="button" class="close" id="file-manager-viewer-header-close">&times;</button>
                     <h4 class="modal-title" id="file-viewer-title">Viewing File : </h4>
                 </div>
                 <div id="file-viewer-body" class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" onclick="javascript:eskimoMain.getFileManagers().closeFileViewer();">OK</button>
+                    <button type="button" class="btn btn-default" id="file-manager-viewer-button-close">OK</button>
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@ Software.
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" onclick="javascript:eskimoMain.getFileManagers().closeFilenameInput();">&times;</button>
+                    <button type="button" class="close" id="file-manager-input-header-close">&times;</button>
                     <h4 class="modal-title" id="filename-input-title">Enter file name </h4>
                 </div>
                 <div class="modal-body">
@@ -101,7 +101,8 @@ Software.
                 </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" onclick="javascript:eskimoMain.getFileManagers().validateCreateFile();">OK</button>
+                    <button type="button" class="btn btn-default" id="file-manager-input-button-cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="file-manager-input-button-validate">OK</button>
                 </div>
             </div>
         </div>
