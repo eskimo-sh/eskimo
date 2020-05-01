@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.MarathonServicesConfig = function() {
+eskimo.MarathonServicesConfig = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -56,15 +59,33 @@ eskimo.MarathonServicesConfig = function() {
                     console.log(setupConfig);
 
                     try {
-                        checkMarathonSetup(setupConfig, eskimoMain.getNodesConfig().getServicesDependencies(),
+                        checkMarathonSetup(setupConfig, that.eskimoMain.getNodesConfig().getServicesDependencies(),
                             function () {
                                 // callback if setup is OK
                                 proceedWithMarathonInstallation(setupConfig);
                             });
                     } catch (error) {
-                        alert ("error");
+                        alert ("error : " + error);
                     }
 
+                    e.preventDefault();
+                    return false;
+                });
+
+                $("#reinstall-marathon-servicesbtn").click(function (e) {
+                    showReinstallSelection();
+                    e.preventDefault();
+                    return false;
+                });
+
+                $("#select-all-marathon-servicesconfig").click(function (e) {
+                    selectAll();
+                    e.preventDefault();
+                    return false;
+                });
+
+                $("#reset-marathon-servicesconfig").click(function (e) {
+                    showMarathonServicesConfig();
                     e.preventDefault();
                     return false;
                 });
@@ -112,7 +133,7 @@ eskimo.MarathonServicesConfig = function() {
         return MARATHON_SERVICES;
     };
 
-    this.selectAll = function() {
+    function selectAll(){
 
         var allSelected = true;
 
@@ -127,7 +148,8 @@ eskimo.MarathonServicesConfig = function() {
         for (var i = 0; i < MARATHON_SERVICES.length; i++) {
             $('#' + MARATHON_SERVICES[i] + "_install").get(0).checked = !allSelected;
         }
-    };
+    }
+    this.selectAll = selectAll;
 
     this.renderMarathonConfig = function (marathonConfig) {
 
@@ -139,7 +161,7 @@ eskimo.MarathonServicesConfig = function() {
 
             marathonServiceRow += ''+
                 '<td>' +
-                '<img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(MARATHON_SERVICES[i]) + '" />' +
+                '<img class="nodes-config-logo" src="' + that.eskimoMain.getNodesConfig().getServiceLogoPath(MARATHON_SERVICES[i]) + '" />' +
                 '</td>'+
                 '<td>'+
                 MARATHON_SERVICES[i]+
@@ -174,9 +196,9 @@ eskimo.MarathonServicesConfig = function() {
 
     };
 
-    this.showReinstallSelection = function() {
+    function showReinstallSelection() {
 
-        eskimoMain.getMarathonServicesSelection().showMarathonServiceSelection();
+        that.eskimoMain.getMarathonServicesSelection().showMarathonServiceSelection();
 
         var marathonServicesSelectionHTML = $('#marathon-services-container-table').html();
         marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/marathon\-services/g, "marathon-services-selection");
@@ -186,18 +208,18 @@ eskimo.MarathonServicesConfig = function() {
             '<form id="marathon-servicesreinstall">' +
             marathonServicesSelectionHTML +
             '</form>');
-
-    };
+    }
+    this.showReinstallSelection = showReinstallSelection;
 
     function showMarathonServicesConfig () {
 
-        if (!eskimoMain.isSetupDone()) {
-            eskimoMain.showSetupNotDone("Cannot configure marathon services as long as initial setup is not completed");
+        if (!that.eskimoMain.isSetupDone()) {
+            that.eskimoMain.showSetupNotDone("Cannot configure marathon services as long as initial setup is not completed");
             return;
         }
 
-        if (eskimoMain.isOperationInProgress()) {
-            eskimoMain.showProgressbar();
+        if (that.eskimoMain.isOperationInProgress()) {
+            that.eskimoMain.showProgressbar();
         }
 
         $.ajax({
@@ -222,7 +244,7 @@ eskimo.MarathonServicesConfig = function() {
 
                 } else if (data.clear == "setup"){
 
-                    eskimoMain.handleSetupNotCompleted();
+                    that.eskimoMain.handleSetupNotCompleted();
 
                 }
 
@@ -231,7 +253,7 @@ eskimo.MarathonServicesConfig = function() {
             error: errorHandler
         });
 
-        eskimoMain.showOnlyContent("marathon-services-config");
+        that.eskimoMain.showOnlyContent("marathon-services-config");
     }
     this.showMarathonServicesConfig = showMarathonServicesConfig;
 
@@ -253,7 +275,7 @@ eskimo.MarathonServicesConfig = function() {
 
     function proceedWithMarathonInstallation(model, reinstall) {
 
-        eskimoMain.showProgressbar();
+        that.eskimoMain.showProgressbar();
 
         // 1 hour timeout
         $.ajax({
@@ -265,7 +287,7 @@ eskimo.MarathonServicesConfig = function() {
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {
 
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.hideProgressbar();
 
                 // OK
                 console.log(data);
@@ -278,16 +300,21 @@ eskimo.MarathonServicesConfig = function() {
                     if (!data.command) {
                         alert ("Expected pending operations command but got none !");
                     } else {
-                        eskimoMain.getMarathonOperationsCommand().showCommand (data.command);
+                        that.eskimoMain.getMarathonOperationsCommand().showCommand (data.command);
                     }
                 }
             },
 
             error: function (jqXHR, status) {
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.hideProgressbar();
                 errorHandler (jqXHR, status);
             }
         });
+    }
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
     }
 
     // call constructor

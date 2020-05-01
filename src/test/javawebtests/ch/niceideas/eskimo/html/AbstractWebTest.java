@@ -188,6 +188,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var nodesConfig = {};");
         page.executeJavaScript("nodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
         page.executeJavaScript("nodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
+        page.executeJavaScript("nodesConfig.getServicesDependencies = function () { return {}; };");
         page.executeJavaScript("nodesConfig.isServiceUnique = function (serviceName){ " +
                 "return (serviceName == 'mesos-master' " +
                 "    || serviceName == 'zookeeper' " +

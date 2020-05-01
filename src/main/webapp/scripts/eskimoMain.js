@@ -354,7 +354,7 @@ eskimo.Main = function() {
         eskimoServicesConfig = new eskimo.ServicesConfig();
         // loadServicesConfig -> load-services-config
 
-        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();
+        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: this});
         // loadMarathonServices -> get-marathon-services
 
         eskimoOperationsCommand = new eskimo.OperationsCommand();

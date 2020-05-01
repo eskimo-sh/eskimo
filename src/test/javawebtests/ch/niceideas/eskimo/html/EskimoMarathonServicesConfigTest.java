@@ -36,14 +36,13 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertNotNull;
 
 public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
@@ -69,7 +68,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         */
 
         // instantiate test object
-        page.executeJavaScript("eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();");
+        page.executeJavaScript("eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: eskimoMain});");
 
         waitForElementIdInDOM("reset-marathon-servicesconfig");
 
@@ -82,11 +81,34 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                 "    \"spark-history-server\",\n" +
                 "    \"zeppelin\"\n" +
                 "  ]);");
+
+        page.executeJavaScript("$('#inner-content-marathon-services-config').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-marathon-services-config').css('visibility', 'visible')");
     }
 
     @Test
     public void testSaveMarathonServicesButtonClick() throws Exception {
-        fail ("To Be Implemented");
+
+        testRenderMarathonConfig();
+
+        page.executeJavaScript("function checkMarathonSetup (marathonConfig) {" +
+                "    console.log (marathonConfig);" +
+                "    window.savedMarathonConfig = JSON.stringify (marathonConfig);" +
+                "};");
+
+        page.getElementById("save-marathon-servicesbtn").click();
+
+        JSONObject expectedConfig = new JSONObject("" +
+                "{\"cerebro_install\":\"on\"," +
+                "\"gdash_install\":\"on\"," +
+                "\"grafana_install\":\"on\"," +
+                "\"kafka-manager_install\":\"on\"," +
+                "\"kibana_install\":\"on\"," +
+                "\"spark-history-server_install\":\"on\"," +
+                "\"zeppelin_install\":\"on\"}");
+
+        JSONObject actualConfig = new JSONObject((String)page.executeJavaScript("window.savedMarathonConfig").getJavaScriptResult());
+        assertTrue(expectedConfig.similar(actualConfig));
     }
 
     @Test
