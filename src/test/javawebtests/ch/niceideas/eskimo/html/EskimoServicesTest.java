@@ -35,11 +35,14 @@
 package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
 
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 public class EskimoServicesTest extends AbstractWebTest {
@@ -178,5 +181,90 @@ public class EskimoServicesTest extends AbstractWebTest {
         page.executeJavaScript("eskimoServices.handleServiceHiding('cerebro', UI_SERVICES_CONFIG['cerebro'])");
 
         assertJavascriptNull("UI_SERVICES_CONFIG['cerebro'].actualUrl");
+    }
+
+    @Test
+    public void testRetryPolicyNominal() throws Exception {
+
+        page.executeJavaScript("eskimoServices.periodicRetryServices = function () { " +
+                "    window.uiConfigsToRetry = eskimoServices.getUIConfigsToRetryForTests();" +
+                "}");
+
+        page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook('192-168-10-11', '192.168.10.11', 'kibana', true, false)");
+
+        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+
+        assertTrue (
+                new JSONArray("[{" +
+                        "\"urlTemplate\":\"http://{NODE_ADDRESS}:9999/kibana\"," +
+                        "\"title\":\"kibana\"," +
+                        "\"waitTime\":15," +
+                        "\"targetUrl\":\"http://192.168.10.11:9999/kibana\"," +
+                        "\"service\":\"kibana\"," +
+                        "\"targetWaitTime\":15," +
+                        "\"refreshWaiting\":true}]")
+                .similar(
+                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+    }
+
+    @Test
+    public void testRetryPolicyStoppedWhenServiceVanishes() throws Exception {
+
+        testRetryPolicyNominal();
+
+        page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook('192-168-10-11', '192.168.10.11', 'kibana', false, false)");
+
+        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+
+        System.err.println(page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+
+        assertTrue (
+                new JSONArray("[]")
+                        .similar(
+                                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+    }
+
+    @Test
+    public void testRetryPolicyNominalThenServiceUp() throws Exception {
+
+        testRetryPolicyNominal();
+
+        page.executeJavaScript("eskimoServices.handleServiceIsUp(window.uiConfigsToRetry[0])");
+
+        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+
+        System.err.println(page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+
+        assertTrue (
+                new JSONArray("[]")
+                        .similar(
+                                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+
+    }
+
+    @Test
+    public void testRetryPolicyServiceClearDoesntStopRetry() throws Exception {
+
+        testRetryPolicyNominal();
+
+        // this is what eskimoMain.serviceMenuClear calls
+        page.executeJavaScript("eskimoServices.handleServiceHiding('kibana')");
+
+        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+
+        System.err.println(page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+
+        assertTrue (
+                new JSONArray("[{" +
+                        "\"urlTemplate\":\"http://{NODE_ADDRESS}:9999/kibana\"," +
+                        "\"title\":\"kibana\"," +
+                        "\"waitTime\":15," +
+                        "\"targetUrl\":\"http://192.168.10.11:9999/kibana\"," +
+                        "\"service\":\"kibana\"," +
+                        "\"targetWaitTime\":15," +
+                        "\"refreshWaiting\":true," +
+                        "\"actualUrl\":null}]")
+                        .similar(
+                                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
     }
 }

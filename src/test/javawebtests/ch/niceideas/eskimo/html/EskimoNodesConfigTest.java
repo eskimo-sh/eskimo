@@ -64,7 +64,12 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
         // instantiate test object
-        page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig();");
+        page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig({\n" +
+                "            eskimoMain: this,\n" +
+                "            eskimoServicesSelection: eskimoServicesSelection,\n" +
+                "            eskimoServices: eskimoServices,\n" +
+                "            eskimoOperationsCommand: eskimoOperationsCommand\n" +
+                "        });");
 
         waitForElementIdInDOM("reset-nodes-config");
 

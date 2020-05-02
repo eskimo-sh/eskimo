@@ -37,6 +37,9 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.Messaging = function(constructorObject) {
 
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
+
     var MESSAGING_POLLING_DELAY = 3000;
 
     var that = this;
@@ -115,9 +118,9 @@ eskimo.Messaging = function(constructorObject) {
     function showMessages() {
 
         // maybe Progress bar was shown previously and we don't show it on messages page
-        eskimoMain.hideProgressbar();
+        that.eskimoMain.hideProgressbar();
 
-        eskimoMain.showOnlyContent("pending");
+        that.eskimoMain.showOnlyContent("pending");
     }
     this.showMessages = showMessages;
 

@@ -319,18 +319,22 @@ eskimo.Main = function() {
 
     this.initialize = function() {
 
+        eskimoOperationsCommand = new eskimo.OperationsCommand();
+        // (nothing)
+
+        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({eskimoMain: this});
+        // (nothing)
+
+        eskimoSetupCommand = new eskimo.SetupCommand();
+        // (nothing)
+
         eskimoSetup = new eskimo.Setup();
         //  -> No specific backend loading
-
-        eskimoNodesConfig = new eskimo.NodesConfig();
-        // loadConfigServices -> get-services-dependencies
-        // - calls eskimoServices.initialize()
-        // loadServiceDependencies -> list-config-services
 
         eskimoNotifications = new eskimo.Notifications();
         // loadLastLine -> get-lastline-notification
 
-        eskimoMessaging = new eskimo.Messaging();
+        eskimoMessaging = new eskimo.Messaging({eskimoMain: this});
         // loadLastLine -> get-lastline-messaging
 
         eskimoConsoles = new eskimo.Consoles({eskimoMain: this});
@@ -352,21 +356,22 @@ eskimo.Main = function() {
         eskimoServicesConfig = new eskimo.ServicesConfig();
         // loadServicesConfig -> load-services-config
 
+        eskimoNodesConfig = new eskimo.NodesConfig({
+            eskimoMain: this,
+            eskimoServicesSelection: eskimoServicesSelection,
+            eskimoServices: eskimoServices,
+            eskimoOperationsCommand: eskimoOperationsCommand
+        });
+        // loadConfigServices -> get-services-dependencies
+        // - calls eskimoServices.initialize()
+        // loadServiceDependencies -> list-config-services
+
         eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: this});
         // loadMarathonServices -> get-marathon-services
 
         eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection({
             eskimoMarathonServicesConfig: eskimoMarathonServicesConfig
         });
-        // (nothing)
-
-        eskimoOperationsCommand = new eskimo.OperationsCommand();
-        // (nothing)
-
-        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({eskimoMain: this});
-        // (nothing)
-
-        eskimoSetupCommand = new eskimo.SetupCommand();
         // (nothing)
 
         eskimoSystemStatus = new eskimo.SystemStatus();

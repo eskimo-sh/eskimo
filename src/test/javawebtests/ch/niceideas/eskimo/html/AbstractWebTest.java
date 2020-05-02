@@ -178,6 +178,10 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var eskimoConsoles = {}");
         page.executeJavaScript("eskimoConsoles.setAvailableNodes = function () {};");
 
+        page.executeJavaScript("var eskimoServicesSelection = {}");
+
+        page.executeJavaScript("var eskimoOperationsCommand = {}");
+
         page.executeJavaScript("var eskimoMessaging = {}");
         page.executeJavaScript("eskimoMessaging.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMessaging.setOperationInProgress = function() {};");

@@ -272,6 +272,10 @@ eskimo.Services = function () {
     }
     this.handleServiceIsUp = handleServiceIsUp;
 
+    this.getUIConfigsToRetryForTests = function() {
+        return uiConfigsToRetry;
+    };
+
     this.periodicRetryServices = function() {
 
         //console.log ("periodicRetryServices - " + uiConfigsToRetry.length);
@@ -310,7 +314,16 @@ eskimo.Services = function () {
 
         var waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
 
-        //console.log ("service display : " + service + " - immediate ? " + immediate + " - reinitialize ? " + reinitialize + " - waitTime : " +  uiConfig.waitTime);
+        /*
+        console.log ("service display : " + service +
+            " - immediate ? " + immediate +
+            " - reinitialize ? " + reinitialize +
+            " - waitTime : " +  uiConfig.waitTime +
+            " - refreshWaiting : " + uiConfig.refreshWaiting +
+            " - serviceInitialized? : " + serviceInitialized[service] +
+            " - condition? : " + ((!serviceInitialized[service] || reinitialize) && !uiConfig.refreshWaiting) +
+            " - uiConfig.includes? : " + uiConfigsToRetry.includes(uiConfig));
+        */
 
         if ((!serviceInitialized[service] || reinitialize) && !uiConfig.refreshWaiting) {
 
@@ -318,11 +331,12 @@ eskimo.Services = function () {
             uiConfig.service = service;
             uiConfig.targetWaitTime = waitTime;
 
-
             uiConfig.refreshWaiting = true;
+
             serviceInitialized[uiConfig.service] = true;
 
-            if (!uiConfigsToRetry.includes(uiConfig)) {
+            if (uiConfigsToRetry.length == 0 || !uiConfigsToRetry.includes(uiConfig)) {
+                //console.log("Adding retry service " + uiConfig.service);
                 uiConfigsToRetry.push(uiConfig);
             }
         }
