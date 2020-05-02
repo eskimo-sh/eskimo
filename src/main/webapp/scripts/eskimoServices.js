@@ -240,15 +240,22 @@ eskimo.Services = function () {
         }
     }
 
-    function handleServiceIsUp(effUIConfig) {
+    function removeFromRetry (uiConfig) {
         // remove from retry list
         for (var j = 0; j < uiConfigsToRetry.length; j++) {
-            if (uiConfigsToRetry[j] == effUIConfig) {
+            if (uiConfigsToRetry[j] == uiConfig) {
+                //console.trace();
                 console.log("removing from retry " + uiConfigsToRetry[j].service);
                 uiConfigsToRetry.splice(j, 1);
                 break;
             }
         }
+    }
+
+    function handleServiceIsUp(effUIConfig) {
+
+        // remove from retry list
+        removeFromRetry (effUIConfig);
 
         // schedule usual refresh
         setTimeout(function (otherUIConfig) {
@@ -323,8 +330,10 @@ eskimo.Services = function () {
 
     this.handleServiceHiding = function (service, uiConfig) {
 
-        if (!uiConfig || uiConfig == null) {
+        var comingFromMenuHook = true;
+        if (!uiConfig || uiConfig == null) { // if coming from eskimoMain.serviceMenuClear()
             uiConfig = UI_SERVICES_CONFIG[service];
+            comingFromMenuHook = false;
         }
 
         if (uiConfig == null) {
@@ -345,6 +354,16 @@ eskimo.Services = function () {
             $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
             serviceInitialized[service] = false;
             uiConfig.actualUrl = null;
+        }
+
+        // comingFromMenuHook is false if the hiding is triggered by the periodic menu cleaning in prealable of service
+        // injection (eskimoMain.serviceMenuClear())
+        // => in this case we don't want to mess with retry yet (not as long as we don't know newest status)
+        if (comingFromMenuHook) {
+            // If there as a retry running on service, drop it
+            // (remove from retry list)
+            removeFromRetry(uiConfig);
+            uiConfig.refreshWaiting = false;
         }
 
         // if service was displayed, show Status

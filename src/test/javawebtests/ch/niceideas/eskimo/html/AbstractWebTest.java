@@ -239,8 +239,6 @@ public abstract class AbstractWebTest {
 
         waitForDefinition("$.fn");
 
-
-
         // override jquery load
         page.executeJavaScript("$.fn._internalLoad = $.fn.load;");
         page.executeJavaScript("$.fn.load = function (resource, callback) { return this._internalLoad ('../../src/main/webapp/'+resource, callback); };");

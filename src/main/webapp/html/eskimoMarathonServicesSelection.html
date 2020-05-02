@@ -39,17 +39,16 @@ Software.
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" onclick="javascript:eskimoMain.getServicesSelection().cancelServicesSelection();">&times;</button>
+                <button type="button" class="close"  id="marathon-services-select-header-cancel">&times;</button>
                 <h4 class="modal-title">Select Marathon Services</h4>
             </div>
             <div id="marathon-services-selection-body" class="modal-body">
                 <p>Some text in the modal.</p>
             </div>
             <div class="modal-footer">
-                <button id="select-all-marathon-services-button" type="button" class="btn btn-default"
-                        onclick="javascript:eskimoMain.getMarathonServicesSelection().marathonServicesSelectionSelectAll();">SelectAll</button>
-                <button type="button" class="btn btn-default" onclick="javascript:eskimoMain.getMarathonServicesSelection().cancelMarathonServicesSelection();">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="javascript:eskimoMain.getMarathonServicesSelection().validateMarathonServicesSelection();">OK</button>
+                <button id="select-all-marathon-services-button" type="button" class="btn btn-default">SelectAll</button>
+                <button type="button" class="btn btn-default" id="marathon-services-select-button-cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="marathon-services-select-button-validate">OK</button>
             </div>
         </div>
 

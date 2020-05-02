@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.MarathonServicesSelection = function() {
+eskimo.MarathonServicesSelection = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMarathonServicesConfig = null;
 
     var that = this;
 
@@ -50,7 +53,13 @@ eskimo.MarathonServicesSelection = function() {
 
             if (statusTxt == "success") {
 
-                // nothing to do
+                $("#marathon-services-select-header-cancel").click(cancelMarathonServicesSelection);
+
+                $("#select-all-marathon-services-button").click(marathonServicesSelectionSelectAll);
+
+                $("#marathon-services-select-button-cancel").click(cancelMarathonServicesSelection);
+
+                $("#marathon-services-select-button-validate").click(validateMarathonServicesSelection);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -67,7 +76,7 @@ eskimo.MarathonServicesSelection = function() {
 
         var allSelected = true;
 
-        var marathonServices = eskimoMain.getMarathonServicesConfig().getMarathonServices();
+        var marathonServices = eskimoMarathonServicesConfig.getMarathonServices();
 
         // are they all selected already
         for (var i = 0; i < marathonServices.length; i++) {
@@ -94,9 +103,15 @@ eskimo.MarathonServicesSelection = function() {
 
         var reinstallConfig = $("form#marathon-servicesreinstall").serializeObject();
 
-        eskimoMain.getMarathonServicesConfig().proceedWithReinstall (reinstallConfig);
+        eskimoMarathonServicesConfig.proceedWithReinstall (reinstallConfig);
     }
     this.validateMarathonServicesSelection = validateMarathonServicesSelection;
+
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

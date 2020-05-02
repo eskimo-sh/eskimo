@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,11 +47,20 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
+        loadScript(page, "bootstrap.js");
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoMarathonServicesSelection.js");
 
+        page.executeJavaScript("eskimoMarathonServicesConfig = {};");
+
+        // leaving gdash out intentionally
+        page.executeJavaScript("eskimoMarathonServicesConfig.getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana', 'zeppelin']};");
+
+
         // instantiate test object
-        page.executeJavaScript("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();");
+        page.executeJavaScript("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection({" +
+                "    eskimoMarathonServicesConfig: eskimoMarathonServicesConfig" +
+                "});");
 
 
         waitForElementIdInDOM("marathon-services-selection-body");
@@ -67,16 +77,42 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
         // this is just to ensure everything has been properly loaded by setup
         assertNotNull (page.getElementById("select-all-marathon-services-button"));
+
+        page.executeJavaScript("eskimoMarathonServicesSelection.showMarathonServiceSelection()");
+
+        Thread.sleep(10);
+
+        assertCssValue("#marathon-services-selection-modal", "display", "block");
+        assertCssValue("#marathon-services-selection-modal", "visibility", "visible");
+    }
+
+    @Test
+    public void testClickButtonValidate() throws Exception {
+
+        testNominal();
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.proceedWithReinstall = function (reinstallConfig) {" +
+                "    window.reinstallConfig = JSON.stringify (reinstallConfig);" +
+                "}");
+
+        testSelectAll();
+
+        page.getElementById("marathon-services-select-button-validate").click();
+
+        JSONObject expectedResult = new JSONObject("{" +
+                "\"cerebro_reinstall\":\"on\"," +
+                "\"grafana_reinstall\":\"on\"," +
+                "\"kafka-manager_reinstall\":\"on\"," +
+                "\"kibana_reinstall\":\"on\"," +
+                "\"spark-history-server_reinstall\":\"on\"," +
+                "\"zeppelin_reinstall\":\"on\"}");
+
+        JSONObject actualResult = new JSONObject((String)page.executeJavaScript("window.reinstallConfig").getJavaScriptResult());
+        assertTrue(expectedResult.similar(actualResult));
     }
 
     @Test
     public void testSelectAll() throws Exception {
-
-        page.executeJavaScript("eskimoMain.marathonServicesConfig = {};");
-        page.executeJavaScript("eskimoMain.getMarathonServicesConfig = function () { return eskimoMain.marathonServicesConfig;} ");
-
-        // leaving gdash out intentionally
-        page.executeJavaScript("eskimoMain.getMarathonServicesConfig().getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana', 'zeppelin']};");
 
         page.executeJavaScript("eskimoMarathonServicesSelection.marathonServicesSelectionSelectAll();");
 
