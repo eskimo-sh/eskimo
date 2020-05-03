@@ -111,8 +111,10 @@ if [[ ! -d /var/lib/spark/eventlog ]]; then
     echo "Inconsistency: zeppelin setup is expecting var/lib/spark/eventlog to be created by the spark executor setup (kind of a hack)"
     exit -42
 fi
-sudo mkdir -p /var/lib/spark/data/zeppelin/notebooks
-sudo chown spark /var/lib/spark/data/zeppelin/notebooks
+
+# I shouldn't be creating here anymore
+#sudo mkdir -p /var/lib/spark/data/zeppelin/notebooks
+#sudo chown spark -R /var/lib/spark/data/zeppelin/
 
 #sudo mkdir -p /usr/local/etc/zeppelin
 #sudo chown -R zeppelin /usr/local/etc/zeppelin
@@ -232,29 +234,12 @@ docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerM
 fail_if_error $? "/tmp/zeppelin_install_log" -21
 
 
-#HACK RAW IMPORT OF ZEPPELIN NOTEBOOKS !!!
-# FIXME : here I am importing on the host, counting on the fact that the container
-# FIXME : I shall copy the archive to the container in a tremporary location and extract them if they don't exist at
-#        Zeppelin startup only
-# FIXME If should do this only once, if it's not the first starzip and they're gone, then someline deleted them and I
-#        not install them again
+echo " - HACK import of rawe samples archived in docker container"
+docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -40
 
-echo " - HACK raw import of samples"
-sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/spark/data/zeppelin/notebooks/ >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -30
-
-echo " - HACK extract of samples"
-bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && sudo tar xvfz eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -31
-
-echo " - HACK changing owner of samples"
-bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && sudo chown -R spark *" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -32
-
-echo " - HACK Deleting samples archive"
-bash -c "cd /var/lib/spark/data/zeppelin/notebooks/ && sudo rm -Rf eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -32
-
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/lib/zeppelin/eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -41
 
 
 echo " - Committing changes to local template and exiting container zeppelin"

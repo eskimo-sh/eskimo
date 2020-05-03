@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,37 +34,48 @@
 # Software.
 #
 
-[Unit]
-Description=Gluster FS Server
-Wants=network-online.target
-After=docker.service
-Requires=docker.service
+echoerr() { echo "$@" 1>&2; }
 
-[Service]
-TimeoutStartSec=0
-RemainAfterExit=false
-ExecStartPre=-/usr/bin/docker kill gluster
-ExecStartPre=-/usr/bin/docker rm -f gluster
-ExecStartPre=/bin/rm -f /var/run/gluster/gluster.pid
+rm -f /tmp/gluster_container_pid
 
-ExecStart=/bin/bash -c "/usr/local/sbin/startGlusterServiceContainer.sh"
+echo " - Launching docker container"
+# capturing docker PID
+nohup /usr/bin/docker run \
+        -i \
+        --name gluster \
+        --network host \
+        --privileged=true \
+        -v /var/lib/gluster:/var/lib/gluster\
+        -v /var/log/gluster:/var/log/gluster\
+        -v /var/run/gluster:/var/run/gluster\
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        -e NODE_NAME=$HOSTNAME \
+        eskimo:gluster \
+        /usr/local/sbin/inContainerStartService.sh | tee /var/log/gluster/gluster-container-out-log &
+
+echo " - Giving 5 seconds to container to start"
+sleep 5
 
 
-ExecStop=/usr/bin/docker stop gluster
+echo " - Finding docker run process PID"
+container_process_PID=`ps -ef | grep "docker run" | grep "name gluster"  | tr -s ' ' | cut -d ' ' -f 2`
 
-# Attempt to slow down further process start after gluster
-# making them wait for gluster to be up and running
-Type=forking
-PIDFile=/var/run/gluster/gluster.pid
+if [[ "$container_process_PID" == "" ]]; then
+    echo " - Couldn't not get docker run command PID"
+    exit -2
+else
+    echo " - docker run PID is $container_process_PID"
+fi
 
-Restart=always
-# giving chance to the OS to eliminate the port the remote servre is using
-RestartSec=10
-StartLimitBurst=3
-StartLimitInterval=60
+echo " - Ensuring gluster container is well started"
+if [[ `ps -p $container_process_PID -f | grep "docker run"` != "" ]]; then
+    echo "   + process has been correctly started"
+else
+    echo "   + Could not find runing PID $container_process_PID"
+    exit -1
+fi
 
-StandardOutput=syslog
-StandardError=syslog
+echo " - Creating PID file"
+echo $container_process_PID > /var/run/gluster/gluster.pid
 
-[Install]
-WantedBy=multi-user.target

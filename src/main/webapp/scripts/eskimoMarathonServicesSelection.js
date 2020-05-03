@@ -76,7 +76,7 @@ eskimo.MarathonServicesSelection = function(constructorObject) {
 
         var allSelected = true;
 
-        var marathonServices = eskimoMarathonServicesConfig.getMarathonServices();
+        var marathonServices = that.eskimoMarathonServicesConfig.getMarathonServices();
 
         // are they all selected already
         for (var i = 0; i < marathonServices.length; i++) {
@@ -103,7 +103,7 @@ eskimo.MarathonServicesSelection = function(constructorObject) {
 
         var reinstallConfig = $("form#marathon-servicesreinstall").serializeObject();
 
-        eskimoMarathonServicesConfig.proceedWithReinstall (reinstallConfig);
+        that.eskimoMarathonServicesConfig.proceedWithReinstall (reinstallConfig);
     }
     this.validateMarathonServicesSelection = validateMarathonServicesSelection;
 

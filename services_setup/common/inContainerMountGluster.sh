@@ -68,10 +68,12 @@ sleep 4
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
     echo "   + Changing owner of $MOUNT_POINT"
-    chown -R $OWNER $MOUNT_POINT
+    # not doing it recursively
+    chown $OWNER $MOUNT_POINT
 fi
 
 echo "   + Changing rights of $MOUNT_POINT"
-chmod -R 777 $MOUNT_POINT
+# not doing it recursively
+chmod 777 $MOUNT_POINT
 
 echo "   + SUCCESSFULLY mounted $MOUNT_POINT"

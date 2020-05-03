@@ -42,5 +42,5 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh logstash
 
-echo " - Starting gluster remote server"
+echo " - Starting logstash remote server"
 /usr/local/sbin/logstash_remote.sh

@@ -98,5 +98,43 @@ if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:18999/?command=volume&subcommand=li
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
 fi
 
+echo " - ceating zeppelin notebokk service if it does not exist"
+mkdir -p /var/lib/spark/data/zeppelin/notebooks
+
+echo " - Checking if samples neeed to be installed"
+if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
+
+    echo " - Installing raw samples "
+
+    echo "   + Creating temp dir /tmp/eskimo_samples"
+    mkdir /tmp/eskimo_samples
+
+    echo "   + Copying archive there"
+    cp /usr/local/lib/zeppelin/eskimo_samples.tgz /tmp/eskimo_samples/
+
+    echo "   + changing dir for temp dir"
+    cd  /tmp/eskimo_samples/
+
+    echo "   + Extracting archive"
+    tar xvfz eskimo_samples.tgz > /tmp/eskimo_samples_extract.log 2>&1;
+
+    echo "   + for each of them, see if it needs to be copied"
+    IFS=$'\n'
+    for i in `ls -1 *.zpln`; do
+
+        echo "      - extracting notebook name"
+        notebook_name=`echo $i | cut -d '_' -f 1`
+
+        echo "      - checking if $notebook_name is already installed"
+        if [[ `find /var/lib/spark/data/zeppelin/notebooks/ -name "$notebook_name*" 2>/dev/null` == "" ]]; then
+
+            echo "      - installing $notebook_name "
+            cp $i /var/lib/spark/data/zeppelin/notebooks/
+        fi
+    done
+
+    touch /var/lib/spark/data/zeppelin/samples_installed_flag.marker
+fi
+
 echo " - Starting service"
 bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'

@@ -151,6 +151,11 @@ for i in `find ./gluster_wrappers -mindepth 1`; do
     sudo chmod 755 /usr/local/sbin/$filename
 done
 
+echo " - Copying gluster service docker container startup file"
+sudo cp startGlusterServiceContainer.sh /usr/local/sbin/startGlusterServiceContainer.sh
+sudo chown root /usr/local/sbin/startGlusterServiceContainer.sh
+sudo chmod 755 /usr/local/sbin/startGlusterServiceContainer.sh
+
 
 #echo " - Installing and checking systemd service file"
 install_and_check_service_file gluster /tmp/gluster_install_log
