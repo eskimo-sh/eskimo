@@ -112,5 +112,15 @@ handle_topology_settings zookeeper /tmp/zk_install_log
 echo " - Committing changes to local template and exiting container zookeeper"
 commit_container zookeeper /tmp/zk_install_log
 
+echo " - Copying zookeeper command line programs docker wrappers to /usr/local/bin"
+for i in `find ./zookeeper_wrappers -mindepth 1`; do
+    sudo cp $i /usr/local/bin
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /usr/local/bin/$filename
+done
+
+echo " - Linking zookeeperCli.sh to zkCli.sh"
+sudo ln -s /usr/local/bin/zkCli.sh /usr/local/bin/zookeeperCli.sh
+
 echo " - Handling zookeeper systemd file"
 install_and_check_service_file zookeeper /tmp/zk_install_log

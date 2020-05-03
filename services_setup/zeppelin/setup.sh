@@ -233,6 +233,11 @@ fail_if_error $? "/tmp/zeppelin_install_log" -21
 
 
 #HACK RAW IMPORT OF ZEPPELIN NOTEBOOKS !!!
+# FIXME : here I am importing on the host, counting on the fact that the container
+# FIXME : I shall copy the archive to the container in a tremporary location and extract them if they don't exist at
+#        Zeppelin startup only
+# FIXME If should do this only once, if it's not the first starzip and they're gone, then someline deleted them and I
+#        not install them again
 
 echo " - HACK raw import of samples"
 sudo cp ./HACK_temp_samples/eskimo_samples.tgz /var/lib/spark/data/zeppelin/notebooks/ >> /tmp/zeppelin_install_log 2>&1

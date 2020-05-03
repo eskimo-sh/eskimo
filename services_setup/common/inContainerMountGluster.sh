@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo " - inContainerMountGluser.sh - will now mount $MOUNT_POINT"
+
 # checking arguments
 if [[ $1 == "" ]]; then
     echo "Expecting gluster volume as first argument"
@@ -19,7 +21,7 @@ if [[ $2 == "" ]]; then
 fi
 export OWNER=$3
 
-echo " - Loading topology"
+echo "   + Loading topology"
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
     echo "Cannot find eskimo topology file"
     exit -1
@@ -29,7 +31,7 @@ fi
 
 
 if [[ ! -d $MOUNT_POINT ]]; then
-    echo " - Creating mount point: $MOUNT_POINT"
+    echo "   + Creating mount point: $MOUNT_POINT"
     mkdir -p $MOUNT_POINT
 fi
 
@@ -42,7 +44,7 @@ fi
 
 ls /dev/fuse > /dev/null 2>&1
 if [[ $? != 0 ]]; then
-    echo " - Creating fuse device"
+    echo "   + Creating fuse device"
     mknod /dev/fuse c 10 229
     if [[ $? != 0 ]]; then
         echo "FAILED to to create /dev/fuse node file"
@@ -50,10 +52,10 @@ if [[ $? != 0 ]]; then
     fi
 fi
 
-echo " - Registering gluster filesystem $VOLUME on $MOUNT_POINT"
+echo "   + Registering gluster filesystem $VOLUME on $MOUNT_POINT"
 echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
 
-echo " - Mounting $MOUNT_POINT"
+echo "   + Mounting $MOUNT_POINT"
 mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
 if [[ $? != 0 ]]; then
     echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
@@ -65,9 +67,11 @@ fi
 sleep 4
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
-    echo " - Changing owner and rights of $MOUNT_POINT"
+    echo "   + Changing owner of $MOUNT_POINT"
     chown -R $OWNER $MOUNT_POINT
 fi
 
-
+echo "   + Changing rights of $MOUNT_POINT"
 chmod -R 777 $MOUNT_POINT
+
+echo "   + SUCCESSFULLY mounted $MOUNT_POINT"

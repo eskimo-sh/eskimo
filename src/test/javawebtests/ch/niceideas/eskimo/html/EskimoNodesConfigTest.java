@@ -38,9 +38,11 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -65,7 +67,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // instantiate test object
         page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig({\n" +
-                "            eskimoMain: this,\n" +
+                "            eskimoMain: eskimoMain,\n" +
                 "            eskimoServicesSelection: eskimoServicesSelection,\n" +
                 "            eskimoServices: eskimoServices,\n" +
                 "            eskimoOperationsCommand: eskimoOperationsCommand\n" +
@@ -79,6 +81,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // set services for tests
         page.executeJavaScript("eskimoNodesConfig.setServicesConfigForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
+
+        page.executeJavaScript("$('#inner-content-nodes').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-nodes').css('visibility', 'visible')");
     }
 
     @Test
@@ -116,6 +121,80 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertJavascriptEquals("1.0", "$('#mesos-master2:checked').length");
     }
 
+    @Test
+    public void testSaveNodesButton() throws Exception {
+        testRenderNodesConfig();
+
+        page.executeJavaScript("function checkNodesSetup(nodeSetup) {" +
+                "    window.nodeSetup = nodeSetup" +
+                "}");
+
+        page.getElementById("save-nodes-btn").click();
+
+        //System.err.println(page.executeJavaScript("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
+
+        JSONObject expectedResult = new JSONObject("{" +
+                "\"action_id1\":\"192.168.10.11\"," +
+                "\"marathon\":\"1\"," +
+                "\"ntp1\":\"on\"," +
+                "\"elasticsearch1\":\"on\"," +
+                "\"kafka1\":\"on\"," +
+                "\"mesos-agent1\":\"on\"," +
+                "\"spark-executor1\":\"on\"," +
+                "\"gluster1\":\"on\"," +
+                "\"logstash1\":\"on\"," +
+                "\"action_id2\":\"192.168.10.13\"," +
+                "\"zookeeper\":\"2\"," +
+                "\"mesos-master\":\"2\"," +
+                "\"ntp2\":\"on\"," +
+                "\"elasticsearch2\":\"on\"," +
+                "\"kafka2\":\"on\"," +
+                "\"mesos-agent2\":\"on\"," +
+                "\"spark-executor2\":\"on\"," +
+                "\"gluster2\":\"on\"," +
+                "\"logstash2\":\"on\"}");
+
+        JSONObject actualResult = new JSONObject((String)page.executeJavaScript("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
+
+        assertTrue(expectedResult.similar(actualResult));
+    }
+
+    @Test
+    public void testShowNodesConfigWithResetButton() throws Exception {
+
+        page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
+
+        // test clear = missing
+        page.executeJavaScript("$.ajax = function (object) {" +
+                "    object.success ({clear: \"missing\"});" +
+                "}");
+
+        page.getElementById("reset-nodes-config").click();
+
+        assertTrue(page.getElementById("nodes-placeholder").getTextContent().contains("(No nodes / services configured yet)"));
+
+        // test clear = setup
+        page.executeJavaScript("$.ajax = function (object) {" +
+                "    object.success ({clear: \"setup\"});" +
+                "}");
+
+        page.executeJavaScript("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
+
+        page.getElementById("reset-nodes-config").click();
+
+        assertTrue((boolean)page.executeJavaScript("window.handleSetupNotCompletedCalled").getJavaScriptResult());
+
+        // test OK
+        page.executeJavaScript("$.ajax = function (object) {" +
+                "    object.success ({result: \"OK\"});" +
+                "}");
+
+        page.executeJavaScript("eskimoNodesConfig.renderNodesConfig = function (config) { window.nodesConfig = config; }");
+
+        page.getElementById("reset-nodes-config").click();
+
+        assertJavascriptEquals("{\"result\":\"OK\"}", "JSON.stringify (window.nodesConfig)");
+    }
 
     @Test
     public void testOnServiceSelectedForNode() throws Exception {
@@ -169,6 +248,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     public void testAddNode() throws Exception {
 
         page.executeJavaScript("eskimoNodesConfig.addNode()");
+
+        assertTrue(page.getElementById("label1").getTextContent().contains("Node no  1"));
 
         assertNotNull (page.getElementById("action_id1"));
         assertTagName ("action_id1", "input");

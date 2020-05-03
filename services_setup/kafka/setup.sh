@@ -129,7 +129,6 @@ echo " - Copying kafka command line programs docker wrappers to /usr/local/bin"
 for i in `find ./kafka_wrappers -mindepth 1`; do
     sudo cp $i /usr/local/bin
     filename=`echo $i | cut -d '/' -f 3`
-    #sudo sed -i s/"XXX.XXX.XXX.XXX"/"$SELF_IP_ADDRESS"/g /usr/local/bin/$filename
     sudo chmod 755 /usr/local/bin/$filename
 done
 
