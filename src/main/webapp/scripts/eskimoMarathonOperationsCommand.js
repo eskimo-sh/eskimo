@@ -39,6 +39,7 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
+    this.eskimoMessaging = null;
 
     var that = this;
 
@@ -120,7 +121,7 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
 
     function validateMarathonOperationsCommand() {
 
-        that.eskimoMain.getMessaging().showMessages();
+        that.eskimoMessaging.showMessages();
 
         that.eskimoMain.startOperationInProgress();
 

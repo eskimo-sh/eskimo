@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Notifications = function() {
+eskimo.Notifications = function(constructorObject) {
 
     var that = this;
 
@@ -151,7 +151,9 @@ eskimo.Notifications = function() {
             '    <h3><span id="notifications-count" class="bold">' +
             notifications.length +
             '    </span> Notification(s) ' +
-            '    <a href="javascript:eskimoMain.getNotifications().clearNotifications();"><span class="notifications-clear-link">Clear</span></a></h3>\n' +
+            '    <a id="notifications-clear" href="#">' +
+            '        <span class="notifications-clear-link">Clear</span>' +
+            '    </a></h3>\n' +
             '</li>';
 
         var start = 0;
@@ -229,6 +231,10 @@ eskimo.Notifications = function() {
 
         $("#notifications-container").html(notificationHTML);
 
+        $("#notifications-clear").click(function () {
+            clearNotifications();
+        });
+
     }
 
     function notificationsShown() {
@@ -236,8 +242,12 @@ eskimo.Notifications = function() {
         newNotificationsCount = 0;
         $("#new-notifications-count").html("");
     }
-
     this.notificationsShown = notificationsShown;
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

@@ -230,6 +230,7 @@ eskimo.FileManagers = function(constructorObject) {
             var subFolderProps = content[sortedFilesArray[i]];
 
             var isFolder = subFolderProps.permissions.substring(0, 1) == "d";
+            var isLink = subFolderProps.permissions.substring(0, 1) == "l";
 
             var folderContentRow = ''+
                 '                <tr>\n' +
@@ -250,6 +251,11 @@ eskimo.FileManagers = function(constructorObject) {
                 '                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath(\'' +
                                         nodeAddress + '\', \'' + nodeName + '\', \'' + folderName + '\', \'' + sortedFilesArray[i] + '\');" ' +
                 '                               class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>\n' +
+                                         (!isFolder && !isLink ?
+                '                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().downloadFile(\'' +
+                                        nodeAddress + '\', \'' + nodeName + '\', \'' + folderName + '\', \'' + sortedFilesArray[i] + '\');" ' +
+                '                               class="btn btn-xs btn-default" title="Download"><i class="fa fa-arrow-down"></i></button>\n'
+                                             : '')+
                 '                    </td>\n' +
                 '                </tr>\n';
 

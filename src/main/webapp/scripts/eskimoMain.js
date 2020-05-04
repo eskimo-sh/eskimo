@@ -319,23 +319,27 @@ eskimo.Main = function() {
 
     this.initialize = function() {
 
-        eskimoOperationsCommand = new eskimo.OperationsCommand();
-        // (nothing)
-
-        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({eskimoMain: this});
-        // (nothing)
-
-        eskimoSetupCommand = new eskimo.SetupCommand();
-        // (nothing)
-
         eskimoSetup = new eskimo.Setup();
         //  -> No specific backend loading
 
-        eskimoNotifications = new eskimo.Notifications();
+        eskimoNotifications = new eskimo.Notifications({});
         // loadLastLine -> get-lastline-notification
 
         eskimoMessaging = new eskimo.Messaging({eskimoMain: this});
         // loadLastLine -> get-lastline-messaging
+
+        eskimoOperationsCommand = new eskimo.OperationsCommand({
+            eskimoMain: this,
+            eskimoMessaging : eskimoMessaging});
+        // (nothing)
+
+        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({
+            eskimoMain: this,
+            eskimoMessaging : eskimoMessaging});
+        // (nothing)
+
+        eskimoSetupCommand = new eskimo.SetupCommand();
+        // (nothing)
 
         eskimoConsoles = new eskimo.Consoles({eskimoMain: this});
         // (nothing)
@@ -343,7 +347,7 @@ eskimo.Main = function() {
         eskimoFileManagers = new eskimo.FileManagers({eskimoMain: this});
         // (nothing)
 
-        eskimoServices = new eskimo.Services();
+        eskimoServices = new eskimo.Services({eskimoMain: this});
         // loadUIServicesConfig -> get-ui-services-config
         // - loadUIServices -> list-ui-services
         //   - createServicesIFrames()

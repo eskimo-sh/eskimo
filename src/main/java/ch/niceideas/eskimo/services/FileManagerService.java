@@ -53,6 +53,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -236,7 +237,7 @@ public class FileManagerService {
     }
 
 
-    public void downloadFile(String hostAddress, String folder, String file, HttpServletResponse response) {
+    public void downloadFile(String hostAddress, String folder, String file, HttpServletResponseAdapter response) {
         try {
 
             SFTPv3Client client = getClient(hostAddress);
@@ -256,7 +257,6 @@ public class FileManagerService {
 
             // copy it to response's OutputStream
             StreamUtils.copy(is, response.getOutputStream());
-            response.flushBuffer();
 
         } catch (IOException | SSHCommandException | ConnectionManagerException ex) {
             logger.error("Download error. Filename was " + file, ex);
@@ -416,12 +416,18 @@ public class FileManagerService {
 
         static final long serialVersionUID = -3117632123352229248L;
 
-        FileDownloadException(String message, Throwable cause) {
+        public FileDownloadException(String message, Throwable cause) {
             super(message, cause);
         }
 
         FileDownloadException(String message) {
             super(message);
         }
+    }
+
+    public interface HttpServletResponseAdapter {
+        void setContentType(String type);
+
+        ServletOutputStream getOutputStream() throws IOException;
     }
 }

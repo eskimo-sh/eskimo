@@ -35,7 +35,11 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.OperationsCommand = function() {
+eskimo.OperationsCommand = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
+    this.eskimoMessaging = null;
 
     var that = this;
 
@@ -45,7 +49,9 @@ eskimo.OperationsCommand = function() {
 
             if (statusTxt == "success") {
 
-                //
+                $('#operations-command-header-cancel').click(cancelOperationsCommand);
+                $('#operations-command-button-cancel').click(cancelOperationsCommand);
+                $('#operations-command-button-validate').click(validateOperationsCommand);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -106,9 +112,9 @@ eskimo.OperationsCommand = function() {
 
     function validateOperationsCommand() {
 
-        eskimoMain.getMessaging().showMessages();
+        that.eskimoMessaging.showMessages();
 
-        eskimoMain.startOperationInProgress();
+        that.eskimoMain.startOperationInProgress();
 
         // 1 hour timeout
         $.ajax({
@@ -124,15 +130,15 @@ eskimo.OperationsCommand = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    eskimoMain.scheduleStopOperationInProgress (false);
+                    that.eskimoMain.scheduleStopOperationInProgress (false);
                 } else {
-                    eskimoMain.scheduleStopOperationInProgress (true);
+                    that.eskimoMain.scheduleStopOperationInProgress (true);
                 }
             },
 
             error: function (jqXHR, status) {
                 errorHandler (jqXHR, status);
-                eskimoMain.scheduleStopOperationInProgress (false);
+                that.eskimoMain.scheduleStopOperationInProgress (false);
             }
         });
 
@@ -145,6 +151,10 @@ eskimo.OperationsCommand = function() {
     }
     this.cancelOperationsCommand = cancelOperationsCommand;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constriuctor
     this.initialize();

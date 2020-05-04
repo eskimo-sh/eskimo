@@ -35,7 +35,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.FileManagerService;
+import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -48,6 +50,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
@@ -154,7 +157,25 @@ public class FileManagerController {
             @RequestParam("folder") String folder,
             @RequestParam("file") String file,
             HttpServletResponse response) {
-        fileManagerService.downloadFile (hostAddress, folder, file, response);
+        response.setHeader("Content-Disposition", "attachment");
+        fileManagerService.downloadFile (hostAddress, folder, file, new FileManagerService.HttpServletResponseAdapter() {
+
+            @Override
+            public void setContentType(String type) {
+                response.setContentType(type);
+            }
+
+            @Override
+            public ServletOutputStream getOutputStream() throws IOException {
+                return response.getOutputStream();
+            }
+        });
+        try {
+            response.flushBuffer();
+        } catch (IOException ex) {
+            logger.error("Download error. Filename was " + file, ex);
+            throw new FileManagerService.FileDownloadException("Download error. Filename was " + file, ex);
+        }
     }
 
     @GetMapping(value = "/file-manager-delete")

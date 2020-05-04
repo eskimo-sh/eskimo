@@ -213,7 +213,18 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                     return null;
                 });
 
-        sc.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), proxyResponse);
+        sc.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), new FileManagerService.HttpServletResponseAdapter(){
+
+            @Override
+            public void setContentType(String type) {
+                proxyResponse.setContentType(type);
+            }
+
+            @Override
+            public ServletOutputStream getOutputStream() throws IOException {
+                return proxyResponse.getOutputStream();
+            }
+        });
 
         String downloadedContent = testStream.toString();
         String originalContent = FileUtils.readFile(tempFile);

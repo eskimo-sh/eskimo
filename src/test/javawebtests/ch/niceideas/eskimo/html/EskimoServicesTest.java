@@ -56,7 +56,9 @@ public class EskimoServicesTest extends AbstractWebTest {
         page.executeJavaScript("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServices = new eskimo.Services();");
+        page.executeJavaScript("eskimoServices = new eskimo.Services({" +
+                "    eskimoMain: eskimoMain" +
+                "});");
 
         URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
 

@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Services = function () {
+eskimo.Services = function (constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var PERIODIC_RETRY_SERVICE_MS = 2000;
 
@@ -115,30 +118,31 @@ eskimo.Services = function () {
 
     function showServiceIFrame(service) {
 
-        if (!eskimoMain.isSetupDone()) {
+        if (!that.eskimoMain.isSetupDone()) {
 
-            eskimoMain.showSetupNotDone("Service " + service + " is not available at this stage.");
-        } else  if (eskimoMain.getSystemStatus().isDisconnected()) {
+            that.eskimoMain.showSetupNotDone("Service " + service + " is not available at this stage.");
 
-            eskimoMain.showStatus();
+        } else if (that.eskimoMain.getSystemStatus().isDisconnected()) {
+
+            that.eskimoMain.showStatus();
+
         } else {
 
             if (serviceInitialized[service]) {
 
                 // maybe Progress bar was shown previously
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.hideProgressbar();
 
-                eskimoMain.setNavigationCompact();
+                that.eskimoMain.setNavigationCompact();
 
-                eskimoMain.showOnlyContent(service, true);
+                that.eskimoMain.showOnlyContent(service, true);
 
             } else {
 
-                eskimoMain.getSystemStatus().showStatusWhenServiceUnavailable(service);
+                that.eskimoMain.getSystemStatus().showStatusWhenServiceUnavailable(service);
             }
         }
     }
-
     this.showServiceIFrame = showServiceIFrame;
 
     this.isServiceAvailable = function (service) {
@@ -203,7 +207,6 @@ eskimo.Services = function () {
         }
         return actualUrl;
     }
-
     /* For tests */
     this.buildUrl = buildUrl;
 
@@ -223,7 +226,6 @@ eskimo.Services = function () {
 
         return urlChanged;
     }
-
     /* For tests */
     this.shouldReinitialize = shouldReinitialize;
 
@@ -381,8 +383,8 @@ eskimo.Services = function () {
         }
 
         // if service was displayed, show Status
-        if (eskimoMain.isCurrentDisplayedService(service)) {
-            eskimoMain.getSystemStatus().showStatus();
+        if (that.eskimoMain.isCurrentDisplayedService(service)) {
+            that.eskimoMain.getSystemStatus().showStatus();
         }
     };
 
@@ -404,7 +406,6 @@ eskimo.Services = function () {
             }
         }
     }
-
     this.serviceMenuServiceFoundHook = serviceMenuServiceFoundHook;
 
     function createServicesMenu() {
@@ -417,18 +418,22 @@ eskimo.Services = function () {
 
             var menuEntry = '' +
                 '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
-                '    <a href="javascript:eskimoMain.getServices().showServiceIFrame(\'' + service + '\');">\n' +
-                '        <img src="' + eskimoMain.getNodesConfig().getServiceIconPath(service) + '"></img>\n' +
+                '    <a id="services-menu_' + service + '" href="#">\n' +
+                '        <img src="' + that.eskimoMain.getNodesConfig().getServiceIconPath(service) + '"></img>\n' +
                 '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
                 '    </a>\n' +
                 '</li>';
 
             $("#mainFolderMenuAnchor").after(menuEntry);
+
+            $("#services-menu_" + service).click(function() {
+                var serviceName = this.id.substring("services-menu_".length);
+                showServiceIFrame(serviceName);
+            });
         }
 
-        eskimoMain.menuResize();
+        that.eskimoMain.menuResize();
     }
-
     /** for tests */
     this.createServicesMenu = createServicesMenu;
 
@@ -454,8 +459,12 @@ eskimo.Services = function () {
             $("#main-content").append($(iframeWrapperString));
         }
     }
-
     /** for tests */
     this.createServicesIFrames = createServicesIFrames;
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 };
 

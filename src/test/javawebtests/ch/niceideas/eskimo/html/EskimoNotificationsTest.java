@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 public class EskimoNotificationsTest extends AbstractWebTest {
@@ -62,9 +63,10 @@ public class EskimoNotificationsTest extends AbstractWebTest {
         assertJavascriptEquals("1", "$('#new-notifications-count').html()");
 
         String notificationsHTML = page.executeJavaScript("$('#notifications-container').html()").getJavaScriptResult().toString();
+        //System.err.println (notificationsHTML);
         assertTrue (notificationsHTML.startsWith ("" +
                 "<li class=\"hoe-submenu-label\">\n" +
-                "    <h3><span id=\"notifications-count\" class=\"bold\">1    </span> Notification(s)     <a href=\"javascript:eskimoMain.getNotifications().clearNotifications();\"><span class=\"notifications-clear-link\">Clear</span></a></h3>\n" +
+                "    <h3><span id=\"notifications-count\" class=\"bold\">1    </span> Notification(s)     <a id=\"notifications-clear\" href=\"#\">        <span class=\"notifications-clear-link\">Clear</span>    </a></h3>\n" +
                 "</li><li>\n" +
                 "    <a href=\"#\" class=\"clearfix\">\n" +
                 "        <i class=\"fa fa-cogs green-text\"></i>\n" +
@@ -74,6 +76,25 @@ public class EskimoNotificationsTest extends AbstractWebTest {
                 "        <p class=\"notification-message\">Installation of Topology and settings on 192.168.10.11 succeeded</p>\n" +
                 "    </a>\n" +
                 "</li>"));
+    }
+
+    @Test
+    public void testClearNotificationsWithLink() throws Exception {
+
+        testAddNotifications();
+
+        page.executeJavaScript("$.ajax = function(object) {" +
+                "    object.success();" +
+                "}");
+
+        page.getElementById("notifications-clear").click();
+
+        String notificationsHTML = page.executeJavaScript("$('#notifications-container').html()").getJavaScriptResult().toString();
+
+        assertEquals("<li class=\"hoe-submenu-label\">\n" +
+                "    <h3><span id=\"notifications-count\" class=\"bold\">0    </span> Notification(s)     <a id=\"notifications-clear\" href=\"#\">        <span class=\"notifications-clear-link\">Clear</span>    </a></h3>\n" +
+                "</li>", notificationsHTML);
+
     }
 
 }
