@@ -174,7 +174,8 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
         echo " - Mount failed. Need to Prepare gluster mount $MOUNT_POINT (no further logs if success)"
         /usr/local/sbin/__gluster-prepare-mount.sh $VOLUME $OWNER_ID >> /tmp/gluster_mount_$1_log 2>&1
         if [[ $? != 0 ]]; then
-            echo "Failed to prepare gluster mount $MOUNT_POINT"
+            echo "Failed to prepare gluster mount $MOUNT_POINT with __gluster-prepare-mount.sh"
+            echo "Reporting here output of __gluster-prepare-mount.sh:"
             cat /tmp/gluster_mount_$1_log
             exit -5
         else
@@ -223,4 +224,4 @@ fi
 
 chmod -R 777 $MOUNT_POINT
 
-rm /var/lib/gluster/volume_management_lock_$VOLUME
+delete_gluster_lock_file

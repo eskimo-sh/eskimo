@@ -35,6 +35,11 @@
 #
 
 
+function delete_gluster_management_lock_file() {
+    echo " - releasing gluster_management_lock"
+    rm -Rf /var/lib/gluster/gluster_management_lock
+}
+
 set -e
 
 # Inject topology
@@ -50,7 +55,7 @@ fi
 if [[ "$MASTER_IP_ADDRESS" == "$SELF_IP_ADDRESS" ]]; then
 
     echo "Specific situation: master is self node. Need to ensure no other peer remain in the pool"
-    gluster_peers=`gluster pool list  | sed -E 's/[a-zA-Z0-9\-]+[ \t]+([0-9\.]+|localhost)[^.]+/\1/;t;d'`
+    gluster_peers=`gluster pool list  | sed -E 's/[a-zA-Z0-9\-]+[ \t]+([0-9\.]+|localhost|marathon\.registry)[^.]+/\1/;t;d'`
 
     for peer in $gluster_peers; do
         if [[ $peer != "localhost" ]]; then
@@ -62,16 +67,53 @@ if [[ "$MASTER_IP_ADDRESS" == "$SELF_IP_ADDRESS" ]]; then
 # multiple nodes in cluster, fixing inconsistencies between local and master
 else
 
-    echo " - Checking out if master is in local pool"
-    if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
+    echo " - Attempting to take gluster_management_lock"
+
+    # From here we will be messing with gluster and hence we need to take a lock
+    export wait_counter=0
+    while [[ -f /var/lib/gluster/gluster_management_lock ]] ; do
+        echo " - gluster management is in execution already. Sleeping 2 secs"
+        sleep 2
+        let wait_counter=$wait_counter+1
+        if [[ $wait_counter -gt 30 ]]; then
+            echo " - Attempted during 60 seconds to get gluster_management_lock unsuccessfully. Stopping here"
+            exit -31
+        fi
+    done
+
+    trap delete_gluster_management_lock_file 15
+    trap delete_gluster_management_lock_file EXIT
+
+    touch /var/lib/gluster/gluster_management_lock
+
+    echo " - Checking if master is in local pool"
+    # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
+    additional_search=$MASTER_IP_ADDRESS
+    if [[ $MASTER_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
+        additional_search=marathon.registry
+    fi
+    localPeerList=`gluster pool list`
+    if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
         MASTER_IN_LOCAL=0
     else
         MASTER_IN_LOCAL=1
     fi
 
     echo " - Checking if local in master pool"
+    set +e
     remote_result=`/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
-    if [[ `echo $remote_result | grep $SELF_IP_ADDRESS` == "" ]]; then
+    if [[ $? != 0 ]]; then
+        echo "Calling remote gluster on $MASTER_IP_ADDRESS failed !"
+        echo "Cannot proceed any further with consistency checking ... SKIPPING"
+        exit 0
+    fi
+    set -e
+    # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
+    additional_search=$SELF_IP_ADDRESS
+    if [[ $SELF_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
+        additional_search=marathon.registry
+    fi
+    if [[ `echo $remote_result | grep $SELF_IP_ADDRESS` == "" && `echo $remote_result | grep $additional_search` == "" ]]; then
         LOCAL_IN_MASTER=0
     else
         LOCAL_IN_MASTER=1

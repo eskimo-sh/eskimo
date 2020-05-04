@@ -63,7 +63,12 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
         echo " - Checking if local node needs to be removed from gluster cluster"
         poolListResult=`docker exec -i gluster bash -c "/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS pool list"`
 
-        if [[ `echo $poolListResult | grep $SELF_IP_ADDRESS` != "" ]]; then
+        # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
+        additional_search=$SELF_IP_ADDRESS
+        if [[ $SELF_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
+            additional_search=marathon.registry
+        fi
+        if [[ `echo $poolListResult | grep $SELF_IP_ADDRESS` != "" || `echo $poolListResult | grep $additional_search` != "" ]]; then
 
             echo " - Removing bricks from node"
             for i in `sudo /usr/local/sbin/gluster volume info | grep Brick | grep / | cut -d ' ' -f 2 | grep $SELF_IP_ADDRESS`; do

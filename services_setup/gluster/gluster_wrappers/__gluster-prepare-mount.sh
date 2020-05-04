@@ -37,21 +37,21 @@
 set -e
 
 # Detecting cluster incoherence and fixing
-echo "Checking peer inconsistency"
+echo "1. Checking peer inconsistency"
 /usr/bin/docker exec \
         -i \
         gluster \
         /usr/local/sbin/gluster-address-peer-inconsistency.sh
 
 # Ensure gluster in container configuration
-echo "Configuring peers"
+echo "2. Configuring peers"
 /usr/bin/docker exec \
         -i \
         gluster \
         /usr/local/sbin/gluster-update-peers.sh
 
 # Perform in container mount of share
-echo "Preparing volumes"
+echo "3. Preparing volumes"
 /usr/bin/docker exec \
         -i \
         gluster \

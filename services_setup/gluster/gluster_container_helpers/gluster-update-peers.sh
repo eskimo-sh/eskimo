@@ -35,6 +35,11 @@
 #
 
 
+function delete_gluster_management_lock_file() {
+    echo " - releasing gluster_management_lock"
+    rm -Rf /var/lib/gluster/gluster_management_lock
+}
+
 set -e
 
 # Inject topology
@@ -53,51 +58,89 @@ if [[ $SELF_IP_ADDRESS == $MASTER_IP_ADDRESS ]]; then
 else
 
     # add other master if not done
-    if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
 
-       # 3 attempts (to address concurrency issues coming from parallel installations)
-       set +e
-       for i in 1 2 3 ; do
-           echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS"
-           /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
-           if [[ $? != 0 ]]; then
-               sleep 2
-               continue
-           fi
-           break
-       done
-
-       # Trying the other way around
-       if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
-           for i in 1 2 3 ; do
-               echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
-               /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS
-               if [[ $? != 0 ]]; then
-                   sleep 2
-                   continue
-               fi
-               break
-           done
-       fi
-
-       # checking
-       sleep 1
-       if [[ `gluster pool list | grep $MASTER_IP_ADDRESS` == "" ]]; then
-           echo "Failed to add $SELF_IP_ADDRESS to cluster where master is $MASTER_IP_ADDRESS"
-           exit -101
-       fi
-
-       # replicate blocks if required
-       __replicate-master-blocks.sh $MASTER_IP_ADDRESS
-
-       set -e
+    # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
+    additional_search=$MASTER_IP_ADDRESS
+    if [[ $MASTER_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
+        additional_search=marathon.registry
     fi
+    localPeerList=`gluster pool list`
+    if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
 
-    # ensure peer is well connected
-    sleep 1
-    if [[ `gluster peer status | grep $MASTER_IP_ADDRESS` == "" ]]; then
-       echo "Error : $MASTER_IP_ADDRESS not found in peers"
-       gluster peer status
-       exit -1
-    fi
+        echo " - Attempting to take gluster_management_lock"
+
+        # From here we will be messing with gluster and hence we need to take a lock
+        export wait_counter=0
+        while [[ -f /var/lib/gluster/gluster_management_lock ]] ; do
+            echo " - gluster management is in execution already. Sleeping 2 secs"
+            sleep 2
+            let wait_counter=$wait_counter+1
+            if [[ $wait_counter -gt 30 ]]; then
+                echo " - Attempted during 60 seconds to get gluster_management_lock unsuccessfully. Stopping here"
+                exit -31
+            fi
+        done
+
+        trap delete_gluster_management_lock_file 15
+        trap delete_gluster_management_lock_file EXIT
+
+        # 4 attempts (to address concurrency issues coming from parallel installations)
+        set +e
+        for i in 1 2 3 4; do
+            echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS"
+            /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
+            if [[ $? != 0 ]]; then
+                sleep 2
+                continue
+            fi
+            break
+        done
+
+        # Trying the other way around
+        localPeerList=`gluster pool list`
+        if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+            echo " - Adding $MASTER_IP_ADDRESS to $SELF_IP_ADDRESS cluster failed. Trying the other way around ..."
+            for i in 1 2 3 4; do
+                echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
+                /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS
+                if [[ $? != 0 ]]; then
+                    sleep 2
+                    continue
+                fi
+                break
+            done
+        fi
+
+        # checking Here as weil, giving it a few tries
+        for i in 1 2 3 4 5; do
+            localPeerList=`gluster pool list`
+            if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+                sleep 2
+                continue
+            fi
+            break
+        done
+
+        # and one last time
+        localPeerList=`gluster pool list`
+        if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+            echo "Failed to add $SELF_IP_ADDRESS to cluster where master is $MASTER_IP_ADDRESS"
+            exit -41
+        fi
+
+        set -e
+
+        # replicate blocks if required
+        __replicate-master-blocks.sh $MASTER_IP_ADDRESS
+
+     fi
+
+     # ensure peer is well connected
+     sleep 1
+     localPeerStatus=`gluster peer status`
+     if [[ `echo $localPeerStatus | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerStatus | grep $additional_search` == "" ]]; then
+        echo "Error : $MASTER_IP_ADDRESS not found in peers"
+        gluster peer status
+        exit -1
+     fi
 fi
