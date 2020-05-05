@@ -55,7 +55,7 @@ public class EskimoSetupTest extends AbstractWebTest {
         System.out.println("Current dir using System:" +currentDir);
 
         // instantiate test object
-        page.executeJavaScript("eskimoSetup = new eskimo.Setup();");
+        page.executeJavaScript("eskimoSetup = new eskimo.Setup({eskimoMain: eskimoMain});");
 
         waitForElementIdInDOM("setup-warning");
     }

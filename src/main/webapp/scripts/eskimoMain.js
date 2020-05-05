@@ -319,7 +319,7 @@ eskimo.Main = function() {
 
     this.initialize = function() {
 
-        eskimoSetup = new eskimo.Setup();
+        eskimoSetup = new eskimo.Setup({eskimoMain: this});
         //  -> No specific backend loading
 
         eskimoNotifications = new eskimo.Notifications({});
@@ -330,15 +330,21 @@ eskimo.Main = function() {
 
         eskimoOperationsCommand = new eskimo.OperationsCommand({
             eskimoMain: this,
-            eskimoMessaging : eskimoMessaging});
+            eskimoMessaging : eskimoMessaging
+        });
         // (nothing)
 
         eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({
             eskimoMain: this,
-            eskimoMessaging : eskimoMessaging});
+            eskimoMessaging : eskimoMessaging
+        });
         // (nothing)
 
-        eskimoSetupCommand = new eskimo.SetupCommand();
+        eskimoSetupCommand = new eskimo.SetupCommand({
+            eskimoMain: this,
+            eskimoMessaging: eskimoMessaging,
+            eskimoSetup: eskimoSetup
+        });
         // (nothing)
 
         eskimoConsoles = new eskimo.Consoles({eskimoMain: this});
@@ -353,9 +359,7 @@ eskimo.Main = function() {
         //   - createServicesIFrames()
         //   - createServicesMenu()
 
-        eskimoServicesSelection = new eskimo.ServicesSelection({
-            eskimoMain: this
-        });
+        eskimoServicesSelection = new eskimo.ServicesSelection({eskimoMain: this});
         // loadServicesConfig -> get-services-config
         // - initModalServicesConfig()
 

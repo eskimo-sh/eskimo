@@ -36,7 +36,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Setup = function() {
+eskimo.Setup = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -71,6 +74,13 @@ eskimo.Setup = function() {
                     return false;
                 });
 
+                $("#reset-setup-btn").click(function(e) {
+                    showSetup();
+
+                    e.preventDefault();
+                    return false;
+                });
+
                 $(document).on('change', '#btn-file-ssh-key', function () {
                     var input = $(this),
                         numFiles = input.get(0).files ? input.get(0).files.length : 1,
@@ -97,7 +107,7 @@ eskimo.Setup = function() {
     };
 
     function handleSetup(data, initializationTime) {
-        eskimoMain.setSetupLoaded();
+        that.eskimoMain.setSetupLoaded();
 
         console.log(data);
 
@@ -131,19 +141,19 @@ eskimo.Setup = function() {
 
         if (!data.clear || data.clear == "services") {
 
-            eskimoMain.handleSetupCompleted();
+            that.eskimoMain.handleSetupCompleted();
 
             if (initializationTime) {
-                eskimoMain.getSystemStatus().showStatus(true);
+                that.eskimoMain.getSystemStatus().showStatus(true);
             }
 
         } else {
 
-            eskimoMain.handleSetupNotCompleted();
+            that.eskimoMain.handleSetupNotCompleted();
 
             if (initializationTime) { // only at initialization time
-                eskimoMain.showOnlyContent("setup");
-                eskimoMain.getSystemStatus().updateStatus(false);
+                that.eskimoMain.showOnlyContent("setup");
+                that.eskimoMain.getSystemStatus().updateStatus(false);
             }
 
             if (data.message && data.message != null) {
@@ -162,7 +172,7 @@ eskimo.Setup = function() {
                 handleSetup(data, initializationTime);
 
                 if (data.processingPending) {  // if backend says there is some provessing going on
-                    eskimoMain.recoverOperationInProgress();
+                    that.eskimoMain.recoverOperationInProgress();
                 }
             },
             error: errorHandler
@@ -172,13 +182,13 @@ eskimo.Setup = function() {
 
     function showSetup () {
 
-        if (eskimoMain.isOperationInProgress()) {
-            eskimoMain.showProgressbar();
+        if (that.eskimoMain.isOperationInProgress()) {
+            that.eskimoMain.showProgressbar();
         }
 
         loadSetup();
 
-        eskimoMain.showOnlyContent("setup");
+        that.eskimoMain.showOnlyContent("setup");
     }
     this.showSetup = showSetup;
 
@@ -219,13 +229,7 @@ eskimo.Setup = function() {
             return false;
         }
 
-        /*
-        eskimoMain.getMessaging().showMessages();
-
-        eskimoMain.startOperationInProgress();
-        */
-
-        eskimoMain.showProgressbar();
+        that.eskimoMain.showProgressbar();
 
         var setupConfig = $("form#setup-config").serializeObject();
 
@@ -238,7 +242,7 @@ eskimo.Setup = function() {
             data: JSON.stringify(setupConfig),
             success: function (data, status, jqXHR) {
 
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.hideProgressbar();
 
                 // OK
                 console.log(data);
@@ -254,11 +258,11 @@ eskimo.Setup = function() {
                     } else {
 
                         if (!data.command.none) {
-                            eskimoMain.getSetupCommand().showCommand(data.command);
+                            that.eskimoMain.getSetupCommand().showCommand(data.command);
 
                         } else {
                             showSetupMessage("Configuration applied successfully", true);
-                            eskimoMain.handleSetupCompleted();
+                            that.eskimoMain.handleSetupCompleted();
                         }
                     }
                 }
@@ -266,13 +270,17 @@ eskimo.Setup = function() {
             },
 
             error: function (jqXHR, status) {
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.hideProgressbar();
                 errorHandler (jqXHR, status);
             }
         });
     }
     this.saveSetup = saveSetup;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

@@ -43,6 +43,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 import logging
 import sys
+import signal
 import os
 import subprocess
 from furl import furl
@@ -130,9 +131,16 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return
 
-
+SocketServer.TCPServer.allow_reuse_address = True
 #httpd = SocketServer.TCPServer(("", PORT), RequestHandler)
 httpd = HTTPServer(('', PORT), RequestHandler)
+
+def signal_handler(sig, frame):
+    httpd.server_close()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
 
 print "serving at port", PORT
 httpd.serve_forever()

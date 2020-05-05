@@ -50,10 +50,7 @@ import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
@@ -118,7 +115,7 @@ public class SystemService {
     private ReentrantLock systemActionLock = new ReentrantLock();
 
     private ReentrantLock statusUpdateLock = new ReentrantLock();
-    private final Timer timer;
+    private final ScheduledExecutorService statusRefreshScheduler;
     private final AtomicReference<SystemStatusWrapper> lastStatus = new AtomicReference<>();
     private final AtomicReference<Exception> lastStatusException = new AtomicReference<>();
 
@@ -168,25 +165,24 @@ public class SystemService {
     }
     public SystemService(boolean createUpdateScheduler) {
         if (createUpdateScheduler) {
-            this.timer = new Timer(true);
 
-            logger.info("Initializing Status fetcher scheduler ...");
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    updateStatus();
-                }
-            }, statusUpdatePeriodSeconds * 1000, statusUpdatePeriodSeconds * 1000);
+            // I shouldn't use a timer here since scheduling at fixed inteval may lead to flooding the system and ending
+            // up in doing only this on large clusters
+
+            statusRefreshScheduler = Executors.newSingleThreadScheduledExecutor();
+
+            logger.info("Initializing Status updater scheduler ...");
+            statusRefreshScheduler.schedule(() -> updateStatus(), statusUpdatePeriodSeconds, TimeUnit.SECONDS);
         } else {
-            this.timer = null;
+            this.statusRefreshScheduler = null;
         }
     }
 
     @PreDestroy
     public void destroy() {
-        logger.info ("Cancelling connection closer scheduler");
-        if (timer != null) {
-            timer.cancel();
+        logger.info ("Cancelling status updater scheduler");
+        if (statusRefreshScheduler != null) {
+            statusRefreshScheduler.shutdown();
         }
     }
 
@@ -444,6 +440,10 @@ public class SystemService {
 
         } finally {
             statusUpdateLock.unlock();
+            // reschedule
+            if (statusRefreshScheduler != null) {
+                statusRefreshScheduler.schedule(() -> updateStatus(), statusUpdatePeriodSeconds, TimeUnit.SECONDS);
+            }
         }
     }
 

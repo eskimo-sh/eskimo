@@ -328,6 +328,7 @@ eskimo.FileManagers = function(constructorObject) {
     };
 
     this.downloadFile = function (nodeAddress, nodeName, currentFolder, file) {
+        console.log ("Downloading: target:"+ encodeURIComponent(file) + " - address=" + nodeAddress + " - folder=" + currentFolder + " - file=" + file);
         window.open("file-manager-download/" + encodeURIComponent(file) + "?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file);
     };
 

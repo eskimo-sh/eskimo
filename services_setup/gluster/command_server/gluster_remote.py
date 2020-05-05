@@ -44,6 +44,7 @@ import SocketServer
 import logging
 import sys
 import os
+import signal
 import subprocess
 from furl import furl
 
@@ -127,8 +128,15 @@ class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_POST(self):
         LOG.info('Got POST request: %s', self.path)
 
-
+SocketServer.TCPServer.allow_reuse_address = True
 httpd = SocketServer.TCPServer(("", PORT), RequestHandler)
+
+def signal_handler(sig, frame):
+    httpd.server_close()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
 
 print "serving at port", PORT
 httpd.serve_forever()

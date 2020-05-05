@@ -93,6 +93,23 @@ commands such as `systemctl start serviceX` to be able to control service _servi
 
 Aside from the above, nothing is enforced and service developers can implement services the way they want.
 
+==== Gluster share mounts
+
+Services running through System mount gluster shares directly on the host machine through scripts operated with
+`ExecStartPre` directives of their respective SystemD unit files. Then the gluster shares they require is mounted in
+their runtime docker containers.
+
+The same approach is impossible for marathon services since marathon cannot hook any command on the host machine in
+prior of the docker container start. For this reason, services operated by marathon mount gluster shares directly in
+their runtime docker containers.
+
+==== OS System Users creation
+
+OS system users required to execute marathon services are required on every node of the cluster. For this reason,
+the linux system users to be created on every node are not created in the individual services `setup.sh` scripts. They
+are created in the eskimo base system installation script `install-eskimo-base-system.sh` in the function
+`create_common_system_users`.
+
 === Standards and conventions over requirements
 
 There are no requirements when setting up a service on a node aside from the constraints mentioned above.
@@ -485,15 +502,11 @@ Let's imagine the following services installed on a cluster node, along with the
 * *ntp* - neglectable
 * *prometheus* - neglectable
 * *gluster* - neglectable
-* *mesos agent* - neglectable
+* *mesos agent* - *verylarge*
 * *elasticsearch* - large
 * *logstash* - small
 * *kafka* - medium
-* *(spark executor)* - large
-* *(flink worker)* - medium
 * *zookeeper* - neglectable
-* *kibana* - small
-* *zeppelin* - small
 
 The following table gives various examples in terms of memory allocation for three different total RAM size values on the
 cluster node running these services. +
@@ -502,22 +515,22 @@ size of total RAM.
 
 [width="80%",frame="topbot",options="header"]
 |===================
-| Node total RAM      | 8 Gb  | 16 Gb | 20 Gb
-| *ntp*               |  -    |  -    |  -
-| *prometheus*        |  -    |  -    |  -
-| *gluster*           |  -    |  -    |  -
-| *mesos agent*       |  -    |  -    |  -
-| *elasticsearch*     | 1359m | 2736m | 3465m
-| *logstash*          |  453m |  912m | 1155m
-| *kafka*             |  906m | 1824m | 2310m
-| *(spark executor)*  | 1359m | 2736m | 3465m
-| *(flink worker)*    |  906m | 1824m | 2310m
-| *zookeeper*         |  -    |  -    |  -
-| *kibana*            |  453m |  912m | 1155m
-| *zeppelin*          |  453m |  912m | 1155m
-| *_Filesystem cache reserve_*  | 1359m | 2736m | 3465m
+| Node total RAM                | 8 Gb  | 16 Gb | 20 Gb
+| *ntp*                         |  -    |  -    |  -
+| *prometheus*                  |  -    |  -    |  -
+| *gluster*                     |  -    |  -    |  -
+| *mesos agent*                 | 2500m | 5357m | 6786m
+| *elasticsearch*               | 1500m | 3214m | 4071m
+| *logstash*                    |  500m | 1071m | 1357m
+| *kafka*                       | 1000m | 2143m | 2714m
+| *zookeeper*                   |  -    |  -    |  -
+| *_Filesystem cache reserve_*  | 1500m | 3214m | 4071m
+| *_OS reserve_*                | 1000m | 1000m | 1000m
 |===================
 
+*Importantly*, all marathon services - such as Kibana, Cerebro, Kafka-manager, etc. - as well as all services operated by mesos -
+such as the spark executors and flink workers - don't get any specific amount of memory assigned. +
+*Instead, they share the memory available for mesos-agent.*
 
 
 ==== Topology file on cluster nodes

@@ -38,15 +38,15 @@ Software.
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" onclick="javascript:eskimoMain.getSetupCommand().cancelSetupCommand();">&times;</button>
+                <button type="button" class="close" id="setup-command-header-close">&times;</button>
                 <h4 class="modal-title">Confirm Pending Setup</h4>
             </div>
             <div id="setup-command-body" class="modal-body">
                 <p>Some text in the modal.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" onclick="javascript:eskimoMain.getSetupCommand().cancelSetupCommand();">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="javascript:eskimoMain.getSetupCommand().validateSetupCommand();">OK</button>
+                <button type="button" class="btn btn-default" id="setup-command-button-close">Cancel</button>
+                <button type="button" class="btn btn-primary" id="setup-command-button-validate">OK</button>
             </div>
         </div>
 

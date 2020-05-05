@@ -35,7 +35,12 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.SetupCommand = function() {
+eskimo.SetupCommand = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
+    this.eskimoMessaging = null;
+    this.eskimoSetup = null;
 
     var that = this;
 
@@ -45,7 +50,9 @@ eskimo.SetupCommand = function() {
 
             if (statusTxt == "success") {
 
-                //
+                $("#setup-command-header-close").click(cancelSetupCommand);
+                $("#setup-command-button-close").click(cancelSetupCommand);
+                $("#setup-command-button-validate").click(validateSetupCommand);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -140,9 +147,9 @@ eskimo.SetupCommand = function() {
 
     function validateSetupCommand() {
 
-        eskimoMain.getMessaging().showMessages();
+        that.eskimoMessaging.showMessages();
 
-        eskimoMain.startOperationInProgress();
+        that.eskimoMain.startOperationInProgress();
 
         // 1 hour timeout
         $.ajax({
@@ -156,27 +163,26 @@ eskimo.SetupCommand = function() {
                 console.log(data);
                 if (data && data.status) {
                     if (data.status == "KO") {
-                        //eskimoMain.getSetup().showSetup();
-                        eskimoMain.getSetup().showSetupMessage(data.error, false);
+                        that.eskimoSetup.showSetupMessage(data.error, false);
                     } else {
-                        eskimoMain.getSetup().showSetupMessage("Configuration applied successfully", true);
-                        eskimoMain.handleSetupCompleted();
+                        that.eskimoSetup.showSetupMessage("Configuration applied successfully", true);
+                        that.eskimoMain.handleSetupCompleted();
                     }
                 } else {
-                    eskimoMain.getSetup().showSetupMessage("No status received back from backend.", false);
+                    that.eskimoSetup.showSetupMessage("No status received back from backend.", false);
                 }
 
                 if (data.error) {
-                    eskimoMain.scheduleStopOperationInProgress (false);
+                    that.eskimoMain.scheduleStopOperationInProgress (false);
                 } else {
-                    eskimoMain.scheduleStopOperationInProgress (true);
+                    that.eskimoMain.scheduleStopOperationInProgress (true);
                 }
 
             },
 
             error: function (jqXHR, status) {
                 errorHandler (jqXHR, status);
-                eskimoMain.scheduleStopOperationInProgress (false);
+                that.eskimoMain.scheduleStopOperationInProgress (false);
             }
         });
 
@@ -189,6 +195,10 @@ eskimo.SetupCommand = function() {
     }
     this.cancelSetupCommand = cancelSetupCommand;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constriuctor
     this.initialize();

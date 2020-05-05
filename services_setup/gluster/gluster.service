@@ -56,8 +56,6 @@ Type=forking
 PIDFile=/var/run/gluster/gluster.pid
 
 Restart=always
-# giving chance to the OS to eliminate the port the remote servre is using
-RestartSec=10
 StartLimitBurst=3
 StartLimitInterval=60
 

@@ -43,8 +43,8 @@ echo " - Launching docker container"
 nohup /usr/bin/docker run \
         -i \
         --name gluster \
-        --network host \
         --privileged=true \
+         --network host \
         -v /var/lib/gluster:/var/lib/gluster\
         -v /var/log/gluster:/var/log/gluster\
         -v /var/run/gluster:/var/run/gluster\
@@ -53,6 +53,16 @@ nohup /usr/bin/docker run \
         -e NODE_NAME=$HOSTNAME \
         eskimo:gluster \
         /usr/local/sbin/inContainerStartService.sh | tee /var/log/gluster/gluster-container-out-log &
+
+#         -p 111:111 \ # RPC Bind is not supported in docke rcontainer since in use on the host in anyway
+# as a consequence if gluster has to be used through nfs, this is not supported without "network host" I guess
+
+#        -p 18999:18999 \
+#        -p 24007:24007 \
+#        -p 24008:24008 \
+#        -p 38465-38467:38465-38467 \
+#        -p 49152:50152 \
+#        -p 2049:2049 \
 
 echo " - Giving 5 seconds to container to start"
 sleep 5

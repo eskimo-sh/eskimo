@@ -380,7 +380,8 @@ public class SetupService {
         }
 
         // 3. Find out about upgrades
-        if (packagesVersion != null) {
+        if (StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG) // for services default is build
+                && packagesVersion != null) {
             Set<String> updates = new HashSet<>();
 
             for (String imageName : packagesToBuild.split(",")) {
@@ -400,7 +401,7 @@ public class SetupService {
                     }
                 }
             }
-            fillInPackages (packageUpdate, packagesVersion, updates);
+            fillInPackages(packageUpdate, packagesVersion, updates);
         }
 
     }
@@ -518,7 +519,7 @@ public class SetupService {
             }
 
             // 3. Handle updates
-            if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
+            if (StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for servuces default is build
                 for (String imageName : packagesToBuild.split(",")) {
 
                     Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);
