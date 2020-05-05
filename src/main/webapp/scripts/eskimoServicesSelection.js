@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.ServicesSelection = function() {
+eskimo.ServicesSelection = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -49,7 +52,14 @@ eskimo.ServicesSelection = function() {
         $("#services-selection-modal-wrapper").load("html/eskimoServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {
 
             if (statusTxt == "success") {
+
                 loadServicesConfig();
+
+                $('#services-selection-header-close').click(cancelServicesSelection);
+                $('#services-selection-button-select-all').click(servicesSelectionSelectAll);
+                $('#services-selection-button-close').click(cancelServicesSelection);
+                $('#services-selection-header-validate').click(validateServicesSelection);
+
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
@@ -92,8 +102,8 @@ eskimo.ServicesSelection = function() {
 
         servicesSelectedcallback = callback;
 
-        var configuredServices = eskimoMain.getNodesConfig().getConfiguredServices();
-        var nbrOfNodes = eskimoMain.getNodesConfig().getNodesCount();
+        var configuredServices = that.eskimoMain.getNodesConfig().getConfiguredServices();
+        var nbrOfNodes = that.eskimoMain.getNodesConfig().getNodesCount();
 
         // clear all boxes
         for (var i = 0; i < configuredServices.length; i++) {
@@ -159,7 +169,7 @@ eskimo.ServicesSelection = function() {
 
             $('#ntp-choice').get(0).checked = true;
 
-            $("#select-all-services-button").css("visibility", "hidden");
+            $("#services-selection-button-select-all").css("visibility", "hidden");
 
             // enabling node ntp to nake it selectaBLE
             var setupConfig = that.getCurrentNodesConfig();
@@ -188,7 +198,7 @@ eskimo.ServicesSelection = function() {
 
         } else {
 
-            $("#select-all-services-button").css("visibility", "visible");
+            $("#services-selection-button-select-all").css("visibility", "visible");
         }
 
         $('#services-selection-modal').modal("show");
@@ -199,7 +209,7 @@ eskimo.ServicesSelection = function() {
 
         var allSelected = true;
 
-        var configuredServices = eskimoMain.getNodesConfig().getConfiguredServices();
+        var configuredServices = that.eskimoMain.getNodesConfig().getConfiguredServices();
 
         // are they all selected already
         for (var i = 0; i < configuredServices.length; i++) {
@@ -251,15 +261,15 @@ eskimo.ServicesSelection = function() {
     }
     this.validateServicesSelection = validateServicesSelection;
 
-    function servicesSelectionRadioMouseDown(radioButton) {
+    function servicesSelectionRadioMouseDown() {
 
         //console.log (radioButton.id);
 
         var re = /([a-zA-Z\-_]+)([0-9]*)-(choice)/;
-        var match = radioButton.id.match(re);
+        var match = this.id.match(re);
 
 
-        console.log(radioButton.id + " - " + match[1] + " - " + match[2] + " - " + match[3]);
+        console.log(this.id + " - " + match[1] + " - " + match[2] + " - " + match[3]);
         var radioName = match[1];
 
         var value = (match[3] != null && match[3] != "") ? "choice" : match[2];
@@ -268,7 +278,7 @@ eskimo.ServicesSelection = function() {
             setTimeout(
                 function () {
                     $('#' + radioName + (value == "choice" ? "-choice" : value)).get(0).checked = false;
-                }, 200);
+                }, 100);
 
         }
     }
@@ -291,7 +301,7 @@ eskimo.ServicesSelection = function() {
 
         var newIn = '<form id="services-selection-form">';
 
-        for (var row = 1; row <= 100; row++) {
+        for (var row = 1; row <= 10; row++) {
 
             var oneFound = false;
             for (var col = 1; col <= 3; col++) {
@@ -318,8 +328,7 @@ eskimo.ServicesSelection = function() {
                             '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="radio-inline">' +
                             '        <input  type="radio" ' +
-                            '                onmousedown="javascript:eskimoMain.getServicesSelection().servicesSelectionRadioMouseDown(this);" ' +
-                            '                class="input-md" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice" value="choice"></input>' +
+                            '                class="input-md service-selection-radio-choice" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice" value="choice"></input>' +
                             '    </label>' +
                             '</div>';
                     } else {
@@ -346,9 +355,15 @@ eskimo.ServicesSelection = function() {
         newIn += '</form>';
 
         $("#services-selection-body").html($(newIn));
+
+        $(".service-selection-radio-choice").mousedown(servicesSelectionRadioMouseDown);
     }
     this.initModalServicesConfig = initModalServicesConfig;
 
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

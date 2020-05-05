@@ -185,15 +185,16 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var eskimoMessaging = {}");
         page.executeJavaScript("eskimoMessaging.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMessaging.setOperationInProgress = function() {};");
+        page.executeJavaScript("eskimoMessaging.showMessages = function() {};");
 
         page.executeJavaScript("var eskimoFileManagers = {};");
         page.executeJavaScript("eskimoFileManagers.setAvailableNodes = function() {};");
 
-        page.executeJavaScript("var nodesConfig = {};");
-        page.executeJavaScript("nodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
-        page.executeJavaScript("nodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
-        page.executeJavaScript("nodesConfig.getServicesDependencies = function () { return {}; };");
-        page.executeJavaScript("nodesConfig.isServiceUnique = function (serviceName){ " +
+        page.executeJavaScript("var eskimoNodesConfig = {};");
+        page.executeJavaScript("eskimoNodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
+        page.executeJavaScript("eskimoNodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
+        page.executeJavaScript("eskimoNodesConfig.getServicesDependencies = function () { return {}; };");
+        page.executeJavaScript("eskimoNodesConfig.isServiceUnique = function (serviceName){ " +
                 "return (serviceName == 'mesos-master' " +
                 "    || serviceName == 'zookeeper' " +
                 "    || serviceName == 'grafana' " +
@@ -213,7 +214,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
         page.executeJavaScript("eskimoMain.getFileManagers = function (){ return eskimoFileManagers; };");
         page.executeJavaScript("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
-        page.executeJavaScript("eskimoMain.getNodesConfig = function () { return nodesConfig; };");
+        page.executeJavaScript("eskimoMain.getNodesConfig = function () { return eskimoNodesConfig; };");
         page.executeJavaScript("eskimoMain.isOperationInProgress = function() { return false; };");
         page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
         page.executeJavaScript("eskimoMain.menuResize = function () {};");
@@ -221,6 +222,8 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.hideProgressbar = function () { }");
         page.executeJavaScript("eskimoMain.isCurrentDisplayedService = function () { return false; }");
         page.executeJavaScript("eskimoMain.setSetupLoaded = function () {}");
+        page.executeJavaScript("eskimoMain.startOperationInProgress = function() {}");
+        page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress = function() {}");
 
         page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
                 "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +

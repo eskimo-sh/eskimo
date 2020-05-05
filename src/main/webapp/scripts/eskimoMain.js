@@ -353,11 +353,16 @@ eskimo.Main = function() {
         //   - createServicesIFrames()
         //   - createServicesMenu()
 
-        eskimoServicesSelection = new eskimo.ServicesSelection();
+        eskimoServicesSelection = new eskimo.ServicesSelection({
+            eskimoMain: this
+        });
         // loadServicesConfig -> get-services-config
         // - initModalServicesConfig()
 
-        eskimoServicesConfig = new eskimo.ServicesConfig();
+        eskimoServicesConfig = new eskimo.ServicesConfig({
+            eskimoMain: this,
+            eskimoMessaging: eskimoMessaging
+        });
         // loadServicesConfig -> load-services-config
 
         eskimoNodesConfig = new eskimo.NodesConfig({
@@ -400,8 +405,9 @@ eskimo.Main = function() {
 
         $(window).resize (this.menuResize);
 
-        $("#menu-scroll-up").click(this.menuUp);
-        $("#menu-scroll-down").click(this.menuDown);
+        $("#menu-scroll-up").click(menuUp);
+        $("#menu-scroll-down").click(menuDown);
+        $('#hoe-left-panel').on('mousewheel', menuMouseWheel);
     };
 
     this.menuResize = function() {
@@ -430,7 +436,16 @@ eskimo.Main = function() {
         menuHidingPos = 0;
     };
 
-    this.menuUp = function(e) {
+    function menuMouseWheel (event) {
+        if (event.deltaY > 0) {
+            menuUp();
+        } else if (event.deltaY < 0) {
+            menuDown();
+        }
+        event.preventDefault();
+    }
+
+    function menuUp(e) {
 
         if (menuHidingPos > 0) {
 
@@ -449,9 +464,10 @@ eskimo.Main = function() {
             e.preventDefault();
         }
         return false;
-    };
+    }
+    this.menuUp = menuUp;
 
-    this.menuDown = function(e) {
+    function menuDown (e) {
 
         var actualMenuHeight = $("#menu-container").height();
         var menuContainerHeight = $("#hoe-left-panel").height();
@@ -474,7 +490,8 @@ eskimo.Main = function() {
             e.preventDefault();
         }
         return false;
-    };
+    }
+    this.menuDown = menuDown;
 
     this.initialize();
 

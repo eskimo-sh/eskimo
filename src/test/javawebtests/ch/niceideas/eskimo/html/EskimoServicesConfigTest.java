@@ -52,7 +52,10 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoServicesConfig.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig();");
+        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig({" +
+                "    eskimoMain: eskimoMain," +
+                "    eskimoMessaging: eskimoMessaging" +
+                "});");
 
         waitForElementIdInDOM("reset-services-config-btn");
 
@@ -62,6 +65,22 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServicesConfig.setServicesConfigForTest(TEST_SERVICE_CONFIG.configs)");
 
+        page.executeJavaScript("$('#inner-content-services-config').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-services-config').css('visibility', 'visible')");
+    }
+
+    @Test
+    public void testSaveServicesConfigWithButton() throws Exception {
+
+        page.executeJavaScript("eskimoServicesConfig.showServicesConfig();");
+
+        page.executeJavaScript("$.ajax = function(object) {" +
+                "    object.success({status: \"OK\"})" +
+                "}");
+
+        page.getElementById("save-services-config-btn").click();
+
+        assertJavascriptEquals("Configuration applied successfully", "$('#services-config-warning-message').html()");
     }
 
     @Test

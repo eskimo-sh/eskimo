@@ -59,9 +59,11 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         loadScript(page, "eskimoServicesSelection.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection();");
+        page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection({" +
+                "    eskimoMain: eskimoMain" +
+                "});");
 
-        waitForElementIdInDOM("select-all-services-button");
+        waitForElementIdInDOM("services-selection-button-select-all");
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
@@ -70,14 +72,14 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
-        //page.executeJavaScript("nodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
+        //page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
         page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\"];");
         page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        page.executeJavaScript("nodesConfig.getConfiguredServices = function() {\n"+
+        page.executeJavaScript("eskimoNodesConfig.getConfiguredServices = function() {\n"+
                 "    return CONFIGURED_SERVICES;\n"+
                 "};\n");
 
@@ -95,11 +97,29 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testInitModalServicesConfig() throws Exception {
 
-        page.executeJavaScript("eskimoServicesSelection.initModalServicesConfig()");
-
         assertJavascriptEquals("1.0", "$('#flink-app-master-choice').length");
         assertJavascriptEquals("1.0", "$('#mesos-master-choice').length");
         assertJavascriptEquals("1.0", "$('#zookeeper-choice').length");
+    }
+
+    @Test
+    public void testServicesSelectionRadioMouseDown() throws Exception {
+        page.getElementById("flink-app-master-choice").click();
+
+        assertJavascriptEquals("true", "$('#flink-app-master-choice').get(0).checked");
+
+        page.getElementById("flink-app-master-choice").click();
+
+        // There's a timer, so let's do 10 attempts
+        for (int i = 0; i < 10; i++) {
+            String checked = page.executeJavaScript("$('#flink-app-master-choice').get(0).checked").getJavaScriptResult().toString();
+            if (!checked.equals("false")) {
+                Thread.sleep(500);
+                continue;
+            }
+            break;
+        }
+        assertJavascriptEquals("false", "$('#flink-app-master-choice').get(0).checked");
     }
 
     @Test
@@ -124,7 +144,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "};" +
                 "}");
 
-        page.executeJavaScript("nodesConfig.getNodesCount = function() { return 2; }");
+        page.executeJavaScript("eskimoNodesConfig.getNodesCount = function() { return 2; }");
 
         page.executeJavaScript("eskimoServicesSelection.showServiceSelection(1, function(model) {result = model;})");
 
@@ -149,7 +169,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("var result = null;");
 
-        page.executeJavaScript("nodesConfig.getNodesCount = function() { return 2; }");
+        page.executeJavaScript("eskimoNodesConfig.getNodesCount = function() { return 2; }");
 
         page.executeJavaScript("eskimoServicesSelection.showServiceSelection(\"empty\", function(model) {result = model;})");
 

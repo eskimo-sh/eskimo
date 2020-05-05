@@ -35,7 +35,11 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.ServicesConfig = function() {
+eskimo.ServicesConfig = function (constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoMain = null;
+    this.eskimoMessaging = null;
 
     var that = this;
 
@@ -54,6 +58,12 @@ eskimo.ServicesConfig = function() {
                     return false;
                 });
 
+                $("#reset-services-config-btn").click(function (e) {
+                    showServicesConfig();
+
+                    e.preventDefault();
+                    return false;
+                });
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -91,9 +101,9 @@ eskimo.ServicesConfig = function() {
 
         var servicesConfigForm = $("form#services-config").serializeObject();
 
-        eskimoMain.getMessaging().showMessages();
+        that.eskimoMessaging.showMessages();
 
-        eskimoMain.startOperationInProgress();
+        that.eskimoMain.startOperationInProgress();
 
         $.ajax({
             type: "POST",
@@ -117,9 +127,9 @@ eskimo.ServicesConfig = function() {
                 }
 
                 if (data.error) {
-                    eskimoMain.scheduleStopOperationInProgress (false);
+                    that.eskimoMain.scheduleStopOperationInProgress (false);
                 } else {
-                    eskimoMain.scheduleStopOperationInProgress (true);
+                    that.eskimoMain.scheduleStopOperationInProgress (true);
                 }
             },
 
@@ -129,8 +139,8 @@ eskimo.ServicesConfig = function() {
                 console.log(status);
                 showServicesConfigMessage('fail : ' + status, false);
 
-                eskimoMain.scheduleStopOperationInProgress (false);
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.scheduleStopOperationInProgress (false);
+                that.eskimoMain.hideProgressbar();
             }
         });
     }
@@ -153,18 +163,18 @@ eskimo.ServicesConfig = function() {
 
     function showServicesConfig () {
 
-        if (!eskimoMain.isSetupDone()) {
-            eskimoMain.showSetupNotDone("Cannot configure nodes as long as initial setup is not completed");
+        if (!that.eskimoMain.isSetupDone()) {
+            that.eskimoMain.showSetupNotDone("Cannot configure nodes as long as initial setup is not completed");
             return;
         }
 
-        if (eskimoMain.isOperationInProgress()) {
-            eskimoMain.showProgressbar();
+        if (that.eskimoMain.isOperationInProgress()) {
+            that.eskimoMain.showProgressbar();
         }
 
         loadServicesConfig();
 
-        eskimoMain.showOnlyContent("services-config");
+        that.eskimoMain.showOnlyContent("services-config");
     }
     this.showServicesConfig = showServicesConfig;
 
@@ -181,7 +191,7 @@ eskimo.ServicesConfig = function() {
                 servicesConfigContent = servicesConfigContent +
                     '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
                     '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
-                    '<td><img class="nodes-config-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" /></td>'+
+                    '<td><img class="nodes-config-logo" src="' + that.eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" /></td>'+
                     '<td><h5>' +
                     serviceName +
                     '</h5></td>' +
@@ -241,6 +251,11 @@ eskimo.ServicesConfig = function() {
         $("#services-config-placeholder").html(servicesConfigContent)
     }
     this.layoutServicesConfig = layoutServicesConfig;
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();
