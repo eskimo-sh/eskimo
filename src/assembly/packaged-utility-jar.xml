@@ -96,6 +96,14 @@ Software.
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/distrib/utils</directory>
+            <outputDirectory>bin/utils</outputDirectory>
+            <includes>
+                <include>encode-password.bat</include>
+                <include>encode-password.sh</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/src/main/distrib</directory>
             <outputDirectory>utils</outputDirectory>
             <includes>
