@@ -66,7 +66,14 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         page.executeJavaScript("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
 
         // instantiate test object
-        page.executeJavaScript("eskimoSystemStatus = new eskimo.SystemStatus();");
+        page.executeJavaScript("eskimoSystemStatus = new eskimo.SystemStatus({\n" +
+                "            eskimoNotifications: eskimoNotifications,\n" +
+                "            eskimoMessaging: eskimoMessaging,\n" +
+                "            eskimoNodesConfig: eskimoNodesConfig,\n" +
+                "            eskimoSetup: eskimoSetup,\n" +
+                "            eskimoServices: eskimoServices,\n" +
+                "            eskimoMain: eskimoMain\n" +
+                "        });");
 
         waitForElementIdInDOM("service-status-warning");
 

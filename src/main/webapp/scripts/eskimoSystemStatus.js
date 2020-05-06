@@ -35,7 +35,15 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.SystemStatus = function() {
+eskimo.SystemStatus = function(constructorObject) {
+
+    // will be injected eventually from constructorObject
+    this.eskimoNotifications = null;
+    this.eskimoMessaging = null;
+    this.eskimoNodesConfig = null;
+    this.eskimoSetup = null;
+    this.eskimoServices = null;
+    this.eskimoMain = null;
 
     var that = this;
 
@@ -92,6 +100,10 @@ eskimo.SystemStatus = function() {
                     setNodeFilter ("issues");
                     showStatus(true);
                 }, this));
+
+                $('#empty-nodes-configure').click(function () {
+                    that.eskimoNodesConfig.showNodesConfig();
+                });
 
                 // initialize menu
                 var menuContent = '' +
@@ -200,7 +212,7 @@ eskimo.SystemStatus = function() {
 
                     STATUS_SERVICES = data.services;
 
-                    eskimoMain.getSetup().loadSetup(true);
+                    that.eskimoSetup.loadSetup(true);
 
                 } else {
                     alert(data.error);
@@ -235,17 +247,19 @@ eskimo.SystemStatus = function() {
 
     function showStatus (blocking) {
 
-        if (!eskimoMain.isSetupLoaded()) {
+        if (!that.eskimoMain.isSetupLoaded()) {
 
-            eskimoMain.getSetup().loadSetup();
+            that.eskimoSetup.loadSetup();
 
             // retry after a ŵhile
-            setTimeout ("eskimoMain.getSystemStatus().showStatus(" + (blocking ? "true" : "false") + ");", 100);
+            setTimeout (function() {
+                showStatus(blocking);
+            }, 100);
 
         } else {
-            if (!eskimoMain.isSetupDone()) {
+            if (!that.eskimoMain.isSetupDone()) {
 
-                eskimoMain.showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
+                that.eskimoMain.showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
 
                 // Still initialize the status update timeer (also used for notifications)
                 updateStatus(false);
@@ -253,9 +267,9 @@ eskimo.SystemStatus = function() {
             } else {
 
                 // maybe Progress bar was shown previously and we don't show it on status page
-                eskimoMain.hideProgressbar();
+                that.eskimoMain.hideProgressbar();
 
-                eskimoMain.showOnlyContent("status");
+                that.eskimoMain.showOnlyContent("status");
 
                 updateStatus(blocking);
             }
@@ -296,9 +310,9 @@ eskimo.SystemStatus = function() {
 
     function serviceAction (action, service, nodeAddress) {
 
-        eskimoMain.getMessaging().showMessages();
+        that.eskimoMessaging.showMessages();
 
-        eskimoMain.startOperationInProgress();
+        that.eskimoMain.startOperationInProgress();
 
         // 1 hour timeout
         $.ajax({
@@ -314,9 +328,9 @@ eskimo.SystemStatus = function() {
 
                 if (!data || data.error) {
                     console.error(data.error);
-                    eskimoMain.scheduleStopOperationInProgress (false);
+                    that.eskimoMain.scheduleStopOperationInProgress (false);
                 } else {
-                    eskimoMain.scheduleStopOperationInProgress (true);
+                    that.eskimoMain.scheduleStopOperationInProgress (true);
 
                     if (data.message != null) {
                         showStatusMessage (data.message);
@@ -326,7 +340,7 @@ eskimo.SystemStatus = function() {
 
             error: function (jqXHR, status) {
                 errorHandler (jqXHR, status);
-                eskimoMain.scheduleStopOperationInProgress (false);
+                that.eskimoMain.scheduleStopOperationInProgress (false);
             }
         });
     }
@@ -396,7 +410,7 @@ eskimo.SystemStatus = function() {
             || monitoringDashboardId == ""
             || monitoringDashboardId == "null"
             // or service grafana not yet available
-            || !eskimoMain.getServices().isServiceAvailable("grafana")
+            || !that.eskimoServices.isServiceAvailable("grafana")
             ) {
 
             $("#status-monitoring-no-dashboard").css("display", "inherit");
@@ -507,7 +521,7 @@ eskimo.SystemStatus = function() {
 
                 var link = systemStatus.links[i];
 
-                if (eskimoMain.getServices().isServiceAvailable(link.service)
+                if (that.eskimoServices.isServiceAvailable(link.service)
                     && this.serviceIsUp (nodeServicesStatus, link.service)) {
                     systemInformationActions += '' +
                         '<a href="javascript:eskimoMain.getServices().showServiceIFrame(\''+link.service+'\');">' +
@@ -538,7 +552,7 @@ eskimo.SystemStatus = function() {
 
         var nodeNamesByNbr = [];
 
-        eskimoMain.handleSetupCompleted();
+        that.eskimoMain.handleSetupCompleted();
 
         var availableNodes = [];
 
@@ -578,11 +592,11 @@ eskimo.SystemStatus = function() {
 
                         if (serviceStatus == "NA" || serviceStatus == "KO") {
 
-                            eskimoMain.getServices().serviceMenuServiceFoundHook(nodeName, nodeAddress, service, false, blocking);
+                            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, false, blocking);
 
                         } else if (serviceStatus == "OK") {
 
-                            eskimoMain.getServices().serviceMenuServiceFoundHook(nodeName, nodeAddress, service, true, blocking);
+                            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, true, blocking);
                         }
                     }
                 }
@@ -605,7 +619,7 @@ eskimo.SystemStatus = function() {
             }
         }
 
-        eskimoMain.setAvailableNodes(availableNodes);
+        that.eskimoMain.setAvailableNodes(availableNodes);
     };
 
     this.renderNodesStatusEmpty = function() {
@@ -630,19 +644,19 @@ eskimo.SystemStatus = function() {
                 var service = $(invokedOn).closest("td."+dataSelector).data('eskimo-service');
 
                 if (action == "show_journal") {
-                    eskimoMain.getSystemStatus().showJournal(service, nodeAddress);
+                    showJournal(service, nodeAddress);
 
                 } else if (action == "start") {
-                    eskimoMain.getSystemStatus().startService(service, nodeAddress);
+                    startService(service, nodeAddress);
 
                 } else if (action == "stop") {
-                    eskimoMain.getSystemStatus().stopService(service, nodeAddress);
+                    stopService(service, nodeAddress);
 
                 } else if (action == "restart") {
-                    eskimoMain.getSystemStatus().restartService(service, nodeAddress);
+                    restartService(service, nodeAddress);
 
                 } else if (action == "reinstall") {
-                    eskimoMain.getSystemStatus().reinstallService(service, nodeAddress);
+                    reinstallService(service, nodeAddress);
 
                 } else {
                     alert("Unknown action : " + action);
@@ -707,7 +721,7 @@ eskimo.SystemStatus = function() {
                             '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
                             '            class="nodes-status-carousel-status-na">' +
                             '            <span class="font-weight-bold service-status-error '+
-                            '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
+                            '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '        ">' +
                             service +
                             '        </span></td>\n' +
@@ -720,9 +734,9 @@ eskimo.SystemStatus = function() {
                             '<table class="node-status-carousel-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
-                            '            class="nodes-status-carousel-status'+(eskimoMain.isOperationInProgress() ? '-pending': '') +'">' +
+                            '            class="nodes-status-carousel-status'+(that.eskimoMain.isOperationInProgress() ? '-pending': '') +'">' +
                             '             <span class="font-weight-bold service-status-error '+
-                            '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
+                            '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '        ">' +
                             service +
                             '        </span></td>\n' +
@@ -742,11 +756,11 @@ eskimo.SystemStatus = function() {
                             '<table class="node-status-carousel-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
-                            '            class="nodes-status-carousel-status'+(eskimoMain.isOperationInProgress() ? '-pending': '') +'"><span class="font-weight-bold '+
-                            '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
+                            '            class="nodes-status-carousel-status'+(that.eskimoMain.isOperationInProgress() ? '-pending': '') +'"><span class="font-weight-bold '+
+                            '        '+(that.eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '         " style="color: '+color+';">' +
                             '            <div class="status-service-icon">' +
-                            '                <img class="status-service-icon-image" src="' + eskimoMain.getNodesConfig().getServiceIconPath(service) + '"/> ' +
+                            '                <img class="status-service-icon-image" src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"/> ' +
                             '            </div>' +
                             '            <div class="status-service-text">' +
                             '&nbsp;' + service +
@@ -816,7 +830,7 @@ eskimo.SystemStatus = function() {
 
                 tableHeaderHtml +=
                     '<td class="status-node-cell" rowspan="2">' +
-                    //'   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
+                    //'   <img class="control-logo-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) +
                     //'   "/><br>' +
                     serviceStatusConfig.name +
                     '</td>\n';
@@ -836,7 +850,7 @@ eskimo.SystemStatus = function() {
             if (serviceStatusConfig.group && serviceStatusConfig.group != null && serviceStatusConfig.group != "") {
                 tableHeaderHtml = tableHeaderHtml +
                     '<td class="status-node-cell">' +
-                    //'   <img class="control-logo-logo" src="' + eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) +
+                    //'   <img class="control-logo-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) +
                     //'   "/><br>' +
                     serviceStatusConfig.name + '</td>\n';
             }
@@ -905,30 +919,30 @@ eskimo.SystemStatus = function() {
 
                     } else if (serviceStatus == "NA") {
 
-                        if (eskimoMain.getNodesConfig().isServiceUnique(service)) {
+                        if (that.eskimoNodesConfig.isServiceUnique(service)) {
                             nodeHasMasters = true;
                         }
 
                         arrayRow +=
                             '    <td class="status-node-cell-empty"><span class="service-status-error '+
-                            '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
+                            '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '      ">NA</span></td>\n';
                         nodeHasIssues = true;
 
                     } else if (serviceStatus == "KO") {
 
-                        if (eskimoMain.getNodesConfig().isServiceUnique(service)) {
+                        if (that.eskimoNodesConfig.isServiceUnique(service)) {
                             nodeHasMasters = true;
                         }
 
                         arrayRow +=
-                            '    <td class="status-node-cell'+(eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
+                            '    <td class="status-node-cell'+(that.eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
                             '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
                             '<span class="service-status-error">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold ' +
-                            '        '+(eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
+                            '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
                             '        ">KO</span></td>\n' +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
@@ -939,7 +953,7 @@ eskimo.SystemStatus = function() {
 
                     } else {
 
-                        if (eskimoMain.getNodesConfig().isServiceUnique(service)) {
+                        if (that.eskimoNodesConfig.isServiceUnique(service)) {
                             nodeHasMasters = true;
                         }
 
@@ -952,13 +966,13 @@ eskimo.SystemStatus = function() {
                         }
 
                         arrayRow +=
-                            '    <td class="status-node-cell'+(eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
+                            '    <td class="status-node-cell'+(that.eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
                             '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
                             '<span style="color: '+color+';">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold '+
-                            '        '+(eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
+                            '        '+(that.eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
                             '        ">OK</span></td>\n' +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
@@ -997,7 +1011,7 @@ eskimo.SystemStatus = function() {
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
-                    eskimoMain.scheduleStopOperationInProgress (data.success);
+                    that.eskimoMain.scheduleStopOperationInProgress (data.success);
                 } else {
                     alert (data.error);
                 }
@@ -1020,7 +1034,7 @@ eskimo.SystemStatus = function() {
         }
 
         if (blocking) {
-            eskimoMain.showProgressbar();
+            that.eskimoMain.showProgressbar();
         }
 
         $.ajax({
@@ -1032,7 +1046,7 @@ eskimo.SystemStatus = function() {
 
                 disconnectedFlag = false;
 
-                eskimoMain.serviceMenuClear(data.nodeServicesStatus);
+                that.eskimoMain.serviceMenuClear(data.nodeServicesStatus);
 
                 //console.log (data);
 
@@ -1044,11 +1058,11 @@ eskimo.SystemStatus = function() {
 
                 } else if (data.clear == "setup"){
 
-                    eskimoMain.handleSetupNotCompleted();
+                    that.eskimoMain.handleSetupNotCompleted();
 
-                    if (   !eskimoMain.isCurrentDisplayedService("setup")
-                        && !eskimoMain.isCurrentDisplayedService("pending")) {
-                        eskimoMain.showSetupNotDone();
+                    if (   !that.eskimoMain.isCurrentDisplayedService("setup")
+                        && !that.eskimoMain.isCurrentDisplayedService("pending")) {
+                        that.eskimoMain.showSetupNotDone();
                     }
 
                 } else if (data.clear == "nodes"){
@@ -1057,17 +1071,17 @@ eskimo.SystemStatus = function() {
                 }
 
                 if (data.processingPending) {  // if backend says there is some processing going on
-                    eskimoMain.recoverOperationInProgress();
+                    that.eskimoMain.recoverOperationInProgress();
 
                 } else {                         // if backend says there is nothing going on
-                    if (eskimoMain.isOperationInProgress()  // but frontend still things there is ...
-                            && eskimoMain.isOperationInProgressOwner()) {  // ... and if that is my fault
+                    if (that.eskimoMain.isOperationInProgress()  // but frontend still things there is ...
+                            && that.eskimoMain.isOperationInProgressOwner()) {  // ... and if that is my fault
                         this.fetchOperationResult();
                     }
                 }
 
                 if (blocking) {
-                    eskimoMain.hideProgressbar();
+                    that.eskimoMain.hideProgressbar();
                 }
 
                 // reschedule updateStatus
@@ -1087,7 +1101,7 @@ eskimo.SystemStatus = function() {
                 if (blocking) {
                     alert('fail : ' + status);
 
-                    eskimoMain.hideProgressbar();
+                    that.eskimoMain.hideProgressbar();
 
                 } else {
 
@@ -1103,14 +1117,20 @@ eskimo.SystemStatus = function() {
         });
 
         // use same timer to fetch notifications
-        eskimoMain.getNotifications().fetchNotifications();
+        that.eskimoNotifications.fetchNotifications();
 
         // show a message on status page if there is some operations in progress pending
-        if (eskimoMain.isOperationInProgress()) {
+        if (that.eskimoMain.isOperationInProgress()) {
             showStatusMessage("Pending operations in progress on backend. See 'Backend Messages' for more information.");
         }
     }
     this.updateStatus = updateStatus;
+
+
+    // inject constructor object in the end
+    if (constructorObject != null) {
+        $.extend(this, constructorObject);
+    }
 
     // call constructor
     this.initialize();

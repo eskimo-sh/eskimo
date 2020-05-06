@@ -69,6 +69,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
     private static final Logger logger = Logger.getLogger(JSONBackedUserDetailsManager.class);
 
+    // default password is "password"
     private static final String DEFAULT_USER = "{ \"users\" : [ { \"username\" : \"admin\", \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\" } ] }";
 
     private final Map<String, MutableUser> users = new ConcurrentHashMap<>();

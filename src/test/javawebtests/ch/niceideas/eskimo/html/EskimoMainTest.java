@@ -45,6 +45,7 @@ public class EskimoMainTest extends AbstractWebTest {
     @Before
     public void setUp() throws Exception {
 
+        loadScript(page, "hoe.js");
         loadScript(page, "eskimoMain.js");
         loadScript(page, "eskimoUtils.js");
 
@@ -79,8 +80,12 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimo.Setup = function(){};");
         page.executeJavaScript("eskimo.About = function(){};");
 
+        // Don0t let jquery load real eskimoMain
+        page.executeJavaScript("$.fn.ready = function () {};");
+
         // instantiate test object
         page.executeJavaScript("eskimoMain = new eskimo.Main();");
+        page.executeJavaScript("eskimoMain.doInitializeInternal();");
     }
 
     @Test

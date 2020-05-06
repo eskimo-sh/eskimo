@@ -533,12 +533,38 @@ before you can use your nodes within eskimo.*
 === Extract archive.
 
 After downloading either the zip ot the tarball archive of eskimo, it needs to be extracted on the local filesystem.
-
+That's only that needs to be done to _install_ eskimo. It doesn't need anything else that extracting the archive on the
+filesystem. +
 Then in the folder `bin` under the newly extracted eskimo binary distribution folder, one can find two scripts:
 
 * a script `eskimo.bat` to execute eskimo on Windows
 * a script `eskimo.sh` to execute eskimo on Linux.
 
+==== Extracted Archive layout and purpose
+
+One extracted on the filesystem the Eskimo folder contains the following elements:
+
+* `bin` : contains executables required to start Eskimo as well as utility commands
+* `conf` : contains Eskimo configuration foles
+* `lib` : contains eskimo runtime binaries
+* `packages-dev` : contains the Eskimo _docker images (packages) development framework_ which is used to build eskimo
+services docker packages locally (this is not required if the administrators decides to download packages
+from www.eskimo.sh)
+* `packages_distrib`: contains eventually the eskimo services docker image packages (ethier build locally or downloaded
+from internet)
+* `services_setup`: contains the services installation framework. *Each and every customization an administrator wishes
+to apply on eskimo services is done by modifying / extending / customizing the shell scripts in this folder*.
+* `static_images`: is intended to be used to add additional icons or logos for new custom services added by an
+administrator to Eskimo.
+
+==== Utility commands
+
+Some command line utilities to ease eskimo's administration are provided in `bin/utils`:
+
+* `encode-password.bat|.sh` : this script is used to generate the encoded password to be stored in the user definition
+file. See <<user_file>>
+
+[[user_file]]
 === Access eskimo
 
 With eskimo properly started using the above scripts, one can reach eskimo using http://machine_ip:9090. +
@@ -563,9 +589,7 @@ The structure of this file is as follows;
 }
 ----
 
-The password is a `BCrypt` hash of the actual password.
-
-TODO Document `EncodedPasswordGenerator` provided by Eskimo
+The password is a `BCrypt` hash (11 rounds) of the actual password.
 
 === Typical startup issues
 

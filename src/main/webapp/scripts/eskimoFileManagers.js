@@ -100,16 +100,16 @@ eskimo.FileManagers = function(constructorObject) {
 
     function showFileManagers() {
 
-        if (!this.eskimoMain.isSetupDone()) {
+        if (!that.eskimoMain.isSetupDone()) {
 
-            this.eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
+            that.eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
 
         } else {
 
             // maybe progress bar was shown previously
-            this.eskimoMain.hideProgressbar();
+            that.eskimoMain.hideProgressbar();
 
-            this.eskimoMain.showOnlyContent("file-managers");
+            that.eskimoMain.showOnlyContent("file-managers");
 
             // Find available nodes and add them to open sftp dropdown
             // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}

@@ -113,19 +113,8 @@ Software.
 
         var eskimoFlavour = "CE";
 
-        var eskimoMain = null;
+        var eskimoMain = new eskimo.Main();
 
-        $(document).ready(function () {
-
-            $("#hoeapp-wrapper").load("html/eskimoMain.html", function (responseTxt, statusTxt, jqXHR) {
-
-                $("#eskimoTitle").html("Eskimo CE");
-
-                eskimoMain = new eskimo.Main();
-
-                initHoe();
-            });
-        });
     </script>
 
 </body></html>

@@ -72,6 +72,146 @@ eskimo.Main = function() {
 
     var menuHidingPos = 0;
 
+    this.doInitializeInternal = function() {
+        $("#eskimoTitle").html("Eskimo CE");
+
+        eskimoSetup = new eskimo.Setup({eskimoMain: that});
+        //  -> No specific backend loading
+
+        eskimoNotifications = new eskimo.Notifications({});
+        // loadLastLine -> get-lastline-notification
+
+        eskimoMessaging = new eskimo.Messaging({eskimoMain: that});
+        // loadLastLine -> get-lastline-messaging
+
+        eskimoOperationsCommand = new eskimo.OperationsCommand({
+            eskimoMain: that,
+            eskimoMessaging : eskimoMessaging
+        });
+        // (nothing)
+
+        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({
+            eskimoMain: that,
+            eskimoMessaging : eskimoMessaging
+        });
+        // (nothing)
+
+        eskimoSetupCommand = new eskimo.SetupCommand({
+            eskimoMain: that,
+            eskimoMessaging: eskimoMessaging,
+            eskimoSetup: eskimoSetup
+        });
+        // (nothing)
+
+        eskimoConsoles = new eskimo.Consoles({eskimoMain: that});
+        // (nothing)
+
+        eskimoFileManagers = new eskimo.FileManagers({eskimoMain: that});
+        // (nothing)
+
+        eskimoServices = new eskimo.Services({eskimoMain: that});
+        // loadUIServicesConfig -> get-ui-services-config
+        // - loadUIServices -> list-ui-services
+        //   - createServicesIFrames()
+        //   - createServicesMenu()
+
+        eskimoServicesSelection = new eskimo.ServicesSelection({eskimoMain: that});
+        // loadServicesConfig -> get-services-config
+        // - initModalServicesConfig()
+
+        eskimoServicesConfig = new eskimo.ServicesConfig({
+            eskimoMain: that,
+            eskimoMessaging: eskimoMessaging
+        });
+        // loadServicesConfig -> load-services-config
+
+        eskimoNodesConfig = new eskimo.NodesConfig({
+            eskimoMain: that,
+            eskimoServicesSelection: eskimoServicesSelection,
+            eskimoServices: eskimoServices,
+            eskimoOperationsCommand: eskimoOperationsCommand
+        });
+        // loadConfigServices -> get-services-dependencies
+        // - calls eskimoServices.initialize()
+        // loadServiceDependencies -> list-config-services
+
+        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: that});
+        // loadMarathonServices -> get-marathon-services
+
+        eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection({
+            eskimoMarathonServicesConfig: eskimoMarathonServicesConfig
+        });
+        // (nothing)
+
+        eskimoSystemStatus = new eskimo.SystemStatus({
+            eskimoNotifications: eskimoNotifications,
+            eskimoMessaging: eskimoMessaging,
+            eskimoNodesConfig: eskimoNodesConfig,
+            eskimoSetup: eskimoSetup,
+            eskimoServices: eskimoServices,
+            eskimoMain: that
+        });
+        // loadUIStatusServicesConfig -> get-ui-services-status-config
+        // - loadListServices -> list-services
+        //   - setup.loadSetup -> load-setup
+        //     + success OR clear=services
+        //       - eskimoMain.handleSetupCompleted
+        //     + clear=[others]
+        //       - eskimoMain.handleSetupNotCompleted();
+        //       - if initializationTime
+        //         + eskimoMain.showOnlyContent("setup");
+        //         + status.updateStatus(false); -- to start the polling
+        //     +  success OR OR clear=services
+        //       - if initializationTime
+        //         + eskimoMain.getSystemStatus().showStatus(true);
+        //     + PROCESSING PENDING DETECTION LOGIC
+
+        eskimoAbout = new eskimo.About();
+
+        isMenuMinimized = $('#hoeapp-container').hasClass("hoe-minimized-lpanel");
+
+        $(window).resize (this.menuResize);
+
+        // menu scrolling
+        $("#menu-scroll-up").click(menuUp);
+        $("#menu-scroll-down").click(menuDown);
+        $('#hoe-left-panel').on('mousewheel', menuMouseWheel);
+
+        // notifications
+        $("#main-show-notifications-link").click(eskimoNotifications.notificationsShown);
+        $("#main-clear-notifications-link").click(eskimoNotifications.clearNotifications);
+
+        // about
+        $("#main-show-about-link").click(eskimoAbout.showAbout);
+
+        // menu entries
+        $("#main-menu-show-consoles-link").click(eskimoConsoles.showConsoles);
+        $("#main-menu-show-file-managers-link").click(eskimoFileManagers.showFileManagers);
+        $("#main-menu-show-status-link").click(eskimoSystemStatus.showStatus);
+        $("#main-menu-show-setup-link").click(eskimoSetup.showSetup);
+        $("#main-menu-show-services-config-link").click(eskimoServicesConfig.showServicesConfig);
+        $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
+        $("#main-menu-show-marathon-config-link").click(eskimoMarathonServicesConfig.showMarathonServicesConfig);
+        $("#main-menu-show-messages-link").click(eskimoMessaging.showMessages);
+        $("#main-menu-logout-link").click(function() {
+            window.location = "logout";
+        });
+    };
+
+    this.initialize = function() {
+
+        $(document).ready(function () {
+
+            $("#hoeapp-wrapper").load("html/eskimoMain.html", function (responseTxt, statusTxt, jqXHR) {
+
+                that.doInitializeInternal();
+
+                // This has to remain last
+                initHoe();
+            });
+        });
+    };
+
     this.isSetupLoaded = function() {
         return setupLoaded;
     };
@@ -317,103 +457,6 @@ eskimo.Main = function() {
         return eskimoAbout;
     };
 
-    this.initialize = function() {
-
-        eskimoSetup = new eskimo.Setup({eskimoMain: this});
-        //  -> No specific backend loading
-
-        eskimoNotifications = new eskimo.Notifications({});
-        // loadLastLine -> get-lastline-notification
-
-        eskimoMessaging = new eskimo.Messaging({eskimoMain: this});
-        // loadLastLine -> get-lastline-messaging
-
-        eskimoOperationsCommand = new eskimo.OperationsCommand({
-            eskimoMain: this,
-            eskimoMessaging : eskimoMessaging
-        });
-        // (nothing)
-
-        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({
-            eskimoMain: this,
-            eskimoMessaging : eskimoMessaging
-        });
-        // (nothing)
-
-        eskimoSetupCommand = new eskimo.SetupCommand({
-            eskimoMain: this,
-            eskimoMessaging: eskimoMessaging,
-            eskimoSetup: eskimoSetup
-        });
-        // (nothing)
-
-        eskimoConsoles = new eskimo.Consoles({eskimoMain: this});
-        // (nothing)
-
-        eskimoFileManagers = new eskimo.FileManagers({eskimoMain: this});
-        // (nothing)
-
-        eskimoServices = new eskimo.Services({eskimoMain: this});
-        // loadUIServicesConfig -> get-ui-services-config
-        // - loadUIServices -> list-ui-services
-        //   - createServicesIFrames()
-        //   - createServicesMenu()
-
-        eskimoServicesSelection = new eskimo.ServicesSelection({eskimoMain: this});
-        // loadServicesConfig -> get-services-config
-        // - initModalServicesConfig()
-
-        eskimoServicesConfig = new eskimo.ServicesConfig({
-            eskimoMain: this,
-            eskimoMessaging: eskimoMessaging
-        });
-        // loadServicesConfig -> load-services-config
-
-        eskimoNodesConfig = new eskimo.NodesConfig({
-            eskimoMain: this,
-            eskimoServicesSelection: eskimoServicesSelection,
-            eskimoServices: eskimoServices,
-            eskimoOperationsCommand: eskimoOperationsCommand
-        });
-        // loadConfigServices -> get-services-dependencies
-        // - calls eskimoServices.initialize()
-        // loadServiceDependencies -> list-config-services
-
-        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: this});
-        // loadMarathonServices -> get-marathon-services
-
-        eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection({
-            eskimoMarathonServicesConfig: eskimoMarathonServicesConfig
-        });
-        // (nothing)
-
-        eskimoSystemStatus = new eskimo.SystemStatus();
-        // loadUIStatusServicesConfig -> get-ui-services-status-config
-        // - loadListServices -> list-services
-        //   - setup.loadSetup -> load-setup
-        //     + success OR clear=services
-        //       - eskimoMain.handleSetupCompleted
-        //     + clear=[others]
-        //       - eskimoMain.handleSetupNotCompleted();
-        //       - if initializationTime
-        //         + eskimoMain.showOnlyContent("setup");
-        //         + status.updateStatus(false); -- to start the polling
-        //     +  success OR OR clear=services
-        //       - if initializationTime
-        //         + eskimoMain.getSystemStatus().showStatus(true);
-        //     + PROCESSING PENDING DETECTION LOGIC
-
-        eskimoAbout = new eskimo.About();
-
-        isMenuMinimized = $('#hoeapp-container').hasClass("hoe-minimized-lpanel");
-
-        $(window).resize (this.menuResize);
-
-        $("#menu-scroll-up").click(menuUp);
-        $("#menu-scroll-down").click(menuDown);
-        $('#hoe-left-panel').on('mousewheel', menuMouseWheel);
-    };
-
     this.menuResize = function() {
         // alert (window.innerHeight + " - " + window.innerWidth);
 
@@ -498,6 +541,5 @@ eskimo.Main = function() {
     this.menuDown = menuDown;
 
     this.initialize();
-
 };
 

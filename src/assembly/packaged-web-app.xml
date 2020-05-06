@@ -71,6 +71,7 @@ Software.
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>*.war</include>
+                <include>*.jar</include>
             </includes>
         </fileSet>
         <fileSet>

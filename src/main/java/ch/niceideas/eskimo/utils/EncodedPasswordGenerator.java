@@ -53,10 +53,15 @@ public class EncodedPasswordGenerator {
             System.exit (-2);
         }
 
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(11);
+        String encodedPassword = new EncodedPasswordGenerator().encodePassword(args[0]);
 
         logger.info ("Encoded password is : ");
-        logger.info (passwordEncoder.encode(args[0]));
+        logger.info (encodedPassword);
 
+    }
+
+    String encodePassword(String clearPassword) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(11);
+        return passwordEncoder.encode(clearPassword);
     }
 }

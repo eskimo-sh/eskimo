@@ -285,24 +285,42 @@ Software.
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Distribution packaging -->
+            
+            <!-- All Distribution packaging -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.0</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/bin.xml</descriptor>
-                    </descriptors>
-                    <finalName>eskimo-ce-${project.version}</finalName>
-                </configuration>
                 <executions>
+
+                    <!-- First: Utility jar -->
                     <execution>
+                        <id>eskimo-utility-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/packaged-utility-jar.xml</descriptor>
+                            </descriptors>
+                            <finalName>eskimo-ce-utility-${project.version}</finalName>
+                        </configuration>
+                    </execution>
+
+                    <!-- Then: Eskimo Distribution package -->
+                    <execution>
+                        <id>eskimo-distribution</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/packaged-web-app.xml</descriptor>
+                            </descriptors>
+                            <finalName>eskimo-ce-${project.version}</finalName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -88,16 +88,16 @@ eskimo.Consoles = function(constructorObject) {
 
     function showConsoles() {
 
-        if (!this.eskimoMain.isSetupDone()) {
+        if (!that.eskimoMain.isSetupDone()) {
 
-            this.eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
+            that.eskimoMain.showSetupNotDone ("Consoles are not available at this stage.");
 
         } else {
 
             // maybe progress bar was shown previously
-            this.eskimoMain.hideProgressbar();
+            that.eskimoMain.hideProgressbar();
 
-            this.eskimoMain.showOnlyContent("consoles");
+            that.eskimoMain.showOnlyContent("consoles");
 
             // Find available nodes and add them to open console dropdown
             // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}

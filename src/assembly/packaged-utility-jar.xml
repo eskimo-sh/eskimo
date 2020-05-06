@@ -39,110 +39,35 @@ Software.
         xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
     <id>bin</id>
     <formats>
-        <format>tar.gz</format>
-        <format>zip</format>
+        <format>jar</format>
     </formats>
-    <!--
+    <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
-            <useProjectArtifact>true</useProjectArtifact>
+            <outputDirectory>.</outputDirectory>
+            <unpack>true</unpack>
+            <scope>runtime</scope>
             <includes>
-                <include>*:*:war:*</include>
+                <include>org.springframework.security:spring-security-core</include>
+                <include>org.springframework:spring-jcl</include>
+                <include>org.slf4j:log4j-over-slf4j</include>
+                <include>org.slf4j:slf4j-api</include>
+                <include>org.apache.logging.log4j:log4j-slf4j-impl</include>
+                <include>org.apache.logging.log4j:log4j-api</include>
+                <include>org.apache.logging.log4j:log4j-core</include>
             </includes>
         </dependencySet>
     </dependencySets>
-    -->
     <fileSets>
         <fileSet>
-            <directory>${basedir}</directory>
-            <includes>
-                <include>README.adoc</include>
-            </includes>
-            <!--
-            <excludes>
-                <exclude>AWESOME.txt</exclude>
-                <exclude>LICENSE.txt</exclude>
-            </excludes>
-            -->
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}</directory>
-            <outputDirectory>lib</outputDirectory>
-            <includes>
-                <include>*.war</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/packages_dev</directory>
-            <outputDirectory>packages_dev</outputDirectory>
+            <directory>${project.build.directory}/classes</directory>
+            <outputDirectory>.</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/services_setup</directory>
-            <outputDirectory>services_setup</outputDirectory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/src/main/distrib</directory>
-            <outputDirectory>bin</outputDirectory>
-            <includes>
-                <include>eskimo.bat</include>
-                <include>eskimo.sh</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/src/main/distrib/utils</directory>
-            <outputDirectory>bin/utils</outputDirectory>
-            <includes>
-                <include>encode-password.bat</include>
-                <include>encode-password.sh</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/src/main/distrib</directory>
-            <outputDirectory>utils</outputDirectory>
-            <includes>
-                <include>cacert</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/packages_distrib</directory>
-            <outputDirectory>packages_distrib</outputDirectory>
-            <includes>
-                <include>dont.delete</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/generated-docs</directory>
-            <outputDirectory>doc</outputDirectory>
-            <includes>
-                <include>*.pdf</include>
-            </includes>
-        </fileSet>
-        <!-- Create empty directory for static_images  -->
-        <fileSet>
-            <outputDirectory>static_images</outputDirectory>
             <excludes>
-                <exclude>**/*</exclude>
+                <exclude>banner*</exclude>
             </excludes>
         </fileSet>
     </fileSets>
-    <files>
-        <file>
-            <source>${basedir}/src/main/distrib/eskimo.properties</source>
-            <outputDirectory>conf</outputDirectory>
-            <destName>eskimo.properties</destName>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>${basedir}/src/main/resources/services.json</source>
-            <outputDirectory>conf</outputDirectory>
-            <destName>services.json</destName>
-        </file>
-    </files>
 </assembly>

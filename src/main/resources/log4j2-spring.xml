@@ -34,6 +34,8 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 -->
 
+<!-- This is the log4j 2 configuration file for the Esimo Spring Boot Web app -->
+
 <Configuration>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">

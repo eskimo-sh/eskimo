@@ -34,11 +34,16 @@
 # Software.
 #
 
+if [[ "$1" == "" ]]; then
+    echo "Expected password to be encoded as aegument"
+    exit -2
+fi
+
 # Find out about script path
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # CHange project root directory
-cd $SCRIPT_DIR/..
+cd $SCRIPT_DIR/../..
 
 # See if we have java in the path
 JAVA_VERSION=`java -version`
@@ -53,10 +58,9 @@ if [[ $? != 0 ]]; then
 fi
 
 # Find out which eskimo version we have in lib
-ESKIMO_WAR=`cd lib; ls -1 eskimo*war`
+ESKIMO_JAR=`cd lib; ls -1 eskimo*jar`
 
 java \
-    -Xms1024m \
-    -Xmx1024m \
-    -jar lib/$ESKIMO_WAR \
-    --spring.config.location=conf/eskimo.properties
+    -Xmx256m \
+    -classpath lib/$ESKIMO_JAR \
+    ch.niceideas.eskimo.utils.EncodedPasswordGenerator $1

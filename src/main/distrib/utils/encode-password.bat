@@ -33,6 +33,11 @@ REM
 REM The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
 REM Software
 
+IF "%1" == "" (
+    echo "Need source password to be encoded in argument"
+    exit 2
+)
+
 java -version
 IF %ERRORLEVEL% NEQ 0 (
     if "%JAVA_HOME%"== "" (
@@ -47,7 +52,7 @@ SET scriptpath=%~dp0
 
 SET drive=%CD:~0,3%
 
-FOR /f "tokens=*" %%G IN ('dir /b %scriptpath%..\lib\eskimo*war') DO set WAR_FILE=%%G
+FOR /f "tokens=*" %%G IN ('dir /b %scriptpath%..\..\lib\eskimo*jar') DO set JAR_FILE=%%G
 
 cd /D %drive%
 cd %scriptpath%..
@@ -55,9 +60,8 @@ cd %scriptpath%..
 REM encoding UTF-8 is required to parse SSH command results properly.
 
 %JAVA_HOME%\bin\java ^
-    -Xms1024m ^
-    -Xmx1024m ^
+    -Xmx256m ^
     -Dfile.encoding=UTF-8 ^
-    -jar %scriptpath%..\lib\%WAR_FILE% ^
-    --spring.config.location=%scriptpath%..\conf\eskimo.properties
+    -classpath %scriptpath%..\lib\%JAR_FILE% ^
+    ch.niceideas.eskimo.utils.EncodedPasswordGenerator %1
 
