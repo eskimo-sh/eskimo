@@ -89,7 +89,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
     public void testCheckMarathonSetupOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("marathon", "1");
             put("ntp1", "on");
             put("prometheus1", "on");
@@ -111,7 +111,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("marathon", "1");
                 put("ntp1", "on");
                 put("prometheus1", "on");
@@ -133,7 +133,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("ntp1", "on");
@@ -157,7 +157,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
                 put("marathon", "1");
                 put("prometheus1", "on");

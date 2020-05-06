@@ -94,8 +94,9 @@ public class NodesConfigurationChecker {
                     Service otherService = servicesDefinition.getService(dependency.getMasterService());
                     if (otherService.isMarathon()) {
                         throw new NodesConfigurationException(
-                                "Inconsistency found : Service " + property.getServiceName() + " is defining a dependency on a marathon service :  " +
-                                        dependency.getMasterService() + ", which is disallowed");
+                                "Inconsistency found : Service " + property.getServiceName()
+                                        + " is defining a dependency on a marathon service :  "
+                                        + dependency.getMasterService() + ", which is disallowed");
                     }
 
                     // I want the dependency on same node if dependency is mandatory
@@ -115,7 +116,9 @@ public class NodesConfigurationChecker {
         }
     }
 
-    static void enforceMandatoryDependency(NodesConfigWrapper nodesConfig, String serviceName, Integer nodeNbr, Dependency dependency) throws NodesConfigurationException {
+    static void enforceMandatoryDependency(
+            NodesConfigWrapper nodesConfig, String serviceName, Integer nodeNbr, Dependency dependency)
+            throws NodesConfigurationException {
 
         // ensure count of dependencies are available
         int expectedCount = dependency.getNumberOfMasters();
@@ -149,7 +152,10 @@ public class NodesConfigurationChecker {
         }
     }
 
-    static void enforceDependencySameNode(NodesConfigWrapper nodesConfig, String serviceName, int nodeNbr, Dependency dependency) throws NodesConfigurationException {
+    static void enforceDependencySameNode(
+            NodesConfigWrapper nodesConfig, String serviceName, int nodeNbr, Dependency dependency)
+            throws NodesConfigurationException {
+
         boolean serviceFound = false;
         for (String otherKey : nodesConfig.keySet()) {
 
@@ -201,7 +207,8 @@ public class NodesConfigurationChecker {
                 }
 
                 if (foundNodes != nodeCount) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + mandatoryServiceName + " is mandatory on all nodes but some nodes are lacking it.");
+                    throw new NodesConfigurationException("Inconsistency found : service " + mandatoryServiceName
+                            + " is mandatory on all nodes but some nodes are lacking it.");
                 }
             }
         }
@@ -215,10 +222,13 @@ public class NodesConfigurationChecker {
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
             if (property != null) {
 
-                if (property != null && StringUtils.isNotBlank(property.getServiceName()) && !property.getServiceName().equals("action_id")) {
+                if (property != null && StringUtils.isNotBlank(property.getServiceName())
+                        && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
+
                     Service service = servicesDefinition.getService(property.getServiceName());
                     if (service.isMarathon()) {
-                        throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName() + " is a marathon service which should not be selectable here.");
+                        throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
+                                + " is a marathon service which should not be selectable here.");
                     }
                 }
             }
@@ -236,21 +246,25 @@ public class NodesConfigurationChecker {
                 if (property.getNodeNumber() != null) {
 
                     if (!StringUtils.isNumericValue(property.getNodeNumber())) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + property.getNodeNumber() + " which is not a numeric value");
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key
+                                + " with nbr " + property.getNodeNumber() + " which is not a numeric value");
                     }
 
                     if (property.getNodeNumber() > nodeCount) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " which is greater than node number " + nodeCount);
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key
+                                + " which is greater than node number " + nodeCount);
                     }
                 } else {
                     String nbr = (String) nodesConfig.getValueForPath(key);
 
                     if (!StringUtils.isNumericValue(nbr)) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + nbr + " which is not a numeric value");
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key
+                                + " with nbr " + nbr + " which is not a numeric value");
                     }
 
                     if (Integer.parseInt(nbr) > nodeCount) {
-                        throw new NodesConfigurationException("Inconsistency found : got key " + key + " with nbr " + nbr + " which is greater than node number " + nodeCount);
+                        throw new NodesConfigurationException("Inconsistency found : got key " + key
+                                + " with nbr " + nbr + " which is greater than node number " + nodeCount);
                     }
                 }
             }
@@ -264,14 +278,16 @@ public class NodesConfigurationChecker {
         // check IP addresses and ranges configuration
         for (String key : nodesConfig.getIpAddressKeys()) {
             nodeCount++;
-            int nodeNbr = Integer.parseInt(key.substring("action_id".length()));
+            int nodeNbr = Integer.parseInt(key.substring(NodesConfigWrapper.NODE_ID_FIELD.length()));
             String ipAddress = (String) nodesConfig.getValueForPath (key);
             if (StringUtils.isBlank(ipAddress)) {
-                throw new NodesConfigurationException("Node " + key.substring(9) + " has no IP configured.");
+                throw new NodesConfigurationException("Node "
+                        + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length()) + " has no IP configured.");
             } else {
                 Matcher matcher = ipAddressCheck.matcher(ipAddress);
                 if (!matcher.matches()) {
-                    throw new NodesConfigurationException("Node " + key.substring(9) + " has IP configured as " + ipAddress + " which is not an IP address or a range.");
+                    throw new NodesConfigurationException("Node " + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length())
+                            + " has IP configured as " + ipAddress + " which is not an IP address or a range.");
                 }
 
                 if (StringUtils.isNotBlank(matcher.group(1))) { // then it's a range
@@ -288,7 +304,10 @@ public class NodesConfigurationChecker {
 
                                     int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
                                     if (otherNodeNbr == nodeNbr) {
-                                        throw new NodesConfigurationException("Node " + key.substring(9) + " is a range an declares service " + otherProperty.getServiceName() + " which is a unique service, hence forbidden on a range.");
+                                        throw new NodesConfigurationException("Node "
+                                                + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length())
+                                                + " is a range an declares service " + otherProperty.getServiceName()
+                                                + " which is a unique service, hence forbidden on a range.");
                                     }
                                 }
                             }

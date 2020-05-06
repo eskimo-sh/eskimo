@@ -67,8 +67,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
-    def _set_headers(self):
-        self.send_response(200)
+    def _set_error_headers(self):
+        self.send_response(500)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
 
@@ -76,7 +76,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         LOG.info('Got GET request: %s (UNSUPPORTED)', self.path)
 
-        self._set_headers()
+        self._set_error_headers()
         self.wfile.write("GET requests are not supported by logstash command server")
 
     def do_POST(self):
@@ -126,8 +126,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         except OSError:
             LOG.error ("error: popen")
 
-            self._set_headers()
-            self.wfile.write("logstash command failed to execute")
+            self._set_error_headers()
+            self.wfile.write("logstash command failed to execute (got OSError)")
+
+        except IOError:
+            LOG.error("stdin file is not accessible (%s)", stdin_file)
+
+            self._set_error_headers()
+            self.wfile.write("logstash command failed to execute (got IOError) - likely stdin file is not accessible.")
 
         return
 

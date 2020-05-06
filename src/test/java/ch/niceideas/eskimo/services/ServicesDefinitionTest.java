@@ -176,7 +176,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     public void testRealLifeExampleSingleNodes() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("zookeeper", "1");
             put("mesos-master", "1");
             put("marathon", "1");
@@ -377,12 +377,12 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     public void testZookeeperOnRange() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("zookeeper", "1");
             put("gluster1", "on");
             put("ntp1", "on");
             put("prometheus1", "on");
-            put("action_id2", "192.168.10.13-192.168.10.14");
+            put("node_id2", "192.168.10.13-192.168.10.14");
             put("gluster2", "on");
             put("ntp2", "on");
             put("prometheus2", "on");

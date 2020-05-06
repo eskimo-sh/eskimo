@@ -92,7 +92,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testRangeOfIps() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11-192.168.10.15");
+            put("node_id1", "192.168.10.11-192.168.10.15");
             put("ntp1", "on");
             put("prometheus1", "on");
         }});
@@ -105,7 +105,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "blabla");
+                put("node_id1", "blabla");
                 put("ntp1", "on");
                 put("prometheus1", "on");
             }});
@@ -121,8 +121,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testCheckNodesSetupMultipleOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
-            put("action_id2", "192.168.10.12");
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.12");
             put("marathon", "2");
             put("elasticsearch1", "on");
             put("elasticsearch2", "on");
@@ -149,8 +149,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testCheckNodesSetupMultipleOKWithRange() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.12-192.160.10.15");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.12-192.160.10.15");
                 put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
@@ -179,7 +179,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testCheckNodesSetupSingleOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("marathon", "1");
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
@@ -199,8 +199,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.12-192.160.10.15");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.12-192.160.10.15");
                 put("marathon", "2");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
@@ -234,8 +234,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.12");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.12");
                 put("marathon", "2");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
@@ -265,7 +265,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "");
+                put("node_id1", "");
             }});
 
             page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
@@ -280,14 +280,14 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testKeyGreaterThanNodeNumber() throws Exception {
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id2", "192.168.10.11");
+                put("node_id2", "192.168.10.11");
             }});
 
             page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : got key action_id2 which is greater than node number 1"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : got key node_id2 which is greater than node number 1"));
     }
 
     @Test
@@ -295,8 +295,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.12");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.12");
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
                 put("ntp1", "on");
@@ -314,7 +314,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testGlusterNoMoreDisabledOnSingleNode() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("marathon", "1");
             put("elasticsearch1", "on");
             put("ntp1", "on");
@@ -334,7 +334,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testNoGlusterOnSingleNode() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("marathon", "1");
             put("elasticsearch1", "on");
             put("ntp1", "on");
@@ -354,7 +354,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("mesos-master", "1");
                 put("ntp", "1");
                 put("spark-executor1", "on");
@@ -374,7 +374,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
                 put("spark-executor1", "on");
                 put("zookeeper", "1");
@@ -393,7 +393,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
                 put("ntp1", "on");
                 put("mesos-master", "1");
@@ -411,8 +411,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testFlinkAndZookeeperSeparatedIsNowOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
-            put("action_id2", "192.168.10.12");
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.12");
             put("ntp1", "on");
             put("ntp2", "on");
             put("mesos-agent1", "on");
@@ -437,8 +437,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.12");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.12");
                 put("ntp1", "on");
                 put("ntp2", "on");
                 put("mesos-agent1", "on");

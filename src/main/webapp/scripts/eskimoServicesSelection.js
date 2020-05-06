@@ -42,6 +42,8 @@ eskimo.ServicesSelection = function(constructorObject) {
 
     var that = this;
 
+    var NODE_ID_FIELD = "node_id";
+
     var nodeNbrInConfiguration = -1;
     var servicesSelectedcallback = null;
 
@@ -189,7 +191,7 @@ eskimo.ServicesSelection = function(constructorObject) {
                     serviceName = key;
                 }
 
-                if (nbr == nodeNbrInConfiguration && serviceName != "action_id") {
+                if (nbr == nodeNbrInConfiguration && serviceName != NODE_ID_FIELD) {
 
                     // I have only enabled (on) services in setupConfig, so I can simply enable it if I get to this stage
                     $('#' + serviceName + "-choice").get(0).checked = true;

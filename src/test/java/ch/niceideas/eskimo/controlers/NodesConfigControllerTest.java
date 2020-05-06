@@ -6,6 +6,7 @@ import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import javax.servlet.http.HttpSession;
@@ -44,14 +45,14 @@ public class NodesConfigControllerTest {
             }
         });
 
-        assertEquals ("{\n" +
+        assertTrue (new JSONObject("{\n" +
                 "    \"mesos-master\": \"2\",\n" +
                 "    \"marathon\": \"1\",\n" +
                 "    \"zookeeper\": \"2\",\n" +
                 "    \"elasticsearch1\": \"on\",\n" +
                 "    \"elasticsearch2\": \"on\",\n" +
-                "    \"action_id2\": \"192.168.10.13\",\n" +
-                "    \"action_id1\": \"192.168.10.11\",\n" +
+                "    \"node_id2\": \"192.168.10.13\",\n" +
+                "    \"node_id1\": \"192.168.10.11\",\n" +
                 "    \"logstash1\": \"on\",\n" +
                 "    \"kafka2\": \"on\",\n" +
                 "    \"logstash2\": \"on\",\n" +
@@ -64,7 +65,7 @@ public class NodesConfigControllerTest {
                 "    \"spark-executor1\": \"on\",\n" +
                 "    \"spark-executor2\": \"on\",\n" +
                 "    \"gluster2\": \"on\"\n" +
-                "}", ncc.loadNodesConfig());
+                "}").similar(new JSONObject (ncc.loadNodesConfig())));
 
         ncc.setSetupService(new SetupService() {
             @Override
@@ -271,7 +272,7 @@ public class NodesConfigControllerTest {
                         "  \"status\": \"OK\"\n" +
                         "}",
                 ncc.saveNodesConfig("" +
-                "{\"action_id1\":\"192.168.10.11\"," +
+                "{\"node_id1\":\"192.168.10.11\"," +
                 "\"flink-app-master\":\"1\"," +
                 "\"mesos-master\":\"1\"," +
                 "\"zookeeper\":\"1\"," +
@@ -284,7 +285,7 @@ public class NodesConfigControllerTest {
                 "\"ntp1\":\"on\"," +
                 "\"prometheus1\":\"on\"," +
                 "\"spark-executor1\":\"on\"," +
-                "\"action_id2\":\"192.168.10.13\"," +
+                "\"node_id2\":\"192.168.10.13\"," +
                 "\"elasticsearch2\":\"on\"," +
                 "\"flink-worker2\":\"on\"," +
                 "\"gluster2\":\"on\"," +

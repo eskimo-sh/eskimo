@@ -78,7 +78,7 @@ public class MarathonServicesConfigCheckerTest {
     public void testCheckMarathonSetupOK() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("marathon", "1");
             put("ntp1", "on");
             put("prometheus1", "on");
@@ -99,7 +99,7 @@ public class MarathonServicesConfigCheckerTest {
     public void testOneCerebroButNoES() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("cerebro", "1");
             put("ntp1", "on");
             put("prometheus1", "on");
@@ -122,7 +122,7 @@ public class MarathonServicesConfigCheckerTest {
     public void testGdashButNoGluster() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("elasticsearch1", "on");
                 put("ntp1", "on");
                 put("prometheus1", "on");
@@ -146,7 +146,7 @@ public class MarathonServicesConfigCheckerTest {
     public void testZeppelinButNoZookeeper() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("prometheus1", "on");
             put("elasticsearch1", "on");
@@ -170,7 +170,7 @@ public class MarathonServicesConfigCheckerTest {
     public void testNonMarathonServiceCanBeSelected() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("prometheus1", "on");
             put("elasticsearch1", "on");

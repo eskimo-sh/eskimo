@@ -1,5 +1,5 @@
 {
-  "action_id1": "192.168.10.11",
+  "node_id1": "192.168.10.11",
   "ntp1": "on",
   "prometheus1": "on",
   "gluster1": "on",

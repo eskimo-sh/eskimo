@@ -131,16 +131,16 @@ public class MemoryComputerTest {
     public void testGetMemoryMap() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
-            put("action_id2", "192.168.10.12");
+            put("node_id2", "192.168.10.12");
             put("service_a2", "on");
             put("service_b2", "on");
             put("service_c2", "on");
-            put("action_id3", "192.168.10.13");
+            put("node_id3", "192.168.10.13");
             put("service_c3", "on");
-            put("action_id4", "192.168.10.14");
+            put("node_id4", "192.168.10.14");
             put("service_c4", "on");
             put("service_b4", "on");
         }});

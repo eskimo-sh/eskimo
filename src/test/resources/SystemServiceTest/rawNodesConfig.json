@@ -1,5 +1,5 @@
 {
-  "action_id1": "192.168.10.15",
+  "node_id1": "192.168.10.15",
   "cerebro": "1",
   "flink-app-master": "1",
   "grafana": "1",
@@ -19,7 +19,7 @@
   "ntp1": "on",
   "prometheus1": "on",
   "spark-executor1": "on",
-  "action_id2": "192.168.10.13",
+  "node_id2": "192.168.10.13",
   "gdash": "2",
   "elasticsearch2": "on",
   "flink-worker2": "on",

@@ -63,8 +63,8 @@ public class NodeRangeResolverTest extends TestCase {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.11-192.168.10.14");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.11-192.168.10.14");
                 put("cerebro", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
@@ -100,8 +100,8 @@ public class NodeRangeResolverTest extends TestCase {
     public void testEmptyRange() throws Exception {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.15-192.168.10.14");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.15-192.168.10.14");
                 put("cerebro", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
@@ -137,8 +137,8 @@ public class NodeRangeResolverTest extends TestCase {
     public void testRangeOverlapRange() throws Exception {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11-192.168.10.13");
-                put("action_id2", "192.168.10.13-192.168.10.14");
+                put("node_id1", "192.168.10.11-192.168.10.13");
+                put("node_id2", "192.168.10.13-192.168.10.14");
                 put("cerebro", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
@@ -199,8 +199,8 @@ public class NodeRangeResolverTest extends TestCase {
     public void testNominal() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
-            put("action_id2", "192.168.11.12-192.168.11.14");
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.11.12-192.168.11.14");
             put("cerebro", "1");
             put("elasticsearch1", "on");
             put("elasticsearch2", "on");
@@ -231,10 +231,10 @@ public class NodeRangeResolverTest extends TestCase {
         assertNotNull(resolvedConfig);
 
         NodesConfigWrapper expectedResultConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
-            put("action_id2", "192.168.11.12");
-            put("action_id3", "192.168.11.13");
-            put("action_id4", "192.168.11.14");
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.11.12");
+            put("node_id3", "192.168.11.13");
+            put("node_id4", "192.168.11.14");
             put("cerebro", "1");
             put("elasticsearch1", "on");
             put("elasticsearch2", "on");
@@ -276,7 +276,7 @@ public class NodeRangeResolverTest extends TestCase {
             put("zookeeper", "1");
         }});
         
-        assertEquals(expectedResultConfig.getFormattedValue(), resolvedConfig.getFormattedValue());
+        assertTrue(expectedResultConfig.getJSONObject().similar(resolvedConfig.getJSONObject()));
     }
 
     @Test
@@ -289,7 +289,7 @@ public class NodeRangeResolverTest extends TestCase {
 
         assertNotNull(resolvedConfig);
 
-        assertEquals("action_id1,action_id2,action_id3,action_id4,action_id5,action_id6,action_id7", String.join(",",
+        assertEquals("node_id1,node_id2,node_id3,node_id4,node_id5,node_id6,node_id7", String.join(",",
                 resolvedConfig.getIpAddressKeys().stream()
                         .sorted(Comparators.comparable())
                         .collect(Collectors.toList())

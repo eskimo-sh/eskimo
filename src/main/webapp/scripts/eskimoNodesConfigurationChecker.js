@@ -36,6 +36,8 @@ Software.
 var nodesConfigPropertyRE = /([a-zA-Z\-_]+)([0-9]*)/;
 var ipAddressCheck = /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+){0,1}/;
 
+var NODE_ID_FIELD = "node_id";
+
 
 function parseProperty (key) {
 
@@ -87,7 +89,7 @@ function enforceDependencies(setupConfig, servicesDependencies) {
                 nodeNbr = parseInt(nbr);
             }
 
-            if (property.serviceName != "action_id") {
+            if (property.serviceName != NODE_ID_FIELD) {
 
                 var serviceDeps = servicesDependencies[property.serviceName];
 
@@ -197,7 +199,8 @@ function enforceMandatoryServices(mandatoryServices, servicesConfiguration, node
             }
 
             if (foundNodes != nodeCount) {
-                throw "Inconsistency found : service " + mandatoryServiceName + " is mandatory on all nodes but some nodes are lacking it.";
+                throw "Inconsistency found : service " + mandatoryServiceName
+                        + " is mandatory on all nodes but some nodes are lacking it.";
             }
         }
     }
@@ -211,11 +214,12 @@ function checkNoMarathonServicesSelected(setupConfig, servicesConfiguration) {
         var property = parseProperty(key);
         if (property != null) {
 
-            if (property != null && property.serviceName != "action_id") {
+            if (property != null && property.serviceName != NODE_ID_FIELD) {
                 var serviceConfig = servicesConfiguration[property.serviceName];
 
                 if (serviceConfig == null || serviceConfig.marathon) {
-                    throw "Inconsistency found : service " + property.serviceName + " is either undefined or a marathon service which should not be selectable here."
+                    throw "Inconsistency found : service " + property.serviceName
+                            + " is either undefined or a marathon service which should not be selectable here."
                 }
             }
         }
@@ -235,7 +239,8 @@ function checkIDSWithinNodeRanges(setupConfig, nodeCount) {
         } else {
             var nbr = setupConfig[key];
             if (parseInt(nbr) > nodeCount) {
-                throw "Inconsistency found : got key " + key + " with nbr " + nbr + " which is greater than node number " + nodeCount;
+                throw "Inconsistency found : got key " + key + " with nbr " + nbr
+                        + " which is greater than node number " + nodeCount;
             }
         }
     }
@@ -247,12 +252,12 @@ function checkIPAddressesAndRanges(setupConfig, uniqueServices) {
 
     // check IP addresses and ranges configuration
     for (var key in setupConfig) {
-        if (key.indexOf("action_id") > -1) {
+        if (key.indexOf(NODE_ID_FIELD) > -1) {
             nodeCount++;
-            var nodeNbr = parseInt(key.substring(9));
+            var nodeNbr = parseInt(key.substring(NODE_ID_FIELD.length));
             var ipAddress = setupConfig[key];
             if (ipAddress == null || ipAddress == "") {
-                throw "Node " + key.substring(9) + " has no IP configured."
+                throw "Node " + key.substring(NODE_ID_FIELD.length) + " has no IP configured."
             } else {
 
                 var match = ipAddress.match(ipAddressCheck);
@@ -276,7 +281,9 @@ function checkIPAddressesAndRanges(setupConfig, uniqueServices) {
                                         var otherNodeNbr = parseInt(setupConfig[otherKey]);
                                         console.log("  - " + otherNodeNbr + " - " + nodeNbr);
                                         if (otherNodeNbr == nodeNbr) {
-                                            throw "Node " + key.substring(9) + " is a range an declares service " + otherProperty.serviceName + " which is a unique service, hence forbidden on a range.";
+                                            throw "Node " + key.substring(NODE_ID_FIELD.length)
+                                                    + " is a range an declares service " + otherProperty.serviceName
+                                                    + " which is a unique service, hence forbidden on a range.";
                                         }
                                     }
                                 }
@@ -285,7 +292,8 @@ function checkIPAddressesAndRanges(setupConfig, uniqueServices) {
                     }
 
                 } else {
-                    throw "Node " + key.substring(9) + " has IP configured as " + ipAddress + " which is not an IP address or a range.";
+                    throw "Node " + key.substring(NODE_ID_FIELD.length) + " has IP configured as " + ipAddress
+                            + " which is not an IP address or a range.";
                 }
             }
         }

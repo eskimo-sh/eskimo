@@ -61,7 +61,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     private static Pattern nodesConfigPropertyRE = Pattern.compile("([a-zA-Z\\-_]+)([0-9]*)");
 
-    public static final String ACTION_ID_FIELD = "action_id";
+    public static final String NODE_ID_FIELD = "node_id";
 
     public NodesConfigWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
@@ -95,22 +95,22 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     public List<String> getIpAddressKeys() {
         return getRootKeys().stream()
-                .filter(key -> key.startsWith(ACTION_ID_FIELD))
+                .filter(key -> key.startsWith(NODE_ID_FIELD))
                 .collect(Collectors.toList());
     }
 
     public List<String> getServiceKeys() {
         return getRootKeys().stream()
-                .filter(key -> !key.contains(ACTION_ID_FIELD))
+                .filter(key -> !key.contains(NODE_ID_FIELD))
                 .collect(Collectors.toList());
     }
 
     public String getNodeAddress(int nodeNbr) {
-        return (String) getValueForPath(ACTION_ID_FIELD + nodeNbr);
+        return (String) getValueForPath(NODE_ID_FIELD + nodeNbr);
     }
 
     public String getNodeName(int nodeNbr) {
-        String nodeAddress = (String) getValueForPath(ACTION_ID_FIELD + nodeNbr);
+        String nodeAddress = (String) getValueForPath(NODE_ID_FIELD + nodeNbr);
         if (StringUtils.isNotBlank(nodeAddress)) {
             return nodeAddress.replace(".", "-");
         }
@@ -147,7 +147,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
         getIpAddressKeys()
                 .forEach(key -> {
                     try {
-                        retList.add(new Pair<>(key.substring(ACTION_ID_FIELD.length()), (String) getValueForPath(key)));
+                        retList.add(new Pair<>(key.substring(NODE_ID_FIELD.length()), (String) getValueForPath(key)));
                     } catch (JSONException e) {
                         throw new NodesConfigWrapperException(e);
                     }
@@ -200,11 +200,11 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     public int getNodeNumber(String ipAddress) throws SystemException {
         for (String key : getRootKeys()) {
-            if (key.startsWith(ACTION_ID_FIELD)) {
+            if (key.startsWith(NODE_ID_FIELD)) {
 
                 try {
                     if (getValueForPath(key).equals(ipAddress)) {
-                        return Integer.parseInt(key.substring(ACTION_ID_FIELD.length()));
+                        return Integer.parseInt(key.substring(NODE_ID_FIELD.length()));
                     }
                 } catch (JSONException e) {
                     logger.error (e, e);

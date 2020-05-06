@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.Topology;
@@ -53,7 +52,7 @@ public class NodeRangeResolver  {
 
     private static final Logger logger = Logger.getLogger(NodeRangeResolver.class);
 
-    public static final String ACTION_ID_FLAG = "action_id";
+    public static final String NODE_ID_FLAG = NodesConfigWrapper.NODE_ID_FIELD;
 
     public NodesConfigWrapper resolveRanges(NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
@@ -69,7 +68,7 @@ public class NodeRangeResolver  {
 
         for (String key : rawNodesConfig.getIpAddressKeys()) {
             String value = (String) rawNodesConfig.getValueForPath(key);
-            Integer nodeNbr = Integer.valueOf(key.substring(ACTION_ID_FLAG.length()));
+            Integer nodeNbr = Integer.valueOf(key.substring(NODE_ID_FLAG.length()));
             if (nodeNbr.compareTo(maxNodeNbr) > 0) {
                 maxNodeNbr = nodeNbr;
             }
@@ -86,7 +85,7 @@ public class NodeRangeResolver  {
             String value = (String) rawNodesConfig.getValueForPath(key);
 
             if (toBeResolvedNumbers.containsKey(property.getNodeNumber())) {
-                if (key.startsWith(ACTION_ID_FLAG)) {
+                if (key.startsWith(NODE_ID_FLAG)) {
 
                     Map<String, String> generatedConfig = generateRange(rawNodesConfig, property.getNodeNumber(), maxNodeNbr, value);
 
@@ -98,9 +97,9 @@ public class NodeRangeResolver  {
                         String generatedKey = entry.getKey();
                         String generatedValue = entry.getValue();
 
-                        if (generatedKey.startsWith(ACTION_ID_FLAG)) {
+                        if (generatedKey.startsWith(NODE_ID_FLAG)) {
                             checkAddress(ipaddresses, generatedValue);
-                            Integer newNnodeNbr = Integer.valueOf(generatedKey.substring(ACTION_ID_FLAG.length()));
+                            Integer newNnodeNbr = Integer.valueOf(generatedKey.substring(NODE_ID_FLAG.length()));
                             if (newNnodeNbr.compareTo(maxNodeNbr) > 0) {
                                 maxNodeNbr = newNnodeNbr;
                             }
@@ -110,7 +109,7 @@ public class NodeRangeResolver  {
                     }
                 }
             } else {
-                if (key.startsWith(ACTION_ID_FLAG)) {
+                if (key.startsWith(NODE_ID_FLAG)) {
                     checkAddress(ipaddresses, value);
                 }
 
@@ -156,7 +155,7 @@ public class NodeRangeResolver  {
                     String newKey = key.endsWith(rangeNodeNbr.toString()) ? property.getServiceName() + actualNbr : property.getServiceName();
                     String newValue;
                     if (key.endsWith(rangeNodeNbr.toString())) {
-                        newValue = key.startsWith(ACTION_ID_FLAG) ? ipAddress : value;
+                        newValue = key.startsWith(NODE_ID_FLAG) ? ipAddress : value;
                     } else {
                         newValue = ""+actualNbr;
                     }

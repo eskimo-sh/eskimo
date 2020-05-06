@@ -134,7 +134,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         //System.err.println(page.executeJavaScript("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
 
         JSONObject expectedResult = new JSONObject("{" +
-                "\"action_id1\":\"192.168.10.11\"," +
+                "\"node_id1\":\"192.168.10.11\"," +
                 "\"marathon\":\"1\"," +
                 "\"ntp1\":\"on\"," +
                 "\"elasticsearch1\":\"on\"," +
@@ -143,7 +143,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"spark-executor1\":\"on\"," +
                 "\"gluster1\":\"on\"," +
                 "\"logstash1\":\"on\"," +
-                "\"action_id2\":\"192.168.10.13\"," +
+                "\"node_id2\":\"192.168.10.13\"," +
                 "\"zookeeper\":\"2\"," +
                 "\"mesos-master\":\"2\"," +
                 "\"ntp2\":\"on\"," +
@@ -230,7 +230,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("eskimoNodesConfig.addNode()");
 
         // manipulate node 2
-        page.executeJavaScript("$('#action_id2').attr('value', '192.168.10.11')");
+        page.executeJavaScript("$('#node_id2').attr('value', '192.168.10.11')");
         page.executeJavaScript("$('#flink-app-master2').get(0).checked = true");
         page.executeJavaScript("$('#elasticsearch2').get(0).checked = true");
 
@@ -238,7 +238,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("eskimoNodesConfig.removeNode ('remove1')");
 
         // ensure values are found in node 1
-        assertAttrValue("#action_id1", "value", "192.168.10.11");
+        assertAttrValue("#node_id1", "value", "192.168.10.11");
 
         assertJavascriptEquals("true", "$('#flink-app-master1').get(0).checked");
         assertJavascriptEquals("true", "$('#elasticsearch1').get(0).checked");
@@ -251,8 +251,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         assertTrue(page.getElementById("label1").getTextContent().contains("Node no  1"));
 
-        assertNotNull (page.getElementById("action_id1"));
-        assertTagName ("action_id1", "input");
+        assertNotNull (page.getElementById("node_id1"));
+        assertTagName ("node_id1", "input");
 
         assertNotNull (page.getElementById("zookeeper1"));
         assertTagName ("zookeeper1", "input");

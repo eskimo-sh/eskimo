@@ -129,7 +129,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
                 "return {\n" +
-                "  \"action_id1\": \"192.168.10.11\",\n" +
+                "  \"node_id1\": \"192.168.10.11\",\n" +
                 "  \"elasticsearch1\": \"on\",\n" +
                 "  \"flink-app-master\": \"1\",\n" +
                 "  \"flink-worker1\": \"on\",\n" +

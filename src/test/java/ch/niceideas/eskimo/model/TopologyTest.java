@@ -73,12 +73,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
     NodesConfigWrapper createStandardNodesConfig() {
         return new NodesConfigWrapper(new HashMap<String, Object>() {{
-                    put("action_id1", "192.168.10.11");
+                    put("node_id1", "192.168.10.11");
                     put("service_a1", "on");
                     put("service_c1", "on");
-                    put("action_id2", "192.168.10.12");
+                    put("node_id2", "192.168.10.12");
                     put("service_b", "2");
-                    put("action_id3", "192.168.10.13");
+                    put("node_id3", "192.168.10.13");
                     put("service_c3", "on");
             }});
     }
@@ -168,12 +168,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomNodeAfterDependencies();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_c1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_b", "1");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_b3", "on");
                 put("service_c3", "on");
         }});
@@ -191,12 +191,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomNodeAfterOrSameDependencies();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_c1", "on");
-            put("action_id2", "192.168.10.12");
+            put("node_id2", "192.168.10.12");
             put("service_b", "1");
-            put("action_id3", "192.168.10.13");
+            put("node_id3", "192.168.10.13");
             put("service_b3", "on");
             put("service_c3", "on");
         }});
@@ -214,7 +214,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomNodeAfterOrSameDependencies();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
             put("service_c1", "on");
@@ -232,16 +232,16 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomNodeAfterDependencies();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_b1", "on");
                 put("service_c1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_b2", "on");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_b3", "on");
                 put("service_c3", "on");
-                put("action_id4", "192.168.10.14");
+                put("node_id4", "192.168.10.14");
                 put("service_b4", "on");
                 put("service_c4", "on");
         }});
@@ -275,9 +275,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         def.addService(serviceA);
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
-                put("action_id2", "192.168.10.13-192.168.10.14");
-                put("action_id3", "192.168.10.12");
+                put("node_id1", "192.168.10.11");
+                put("node_id2", "192.168.10.13-192.168.10.14");
+                put("node_id3", "192.168.10.12");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("gluster3", "on");
@@ -297,12 +297,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomNodeAfterDependencies();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_c1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_b", "2");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_b3", "on");
                 put("service_c3", "on");
         }});
@@ -320,11 +320,11 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initAdditionalEnvironment();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_b", "1");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_b3", "on");
         }});
 
@@ -339,12 +339,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initAdditionalEnvironment();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_a2", "on");
                 put("service_c2", "on");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_c3", "on");
         }});
 
@@ -397,7 +397,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initAdditionalNodeList();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
             put("service_c1", "on");
@@ -437,7 +437,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initAdditionalNodeListWithAdditionalMemory();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
         }});
@@ -466,19 +466,19 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initAdditionalNodeList();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_b1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_a2", "on");
                 put("service_b2", "on");
                 put("service_c2", "on");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_c3", "on");
-                put("action_id4", "192.168.10.14");
+                put("node_id4", "192.168.10.14");
                 put("service_c4", "on");
                 put("service_b4", "on");
-                put("action_id5", "192.168.10.15");
+                put("node_id5", "192.168.10.15");
                 put("service_a5", "on");
                 put("service_c5", "on");
         }});
@@ -527,12 +527,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initAdditionalEnvironment();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
-                put("action_id2", "192.168.10.12");
+                put("node_id2", "192.168.10.12");
                 put("service_a2", "on");
                 put("service_c2", "on");
-                put("action_id3", "192.168.10.13");
+                put("node_id3", "192.168.10.13");
                 put("service_c3", "on");
         }});
 
@@ -554,17 +554,17 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         // now change topology and ensure node numbers for services A and C are unchanged
         nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("action_id1", "192.168.10.11");
+                put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
-                put("action_id2", "192.168.10.14");
+                put("node_id2", "192.168.10.14");
                 put("service_a2", "on");
-                put("action_id3", "192.168.10.12");
+                put("node_id3", "192.168.10.12");
                 put("service_a3", "on");
                 put("service_c3", "on");
-                put("action_id4", "192.168.10.15");
+                put("node_id4", "192.168.10.15");
                 put("service_a4", "on");
                 put("service_c4", "on");
-                put("action_id5", "192.168.10.13");
+                put("node_id5", "192.168.10.13");
                 put("service_c5", "on");
         }});
 
@@ -614,11 +614,11 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         def.addService(serviceD);
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
-            put("action_id2", "192.168.10.12");
+            put("node_id2", "192.168.10.12");
             put("service_a2", "on");
-            put("action_id3", "192.168.10.13");
+            put("node_id3", "192.168.10.13");
         }});
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
@@ -644,13 +644,13 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomDependenciesFewer();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_c1", "on");
-            put("action_id2", "192.168.10.12");
-            put("action_id3", "192.168.10.13");
+            put("node_id2", "192.168.10.12");
+            put("node_id3", "192.168.10.13");
             put("service_c3", "on");
-            put("action_id4", "192.168.10.14");
+            put("node_id4", "192.168.10.14");
             put("service_c4", "on");
         }});
 
@@ -669,16 +669,16 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         initRandomDependencies();
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("action_id1", "192.168.10.11");
+            put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
             put("service_c1", "on");
-            put("action_id2", "192.168.10.12");
+            put("node_id2", "192.168.10.12");
             put("service_b2", "on");
-            put("action_id3", "192.168.10.13");
+            put("node_id3", "192.168.10.13");
             put("service_b3", "on");
             put("service_c3", "on");
-            put("action_id4", "192.168.10.14");
+            put("node_id4", "192.168.10.14");
             put("service_b4", "on");
             put("service_c4", "on");
         }});

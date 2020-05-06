@@ -178,8 +178,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         }});
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put ("action_id1", "192.168.10.11");
-                put ("action_id2", "192.168.10.13");
+                put ("node_id1", "192.168.10.11");
+                put ("node_id2", "192.168.10.13");
                 put ("logstash2", "on");
                 put ("elasticsearch2", "on");
         }} );

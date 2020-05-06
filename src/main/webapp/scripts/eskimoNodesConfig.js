@@ -45,6 +45,8 @@ eskimo.NodesConfig = function(constructorObject) {
 
     var that = this;
 
+    var NODE_ID_FIELD = "node_id";
+
     // initialized by backend
     var UNIQUE_SERVICES = [];
     var MULTIPLE_SERVICES = [];
@@ -222,17 +224,17 @@ eskimo.NodesConfig = function(constructorObject) {
         var re = /([a-zA-Z\-_]+)([0-9]*)/;
 
         // render nodes and range containers
-        var actionIds = [];
+        var nodeIds = [];
         for (var serviceConfig in data) {
             //console.log(attr);
-            if (serviceConfig.indexOf("action_id") > -1) {
-                actionIds.push(serviceConfig);
+            if (serviceConfig.indexOf(NODE_ID_FIELD) > -1) {
+                nodeIds.push(serviceConfig);
             }
         }
-        actionIds.sort();
-        console.log(actionIds);
-        for (var i = 0; i < actionIds.length; i++) {
-            var ipAddress = data[actionIds[i]];
+        nodeIds.sort();
+        console.log(nodeIds);
+        for (var i = 0; i < nodeIds.length; i++) {
+            var ipAddress = data[nodeIds[i]];
             if (ipAddress.indexOf("-") > -1) { // range
                 addRange()
             } else {
@@ -243,7 +245,7 @@ eskimo.NodesConfig = function(constructorObject) {
         // then empty service placeholders
         for (var serviceConfig in data) {
 
-            if (serviceConfig.indexOf("action_id") > -1) {
+            if (serviceConfig.indexOf(NODE_ID_FIELD) > -1) {
                 $("#" + serviceConfig).val(data[serviceConfig]);
 
                 var match = serviceConfig.match(re);
@@ -261,7 +263,7 @@ eskimo.NodesConfig = function(constructorObject) {
         // finally fill them up !
         for (var serviceConfig in data) {
 
-            if (serviceConfig.indexOf("action_id") == -1) {
+            if (serviceConfig.indexOf(NODE_ID_FIELD) == -1) {
 
                 var match = serviceConfig.match(re);
 
@@ -435,8 +437,8 @@ eskimo.NodesConfig = function(constructorObject) {
             console.log("  - shiffting field  " + i);
             $(nodes[i]["field"]).attr("name", "field" + (i + 1));
             $(nodes[i]["field"]).attr("id", "field" + (i + 1));
-            $(nodes[i]["input"]).attr("name", "action_id" + (i + 1));
-            $(nodes[i]["input"]).attr("id", "action_id" + (i + 1));
+            $(nodes[i]["input"]).attr("name", NODE_ID_FIELD + (i + 1));
+            $(nodes[i]["input"]).attr("id", NODE_ID_FIELD + (i + 1));
             $(nodes[i]["configure"]).attr("id", "configure" + (i + 1));
             $(nodes[i]["remove"]).attr("id", "remove" + (i + 1));
             $(nodes[i]["label"]).html(getNodeTitle(nodes[i]["type"] == "range") + '<div class="server-title-text">' + (i + 1) + '</div>');
@@ -460,7 +462,7 @@ eskimo.NodesConfig = function(constructorObject) {
             }
 
             nodes[i]["field"] = "#field"+(i + 1);
-            nodes[i]["input"] = "#action_id"+(i + 1);
+            nodes[i]["input"] = "#"+NODE_ID_FIELD+(i + 1);
             nodes[i]["configure"] = "#configure"+(i + 1);
             nodes[i]["remove"] = "#remove"+(i + 1);
             nodes[i]["label"] = "#label"+(i + 1);
@@ -555,7 +557,7 @@ eskimo.NodesConfig = function(constructorObject) {
             '    <div class="col-md-12 node-config-element-wrapper"> '+
             '        <label class="col-md-3 control-label" id="label'+next+'">'+getNodeTitle(isRange)+' <div class="server-title-text">' + next + '</div></label> '+
             '        <div class="col-md-6"> '+
-            '            <input id="action_id'+next+'" name="action_id'+next+'" type="text" placeholder="'+
+            '            <input id="'+NODE_ID_FIELD + next+'" name="'+NODE_ID_FIELD+next+'" type="text" placeholder="'+
                                 (isRange ? 'IP addresses range, e.g 192.168.1.10-192.168.1.25' : 'IP address, e.g. 192.168.10.10')+
             '                   " class="form-control input-md"> '+
             '        </div>'+
@@ -581,7 +583,7 @@ eskimo.NodesConfig = function(constructorObject) {
         nodes[next-1] = new Object();
         nodes[next-1]["type"] = isRange ? "range" : "node";
         nodes[next-1]["field"] = "#field"+next;
-        nodes[next-1]["input"] = "#action_id"+next;
+        nodes[next-1]["input"] = "#"+NODE_ID_FIELD+next;
         nodes[next-1]["remove"] = "#remove"+next;
         nodes[next-1]["configure"] = "#configure"+next;
         nodes[next-1]["label"] = "#label"+next;

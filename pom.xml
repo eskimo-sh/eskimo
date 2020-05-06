@@ -285,7 +285,7 @@ Software.
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- All Distribution packaging -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
