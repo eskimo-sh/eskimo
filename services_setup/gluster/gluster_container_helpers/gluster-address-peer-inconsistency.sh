@@ -92,7 +92,13 @@ else
     if [[ $MASTER_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
         additional_search=marathon.registry
     fi
-    localPeerList=`gluster pool list`
+    localPeerList=`gluster pool list 2>/tmp/local_gluster_check`
+    if [[ $? != 0 ]]; then
+        echo "Calling 'gluster pool list'"
+        cat /tmp/local_gluster_check
+        echo "Cannot proceed any further with consistency checking ... SKIPPING"
+        exit 10
+    fi
     if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
         MASTER_IN_LOCAL=0
     else

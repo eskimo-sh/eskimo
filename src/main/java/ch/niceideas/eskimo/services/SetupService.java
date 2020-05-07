@@ -102,7 +102,7 @@ public class SetupService {
     private String configStoragePathInternal = null;
 
     /** For tests */
-    void setConfigStoragePathInternal(String configStoragePathInternal) {
+    public void setConfigStoragePathInternal(String configStoragePathInternal) {
         this.configStoragePathInternal = configStoragePathInternal;
     }
     void setPackageDistributionPath(String packageDistributionPath) {

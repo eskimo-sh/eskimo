@@ -1,0 +1,7 @@
+
+#/bin/bash
+
+echo "$@" > .log_sed
+
+
+# TODO test of dummy config file exist and test sed

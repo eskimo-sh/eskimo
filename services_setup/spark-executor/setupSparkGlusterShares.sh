@@ -34,6 +34,7 @@
 # Software.
 #
 
+set -e
 
 # Handling /var/lib/spark/data
 /usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark

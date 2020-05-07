@@ -125,20 +125,21 @@ function deploy_marathon() {
 
 
     echo " - Removing any previously deployed $1 service from marathon"
-    curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$1 >> $2 2>&1
+    curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$1 >> $2_marathon_deploy 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not reach marathon"
         exit -23
     fi
-    if [[ `grep "does not exist" $2` == "" ]]; then
+    cat $2_marathon_deploy
+    if [[ `cat $2_marathon_deploy` != "" && `grep "does not exist" $2_marathon_deploy` == "" ]]; then
         echo "   + Previous instance removed"
+        sleep 5
     fi
 
 
     echo " - Deploying $1 service in marathon"
     # 10 attempts with 5 seconds sleep each
     for i in $(seq 1 10); do
-        sleep 5
         echo "   + Attempt $i"
         curl  -X POST -H 'Content-Type: application/json' \
             -d "@$1.marathon.json" \
@@ -155,6 +156,7 @@ function deploy_marathon() {
             echo "   + Failed 10 times !!"
             exit -25
         fi
+        sleep 5
     done
 
 

@@ -312,8 +312,6 @@ function create_common_system_users() {
 
     create_user_infrastructure grafana 3304
 
-    create_user_infrastructure grafana 3304
-
     create_user_infrastructure flink 3305
 
     create_user_infrastructure marathon 3306

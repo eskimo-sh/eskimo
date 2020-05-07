@@ -34,6 +34,7 @@
 # Software.
 #
 
+set -e
 
 # Handling /var/lib/flink/data
 /usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink

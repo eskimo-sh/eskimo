@@ -1,0 +1,17 @@
+#/bin/bash
+
+echo "$@" > .log_id
+
+if [[ $2 == 'elasticsearch' ]]; then
+    echo '3301'
+elif [[ $2 == 'spark' ]]; then
+    echo '3302'
+elif [[ $2 == 'kafka' ]]; then
+    echo '3303'
+elif [[ $2 == 'grafana' ]]; then
+    echo '3304'
+elif [[ $2 == 'flink' ]]; then
+    echo '3305'
+elif [[ $2 == 'marathon' ]]; then
+    echo '3306'
+fi

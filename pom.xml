@@ -239,6 +239,7 @@ Software.
                         <configuration>
                             <sources>
                                 <source>src/test/javawebtests</source>
+                                <source>src/test/javashelltests</source>
                             </sources>
                         </configuration>
                     </execution>

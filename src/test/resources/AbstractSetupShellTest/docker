@@ -1,0 +1,18 @@
+
+#/bin/bash
+
+echo "$@" > .log_docker
+
+
+if [[ $1 == "exec" && $3 == "bash" ]]; then
+    if [[ `echo $4 | grep inContainerSetup` != "" ]]; then
+
+         configScript=`echo $4 | sed -E 's/\/scripts\/(.*)/\1/g'`
+
+         if [[ $configScript != "" ]]; then
+            bash $configScript
+         fi
+
+         echo " - In container config SUCCESS"
+    fi
+fi

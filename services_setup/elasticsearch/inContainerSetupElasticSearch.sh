@@ -44,7 +44,7 @@ echo "-- SETTING UP ELASTICSEARCH ----------------------------------------------
 
 echo " - Getting elasticsearch user_id"
 set +e
-elasticsearch_user_id=`id -u elasticsearch 2> /tmp/es_install_log`
+elasticsearch_user_id=`id -u elasticsearch`
 set -e
 
 # These should be mounted properly by docker

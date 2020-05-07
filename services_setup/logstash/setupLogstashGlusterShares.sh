@@ -34,5 +34,7 @@
 # Software.
 #
 
+set -e
+
 # Handling /var/lib/logstash/data
 /usr/local/sbin/gluster_mount.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch

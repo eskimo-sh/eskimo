@@ -63,10 +63,10 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f /tmp/es_install_log
+sudo rm -f es_install_log
 
 echo " - Building container elasticsearch"
-build_container elasticsearch elasticsearch /tmp/es_install_log
+build_container elasticsearch elasticsearch es_install_log
 
 echo " - Configuring host elasticsearch common part"
 . ./setupESCommon.sh
@@ -92,39 +92,39 @@ docker run \
         -e NODE_NAME=$HOSTNAME \
         -d --name elasticsearch \
         -i \
-        -t eskimo:elasticsearch bash >> /tmp/es_install_log 2>&1
-fail_if_error $? "/tmp/es_install_log" -2
+        -t eskimo:elasticsearch bash >> es_install_log 2>&1
+fail_if_error $? es_install_log -2
 
 # connect to container
 #docker exec -it elasticsearch bash
 
 echo " - Configuring elasticsearch container (common part)"
-docker exec elasticsearch bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a /tmp/es_install_log 2>&1
-if [[ `tail -n 1 /tmp/es_install_log` != " - In container config SUCCESS" ]]; then
+docker exec elasticsearch bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a es_install_log 2>&1
+if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
-    cat /tmp/es_install_log
+    cat es_install_log
     exit -102
 fi
 
 echo " - Configuring Elasticsearch container"
-docker exec elasticsearch bash /scripts/inContainerSetupElasticSearch.sh | tee -a /tmp/es_install_log 2>&1
-if [[ `tail -n 1 /tmp/es_install_log` != " - In container config SUCCESS" ]]; then
+docker exec elasticsearch bash /scripts/inContainerSetupElasticSearch.sh | tee -a es_install_log 2>&1
+if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/es_install_log
+    cat es_install_log
     exit -100
 fi
 
 echo " - Handling topology and setting injection"
-handle_topology_settings elasticsearch /tmp/cerebro_install_log
+handle_topology_settings elasticsearch cerebro_install_log
 
 #echo " - TODO"
 #docker exec -it elasticsearch TODO
 
 echo " - Committing changes to local template and exiting container elasticsearch"
-commit_container elasticsearch /tmp/es_install_log
+commit_container elasticsearch es_install_log
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file elasticsearch /tmp/es_install_log
+install_and_check_service_file elasticsearch es_install_log
 
 
 

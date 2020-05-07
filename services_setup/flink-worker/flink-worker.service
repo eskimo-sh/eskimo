@@ -54,8 +54,10 @@ ExecStart=/bin/bash -c 'while [[ 1 ]]; do if [[ `docker image ls -a | grep eskim
 Type=simple
 
 Restart=always
-StartLimitBurst=3
-StartLimitInterval=30
+StartLimitBurst=4
+# Giving a little time to gluster to recover in case of issues
+RestartSec=3
+StartLimitInterval=50
 
 StandardOutput=syslog
 StandardError=syslog

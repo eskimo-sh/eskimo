@@ -63,7 +63,7 @@ cd $saved_dir
 
 echo " - Creating marathon user (if not exist) in container"
 set +e
-marathon_user_id=`id -u marathon 2> /tmp/es_install_log`
+marathon_user_id=`id -u marathon`
 set -e
 if [[ $marathon_user_id == "" ]]; then
     useradd -u $MARATHON_USER_ID marathon

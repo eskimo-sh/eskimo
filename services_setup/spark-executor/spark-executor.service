@@ -79,7 +79,9 @@ Type=simple
 
 Restart=always
 StartLimitBurst=5
-StartLimitInterval=30
+# Giving a little time to gluster to recover in case of issues
+RestartSec=3
+StartLimitInterval=60
 
 StandardOutput=syslog
 StandardError=syslog

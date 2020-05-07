@@ -50,7 +50,7 @@ echo "-- SETTING UP SPARK (COMMON PART) --------------------------------------"
 
 echo " - Creating spark user (if not exist) in container"
 set +e
-spark_user_id=`id -u spark 2> /tmp/es_install_log`
+spark_user_id=`id -u spark`
 set -e
 if [[ $spark_user_id == "" ]]; then
     useradd -u $SPARK_USER_ID spark

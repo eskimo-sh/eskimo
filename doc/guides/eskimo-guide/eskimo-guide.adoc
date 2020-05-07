@@ -1404,6 +1404,18 @@ executors as well
 * `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
 history server to monitor spark jobs.
 
+==== Other spark specificities within Eskimo
+
+When running on Apache Mesos, Spark needs a special process to be up and running to orchestrate the shuffle stage in
+between executor processes on the various nodes. With Dynamic allocation, Spark needs to understand the executor
+topology operated by Mesos. +
+A special process needs to be up and running on every node where spark executors can be run for this very need, the
+_Mesos Shuffle Service_.
+
+Within Eskimo, this _Mesos Shuffle Service_ is identified as the `spark-executor` service which serves two intents:
+operating the _Mesos Shuffle Service_ and setting up host-level requirements to optimize spark executors execution from
+Mesis on every node of the Eskimo cluster.
+
 === Apache Flink
 
 image::pngs/flink-app-master-logo.png[50, 50, align="center"]
@@ -1428,34 +1440,6 @@ gluster shares created and mounted:
 
 * `/var/lib/flink/data flink` used to store data to be shared amoung flink workers.
 * `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
-
-
-==== Flink bugs and workarounds
-
-The version 1.9.1 of Flink suffers from a bug affecting severely the way tasks are dispatched to tasks managers. A
-consequence of this bug is that most of the time, after an initial job was accepted by a task manager, all subsequent
-jobs are refused and cannot be executed anymore if the task manager lost its execution slots on mesos.
-
-The workaround implemented within Eskimo consists in keeping the TaskManager execution context in mesos for 1 hours
-instead of using the default 1 minute timeout. +
-In addition, after when the 1 hour timeout occurs, the Flink App Master is restarted by force to trigger a
-re-registration of the framework within Mesos in order to enable further flink processings to be successfully
-dispatched.
-
-This workaround works well but has a severe consequence: *when a flink job has been executed, the resources it has been
-allocated to will be kept booked for ONE WHOLE HOUR within Mesos*.
-
-This is fairly acceptable on a large cluster, but on a single node or on a tiny cluster, if all resources of the
-cluster are booked by the flink task managers, no other job will be schedulable by mesos!
-
-In this case, instead of waiting one hour for this task manager to be released and free its resources from mesos,
-one needs to *Kill the flink framework using mesos-cli.sh* in order to force release the resources booked by flink.
-
-In terms of process:
-
-1. Use the "mesos Console" to find out about the `frameworkId` of the mesos app master
-2. Use a terminal on one of the node of the Eskimo cluster to execute `mesos-cli.sh kill_framework -f [frameworkId]`
-
 
 
 === Apache zeppelin
