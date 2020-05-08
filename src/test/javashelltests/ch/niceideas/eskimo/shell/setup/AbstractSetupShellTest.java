@@ -10,8 +10,6 @@ import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +32,12 @@ public abstract class AbstractSetupShellTest {
         }
     }
     */
+
+    protected void copyFile(String jailPath, String source) throws IOException {
+        FileUtils.copy(
+                new File ("./services_setup/" + getServiceName() + "/" + source),
+                new File (jailPath + "/" + source));
+    }
 
     protected final String setupJail(String serviceName) throws Exception {
         String jailPath = createJail();
@@ -60,7 +64,7 @@ public abstract class AbstractSetupShellTest {
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
-        String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getFirstLetterCapitalServiceName()+"SetupShellTest/testFile.conf"));
+        String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCaemlCaseServiceName()+"SetupShellTest/testFile.conf"));
         if (StringUtils.isNotBlank(testFileConf)) {
             copyResource("testFile.conf", jailPath, testFileConf);
         }
@@ -86,17 +90,22 @@ public abstract class AbstractSetupShellTest {
                 // inject overriding of path to use jail commands
                 scriptContent = scriptContent.replace("#!/usr/bin/env bash\n", "" +
                         "#!/usr/bin/env bash\n" +
-                        "export PATH=.:$PATH\n" +
+                        "\n" +
                         "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
                         "\n" +
                         "# Change current folder to script dir (important !)\n" +
                         "cd $SCRIPT_DIR\n"+
                         "\n" +
                         "# Avoid sleeps everywhere\n" +
-                        "export NO_SLEEP=true\n");
+                        "export NO_SLEEP=true\n" +
+                        "\n"+
+                        "# Using local commands\n" +
+                        "export PATH=$SCRIPT_DIR:$PATH\n");
 
                 // inject custom topology loading
                 scriptContent = scriptContent.replace(". /etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
+
+                scriptContent = scriptContent.replace(". /host_etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
 
                 copyResource(scriptToExecute, jailPath, scriptContent);
             }
@@ -174,7 +183,7 @@ public abstract class AbstractSetupShellTest {
 
             //System.err.println (dockerLogs);
 
-            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getServiceName() + "_template");
+            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getTemplateName() + "_template");
             assertTrue(indexOfImagesQ > -1);
 
             int indexOfLoad = dockerLogs.indexOf("load", indexOfImagesQ + 1);
@@ -244,7 +253,7 @@ public abstract class AbstractSetupShellTest {
     }
 
     protected final void assertTestConfFileUpdate() throws Exception {
-        String testFileConfResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getFirstLetterCapitalServiceName()+"SetupShellTest/testFile.conf.result"));
+        String testFileConfResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCaemlCaseServiceName()+"SetupShellTest/testFile.conf.result"));
         if (StringUtils.isNotBlank(testFileConfResult)) {
 
             File updatedTestConfFilePath = new File (getJailPath() + "/testFile.conf");
@@ -253,11 +262,15 @@ public abstract class AbstractSetupShellTest {
             assertEquals(testFileConfResult.trim(), updatedTestConfFile.trim());
 
         } else {
-            fail ("file 'testFile.conf.result' is missing in " + getFirstLetterCapitalServiceName()+"SetupShellTest/");
+            fail ("file 'testFile.conf.result' is missing in " + getCaemlCaseServiceName()+"SetupShellTest/");
         }
     }
 
     protected abstract String getServiceName();
+
+    protected String getTemplateName() {
+        return getServiceName();
+    }
 
     protected abstract void copyScripts(String jailPath) throws IOException;
 
@@ -292,6 +305,7 @@ public abstract class AbstractSetupShellTest {
         createLoggingExecutable("rm", tempFile.getAbsolutePath());
         createLoggingExecutable("bash", tempFile.getAbsolutePath());
         createLoggingExecutable("systemctl", tempFile.getAbsolutePath());
+        createLoggingExecutable("echo", tempFile.getAbsolutePath());
 
         createDummyExecutable("id", tempFile.getAbsolutePath());
         createDummyExecutable("docker", tempFile.getAbsolutePath());
@@ -330,8 +344,8 @@ public abstract class AbstractSetupShellTest {
         return targetPath;
     }
 
-    public String getFirstLetterCapitalServiceName() {
-        return getServiceName().substring(0, 1).toUpperCase() + getServiceName().substring(1);
+    public String getCaemlCaseServiceName() {
+        return StringUtils.toCamelCase(getServiceName());
     }
 
 }

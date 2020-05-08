@@ -14,9 +14,9 @@ import java.io.IOException;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
-public class ElasticSearchSetupTest extends AbstractSetupShellTest {
+public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(ElasticSearchSetupTest.class);
+    private static final Logger logger = Logger.getLogger(FlinkWorkerSetupTest.class);
 
     protected static String jailPath = null;
 
@@ -37,17 +37,21 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "elasticsearch";
+        return "flink-worker";
+    }
+
+    @Override
+    protected String getTemplateName() {
+        return "flink";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh is automatic
         copyFile(jailPath, "common.sh");
-        copyFile(jailPath, "setupESCommon.sh");
-        copyFile(jailPath, "inContainerSetupElasticSearch.sh");
-        copyFile(jailPath, "inContainerSetupESCommon.sh");
-        copyFile(jailPath, "inContainerStartService.sh");
+        copyFile(jailPath, "setupCommon.sh");
+        copyFile(jailPath, "inContainerSetupFlinkWorker.sh");
+        copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }
 
@@ -55,7 +59,7 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupElasticSearch.sh",
+                "inContainerSetupFlinkWorker.sh",
                 "inContainerInjectTopology.sh"
         };
     }
@@ -74,15 +78,12 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
     public void testConfigurationFileUpdate() throws Exception {
         assertTestConfFileUpdate();
 
-        String bashLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_bash"));
-        if (StringUtils.isNotBlank(bashLogs)) {
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
+        if (StringUtils.isNotBlank(sudoLogs)) {
 
-            //System.err.println (bashLogs);
+            //System.err.println (sudoLogs);
 
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"network.publish_host: 192.168.10.11\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
+            assertTrue(sudoLogs.contains("bash -c echo -e \"taskmanager.host: 192.168.10.11\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
         } else {
             fail ("Expected to find bash logs in .log_bash");
         }

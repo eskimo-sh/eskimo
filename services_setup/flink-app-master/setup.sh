@@ -58,7 +58,7 @@ fi
 
 
 # reinitializing log
-sudo rm -f /tmp/flink_install_log
+sudo rm -f flink_install_log
 
 # Initially this was a Hack for BTRFS support :
 #   - need to unmount gluster shares otherwise cp command goes nuts
@@ -81,7 +81,7 @@ sudo chmod 755 /usr/local/sbin/setupFlinkGlusterShares.sh
 
 
 echo " - Building container flink"
-build_container flink-app-master flink /tmp/flink_install_log
+build_container flink-app-master flink flink_install_log
 
 #sudo mkdir -p /usr/local/etc/flink
 #sudo chown -R flink/usr/local/etc/flink
@@ -95,9 +95,10 @@ docker run \
         -v /var/log/flink:/var/log/flink \
         -v /var/run/flink:/var/run/flink \
         -v /var/lib/flink:/var/lib/flink \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -i \
-        -t eskimo:flink-app-master bash >> /tmp/flink_install_log 2>&1
-fail_if_error $? "/tmp/flink_install_log" -2
+        -t eskimo:flink-app-master bash >> flink_install_log 2>&1
+fail_if_error $? "flink_install_log" -2
 
 
 # connect to container
@@ -105,18 +106,18 @@ fail_if_error $? "/tmp/flink_install_log" -2
 
 
 echo " - Configuring flink (Flink Common part)"
-docker exec flink-app-master bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee -a /tmp/flink_install_log 2>&1
-if [[ `tail -n 1 /tmp/flink_install_log` != " - In container config SUCCESS" ]]; then
+docker exec flink-app-master bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee -a flink_install_log 2>&1
+if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/flink_install_log
+    cat flink_install_log
     exit -101
 fi
 
 echo " - Configuring flink App Master container"
-docker exec flink-app-master bash /scripts/inContainerSetupFlinkAppMaster.sh $SELF_IP_ADDRESS | tee -a /tmp/flink_install_log 2>&1
-if [[ `tail -n 1 /tmp/flink_install_log` != " - In container config SUCCESS" ]]; then
+docker exec flink-app-master bash /scripts/inContainerSetupFlinkAppMaster.sh | tee -a flink_install_log 2>&1
+if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/flink_install_log
+    cat flink_install_log
     exit -101
 fi
 
@@ -125,10 +126,10 @@ fi
 
 
 echo " - Handling topology and setting injection"
-handle_topology_settings flink-app-master /tmp/flink_install_log
+handle_topology_settings flink-app-master flink_install_log
 
 echo " - Committing changes to local template and exiting container flink-app-master"
-commit_container flink-app-master /tmp/flink_install_log
+commit_container flink-app-master flink_install_log
 
 echo " - Copying flink command line programs docker wrappers to /usr/local/bin"
 for i in `find ./flink_wrappers -mindepth 1`; do
@@ -138,4 +139,4 @@ for i in `find ./flink_wrappers -mindepth 1`; do
 done
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file flink-app-master /tmp/flink_install_log
+install_and_check_service_file flink-app-master flink_install_log

@@ -41,7 +41,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 echo " - Checking flink user"
-export flink_user_id=`id -u flink 2>> /tmp/flink_executor_install.log`
+export flink_user_id=`id -u flink 2>> flink_install.log`
 if [[ $flink_user_id == "" ]]; then
     echo "User flink should have been added by eskimo-base-system setup script"
     exit -4

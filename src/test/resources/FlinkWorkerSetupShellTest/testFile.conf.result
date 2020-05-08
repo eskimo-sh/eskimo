@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+/usr/local/sbin/inContainerInjectTopology.sh
+
+
+jobmanager.rpc.address:

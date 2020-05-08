@@ -46,11 +46,11 @@ cd $SCRIPT_DIR
 loadTopology
 
 # reinitializing log
-sudo rm -f /tmp/gdash_install_log
+sudo rm -f gdash_install_log
 
 
 echo " - Building container gdash"
-build_container gdash gdash /tmp/gdash_install_log
+build_container gdash gdash gdash_install_log
 
 
 # create and start container
@@ -62,26 +62,26 @@ docker run \
         -e NODE_NAME=$HOSTNAME \
         -d --name gdash \
         -i \
-        -t eskimo:gdash bash >> /tmp/gdash_install_log 2>&1
-fail_if_error $? "/tmp/gdash_install_log" -2
+        -t eskimo:gdash bash >> gdash_install_log 2>&1
+fail_if_error $? "gdash_install_log" -2
 
 # connect to container
 #docker exec -it gdash bash
 
 echo " - Configuring gdash container"
-docker exec gdash bash /scripts/inContainerSetupGdash.sh | tee -a /tmp/gdash_install_log 2>&1
-if [[ `tail -n 1 /tmp/gdash_install_log` != " - In container config SUCCESS" ]]; then
+docker exec gdash bash /scripts/inContainerSetupGdash.sh | tee -a gdash_install_log 2>&1
+if [[ `tail -n 1 gdash_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/gdash_install_log
+    cat gdash_install_log
     exit -100
 fi
 
 echo " - Handling topology and setting injection"
-handle_topology_settings gdash /tmp/gdash_install_log
+handle_topology_settings gdash gdash_install_log
 
 echo " - Committing changes to local template and exiting container gdash"
-commit_container gdash /tmp/gdash_install_log
+commit_container gdash gdash_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon gdash /tmp/gdash_install_log
+deploy_marathon gdash gdash_install_log

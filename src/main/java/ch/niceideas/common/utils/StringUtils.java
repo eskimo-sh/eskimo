@@ -41,8 +41,10 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -587,5 +589,11 @@ public abstract class StringUtils {
     		}
     	}
     	return source;
+    }
+
+    public static String toCamelCase(String source) {
+        return Arrays.stream(source.split("\\-"))
+                .map(s -> Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase())
+                .collect(Collectors.joining());
     }
 }

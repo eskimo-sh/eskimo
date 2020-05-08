@@ -1,6 +1,6 @@
 package ch.niceideas.eskimo.shell.setup;
 
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,12 +8,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+public class GdashSetupTest extends AbstractSetupShellTest {
 
-public class CerebroSetupTest extends AbstractSetupShellTest {
-
-    private static final Logger logger = Logger.getLogger(CerebroSetupTest.class);
+    private static final Logger logger = Logger.getLogger(GdashSetupTest.class);
 
     protected static String jailPath = null;
 
@@ -34,16 +31,14 @@ public class CerebroSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "cerebro";
+        return "gdash";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh is automatic
         copyFile(jailPath, "common.sh");
-        copyFile(jailPath, "setupESCommon.sh");
-        copyFile(jailPath, "inContainerSetupCerebro.sh");
-        copyFile(jailPath, "inContainerSetupESCommon.sh");
+        copyFile(jailPath, "inContainerSetupGdash.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }

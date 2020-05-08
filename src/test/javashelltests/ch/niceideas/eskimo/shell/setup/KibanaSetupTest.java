@@ -37,12 +37,12 @@ public class KibanaSetupTest extends AbstractSetupShellTest {
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh is automatic
-        copyFile("kibana", jailPath, "common.sh");
-        copyFile("kibana", jailPath, "setupESCommon.sh");
-        copyFile("kibana", jailPath, "inContainerSetupKibana.sh");
-        copyFile("kibana", jailPath, "inContainerSetupESCommon.sh");
-        copyFile("kibana", jailPath, "inContainerStartService.sh");
-        copyFile("kibana", jailPath, "inContainerInjectTopology.sh");
+        copyFile(jailPath, "common.sh");
+        copyFile(jailPath, "setupESCommon.sh");
+        copyFile(jailPath, "inContainerSetupKibana.sh");
+        copyFile(jailPath, "inContainerSetupESCommon.sh");
+        copyFile(jailPath, "inContainerStartService.sh");
+        copyFile(jailPath, "inContainerInjectTopology.sh");
     }
 
     @Override
@@ -52,20 +52,6 @@ public class KibanaSetupTest extends AbstractSetupShellTest {
                 "inContainerSetupKibana.sh",
                 "inContainerInjectTopology.sh"};
     }
-
-    private void copyFile(String service,  String jailPath, String source) throws IOException {
-        FileUtils.copy(
-                new File ("./services_setup/" + service + "/" + source),
-                new File (jailPath + "/" + source));
-    }
-
-    // none on kibana
-    /*
-    @Test
-    public void testSystemDInstallation() throws Exception {
-        System.err.println (setupLogs);
-    }
-    */
 
     @Test
     public void testMarathonInstallation() throws Exception {

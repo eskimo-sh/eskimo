@@ -14,9 +14,9 @@ import java.io.IOException;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
-public class ElasticSearchSetupTest extends AbstractSetupShellTest {
+public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(ElasticSearchSetupTest.class);
+    private static final Logger logger = Logger.getLogger(FlinkAppMasterSetupTest.class);
 
     protected static String jailPath = null;
 
@@ -37,16 +37,21 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "elasticsearch";
+        return "flink-app-master";
+    }
+
+    @Override
+    protected String getTemplateName() {
+        return "flink";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh is automatic
         copyFile(jailPath, "common.sh");
-        copyFile(jailPath, "setupESCommon.sh");
-        copyFile(jailPath, "inContainerSetupElasticSearch.sh");
-        copyFile(jailPath, "inContainerSetupESCommon.sh");
+        copyFile(jailPath, "setupCommon.sh");
+        copyFile(jailPath, "inContainerSetupFlinkAppMaster.sh");
+        copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }
@@ -55,7 +60,7 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupElasticSearch.sh",
+                "inContainerSetupFlinkAppMaster.sh",
                 "inContainerInjectTopology.sh"
         };
     }
@@ -79,10 +84,8 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
 
             //System.err.println (bashLogs);
 
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"network.publish_host: 192.168.10.11\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
+            assertTrue(bashLogs.contains("-c echo -e \"\\n# Specyfing mesos master\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
+            assertTrue(bashLogs.contains("-c echo -e \"mesos.master: zk://192.168.10.13:2181/mesos\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
         } else {
             fail ("Expected to find bash logs in .log_bash");
         }

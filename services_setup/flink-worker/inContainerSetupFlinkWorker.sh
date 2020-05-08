@@ -40,10 +40,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
+. /etc/eskimo_topology.sh
 
-SELF_IP_ADDRESS=$1
 if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
+    echo " - Didn't find Self IP Address in eskimo_topology.sh"
     exit -2
 fi
 
