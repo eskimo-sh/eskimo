@@ -51,11 +51,11 @@ sudo update-rc.d rsync remove
 
 echo " - Enabling and starting cron"
 sudo update-rc.d cron enable
-/etc/init.d/cron start >> /tmp/ntp-setup-log
+sudo bash -c "/etc/init.d/cron start >> /tmp/ntp-setup-log"
 
 echo " - Configuring logging"
-echo -e "\nlogfile /var/log/ntp/ntp.log" >> /etc/ntp.conf
-echo -e "logconfig =syncevents +peerevents +sysevents +allclock" >> /etc/ntp.conf
+bash -c "echo -e \"\nlogfile /var/log/ntp/ntp.log\" >> /etc/ntp.conf"
+bash -c "echo -e \"logconfig =syncevents +peerevents +sysevents +allclock\" >> /etc/ntp.conf"
 
 echo " - Making sure ntp has access to /var/lib/ntp"
 touch /var/lib/ntp/ntp.drift.TEMP

@@ -57,7 +57,7 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f /tmp/gluster_install_log
+sudo rm -f gluster_install_log
 
 
 echo " - Creating required folders"
@@ -73,7 +73,7 @@ sudo mkdir -p /var/lib/gluster
 
 
 echo " - Building container gluster"
-build_container gluster gluster /tmp/gluster_install_log
+build_container gluster gluster gluster_install_log
 
 # create and start container
 echo " - Running docker container"
@@ -82,13 +82,14 @@ docker run \
         -v $PWD/../common:/common \
         --network host \
         --privileged=true \
-        -v /var/lib/gluster:/var/lib/gluster\
-        -v /var/log/gluster:/var/log/gluster\
-        -v /var/run/gluster:/var/run/gluster\
+        -v /var/lib/gluster:/var/lib/gluster \
+        -v /var/log/gluster:/var/log/gluster \
+        -v /var/run/gluster:/var/run/gluster \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -d --name gluster \
         -i \
-        -t eskimo:gluster bash >> /tmp/gluster_install_log 2>&1
-fail_if_error $? "/tmp/gluster_install_log" -2
+        -t eskimo:gluster bash >> gluster_install_log 2>&1
+fail_if_error $? "gluster_install_log" -2
 
 # connect to container
 #docker exec -it gluster bash
@@ -97,9 +98,9 @@ echo " - Gluster Remote Server Scripts"
 for i in `find ./command_server`; do
     if [[ -f $SCRIPT_DIR/$i ]]; then
         filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        docker exec gluster chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        fail_if_error $? /tmp/gluster_install_log -30
+        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> gluster_install_log 2>&1
+        docker exec gluster chmod 755 /usr/local/sbin/$filename >> gluster_install_log 2>&1
+        fail_if_error $? gluster_install_log -30
     fi
 done
 
@@ -107,17 +108,17 @@ echo " - Gluster in container helpers"
 for i in `find ./gluster_container_helpers`; do
     if [[ -f $SCRIPT_DIR/$i ]]; then
         filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        docker exec gluster chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        fail_if_error $? /tmp/gluster_install_log -30
+        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> gluster_install_log 2>&1
+        docker exec gluster chmod 755 /usr/local/sbin/$filename >> gluster_install_log 2>&1
+        fail_if_error $? gluster_install_log -30
     fi
 done
 
 echo " - Configuring gluster container"
-docker exec gluster bash /scripts/inContainerSetupGluster.sh $SELF_IP_ADDRESS | tee -a /tmp/gluster_install_log 2>&1
-if [[ `tail -n 1 /tmp/gluster_install_log` != " - In container config SUCCESS" ]]; then
+docker exec gluster bash /scripts/inContainerSetupGluster.sh | tee -a gluster_install_log 2>&1
+if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/gluster_install_log
+    cat gluster_install_log
     exit -100
 fi
 
@@ -125,23 +126,23 @@ fi
 #docker exec -it gluster TODO
 
 echo " - Copying Service Start Script"
-docker cp $SCRIPT_DIR/inContainerStartService.sh gluster:/usr/local/sbin/inContainerStartService.sh >> /tmp/gluster_install_log 2>&1
-fail_if_error $? /tmp/gluster_install_log -20
+docker cp $SCRIPT_DIR/inContainerStartService.sh gluster:/usr/local/sbin/inContainerStartService.sh >> gluster_install_log 2>&1
+fail_if_error $? gluster_install_log -20
 
-docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> /tmp/gluster_install_log 2>&1
-fail_if_error $? /tmp/gluster_install_log -21
+docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> gluster_install_log 2>&1
+fail_if_error $? gluster_install_log -21
 
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh gluster:/usr/local/sbin/settingsInjector.sh >> /tmp/gluster_install_log 2>&1
-fail_if_error $? /tmp/gluster_install_log -23
+docker cp $SCRIPT_DIR/settingsInjector.sh gluster:/usr/local/sbin/settingsInjector.sh >> gluster_install_log 2>&1
+fail_if_error $? gluster_install_log -23
 
-docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/gluster_install_log 2>&1
-fail_if_error $? /tmp/gluster_install_log -24
+docker exec --user root gluster bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> gluster_install_log 2>&1
+fail_if_error $? gluster_install_log -24
 
 
 echo " - Committing changes to local template and exiting container gluster"
-commit_container gluster /tmp/gluster_install_log
+commit_container gluster gluster_install_log
 
 
 echo " - Copying gluster command line programs docker wrappers to /usr/local/bin"
@@ -158,7 +159,7 @@ sudo chmod 755 /usr/local/sbin/startGlusterServiceContainer.sh
 
 
 #echo " - Installing and checking systemd service file"
-install_and_check_service_file gluster /tmp/gluster_install_log
+install_and_check_service_file gluster gluster_install_log
 
 
 

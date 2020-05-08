@@ -82,7 +82,7 @@ public abstract class AbstractSetupShellTest {
 
     private void enhanceScripts(String jailPath) throws FileException {
 
-        for (String scriptToExecute: getScriptsToExecute()) {
+        for (String scriptToExecute: getScriptsToEnhance()) {
 
             String scriptContent = FileUtils.readFile(new File(jailPath + "/" + scriptToExecute));
             if (StringUtils.isNotBlank(scriptContent)) {
@@ -276,6 +276,10 @@ public abstract class AbstractSetupShellTest {
 
     protected abstract String[] getScriptsToExecute();
 
+    protected String[] getScriptsToEnhance() {
+        return getScriptsToExecute();
+    }
+
     protected final String executeScripts(String jailPath) throws ProcessHelper.ProcessHelperException {
         StringBuilder resultBuilder = new StringBuilder();
         for (String scriptToExecute: getScriptsToExecute()) {
@@ -306,6 +310,7 @@ public abstract class AbstractSetupShellTest {
         createLoggingExecutable("bash", tempFile.getAbsolutePath());
         createLoggingExecutable("systemctl", tempFile.getAbsolutePath());
         createLoggingExecutable("echo", tempFile.getAbsolutePath());
+        createLoggingExecutable("touch", tempFile.getAbsolutePath());
 
         createDummyExecutable("id", tempFile.getAbsolutePath());
         createDummyExecutable("docker", tempFile.getAbsolutePath());

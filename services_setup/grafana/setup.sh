@@ -47,13 +47,13 @@ loadTopology
 
 
 # reinitializing log
-sudo rm -f /tmp/grafana_install_log
+sudo rm -f grafana_install_log
 
 echo " - Building container grafana"
-build_container grafana grafana /tmp/grafana_install_log
+build_container grafana grafana grafana_install_log
 
 echo " - Creating grafana user (if not exist)"
-grafana_user_id=`id -u grafana 2>> /tmp/grafana_install_log`
+grafana_user_id=`id -u grafana 2>> grafana_install_log`
 if [[ $grafana_user_id == "" ]]; then
     echo "User grafana should have been added by eskimo-base-system setup script"
     exit -4
@@ -69,17 +69,17 @@ docker run \
         -v $SCRIPT_DIR/provisioning:/eskimo/provisioning \
         -d --name grafana \
         -i \
-        -t eskimo:grafana bash >> /tmp/grafana_install_log 2>&1
-fail_if_error $? "/tmp/grafana_install_log" -2
+        -t eskimo:grafana bash >> grafana_install_log 2>&1
+fail_if_error $? "grafana_install_log" -2
 
 # connect to container
 #docker exec -it grafana bash
 
 echo " - Configuring grafana container"
-docker exec grafana bash /scripts/inContainerSetupGrafana.sh $grafana_user_id $CONTEXT_PATH | tee -a /tmp/grafana_install_log 2>&1
-if [[ `tail -n 1 /tmp/grafana_install_log` != " - In container config SUCCESS" ]]; then
+docker exec grafana bash /scripts/inContainerSetupGrafana.sh $grafana_user_id $CONTEXT_PATH | tee -a grafana_install_log 2>&1
+if [[ `tail -n 1 grafana_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/grafana_install_log
+    cat grafana_install_log
     exit -100
 fi
 
@@ -87,12 +87,12 @@ fi
 #docker exec -it grafana TODO
 
 echo " - Handling topology and setting injection"
-handle_topology_settings grafana /tmp/grafana_install_log
+handle_topology_settings grafana grafana_install_log
 
 echo " - Committing changes to local template and exiting container grafana"
-commit_container grafana /tmp/grafana_install_log
+commit_container grafana grafana_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon grafana /tmp/grafana_install_log
+deploy_marathon grafana grafana_install_log
 

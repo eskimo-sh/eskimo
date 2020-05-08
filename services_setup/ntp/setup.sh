@@ -47,10 +47,10 @@ loadTopology
 
 
 # reinitializing log
-sudo rm -f /tmp/ntp_install_log
+sudo rm -f ntp_install_log
 
 echo " - Building container ntp"
-build_container ntp ntp /tmp/ntp_install_log
+build_container ntp ntp ntp_install_log
 
 echo " - Creating shared lib"
 sudo mkdir -p /var/lib/ntp/
@@ -72,17 +72,17 @@ docker run \
         --cap-add SYS_TIME\
         -d --name ntp \
         -i \
-        -t eskimo:ntp bash >> /tmp/ntp_install_log 2>&1
-fail_if_error $? "/tmp/ntp_install_log" -2
+        -t eskimo:ntp bash >> ntp_install_log 2>&1
+fail_if_error $? "ntp_install_log" -2
 
 # connect to container
 #docker exec -it ntp bash
 
 echo " - Configuring ntp container"
-docker exec ntp bash /scripts/inContainerSetupNtp.sh | tee -a /tmp/ntp_install_log 2>&1
-if [[ `tail -n 1 /tmp/ntp_install_log` != " - In container config SUCCESS" ]]; then
+docker exec ntp bash /scripts/inContainerSetupNtp.sh | tee -a ntp_install_log 2>&1
+if [[ `tail -n 1 ntp_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/ntp_install_log
+    cat ntp_install_log
     exit -100
 fi
 
@@ -90,10 +90,10 @@ fi
 #docker exec -it ntp TODO
 
 echo " - Handling topology and setting injection"
-handle_topology_settings ntp /tmp/ntp_install_log
+handle_topology_settings ntp ntp_install_log
 
 echo " - Committing changes to local template and exiting container ntp"
-commit_container ntp /tmp/ntp_install_log
+commit_container ntp ntp_install_log
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file ntp /tmp/ntp_install_log
+install_and_check_service_file ntp ntp_install_log

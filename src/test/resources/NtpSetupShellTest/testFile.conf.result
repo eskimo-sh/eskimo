@@ -1,0 +1,5 @@
+pool ntp1.hetzner.de iburst
+
+pool ntp2.hetzner.com iburst
+
+pool ntp3.hetzner.net iburst

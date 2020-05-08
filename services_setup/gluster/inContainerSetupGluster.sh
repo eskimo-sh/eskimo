@@ -36,9 +36,10 @@
 
 set -e
 
-SELF_IP_ADDRESS=$1
+. /etc/eskimo_topology.sh
+
 if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No self ip address passed in argument"
+    echo " - Didn't find Self IP Address in eskimo_topology.sh"
     exit -2
 fi
 

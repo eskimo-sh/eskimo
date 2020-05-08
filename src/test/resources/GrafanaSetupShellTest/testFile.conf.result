@@ -1,0 +1,16 @@
+allow_embedding = true
+
+admin_user = eskimo
+
+admin_password = eskimo
+
+reporting_enabled = false
+
+default_theme = light
+
+# enable anonymous access
+enabled = true
+
+root_url = /grafana/
+
+serve_from_sub_path = true
