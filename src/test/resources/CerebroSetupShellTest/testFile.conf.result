@@ -1,0 +1,11 @@
+
+  {
+    host = "http://192.168.10.11:9200"
+    name = "Eskimo"
+  }
+
+  {
+    host = "http://192.168.10.11:9200"
+    name = "Eskimo"
+    headers-whitelist = [ "x-proxy-user", "x-proxy-roles", "X-Forwarded-For" ]
+ }

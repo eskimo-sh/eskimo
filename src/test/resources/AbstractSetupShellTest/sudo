@@ -1,0 +1,9 @@
+#/bin/bash
+
+echo "$@" >> .log_sudo
+
+if [[ $1 == "sed" ]]; then
+
+    ./sed "${@:2}"
+
+fi

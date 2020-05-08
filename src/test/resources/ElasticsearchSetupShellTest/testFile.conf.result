@@ -1,0 +1,21 @@
+cluster.name: eskimo
+
+path.data: /var/lib/elasticsearch
+
+path.logs: /usr/local/lib/elasticsearch/logs
+
+bootstrap.memory_lock: false
+
+network.host: 0.0.0.0
+
+discovery.zen.ping.unicast.hosts: ["192.168.10.13"]
+
+discovery.seed_hosts: ["192.168.10.13"]
+
+cluster.initial_master_nodes: ["192.168.10.13", "192.168.10.11"]
+
+discovery.zen.minimum_master_nodes: 1
+
+#discovery.zen.minimum_master_nodes:
+
+gateway.recover_after_nodes: 1

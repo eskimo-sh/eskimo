@@ -174,7 +174,7 @@ public class SystemService {
             logger.info("Initializing Status updater scheduler ...");
             statusRefreshScheduler.schedule(() -> updateStatus(), statusUpdatePeriodSeconds, TimeUnit.SECONDS);
         } else {
-            this.statusRefreshScheduler = null;
+            statusRefreshScheduler = null;
         }
     }
 

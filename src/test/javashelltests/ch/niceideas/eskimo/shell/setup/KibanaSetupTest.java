@@ -1,6 +1,6 @@
 package ch.niceideas.eskimo.shell.setup;
 
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,12 +8,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+public class KibanaSetupTest extends AbstractSetupShellTest {
 
-public class CerebroSetupTest extends AbstractSetupShellTest {
-
-    private static final Logger logger = Logger.getLogger(CerebroSetupTest.class);
+    private static final Logger logger = Logger.getLogger(KibanaSetupTest.class);
 
     protected static String jailPath = null;
 
@@ -34,23 +31,26 @@ public class CerebroSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "cerebro";
+        return "kibana";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh is automatic
-        copyFile("cerebro", jailPath, "common.sh");
-        copyFile("cerebro", jailPath, "setupESCommon.sh");
-        copyFile("cerebro", jailPath, "inContainerSetupCerebro.sh");
-        copyFile("cerebro", jailPath, "inContainerSetupESCommon.sh");
-        copyFile("cerebro", jailPath, "inContainerStartService.sh");
-        copyFile("cerebro", jailPath, "inContainerInjectTopology.sh");
+        copyFile("kibana", jailPath, "common.sh");
+        copyFile("kibana", jailPath, "setupESCommon.sh");
+        copyFile("kibana", jailPath, "inContainerSetupKibana.sh");
+        copyFile("kibana", jailPath, "inContainerSetupESCommon.sh");
+        copyFile("kibana", jailPath, "inContainerStartService.sh");
+        copyFile("kibana", jailPath, "inContainerInjectTopology.sh");
     }
 
     @Override
     protected String[] getScriptsToExecute() {
-        return new String[] {"setup.sh", "inContainerInjectTopology.sh"};
+        return new String[] {
+                "setup.sh",
+                "inContainerSetupKibana.sh",
+                "inContainerInjectTopology.sh"};
     }
 
     private void copyFile(String service,  String jailPath, String source) throws IOException {
@@ -58,6 +58,14 @@ public class CerebroSetupTest extends AbstractSetupShellTest {
                 new File ("./services_setup/" + service + "/" + source),
                 new File (jailPath + "/" + source));
     }
+
+    // none on kibana
+    /*
+    @Test
+    public void testSystemDInstallation() throws Exception {
+        System.err.println (setupLogs);
+    }
+    */
 
     @Test
     public void testMarathonInstallation() throws Exception {

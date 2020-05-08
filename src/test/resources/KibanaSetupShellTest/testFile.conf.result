@@ -1,0 +1,13 @@
+server.host: "0.0.0.0"
+
+server.name: "Eskimo"
+
+pid.file: /var/run/elasticsearch/kibana/kibana.pid
+
+logging.dest: /var/log/elasticsearch/kibana/kibana.log
+
+server.basePath: "/kibana"
+
+elasticsearch.url: "http://192.168.10.11:9200"
+
+elasticsearch.hosts: ["http://192.168.10.11:9200"]

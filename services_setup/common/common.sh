@@ -133,7 +133,7 @@ function deploy_marathon() {
     cat $2_marathon_deploy
     if [[ `cat $2_marathon_deploy` != "" && `grep "does not exist" $2_marathon_deploy` == "" ]]; then
         echo "   + Previous instance removed"
-        sleep 5
+        if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
     fi
 
 
@@ -156,7 +156,7 @@ function deploy_marathon() {
             echo "   + Failed 10 times !!"
             exit -25
         fi
-        sleep 5
+        if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
     done
 
 
@@ -194,7 +194,7 @@ function install_and_check_service_file() {
     sudo chmod 644 $systemd_units_dir/$1.service
 
     echo " - Reloading systemd config"
-    sleep 1 # hacky hack - I get weird and unexplainable errors here sometimes.
+    if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi # hacky hack - I get weird and unexplainable errors here sometimes.
     sudo systemctl daemon-reload >> $2 2>&1
     fail_if_error $? "$2" -6
 
@@ -214,7 +214,7 @@ function install_and_check_service_file() {
     fail_if_error $? "$2" -7
 
     echo " - Testing systemd startup - Checking startup"
-    sleep 12
+    if [[ -z "$NO_SLEEP" ]]; then sleep 12; fi
     sudo systemctl status $1 >> $2 2>&1
     fail_if_error $? "$2" -8
 
@@ -365,7 +365,7 @@ function preinstall_unmount_gluster_share () {
         i=0
         while [[ `grep $1 /etc/mtab` != "" ]]; do
             sudo umount $1
-            sleep 1
+            if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi
             i=$((i+1))
             if [[ $1 == 5 ]]; then
                 echo " - Failed to unmount $1 after 5 attempts"

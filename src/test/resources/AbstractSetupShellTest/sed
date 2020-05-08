@@ -1,7 +1,37 @@
 
 #/bin/bash
 
-echo "$@" > .log_sed
+echo "$@" >> .log_sed
+
+set -e
+
+if [[ -f testFile.conf ]]; then
+
+    if [[ $5 == "" ]]; then
+        rule=$3
+    fi
+    if [[ $4 == "" ]]; then
+        rule=$2
+    fi
+    if [[ $3 == "" ]]; then
+        rule=$1
+    fi
+
+    echo "1: $1"
+    echo "2: $2"
+    echo "3: $3"
+    echo "4: $4"
+
+    echo "SED RULE : $rule"
+
+    if [[ `echo $1 | grep n` != "" || $1 == "-n" || $2 == "-n" ]]; then
+        /bin/sed -i -n  "$rule" testFile.conf
+    else
+        /bin/sed -i "$rule" testFile.conf
+    fi
+
+fi
+
 
 
 # TODO test of dummy config file exist and test sed

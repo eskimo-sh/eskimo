@@ -1,6 +1,6 @@
 #/bin/bash
 
-echo "$@" > .log_id
+echo "$@" >> .log_id
 
 if [[ $2 == 'elasticsearch' ]]; then
     echo '3301'
