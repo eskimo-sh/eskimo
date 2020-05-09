@@ -9,9 +9,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-public class GrafanaSetupTest extends AbstractSetupShellTest {
+public class KafkaManagerSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(GrafanaSetupTest.class);
+    private static final Logger logger = Logger.getLogger(KafkaManagerSetupTest.class);
 
     protected static String jailPath = null;
 
@@ -32,21 +32,29 @@ public class GrafanaSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "grafana";
+        return "kafka-manager";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
-        copyFile(jailPath, "inContainerSetupGrafana.sh");
+        copyFile(jailPath, "setupCommon.sh");
+        //copyFile(jailPath, "inContainerSetupKafkaManager.sh");
+        copyFile(jailPath, "inContainerSetupKafkaCommon.sh");
+        copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
 
         // create a wrapper passing arguments to inContainerSetupGrafana.sh
         try {
-            FileUtils.writeFile(new File(jailPath + "/inContainerSetupGrafanaWrapper.sh"), "" +
-                    "#!/bin/bash\n" +
-                    "\n" +
-                    "/bin/bash " + jailPath + "/inContainerSetupGrafana.sh 3304\n");
+            String setupScript = FileUtils.readFile(new File("./services_setup/kafka-manager/inContainerSetupKafkaManager.sh"));
+
+            setupScript = setupScript.replace("/usr/local/lib/kafka-manager/bin/kafka-manager \\", "sleep 200 &");
+            setupScript = setupScript.replace("-Dapplication.home=/usr/local/lib/kafka-manager/ \\", "# (replaced)");
+            setupScript = setupScript.replace("-Dpidfile.path=/tmp/kafka-manager-temp.pid \\", "# (replaced)");
+            setupScript = setupScript.replace("-Dconfig.file=/usr/local/lib/kafka-manager/conf/application.conf \\", "# (replaced)");
+            setupScript = setupScript.replace("-Dhttp.port=22080 >> kafka-manager_install_log 2>&1 &", "# (replaced)");
+
+            FileUtils.writeFile(new File(jailPath + "/inContainerSetupKafkaManager.sh"), setupScript);
         } catch (FileException e) {
             throw new IOException(e);
         }
@@ -56,18 +64,8 @@ public class GrafanaSetupTest extends AbstractSetupShellTest {
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupGrafanaWrapper.sh",
-                "inContainerInjectTopology.sh"
-        };
-    }
-
-    @Override
-    protected String[] getScriptsToEnhance() {
-        return new String[] {
-                "setup.sh",
-                "inContainerSetupGrafana.sh",
-                "inContainerInjectTopology.sh"
-        };
+                "inContainerSetupKafkaManager.sh",
+                "inContainerInjectTopology.sh"};
     }
 
     @Test

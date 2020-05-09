@@ -40,10 +40,13 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-MASTER_ZK_IP_ADDRESS=$1
-if [[ $MASTER_ZK_IP_ADDRESS == "" ]]; then
-    echo " - No master passed in argument"
-    exit -5
+. /etc/eskimo_topology.sh
+
+# Defining topology variables
+export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
+if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
+    echo " - No zookeeper master found in topology"
+    exit -3
 fi
 
 
@@ -60,12 +63,12 @@ if [[ $kafka_user_id == "" ]]; then
 fi
 
 echo " - Enabling kafka user to create kafka directories and chown them"
-echo "spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp" >> /etc/sudoers.d/spark
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp\" >> /etc/sudoers.d/spark"
 
-echo "kafka  ALL = NOPASSWD: /bin/mkdir -p /var/run/kafka/kafka-manager" >> /etc/sudoers.d/kafka
-echo "kafka  ALL = NOPASSWD: /bin/chown kafka /var/run/kafka/kafka-manager" >> /etc/sudoers.d/kafka
-echo "kafka  ALL = NOPASSWD: /bin/mkdir -p /var/log/kafka/kafka-manager" >> /etc/sudoers.d/kafka
-echo "kafka  ALL = NOPASSWD: /bin/chown kafka /var/log/kafka/kafka-manager" >> /etc/sudoers.d/kafka
+bash -c "echo \"kafka  ALL = NOPASSWD: /bin/mkdir -p /var/run/kafka/kafka-manager\" >> /etc/sudoers.d/kafka"
+bash -c "echo \"kafka  ALL = NOPASSWD: /bin/chown kafka /var/run/kafka/kafka-manager\" >> /etc/sudoers.d/kafka"
+bash -c "echo \"kafka  ALL = NOPASSWD: /bin/mkdir -p /var/log/kafka/kafka-manager\" >> /etc/sudoers.d/kafka"
+bash -c "echo \"kafka  ALL = NOPASSWD: /bin/chown kafka /var/log/kafka/kafka-manager\" >> /etc/sudoers.d/kafka"
 
 
 echo " - Chaning owner of /var/run/kafka-manager/"
@@ -79,7 +82,7 @@ sudo chown kafka /var/log/kafka/kafka-manager
 sudo rm -Rf /usr/local/lib/kafka-manager/logs
 sudo ln -s /var/log/kafka/kafka-manager /usr/local/lib/kafka-manager/logs
 
-echo " - Adapting Configuration file"
+echo " - Adapting Configuration file (first time for config run)"
 
 sudo sed -i s/"kafka-manager.zkhosts=\"kafka-manager-zookeeper:2181\""/"kafka-manager.zkhosts=\"$MASTER_ZK_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
 
@@ -89,23 +92,26 @@ echo " - Starting kafka manager to inject eskimo cluster payload"
         -Dapplication.home=/usr/local/lib/kafka-manager/ \
         -Dpidfile.path=/tmp/kafka-manager-temp.pid \
         -Dconfig.file=/usr/local/lib/kafka-manager/conf/application.conf \
-        -Dhttp.port=22080 >> /tmp/kafka_manager_install_log 2>&1 &
+        -Dhttp.port=22080 >> kafka-manager_install_log 2>&1 &
 KAFKA_MANAGER_PID=$!
-fail_if_error $? "/tmp/kafka_manager_install_log" -5
+fail_if_error $? "kafka-manager_install_log" -5
 
-sleep 5
+if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
+
 if ps -p $KAFKA_MANAGER_PID > /dev/null; then
     echo " - Kafka Manager successfully started"
 else
     echo "Could not successfully start kafka manager in container"
-    cat /tmp/kafka_manager_install_log
+    cat kafka-manager_install_log
     echo "Could not successfully start kafka manager in container"
     exit -10
 fi
 
 set +e
 for i in $(seq 1 10); do
-    sleep 5
+
+    if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
+
     echo "   + Attempt $i"
     clusterSearch=`curl -XGET http://localhost:22080/clusters/Eskimo 2>&1`
     if [[ $? == 0 ]]; then
@@ -133,15 +139,15 @@ if [[ `echo $clusterSearch | grep "Unknown cluster"` != "" ]]; then
     payload+='&tuning.kafkaManagedOffsetGroupCacheSize=1000000&tuning.kafkaManagedOffsetGroupExpireDays=7'
     payload+='&securityProtocol=PLAINTEXT&saslMechanism=DEFAULT&jaasConfig='
 
-    curl -XPOST http://localhost:22080/clusters -d $payload >> /tmp/kafka_manager_install_log 2>&1
-    fail_if_error $? "/tmp/kafka_manager_install_log" -4
+    curl -XPOST http://localhost:22080/clusters -d $payload >> kafka-manager_install_log 2>&1
+    fail_if_error $? "kafka-manager_install_log" -4
 else
     echo " - (Creating Eskimo Cluster in Kafka Manager"
 fi
 
 echo " - Stopping kafka manager"
-kill $KAFKA_MANAGER_PID  >> /tmp/kafka_manager_install_log 2>&1
-fail_if_error $? "/tmp/kafka_manager_install_log" -5
+kill $KAFKA_MANAGER_PID  >> kafka-manager_install_log 2>&1
+fail_if_error $? "kafka-manager_install_log" -5
 
 echo " - Changing zookeeper host back to marker for startup topology injection"
 sudo sed -i s/"kafka-manager.zkhosts=\"$MASTER_ZK_IP_ADDRESS:2181\""/"kafka-manager.zkhosts=\"MASTER_ZK_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf

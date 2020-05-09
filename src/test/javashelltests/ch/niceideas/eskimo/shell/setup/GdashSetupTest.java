@@ -36,8 +36,7 @@ public class GdashSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
-        // setup.sh is automatic
-        copyFile(jailPath, "common.sh");
+        // setup.sh and common.sh are automatic
         copyFile(jailPath, "inContainerSetupGdash.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");

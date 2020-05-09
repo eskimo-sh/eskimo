@@ -54,7 +54,7 @@ fi
 
 
 # reinitializing log
-sudo rm -f /tmp/kafka-manager_install_log
+sudo rm -f kafka-manager_install_log
 
 echo " - Configuring host kafka common part"
 . ./setupCommon.sh
@@ -64,7 +64,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Building container kafka-manager"
-build_container kafka-manager kafka-manager /tmp/kafka-manager_install_log
+build_container kafka-manager kafka-manager kafka-manager_install_log
 
 
 # create and start container
@@ -79,26 +79,25 @@ docker run \
         -p 22000:22000 \
         -d --name kafka-manager \
         -i \
-        -t eskimo:kafka-manager bash >> /tmp/kafka-manager_install_log 2>&1
-fail_if_error $? "/tmp/kafka-manager_install_log" -2
+        -t eskimo:kafka-manager bash >> kafka-manager_install_log 2>&1
+fail_if_error $? "kafka-manager_install_log" -2
 
 # connect to container
 #docker exec -it kafka bash
 
 echo " - Configuring kafka container (common part)"
-docker exec kafka-manager bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee -a /tmp/kafka-manager_install_log 2>&1
-if [[ `tail -n 1 /tmp/kafka-manager_install_log` != " - In container config SUCCESS" ]]; then
+docker exec kafka-manager bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee -a kafka-manager_install_log 2>&1
+if [[ `tail -n 1 kafka-manager_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
-    cat /tmp/kafka-manager_install_log
+    cat kafka-manager_install_log
     exit -100
 fi
 
 echo " - Configuring kafka-manager container"
-docker exec kafka-manager bash /scripts/inContainerSetupKafkaManager.sh $ZOOKEEPER_IP_ADDRESS \
-        | tee -a /tmp/kafka-manager_install_log 2>&1
-if [[ `tail -n 1 /tmp/kafka-manager_install_log` != " - In container config SUCCESS" ]]; then
+docker exec kafka-manager bash /scripts/inContainerSetupKafkaManager.sh | tee -a kafka-manager_install_log 2>&1
+if [[ `tail -n 1 kafka-manager_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/kafka-manager_install_log
+    cat kafka-manager_install_log
     exit -100
 fi
 
@@ -106,11 +105,11 @@ fi
 #docker exec -it kafka-manager TODO
 
 echo " - Handling topology and setting injection"
-handle_topology_settings kafka-manager /tmp/kafka_install_log
+handle_topology_settings kafka-manager kafka-manager_install_log
 
 echo " - Committing changes to local template and exiting container kafka-manager"
-commit_container kafka-manager /tmp/kafka-manager_install_log
+commit_container kafka-manager kafka-manager_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon kafka-manager /tmp/kafka-manager_install_log
+deploy_marathon kafka-manager kafka-manager_install_log

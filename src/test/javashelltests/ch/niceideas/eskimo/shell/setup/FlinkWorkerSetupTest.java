@@ -47,8 +47,7 @@ public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
-        // setup.sh is automatic
-        copyFile(jailPath, "common.sh");
+        // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
         copyFile(jailPath, "inContainerSetupFlinkWorker.sh");
         copyFile(jailPath, "inContainerSetupFlinkCommon.sh");

@@ -36,8 +36,7 @@ public class KibanaSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
-        // setup.sh is automatic
-        copyFile(jailPath, "common.sh");
+        // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupESCommon.sh");
         copyFile(jailPath, "inContainerSetupKibana.sh");
         copyFile(jailPath, "inContainerSetupESCommon.sh");

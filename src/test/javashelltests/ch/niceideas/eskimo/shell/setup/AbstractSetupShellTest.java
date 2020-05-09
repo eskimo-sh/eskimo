@@ -10,6 +10,8 @@ import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import org.apache.log4j.Logger;
+import org.junit.Assume;
+import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +25,12 @@ import static junit.framework.TestCase.fail;
 public abstract class AbstractSetupShellTest {
 
     private static final Logger logger = Logger.getLogger(AbstractSetupShellTest.class);
+
+    /** Run Test on Linux only */
+    @Before
+    public void beforeMethod() {
+        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+    }
 
     /*
     @AfterClass
@@ -42,12 +50,26 @@ public abstract class AbstractSetupShellTest {
     protected final String setupJail(String serviceName) throws Exception {
         String jailPath = createJail();
 
+        // Enhance setup script
         String setupScript = FileUtils.readFile(new File("./services_setup/" + serviceName + "/setup.sh"));
 
         // inject custom topology loading
         setupScript = setupScript.replace("loadTopology", ". ./eskimo-topology.sh");
 
         FileUtils.writeFile(new File(jailPath + "/setup.sh"), setupScript);
+
+
+        // Enhance common script
+        String commonScript = FileUtils.readFile(new File("./services_setup/" + serviceName + "/common.sh"));
+
+        // inject custom topology loading
+        commonScript = commonScript.replace(
+                "function create_binary_wrapper(){",
+                "function create_binary_wrapper(){\n" +
+                        "return\n");
+
+        FileUtils.writeFile(new File(jailPath + "/common.sh"), commonScript);
+
 
         // generate custom topology file
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();

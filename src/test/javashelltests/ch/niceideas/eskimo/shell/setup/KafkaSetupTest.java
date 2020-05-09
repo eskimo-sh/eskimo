@@ -1,6 +1,5 @@
 package ch.niceideas.eskimo.shell.setup;
 
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
@@ -8,15 +7,14 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
-public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
+public class KafkaSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(FlinkAppMasterSetupTest.class);
+    private static final Logger logger = Logger.getLogger(KafkaSetupTest.class);
 
     protected static String jailPath = null;
 
@@ -37,20 +35,15 @@ public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "flink-app-master";
-    }
-
-    @Override
-    protected String getTemplateName() {
-        return "flink";
+        return "kafka";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "inContainerSetupFlinkAppMaster.sh");
-        copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
+        copyFile(jailPath, "inContainerSetupKafka.sh");
+        copyFile(jailPath, "inContainerSetupKafkaCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }
@@ -59,7 +52,7 @@ public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupFlinkAppMaster.sh",
+                "inContainerSetupKafka.sh",
                 "inContainerInjectTopology.sh"
         };
     }
@@ -78,13 +71,13 @@ public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
     public void testConfigurationFileUpdate() throws Exception {
         assertTestConfFileUpdate();
 
-        String bashLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_bash"));
-        if (StringUtils.isNotBlank(bashLogs)) {
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
+        if (StringUtils.isNotBlank(sudoLogs)) {
 
-            //System.err.println (bashLogs);
+            //System.err.println (sudoLogs);
 
-            assertTrue(bashLogs.contains("-c echo -e \"\\n# Specyfing mesos master\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
-            assertTrue(bashLogs.contains("-c echo -e \"mesos.master: zk://192.168.10.13:2181/mesos\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
+            assertTrue(sudoLogs.contains("bash -c echo -e \"\\n\\n#Enabling topic deletion. \"  >> /usr/local/etc/kafka/server.properties"));
+            assertTrue(sudoLogs.contains("bash -c echo -e \"delete.topic.enable=true\"  >> /usr/local/etc/kafka/server.properties"));
         } else {
             fail ("Expected to find bash logs in .log_bash");
         }

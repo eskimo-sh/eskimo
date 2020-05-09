@@ -40,8 +40,7 @@ public class NtpSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
-        // setup.sh is automatic
-        copyFile(jailPath, "common.sh");
+        // setup.sh and common.sh are automatic
         copyFile(jailPath, "inContainerSetupNtp.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
@@ -75,11 +74,6 @@ public class NtpSetupTest extends AbstractSetupShellTest {
         if (StringUtils.isNotBlank(bashLogs)) {
 
             System.err.println (bashLogs);
-
-            /*
-            bash -c "echo -e \"\nlogfile /var/log/ntp/ntp.log\" >> /etc/ntp.conf"
-bash -c "echo -e \"logconfig =syncevents +peerevents +sysevents +allclock\" >> /etc/ntp.conf"
-             */
 
             assertTrue(bashLogs.contains("" +
                     "-c echo -e \"\\nlogfile /var/log/ntp/ntp.log\" >> /etc/ntp.conf\n" +
