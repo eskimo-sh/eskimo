@@ -57,7 +57,7 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f /tmp/spark_history_server_install_log
+sudo rm -f spark_history_server_install_log
 
 
 # build
@@ -78,7 +78,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Building docker container for spark history server"
-build_container spark-history-server spark /tmp/spark_history_server_install_log
+build_container spark-history-server spark spark_history_server_install_log
 
 # create and start container
 echo " - Running docker container to configure spark executor"
@@ -90,27 +90,27 @@ docker run \
         -v /var/lib/spark:/var/lib/spark \
         --name spark-history-server \
         -i \
-        -t eskimo:spark-history-server bash >> /tmp/spark_history_server_install_log 2>&1
-fail_if_error $? "/tmp/spark_history_server_install_log" -2
+        -t eskimo:spark-history-server bash >> spark_history_server_install_log 2>&1
+fail_if_error $? "spark_history_server_install_log" -2
 
 # connect to container
 #docker exec -it spark bash
 
 echo " - Configuring spark-history-server container (config script)"
 docker exec spark-history-server bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
-        | tee -a /tmp/spark_history_server_install_log 2>&1
-if [[ `tail -n 1 /tmp/spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
+        | tee -a spark_history_server_install_log 2>&1
+if [[ `tail -n 1 spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/spark_history_server_install_log
+    cat spark_history_server_install_log
     exit -100
 fi
 
 echo " - Configuring spark-history-server container"
 docker exec spark-history-server bash /scripts/inContainerSetupSparkHistoryServer.sh \
-        | tee -a /tmp/spark_history_server_install_log 2>&1
-if [[ `tail -n 1 /tmp/spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
+        | tee -a spark_history_server_install_log 2>&1
+if [[ `tail -n 1 spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/spark_history_server_install_log
+    cat spark_history_server_install_log
     exit -101
 fi
 
@@ -119,25 +119,25 @@ fi
 
 
 echo " - Handling topology and setting injection"
-handle_topology_settings spark-history-server /tmp/spark_history_server_install_log
+handle_topology_settings spark-history-server spark_history_server_install_log
 
 echo " - Copying Topology Injection Script (Spark History)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologySparkHistory.sh spark-history-server:/usr/local/sbin/inContainerInjectTopologySparkHistory.sh >> /tmp/spark_history_server_install_log 2>&1
-fail_if_error $? "/tmp/spark_history_server_install_log" -20
+docker cp $SCRIPT_DIR/inContainerInjectTopologySparkHistory.sh spark-history-server:/usr/local/sbin/inContainerInjectTopologySparkHistory.sh >> spark_history_server_install_log 2>&1
+fail_if_error $? "spark_history_server_install_log" -20
 
-docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySparkHistory.sh" >> /tmp/spark_history_server_install_log 2>&1
-fail_if_error $? "/tmp/spark_history_server_install_log" -21
+docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySparkHistory.sh" >> spark_history_server_install_log 2>&1
+fail_if_error $? "spark_history_server_install_log" -21
 
 echo " - Copying inContainerMountGluster.sh scriot"
-docker cp $SCRIPT_DIR/inContainerMountGluster.sh spark-history-server:/usr/local/sbin/inContainerMountGluster.sh >> /tmp/spark_history_server_install_log 2>&1
-fail_if_error $? "/tmp/spark_history_server_install_log" -20
+docker cp $SCRIPT_DIR/inContainerMountGluster.sh spark-history-server:/usr/local/sbin/inContainerMountGluster.sh >> spark_history_server_install_log 2>&1
+fail_if_error $? "spark_history_server_install_log" -20
 
-docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> /tmp/spark_history_server_install_log 2>&1
-fail_if_error $? "/tmp/spark_history_server_install_log" -21
+docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> spark_history_server_install_log 2>&1
+fail_if_error $? "spark_history_server_install_log" -21
 
 echo " - Committing changes to local template and exiting container spark"
-commit_container spark-history-server /tmp/spark_history_server_install_log
+commit_container spark-history-server spark_history_server_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon spark-history-server /tmp/spark_history_server_install_log
+deploy_marathon spark-history-server spark_history_server_install_log

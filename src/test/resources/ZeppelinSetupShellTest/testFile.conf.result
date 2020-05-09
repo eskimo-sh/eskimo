@@ -1,0 +1,52 @@
+export ZEPPELIN_PORT=38080
+
+export ZEPPELIN_ADDR=0.0.0.0
+
+export ZEPPELIN_LOCAL_IP=0.0.0.0
+
+export ZEPPELIN_LOG_DIR=/var/log/spark/zeppelin/
+
+export ZEPPELIN_PID_DIR=/var/run/spark/zeppelin/
+
+export ZEPPELIN_NOTEBOOK_DIR=/var/lib/spark/data/zeppelin/notebooks/
+
+export ZEPPELIN_IDENT_STRING=eskimo
+
+export SPARK_HOME=/usr/local/lib/spark/
+
+<value>38080</value>
+
+<value>0.0.0.0</value>
+
+          "name": "zeppelin.spark.useNew",
+          "value": false,
+
+          "name": "elasticsearch.client.type",
+          "value": "http",
+
+          "name": "elasticsearch.port",
+          "value": "9200",
+
+          "name": "flink.execution.remote.port",
+          "value": "8081",
+
+          "name": "flink.execution.mode",
+          "value": "remote",
+
+          "name": "FLINK_HOME",
+          "value": "/usr/local/lib/flink/",
+
+          "name": "flink.tm.memory",
+          "value": "800m",
+
+          "name": "shell.command.timeout.millisecs",
+          "value": "1200000",
+
+          "name": "elasticsearch.host",
+          "value": "192.168.10.11",
+
+          "name": "master",
+          "value": "mesos://zk://192.168.10.13:2181/mesos",
+
+          "name": "flink.execution.remote.host",
+          "value": "",

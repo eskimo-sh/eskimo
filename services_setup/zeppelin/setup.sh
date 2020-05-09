@@ -57,7 +57,7 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f /tmp/zeppelin_install_log
+sudo rm -f zeppelin_install_log
 
 # Initially this was a Hack for BTRFS support :
 #   - need to unmount gluster shares otherwise cp command goes nuts
@@ -100,14 +100,14 @@ fi
 
 
 echo " - Building container zeppelin"
-build_container zeppelin zeppelin /tmp/zeppelin_install_log
+build_container zeppelin zeppelin zeppelin_install_log
 
 
-if [[ ! -d /var/lib/spark/data ]]; then
+if [[ -z $TEST_MODE && ! -d /var/lib/spark/data ]]; then
     echo "Inconsistency: zeppelin setup is expecting var/lib/spark/data to be created by the spark executor setup (kind of a hack)"
     exit -41
 fi
-if [[ ! -d /var/lib/spark/eventlog ]]; then
+if [[ -z $TEST_MODE && ! -d /var/lib/spark/eventlog ]]; then
     echo "Inconsistency: zeppelin setup is expecting var/lib/spark/eventlog to be created by the spark executor setup (kind of a hack)"
     exit -42
 fi
@@ -130,8 +130,8 @@ docker run \
         -v /var/lib/spark:/var/lib/spark:rshared \
         -v /usr/local/lib:/usr/local/host_lib:ro \
         -i \
-        -t eskimo:zeppelin bash >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -2
+        -t eskimo:zeppelin bash >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -2
 
 #        -v /var/lib/zeppelin:/var/lib/zeppelin \
 #        -v /usr/local/etc/zeppelin:/usr/local/etc/zeppelin \
@@ -142,27 +142,27 @@ fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 echo " - Configuring zeppelin container (config spark script)"
 docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
-        | tee -a /tmp/zeppelin_install_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
+        | tee -a zeppelin_install_log 2>&1
+if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/zeppelin_install_log
+    cat zeppelin_install_log
     exit -100
 fi
 
 echo " - Configuring zeppelin container (config flink script)"
 docker exec zeppelin bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
-        | tee -a /tmp/zeppelin_install_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
+        | tee -a zeppelin_install_log 2>&1
+if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/zeppelin_install_log
+    cat zeppelin_install_log
     exit -100
 fi
 
 echo " - Configuring zeppelin container"
-docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee -a /tmp/zeppelin_install_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_install_log` != " - In container config SUCCESS" ]]; then
+docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee -a zeppelin_install_log 2>&1
+if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/zeppelin_install_log
+    cat zeppelin_install_log
     exit -101
 fi
 
@@ -171,83 +171,83 @@ fi
 
 
 echo " - Copying Topology Injection Script (Spark)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologySpark.sh zeppelin:/usr/local/sbin/inContainerInjectTopologySpark.sh >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -20
+docker cp $SCRIPT_DIR/inContainerInjectTopologySpark.sh zeppelin:/usr/local/sbin/inContainerInjectTopologySpark.sh >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -20
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySpark.sh" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -21
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySpark.sh" >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -21
 
 echo " - Copying Topology Injection Script (Flink)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologyFlink.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyFlink.sh >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -20
+docker cp $SCRIPT_DIR/inContainerInjectTopologyFlink.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyFlink.sh >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -20
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyFlink.sh" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -21
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyFlink.sh" >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -21
 
 echo " - Copying Service Start Script"
-docker cp $SCRIPT_DIR/inContainerStartService.sh zeppelin:/usr/local/sbin/inContainerStartService.sh >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -22
+docker cp $SCRIPT_DIR/inContainerStartService.sh zeppelin:/usr/local/sbin/inContainerStartService.sh >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -22
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -24
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -24
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh zeppelin:/usr/local/sbin/settingsInjector.sh >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -23
+docker cp $SCRIPT_DIR/settingsInjector.sh zeppelin:/usr/local/sbin/settingsInjector.sh >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -23
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? /tmp/zeppelin_install_log -24
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> zeppelin_install_log 2>&1
+fail_if_error $? zeppelin_install_log -24
 
 echo " - Copying Topology Injection Script (Zeppelin)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologyZeppelin.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyZeppelin.sh >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -20
+docker cp $SCRIPT_DIR/inContainerInjectTopologyZeppelin.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyZeppelin.sh >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -20
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyZeppelin.sh" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -21
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyZeppelin.sh" >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -21
 
 
 if [[ -f /usr/local/bin/mesos-cli.sh ]]; then
     echo " - Copying mesos-cli"
-    docker cp /usr/local/bin/mesos-cli.sh zeppelin:/usr/local/bin/mesos-cli.sh >> /tmp/zeppelin_install_log 2>&1
-    fail_if_error $? "/tmp/zeppelin_install_log" -20
+    docker cp /usr/local/bin/mesos-cli.sh zeppelin:/usr/local/bin/mesos-cli.sh >> zeppelin_install_log 2>&1
+    fail_if_error $? "zeppelin_install_log" -20
 
-    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/mesos-cli.sh" >> /tmp/zeppelin_install_log 2>&1
-    fail_if_error $? "/tmp/zeppelin_install_log" -21
+    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/mesos-cli.sh" >> zeppelin_install_log 2>&1
+    fail_if_error $? "zeppelin_install_log" -21
 fi
 
 # if /usr/local/bin/logstash-cli is found, then copy it to container
 if [[ -f /usr/local/bin/logstash-cli ]]; then
 
     echo " - Copying logstash command client to zeppelin container"
-    docker cp /usr/local/bin/logstash-cli zeppelin:/usr/local/bin/logstash-cli >> /tmp/zeppelin_install_log 2>&1
-    fail_if_error $? /tmp/zeppelin_install_log -31
+    docker cp /usr/local/bin/logstash-cli zeppelin:/usr/local/bin/logstash-cli >> zeppelin_install_log 2>&1
+    fail_if_error $? zeppelin_install_log -31
 
-    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/logstash-cli" >> /tmp/zeppelin_install_log 2>&1
-    fail_if_error $? /tmp/zeppelin_install_log -24
+    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/logstash-cli" >> zeppelin_install_log 2>&1
+    fail_if_error $? zeppelin_install_log -24
 fi
 
 echo " - Copying inContainerMountGluster.sh scriot"
-docker cp $SCRIPT_DIR/inContainerMountGluster.sh zeppelin:/usr/local/sbin/inContainerMountGluster.sh >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -20
+docker cp $SCRIPT_DIR/inContainerMountGluster.sh zeppelin:/usr/local/sbin/inContainerMountGluster.sh >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -20
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -21
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -21
 
 
 echo " - HACK import of rawe samples archived in docker container"
-docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -40
+docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -40
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/lib/zeppelin/eskimo_samples.tgz" >> /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -41
+docker exec --user root zeppelin bash -c "chmod 755 /usr/local/lib/zeppelin/eskimo_samples.tgz" >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -41
 
 
 echo " - Committing changes to local template and exiting container zeppelin"
-commit_container zeppelin /tmp/zeppelin_install_log
+commit_container zeppelin zeppelin_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon zeppelin /tmp/zeppelin_install_log
+deploy_marathon zeppelin zeppelin_install_log
 
 
 ## FIXME . temporary hack
@@ -276,8 +276,8 @@ deploy_marathon zeppelin /tmp/zeppelin_install_log
 #        echo "   + importing $i"
 #        curl -XPOST -H "Content-Type: application/json" \
 #                http://localhost:38080/api/notebook/import \
-#                -d @"$i" >> /tmp/zeppelin_install_log 2>&1
-#        fail_if_error $? "/tmp/zeppelin_install_log" -21
+#                -d @"$i" >> zeppelin_install_log 2>&1
+#        fail_if_error $? "zeppelin_install_log" -21
 #    fi
 #done
 

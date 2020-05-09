@@ -237,12 +237,21 @@ function build_image() {
     docker build --iidfile id_file --tag eskimo:$1_template .  >> $2 2>&1
     fail_if_error $? $2 -11
 
+    export TMP_FOLDER=/tmp
+    if [[ ! -z "$BUILD_TEMP_FOLDER" ]]; then
+        export TMP_FOLDER=$BUILD_TEMP_FOLDER
+
+        echo " - making sure I can write in $BUILD_TEMP_FOLDER"
+        touch $BUILD_TEMP_FOLDER/test >> $2 2>&1
+        fail_if_error $? $2 -11
+    fi
+
     echo " - Starting container $1_template"
     # create and start container
     docker run \
             -v $PWD:/scripts \
             -v $PWD/../common:/common  \
-            -v /tmp:/tmp \
+            -v $TMP_FOLDER:/tmp \
             -d --name $1 \
             -i \
             -t eskimo:$1_template bash  >> $2 2>&1

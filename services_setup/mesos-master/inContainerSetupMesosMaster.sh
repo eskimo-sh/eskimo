@@ -36,11 +36,20 @@
 
 set -e
 
-SELF_IP_ADDRESS=$1
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP Address passed in argument"
+# Loading topology
+. /etc/eskimo_topology.sh
+
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
     exit -1
 fi
+
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit -2
+fi
+
 
 
 

@@ -58,7 +58,7 @@ fi
 
 
 # reinitializing log
-sudo rm -f /tmp/marathon_install_log
+sudo rm -f marathon_install_log
 
 # Initially this was a Hack for BTRFS support :
 #   - need to unmount gluster shares otherwise cp command goes nuts
@@ -68,7 +68,7 @@ sudo rm -f /tmp/marathon_install_log
 #preinstall_unmount_gluster_share /var/lib/marathon/data
 
 echo " - Creating marathon user (if not exist)"
-export marathon_user_id=`id -u marathon 2>> /tmp/flink_executor_install.log`
+export marathon_user_id=`id -u marathon 2>> marathon_install_log`
 if [[ $marathon_user_id == "" ]]; then
     echo "User marathon should have been added by eskimo-base-system setup script"
     exit -4
@@ -98,7 +98,7 @@ sudo cp setupMarathonGlusterShares.sh /usr/local/sbin/
 sudo chmod 755 /usr/local/sbin/setupMarathonGlusterShares.sh
 
 echo " - Building container marathon"
-build_container marathon marathon /tmp/marathon_install_log
+build_container marathon marathon marathon_install_log
 
 #sudo mkdir -p /usr/local/etc/marathon
 #sudo chown -R marathon/usr/local/etc/marathon
@@ -114,9 +114,10 @@ docker run \
         -v /var/lib/marathon:/var/lib/marathon \
         -v /var/lib/docker_registry:/var/lib/docker_registry \
         -v /var/log/docker_registry:/var/log/docker_registry \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -i \
-        -t eskimo:marathon bash >> /tmp/marathon_install_log 2>&1
-fail_if_error $? "/tmp/marathon_install_log" -2
+        -t eskimo:marathon bash >> marathon_install_log 2>&1
+fail_if_error $? "marathon_install_log" -2
 
 
 # connect to container
@@ -124,10 +125,10 @@ fail_if_error $? "/tmp/marathon_install_log" -2
 
 
 echo " - Configuring marathon App Master container"
-docker exec marathon bash /scripts/inContainerSetupMarathon.sh $marathon_user_id $SELF_IP_ADDRESS | tee -a /tmp/marathon_install_log 2>&1
-if [[ `tail -n 1 /tmp/marathon_install_log` != " - In container config SUCCESS" ]]; then
+docker exec marathon bash /scripts/inContainerSetupMarathon.sh $marathon_user_id $SELF_IP_ADDRESS | tee -a marathon_install_log 2>&1
+if [[ `tail -n 1 marathon_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/marathon_install_log
+    cat marathon_install_log
     exit -101
 fi
 
@@ -136,10 +137,10 @@ fi
 
 
 echo " - Handling topology and setting injection"
-handle_topology_settings marathon /tmp/marathon_install_log
+handle_topology_settings marathon marathon_install_log
 
 echo " - Committing changes to local template and exiting container marathon"
-commit_container marathon /tmp/marathon_install_log
+commit_container marathon marathon_install_log
 
 echo " - Copying marathon command line programs docker wrappers to /usr/local/bin"
 for i in `find ./marathon_wrappers -mindepth 1`; do
@@ -149,4 +150,4 @@ for i in `find ./marathon_wrappers -mindepth 1`; do
 done
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file marathon /tmp/marathon_install_log
+install_and_check_service_file marathon marathon_install_log

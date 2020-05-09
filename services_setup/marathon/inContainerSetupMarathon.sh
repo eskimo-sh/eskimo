@@ -46,9 +46,17 @@ if [[ $MARATHON_USER_ID == "" ]]; then
     exit -2
 fi
 
-SELF_IP_ADDRESS=$2
+# Loading topology
+. /etc/eskimo_topology.sh
+
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit -1
+fi
+
 if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - Didn't get Self IP Address as argument"
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
     exit -2
 fi
 

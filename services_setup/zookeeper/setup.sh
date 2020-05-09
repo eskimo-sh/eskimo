@@ -64,11 +64,11 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f /tmp/zk_install_log
+sudo rm -f zk_install_log
 
 # build
 echo " - Building docker container"
-build_container zookeeper zookeeper /tmp/zk_install_log
+build_container zookeeper zookeeper zk_install_log
 
 # Create shared dir
 sudo mkdir -p /var/log/zookeeper
@@ -87,19 +87,20 @@ docker run \
         -v /var/log/zookeeper:/var/log/zookeeper \
         -v /var/run/zookeeper:/var/run/zookeeper \
         -v /var/lib/zookeeper:/var/lib/zookeeper \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -d --name zookeeper \
         -i \
-        -t eskimo:zookeeper bash >> /tmp/zk_install_log 2>&1
-fail_if_error $? "/tmp/zk_install_log" -2
+        -t eskimo:zookeeper bash >> zk_install_log 2>&1
+fail_if_error $? "zk_install_log" -2
 
 # connect to container
 #docker exec -it zookeeper bash
 
 echo " - Configuring zookeeper container"
-docker exec zookeeper bash /scripts/inContainerSetupZookeeper.sh $SELF_IP_ADDRESS $MASTER_IP_ADDRESS | tee -a /tmp/zk_install_log 2>&1
-if [[ `tail -n 1 /tmp/zk_install_log` != " - In container config SUCCESS" ]]; then
+docker exec zookeeper bash /scripts/inContainerSetupZookeeper.sh | tee -a zk_install_log 2>&1
+if [[ `tail -n 1 zk_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/zk_install_log
+    cat zk_install_log
     exit -100
 fi
 
@@ -107,10 +108,10 @@ fi
 #docker exec -it zookeeper TODO
 
 echo " - Handling topology and setting injection"
-handle_topology_settings zookeeper /tmp/zk_install_log
+handle_topology_settings zookeeper zk_install_log
 
 echo " - Committing changes to local template and exiting container zookeeper"
-commit_container zookeeper /tmp/zk_install_log
+commit_container zookeeper zk_install_log
 
 echo " - Copying zookeeper command line programs docker wrappers to /usr/local/bin"
 for i in `find ./zookeeper_wrappers -mindepth 1`; do
@@ -123,4 +124,4 @@ echo " - Linking zookeeperCli.sh to zkCli.sh"
 sudo ln -s /usr/local/bin/zkCli.sh /usr/local/bin/zookeeperCli.sh
 
 echo " - Handling zookeeper systemd file"
-install_and_check_service_file zookeeper /tmp/zk_install_log
+install_and_check_service_file zookeeper zk_install_log

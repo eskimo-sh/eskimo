@@ -57,13 +57,13 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f /tmp/mesos_install_log
+sudo rm -f mesos_install_log
 
 # Find out mesos version
 export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
 
 echo " - Building container mesos-master"
-build_container mesos-master mesos-master /tmp/mesos_install_log
+build_container mesos-master mesos-master mesos_install_log
 
 echo " - Creating shared directory"
 if [[ ! -d /var/lib/mesos ]]; then
@@ -97,21 +97,21 @@ docker run \
         -v /usr/local/sbin:/usr/local/sbin \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -d \
         --name mesos-master \
         -i \
-        -t eskimo:mesos-master bash >> /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -2
+        -t eskimo:mesos-master bash >> mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -2
 
 # connect to container
 #docker exec -it mesos bash
 
 echo " - Configuring mesos container"
-docker exec mesos-master bash /scripts/inContainerSetupMesosMaster.sh $SELF_IP_ADDRESS \
-        | tee -a /tmp/mesos_install_log 2>&1
-if [[ `tail -n 1 /tmp/mesos_install_log` != " - In container config SUCCESS" ]]; then
+docker exec mesos-master bash /scripts/inContainerSetupMesosMaster.sh | tee -a mesos_install_log 2>&1
+if [[ `tail -n 1 mesos_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/mesos_install_log
+    cat mesos_install_log
     exit -100
 fi
 
@@ -119,13 +119,13 @@ fi
 #docker exec -it mesos TODO
 
 echo " - Handling topology and setting injection"
-handle_topology_settings mesos-master /tmp/mesos_install_log
+handle_topology_settings mesos-master mesos_install_log
 
 echo " - Committing changes to local template and exiting container mesos"
-commit_container mesos-master /tmp/mesos_install_log
+commit_container mesos-master mesos_install_log
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file mesos-master /tmp/mesos_install_log
+install_and_check_service_file mesos-master mesos_install_log
 
 
 

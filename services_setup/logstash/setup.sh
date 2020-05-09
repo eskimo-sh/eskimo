@@ -47,7 +47,7 @@ loadTopology
 
 
 # reinitializing log
-sudo rm -f /tmp/logstash_install_log
+sudo rm -f logstash_install_log
 
 # build
 
@@ -78,7 +78,7 @@ sudo chmod 755 /usr/local/sbin/setupLogstashGlusterShares.sh
 
 
 echo " - Building docker container for logstash"
-build_container logstash logstash /tmp/logstash_install_log
+build_container logstash logstash logstash_install_log
 
 # create and start container
 echo " - Running docker container to configure logstash executor"
@@ -90,8 +90,8 @@ docker run \
         -v /var/lib/elasticsearch:/var/lib/elasticsearch \
         --name logstash \
         -i \
-        -t eskimo:logstash bash >> /tmp/logstash_install_log 2>&1
-fail_if_error $? "/tmp/logstash_install_log" -2
+        -t eskimo:logstash bash >> logstash_install_log 2>&1
+fail_if_error $? "logstash_install_log" -2
 
 # connect to container
 #docker exec -it logstash bash
@@ -100,25 +100,25 @@ echo " - Logstash Remote Server Scripts"
 for i in `find ./command_server`; do
     if [[ -f $SCRIPT_DIR/$i ]]; then
         filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> /tmp/logstash_install_log 2>&1
-        docker exec logstash chmod 755 /usr/local/sbin/$filename >> /tmp/logstash_install_log 2>&1
-        fail_if_error $? /tmp/logstash_install_log -30
+        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> logstash_install_log 2>&1
+        docker exec logstash chmod 755 /usr/local/sbin/$filename >> logstash_install_log 2>&1
+        fail_if_error $? logstash_install_log -30
     fi
 done
 
 echo " - Configuring logstash container (common part)"
-docker exec logstash bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a /tmp/logstash_install_log 2>&1
-if [[ `tail -n 1 /tmp/logstash_install_log` != " - In container config SUCCESS" ]]; then
+docker exec logstash bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a logstash_install_log 2>&1
+if [[ `tail -n 1 logstash_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
-    cat /tmp/logstash_install_log
+    cat logstash_install_log
     exit -102
 fi
 
 echo " - Configuring logstash container"
-docker exec logstash bash /scripts/inContainerSetupLogstash.sh | tee -a /tmp/logstash_install_log 2>&1
-if [[ `tail -n 1 /tmp/logstash_install_log` != " - In container config SUCCESS" ]]; then
+docker exec logstash bash /scripts/inContainerSetupLogstash.sh | tee -a logstash_install_log 2>&1
+if [[ `tail -n 1 logstash_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/logstash_install_log
+    cat logstash_install_log
     exit -101
 fi
 
@@ -127,10 +127,10 @@ fi
 
 
 echo " - Handling topology and setting injection"
-handle_topology_settings logstash /tmp/logstash_install_log
+handle_topology_settings logstash logstash_install_log
 
 echo " - Committing changes to local template and exiting container logstash"
-commit_container logstash /tmp/logstash_install_log
+commit_container logstash logstash_install_log
 
 echo " - Copying logstash command line programs docker wrappers to /usr/local/bin"
 for i in `find ./logstash_wrappers -mindepth 1`; do
@@ -144,4 +144,4 @@ sudo cp command_server/logstash-cli /usr/local/bin
 sudo chmod 755 /usr/local/bin/logstash-cli
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file logstash /tmp/logstash_install_log
+install_and_check_service_file logstash logstash_install_log

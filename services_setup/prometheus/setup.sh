@@ -47,10 +47,10 @@ loadTopology
 
 
 # reinitializing log
-sudo rm -f /tmp/prometheus_install_log
+sudo rm -f prometheus_install_log
 
 echo " - Building container prometheus"
-build_container prometheus prometheus /tmp/prometheus_install_log
+build_container prometheus prometheus prometheus_install_log
 
 echo " - Creating shared directory"
 # TODO
@@ -63,17 +63,17 @@ docker run \
         -v /var/log/prometheus:/var/log/prometheus \
         -d --name prometheus \
         -i \
-        -t eskimo:prometheus bash >> /tmp/prometheus_install_log 2>&1
-fail_if_error $? "/tmp/prometheus_install_log" -2
+        -t eskimo:prometheus bash >> prometheus_install_log 2>&1
+fail_if_error $? "prometheus_install_log" -2
 
 # connect to container
 #docker exec -it prometheus bash
 
 echo " - Configuring prometheus container"
-docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh | tee -a /tmp/prometheus_install_log 2>&1
-if [[ `tail -n 1 /tmp/prometheus_install_log` != " - In container config SUCCESS" ]]; then
+docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh | tee -a prometheus_install_log 2>&1
+if [[ `tail -n 1 prometheus_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/prometheus_install_log
+    cat prometheus_install_log
     exit -100
 fi
 
@@ -81,10 +81,10 @@ fi
 #docker exec -it prometheus TODO
 
 echo " - Handling topology and setting injection"
-handle_topology_settings prometheus /tmp/prometheus_install_log
+handle_topology_settings prometheus prometheus_install_log
 
 echo " - Committing changes to local template and exiting container prometheus"
-commit_container prometheus /tmp/prometheus_install_log
+commit_container prometheus prometheus_install_log
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file prometheus /tmp/prometheus_install_log
+install_and_check_service_file prometheus prometheus_install_log

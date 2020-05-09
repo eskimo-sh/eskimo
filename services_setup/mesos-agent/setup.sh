@@ -58,7 +58,7 @@ fi
 
 
 # reinitializing log
-sudo rm -f /tmp/mesos_install_log
+sudo rm -f mesos_install_log
 
 echo " - Creating shared directory"
 if [[ ! -d /var/lib/mesos ]]; then
@@ -188,28 +188,28 @@ sudo bash -c "echo -e \"export MESOS_reconfiguration_policy=additive\"  >> /usr/
 
 
 echo " - Reloading systemd config"
-sudo systemctl daemon-reload >> /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -6
+sudo systemctl daemon-reload >> mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -6
 
 echo " - Checking mesos agent Systemd file"
 if [[ `systemctl status mesos-agent | grep 'could not be found'` != "" ]]; then
     echo "mesos-agent systemd file installation failed"
     exit -12
 fi
-sudo systemctl status mesos-agent > /tmp/mesos_install_log 2>&1
+sudo systemctl status mesos-agent > mesos_install_log 2>&1
 if [[ $? != 0 && $? != 3 ]]; then
     echo "mesos-agent systemd file doesn't work as expected"
     exit -12
 fi  
 
 echo " - Testing systemd startup - starting mesos-agent"
-sudo systemctl start mesos-agent > /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -6
+sudo systemctl start mesos-agent > mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -6
 
 echo " - Testing systemd startup - Checking startup of agent"
-sleep 8
-sudo systemctl status mesos-agent > /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -7
+if [[ -z "$NO_SLEEP" ]]; then sleep 8; fi
+sudo systemctl status mesos-agent > mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -7
 
 echo " - Testing systemd startup - Make sure service is really running"
 if [[ `systemctl show -p SubState mesos-agent | grep exited` != "" ]]; then
@@ -218,16 +218,16 @@ if [[ `systemctl show -p SubState mesos-agent | grep exited` != "" ]]; then
 fi
 
 echo " - Testing systemd startup - stopping mesos-agent"
-sudo systemctl stop mesos-agent > /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -8
+sudo systemctl stop mesos-agent > mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -8
 
 echo " - Enabling mesos-agent on startup"
-sudo systemctl enable mesos-agent > /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -9
+sudo systemctl enable mesos-agent > mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -9
 
 echo " - Testing systemd startup - starting mesos-agent (again)"
-sudo systemctl start mesos-agent > /tmp/mesos_install_log 2>&1
-fail_if_error $? "/tmp/mesos_install_log" -6
+sudo systemctl start mesos-agent > mesos_install_log 2>&1
+fail_if_error $? "mesos_install_log" -6
 
 
 

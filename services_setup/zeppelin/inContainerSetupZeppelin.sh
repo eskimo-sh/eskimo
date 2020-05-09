@@ -49,14 +49,14 @@ chown -R spark /usr/local/lib/zeppelin/interpreter/
 chown spark /usr/local/lib/zeppelin/
 
 echo " - Enabling spark user to create /var/run/spark/zeppelin and chown it"
-echo "spark  ALL = NOPASSWD: /bin/mkdir -p /var/run/spark/zeppelin" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/chown spark /var/run/spark/zeppelin" >> /etc/sudoers.d/spark
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/mkdir -p /var/run/spark/zeppelin\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown spark /var/run/spark/zeppelin\" >> /etc/sudoers.d/spark"
 
 echo " - Enabling spark user to use host folders"
-echo "spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/flink" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_flink /var/lib/flink" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/elasticsearch" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_elasticsearch /var/lib/elasticsearch" >> /etc/sudoers.d/spark
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/flink\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_flink /var/lib/flink\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/elasticsearch\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_elasticsearch /var/lib/elasticsearch\" >> /etc/sudoers.d/spark"
 
 # zeppelin is not mounting /var/lib/spark from host but gluster shares inside
 # still need to be able to manipulate that directory !
@@ -71,7 +71,7 @@ sudo ln -s libsasl2.so.2 libsasl2.so.3
 cd $saved_dir
 
 echo " - Finding mesos"
-/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
+bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
 . /run/zeppelin_mesos_environment
 ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION
 ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos

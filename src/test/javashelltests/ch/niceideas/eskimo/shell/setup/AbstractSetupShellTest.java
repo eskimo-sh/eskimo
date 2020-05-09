@@ -55,7 +55,6 @@ public abstract class AbstractSetupShellTest {
 
         // inject custom topology loading
         setupScript = setupScript.replace("loadTopology", ". ./eskimo-topology.sh");
-
         FileUtils.writeFile(new File(jailPath + "/setup.sh"), setupScript);
 
 
@@ -120,6 +119,9 @@ public abstract class AbstractSetupShellTest {
                         "\n" +
                         "# Avoid sleeps everywhere\n" +
                         "export NO_SLEEP=true\n" +
+                        "\n"+
+                        "# Set test mode\n" +
+                        "export TEST_MODE=true\n" +
                         "\n"+
                         "# Using local commands\n" +
                         "export PATH=$SCRIPT_DIR:$PATH\n");
@@ -238,7 +240,7 @@ public abstract class AbstractSetupShellTest {
 
             //System.err.println (dockerLogs);
 
-            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getServiceName() + "_template");
+            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getTemplateName() + "_template");
             assertTrue(indexOfImagesQ > -1);
 
             int indexOfLoad = dockerLogs.indexOf("load", indexOfImagesQ + 1);
@@ -326,6 +328,7 @@ public abstract class AbstractSetupShellTest {
         createLoggingExecutable("mkdir", tempFile.getAbsolutePath());
         createLoggingExecutable("useradd", tempFile.getAbsolutePath());
         createLoggingExecutable("chown", tempFile.getAbsolutePath());
+        createLoggingExecutable("chmod", tempFile.getAbsolutePath());
         createLoggingExecutable("curl", tempFile.getAbsolutePath());
         createLoggingExecutable("ln", tempFile.getAbsolutePath());
         createLoggingExecutable("rm", tempFile.getAbsolutePath());
@@ -350,12 +353,12 @@ public abstract class AbstractSetupShellTest {
                 "\n" +
                 "echo \"$@\" >> .log_" + command + "\n");
 
-        logger.info (ProcessHelper.exec("chmod 755 " + targetPath, true));
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
     }
 
     private void createDummyExecutable(String script, String targetDir) throws Exception {
         File targetPath = createResourceFile(script, targetDir);
-        logger.info (ProcessHelper.exec("chmod 755 " + targetPath, true));
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
     }
 
     private File createResourceFile(String resourceFile, String targetDir) throws IOException, FileException {

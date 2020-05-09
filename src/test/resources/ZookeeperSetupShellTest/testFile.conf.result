@@ -1,0 +1,5 @@
+initLimit=100
+
+syncLimit=10
+
+server.=192.168.10.13:2888:3888

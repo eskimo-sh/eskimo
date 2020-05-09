@@ -43,11 +43,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 check_for_internet
 
-check_for_vagrant
-
-if [[ $USE_VIRTUALBOX == 1 ]]; then
-    check_for_virtualbox
-fi
+check_for_docker
 
 
 mkdir -p /tmp/build-mesos-debian
@@ -78,55 +74,66 @@ chmod 755 /tmp/build-mesos-debian/buildMesosFromSources.sh
 
 rm -f /tmp/build-mesos-debian-log
 
+cp Dockerfile.debian /tmp/build-mesos-debian/Dockerfile
+
 cd /tmp/build-mesos-debian
 
-create-vagrant-file
+. ./common.sh
 
-echo " - Destroying any previously existing VM"
-vagrant destroy --force deb-build-node >> /tmp/build-mesos-debian-log 2>&1
+build_image build_debian /tmp/build-mesos-debian-log
 
-echo " - Bringing Build VM up"
-if [[ $USE_VIRTUALBOX == 1 ]]; then
-    vagrant up deb-build-node >> /tmp/build-mesos-debian-log 2>&1
-else
-    vagrant up deb-build-node --provider=libvirt >> /tmp/build-mesos-debian-log 2>&1
-fi
+
+#echo " - Destroying any previously existing VM"
+#vagrant destroy --force deb-build-node >> /tmp/build-mesos-debian-log 2>&1
+
+#echo " - Bringing Build VM up"
+#if [[ $USE_VIRTUALBOX == 1 ]]; then
+#    vagrant up deb-build-node >> /tmp/build-mesos-debian-log 2>&1
+#else
+#    vagrant up deb-build-node --provider=libvirt >> /tmp/build-mesos-debian-log 2>&1
+#fi
 
 #deb http://httpredir.debian.org/debian/ jessie main
 #deb http://httpredir.debian.org/debian/ jessie main contrib non-free
 
 echo " - Updating the appliance"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq update" >> /tmp/build-mesos-debian-log 2>&1
 
 echo " - Upgrading the appliance"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade" >> /tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing the latest OpenJDK"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-7-jdk " deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing a few utility tools"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils sudo" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing build tools"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" >>/tmp/build-mesos-debian-log 2>&1
 
-echo " - Installing swapspace"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y swapspace" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+#echo " - Installing swapspace"
+#docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y swapspace" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing python"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python-dev python-six python-virtualenv python-pip" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y python-dev python-six python-virtualenv python-pip" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing other Mesos dependencies"
-vagrant ssh -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev" >>/tmp/build-mesos-debian-log 2>&1
+
+
+
+
+
+
 
 echo " - Building Mesos"
-vagrant ssh -c "sudo JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/ /vagrant/buildMesosFromSources.sh" deb-build-node
+docker exec -i build_debian bash -c "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/ /scripts/buildMesosFromSources.sh"
 
 echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
-vagrant ssh -c "sudo bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Copying Mesos archive to shared folder"
-vagrant ssh -c "sudo mv /usr/local/lib/mesos-$AMESOS_VERSION.tar.gz /vagrant/" deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "mv /usr/local/lib/mesos-$AMESOS_VERSION.tar.gz /vagrant/" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Dowloading mesos archive"
 chmod 700 ssh_key
@@ -142,4 +149,4 @@ echo " - Copying Mesos archive to distribution folder"
 mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_mesos-debian_"$AMESOS_VERSION"_1.tar.gz
 
 echo " - Destroying build VM"
-vagrant destroy --force deb-build-node  >> /tmp/build-mesos-debian-log 2>&1
+vagrant destroy --force >>/tmp/build-mesos-debian-log 2>&1

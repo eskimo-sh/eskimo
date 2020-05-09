@@ -1,0 +1,2 @@
+FROM debian:stretch
+MAINTAINER Eskimo <eskimo@niceideas.ch>

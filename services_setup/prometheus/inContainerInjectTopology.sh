@@ -43,15 +43,13 @@ echo " - Loading Topology"
 echo " - Adapting Configuration file"
 
 echo " - Adding node exporter scrap config to prometheus"
-echo -e "\n"\
-"  - job_name: 'node'\n"\
-"    static_configs:" >> /usr/local/lib/prometheus/prometheus.yml
+bash -c "echo -e \"\n  - job_name: 'node'\n    static_configs:\" >> /usr/local/lib/prometheus/prometheus.yml"
 
 if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
 
     echo " - fetching from all other node exporters"
 
     for i in `echo "$ALL_NODES_LIST_prometheus"  | tr "," "\n"`; do
-        echo -e "    - targets: ['$i:9100']" >> /usr/local/lib/prometheus/prometheus.yml
+        bash -c "echo -e \"    - targets: ['$i:9100']\" >> /usr/local/lib/prometheus/prometheus.yml"
     done
 fi

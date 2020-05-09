@@ -1,0 +1,2 @@
+FROM opensuse:leap
+MAINTAINER Eskimo <eskimo@niceideas.ch>
