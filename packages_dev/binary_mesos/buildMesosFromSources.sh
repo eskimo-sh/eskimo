@@ -172,8 +172,8 @@ fail_if_error $? "/tmp/mesos_install_log" -7
 
 echo " - Cleaning build folder"
 cd $saved_dir
-#sudo rm -Rf /tmp/mesos_setup >> /tmp/mesos_install_log 2>&1
-#fail_if_error $? "/tmp/mesos_install_log" -10
+sudo rm -Rf /tmp/mesos_setup >> /tmp/mesos_install_log 2>&1
+fail_if_error $? "/tmp/mesos_install_log" -10
 
 echo " - Creating tar.gz mesos archive"
 cd /usr/local/lib/

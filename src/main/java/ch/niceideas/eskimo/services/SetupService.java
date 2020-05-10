@@ -82,22 +82,28 @@ public class SetupService {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
     private String storagePathConfDir = System.getProperty("user.dir");
 
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
-    @Value("${system.packagesDevPath}")
+    @Value("${setup.packagesDevPath}")
     private String packagesDevPath = "./packages_dev";
 
-    @Value("${system.packagesToBuild}")
+    @Value("${setup.packagesToBuild}")
     private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
-    @Value("${system.mesosPackages}")
+    @Value("${setup.mesosPackages}")
     private String mesosPackages = "mesos-debian,mesos-redhat";
 
-    @Value("${system.packagesDownloadUrlRoot}")
+    @Value("${setup.packagesDownloadUrlRoot}")
     private String packagesDownloadUrlRoot = "https://niceideas.ch/eskimo/";
+
+    @Value("${setup.temporaryBuildFolder}")
+    private String temporaryBuildFolder = "/tmp";
 
     private String configStoragePathInternal = null;
 
@@ -119,6 +125,9 @@ public class SetupService {
     }
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
+    }
+    void setServicesDefinition (ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
     }
 
     void setStoragePathConfDir (String storagePathConfDir) {
@@ -179,7 +188,7 @@ public class SetupService {
 
         Set<String> missingServices = new HashSet<>();
 
-        findMissingServices(packagesDistribFolder, missingServices);
+        findMissingPackages(packagesDistribFolder, missingServices);
 
         // 4. Ensure mesos is properly downloaded / built
         findMissingMesos(packagesDistribFolder, missingServices);
@@ -201,7 +210,7 @@ public class SetupService {
         }
     }
 
-    void findMissingServices(File packagesDistribFolder, Set<String> missingServices) {
+    void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
         for (String service : packagesToBuild.split(",")) {
             if (Arrays.stream(packagesDistribFolder.listFiles())
                     .noneMatch(file ->
@@ -346,7 +355,7 @@ public class SetupService {
         String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
         if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
 
-            findMissingServices(packagesDistribFolder, buildPackage);
+            findMissingPackages(packagesDistribFolder, buildPackage);
 
         } else {
 
@@ -355,7 +364,7 @@ public class SetupService {
             }
 
             Set<String> missingServices = new HashSet<>();
-            findMissingServices(packagesDistribFolder, missingServices);
+            findMissingPackages(packagesDistribFolder, missingServices);
 
             fillInPackages(downloadPackages, packagesVersion, missingServices);
 
@@ -455,15 +464,28 @@ public class SetupService {
 
             String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
 
-            Set<String> missingServices = new HashSet<>();
-            findMissingServices(packagesDistribFolder, missingServices);
+            Set<String> missingPackages = new HashSet<>();
+            findMissingPackages(packagesDistribFolder, missingPackages);
 
             JsonWrapper packagesVersion = null;
 
-            if (!missingServices.isEmpty()) {
+            List<String> sortedServices = Arrays.stream(servicesDefinition.listAllServices())
+                    .map(serviceName -> servicesDefinition.getService(serviceName))
+                    .filter(service -> missingPackages.contains(service.getImageName()))
+                    .sorted((one, other) -> servicesDefinition.compareServices(one, other))
+                    .map(service -> service.getImageName())
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            // this one cannot be added by services
+            if (missingPackages.contains("base-eskimo")) {
+                sortedServices.add(0, "base-eskimo");
+            }
+
+            if (!missingPackages.isEmpty()) {
                 if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
 
-                    for (String packageName : missingServices) {
+                    for (String packageName : sortedServices) {
                         buildPackage(packageName);
                     }
 
@@ -473,7 +495,7 @@ public class SetupService {
                         packagesVersion = loadRemotePackagesVersionFile();
                     }
 
-                    for (String packageName : missingServices) {
+                    for (String packageName : sortedServices) {
 
                         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
@@ -612,8 +634,17 @@ public class SetupService {
                 systemOperationService.applySystemOperation("Building of package " + image,
                         builder -> {
                             try {
-                                builder.append(ProcessHelper.exec(new String[]{"bash", packagesDevPath + "/build.sh", "-n", image}, true));
-                            } catch (ProcessHelper.ProcessHelperException e) {
+
+                                File tempScript = File.createTempFile("tmp_build_script_" + image, ".sh");
+                                FileUtils.writeFile(tempScript, "#!/bin/bash\n" +
+                                        "export BUILD_TEMP_FOLDER=" + temporaryBuildFolder +"\n" +
+                                        "bash " + packagesDevPath + "/build.sh -n " + image);
+
+                                builder.append(ProcessHelper.exec(new String[]{
+                                        "bash",
+                                        tempScript.getAbsolutePath()
+                                }, true));
+                            } catch (ProcessHelper.ProcessHelperException | FileException e) {
                                 logger.debug(e, e);
                                 builder.append(e.getMessage());
                                 throw new ProcessHelper.ProcessHelperException("build.sh script execution for " + image + " failed.");

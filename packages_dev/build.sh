@@ -42,18 +42,16 @@ cd $SCRIPT_DIR
 package=""  # Default to empty package
 
 export DONT_OVERWRITE=0
-export USE_VIRTUALBOX=1 # Changing default to virtualbox again
 
 echo_usage() {
       echo "Usage:"
       echo "    build.sh -h                    Display this help message."
       echo "    build.sh [-n] <package>        Build <package>."
-      echo "        where package in [mesos-rhel, mesos-deb, mesos-suse, mesos-all, <image>, all_images]"
+      echo "        where package in [mesos-redhat, mesos-debian, mesos-suse, mesos-all, <image>, all_images]"
       echo "        and <image> any docker image such as eg, kafka, mesos-master, "
       echo "                                                 ntp, spark, etc."
       echo "        Options:"
       echo "          -n Don't rebuild if image is already built"
-      echo "          -b Use virtualBox instead of libvirt for building"
 }
 
 # Parse options to the `pip` command
@@ -70,9 +68,6 @@ while getopts ":hn" opt; do
    n )
      export DONT_OVERWRITE=1
      ;;
-   n )
-     export USE_VIRTUALBOX=1
-     ;;
   esac
 done
 shift $((OPTIND -1))
@@ -82,9 +77,7 @@ package=$1;
 check_for_internet
 
 
-if [[ $package == "mesos-rhel" ]] ; then
-
-    check_for_vagrant
+if [[ $package == "mesos-redhat" ]] ; then
 
     if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-redhat.sh"
@@ -92,9 +85,7 @@ if [[ $package == "mesos-rhel" ]] ; then
         echo "RedHat Mesos package already built"
     fi
 
-elif [[ $package == "mesos-deb" ]] ; then
-
-    check_for_vagrant
+elif [[ $package == "mesos-debian" ]] ; then
 
     if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-debian.sh"
@@ -103,8 +94,6 @@ elif [[ $package == "mesos-deb" ]] ; then
     fi
 
 elif [[ $package == "mesos-suse" ]] ; then
-
-    check_for_vagrant
 
     if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-suse.sh"

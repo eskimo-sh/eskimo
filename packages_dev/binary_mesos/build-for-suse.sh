@@ -39,15 +39,9 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-. $SCRIPT_DIR/commonBuild.sh "$@"
-
 check_for_internet
 
-check_for_vagrant
-
-if [[ $USE_VIRTUALBOX == 1 ]]; then
-    check_for_virtualbox
-fi
+check_for_docker
 
 
 mkdir -p /tmp/build-mesos-suse
@@ -78,72 +72,79 @@ chmod 755 /tmp/build-mesos-suse/buildMesosFromSources.sh
 
 rm -f /tmp/build-mesos-suse-log
 
+cp Dockerfile.suse /tmp/build-mesos-suse/Dockerfile
+
 cd /tmp/build-mesos-suse
 
-create-vagrant-file
+export NO_BASE_IMAGE=true
+build_image build_suse /tmp/build-mesos-suse-log
 
-echo " - Destroying any previously existing VM"
-vagrant destroy --force suse-build-node >> /tmp/build-mesos-suse-log 2>&1
+#echo " - Destroying any previously existing VM"
+#vagrant destroy --force suse-build-node >> /tmp/build-mesos-suse-log 2>&1
 
-echo " - Bringing Build VM up"
-if [[ $USE_VIRTUALBOX == 1 ]]; then
-    vagrant up suse-build-node >> /tmp/build-mesos-suse-log 2>&1
-else
-    vagrant up suse-build-node --provider=libvirt >> /tmp/build-mesos-suse-log 2>&1
-fi
+#echo " - Bringing Build VM up"
+#if [[ $USE_VIRTUALBOX == 1 ]]; then
+#    vagrant up suse-build-node >> /tmp/build-mesos-suse-log 2>&1
+#else
+#    vagrant up suse-build-node --provider=libvirt >> /tmp/build-mesos-suse-log 2>&1
+#fi
 
 #deb http://httpredir.debian.org/debian/ jessie main
 #deb http://httpredir.debian.org/debian/ jessie main contrib non-free
 
 echo " - Updating the appliance"
-vagrant ssh -c "sudo zypper refresh" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper refresh" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing the latest OpenJDK"
-vagrant ssh -c "sudo zypper install -y java-1_8_0-openjdk java-1_8_0-openjdk-devel" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper install -y java-1_8_0-openjdk java-1_8_0-openjdk-devel" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing a few utility tools"
-vagrant ssh -c "sudo zypper install -y tar wget git unzip curl moreutils" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper install -y tar wget git unzip curl moreutils sudo" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing C/C++development tools"
-vagrant ssh -c "sudo zypper install -y -t pattern devel_C_C++" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper install -y -t pattern devel_C_C++" >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "g++" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing build tools"
-vagrant ssh -c "sudo zypper install -y -t pattern devel_basis" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper install -y -t pattern devel_basis" >> /tmp/build-mesos-suse-log 2>&1
 
 
 #echo " - Installing swapspace"
-#vagrant ssh -c "sudo yum install -y swapspace" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+#docker exec -i build_suse bash -c "yum install -y swapspace" >> /tmp/build-mesos-suse-log 2>&1
 
 #echo " - installing epel release repository"
-#vagrant ssh -c "sudo yum install -y epel-release" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+#docker exec -i build_suse bash -c "yum install -y epel-release" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing python"
-vagrant ssh -c "sudo zypper install -y python-devel python-six python-virtualenv python-pip" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper install -y python-devel python-six python-virtualenv python-pip" >> /tmp/build-mesos-suse-log 2>&1
 
 
 echo " - Installing maven "
-vagrant ssh -c "sudo zypper addrepo https://download.opensuse.org/repositories/devel:tools:building/openSUSE_Leap_15.1/devel:tools:building.repo" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
-vagrant ssh -c "sudo zypper addrepo https://download.opensuse.org/repositories/Java:packages/openSUSE_Leap_15.1/Java:packages.repo" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
-vagrant ssh -c "sudo zypper --no-gpg-checks --non-interactive refresh" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
-vagrant ssh -c "sudo zypper --no-gpg-checks install -y maven" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper addrepo https://download.opensuse.org/repositories/devel:tools:building/openSUSE_Leap_15.1/devel:tools:building.repo" >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper addrepo https://download.opensuse.org/repositories/Java:packages/openSUSE_Leap_15.1/Java:packages.repo" >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper --no-gpg-checks --non-interactive refresh" >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper --no-gpg-checks install -y maven" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing other Mesos dependencies"
-vagrant ssh -c "sudo zypper --no-gpg-checks install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel" suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper --no-gpg-checks install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel" >> /tmp/build-mesos-suse-log 2>&1
 
+
+echo " - Finding java"
+JAVA_HOME=`docker exec -i build_suse bash -c "find /usr/lib64/jvm/*  -type d -maxdepth 0"`
 
 echo " - Building Mesos"
-vagrant ssh -c "sudo JAVA_HOME=/usr/lib64/jvm/java-1.8.0-openjdk-1.8.0/ /vagrant/buildMesosFromSources.sh" suse-build-node
+docker exec -i build_suse bash -c "JAVA_HOME=$JAVA_HOME /scripts/buildMesosFromSources.sh" suse-build-node
 
-echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
-vagrant ssh -c "sudo bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" suse-build-node  >> /tmp/build-mesos-debian-log 2>&1
+#echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
+#docker exec -i build_suse bash -c "bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" >> /tmp/build-mesos-debian-log 2>&1
 
 echo " - Copying Mesos archive to shared folder"
-vagrant ssh -c "sudo mv /usr/local/lib/mesos-$AMESOS_VERSION.tar.gz /vagrant/" suse-build-node >> /tmp/build-mesos-debian-log 2>&1
+docker exec -i build_suse bash -c "mv /usr/local/lib/mesos-$AMESOS_VERSION.tar.gz /scripts/" >> /tmp/build-mesos-debian-log 2>&1
 
-echo " - Dowloading mesos archive"
-chmod 700 ssh_key
-chmod 700 ssh_key.pub
-scp -o StrictHostKeyChecking=no -i ssh_key vagrant@192.168.10.105:/vagrant/mesos-$AMESOS_VERSION.tar.gz . >> /tmp/build-mesos-debian-log 2>&1
+#echo " - Dowloading mesos archive"
+#chmod 700 ssh_key
+#chmod 700 ssh_key.pub
+#scp -o StrictHostKeyChecking=no -i ssh_key vagrant@192.168.10.105:/vagrant/mesos-$AMESOS_VERSION.tar.gz . >> /tmp/build-mesos-debian-log 2>&1
 
 if [[ -f "$SCRIPT_DIR/../../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz" ]]; then
     echo " - renaming previous eskimo_mesos-suse-$AMESOS_VERSION.tar.gz"
@@ -153,5 +154,9 @@ fi
 echo " - Copying Mesos archive to distribution folder"
 mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_mesos-suse_"$AMESOS_VERSION"_1.tar.gz
 
-echo " - Destroying build VM"
-vagrant destroy --force suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+echo " - Destroying Docker Container"
+#vagrant destroy --force suse-build-node  >> /tmp/build-mesos-suse-log 2>&1
+
+docker stop build_suse
+
+docker container rm build_suse

@@ -99,12 +99,12 @@ public class SetupConfigController {
                 setupService.ensureSetupCompleted();
             } catch (SetupException e) {
                 logger.debug (e, e);
-                return ErrorStatusHelper.createClearStatusWithMessage("setup", systemService.isProcessingPending(), e.getMessage());
+
+                configWrapper.setValueForPath("clear", "setup");
+                configWrapper.setValueForPath("message", e.getMessage());
             }
 
-            if (systemService.isProcessingPending()) {
-                configWrapper.setValueForPath("processingPending", "true");
-            }
+            configWrapper.setValueForPath("processingPending", systemService.isProcessingPending());
 
             return configWrapper.getFormattedValue();
 

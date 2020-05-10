@@ -64,7 +64,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private File tempPackagesDistribPath = null;
 
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
     private String mesosPackages = "mesos-debian,mesos-redhat,mesos-suse";
 
@@ -121,7 +121,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertNotNull(command);
 
         assertEquals(3, command.getBuildMesos().size());
-        assertEquals(16, command.getBuildPackage().size());
+        assertEquals(17, command.getBuildPackage().size());
 
         assertEquals(0, command.getDownloadMesos().size());
         assertEquals(0, command.getDownloadPackages().size());
@@ -159,9 +159,9 @@ public class SetupServiceTest extends AbstractSystemTest {
             setupService.ensureSetupCompleted();
         });
         assertEquals(
-                    "Following services are missing and need to be downloaded or built base-eskimo, cerebro, " +
-                    "elasticsearch, gdash, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
-                    "mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
+                "Following services are missing and need to be downloaded or built base-eskimo, cerebro, elasticsearch, " +
+                        "flink, gdash, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
+                        "mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
                 exception.getMessage());
 
         // Create docker images packages
@@ -209,14 +209,19 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfig);
 
+        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        servicesDefinition.afterPropertiesSet();
+
+        setupService.setServicesDefinition(servicesDefinition);
+
         setupService.applySetup(new JsonWrapper(setupConfig));
 
-        assertEquals(19, builtPackageList.size());
+        assertEquals(20, builtPackageList.size());
         assertEquals(0, downloadPackageList.size());
 
         Collections.sort(builtPackageList);
         assertEquals(
-                    "base-eskimo, cerebro, elasticsearch, gdash, gluster, grafana, kafka, kafka-manager, kibana, " +
+                    "base-eskimo, cerebro, elasticsearch, flink, gdash, gluster, grafana, kafka, kafka-manager, kibana, " +
                     "logstash, mesos-debian, mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
                 String.join(", ", builtPackageList));
 

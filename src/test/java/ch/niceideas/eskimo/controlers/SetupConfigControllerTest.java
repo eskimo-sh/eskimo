@@ -46,7 +46,10 @@ public class SetupConfigControllerTest {
             }
         });
 
-        assertEquals ("{\"config\": \"dummy\"}", scc.loadSetupConfig());
+        assertEquals ("{\n" +
+                "    \"processingPending\": false,\n" +
+                "    \"config\": \"dummy\"\n" +
+                "}", scc.loadSetupConfig());
 
         scc.setSetupService(new SetupService() {
             @Override
@@ -63,10 +66,10 @@ public class SetupConfigControllerTest {
         });
 
         assertEquals ("{\n" +
-                "  \"clear\": \"setup\",\n" +
-                "  \"message\": \"No loaded\",\n" +
-                "  \"processingPending\": false,\n" +
-                "  \"status\": \"OK\"\n" +
+                "    \"processingPending\": false,\n" +
+                "    \"clear\": \"setup\",\n" +
+                "    \"message\": \"No loaded\",\n" +
+                "    \"config\": \"dummy\"\n" +
                 "}", scc.loadSetupConfig());
 
         scc.setConfigurationService(new ConfigurationService() {
@@ -104,7 +107,7 @@ public class SetupConfigControllerTest {
         });
 
         assertEquals ("{\n" +
-                "    \"processingPending\": \"true\",\n" +
+                "    \"processingPending\": true,\n" +
                 "    \"config\": \"dummy\"\n" +
                 "}", scc.loadSetupConfig());
     }

@@ -58,7 +58,7 @@ export ES_VERSION_MAJOR=7
 
 export CEREBRO_VERSION=0.8.5
 
-export KAFKA_VERSION=2.2.0
+export KAFKA_VERSION=2.2.2
 export KAFKA_MANAGER_VERSION=2.0.0.2
 
 export SCALA_VERSION=2.11
@@ -216,14 +216,16 @@ function build_image() {
         exit -2
     fi
 
-    echo " - Checking if base eskimo image is available"
-    if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
-        echo " - Trying to loads base eskimo image"
-        for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
-            echo "   + loading image $i"
-            gunzip -c $i | docker load >> $2 2>&1
-            fail_if_error $? $2 -10
-        done
+    if [[ -z "$NO_BASE_IMAGE" ]]; then
+        echo " - Checking if base eskimo image is available"
+        if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
+            echo " - Trying to loads base eskimo image"
+            for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
+                echo "   + loading image $i"
+                gunzip -c $i | docker load >> $2 2>&1
+                fail_if_error $? $2 -10
+            done
+        fi
     fi
 
     echo " - Deleting any previous containers"
@@ -249,6 +251,7 @@ function build_image() {
     echo " - Starting container $1_template"
     # create and start container
     docker run \
+            --privileged \
             -v $PWD:/scripts \
             -v $PWD/../common:/common  \
             -v $TMP_FOLDER:/tmp \

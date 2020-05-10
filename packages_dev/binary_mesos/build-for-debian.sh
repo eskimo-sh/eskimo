@@ -39,7 +39,6 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-. $SCRIPT_DIR/commonBuild.sh "$@"
 
 check_for_internet
 
@@ -78,8 +77,7 @@ cp Dockerfile.debian /tmp/build-mesos-debian/Dockerfile
 
 cd /tmp/build-mesos-debian
 
-. ./common.sh
-
+export NO_BASE_IMAGE=true
 build_image build_debian /tmp/build-mesos-debian-log
 
 
@@ -106,7 +104,7 @@ echo " - Installing the latest OpenJDK"
 docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing a few utility tools"
-docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils sudo" >>/tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils sudo procps" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing build tools"
 docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" >>/tmp/build-mesos-debian-log 2>&1
@@ -120,25 +118,21 @@ docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get inst
 echo " - Installing other Mesos dependencies"
 docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev" >>/tmp/build-mesos-debian-log 2>&1
 
-
-
-
-
-
-
 echo " - Building Mesos"
 docker exec -i build_debian bash -c "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/ /scripts/buildMesosFromSources.sh"
 
-echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
-docker exec -i build_debian bash -c "bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" >>/tmp/build-mesos-debian-log 2>&1
+
+# Done within script
+#echo " - Creating archive mesos-$AMESOS_VERSION.tar.gz"
+#docker exec -i build_debian bash -c "bash -c \"cd /usr/local/lib && tar cvfz mesos-$AMESOS_VERSION.tar.gz mesos-$AMESOS_VERSION\"" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Copying Mesos archive to shared folder"
-docker exec -i build_debian bash -c "mv /usr/local/lib/mesos-$AMESOS_VERSION.tar.gz /vagrant/" >>/tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "mv /usr/local/lib/mesos-$AMESOS_VERSION.tar.gz /scripts/" >>/tmp/build-mesos-debian-log 2>&1
 
-echo " - Dowloading mesos archive"
-chmod 700 ssh_key
-chmod 700 ssh_key.pub
-scp -o StrictHostKeyChecking=no -i ssh_key vagrant@192.168.10.101:/vagrant/mesos-$AMESOS_VERSION.tar.gz . >> /tmp/build-mesos-debian-log 2>&1
+#echo " - Dowloading mesos archive"
+#chmod 700 ssh_key
+#chmod 700 ssh_key.pub
+#scp -o StrictHostKeyChecking=no -i ssh_key vagrant@192.168.10.101:/vagrant/mesos-$AMESOS_VERSION.tar.gz . >> /tmp/build-mesos-debian-log 2>&1
 
 if [[ -f "$SCRIPT_DIR/../../packages_distrib/eskimo_mesos-debian-$AMESOS_VERSION.tar.gz" ]]; then
     echo " - renaming previous eskimo_mesos-debian-$AMESOS_VERSION.tar.gz"
@@ -148,5 +142,9 @@ fi
 echo " - Copying Mesos archive to distribution folder"
 mv mesos-$AMESOS_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_mesos-debian_"$AMESOS_VERSION"_1.tar.gz
 
-echo " - Destroying build VM"
-vagrant destroy --force >>/tmp/build-mesos-debian-log 2>&1
+echo " - Destroying Docker container"
+#vagrant destroy --force >>/tmp/build-mesos-debian-log 2>&1
+
+docker stop build_debian
+
+docker container rm build_debian
