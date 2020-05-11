@@ -85,6 +85,9 @@ public class SetupService {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
+    @Autowired
+    private ApplicationStatusService applicationStatusService;
+
     private String storagePathConfDir = System.getProperty("user.dir");
 
     @Value("${system.packageDistributionPath}")
@@ -128,6 +131,9 @@ public class SetupService {
     }
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
+    }
+    void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
+        this.applicationStatusService = applicationStatusService;
     }
 
     void setStoragePathConfDir (String storagePathConfDir) {
@@ -359,6 +365,10 @@ public class SetupService {
 
         } else {
 
+            if (applicationStatusService.isSnapshot()) {
+                throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+            }
+
             if (packagesVersion == null) {
                 throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
             }
@@ -373,6 +383,10 @@ public class SetupService {
         // 2. Find out about missing mesos distrib
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
         if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
+
+            if (applicationStatusService.isSnapshot()) {
+                throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+            }
 
             if (packagesVersion == null) {
                 throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
@@ -389,7 +403,8 @@ public class SetupService {
         }
 
         // 3. Find out about upgrades
-        if (StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG) // for services default is build
+        if (!applicationStatusService.isSnapshot()
+                && StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG) // for services default is build
                 && packagesVersion != null) {
             Set<String> updates = new HashSet<>();
 
@@ -491,6 +506,10 @@ public class SetupService {
 
                 } else {
 
+                    if (applicationStatusService.isSnapshot()) {
+                        throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+                    }
+
                     if (packagesVersion == null) {
                         packagesVersion = loadRemotePackagesVersionFile();
                     }
@@ -517,6 +536,10 @@ public class SetupService {
             if (!missingMesosPackages.isEmpty()) {
                 if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
+                    if (applicationStatusService.isSnapshot()) {
+                        throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+                    }
+
                     if (packagesVersion == null) {
                         packagesVersion = loadRemotePackagesVersionFile();
                     }
@@ -541,7 +564,10 @@ public class SetupService {
             }
 
             // 3. Handle updates
-            if (StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for servuces default is build
+            if (!applicationStatusService.isSnapshot()
+                    && StringUtils.isNotEmpty(servicesOrigin)
+                    && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for services default is build
+
                 for (String imageName : packagesToBuild.split(",")) {
 
                     Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);

@@ -1,2 +1,2 @@
-FROM opensuse/leap:15
+FROM opensuse/leap:15.2
 MAINTAINER Eskimo <eskimo@niceideas.ch>

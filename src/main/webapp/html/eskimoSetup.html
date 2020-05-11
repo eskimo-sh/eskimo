@@ -113,7 +113,7 @@ Software.
                                     <div class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0">
                                         <div class="radio">
                                             <label class="control-label">Download Mesos </label>
-                                            <label class="radio-inline">
+                                            <label class="radio-inline"  id="setup-mesos-origin-download-label">
                                                 <input  type="radio"
                                                         class="input-md" name="setup-mesos-origin" id="setup-mesos-origin-download" value="download">
                                             </label>
@@ -133,7 +133,8 @@ Software.
                                 <div class="col-md-12 col-sd-12">
                                     <label class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0 control-label" id="download-mesos-explain">
                                         Download mesos from niceideas.ch <br>
-                                        - internet access required</label>
+                                        - internet access required
+                                        <span id="download-mesos-explain-disabled" style="color: red;">(Disabled on development version)</span> </label>
                                     <label class="col-lg-3 col-md-4 col-sm-6 control-label" id="build-mesos-explain">
                                         Build mesos locally on eskimo backend<br>
                                         - <strong>only on Linux</strong> <br>
@@ -165,7 +166,7 @@ Software.
 
                                         <div class="radio">
                                             <label class="control-label">Download Packages </label>
-                                            <label class="radio-inline">
+                                            <label class="radio-inline" id="setup-services-origin-download-label">
                                                 <input  type="radio"
                                                         class="input-md" name="setup-services-origin" id="setup-services-origin-download" value="download">
                                             </label>
@@ -187,7 +188,8 @@ Software.
                                 <div class="col-md-12 col-sd-12">
                                     <label class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0 control-label" id="download-services-explain">
                             Download docker packages from niceideas.ch <br>
-                            - internet access required</label>
+                            - internet access required<br>
+                                        <span id="download-services-explain-disabled" style="color: red;">(Disabled on development version)</span> </label>
                                     <label class="col-lg-3 col-md-4 col-sm-6 control-label" id="build-services-explain">
                             Build docker packages locally on eskimo backend <br>
                             - <strong>only on Linux</strong> <br>

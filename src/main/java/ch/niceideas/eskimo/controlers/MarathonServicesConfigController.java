@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -42,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +88,9 @@ public class MarathonServicesConfigController {
     @Autowired
     private NotificationService notificationService;
 
+    @Value("${eskimo.enableMarathonSubsystem}")
+    private String enableMarathon = "true";
+
     /* For tests */
     void setMarathonServicesConfigService(MarathonService marathonServicesConfigService) {
         this.marathonServicesConfigService = marathonServicesConfigService;
@@ -97,6 +102,11 @@ public class MarathonServicesConfigController {
     @GetMapping("/load-marathon-services-config")
     @ResponseBody
     public String loadMarathonServicesConfig() {
+
+        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
+            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+        }
+
         try {
             setupService.ensureSetupCompleted();
             MarathonServicesConfigWrapper msConfig = configurationService.loadMarathonServicesConfig();
@@ -122,6 +132,10 @@ public class MarathonServicesConfigController {
     public String saveMarathonServicesConfig(@RequestBody String configAsString, HttpSession session) {
 
         logger.info ("Got config : " + configAsString);
+
+        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
+            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+        }
 
         try {
 
@@ -154,6 +168,10 @@ public class MarathonServicesConfigController {
     public String reinstallMarathonServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
 
         logger.info ("Got model : " + reinstallModel);
+
+        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
+            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+        }
 
         try {
 
@@ -208,6 +226,10 @@ public class MarathonServicesConfigController {
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String applyMarathonServicesConfig(HttpSession session) {
+
+        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
+            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+        }
 
         try {
 

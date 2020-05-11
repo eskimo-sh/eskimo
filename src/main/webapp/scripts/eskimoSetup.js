@@ -43,6 +43,8 @@ eskimo.Setup = function(constructorObject) {
 
     var that = this;
 
+    this.isSnapshot = true;
+
     // constants
     var MESSAGE_SHOW_DURATION = 10000;
 
@@ -106,6 +108,10 @@ eskimo.Setup = function(constructorObject) {
         });
     };
 
+    this.setSnapshot = function (isSnapshot) {
+      that.isSnapshot = isSnapshot;
+    };
+
     function handleSetup(data, initializationTime) {
         that.eskimoMain.setSetupLoaded();
 
@@ -127,16 +133,32 @@ eskimo.Setup = function(constructorObject) {
             $("#content-ssh-key").val(data['content-ssh-key']);
         }
 
-        if (data['setup-mesos-origin'] == "build") {
+        if (that.isSnapshot) {
             $('#setup-mesos-origin-build').get(0).checked = true;
+            $('#setup-mesos-origin-download-label').addClass("disabled");
+            $('#download-mesos-explain-disabled').css('display', 'block');
         } else {
-            $('#setup-mesos-origin-download').get(0).checked = true; // default
+            $('#setup-mesos-origin-download-label').removeClass("disabled");
+            $('#download-mesos-explain-disabled').css('display', 'none');
+            if (data['setup-mesos-origin'] == "build") {
+                $('#setup-mesos-origin-build').get(0).checked = true;
+            } else {
+                $('#setup-mesos-origin-download').get(0).checked = true; // default
+            }
         }
 
-        if (data['setup-services-origin'] == "build") {
+        if (that.isSnapshot) {
             $('#setup-services-origin-build').get(0).checked = true;
+            $('#setup-services-origin-download-label').addClass("disabled");
+            $('#download-services-explain-disabled').css('display', 'block');
         } else {
-            $('#setup-services-origin-download').get(0).checked = true; // default
+            $('#setup-services-origin-download-label').removeClass("disabled");
+            $('#download-services-explain-disabled').css('display', 'none');
+            if (data['setup-services-origin'] == "build") {
+                $('#setup-services-origin-build').get(0).checked = true;
+            } else {
+                $('#setup-services-origin-download').get(0).checked = true; // default
+            }
         }
 
         if (!data.clear || data.clear == "services") {

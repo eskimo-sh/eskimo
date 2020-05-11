@@ -107,6 +107,7 @@ public class SetupServiceTest extends AbstractSystemTest {
     public void testSaveAndPrepareSetup() throws Exception {
 
         SetupService setupService = createSetupService(new SetupService());
+        setupService.setApplicationStatusService(applicationStatusService);
 
         SetupCommand command = setupService.saveAndPrepareSetup(setupConfig);
 
@@ -153,6 +154,8 @@ public class SetupServiceTest extends AbstractSystemTest {
     public void testEnsureSetupCompleted() throws Exception {
 
         SetupService setupService = createSetupService(new SetupService());
+        setupService.setApplicationStatusService(applicationStatusService);
+
         setupService.saveAndPrepareSetup(setupConfig);
 
         SetupException exception = assertThrows(SetupException.class, () -> {
@@ -206,6 +209,8 @@ public class SetupServiceTest extends AbstractSystemTest {
                 return new JsonWrapper(packagesVersionFile);
             }
         });
+
+        setupService.setApplicationStatusService(applicationStatusService);
 
         setupService.saveAndPrepareSetup(setupConfig);
 

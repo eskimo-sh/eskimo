@@ -79,6 +79,8 @@ public abstract class AbstractSystemTest {
 
     protected NodesConfigurationService nodesConfigurationService = null;
 
+    protected ApplicationStatusService applicationStatusService = null;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
 
@@ -135,6 +137,9 @@ public abstract class AbstractSystemTest {
         configurationService.setServicesDefinition (servicesDefinition);
 
         setupService.setConfigurationService (configurationService);
+
+        applicationStatusService = new ApplicationStatusService();
+        setupService.setApplicationStatusService(applicationStatusService);
 
         systemService = createSystemService();
 

@@ -287,6 +287,26 @@ eskimo.Main = function() {
         }
     };
 
+    this.handleMarathonSubsystem = function (enableMarathon) {
+        var menuMarathonConfig = $("#menu-marathon-configuration");
+        if (enableMarathon) {
+            if (menuMarathonConfig.hasClass("menu-hidden")) {
+                menuMarathonConfig.css("visibility", "visible");
+                menuMarathonConfig.css("display", "inherit");
+                menuMarathonConfig.removeClass("menu-hidden")
+
+                // perhaps need to resize the menu ?
+                this.menuResize();
+            }
+        } else {
+            if (!menuMarathonConfig.hasClass("menu-hidden")) {
+                menuMarathonConfig.css("visibility", "hidden");
+                menuMarathonConfig.css("display", "none");
+                menuMarathonConfig.addClass("menu-hidden")
+            }
+        }
+    };
+
     function getDisplayedService () {
         var displayService;
         $(".inner-content").each(function (nbr, innerContent) {
@@ -377,7 +397,9 @@ eskimo.Main = function() {
         setupDone = true;
 
         $(".config-menu-items").each(function() {
-            $(this).attr("class", "config-menu-items");
+            if (!$(this).hasClass("menu-hidden")) {
+                $(this).attr("class", "config-menu-items");
+            }
         });
     };
 
@@ -388,7 +410,9 @@ eskimo.Main = function() {
         serviceMenuClear();
 
         $(".config-menu-items").each(function() {
-            $(this).attr("class", "config-menu-items disabled");
+            if (!$(this).hasClass("menu-hidden")) {
+                $(this).attr("class", "config-menu-items disabled");
+            }
         });
 
         $("#menu-configure-setup").attr("class", "config-menu-items");
@@ -478,7 +502,9 @@ eskimo.Main = function() {
 
         // reset visibility state
         $("#menu-container > * > li").each(function(nbr, node) {
-            $(node).css("display", "");
+            if (!$(node).hasClass("menu-hidden")) {
+                $(node).css("display", "");
+            }
         });
         menuHidingPos = 0;
     };
@@ -502,7 +528,9 @@ eskimo.Main = function() {
             // and deincrement menuHidingPos
             $("#menu-container > * > li").each(function(nbr, node) {
                 if (nbr == menuHidingPos) {
-                    $(node).css("display", "");
+                    if (!$(node).hasClass ("menu-hidden")) {
+                        $(node).css("display", "");
+                    }
                 }
             });
         }

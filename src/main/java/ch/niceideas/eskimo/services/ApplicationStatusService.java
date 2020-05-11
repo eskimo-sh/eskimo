@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.UIConfig;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -79,6 +80,9 @@ public class ApplicationStatusService {
     @Value("${build.timestamp}")
     private String buildTimestamp = "LATEST DEV";
 
+    @Value("${eskimo.enableMarathonSubsystem}")
+    private String enableMarathon = "true";
+
     private ThreadLocal<SimpleDateFormat> localDateFormatter = new ThreadLocal<>();
 
     private ReentrantLock statusUpdateLock = new ReentrantLock();
@@ -103,6 +107,10 @@ public class ApplicationStatusService {
     public void destroy() {
         logger.info ("Cancelling connection closer scheduler");
         timer.cancel();
+    }
+
+    public boolean isSnapshot() {
+        return StringUtils.isBlank(buildVersion) || buildVersion.endsWith("SNAPSHOT");
     }
 
     public JsonWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
@@ -130,6 +138,10 @@ public class ApplicationStatusService {
             systemStatus.setValueForPath("buildVersion", buildVersion);
 
             systemStatus.setValueForPath("buildTimestamp", buildTimestamp);
+
+            systemStatus.setValueForPath("enableMarathon", StringUtils.isNotBlank(enableMarathon) && enableMarathon.equals("true"));
+
+            systemStatus.setValueForPath("isSnapshot", isSnapshot());
 
             try {
                 JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());

@@ -92,8 +92,11 @@ build_image build_suse /tmp/build-mesos-suse-log
 #deb http://httpredir.debian.org/debian/ jessie main
 #deb http://httpredir.debian.org/debian/ jessie main contrib non-free
 
+echo " - refreshing the appliance"
+docker exec -i build_suse bash -c "zypper --no-gpg-checks --non-interactive refresh" >> /tmp/build-mesos-suse-log 2>&1
+
 echo " - Updating the appliance"
-docker exec -i build_suse bash -c "zypper refresh" >> /tmp/build-mesos-suse-log 2>&1
+docker exec -i build_suse bash -c "zypper --no-gpg-checks --non-interactive update" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing the latest OpenJDK"
 docker exec -i build_suse bash -c "zypper install -y java-1_8_0-openjdk java-1_8_0-openjdk-devel" >> /tmp/build-mesos-suse-log 2>&1
@@ -101,13 +104,11 @@ docker exec -i build_suse bash -c "zypper install -y java-1_8_0-openjdk java-1_8
 echo " - Installing a few utility tools"
 docker exec -i build_suse bash -c "zypper install -y tar wget git unzip curl moreutils sudo" >> /tmp/build-mesos-suse-log 2>&1
 
-echo " - Installing C/C++development tools"
-docker exec -i build_suse bash -c "zypper install -y -t pattern devel_C_C++" >> /tmp/build-mesos-suse-log 2>&1
-docker exec -i build_suse bash -c "g++" >> /tmp/build-mesos-suse-log 2>&1
-
 echo " - Installing build tools"
 docker exec -i build_suse bash -c "zypper install -y -t pattern devel_basis" >> /tmp/build-mesos-suse-log 2>&1
 
+echo " - Installing C/C++development tools"
+docker exec -i build_suse bash -c "zypper install -y -t pattern devel_C_C++" >> /tmp/build-mesos-suse-log 2>&1
 
 #echo " - Installing swapspace"
 #docker exec -i build_suse bash -c "yum install -y swapspace" >> /tmp/build-mesos-suse-log 2>&1
@@ -118,10 +119,15 @@ docker exec -i build_suse bash -c "zypper install -y -t pattern devel_basis" >> 
 echo " - Installing python"
 docker exec -i build_suse bash -c "zypper install -y python-devel python-six python-virtualenv python-pip" >> /tmp/build-mesos-suse-log 2>&1
 
-
-echo " - Installing maven "
+echo " - Installing Devel repos"
 docker exec -i build_suse bash -c "zypper addrepo https://download.opensuse.org/repositories/devel:tools:building/openSUSE_Leap_15.1/devel:tools:building.repo" >> /tmp/build-mesos-suse-log 2>&1
 docker exec -i build_suse bash -c "zypper addrepo https://download.opensuse.org/repositories/Java:packages/openSUSE_Leap_15.1/Java:packages.repo" >> /tmp/build-mesos-suse-log 2>&1
+
+echo " - Installing g++ explictely"
+docker exec -i build_suse bash -c "zypper --no-gpg-checks install -y gcc-c++" >> /tmp/build-mesos-suse-log 2>&1
+
+
+echo " - Installing maven "
 docker exec -i build_suse bash -c "zypper --no-gpg-checks --non-interactive refresh" >> /tmp/build-mesos-suse-log 2>&1
 docker exec -i build_suse bash -c "zypper --no-gpg-checks install -y maven" >> /tmp/build-mesos-suse-log 2>&1
 

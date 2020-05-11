@@ -190,6 +190,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var eskimoNotifications = {}");
 
         page.executeJavaScript("var eskimoSetup = {}");
+        page.executeJavaScript("eskimoSetup.setSnapshot = function () {};");
 
         page.executeJavaScript("var eskimoFileManagers = {};");
         page.executeJavaScript("eskimoFileManagers.setAvailableNodes = function() {};");
@@ -228,6 +229,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.setSetupLoaded = function () {}");
         page.executeJavaScript("eskimoMain.startOperationInProgress = function() {}");
         page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress = function() {}");
+        page.executeJavaScript("eskimoMain.handleMarathonSubsystem = function() {}");
 
         page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
                 "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +

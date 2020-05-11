@@ -128,9 +128,9 @@ function deploy_marathon() {
     curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$1 >> $2_marathon_deploy 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not reach marathon"
+        cat $2_marathon_deploy
         exit -23
     fi
-    cat $2_marathon_deploy
     if [[ `cat $2_marathon_deploy` != "" && `grep "does not exist" $2_marathon_deploy` == "" ]]; then
         echo "   + Previous instance removed"
         if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi

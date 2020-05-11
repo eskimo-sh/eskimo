@@ -540,6 +540,12 @@ eskimo.SystemStatus = function(constructorObject) {
         }
 
         $("#system-information-actions").html(systemInformationActions);
+
+        // D. General configuration
+
+        that.eskimoMain.handleMarathonSubsystem (systemStatus.enableMarathon);
+
+        that.eskimoSetup.setSnapshot(systemStatus.isSnapshot);
     };
 
     this.monitoringDashboardFrameTamper = function() {
