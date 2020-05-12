@@ -141,7 +141,34 @@ public class EskimoServicesTest extends AbstractWebTest {
 
     @Test
     public void testPeriodicRetryServices() throws Exception {
-        fail ("To Be Implemented");
+
+        page.executeJavaScript("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
+        page.executeJavaScript("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
+        page.executeJavaScript("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
+
+        page.executeJavaScript("alert (JSON.stringify (eskimoServices.getUIConfigsToRetryForTests()));");
+
+        assertJavascriptEquals("2.0", "eskimoServices.getUIConfigsToRetryForTests().length");
+        assertJavascriptEquals("cerebro", "eskimoServices.getUIConfigsToRetryForTests()[0].title");
+        assertJavascriptEquals("kibana", "eskimoServices.getUIConfigsToRetryForTests()[1].title");
+
+        page.executeJavaScript("$.ajax = function(object) { object.success(); }");
+
+        page.executeJavaScript("eskimoServices.periodicRetryServices();");
+
+        int i = 0;
+        do {
+            Double size = (Double) page.executeJavaScript("eskimoServices.getUIConfigsToRetryForTests().length").getJavaScriptResult();
+            if (size == 0.0) {
+                break;
+            }
+            Thread.sleep (100);
+            i++;
+        } while (i < 50);
+
+        if (i == 50) {
+            fail ("Didn't work in 5 seconds");
+        }
     }
 
     @Test

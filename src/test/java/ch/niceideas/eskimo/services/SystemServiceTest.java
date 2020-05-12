@@ -118,22 +118,26 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournal() throws Exception {
-        fail ("To Be Implemented");
+        systemService.showJournal("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo journalctl -u elasticsearch", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStartService() throws Exception {
-        fail ("To Be Implemented");
+        systemService.startService("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo systemctl start elasticsearch", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStopService() throws Exception {
-        fail ("To Be Implemented");
+        systemService.stopService("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo systemctl stop elasticsearch", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testRestartService() throws Exception {
-        fail ("To Be Implemented");
+        systemService.restartService("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo systemctl restart elasticsearch", testSSHCommandScript.toString().trim());
     }
 
     @Test

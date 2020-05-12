@@ -314,6 +314,16 @@ eskimo.Services = function (constructorObject) {
         setTimeout(that.periodicRetryServices, PERIODIC_RETRY_SERVICE_MS);
     };
 
+    function alreadyInRetry (uiConfig) {
+        for (var i = 0; i < uiConfigsToRetry.length; i++) {
+            var inUiConfig = uiConfigsToRetry[i];
+            if (inUiConfig.title == uiConfig.title) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     this.handleServiceDisplay = function (service, uiConfig, nodeAddress, immediate) {
 
         //var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
@@ -324,6 +334,7 @@ eskimo.Services = function (constructorObject) {
 
         /*
         console.log ("service display : " + service +
+            " - uiConfig.title? " + uiConfig.title +
             " - immediate ? " + immediate +
             " - reinitialize ? " + reinitialize +
             " - waitTime : " +  uiConfig.waitTime +
@@ -343,7 +354,7 @@ eskimo.Services = function (constructorObject) {
 
             serviceInitialized[uiConfig.service] = true;
 
-            if (uiConfigsToRetry.length == 0 || !uiConfigsToRetry.includes(uiConfig)) {
+            if (uiConfigsToRetry.length == 0 || !alreadyInRetry (uiConfig)) {
                 //console.log("Adding retry service " + uiConfig.service);
                 uiConfigsToRetry.push(uiConfig);
             }
