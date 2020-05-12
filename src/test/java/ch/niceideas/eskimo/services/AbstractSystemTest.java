@@ -148,6 +148,9 @@ public abstract class AbstractSystemTest {
         setupService.setConfigurationService (configurationService);
 
         applicationStatusService = new ApplicationStatusService();
+        applicationStatusService.setConfigurationService(configurationService);
+        applicationStatusService.setServicesDefinition(servicesDefinition);
+
         setupService.setApplicationStatusService(applicationStatusService);
 
         systemService = createSystemService();
