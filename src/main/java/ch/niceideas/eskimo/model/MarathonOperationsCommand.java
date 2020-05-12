@@ -46,8 +46,6 @@ import java.util.*;
 
 public class MarathonOperationsCommand implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(MarathonOperationsCommand.class);
-
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
 
     private final ArrayList<String> installations = new ArrayList<>();

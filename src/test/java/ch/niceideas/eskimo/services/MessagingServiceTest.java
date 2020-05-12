@@ -43,7 +43,10 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class MessagingServiceTest extends TestCase {
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
+public class MessagingServiceTest {
 
     private MessagingService ms = null;
 

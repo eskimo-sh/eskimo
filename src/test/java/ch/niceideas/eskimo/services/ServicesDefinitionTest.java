@@ -369,8 +369,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "spark-history-server",
                 "zeppelin"
         }, zookeeperDep);
-
-        System.err.println (def.getDependentServices("zookeeper").toArray(new String[0]));
     }
 
     @Test

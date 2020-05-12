@@ -52,6 +52,7 @@ import java.util.HashMap;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
@@ -102,7 +103,13 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
             put("grafana_install", "on");
         }});
 
-        page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+        Exception error = null;
+        try {
+            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+        } catch (Exception e) {
+            error = e;
+        }
+        assertNull(error);
     }
 
 

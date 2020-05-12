@@ -25,7 +25,7 @@ abstract class AbstractWrappingList <T> implements List<T> {
 
     @Override
     public final <T1> T1[] toArray(T1[] a) {
-        return underlying.toArray(a);
+        return underlying.<T1>toArray(a);
     }
 
     @Override

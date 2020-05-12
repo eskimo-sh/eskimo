@@ -317,8 +317,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusNominal () throws Exception {
 
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -326,7 +324,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
@@ -358,8 +355,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusServiceDown () throws Exception {
 
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -371,7 +366,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
@@ -403,8 +397,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusMarathonServiceDown () throws Exception {
 
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -412,7 +404,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
@@ -448,9 +439,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusMarathonNodeDown () throws Exception {
 
-
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -458,7 +446,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override

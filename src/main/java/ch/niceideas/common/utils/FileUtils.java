@@ -67,7 +67,8 @@ public class FileUtils {
         if (file.isDirectory()) {
 
             // directory is empty, then delete it
-            if (file.list().length == 0) {
+            String[] fileContent = file.list();
+            if (fileContent == null || fileContent.length == 0) {
 
                 if (file.delete()) {
                     logger.debug("Directory is deleted : " + file.getAbsolutePath());
@@ -85,7 +86,8 @@ public class FileUtils {
                 }
 
                 // check the directory again, if empty then delete it
-                if (file.list().length > 0) {
+                fileContent = file.list();
+                if (fileContent != null && fileContent.length > 0) {
                     throw new FileDeleteFailedException ("Could not delete all files from directory " + file.getAbsolutePath());
                 }
 
@@ -225,10 +227,12 @@ public class FileUtils {
             // no need to copy any content since it is
             // a directory, just close the archive Entry
             tos.closeArchiveEntry();
-            for (File cFile : file.listFiles()){
-                // recursively call the method for all the subfolders
-                addFilesToTarGZ(fileName + "/" + cFile.getName(), cFile, tos);
-
+            File[] fileContent = file.listFiles();
+            if (fileContent != null) {
+                for (File cFile : fileContent) {
+                    // recursively call the method for all the subfolders
+                    addFilesToTarGZ(fileName + "/" + cFile.getName(), cFile, tos);
+                }
             }
         }
     }

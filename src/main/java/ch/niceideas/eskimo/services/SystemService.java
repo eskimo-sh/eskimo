@@ -633,7 +633,7 @@ public class SystemService {
                         }
                     }
 
-                    String nodeIp = nodeName == null ? null : nodeName.replace("-", ".");
+                    String nodeIp = nodeName.replace("-", ".");
 
                     Boolean nodeAlive = StringUtils.isNotBlank(nodeName) ? systemStatus.isNodeAlive (nodeName) : Boolean.FALSE;
 
@@ -761,7 +761,7 @@ public class SystemService {
 
                     logger.warn("For service " + serviceStatusFlag + " - previous status was OK and status is " + systemStatus.getValueForPath(serviceStatusFlag));
                     notificationService.addError("Service " + SystemStatusWrapper.getServiceName(serviceStatusFlag)
-                            + " on " +  SystemStatusWrapper.getNodeName(serviceStatusFlag).replace("-", ".")
+                            + " on " +  Objects.requireNonNull(SystemStatusWrapper.getNodeName(serviceStatusFlag)).replace("-", ".")
                             + " got into problem");
                 }
             }

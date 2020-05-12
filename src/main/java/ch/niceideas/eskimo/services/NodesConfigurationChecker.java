@@ -222,7 +222,7 @@ public class NodesConfigurationChecker {
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
             if (property != null) {
 
-                if (property != null && StringUtils.isNotBlank(property.getServiceName())
+                if (StringUtils.isNotBlank(property.getServiceName())
                         && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
 
                     Service service = servicesDefinition.getService(property.getServiceName());

@@ -233,20 +233,18 @@ public class ServicesProxyServlet extends ProxyServlet {
             }
 
         } else {
-            if (entity != null) {
 
-                String inputString = StreamUtils.getAsString(entity.getContent());
+            String inputString = StreamUtils.getAsString(entity.getContent());
 
-                String resultString = performReplacements(service, servletRequest.getRequestURI(), contextPathPrefix, prefixPath, inputString);
+            String resultString = performReplacements(service, servletRequest.getRequestURI(), contextPathPrefix, prefixPath, inputString);
 
-                byte[] result = resultString.getBytes();
+            byte[] result = resultString.getBytes();
 
-                // overwrite content length header
-                servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);
+            // overwrite content length header
+            servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);
 
-                OutputStream servletOutputStream = servletResponse.getOutputStream();
-                StreamUtils.copy(new ByteArrayInputStream(result), servletOutputStream);
-            }
+            OutputStream servletOutputStream = servletResponse.getOutputStream();
+            StreamUtils.copy(new ByteArrayInputStream(result), servletOutputStream);
         }
     }
 

@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -74,7 +75,7 @@ public class GenerateLCOV {
             }
 
             SortedMap<String, FileData> total = new TreeMap<>();
-            for (File reportSubdir : reportDir.listFiles()) {
+            for (File reportSubdir : Objects.requireNonNull(reportDir.listFiles())) {
                 File reportFile = new File (reportSubdir, "jscoverage.json");
                 if (!reportFile.exists()) {
                     logger.warn(reportFile + " doesn't exist");

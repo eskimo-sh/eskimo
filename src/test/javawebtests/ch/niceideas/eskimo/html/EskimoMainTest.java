@@ -107,18 +107,22 @@ public class EskimoMainTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowHideProgressBar() {
+    public void testShowHideProgressBar() throws Exception {
 
-        // FIXME Dunno why this whole shit failes. sick of it.
-        //page.executeJavaScript("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
+        page.executeJavaScript("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
+
+        waitForElementIdInDOM("inner-content-progress");
+
+        page.executeJavaScript("$('#main-content').css('visibility', 'visible');");
+        page.executeJavaScript("$('#hoeapp-container').css('visibility', 'visible');");
 
         page.executeJavaScript("eskimoMain.showProgressbar()");
 
-        //assertEquals ("visible", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals ("visible", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
 
         page.executeJavaScript("eskimoMain.hideProgressbar()");
 
-        //assertEquals ("hidden", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals ("hidden", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
     }
 
     @Test
