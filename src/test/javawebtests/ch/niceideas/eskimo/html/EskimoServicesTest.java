@@ -78,6 +78,73 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
+    public void testShowServiceIFrame() throws Exception {
+
+        // 1. setup not done
+        page.executeJavaScript("eskimoMain.showSetupNotDone = function(message) { window.setupNotDoneMessage = message; }");
+        page.executeJavaScript("eskimoMain.isSetupDone = function() { return false; }");
+
+        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+
+        assertJavascriptEquals("Service cerebro is not available at this stage.", "window.setupNotDoneMessage");
+
+        // 2. disconnected
+        page.executeJavaScript("eskimoMain.isSetupDone = function() { return true; }");
+        page.executeJavaScript("eskimoSystemStatus.isDisconnected = function() { return true; }");
+        page.executeJavaScript("eskimoMain.showStatus = function() { window.showStatusCalled = true; }");
+
+        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+
+        assertJavascriptEquals("true", "window.showStatusCalled");
+
+        // 3. Service not yet initialized
+        page.executeJavaScript("eskimoSystemStatus.isDisconnected = function() { return false; }");
+        page.executeJavaScript("eskimoSystemStatus.showStatusWhenServiceUnavailable = function (service) { window.statusUnavailableService = service;}");
+
+        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+
+        assertJavascriptEquals("cerebro", "window.statusUnavailableService");
+
+        // 4. service initialized
+        page.executeJavaScript("eskimoMain.hideProgressbar = function() { window.hideProgressbarCalled = true; }");
+        page.executeJavaScript("eskimoMain.setNavigationCompact = function() { window.setNavigationCompactCalled = true; }");
+        page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { window.onlyContentShown = content; }");
+
+        page.executeJavaScript("eskimoServices.setServiceInitializedForTests ('cerebro');");
+
+        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+
+        assertJavascriptEquals("true", "window.hideProgressbarCalled");
+        assertJavascriptEquals("true", "window.setNavigationCompactCalled");
+        assertJavascriptEquals("cerebro", "window.onlyContentShown");
+    }
+
+    @Test
+    public void testIsServiceAvailable() throws Exception {
+
+        assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('non-existent');");
+
+        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin', 'refreshWaiting': true }});");
+
+        assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('zeppelin');");
+
+        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'}});");
+
+        assertJavascriptEquals("true", "!(eskimoServices.isServiceAvailable('zeppelin'))"); // undefined
+
+        page.executeJavaScript("eskimoServices.setServiceInitializedForTests ('zeppelin');");
+
+        assertJavascriptEquals("true", "eskimoServices.isServiceAvailable('zeppelin');");
+    }
+
+    @Test
+    public void testPeriodicRetryServices() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testCreateMenu() throws Exception {
 
         // add services menu
@@ -152,6 +219,8 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].service");
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
+
+        page.executeJavaScript("eskimoServices.setServiceNotInitializedForTests ('cerebro');");
 
         assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('cerebro')");
 

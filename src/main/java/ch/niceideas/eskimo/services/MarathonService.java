@@ -261,6 +261,8 @@ public class MarathonService {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         logger.debug (e, e);
+                        // Restore interrupted state...
+                        Thread.currentThread().interrupt();
                     }
                     continue;
                 } else {
@@ -284,6 +286,8 @@ public class MarathonService {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     logger.debug (e, e);
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
                 continue;
             }

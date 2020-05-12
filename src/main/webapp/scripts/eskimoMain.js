@@ -377,6 +377,7 @@ eskimo.Main = function() {
 
     this.sidebarToggleClickedListener = function () {
         dontMessWithSidebarSizeAnyMore = true;
+        that.menuResize();
     };
 
     this.setNavigationCompact = function () {

@@ -41,14 +41,13 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -188,9 +187,122 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.ensureSetupCompleted();
     }
 
+    @Test
+    public void testBuildPackage() throws Exception {
+
+        File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
+        packageDevPathTest.delete();
+        packageDevPathTest.mkdirs();
+
+        setupService.setPackagesDevPathForTests(packageDevPathTest.getAbsolutePath());
+
+        FileUtils.writeFile(new File (packageDevPathTest.getAbsolutePath() + "/build.sh"),
+                "#!/bin/bash\n" +
+                "echo $@\n");
+
+        setupService.buildPackage("cerebro");
+
+        List<String> messages = messagingService.getSubList(0);
+        assertEquals (6, messages.size());
+
+        assertEquals("\nBuilding of package cerebro" +
+                    "," +
+                    "," +
+                    "Done : Building of package cerebro,-------------------------------------------------------------------------------," +
+                    "cerebro," +
+                    "--> Completed Successfuly.",
+                String.join(",", messages));
+
+        FileUtils.delete(packageDevPathTest);
+    }
 
     @Test
-    public void testApplySetup() throws Exception {
+    public void testDownloadPackage() throws Exception {
+
+        File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
+        packageDevPathTest.delete();
+        packageDevPathTest.mkdirs();
+
+        setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
+
+        setupService.downloadPackage("cerebro");
+
+        assertEquals (1, packageDevPathTest.listFiles().length);
+        assertEquals("cerebro", packageDevPathTest.listFiles()[0].getName());
+        assertEquals("TEST DOWNLOADED CONTENT", FileUtils.readFile(packageDevPathTest.listFiles()[0]));
+
+        FileUtils.delete(packageDevPathTest);
+    }
+
+    @Test
+    public void testReadConfigStoragePath() throws Exception {
+
+        File storagePathTest = File.createTempFile("test_setup_storage", "folder");
+        storagePathTest.delete();
+        storagePathTest.mkdirs();
+
+        setupService.setStoragePathConfDir(storagePathTest.getAbsolutePath());
+
+        assertNull (setupService.readConfigStoragePath());
+
+        FileUtils.writeFile(new File (storagePathTest, "storagePath.conf"), "/tmp/test");
+
+        assertEquals ("/tmp/test", setupService.readConfigStoragePath());
+    }
+
+    @Test
+    public void testFillInPackages() throws Exception {
+
+        JsonWrapper packagesVersion = new JsonWrapper(new JSONObject(new HashMap<String, Object>(){{
+            put ("cerebro", new JSONObject(new HashMap<String, Object>(){{
+                put ("software", "1.1");
+                put ("distribution", "1");
+            }}));
+            put ("elasticsearch", new JSONObject(new HashMap<String, Object>(){{
+                put ("software", "2.2");
+                put ("distribution", "2");
+            }}));
+            put ("kibana", new JSONObject(new HashMap<String, Object>(){{
+                put ("software", "3.3");
+                put ("distribution", "3");
+            }}));
+        }}));
+        Set<String> downloadPackages = new HashSet<>();
+        Set<String> missingServices = new HashSet<String>(){{
+            add("cerebro");
+            add("elasticsearch");
+            add("kibana");
+        }};
+
+        setupService.fillInPackages(downloadPackages, packagesVersion, missingServices);
+
+        assertEquals(3, downloadPackages.size());
+
+        List<String> sorted = new ArrayList<>(downloadPackages);
+        Collections.sort(sorted);
+
+        assertEquals("cerebro_1.1_1", sorted.get(0));
+        assertEquals("elasticsearch_2.2_2", sorted.get(1));
+        assertEquals("kibana_3.3_3", sorted.get(2));
+    }
+
+    @Test
+    public void testPrepareSetup() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testApplySetupHandleUpdates() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testApplySetupDownload() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testApplySetupBuild() throws Exception {
 
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();

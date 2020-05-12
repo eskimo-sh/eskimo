@@ -117,6 +117,31 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testShowJournal() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testStartService() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testStopService() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testRestartService() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testUpdateStatusWithMarathonException() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testFetchNodeStatus() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();

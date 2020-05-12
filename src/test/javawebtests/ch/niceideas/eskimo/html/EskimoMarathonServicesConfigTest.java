@@ -161,7 +161,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSowReinstallSelection() throws Exception {
+    public void testShowReinstallSelection() throws Exception {
 
         testRenderMarathonConfig();
 
@@ -176,5 +176,22 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         assertEquals(
                 expectedMarathonSelectionTableContent.replace("  ", ""),
                 page.getElementById("marathon-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+    }
+
+    @Test
+    public void testShowMarathonServicesConfig() throws Exception {
+        // mock jquery
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testProceedWithReinstall() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testProceedWithMarathonInstallation() throws Exception  {
+        // mock jquery
+        fail ("To Be Implemented");
     }
 }

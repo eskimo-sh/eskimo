@@ -107,7 +107,7 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
             commandDescription = commandDescription +
                 '<div class="col-xs-12 col-md-12">' +
                 '<div class="alert alert-warning" role="alert">' +
-                command.warnings
+                command.warnings +
                 '</div>' +
                 '</div>';
 

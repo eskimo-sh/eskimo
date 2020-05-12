@@ -100,7 +100,7 @@ public class ApplicationStatusService {
             public void run() {
                 updateStatus();
             }
-        }, 15 * 1000, 15 * 1000);
+        }, 15L * 1000L, 15L * 1000L);
     }
 
     @PreDestroy

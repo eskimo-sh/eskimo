@@ -3,7 +3,6 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.log4j.Logger;
@@ -15,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)

@@ -115,6 +115,12 @@ eskimo.Services = function (constructorObject) {
     this.setUiServicesConfig = function (uiServicesConfig) {
         UI_SERVICES_CONFIG = uiServicesConfig;
     };
+    this.setServiceInitializedForTests = function (service) {
+        serviceInitialized[service] = true;
+    };
+    this.setServiceNotInitializedForTests = function (service) {
+        serviceInitialized[service] = false;
+    };
 
     function showServiceIFrame(service) {
 
@@ -149,17 +155,17 @@ eskimo.Services = function (constructorObject) {
 
         var uiConfig = UI_SERVICES_CONFIG[service];
         if (uiConfig == null) {
-            //console.log ("service " + service + " - has not uiConfig (A)");
+            console.log ("service " + service + " - has not uiConfig (A)");
             return false;
         }
 
-        if (uiConfigsToRetry.includes(uiConfig)) {
-            //console.log ("service " + service + " - is pending retry (B)");
+        if (uiConfigsToRetry.length > 0 && uiConfigsToRetry.includes(uiConfig)) {
+            console.log ("service " + service + " - is pending retry (B)");
             return false;
         }
 
         if (uiConfig.refreshWaiting) {
-            //console.log ("service " + service + " - is pending refresh (C)");
+            console.log ("service " + service + " - is pending refresh (C)");
             return false;
         }
 

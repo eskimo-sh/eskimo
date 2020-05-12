@@ -83,6 +83,16 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
+    public void testRenderNodesStatusEmpty() {
+        fail ("To be Implemented");
+    }
+
+    @Test
+    public void testRegisterMenu() {
+        fail ("To be Implemented");
+    }
+
+    @Test
     public void testRenderNodesStatusFlat() throws Exception {
 
         page.executeJavaScript("eskimoSystemStatus.setRenderInTable(false);");

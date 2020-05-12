@@ -231,6 +231,21 @@ public class MarathonServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testGetAndWaitServiceRuntimeNode() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testEnsureMarathonAvailability() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testWaitForServiceShutdown() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testUninstallMarathonService () throws Exception {
 
         final List<String> marathonApiCalls = new ArrayList<>();

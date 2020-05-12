@@ -110,6 +110,21 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testInstallEskimoBaseSystem() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testCopyCommand() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testGetNodeFlavour() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testInstallService() throws Exception {
 
         ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{

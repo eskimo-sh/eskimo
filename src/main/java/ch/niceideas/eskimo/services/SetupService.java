@@ -135,6 +135,12 @@ public class SetupService {
     void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
         this.applicationStatusService = applicationStatusService;
     }
+    void setPackagesDevPathForTests (String packagesDevPathForTest) {
+        this.packagesDevPath = packagesDevPathForTest;
+    }
+    void setSystemOperationService (SystemOperationService systemOperationService) {
+        this.systemOperationService = systemOperationService;
+    }
 
     void setStoragePathConfDir (String storagePathConfDir) {
         this.storagePathConfDir = storagePathConfDir;
@@ -157,17 +163,16 @@ public class SetupService {
         return packagesDownloadUrlRoot;
     }
 
-    private String readConfigStoragePath() {
+    String readConfigStoragePath() {
         // First read config storage path
         File entryFile = new File(storagePathConfDir + "/storagePath.conf");
         if (!entryFile.exists()) {
             logger.warn ("Application is not initialized properly. Missing file 'storagePath.conf' in backend working directory.");
             return null;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(entryFile))) {
-            return reader.readLine();
-
-        } catch (IOException e) {
+        try {
+            return FileUtils.readFile(entryFile).trim();
+        } catch (FileException e) {
             logger.error(e, e);
             return null;
         }
