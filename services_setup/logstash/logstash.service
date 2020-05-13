@@ -38,6 +38,7 @@ Documentation=http://www.elastic.co
 Wants=network-online.target
 After=docker.service
 Requires=docker.service
+After=gluster.service
 
 [Service]
 TimeoutStartSec=180sec

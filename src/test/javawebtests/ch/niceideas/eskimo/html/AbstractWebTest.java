@@ -232,6 +232,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.startOperationInProgress = function() {}");
         page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress = function() {}");
         page.executeJavaScript("eskimoMain.handleMarathonSubsystem = function() {}");
+        page.executeJavaScript("eskimoMain.showProgressbar = function() {}");
 
         page.executeJavaScript("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 

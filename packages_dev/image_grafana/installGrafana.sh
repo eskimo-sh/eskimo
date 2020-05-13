@@ -101,9 +101,47 @@ trap check_stop_es_grafana 15
 trap check_stop_es_grafana EXIT
 
 
+echo " - Installing required Grafana plugins"
+
+echo "   + grafana-piechart-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install grafana-piechart-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + grafana-clock-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install grafana-clock-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + grafana-worldmap-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install grafana-worldmap-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + ryantxu-ajax-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install ryantxu-ajax-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + digrich-bubblechart-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install digrich-bubblechart-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + aidanmountford-html-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install aidanmountford-html-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + natel-plotly-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install natel-plotly-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + snuids-radar-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install snuids-radar-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+echo "   + marcuscalidus-svg-panel"
+/usr/local/lib/grafana/bin/grafana-cli plugins install marcuscalidus-svg-panel > /tmp/grafana_install_log 2>&1
+fail_if_error $? "/tmp/grafana_install_log" -2
+
+
 echo " - Starting Grafana"
-/usr/local/lib/grafana-$GRAFANA_VERSION/bin/grafana-server \
-        -homepath /usr/local/lib/grafana-$GRAFANA_VERSION > /tmp/grafana_run_log 2>&1 &
+/usr/local/lib/grafana/bin/grafana-server -homepath /usr/local/lib/grafana/ > /tmp/grafana_run_log 2>&1 &
 export GRAFANA_PROC_ID=$!
 
 echo " - Checking Grafana startup"

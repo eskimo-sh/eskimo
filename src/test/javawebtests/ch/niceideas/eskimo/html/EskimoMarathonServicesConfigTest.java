@@ -172,7 +172,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoMarathonServicesConfig.showReinstallSelection()");
 
-        System.err.println (page.getElementById("marathon-services-selection-body").asXml());
+        //System.err.println (page.getElementById("marathon-services-selection-body").asXml());
         assertEquals(
                 expectedMarathonSelectionTableContent.replace("  ", ""),
                 page.getElementById("marathon-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
@@ -241,13 +241,31 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testProceedWithReinstall() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
     public void testProceedWithMarathonInstallation() throws Exception  {
-        // mock jquery
-        fail ("To Be Implemented");
+
+        testRenderMarathonConfig();
+
+        // 1. error
+        page.executeJavaScript("console.error = function (error) { window.consoleError = error; };");
+        page.executeJavaScript("$.ajax = function (object) { object.success ( { error: 'dGVzdEVycm9y' } );}");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.proceedWithMarathonInstallation ( { }, false);");
+
+        assertJavascriptEquals("testError", "window.consoleError");
+
+        // 2. pass command
+        page.executeJavaScript("eskimoMain.getMarathonOperationsCommand = function () { " +
+                "    return {" +
+                "        showCommand: function (command) {" +
+                "            window.command = command;" +
+                "        }" +
+                "    }" +
+                "};");
+
+        page.executeJavaScript("$.ajax = function (object) { object.success ( { command: 'testCommand' } );}");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.proceedWithMarathonInstallation ( { }, false);");
+
+        assertJavascriptEquals("testCommand", "window.command");
     }
 }
