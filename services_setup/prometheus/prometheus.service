@@ -65,8 +65,8 @@ ExecStop=/usr/bin/docker stop prometheus
 Type=simple
 
 Restart=always
-StartLimitBurst=3
-StartLimitInterval=40
+StartLimitBurst=4
+StartLimitInterval=120
 
 StandardOutput=syslog
 StandardError=syslog

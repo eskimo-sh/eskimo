@@ -71,11 +71,11 @@ if [[ $? != 0 ]]; then
 fi
 
 
-echo " - Extracting prometheus-$PROMETHEUS_VERSION"
+echo " - Extracting node_exporter-$PROMETHEUS_VERSION"
 tar -xvf node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 fail_if_error $? "/tmp/prometheus_install_log" -2
 
-echo " - Installing prometheus"
+echo " - Installing node_exporter"
 sudo chown -R root.staff node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64/
 sudo mkdir -p /usr/local/lib/prometheus-$PROMETHEUS_VERSION.linux-amd64/exporters/
 sudo mv node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64 /usr/local/lib/prometheus-$PROMETHEUS_VERSION.linux-amd64/exporters/
