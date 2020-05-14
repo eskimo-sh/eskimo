@@ -63,6 +63,7 @@ public class MarathonServicesConfigController {
 
     public static final String PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE = "PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE";
     public static final String PENDING_MARATHON_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
+    public static final String NOMARATHON = "nomarathon";
 
     @Autowired
     private MarathonService marathonService;
@@ -116,7 +117,7 @@ public class MarathonServicesConfigController {
     public String loadMarathonServicesConfig() {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
@@ -146,7 +147,7 @@ public class MarathonServicesConfigController {
         logger.info ("Got config : " + configAsString);
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
@@ -182,7 +183,7 @@ public class MarathonServicesConfigController {
         logger.info ("Got model : " + reinstallModel);
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
@@ -240,7 +241,7 @@ public class MarathonServicesConfigController {
     public String applyMarathonServicesConfig(HttpSession session) {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus("nomarathon", systemService.isProcessingPending());
+            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {

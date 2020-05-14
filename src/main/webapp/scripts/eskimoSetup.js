@@ -112,6 +112,22 @@ eskimo.Setup = function(constructorObject) {
       that.isSnapshot = isSnapshot;
     };
 
+    function swtchDownloadBuild(target) {
+        if (that.isSnapshot) {
+            $('#setup-'+target+'-origin-build').get(0).checked = true;
+            $('#setup-'+target+'-origin-download-label').addClass("disabled");
+            $('#download-'+target+'-explain-disabled').css('display', 'block');
+        } else {
+            $('#setup-'+target+'-origin-download-label').removeClass("disabled");
+            $('#download-'+target+'-explain-disabled').css('display', 'none');
+            if (data['setup-'+target+'-origin'] == "build") {
+                $('#setup-'+target+'-origin-build').get(0).checked = true;
+            } else {
+                $('#setup-'+target+'-origin-download').get(0).checked = true; // default
+            }
+        }
+    }
+
     function handleSetup(data, initializationTime) {
         that.eskimoMain.setSetupLoaded();
 
@@ -133,33 +149,9 @@ eskimo.Setup = function(constructorObject) {
             $("#content-ssh-key").val(data['content-ssh-key']);
         }
 
-        if (that.isSnapshot) {
-            $('#setup-mesos-origin-build').get(0).checked = true;
-            $('#setup-mesos-origin-download-label').addClass("disabled");
-            $('#download-mesos-explain-disabled').css('display', 'block');
-        } else {
-            $('#setup-mesos-origin-download-label').removeClass("disabled");
-            $('#download-mesos-explain-disabled').css('display', 'none');
-            if (data['setup-mesos-origin'] == "build") {
-                $('#setup-mesos-origin-build').get(0).checked = true;
-            } else {
-                $('#setup-mesos-origin-download').get(0).checked = true; // default
-            }
-        }
+        swtchDownloadBuild ("mesos");
 
-        if (that.isSnapshot) {
-            $('#setup-services-origin-build').get(0).checked = true;
-            $('#setup-services-origin-download-label').addClass("disabled");
-            $('#download-services-explain-disabled').css('display', 'block');
-        } else {
-            $('#setup-services-origin-download-label').removeClass("disabled");
-            $('#download-services-explain-disabled').css('display', 'none');
-            if (data['setup-services-origin'] == "build") {
-                $('#setup-services-origin-build').get(0).checked = true;
-            } else {
-                $('#setup-services-origin-download').get(0).checked = true; // default
-            }
-        }
+        swtchDownloadBuild ("services");
 
         if (!data.clear || data.clear == "services") {
 

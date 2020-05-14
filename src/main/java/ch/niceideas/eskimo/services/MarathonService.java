@@ -42,6 +42,7 @@ public class MarathonService {
 
     public static final String MARATHON_NA_FLAG = "MARATHON_NA";
     public static final String MARATHON_CONTEXT = "apps/";
+    public static final String MARATHON = "marathon";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -178,7 +179,7 @@ public class MarathonService {
     protected String queryMarathon (String endpoint, String method) throws MarathonException {
 
         try {
-            ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
+            ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig(MARATHON);
             if (marathonTunnelConfig == null) {
                 return null;
             }
@@ -197,7 +198,7 @@ public class MarathonService {
     protected String updateMarathon (String endpoint, String method, String content) throws MarathonException {
 
         try {
-            ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig("marathon");
+            ProxyTunnelConfig marathonTunnelConfig = proxyManagerService.getTunnelConfig(MARATHON);
             if (marathonTunnelConfig == null) {
                 throw new MarathonException("Marathon is not detected as present (in proxy)");
             }
@@ -297,7 +298,7 @@ public class MarathonService {
             if (StringUtils.isBlank(nodeIp)) {
 
                 // service is not started by marathon, assuming it on marathon node
-                nodeIp = servicesInstallStatus.getFirstIpAddress("marathon");
+                nodeIp = servicesInstallStatus.getFirstIpAddress(MARATHON);
             }
 
             String status = "notOK";
@@ -325,7 +326,7 @@ public class MarathonService {
             // Find out node running marathon
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            String marathonIpAddress = servicesInstallStatus.getFirstIpAddress("marathon");
+            String marathonIpAddress = servicesInstallStatus.getFirstIpAddress(MARATHON);
             if (StringUtils.isBlank(marathonIpAddress)) {
                 String message = "Marathon doesn't seem to be installed";
                 notificationService.addError(message);
@@ -428,7 +429,7 @@ public class MarathonService {
         try {
             SystemStatusWrapper lastStatus = systemService.getStatus();
 
-            String marathonNodeName = lastStatus.getFirstNodeName("marathon");
+            String marathonNodeName = lastStatus.getFirstNodeName(MARATHON);
             if (StringUtils.isBlank(marathonNodeName)) {
                 String message = "Marathon is not available";
                 notificationService.addError(message);
@@ -438,7 +439,7 @@ public class MarathonService {
                 throw new MarathonException(message);
             } else {
 
-                if (!lastStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
+                if (!lastStatus.isServiceOKOnNode(MARATHON, marathonNodeName)) {
 
                     String message = "Marathon is not properly running";
                     notificationService.addError(message);
@@ -570,7 +571,7 @@ public class MarathonService {
         // 3.1 Node answers
         try {
 
-            String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress("marathon");
+            String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress(MARATHON);
 
             String ping = null;
             if (!StringUtils.isBlank(marathonIpAddress)) {
@@ -617,11 +618,11 @@ public class MarathonService {
                     if (StringUtils.isNotBlank(marathonIpAddress)) {
                         nodeName = marathonIpAddress.replace(".", "-");
                     } else {
-                        nodeName = servicesInstallationStatus.getFirstNodeName("marathon");
+                        nodeName = servicesInstallationStatus.getFirstNodeName(MARATHON);
                     }
                     // last attempt, get it from theoretical perspective
                     if (StringUtils.isBlank(nodeName)) {
-                        nodeName = configurationService.loadNodesConfig().getFirstNodeName("marathon");
+                        nodeName = configurationService.loadNodesConfig().getFirstNodeName(MARATHON);
                     }
                 }
 
@@ -912,6 +913,8 @@ public class MarathonService {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 logger.debug(e.getMessage());
+                // Restore interrupted state...
+                Thread.currentThread().interrupt();
             }
         }
         if (i == MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS) {
