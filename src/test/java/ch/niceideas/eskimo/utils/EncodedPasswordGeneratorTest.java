@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.utils;
 import org.junit.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class EncodedPasswordGeneratorTest {
@@ -58,7 +59,13 @@ public class EncodedPasswordGeneratorTest {
 
     @Test
     public void testMain() {
-
+        Exception error = null;
+        try {
+            EncodedPasswordGenerator.main(new String[] {"password"});
+        } catch (Exception e) {
+            error = e;
+        }
+        assertNull (error);
     }
 
 }

@@ -193,7 +193,6 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
                 }
             }
         }
-
     };
 
     function showReinstallSelection() {
@@ -311,6 +310,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
             }
         });
     }
+    this.proceedWithMarathonInstallation = proceedWithMarathonInstallation;
 
     // inject constructor object in the end
     if (constructorObject != null) {

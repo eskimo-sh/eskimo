@@ -34,22 +34,26 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
@@ -107,6 +111,64 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         };
 
         return marathonService;
+    }
+
+    @Test
+    public void testInstallEskimoBaseSystem() throws Exception {
+
+        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
+            public void forceRecreateConnection(String ipAddress) {
+                // No-Op
+            }
+        });
+
+        StringBuilder sb = new StringBuilder();
+        nodesConfigurationService.installEskimoBaseSystem(sb, "192.168.10.11");
+
+
+        assertEquals (" - Copying jq program\n" +
+                " - Copying mesos-cli script\n" +
+                " - Copying gluster-mount script\n", sb.toString());
+
+        assertEquals ("192.168.10.11-./services_setup/base-eskimo/jq-1.6-linux64\n" +
+                "192.168.10.11-./services_setup/base-eskimo/mesos-cli.sh\n" +
+                "192.168.10.11-./services_setup/base-eskimo/gluster_mount.sh", testSCPCommands.toString().trim());
+
+        assertTrue (testSSHCommandScript.toString().startsWith("#!/bin/bash\n"));
+    }
+
+    @Test
+    public void testGetNodeFlavour() throws Exception {
+
+        AtomicReference command = new AtomicReference();
+
+        nodesConfigurationService.setSshCommandService(new SSHCommandService() {
+            @Override
+            public String runSSHScript(String hostAddress, String script) throws SSHCommandException {
+                return (String) command.get();
+            }
+        });
+
+        command.set("debian");
+        assertEquals ("debian", nodesConfigurationService.getNodeFlavour("192.168.10.11"));
+
+        command.set("redhat");
+        assertEquals ("redhat", nodesConfigurationService.getNodeFlavour("192.168.10.11"));
+
+        command.set("suse");
+        assertEquals ("suse", nodesConfigurationService.getNodeFlavour("192.168.10.11"));
+    }
+
+    @Test
+    public void testCopyCommand() throws Exception {
+
+        nodesConfigurationService.copyCommand("source", "target", "192.168.10.11");
+
+        assertEquals ("192.168.10.11-./services_setup/base-eskimo/source", testSCPCommands.toString().trim());
+        assertEquals ("sudo mv source target \n" +
+                "sudo chown root.root target \n" +
+                "sudo chmod 755 target \n", testSSHCommandScript.toString());
     }
 
     @Test

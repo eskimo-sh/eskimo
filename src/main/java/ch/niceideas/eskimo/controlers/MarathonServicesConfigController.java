@@ -65,7 +65,7 @@ public class MarathonServicesConfigController {
     public static final String PENDING_MARATHON_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
 
     @Autowired
-    private MarathonService marathonServicesConfigService;
+    private MarathonService marathonService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -92,11 +92,23 @@ public class MarathonServicesConfigController {
     private String enableMarathon = "true";
 
     /* For tests */
-    void setMarathonServicesConfigService(MarathonService marathonServicesConfigService) {
-        this.marathonServicesConfigService = marathonServicesConfigService;
+    void setMarathonService(MarathonService marathonService) {
+        this.marathonService = marathonService;
     }
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
+    }
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    void setSetupService(SetupService setupService) {
+        this.setupService = setupService;
+    }
+    void setConfigurationService (ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+    void setMarathonServicesConfigChecker (MarathonServicesConfigChecker marathonServicesConfigChecker) {
+        this.marathonServicesConfigChecker = marathonServicesConfigChecker;
     }
 
     @GetMapping("/load-marathon-services-config")
@@ -253,7 +265,7 @@ public class MarathonServicesConfigController {
 
             configurationService.saveMarathonServicesConfig(command.getRawConfig());
 
-            marathonServicesConfigService.applyMarathonServicesConfig(command);
+            marathonService.applyMarathonServicesConfig(command);
 
             return "{\"status\": \"OK\" }";
 

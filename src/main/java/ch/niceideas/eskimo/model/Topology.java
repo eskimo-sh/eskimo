@@ -180,9 +180,13 @@ public class Topology {
 
                 String serviceToList = addEnv.substring("ALL_NODES_LIST_".length());
 
+                String varName = addEnv.replace("-", "_");
+
                 String allAddresses = String.join(",", nodesConfig.getAllNodeAddressesWithService(serviceToList).toArray(new String[0]));
 
-                addEnvForService.put (addEnv, allAddresses);
+                if (StringUtils.isNotBlank(allAddresses)) {
+                    addEnvForService.put(varName, allAddresses);
+                }
 
             } else if (addEnv.equals("CONTEXT_PATH")) {
 

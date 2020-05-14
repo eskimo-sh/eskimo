@@ -39,7 +39,9 @@ public class MarathonService {
     private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
 
     public static final int MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS = 200;
+
     public static final String MARATHON_NA_FLAG = "MARATHON_NA";
+    public static final String MARATHON_CONTEXT = "apps/";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -233,7 +235,7 @@ public class MarathonService {
         return getAndWaitServiceRuntimeNode(service, 1);
     }
 
-    protected Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
+    protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws
             MarathonException  {
 
         ServicesInstallStatusWrapper servicesInstallStatus = null;
@@ -247,7 +249,7 @@ public class MarathonService {
         for (int i = 0; i < numberOfAttempts; i++) {
             String serviceJson = null;
             try {
-                serviceJson = queryMarathon("apps/" + service);
+                serviceJson = queryMarathon(MARATHON_CONTEXT + service);
             } catch (MarathonException e) {
                 if (e.getCause() != null) {
                     logger.warn("getAndWaitServiceRuntimeNode - Got " + e.getCause().getClass() + ":" + e.getCause().getMessage());
@@ -261,6 +263,8 @@ public class MarathonService {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         logger.debug (e, e);
+                        // Restore interrupted state...
+                        Thread.currentThread().interrupt();
                     }
                     continue;
                 } else {
@@ -284,6 +288,8 @@ public class MarathonService {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     logger.debug (e, e);
+                    // Restore interrupted state...
+                    Thread.currentThread().interrupt();
                 }
                 continue;
             }
@@ -292,7 +298,6 @@ public class MarathonService {
 
                 // service is not started by marathon, assuming it on marathon node
                 nodeIp = servicesInstallStatus.getFirstIpAddress("marathon");
-
             }
 
             String status = "notOK";
@@ -512,7 +517,7 @@ public class MarathonService {
 
         // 2. Stop service
         sb.append("Deleting marathon application for " + service + "\n");
-        String killResultString = queryMarathon("apps/"+service, "DELETE");
+        String killResultString = queryMarathon(MARATHON_CONTEXT + service, "DELETE");
         JsonWrapper killResult = new JsonWrapper(killResultString);
 
         String deploymentId = killResult.getValueForPathAsString("deploymentId");
@@ -670,7 +675,7 @@ public class MarathonService {
         }
 
         try {
-            String serviceJson = queryMarathon("apps/" + service.getName());
+            String serviceJson = queryMarathon(MARATHON_CONTEXT + service.getName());
 
             JsonWrapper serviceResult = new JsonWrapper(serviceJson);
 
@@ -806,7 +811,7 @@ public class MarathonService {
 
         } else {
 
-            String startResultString = updateMarathon("apps/" + service.getName(), "PATCH", "{ \"id\": \"/" + service.getName() + "\", \"instances\": 1}");
+            String startResultString = updateMarathon(MARATHON_CONTEXT + service.getName(), "PATCH", "{ \"id\": \"/" + service.getName() + "\", \"instances\": 1}");
             JsonWrapper startResult = new JsonWrapper(startResultString);
 
             String deploymentId = startResult.getValueForPathAsString("deploymentId");
@@ -845,7 +850,7 @@ public class MarathonService {
 
                 // 1. Kill all tasks for service
                 log.append("Killing tasks for " + service.getName() + "\n");
-                String killResultString = queryMarathon("apps/" + service.getName() + "/tasks?scale=true", "DELETE");
+                String killResultString = queryMarathon(MARATHON_CONTEXT + service.getName() + "/tasks?scale=true", "DELETE");
                 JsonWrapper killResult = new JsonWrapper(killResultString);
 
                 String deploymentId = killResult.getValueForPathAsString("deploymentId");

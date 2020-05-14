@@ -122,18 +122,16 @@ echo " - Handling topology and setting injection"
 handle_topology_settings spark-history-server spark_history_server_install_log
 
 echo " - Copying Topology Injection Script (Spark History)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologySparkHistory.sh spark-history-server:/usr/local/sbin/inContainerInjectTopologySparkHistory.sh >> spark_history_server_install_log 2>&1
-fail_if_error $? "spark_history_server_install_log" -20
-
-docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySparkHistory.sh" >> spark_history_server_install_log 2>&1
-fail_if_error $? "spark_history_server_install_log" -21
+docker_cp_script inContainerInjectTopologySparkHistory.sh sbin spark-history-server spark_history_server_install_log
 
 echo " - Copying inContainerMountGluster.sh scriot"
-docker cp $SCRIPT_DIR/inContainerMountGluster.sh spark-history-server:/usr/local/sbin/inContainerMountGluster.sh >> spark_history_server_install_log 2>&1
-fail_if_error $? "spark_history_server_install_log" -20
+docker_cp_script inContainerMountGluster.sh sbin spark-history-server spark_history_server_install_log
 
-docker exec --user root spark-history-server bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> spark_history_server_install_log 2>&1
-fail_if_error $? "spark_history_server_install_log" -21
+echo " - Copying glusterMountChecker.sh Script (Spark History)"
+docker_cp_script glusterMountChecker.sh sbin spark-history-server spark_history_server_install_log
+
+echo " - Copying containerWatchDog.sh script to container"
+docker_cp_script containerWatchDog.sh sbin spark-history-server spark_history_server_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark-history-server spark_history_server_install_log

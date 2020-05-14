@@ -41,12 +41,13 @@ Requires=docker.service
 [Service]
 TimeoutStartSec=0
 RemainAfterExit=false
+
 ExecStartPre=-/usr/bin/docker kill gluster
 ExecStartPre=-/usr/bin/docker rm -f gluster
+
 ExecStartPre=/bin/rm -f /var/run/gluster/gluster.pid
 
 ExecStart=/bin/bash -c "/usr/local/sbin/startGlusterServiceContainer.sh"
-
 
 ExecStop=/usr/bin/docker stop gluster
 

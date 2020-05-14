@@ -231,6 +231,183 @@ public class MarathonServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testGetAndWaitServiceRuntimeNode() throws Exception {
+
+        // 1. marathon down
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String queryMarathon(String endpoint) throws MarathonException {
+                throw new MarathonException("Marathon Down");
+            }
+        });
+        marathonService.setConfigurationService(new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        });
+
+        Pair<String, String> status = marathonService.getAndWaitServiceRuntimeNode ("cerebro", 1);
+        assertNotNull(status);
+        assertEquals("MARATHON_NA", status.getKey());
+        assertEquals("NA", status.getValue());
+
+        // 2. service does not exist
+        marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String queryMarathon(String endpoint) throws MarathonException {
+                return "{ \"message\" : \"cerebro does not exist\"} ";
+            }
+        });
+        marathonService.setConfigurationService(new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        });
+
+        status = marathonService.getAndWaitServiceRuntimeNode ("cerebro", 1);
+        assertNotNull(status);
+        assertEquals(null, status.getKey());
+        assertEquals("NA", status.getValue());
+
+        /* FIXME Find out why I cann't make this work
+        BUT DON'T CHANGE ANYTHOING IN THE CODE : WHAT I HAVE NOW WORKS !!
+        // 3. Service not up and running
+        marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String queryMarathon(String endpoint) throws MarathonException {
+                return "{ \"message\" : \"cerebro OK but no node\"} ";
+            }
+        });
+        marathonService.setConfigurationService(new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        });
+
+        status = marathonService.getAndWaitServiceRuntimeNode ("cerebro", 2); // 2 HERE IS IMPORTANT !!
+        assertNotNull(status);
+        assertEquals(null, status.getKey());
+        assertEquals("notOK", status.getValue());
+        */
+
+        // 4. Service in deployment
+        marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String queryMarathon(String endpoint) throws MarathonException {
+                return "{ \"app\" : { \"tasks\" : [ { \"host\" : \"192.168.10.20\" } ] } } ";
+            }
+        });
+        marathonService.setConfigurationService(new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        });
+
+        status = marathonService.getAndWaitServiceRuntimeNode ("cerebro", 1);
+        assertNotNull(status);
+        assertEquals("192.168.10.20", status.getKey());
+        assertEquals("notOK", status.getValue());
+
+        // 5. service running
+        marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String queryMarathon(String endpoint) throws MarathonException {
+                return "{ \"app\" : { \"tasks\" : [ { \"host\" : \"192.168.10.20\" } ], \"tasksRunning\": 1 } } ";
+            }
+        });
+        marathonService.setConfigurationService(new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        });
+
+        status = marathonService.getAndWaitServiceRuntimeNode ("cerebro", 1);
+        assertNotNull(status);
+        assertEquals("192.168.10.20", status.getKey());
+        assertEquals("running", status.getValue());
+    }
+
+    @Test
+    public void testEnsureMarathonAvailability() throws Exception {
+
+        // 1. no status available (exception)
+        marathonService.setSystemService(new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+                throw new StatusExceptionWrapperException (new Exception("none"));
+            }
+        });
+
+        MarathonException exception = assertThrows(MarathonException.class, () -> {
+            marathonService.ensureMarathonAvailability();
+        });
+        assertNotNull(exception);
+        assertEquals("Couldn't get last marathon Service status", exception.getMessage());
+
+        // 2. Marathon not available (not installed)
+        marathonService.setSystemService(new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+                return new SystemStatusWrapper("{}");
+            }
+        });
+
+        exception = assertThrows(MarathonException.class, () -> {
+            marathonService.ensureMarathonAvailability();
+        });
+        assertNotNull(exception);
+        assertEquals("Marathon is not available", exception.getMessage());
+
+        // 3. Marathon not up and running
+        marathonService.setSystemService(new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+                return new SystemStatusWrapper("{\"service_marathon_192-168-10-11\": \"KO\"}");
+            }
+        });
+
+        exception = assertThrows(MarathonException.class, () -> {
+            marathonService.ensureMarathonAvailability();
+        });
+        assertNotNull(exception);
+        assertEquals("Marathon is not properly running", exception.getMessage());
+
+        // 4. Service OK
+        marathonService.setSystemService(new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+                return new SystemStatusWrapper("{\"service_marathon_192-168-10-11\": \"OK\"}");
+            }
+        });
+
+        marathonService.ensureMarathonAvailability();
+    }
+
+    @Test
+    public void testWaitForServiceShutdown() throws Exception {
+
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
+                return new Pair<>("192.168.10.11", "notOk");
+            }
+        });
+
+        Exception error = null;
+        try {
+            marathonService.waitForServiceShutdown("cerebro");
+        } catch (Exception e) {
+            error = e;
+        }
+        assertNull (error);
+    }
+
+    @Test
     public void testUninstallMarathonService () throws Exception {
 
         final List<String> marathonApiCalls = new ArrayList<>();
@@ -302,8 +479,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusNominal () throws Exception {
 
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -311,7 +486,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
@@ -343,8 +517,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusServiceDown () throws Exception {
 
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -356,7 +528,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
@@ -388,8 +559,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusMarathonServiceDown () throws Exception {
 
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -397,7 +566,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
@@ -433,9 +601,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchMarathonServicesStatusMarathonNodeDown () throws Exception {
 
-
-        final List<String> marathonApiCalls = new ArrayList<>();
-
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
@@ -443,7 +608,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
             @Override
             protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
-                marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override

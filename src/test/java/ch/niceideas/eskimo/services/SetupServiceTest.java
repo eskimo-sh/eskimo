@@ -41,14 +41,13 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -181,16 +180,379 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         // Create mesos packages
         for (String mesosPackage : mesosPackages.split(",")) {
-            FileUtils.writeFile(new File(tempPackagesDistribPath + "/" + mesosPackage), "DUMMY");
+            FileUtils.writeFile(new File(tempPackagesDistribPath + "/eskimo_" + mesosPackage + "_1.8.1_1.tar.gz"), "DUMMY");
         }
 
         // no exception expected anymore
         setupService.ensureSetupCompleted();
     }
 
+    @Test
+    public void testBuildPackage() throws Exception {
+
+        File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
+        packageDevPathTest.delete();
+        packageDevPathTest.mkdirs();
+
+        setupService.setPackagesDevPathForTests(packageDevPathTest.getAbsolutePath());
+
+        FileUtils.writeFile(new File (packageDevPathTest.getAbsolutePath() + "/build.sh"),
+                "#!/bin/bash\n" +
+                "echo $@\n");
+
+        setupService.buildPackage("cerebro");
+
+        List<String> messages = messagingService.getSubList(0);
+        assertEquals (6, messages.size());
+
+        assertEquals("\nBuilding of package cerebro" +
+                    "," +
+                    "," +
+                    "Done : Building of package cerebro,-------------------------------------------------------------------------------," +
+                    "cerebro," +
+                    "--> Completed Successfuly.",
+                String.join(",", messages));
+
+        FileUtils.delete(packageDevPathTest);
+    }
 
     @Test
-    public void testApplySetup() throws Exception {
+    public void testDownloadPackage() throws Exception {
+
+        File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
+        packageDevPathTest.delete();
+        packageDevPathTest.mkdirs();
+
+        setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
+
+        setupService.downloadPackage("cerebro");
+
+        assertEquals (1, packageDevPathTest.listFiles().length);
+        assertEquals("cerebro", packageDevPathTest.listFiles()[0].getName());
+        assertEquals("TEST DOWNLOADED CONTENT", FileUtils.readFile(packageDevPathTest.listFiles()[0]));
+
+        FileUtils.delete(packageDevPathTest);
+    }
+
+    @Test
+    public void testReadConfigStoragePath() throws Exception {
+
+        File storagePathTest = File.createTempFile("test_setup_storage", "folder");
+        storagePathTest.delete();
+        storagePathTest.mkdirs();
+
+        setupService.setStoragePathConfDir(storagePathTest.getAbsolutePath());
+
+        assertNull (setupService.readConfigStoragePath());
+
+        FileUtils.writeFile(new File (storagePathTest, "storagePath.conf"), "/tmp/test");
+
+        assertEquals ("/tmp/test", setupService.readConfigStoragePath());
+    }
+
+    @Test
+    public void testFillInPackages() throws Exception {
+
+        JsonWrapper packagesVersion = new JsonWrapper(new JSONObject(new HashMap<String, Object>(){{
+            put ("cerebro", new JSONObject(new HashMap<String, Object>(){{
+                put ("software", "1.1");
+                put ("distribution", "1");
+            }}));
+            put ("elasticsearch", new JSONObject(new HashMap<String, Object>(){{
+                put ("software", "2.2");
+                put ("distribution", "2");
+            }}));
+            put ("kibana", new JSONObject(new HashMap<String, Object>(){{
+                put ("software", "3.3");
+                put ("distribution", "3");
+            }}));
+        }}));
+        Set<String> downloadPackages = new HashSet<>();
+        Set<String> missingServices = new HashSet<String>(){{
+            add("cerebro");
+            add("elasticsearch");
+            add("kibana");
+        }};
+
+        setupService.fillInPackages(downloadPackages, packagesVersion, missingServices);
+
+        assertEquals(3, downloadPackages.size());
+
+        List<String> sorted = new ArrayList<>(downloadPackages);
+        Collections.sort(sorted);
+
+        assertEquals("cerebro_1.1_1", sorted.get(0));
+        assertEquals("elasticsearch_2.2_2", sorted.get(1));
+        assertEquals("kibana_3.3_3", sorted.get(2));
+    }
+
+    @Test
+    public void testPrepareSetup() throws Exception {
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+                return new JsonWrapper(packagesVersionFile);
+            }
+        });
+
+        setupService.setApplicationStatusService(applicationStatusService);
+
+        JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
+
+        // 1. test build strategy
+
+        Set<String> downloadPackages = new HashSet<>();
+        Set<String> buildPackage = new HashSet<>();
+        Set<String> downloadMesos = new HashSet<>();
+        Set<String> buildMesos = new HashSet<>();
+        Set<String> packageUpdate = new HashSet<>();
+
+        setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
+
+        assertEquals(17, buildPackage.size());
+        assertEquals(3, buildMesos.size());
+
+        // 2. test download strategy
+        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        SetupException exception = assertThrows(SetupException.class, () -> {
+                setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
+        });
+
+        assertNotNull(exception);
+        assertEquals("Downloading packages is not supported on development version (SNAPSHOT)", exception.getMessage());
+    }
+
+    @Test
+    public void testCompareSoftwareVersion() throws Exception {
+
+        assertEquals(0, setupService.compareSoftwareVersion("1.1.1", "1.1.1"));
+        assertEquals(0, setupService.compareSoftwareVersion("1.1_1", "1.1_1"));
+        assertEquals(0, setupService.compareSoftwareVersion("1.1_a", "1.1_a"));
+        assertEquals(0, setupService.compareSoftwareVersion("8.a1", "8.a1"));
+        assertEquals(0, setupService.compareSoftwareVersion("abc", "abc"));
+        assertEquals(0, setupService.compareSoftwareVersion("a.b.1", "a.b.1"));
+
+        assertEquals(1, setupService.compareSoftwareVersion("1.1.2", "1.1.1"));
+        assertEquals(1, setupService.compareSoftwareVersion("1.1.10", "1.1.9"));
+        assertEquals(1, setupService.compareSoftwareVersion("1.10.1", "1.9.1"));
+        assertEquals(1, setupService.compareSoftwareVersion("abd", "abc"));
+        assertEquals(1, setupService.compareSoftwareVersion("1.1-abd", "1.1-abc"));
+
+        assertEquals(-1, setupService.compareSoftwareVersion("1.1.1", "1.1.2"));
+        assertEquals(-1, setupService.compareSoftwareVersion("1.1.9", "1.1.10"));
+        assertEquals(-1, setupService.compareSoftwareVersion("1.9.1", "1.10.1"));
+        assertEquals(-1, setupService.compareSoftwareVersion("abc", "abd"));
+        assertEquals(-1, setupService.compareSoftwareVersion("1.1-abc", "1.1-abd"));
+    }
+
+    @Test
+    public void testApplySetupHandleUpdates_NumericOrder() throws Exception {
+
+        final List<String> builtPackageList = new ArrayList<>();
+        final List<String> downloadPackageList = new ArrayList<>();
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected void buildPackage(String image) throws SetupException {
+                builtPackageList.add (image);
+            }
+            @Override
+            protected void downloadPackage(String fileName) throws SetupException {
+                downloadPackageList.add (fileName);
+            }
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+                JsonWrapper updateFile = new JsonWrapper(packagesVersionFile);
+                updateFile.setValueForPath("flink.software", "1.9.0");
+                return updateFile;
+            }
+            @Override
+            void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
+                // No-Op
+            }
+            @Override
+            void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
+                // No-Op
+            }
+            @Override
+            Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
+                return new Pair<>(new File ("package_" + packageName + ".tgz"), new Pair<>("1.10.1", "1"));
+            }
+        });
+
+        setupService.setApplicationStatusService(new ApplicationStatusService() {
+            public boolean isSnapshot() {
+                return false;
+            }
+        });
+
+        JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
+        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        setupService.setPackagesToBuild("flink");
+
+        setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
+
+        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        servicesDefinition.afterPropertiesSet();
+
+        setupService.setServicesDefinition(servicesDefinition);
+
+        setupService.applySetup(setupConfigWrapper);
+
+        // no update (installed flink is latest version !)
+        assertEquals(0, downloadPackageList.size());
+        assertEquals(0, builtPackageList.size());
+    }
+
+    @Test
+    public void testApplySetupHandleUpdates() throws Exception {
+
+        final List<String> builtPackageList = new ArrayList<>();
+        final List<String> downloadPackageList = new ArrayList<>();
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected void buildPackage(String image) throws SetupException {
+                builtPackageList.add (image);
+            }
+            @Override
+            protected void downloadPackage(String fileName) throws SetupException {
+                downloadPackageList.add (fileName);
+            }
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+                return new JsonWrapper(packagesVersionFile);
+            }
+            @Override
+            void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
+                // No-Op
+            }
+            @Override
+            void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
+                // No-Op
+            }
+            @Override
+            Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
+                return new Pair<>(new File ("package_" + packageName + ".tgz"), new Pair<>("1.0", "0"));
+            }
+        });
+
+        setupService.setApplicationStatusService(new ApplicationStatusService() {
+            public boolean isSnapshot() {
+                return false;
+            }
+        });
+
+        JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
+        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
+
+        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        servicesDefinition.afterPropertiesSet();
+
+        setupService.setServicesDefinition(servicesDefinition);
+
+        setupService.applySetup(setupConfigWrapper);
+
+        // 13 updated packages
+        assertEquals(13, downloadPackageList.size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
+        assertEquals(0, builtPackageList.size());
+
+        Collections.sort(downloadPackageList);
+        assertEquals(
+                "docker_template_elasticsearch_6.8.3_1.tar.gz, " +
+                "docker_template_flink_1.9.1_1.tar.gz, " +
+                "docker_template_gluster_debian_09_stretch_1.tar.gz, " +
+                "docker_template_grafana_6.3.3_1.tar.gz, " +
+                "docker_template_kafka-manager_2.0.0.2_1.tar.gz, " +
+                "docker_template_kafka_2.2.0_1.tar.gz, " +
+                "docker_template_kibana_6.8.3_1.tar.gz, " +
+                "docker_template_logstash_6.8.3_1.tar.gz, " +
+                "docker_template_mesos-master_1.8.1_1.tar.gz, " +
+                "docker_template_ntp_debian_09_stretch_1.tar.gz, " +
+                "docker_template_prometheus_2.10.0_1.tar.gz, " +
+                "docker_template_spark_2.4.4_1.tar.gz, " +
+                "docker_template_zookeeper_debian_09_stretch_1.tar.gz",
+            String.join(", ", downloadPackageList));
+    }
+
+    @Test
+    public void testApplySetupDownload() throws Exception {
+
+        final List<String> builtPackageList = new ArrayList<>();
+        final List<String> downloadPackageList = new ArrayList<>();
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected void buildPackage(String image) throws SetupException {
+                builtPackageList.add (image);
+            }
+            @Override
+            protected void downloadPackage(String fileName) throws SetupException {
+                downloadPackageList.add (fileName);
+            }
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+                return new JsonWrapper(packagesVersionFile);
+            }
+        });
+
+        setupService.setApplicationStatusService(new ApplicationStatusService() {
+            public boolean isSnapshot() {
+                return false;
+            }
+        });
+
+        JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
+        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        setupService.saveAndPrepareSetup(setupConfig);
+
+        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        servicesDefinition.afterPropertiesSet();
+
+        setupService.setServicesDefinition(servicesDefinition);
+
+        setupService.applySetup(setupConfigWrapper);
+
+        assertEquals(20, downloadPackageList.size());
+        assertEquals(0, builtPackageList.size());
+
+        Collections.sort(downloadPackageList);
+        assertEquals(
+                    "docker_template_base-eskimo_0.2_1.tar.gz, " +
+                    "docker_template_cerebro_0.8.4_1.tar.gz, " +
+                    "docker_template_elasticsearch_6.8.3_1.tar.gz, " +
+                    "docker_template_flink_1.9.1_1.tar.gz, " +
+                    "docker_template_gdash_0.0.1_1.tar.gz, " +
+                    "docker_template_gluster_debian_09_stretch_1.tar.gz, " +
+                    "docker_template_grafana_6.3.3_1.tar.gz, " +
+                    "docker_template_kafka-manager_2.0.0.2_1.tar.gz, " +
+                    "docker_template_kafka_2.2.0_1.tar.gz, " +
+                    "docker_template_kibana_6.8.3_1.tar.gz, " +
+                    "docker_template_logstash_6.8.3_1.tar.gz, " +
+                    "docker_template_mesos-master_1.8.1_1.tar.gz, " +
+                    "docker_template_ntp_debian_09_stretch_1.tar.gz, " +
+                    "docker_template_prometheus_2.10.0_1.tar.gz, " +
+                    "docker_template_spark_2.4.4_1.tar.gz, " +
+                    "docker_template_zeppelin_0.9.0_1.tar.gz, " +
+                    "docker_template_zookeeper_debian_09_stretch_1.tar.gz, " +
+                    "eskimo_mesos-debian_1.8.1_1.tar.gz, " +
+                    "eskimo_mesos-redhat_1.8.1_1.tar.gz, " +
+                    "eskimo_mesos-suse_1.8.1_1.tar.gz",
+                String.join(", ", downloadPackageList));
+    }
+
+    @Test
+    public void testApplySetupBuild() throws Exception {
 
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();

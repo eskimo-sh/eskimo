@@ -3,7 +3,6 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.log4j.Logger;
@@ -15,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -271,7 +273,7 @@ public class NodesConfigurationService {
         }
     }
 
-    private void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
+    void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
         sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
         sb.append(" - Copying jq program\n");
@@ -290,7 +292,7 @@ public class NodesConfigurationService {
         return sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-mesos.sh");
     }
 
-    private void copyCommand (String source, String target, String ipAddress) throws SSHCommandException {
+    void copyCommand (String source, String target, String ipAddress) throws SSHCommandException {
         sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/" + source);
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", source, target});
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", target});
@@ -501,7 +503,7 @@ public class NodesConfigurationService {
         sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", mode, file});
     }
 
-    private String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
+    String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
         // Find out if debian or RHEL or SUSE
         String flavour = null;
         String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");

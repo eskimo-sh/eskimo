@@ -37,6 +37,7 @@ Description=Flink Worker Initializer and Availability checker
 Wants=network-online.target
 After=docker.service
 Requires=docker.service
+After=gluster.service
 
 [Service]
 TimeoutStartSec=0

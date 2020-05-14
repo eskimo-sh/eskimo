@@ -124,6 +124,9 @@ fail_if_error $? "marathon_install_log" -2
 #docker exec -it marathon bash
 
 
+echo " - Copying containerWatchDog.sh script to container"
+docker_cp_script containerWatchDog.sh sbin marathon marathon_install_log
+
 echo " - Configuring marathon App Master container"
 docker exec marathon bash /scripts/inContainerSetupMarathon.sh $marathon_user_id $SELF_IP_ADDRESS | tee -a marathon_install_log 2>&1
 if [[ `tail -n 1 marathon_install_log` != " - In container config SUCCESS" ]]; then

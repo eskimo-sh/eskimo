@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.MemoryModel;
@@ -43,6 +45,13 @@ import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Set;
 
 public abstract class AbstractSystemTest {
@@ -83,6 +92,7 @@ public abstract class AbstractSystemTest {
 
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
+    protected StringBuilder testSCPCommands = new StringBuilder();
 
     protected String systemStatusTest = null;
     protected String expectedFullStatus = null;
@@ -139,6 +149,9 @@ public abstract class AbstractSystemTest {
         setupService.setConfigurationService (configurationService);
 
         applicationStatusService = new ApplicationStatusService();
+        applicationStatusService.setConfigurationService(configurationService);
+        applicationStatusService.setServicesDefinition(servicesDefinition);
+
         setupService.setApplicationStatusService(applicationStatusService);
 
         systemService = createSystemService();
@@ -166,9 +179,11 @@ public abstract class AbstractSystemTest {
             }
             @Override
             public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
-                // just do nothing
+                testSCPCommands.append(hostAddress + "-" + filePath + "\n");
             }
         };
+
+        setupService.setSystemService(systemService);
 
         messagingService = new MessagingService();
 
@@ -179,6 +194,8 @@ public abstract class AbstractSystemTest {
         systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
+
+        setupService.setSystemOperationService (systemOperationService);
 
         memoryComputer = new MemoryComputer() {
             @Override
@@ -242,7 +259,17 @@ public abstract class AbstractSystemTest {
     }
 
     protected SetupService createSetupService() {
-        return new SetupService();
+        return new SetupService(){
+            protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+                destinationFile.createNewFile();
+                try {
+                    FileUtils.writeFile(destinationFile, "TEST DOWNLOADED CONTENT");
+                } catch (FileException e) {
+                    logger.debug (e, e);
+                    throw new IOException(e);
+                }
+            }
+        };
     }
 
     protected SystemService createSystemService() {

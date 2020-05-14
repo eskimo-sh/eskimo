@@ -12,6 +12,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -38,7 +39,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketServerSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 
-        String uri = webSocketServerSession.getUri().toString();
+        String uri = Objects.requireNonNull(webSocketServerSession.getUri()).toString();
 
         int indexOfWs = uri.indexOf("/ws");
         int indexOfSlash = uri.indexOf('/', indexOfWs + 4);

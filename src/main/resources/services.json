@@ -67,7 +67,10 @@
         "mandatory": true
       }
     ],
-    "additionalEnvironment": [ "ALL_NODES_LIST_prometheus" ]
+    "additionalEnvironment": [
+      "ALL_NODES_LIST_prometheus",
+      "ALL_NODES_LIST_mesos-agent"
+    ]
   },
 
 

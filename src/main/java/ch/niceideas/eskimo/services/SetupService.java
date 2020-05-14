@@ -97,7 +97,7 @@ public class SetupService {
     private String packagesDevPath = "./packages_dev";
 
     @Value("${setup.packagesToBuild}")
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,flink,zeppelin,marathon";
 
     @Value("${setup.mesosPackages}")
     private String mesosPackages = "mesos-debian,mesos-redhat";
@@ -135,6 +135,12 @@ public class SetupService {
     void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
         this.applicationStatusService = applicationStatusService;
     }
+    void setPackagesDevPathForTests (String packagesDevPathForTest) {
+        this.packagesDevPath = packagesDevPathForTest;
+    }
+    void setSystemOperationService (SystemOperationService systemOperationService) {
+        this.systemOperationService = systemOperationService;
+    }
 
     void setStoragePathConfDir (String storagePathConfDir) {
         this.storagePathConfDir = storagePathConfDir;
@@ -157,17 +163,16 @@ public class SetupService {
         return packagesDownloadUrlRoot;
     }
 
-    private String readConfigStoragePath() {
+    String readConfigStoragePath() {
         // First read config storage path
         File entryFile = new File(storagePathConfDir + "/storagePath.conf");
         if (!entryFile.exists()) {
             logger.warn ("Application is not initialized properly. Missing file 'storagePath.conf' in backend working directory.");
             return null;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(entryFile))) {
-            return reader.readLine();
-
-        } catch (IOException e) {
+        try {
+            return FileUtils.readFile(entryFile).trim();
+        } catch (FileException e) {
             logger.error(e, e);
             return null;
         }
@@ -208,9 +213,12 @@ public class SetupService {
 
     void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
         for (String mesosPackage : mesosPackages.split(",")) {
-            if (Arrays.stream(packagesDistribFolder.listFiles())
+            if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
-                            file.getName().contains(mesosPackage) && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX))) {
+                            file.getName().contains(mesosPackage)
+                                    && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX)
+                                    && file.getName().endsWith(TAR_GZ_EXTENSION)
+                                    && file.getName().startsWith("eskimo_") )) {
                 missingServices.add(mesosPackage);
             }
         }
@@ -218,11 +226,12 @@ public class SetupService {
 
     void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
         for (String service : packagesToBuild.split(",")) {
-            if (Arrays.stream(packagesDistribFolder.listFiles())
+            if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
-                            file.getName().contains("docker_template")
+                            file.getName().startsWith("docker_template")
                                     && file.getName().contains("_"+service+"_")
-                                    && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX))) {
+                                    && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX)
+                                    && file.getName().endsWith(TAR_GZ_EXTENSION))) {
                 missingServices.add(service);
             }
         }
@@ -311,7 +320,8 @@ public class SetupService {
     }
 
     Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
-        List<File> imageFiles = Arrays.stream(packagesDistribFolder.listFiles())
+
+        List<File> imageFiles = Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                 .filter(file -> file.getName().contains(prefix) && file.getName().contains(packageName))
                 .collect(Collectors.toList());
 
@@ -418,9 +428,9 @@ public class SetupService {
                     String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
                     String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
 
-                    if (newSoftwareVersion.compareTo(lastVersionValues.getKey()) > 0
-                            || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
-                            && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
+                    if (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) > 0
+                            || (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) == 0
+                            && Integer.valueOf(newDistributionVersion).compareTo(Integer.valueOf (lastVersionValues.getValue())) > 0)) {
                         updates.add(imageName);
                     }
                 }
@@ -519,9 +529,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
 
-                        String fileName = DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION;
-
-                        downloadPackage(fileName);
+                        downloadPackage(DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
                 }
             }
@@ -549,9 +557,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".distribution");
 
-                        String fileName = "eskimo_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION;
-
-                        downloadPackage(fileName);
+                        downloadPackage("eskimo_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
 
                 } else {
@@ -582,12 +588,11 @@ public class SetupService {
                         String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
                         String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
 
-                        if (newSoftwareVersion.compareTo(lastVersionValues.getKey()) > 0
-                                || (newSoftwareVersion.compareTo(lastVersionValues.getKey()) == 0
-                                && newDistributionVersion.compareTo(lastVersionValues.getValue()) > 0)) {
+                        if (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) > 0
+                                || (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) == 0
+                                && Integer.valueOf(newDistributionVersion).compareTo(Integer.valueOf (lastVersionValues.getValue())) > 0)) {
 
-                            String fileName = DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION;
-                            downloadPackage(fileName);
+                            downloadPackage(DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION);
                         }
                     }
                 }
@@ -606,6 +611,39 @@ public class SetupService {
             systemService.setLastOperationSuccess (success);
             systemService.releaseProcessingPending();
         }
+    }
+
+    protected int compareSoftwareVersion (String firstVersion, String secondVersion) {
+
+        String[] unitsFirst = firstVersion.split("[,\\.\\-_]");
+        String[] unitsSecond = secondVersion.split("[,\\.\\-_]");
+
+        for (int i = 0; i < Math.max(unitsFirst.length, unitsSecond.length); i++) {
+
+            String unitFirst = i < unitsFirst.length ? unitsFirst[i] : null;
+            String unitSecond = i < unitsSecond.length ? unitsSecond[i] : null;
+
+            if (unitFirst == null) {
+                return -1;
+            }
+            if (unitSecond == null) {
+                return 1;
+            }
+
+            if (StringUtils.isIntegerValue(unitFirst) && StringUtils.isIntegerValue(unitSecond)) {
+                int comparison = Integer.valueOf(unitFirst).compareTo(Integer.valueOf(unitSecond));
+                if (comparison != 0) {
+                    return comparison;
+                }
+            } else {
+                int comparison = unitFirst.compareTo(unitSecond);
+                if (comparison != 0) {
+                    return comparison;
+                }
+            }
+        }
+
+        return 0;
     }
 
     protected void downloadPackage(String fileName) throws SetupException {

@@ -51,6 +51,8 @@ public class MarathonServicesConfigWrapper extends JsonWrapper implements Serial
 
     private static final Logger logger = Logger.getLogger(MarathonServicesConfigWrapper.class);
 
+    public static final String INSTALL_FLAG = "_install";
+
     public MarathonServicesConfigWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
     }
@@ -73,16 +75,16 @@ public class MarathonServicesConfigWrapper extends JsonWrapper implements Serial
 
     public Collection<String> getEnabledServices() {
         return getRootKeys().stream()
-                .filter(key -> key.contains("_install"))
+                .filter(key -> key.contains(INSTALL_FLAG))
                 .filter(key -> getValueForPath(key).equals("on"))
-                .map(key -> key.substring(0, key.indexOf("_install")))
+                .map(key -> key.substring(0, key.indexOf(INSTALL_FLAG)))
                 .collect(Collectors.toList());
     }
 
 
     public boolean isServiceInstallRequired( String service) {
-        return StringUtils.isNotBlank(getValueForPathAsString(service + "_install"))
-                && getValueForPath(service + "_install").equals("on");
+        return StringUtils.isNotBlank(getValueForPathAsString(service + INSTALL_FLAG))
+                && getValueForPath(service + INSTALL_FLAG).equals("on");
     }
 
     private static final class MarathonServicesConfigWrapperException extends RuntimeException {

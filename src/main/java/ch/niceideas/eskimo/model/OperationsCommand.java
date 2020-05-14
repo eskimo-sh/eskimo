@@ -134,7 +134,7 @@ public class OperationsCommand implements Serializable {
         // also add services simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().stream().forEach(installStatusFlag -> {
             Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
-            String installedService = serviceAndNodePair.getKey();
+            String installedService = Objects.requireNonNull(serviceAndNodePair).getKey();
             String status = (String) servicesInstallStatus.getValueForPath(installStatusFlag);
             if (status.equals("restart")) {
                 restartedServices.add (installedService);

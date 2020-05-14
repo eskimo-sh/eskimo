@@ -72,7 +72,7 @@ build_image zeppelin /tmp/zeppelin_build_log
 #fail_if_error $? "/tmp/zeppelin_build_log" -4
 
 echo " - Installing a few utilities"
-docker exec -i zeppelin apt-get install -y zip netcat >> /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin apt-get install -y zip netcat sshpass >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -11
 
 echo " - Installing python"

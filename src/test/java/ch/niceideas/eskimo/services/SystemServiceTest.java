@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -114,6 +115,95 @@ public class SystemServiceTest extends AbstractSystemTest {
         File configStoragePathFile = new File (dtempFileName.getAbsolutePath() + "/");
         configStoragePathFile.mkdirs();
         return configStoragePathFile.getAbsolutePath();
+    }
+
+    @Test
+    public void testShowJournal() throws Exception {
+        systemService.showJournal("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo journalctl -u elasticsearch", testSSHCommandScript.toString().trim());
+    }
+
+    @Test
+    public void testStartService() throws Exception {
+        systemService.startService("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo systemctl start elasticsearch", testSSHCommandScript.toString().trim());
+    }
+
+    @Test
+    public void testStopService() throws Exception {
+        systemService.stopService("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo systemctl stop elasticsearch", testSSHCommandScript.toString().trim());
+    }
+
+    @Test
+    public void testRestartService() throws Exception {
+        systemService.restartService("elasticsearch", "192.168.10.11");
+        assertEquals ("sudo systemctl restart elasticsearch", testSSHCommandScript.toString().trim());
+    }
+
+    @Test
+    public void testUpdateStatusWithMarathonException() throws Exception {
+
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        configurationService.saveNodesConfig(nodesConfig);
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+
+        systemService.setSshCommandService(new SSHCommandService() {
+            @Override
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+                testSSHCommandScript.append(script).append("\n");
+                if (script.equals("echo OK")) {
+                    return "OK";
+                }
+                if (script.startsWith("sudo systemctl status --no-pager -al")) {
+                    return systemStatusTest;
+                }
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+                testSSHCommandScript.append(command + "\n");
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+                // just do nothing
+            }
+        });
+
+        systemService.setMarathonService(new MarathonService() {
+            @Override
+            public void fetchMarathonServicesStatus
+                    (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
+                    throws MarathonException {
+                throw new MarathonException ("dummy");
+            }
+        });
+
+        systemService.updateStatus();
+
+        SystemStatusWrapper systemStatus = systemService.getStatus();
+
+        //System.err.println(systemStatus.getFormattedValue());
+
+        SystemStatusWrapper expectedStatusWrapper = new SystemStatusWrapper(expectedFullStatus);
+        for (String marathonService : servicesDefinition.listMarathonServices()) {
+            String prevValue = expectedStatusWrapper.getValueForPathAsString(SystemStatusWrapper.SERVICE_PREFIX + marathonService + "_192-168-10-11");
+            if (StringUtils.isNotBlank(prevValue) && prevValue.equals("OK")) {
+                expectedStatusWrapper.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + marathonService + "_192-168-10-11", "KO");
+            }
+        }
+        expectedStatusWrapper.removeRootKey(SystemStatusWrapper.SERVICE_PREFIX + "grafana_192-168-10-11");
+
+        //System.out.println(expectedStatusWrapper.getFormattedValue());
+
+        assertTrue(expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()));
     }
 
     @Test

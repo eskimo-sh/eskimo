@@ -161,7 +161,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSowReinstallSelection() throws Exception {
+    public void testShowReinstallSelection() throws Exception {
 
         testRenderMarathonConfig();
 
@@ -172,9 +172,100 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoMarathonServicesConfig.showReinstallSelection()");
 
-        System.err.println (page.getElementById("marathon-services-selection-body").asXml());
+        //System.err.println (page.getElementById("marathon-services-selection-body").asXml());
         assertEquals(
                 expectedMarathonSelectionTableContent.replace("  ", ""),
                 page.getElementById("marathon-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+    }
+
+    @Test
+    public void testShowMarathonServicesConfig() throws Exception {
+
+        // 1. setup not OK
+        page.executeJavaScript("eskimoMain.isSetupDone = function () { return false; }");
+        page.executeJavaScript("eskimoMain.showSetupNotDone = function () { window.setupNotDoneCalled = true; }");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        assertJavascriptEquals("true", "window.setupNotDoneCalled");
+
+        // 2. setup OK, operation in progress
+        page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
+        page.executeJavaScript("eskimoMain.isOperationInProgress = function () { return true; }");
+        page.executeJavaScript("eskimoMain.showProgressbar = function () { window.showProgressBarCalled = true; }");
+        page.executeJavaScript("$.ajax = function() {}");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        assertJavascriptEquals("true", "window.showProgressBarCalled");
+
+        // 3. data clear, setup
+        page.executeJavaScript("eskimoMain.isOperationInProgress = function () { return false; }");
+        page.executeJavaScript("$.ajax = function(object) { object.success( { 'clear': 'setup'}); }");
+        page.executeJavaScript("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        assertJavascriptEquals("true", "window.handleSetupNotCompletedCalled");
+
+        // 4. data clear, missing
+        page.executeJavaScript("window.handleSetupNotCompletedCalled = false;");
+        page.executeJavaScript("window.showProgressBarCalled = false;");
+        page.executeJavaScript("window.setupNotDoneCalled = false;");
+
+        page.executeJavaScript("$.ajax = function(object) { object.success( { 'clear': 'missing'}); }");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+
+        assertEquals (false, page.executeJavaScript("$('#kibana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#gdash_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#grafana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, page.executeJavaScript("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+
+        // 5. all good, all services selected
+        page.executeJavaScript("$.ajax = function(object) { object.success( {\n" +
+                "    \"cerebro_install\": \"on\",\n" +
+                        "    \"zeppelin_install\": \"on\",\n" +
+                        "    \"kafka-manager_install\": \"on\",\n" +
+                        "    \"kibana_install\": \"on\",\n" +
+                        "    \"gdash_install\": \"on\",\n" +
+                        "    \"spark-history-server_install\": \"on\",\n" +
+                        "    \"grafana_install\": \"on\"\n" +
+                        "} ); }");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+
+        assertEquals (true, page.executeJavaScript("$('#kibana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#gdash_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#grafana_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, page.executeJavaScript("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+    }
+
+    @Test
+    public void testProceedWithMarathonInstallation() throws Exception  {
+
+        testRenderMarathonConfig();
+
+        // 1. error
+        page.executeJavaScript("console.error = function (error) { window.consoleError = error; };");
+        page.executeJavaScript("$.ajax = function (object) { object.success ( { error: 'dGVzdEVycm9y' } );}");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.proceedWithMarathonInstallation ( { }, false);");
+
+        assertJavascriptEquals("testError", "window.consoleError");
+
+        // 2. pass command
+        page.executeJavaScript("eskimoMain.getMarathonOperationsCommand = function () { " +
+                "    return {" +
+                "        showCommand: function (command) {" +
+                "            window.command = command;" +
+                "        }" +
+                "    }" +
+                "};");
+
+        page.executeJavaScript("$.ajax = function (object) { object.success ( { command: 'testCommand' } );}");
+
+        page.executeJavaScript("eskimoMarathonServicesConfig.proceedWithMarathonInstallation ( { }, false);");
+
+        assertJavascriptEquals("testCommand", "window.command");
     }
 }

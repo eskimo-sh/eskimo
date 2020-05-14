@@ -155,7 +155,7 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.showJournalMarathon(service),
-                    serviceName + " has been restarted successfuly on marathon.");
+                    "Successfully shown journal of " +  serviceName + ".");
 
         } else {
             return performSystemOperation(
@@ -173,7 +173,7 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.startServiceMarathon(service),
-                    serviceName + " has been restarted successfuly on marathon.");
+                    serviceName + " has been started successfuly on marathon.");
 
         } else {
             return performSystemOperation(
@@ -190,7 +190,7 @@ public class SystemAdminController {
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.stopServiceMarathon(service),
-                    serviceName + " has been restarted successfuly on marathon.");
+                    serviceName + " has been stopped successfuly on marathon.");
 
         } else {
             return performSystemOperation(

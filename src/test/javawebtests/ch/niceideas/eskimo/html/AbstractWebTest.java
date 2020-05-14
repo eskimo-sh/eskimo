@@ -212,6 +212,8 @@ public abstract class AbstractWebTest {
                 "    || serviceName == 'zeppelin' ); " +
                 "};");
 
+        page.executeJavaScript("var eskimoSystemStatus = {};");
+
 
         page.executeJavaScript("var eskimoMain = {};");
         page.executeJavaScript("eskimoMain.handleSetupCompleted = function (){};");
@@ -230,6 +232,9 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.startOperationInProgress = function() {}");
         page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress = function() {}");
         page.executeJavaScript("eskimoMain.handleMarathonSubsystem = function() {}");
+        page.executeJavaScript("eskimoMain.showProgressbar = function() {}");
+
+        page.executeJavaScript("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 
         page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
                 "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +

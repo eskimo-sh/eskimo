@@ -42,7 +42,9 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class NotificationServiceTest extends TestCase {
+import static junit.framework.TestCase.assertEquals;
+
+public class NotificationServiceTest {
 
     private NotificationService ns = null;
 

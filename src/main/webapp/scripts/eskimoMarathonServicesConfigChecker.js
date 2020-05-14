@@ -42,7 +42,7 @@ function checkMarathonSetup (marathonSetupConfig, servicesDependencies, successC
         success: function (data, status, jqXHR) {
 
             try {
-                doCheckMarathonSetup (data, marathonSetupConfig, servicesDependencies, successCallback);
+                doCheckMarathonSetup (data, marathonSetupConfig, servicesDependencies);
 
                 if(successCallback && successCallback != null && successCallback instanceof Function) {
                     successCallback();

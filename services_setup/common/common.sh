@@ -34,6 +34,47 @@
 # Software.
 #
 
+# Copy a script to the docker container
+# Arguments are:
+# - $1 : the script to be copied. Needs to be in the service setup directory
+# - $2 : the folder to copy to under /usr/local
+# - $3 : the docker container to copy to
+# - $4 : the log file to log errors to
+docker_cp_script() {
+
+    if [[ $1 == "" ]]; then
+        echo "expected Script filename as first argument"
+        exit -1
+    fi
+    export SCRIPT=$1
+
+    if [[ $2 == "" ]]; then
+        echo "expected target folder as second argument"
+        exit -2
+    fi
+    export FOLDER=$2
+
+    if [[ $3 == "" ]]; then
+        echo "expected docker container name folder as third argument"
+        exit -3
+    fi
+    export CONTAINER=$3
+
+    if [[ $4 == "" ]]; then
+        echo "expected target folder as fourth argument"
+        exit -4
+    fi
+    export LOGFILE=$4
+
+    echo " - Copying $SCRIPT Script to $CONTAINER"
+    docker cp $SCRIPT_DIR/$SCRIPT $CONTAINER:/usr/local/$FOLDER/$SCRIPT >> $LOGFILE 2>&1
+    fail_if_error $? "$LOGFILE" -20
+
+    docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/$FOLDER/$SCRIPT" >> $LOGFILE 2>&1
+    fail_if_error $? "$LOGFILE" -21
+}
+
+
 # This function installs the topology related scripts
 # - inContainerInjectTopology.sh
 # - inContainerStartService.sh
