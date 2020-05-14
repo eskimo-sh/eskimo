@@ -670,6 +670,7 @@ eskimo.SystemStatus = function(constructorObject) {
             }
         })
     }
+    this.registerMenu = registerMenu;
 
     this.renderNodesStatusCarousel = function (data, blocking, availableNodes, nodeNamesByNbr) {
 

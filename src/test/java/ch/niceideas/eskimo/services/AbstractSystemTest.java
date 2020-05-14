@@ -92,6 +92,7 @@ public abstract class AbstractSystemTest {
 
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
+    protected StringBuilder testSCPCommands = new StringBuilder();
 
     protected String systemStatusTest = null;
     protected String expectedFullStatus = null;
@@ -178,7 +179,7 @@ public abstract class AbstractSystemTest {
             }
             @Override
             public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
-                // just do nothing
+                testSCPCommands.append(hostAddress + "-" + filePath + "\n");
             }
         };
 

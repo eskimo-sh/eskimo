@@ -52,10 +52,10 @@ sudo mkdir -p /var/log/gluster/
 sudo chmod 777 /var/log/gluster/
 
 echo " - Enabling spark user to call glusterMountCheckerPeriodic.sh"
-echo "spark  ALL = NOPASSWD: /bin/chown root /tmp/glusterMountCheckerPeriodic.sh" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh" >> /etc/sudoers.d/spark
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown root /tmp/glusterMountCheckerPeriodic.sh\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/spark"
 
 echo " - Defining history server configuration properties"
 sudo bash -c "echo -e \"\n#For the filesystem history provider, the directory containing application event logs to load.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

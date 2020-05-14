@@ -80,16 +80,32 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         // set services for tests
         page.executeJavaScript("eskimoSystemStatus.setStatusServices (STATUS_SERVICES);");
         page.executeJavaScript("eskimoSystemStatus.setServicesStatusConfig (SERVICES_STATUS_CONFIG);");
+
+        page.executeJavaScript("$('#inner-content-status').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-status').css('visibility', 'visible')");
     }
 
     @Test
-    public void testRenderNodesStatusEmpty() {
-        fail ("To be Implemented");
+    public void testRenderNodesStatusEmpty() throws Exception {
+
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatusEmpty()");
+
+        assertCssValue("#status-node-container-empty", "visibility", "inherit");
+        assertCssValue("#status-node-container-empty", "display", "inherit");
     }
 
     @Test
-    public void testRegisterMenu() {
-        fail ("To be Implemented");
+    public void testRegisterMenu() throws Exception {
+
+        testRenderNodesStatusTable();
+
+        Exception error = null;
+        try {
+            page.executeJavaScript("eskimoSystemStatus.registerMenu('#status-node-table-body td.status-node-cell', 'status-node-cell');");
+        } catch (Exception e) {
+            error = e;
+        }
+        assertNull(error);
     }
 
     @Test
