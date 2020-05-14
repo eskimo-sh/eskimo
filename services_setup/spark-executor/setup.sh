@@ -127,19 +127,10 @@ fi
 
 
 echo " - Copying Topology Injection Script (common)"
-docker cp $SCRIPT_DIR/inContainerInjectTopology.sh spark-executor:/usr/local/sbin/inContainerInjectTopology.sh >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -20
-
-docker exec --user root spark-executor bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -21
+docker_cp_script inContainerInjectTopology.sh sbin spark-executor spark_executor_install_log
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh spark-executor:/usr/local/sbin/settingsInjector.sh >> spark_executor_install_log 2>&1
-fail_if_error $? spark_executor_install_log -23
-
-docker exec --user root spark-executor bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> spark_executor_install_log 2>&1
-fail_if_error $? spark_executor_install_log -24
-
+docker_cp_script settingsInjector.sh sbin spark-executor spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark-executor spark_executor_install_log
@@ -210,32 +201,16 @@ fi
 #docker exec -it spark TODO
 
 echo " - Copying Topology Injection Script (Common)"
-docker cp $SCRIPT_DIR/inContainerInjectTopology.sh spark-mesos-shuffle-service:/usr/local/sbin/inContainerInjectTopology.sh >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -20
-
-docker exec --user root spark-mesos-shuffle-service bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -21
+docker_cp_script inContainerInjectTopology.sh sbin spark-mesos-shuffle-service spark_executor_install_log
 
 echo " - Copying Topology Injection Script (Mesos Shuffle)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologyMesosShuffle.sh spark-mesos-shuffle-service:/usr/local/sbin/inContainerInjectTopologyMesosShuffle.sh >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -20
-
-docker exec --user root spark-mesos-shuffle-service bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyMesosShuffle.sh" >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -21
+docker_cp_script inContainerInjectTopologyMesosShuffle.sh sbin spark-mesos-shuffle-service spark_executor_install_log
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh spark-mesos-shuffle-service:/usr/local/sbin/settingsInjector.sh >> spark_executor_install_log 2>&1
-fail_if_error $? spark_executor_install_log -23
-
-docker exec --user root spark-mesos-shuffle-service bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> spark_executor_install_log 2>&1
-fail_if_error $? spark_executor_install_log -24
+docker_cp_script settingsInjector.sh sbin spark-mesos-shuffle-service spark_executor_install_log
 
 echo " - Copying Service Start Script"
-docker cp $SCRIPT_DIR/inContainerStartMesosShuffleService.sh spark-mesos-shuffle-service:/usr/local/sbin/inContainerStartMesosShuffleService.sh>> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -20
-
-docker exec --user root spark-mesos-shuffle-service bash -c "chmod 755 /usr/local/sbin/inContainerStartMesosShuffleService.sh" >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -21
+docker_cp_script inContainerStartMesosShuffleService.sh sbin spark-mesos-shuffle-service spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark-mesos-shuffle-service spark_executor_install_log

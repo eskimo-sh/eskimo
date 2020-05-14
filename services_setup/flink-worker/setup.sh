@@ -124,18 +124,10 @@ fi
 
 
 echo " - Copying Topology Injection Script (common)"
-docker cp $SCRIPT_DIR/inContainerInjectTopology.sh flink-worker:/usr/local/sbin/inContainerInjectTopology.sh >> flink_worker_install_log 2>&1
-fail_if_error $? "flink_worker_install_log" -20
-
-docker exec --user root flink-worker bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> flink_worker_install_log 2>&1
-fail_if_error $? "flink_worker_install_log" -21
+docker_cp_script inContainerInjectTopology.sh sbin flink-worker flink_worker_install_log
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh flink-worker:/usr/local/sbin/settingsInjector.sh >> flink_worker_install_log 2>&1
-fail_if_error $? flink_worker_install_log -23
-
-docker exec --user root flink-worker bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> flink_worker_install_log 2>&1
-fail_if_error $? flink_worker_install_log -24
+docker_cp_script settingsInjector.sh sbin flink-worker flink_worker_install_log
 
 
 echo " - Committing changes to local template and exiting container flink"

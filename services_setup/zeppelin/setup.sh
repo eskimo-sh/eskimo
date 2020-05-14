@@ -171,40 +171,25 @@ fi
 
 
 echo " - Copying Topology Injection Script (Spark)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologySpark.sh zeppelin:/usr/local/sbin/inContainerInjectTopologySpark.sh >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -20
-
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologySpark.sh" >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -21
+docker_cp_script inContainerInjectTopologySpark.sh sbin zeppelin zeppelin_install_log
 
 echo " - Copying Topology Injection Script (Flink)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologyFlink.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyFlink.sh >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -20
-
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyFlink.sh" >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -21
+docker_cp_script inContainerInjectTopologyFlink.sh sbin zeppelin zeppelin_install_log
 
 echo " - Copying Service Start Script"
-docker cp $SCRIPT_DIR/inContainerStartService.sh zeppelin:/usr/local/sbin/inContainerStartService.sh >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -22
-
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -24
+docker_cp_script inContainerStartService.sh sbin zeppelin zeppelin_install_log
 
 echo " - Copying settingsInjector.sh Script"
-docker cp $SCRIPT_DIR/settingsInjector.sh zeppelin:/usr/local/sbin/settingsInjector.sh >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -23
-
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> zeppelin_install_log 2>&1
-fail_if_error $? zeppelin_install_log -24
+docker_cp_script settingsInjector.sh sbin zeppelin zeppelin_install_log
 
 echo " - Copying Topology Injection Script (Zeppelin)"
-docker cp $SCRIPT_DIR/inContainerInjectTopologyZeppelin.sh zeppelin:/usr/local/sbin/inContainerInjectTopologyZeppelin.sh >> zeppelin_install_log 2>&1
-fail_if_error $? "zeppelin_install_log" -20
+docker_cp_script inContainerInjectTopologyZeppelin.sh sbin zeppelin zeppelin_install_log
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopologyZeppelin.sh" >> zeppelin_install_log 2>&1
-fail_if_error $? "zeppelin_install_log" -21
+echo " - Copying glusterMountChecker.sh Script"
+docker_cp_script glusterMountChecker.sh sbin zeppelin zeppelin_install_log
 
+echo " - Copying containerWatchDog.sh script to container"
+docker_cp_script containerWatchDog.sh sbin zeppelin zeppelin_install_log
 
 if [[ -f /usr/local/bin/mesos-cli.sh ]]; then
     echo " - Copying mesos-cli"
@@ -226,13 +211,8 @@ if [[ -f /usr/local/bin/logstash-cli ]]; then
     fail_if_error $? zeppelin_install_log -24
 fi
 
-echo " - Copying inContainerMountGluster.sh scriot"
-docker cp $SCRIPT_DIR/inContainerMountGluster.sh zeppelin:/usr/local/sbin/inContainerMountGluster.sh >> zeppelin_install_log 2>&1
-fail_if_error $? "zeppelin_install_log" -20
-
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/sbin/inContainerMountGluster.sh" >> zeppelin_install_log 2>&1
-fail_if_error $? "zeppelin_install_log" -21
-
+echo " - Copying inContainerMountGluster.sh script"
+docker_cp_script inContainerMountGluster.sh sbin zeppelin zeppelin_install_log
 
 echo " - HACK import of rawe samples archived in docker container"
 docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> zeppelin_install_log 2>&1

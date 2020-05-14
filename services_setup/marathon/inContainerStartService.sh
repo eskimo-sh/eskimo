@@ -58,10 +58,10 @@ export LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS
 
 echo " - Starting Docker registry"
 docker-registry serve /etc/docker_registry/config.yml > /var/log/marathon/docker_registry/docker_registry.log 2>&1 &
-
-# TODO put in place some monitoring to kill container if docker registry goes down
+export DOCKER_REGISTRY_PID=$!
 
 echo " - Starting service"
+# giving 420000 ms timeout for task launch (7 minutes)
 /usr/local/lib/marathon/bin/marathon \
     --master zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos \
     --zk zk://$ZOOKEEPER_IP_ADDRESS:2181/marathon  \
@@ -70,6 +70,11 @@ echo " - Starting service"
     --task_launch_timeout 420000 \
     --zk_connection_timeout 15000 \
     --zk_session_timeout 15000 \
-    --hostname $SELF_IP_ADDRESS | tee /var/log/marathon/marathon.log
+    --hostname $SELF_IP_ADDRESS > /var/log/marathon/marathon.log 2>&1 &
+MARATHON_SERVICE=$!
 
-# giving 420000 ms timeout for task launch (7 minutes)
+echo " - Launching Watch Dog on gluster remote server"
+/usr/local/sbin/containerWatchDog.sh $DOCKER_REGISTRY_PID $MARATHON_SERVICE /var/log/marathon/docker-registry-watchdog.log &
+
+echo " - Now waiting on main process to exit"
+wait $MARATHON_SERVICE

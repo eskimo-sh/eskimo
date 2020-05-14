@@ -54,10 +54,33 @@ if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_
     exit -20
 fi
 
+echo " - Creating glusterMountCheckerPeriodic.sh script"
+cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
+#!/usr/bin/env bash
+while true; do
+     sleep 10
+     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
+done
+EOF
+sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
+sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
+sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
+
+echo " - Start glusterMountCheckerPeriodic.sh script"
+/bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
+export GLUSTER_MOUNT_CHECKER_PID=$!
+
 echo " - Mounting gluster shares for spark console"
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
 
 
 echo " - Starting service"
-/usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+/usr/local/lib/spark/sbin/start-history-server-wrapper.sh &
+export SPARK_HISTO_SERVICE=$!
+
+echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $SPARK_HISTO_SERVICE /var/log/spark/gluster-mount-checker-periodic-watchdog.log &
+
+echo " - Now waiting on main process to exit"
+wait $SPARK_HISTO_SERVICE

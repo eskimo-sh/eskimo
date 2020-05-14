@@ -100,11 +100,12 @@ echo " - Logstash Remote Server Scripts"
 for i in `find ./command_server`; do
     if [[ -f $SCRIPT_DIR/$i ]]; then
         filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> logstash_install_log 2>&1
-        docker exec logstash chmod 755 /usr/local/sbin/$filename >> logstash_install_log 2>&1
-        fail_if_error $? logstash_install_log -30
+        docker cp $SCRIPT_DIR/$i logstash:/usr/local/sbin/$filename >> /tmp/logstash_install_log 2>&1
+        docker exec logstash chmod 755 /usr/local/sbin/$filename >> /tmp/logstash_install_log 2>&1
+        fail_if_error $? /tmp/logstash_install_log -30
     fi
 done
+
 
 echo " - Configuring logstash container (common part)"
 docker exec logstash bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a logstash_install_log 2>&1

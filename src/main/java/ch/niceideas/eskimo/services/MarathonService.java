@@ -235,7 +235,7 @@ public class MarathonService {
         return getAndWaitServiceRuntimeNode(service, 1);
     }
 
-    protected Pair<String, String> getAndWaitServiceRuntimeNode (String service,int numberOfAttempts) throws
+    protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws
             MarathonException  {
 
         ServicesInstallStatusWrapper servicesInstallStatus = null;
@@ -298,7 +298,6 @@ public class MarathonService {
 
                 // service is not started by marathon, assuming it on marathon node
                 nodeIp = servicesInstallStatus.getFirstIpAddress("marathon");
-
             }
 
             String status = "notOK";

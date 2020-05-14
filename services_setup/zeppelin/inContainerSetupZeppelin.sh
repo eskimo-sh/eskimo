@@ -48,6 +48,10 @@ chown -R spark /usr/local/lib/zeppelin/conf/
 chown -R spark /usr/local/lib/zeppelin/interpreter/
 chown spark /usr/local/lib/zeppelin/
 
+echo " - creating gluster log dir (for gluster mount checker)"
+sudo mkdir -p /var/log/gluster/
+sudo chmod 777 /var/log/gluster/
+
 echo " - Enabling spark user to create /var/run/spark/zeppelin and chown it"
 bash -c "echo \"spark  ALL = NOPASSWD: /bin/mkdir -p /var/run/spark/zeppelin\" >> /etc/sudoers.d/spark"
 bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown spark /var/run/spark/zeppelin\" >> /etc/sudoers.d/spark"
@@ -57,6 +61,12 @@ bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/flink\" >> /etc/sudo
 bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_flink /var/lib/flink\" >> /etc/sudoers.d/spark"
 bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/elasticsearch\" >> /etc/sudoers.d/spark"
 bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_elasticsearch /var/lib/elasticsearch\" >> /etc/sudoers.d/spark"
+
+echo " - Enabling spark user to call glusterMountCheckerPeriodic.sh"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown root /tmp/glusterMountCheckerPeriodic.sh\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh\" >> /etc/sudoers.d/spark"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/spark"
 
 # zeppelin is not mounting /var/lib/spark from host but gluster shares inside
 # still need to be able to manipulate that directory !

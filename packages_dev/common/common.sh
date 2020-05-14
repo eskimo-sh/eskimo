@@ -79,6 +79,7 @@ export ZEPPELIN_VERSION_FULL=0.9.0-eskimo
 export ZEPPELIN_VERSION=0.9.0
 export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master
 
+
 # This functions ensures that internet is available on host machine (the one running eskimo)
 # Internet is indeed required to download source packages for services.
 check_for_internet() {

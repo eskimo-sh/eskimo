@@ -136,5 +136,28 @@ if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
     touch /var/lib/spark/data/zeppelin/samples_installed_flag.marker
 fi
 
+echo " - Creating glusterMountCheckerPeriodic.sh script"
+cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
+#!/usr/bin/env bash
+while true; do
+     sleep 10
+     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
+done
+EOF
+sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
+sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
+sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
+
+echo " - Start glusterMountCheckerPeriodic.sh script"
+/bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
+export GLUSTER_MOUNT_CHECKER_PID=$!
+
 echo " - Starting service"
-bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'
+bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh' &
+export ZEPPELIN_PID=$!
+
+echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $ZEPPELIN_PID /var/log/spark/zeppelin/gluster-mount-checker-periodic-watchdog.log &
+
+echo " - Now waiting on main process to exit"
+wait $ZEPPELIN_PID

@@ -69,6 +69,9 @@ fail_if_error $? "prometheus_install_log" -2
 # connect to container
 #docker exec -it prometheus bash
 
+echo " - Copying containerWatchDog.sh script to container"
+docker_cp_script containerWatchDog.sh sbin prometheus prometheus_install_log
+
 echo " - Configuring prometheus container"
 docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh | tee -a prometheus_install_log 2>&1
 if [[ `tail -n 1 prometheus_install_log` != " - In container config SUCCESS" ]]; then

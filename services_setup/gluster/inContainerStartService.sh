@@ -44,6 +44,14 @@ echo " - Inject settings"
 
 echo " - Starting gluster remote server"
 /usr/local/sbin/gluster_remote.sh &
+REMOTE_SERVER_PID=$!
 
 echo " - Starting service"
-/usr/sbin/glusterd -l /var/log/gluster/glusterfs.log -f /var/lib/gluster/glusterfs.VOLUME_FILE -N
+/usr/sbin/glusterd -l /var/log/gluster/glusterfs.log -f /var/lib/gluster/glusterfs.VOLUME_FILE -N &
+GLUSTER_SERVICE=$!
+
+echo " - Launching Watch Dog on gluster remote server"
+/usr/local/sbin/containerWatchDog.sh $REMOTE_SERVER_PID $GLUSTER_SERVICE /var/log/gluster/remote-server-watchdog.log &
+
+echo " - Now waiting on main process to exit"
+wait $GLUSTER_SERVICE

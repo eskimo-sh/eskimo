@@ -109,18 +109,26 @@ echo " - Starting mesos agent exporter"
     -addr :9106 \
     -slave http://$SELF_IP_ADDRESS:5051 \
     -logLevel info \
-    > /var/log/prometheus/mesos-agent-exporter.log 2>&1
+    > /var/log/prometheus/mesos-agent-exporter.log 2>&1 &
+export MESOS_AGENT_EXPORTER=$!
+
+# running watch dogs
+
+echo " - Launching Watch Dog on Node exporter"
+/usr/local/sbin/containerWatchDog.sh $NODE_EXPORTER_PROC_ID $MESOS_AGENT_EXPORTER /var/log/prometheus/node-exporter-watchdog.log &
+
+if [[ $MASTER_PROMETHEUS_1 == $SELF_IP_ADDRESS ]]; then
+    echo " - Launching Watch Dog on Node exporter"
+    /usr/local/sbin/containerWatchDog.sh $PROMETHEUS_PROC_ID $MESOS_AGENT_EXPORTER /var/log/prometheus/prometheus-watchdog.log &
+fi
+
+if [[ $MASTER_MESOS_MASTER_1 == $SELF_IP_ADDRESS ]]; then
+    echo " - Launching Watch Dog on Mesos Master"
+    /usr/local/sbin/containerWatchDog.sh $MESOS_MASTER_EXPORTER_PROC_ID $MESOS_AGENT_EXPORTER /var/log/prometheus/mesos-master-watchdog.log &
+fi
 
 
+echo " - Now waiting on main process to exit"
+wait $MESOS_AGENT_EXPORTER
 
 
-
-#export NODE_EXPORTER_PROC_ID=$!
-#
-#echo " - Checking Node Exporter startup"
-#sleep 4
-#if [[ `ps -e | grep $NODE_EXPORTER_PROC_ID` == "" ]]; then
-#    echo " !! Failed to start Node Exporter !!"
-#    cat /var/log/prometheus/node-exporter.log
-#    exit -7
-#fi
