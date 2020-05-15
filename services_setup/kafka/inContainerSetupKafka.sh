@@ -93,10 +93,9 @@ create_binary_wrapper /usr/local/lib/kafka/bin/kafka-consumer-perf-test.sh /usr/
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-delegation-tokens.sh /usr/local/bin/kafka-delegation-tokens.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-delete-records.sh /usr/local/bin/kafka-delete-records.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-dump-log.sh /usr/local/bin/kafka-dump-log.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-log-dirs.sh /usr/local/lib/kafka-log-dirs.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-log-dirs.sh /usr/local/bin/kafka-log-dirs.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-producer-perf-test.sh /usr/local/bin/kafka-producer-perf-test.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-run-class.sh /usr/local/bin/kafka-run-class.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-simple-consumer-shell.sh /usr/local/bin/kafka-simple-consumer-shell.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-topics.sh /usr/local/bin/kafka-topics.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-verifiable-consumer.sh /usr/local/bin/kafka-verifiable-consumer.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-verifiable-producer.sh /usr/local/bin/kafka-verifiable-producer.sh
@@ -105,13 +104,13 @@ create_binary_wrapper /usr/local/lib/kafka/bin/trogdor.sh /usr/local/bin/kafka-t
 
 echo " - Creating kafka system binaries wrappers to /usr/local/sbin"
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-acls.sh /usr/local/sbin/kafka-acls.sh
+create_binary_wrapper /usr/local/lib/kafka/bin/kafka-configs.sh /usr/local/sbin/kafka-configs.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/sbin/kafka-server-start.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-server-stop.sh /usr/local/sbin/kafka-server-stop.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-configs.sh /usr/local/sbin/kafka-configs.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-mirror-maker.sh /usr/local/sbin/kafka-mirror-maker.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-preferred-replica-election.sh /usr/local/sbin/kafka-preferred-replica-election.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-reassign-partitions.sh /usr/local/sbin/kafka-reassign-partitions.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-replay-log-producer.sh /usr/local/sbin/kafka-replay-log-producer.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-replica-verification.sh /usr/local/sbin/kafka-replica-verification.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-streams-application-reset.sh /usr/local/sbin/kafka-streams-application-reset.sh
 

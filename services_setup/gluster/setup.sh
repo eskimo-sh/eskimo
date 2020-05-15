@@ -157,6 +157,26 @@ sudo cp startGlusterServiceContainer.sh /usr/local/sbin/startGlusterServiceConta
 sudo chown root /usr/local/sbin/startGlusterServiceContainer.sh
 sudo chmod 755 /usr/local/sbin/startGlusterServiceContainer.sh
 
+echo " - Creating glusterMountCheckerPeriodic.sh script"
+cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
+#!/usr/bin/env bash
+while true; do
+     sleep 10
+     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
+done
+EOF
+sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
+sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
+sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
+
+if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountCheckerPeriodic` == "" ]]; then
+    echo " - Scheduling periodic execution of glusterMountCheckerPeriodic using crontab"
+    sudo rm -f /tmp/crontab
+    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+    sudo bash -c "echo \"* * * * * /usr/local/sbin/glusterMountCheckerPeriodic\" >> /tmp/crontab"
+    sudo crontab -u root /tmp/crontab
+fi
+
 
 #echo " - Installing and checking systemd service file"
 install_and_check_service_file gluster gluster_install_log
