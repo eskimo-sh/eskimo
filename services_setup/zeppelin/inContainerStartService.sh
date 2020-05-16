@@ -140,12 +140,11 @@ echo " - Start glusterMountCheckerPeriodic.sh script"
 /bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
 export GLUSTER_MOUNT_CHECKER_PID=$!
 
-echo " - Starting service"
-bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh' &
-export ZEPPELIN_PID=$!
-
 echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
-/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $ZEPPELIN_PID /var/log/spark/zeppelin/gluster-mount-checker-periodic-watchdog.log &
+/usr/local/sbin/containerWatchDog.sh \
+     $GLUSTER_MOUNT_CHECKER_PID \
+     "ps -efl | grep java | grep org.apache.zeppelin.server.ZeppelinServer | grep -v bash | sed -E 's/[0-9a-zA-Z]{1} [0-9a-zA-Z]{1} spark *([0-9]+).*/\1/'" \
+     /var/log/spark/zeppelin/gluster-mount-checker-periodic-watchdog.log &
 
-echo " - Now waiting on main process to exit"
-wait $ZEPPELIN_PID
+echo " - Starting service"
+bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'

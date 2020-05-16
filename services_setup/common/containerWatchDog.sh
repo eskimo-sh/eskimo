@@ -43,9 +43,11 @@
 # Here comes the Watch Dog, it monitors a background process carefully and kills the main container process in case
 # the background process dies.
 # The Watch Dog takes both process IDs in argument
-# - the first PID is the background process to be monitored
-# - the second PID if the process to be killed in case the monitored background process vanishes
-# A third argument is passed to log actions in the given log file
+# - the first parameter is the PID is the background process to be monitored
+# - the second parameter is
+#   + either PID if the process to be killed in case the monitored background process vanishes
+#   + or a command enabling to find that PID at runtime
+# - A third argument is passed to log actions in the given log file
 #
 # A Watch Dog command should be invoked in background as well AFTER all the container process have been launched in
 # background and BEFORE waiting on the main process.
@@ -63,14 +65,35 @@ if [[ "$2" == "" ]]; then
 fi
 
 if [[ "$3" == "" ]]; then
-    echo "Expected logfile path to log actions as second argument"
-    exit -2
+    echo "Expected logfile path to log actions as third argument"
+    exit -3
 fi
 
 
 export BACKGROUND_PID=$1
 export MAIN_PID=$2
 export LOG_FILE=$3
+
+case $MAIN_PID in
+    ''|*[!0-9]*)
+        echo `date +"%Y-%m-%d %H:%M:%S"`" - Passed MAIN_PID is a command, need to use it to find PID" >> $LOG_FILE
+        sleep 10 # need to give a chance to the target process to start
+        MAIN_PID=`eval $MAIN_PID`
+        case $MAIN_PID in
+            ''|*[!0-9]*)
+                echo `date +"%Y-%m-%d %H:%M:%S"`" - Could not resolve MAIN_PID to a process ID ($MAIN_PID). Killing $BACKGROUND_PID and crashing..." >> $LOG_FILE
+                kill -15 $BACKGROUND_PID >> $LOG_FILE 2>&1
+                exit -11
+            ;;
+            *)
+                echo `date +"%Y-%m-%d %H:%M:%S"`" - Found MAIN_PID=$MAIN_PID" >> $LOG_FILE
+            ;;
+        esac
+    ;;
+    *)
+        echo `date +"%Y-%m-%d %H:%M:%S"`"Passed MAIN_PID is a process ID, good to go..." >> $LOG_FILE
+    ;;
+esac
 
 # make sure this process never exist
 set +e
@@ -79,7 +102,7 @@ while true; do
 
     sleep 10
 
-    if [[ `ps -o pid= -p $BACKGROUND_PID 2>$LOG_FILE` == "" ]]; then
+    if [[ `ps -o pid= -p $BACKGROUND_PID 2>>$LOG_FILE` == "" ]]; then
 
         echo `date +"%Y-%m-%d %H:%M:%S"`" - Process with PID $BACKGROUND_PID could not be found Killing $MAIN_PID" \
                 >> $LOG_FILE
@@ -89,7 +112,7 @@ while true; do
         break
     fi
 
-    if [[ `ps -o pid= -p $MAIN_PID 2>$LOG_FILE` == "" ]]; then
+    if [[ `ps -o pid= -p $MAIN_PID 2>>$LOG_FILE` == "" ]]; then
 
         echo `date +"%Y-%m-%d %H:%M:%S"`" - Process with PID $MAIN_PID could not be found Killing $BACKGROUND_PID" \
                 >> $LOG_FILE
