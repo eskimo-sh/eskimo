@@ -361,7 +361,8 @@ function build_container() {
 # - $2 the wrapper location
 function create_binary_wrapper(){
     if [[ $1 == "" || $2 == "" ]]; then
-        echo "source and target have to be passed as argument of the create_kafka_wrapper function"
+        echo "source and target have to be passed as argument of the create_binary_wrapper function"
+        exit -2
     else
         touch $2
         chmod 777 $2

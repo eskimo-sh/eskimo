@@ -203,4 +203,16 @@ public class CommonDevShellTest {
         }
     }
 
+    @Test
+    public void testCreateBinaryWrapper() throws Exception {
+        createTestScript("create_binary_wrapper.sh", "" +
+                "create_binary_wrapper /bin/pwd $SCRIPT_DIR/pwd.sh \n" +
+                ". $SCRIPT_DIR/pwd.sh;\n"
+                );
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/create_binary_wrapper.sh"}, true);
+
+        // no error reported
+        assertEquals(jailPath+"\n", result);
+    }
 }
