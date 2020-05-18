@@ -107,39 +107,6 @@ check_for_docker() {
     fi
 }
 
-# This function ensures that vagrant is available on host machine (the one running eskimo)
-# vagrant is required to build Mesos.
-check_for_vagrant() {
-    if [ -x "$(command -v vagrant)" ]; then
-        echo "Found vagrant : "`vagrant -v`
-    else
-        echo "Vagrant is not available on system"
-        exit -1
-    fi
-}
-
-# This function ensures that VirtualBox is available on host machine (the one running eskimo)
-# VirtualBox is required to build mesos.
-check_for_virtualbox() {
-    if [ -x "$(command -v VBoxManage)" ]; then
-        echo "Found virtualbox : "`VBoxManage -v`
-    else
-
-        if [[ -f /etc/debian_version ]]; then
-            if [[ `dpkg-query -l '*virtualbox*' | grep ii` == "" ]]; then
-                echo "This setup requires VirtualBox installed and ready on the host machine"
-                exit -2
-            fi
-        else
-            # workds for both RHEL and suse
-            if [[ `rpm -qa | grep 'virtualbox'` == "" ]]; then
-                echo "This setup requires VirtualBox installed and ready on the host machine"
-                exit -3
-            fi
-        fi
-    fi
-}
-
 # This function is used after proper building of a service image to close the image and save it
 # Arguments are:
 # - $1 the image name
@@ -183,7 +150,7 @@ function close_and_save_image() {
 
     # save base image
     echo " - Saving image $1_template"
-	set -e
+	if [[ -z $TEST_MODE ]]; then set -e; fi
     docker save eskimo:$1_template | gzip >  ../../packages_distrib/tmp_image_$1_TEMP.tar.gz
     set +e
 
