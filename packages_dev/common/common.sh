@@ -117,55 +117,58 @@ function close_and_save_image() {
         echo "Image needs to be passed in argument"
         exit -2
     fi
+    IMAGE=$1
 
 	if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
         exit -2
     fi
+    LOG_FILE=$2
 
     if [[ $3 == "" ]]; then
         echo "Software version needs to be passed in argument"
         exit -3
     fi
+    VERSION=$3
 	
     echo " - Cleaning apt cache"
-    docker exec -i $1 apt-get clean -q >> $2 2>&1
-    fail_if_error $? $2 -2
+    docker exec -i $IMAGE apt-get clean -q >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -2
 
     # Exit the container and commit the changes
     # Now that we've modified the container we have to commit the changes. First exit the container with the command exit.
     # To commit the changes and create a new image based on said changes, issue the command:
-    echo " - Comitting changes from container $1 on image $1_template"
-    docker commit $1 eskimo:$1_template >> $2 2>&1
-    fail_if_error $? $2 -3
+    echo " - Comitting changes from container $IMAGE on image "$IMAGE"_template"
+    docker commit $IMAGE eskimo:"$IMAGE"_template >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -3
 
     # Stop container and delete image
-    echo " - Stopping container $1"
-    docker stop $1 >> $2 2>&1
-    fail_if_error $? $2 -4
+    echo " - Stopping container $IMAGE"
+    docker stop $IMAGE >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -4
 
-    echo " - removing container $1"
-    docker container rm $1 >> $2 2>&1
-    fail_if_error $? $2 -5
+    echo " - removing container $IMAGE"
+    docker container rm $IMAGE >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -5
 
     # save base image
-    echo " - Saving image $1_template"
+    echo " - Saving image "$IMAGE"_template"
 	if [[ -z $TEST_MODE ]]; then set -e; fi
-    docker save eskimo:$1_template | gzip >  ../../packages_distrib/tmp_image_$1_TEMP.tar.gz
+    docker save eskimo:"$IMAGE"_template | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
     set +e
 
     echo " - versioning image"
     for i in `seq 1 100`; do
-        if [[ ! -f "../../packages_distrib/docker_template_$1_$3_$i.tar.gz" ]]; then
-            mv ../../packages_distrib/tmp_image_$1_TEMP.tar.gz ../../packages_distrib/docker_template_$1_$3_$i.tar.gz
+        if [[ ! -f "../../packages_distrib/docker_template_"$IMAGE"_"$VERSION"_$i.tar.gz" ]]; then
+            mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_"$IMAGE"_"$VERSION"_$i.tar.gz
             break;
         fi
     done
 
     #docker image rm `cat id_file`
-    echo " - removing image $1_template"
-    docker image rm eskimo:$1_template >> $2 2>&1
-    fail_if_error $? $2 -6
+    echo " - removing image "$IMAGE"_template"
+    docker image rm eskimo:"$IMAGE"_template >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -6
 
 }
 
@@ -179,11 +182,13 @@ function build_image() {
         echo "Image needs to be passed in argument"
         exit -2
     fi
+    IMAGE=$1
 	
 	if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
         exit -2
     fi
+    LOG_FILE=$2
 
     if [[ -z "$NO_BASE_IMAGE" ]]; then
         echo " - Checking if base eskimo image is available"
@@ -191,71 +196,81 @@ function build_image() {
             echo " - Trying to loads base eskimo image"
             for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
                 echo "   + loading image $i"
-                gunzip -c $i | docker load >> $2 2>&1
-                fail_if_error $? $2 -10
+                gunzip -c $i | docker load >> $LOG_FILE 2>&1
+                fail_if_error $? $LOG_FILE -10
             done
         fi
     fi
 
     echo " - Deleting any previous containers"
-    if [[ `docker ps -a -q -f name=$1` != "" ]]; then
-        docker stop $1 > /dev/null 2>&1
-        docker container rm $1 > /dev/null 2>&1
+    if [[ `docker ps -a -q -f name=$IMAGE` != "" ]]; then
+        docker stop $IMAGE > /dev/null 2>&1
+        docker container rm $IMAGE > /dev/null 2>&1
     fi
 
     # build
-    echo " - building docker image $1"
-    docker build --iidfile id_file --tag eskimo:$1_template .  >> $2 2>&1
-    fail_if_error $? $2 -11
+    echo " - building docker image $IMAGE"
+    docker build --iidfile id_file --tag eskimo:"$IMAGE"_template .  >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -11
 
     export TMP_FOLDER=/tmp
     if [[ ! -z "$BUILD_TEMP_FOLDER" ]]; then
         export TMP_FOLDER=$BUILD_TEMP_FOLDER
 
         echo " - making sure I can write in $BUILD_TEMP_FOLDER"
-        touch $BUILD_TEMP_FOLDER/test >> $2 2>&1
-        fail_if_error $? $2 -11
+        touch $BUILD_TEMP_FOLDER/test >> $LOG_FILE 2>&1
+        fail_if_error $? $LOG_FILE -11
     fi
 
-    echo " - Starting container $1_template"
+    echo " - Starting container "$IMAGE"_template"
     # create and start container
     docker run \
             --privileged \
             -v $PWD:/scripts \
             -v $PWD/../common:/common  \
             -v $TMP_FOLDER:/tmp \
-            -d --name $1 \
+            -d --name $IMAGE \
             -i \
-            -t eskimo:$1_template bash  >> $2 2>&1
-    fail_if_error $? $2 -12
+            -t eskimo:"$IMAGE"_template bash  >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -12
 
 }
 
-# This function is to build a command wrapper around a command that needs to be called from a specific directory
-# Arguments are:
-# - $1 the source command to wrap
-# - $2 the target wrapper to create
+## This is used to create a command wrapper around a binary command in order to
+# - change the current directory to the command software installation location
+# - inject topology
+# Arguments:
+# - $1 the source binary command to be wrapped
+# - $2 the wrapper location
 function create_binary_wrapper(){
+
     if [[ $1 == "" || $2 == "" ]]; then
-        echo "source and target have to be passed as argument of the create_binary_wrapper function"
+        echo "target and wrapper have to be passed as argument of the create_binary_wrapper function"
         exit -2
-    else
-        touch $2
-        chmod 777 $2
-        echo -e '#!/bin/bash' > $2
-        echo -e "" >> $2
-        echo -e "__tmp_saved_dir=`pwd`" >> $2
-        echo -e "function __tmp_returned_to_saved_dir() {" >> $2
-        echo -e '     cd $__tmp_saved_dir' >> $2
-        echo -e "}" >> $2
-        echo -e "trap __tmp_returned_to_saved_dir 15" >> $2
-        echo -e "trap __tmp_returned_to_saved_dir EXIT" >> $2
-        echo -e "" >> $2
-        echo -e "$1 \"\$@\"" >> $2
-        echo -e "" >> $2
-        echo -e "__tmp_returned_to_saved_dir" >> $2
-        chmod 755 $2
     fi
+    TARGET=$1
+    WRAPPER=$2
+
+    touch $WRAPPER
+    chmod 777 $WRAPPER
+    echo -e '#!/bin/bash' > $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then" >> $WRAPPER
+    echo -e "    # Injecting topoloy" >> $WRAPPER
+    echo -e "    . /usr/local/sbin/inContainerInjectTopology.sh" >> $WRAPPER
+    echo -e "fi" >> $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "__tmp_saved_dir=`pwd`" >> $WRAPPER
+    echo -e "function __tmp_returned_to_saved_dir() {" >> $WRAPPER
+    echo -e '     cd $__tmp_saved_dir' >> $WRAPPER
+    echo -e "}" >> $WRAPPER
+    echo -e "trap __tmp_returned_to_saved_dir 15" >> $WRAPPER
+    echo -e "trap __tmp_returned_to_saved_dir EXIT" >> $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "$TARGET \"\$@\"" >> $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "__tmp_returned_to_saved_dir" >> $WRAPPER
+    chmod 755 $WRAPPER
 }
 
 

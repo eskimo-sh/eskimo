@@ -89,32 +89,34 @@ function handle_topology_settings() {
         echo "Container needs to be passed in argument"
         exit -2
     fi
+    export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit -3
     fi
+    export LOG_FILE=$2
 
     echo " - Copying Topology Injection Script"
-    docker cp $SCRIPT_DIR/inContainerInjectTopology.sh $1:/usr/local/sbin/inContainerInjectTopology.sh >> $2 2>&1
-    fail_if_error $? $2 -20
+    docker cp $SCRIPT_DIR/inContainerInjectTopology.sh $CONTAINER:/usr/local/sbin/inContainerInjectTopology.sh >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -20
 
-    docker exec --user root $1 bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> $2 2>&1
-    fail_if_error $? $2 -21
+    docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -21
 
     echo " - Copying Service Start Script"
-    docker cp $SCRIPT_DIR/inContainerStartService.sh $1:/usr/local/sbin/inContainerStartService.sh >> $2 2>&1
-    fail_if_error $? $2 -22
+    docker cp $SCRIPT_DIR/inContainerStartService.sh $CONTAINER:/usr/local/sbin/inContainerStartService.sh >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -22
 
-    docker exec --user root $1 bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> $2 2>&1
-    fail_if_error $? $2 -24
+    docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -24
 
     echo " - Copying settingsInjector.sh Script"
-    docker cp $SCRIPT_DIR/settingsInjector.sh $1:/usr/local/sbin/settingsInjector.sh >> $2 2>&1
-    fail_if_error $? $2 -23
+    docker cp $SCRIPT_DIR/settingsInjector.sh $CONTAINER:/usr/local/sbin/settingsInjector.sh >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -23
 
-    docker exec --user root $1 bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> $2 2>&1
-    fail_if_error $? $2 -24
+    docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -24
 }
 
 # This is used to load the topology definition file
@@ -138,59 +140,60 @@ function deploy_marathon() {
         echo "Container needs to be passed in argument"
         exit -2
     fi
+    export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit -3
     fi
+    export LOG_FILE=$2
 
-    echo " - Deploying $1 Service in docker registry for marathon"
-    docker tag eskimo:$1 marathon.registry:5000/$1 >> $2 2>&1
+    echo " - Deploying $CONTAINER Service in docker registry for marathon"
+    docker tag eskimo:$CONTAINER marathon.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not re-tag marathon container image"
         exit -30
     fi
 
-    docker push marathon.registry:5000/$1 >> $2 2>&1
+    docker push marathon.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         echo "Image push in docker registry failed !"
         exit -22
     fi
 
     echo " - removing local image"
-    docker image rm eskimo:$1  >> $2 2>&1
+    docker image rm eskimo:$CONTAINER  >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         echo "local image removal failed !"
         exit -32
     fi
 
-
-    echo " - Removing any previously deployed $1 service from marathon"
-    curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$1 >> $2_marathon_deploy 2>&1
+    echo " - Removing any previously deployed $CONTAINER service from marathon"
+    curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$CONTAINER >> $LOG_FILE"_marathon_deploy" 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not reach marathon"
-        cat $2_marathon_deploy
+        cat "$LOG_FILE"_marathon_deploy
         exit -23
     fi
-    if [[ `cat $2_marathon_deploy` != "" && `grep "does not exist" $2_marathon_deploy` == "" ]]; then
+
+    if [[ `cat "$LOG_FILE"_marathon_deploy` != "" && `grep "does not exist" "$LOG_FILE"_marathon_deploy` == "" ]]; then
         echo "   + Previous instance removed"
         if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
     fi
 
-
-    echo " - Deploying $1 service in marathon"
+    echo " - Deploying $CONTAINER service in marathon"
     # 10 attempts with 5 seconds sleep each
     for i in $(seq 1 10); do
         echo "   + Attempt $i"
         curl  -X POST -H 'Content-Type: application/json' \
-            -d "@$1.marathon.json" \
-            http://$MASTER_MARATHON_1:28080/v2/apps 2>&1 | tee "$2"_deploy >> $2
+            -d "@$CONTAINER.marathon.json" \
+            http://$MASTER_MARATHON_1:28080/v2/apps 2>&1 | tee "$LOG_FILE"_deploy >> $LOG_FILE
         if [[ $? != 0 ]]; then
-            echo "   + Could not deploy $1 application in marathon"
-            cat $2
+            echo "   + Could not deploy $CONTAINER application in marathon"
+            cat "$LOG_FILE"_deploy
             exit -24
         fi
-        if [[ `grep "App is locked by one or more deployments" "$2"_deploy` == "" ]]; then
+        if [[ `grep "App is locked by one or more deployments" "$LOG_FILE"_deploy` == "" ]]; then
             break
         fi
         if [[ "$i" == "10" ]]; then
@@ -215,11 +218,13 @@ function install_and_check_service_file() {
         echo "Container needs to be passed in argument"
         exit -2
     fi
+    export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit -3
     fi
+    export LOG_FILE=$2
 
     if [[ -d /lib/systemd/system/ ]]; then
         export systemd_units_dir=/lib/systemd/system/
@@ -230,52 +235,52 @@ function install_and_check_service_file() {
         exit -10
     fi
 
-    echo " - Copying $1 systemd file"
-    sudo cp $SCRIPT_DIR/$1.service $systemd_units_dir
-    sudo chmod 644 $systemd_units_dir/$1.service
+    echo " - Copying $CONTAINER systemd file"
+    sudo cp $SCRIPT_DIR/$CONTAINER.service $systemd_units_dir
+    sudo chmod 644 $systemd_units_dir/$CONTAINER.service
 
     echo " - Reloading systemd config"
     if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi # hacky hack - I get weird and unexplainable errors here sometimes.
-    sudo systemctl daemon-reload >> $2 2>&1
-    fail_if_error $? "$2" -6
+    sudo systemctl daemon-reload >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -6
 
     echo " - Checking Systemd file"
-    if [[ `sudo systemctl status $1 | grep 'could not be found'` != "" ]]; then
-        echo "$1 systemd file installation failed"
+    if [[ `sudo systemctl status $CONTAINER | grep 'could not be found'` != "" ]]; then
+        echo "$CONTAINER systemd file installation failed"
         exit -12
     fi
-    sudo systemctl status $1 >> $2 2>&1
+    sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 && $? != 3 ]]; then
-        echo "$1 systemd file doesn't work as expected"
+        echo "$CONTAINER systemd file doesn't work as expected"
         exit -12
     fi
 
-    echo " - Testing systemd startup - starting $1"
-    sudo systemctl start $1 >> $2 2>&1
-    fail_if_error $? "$2" -7
+    echo " - Testing systemd startup - starting $CONTAINER"
+    sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -7
 
     echo " - Testing systemd startup - Checking startup"
     if [[ -z "$NO_SLEEP" ]]; then sleep 12; fi
-    sudo systemctl status $1 >> $2 2>&1
-    fail_if_error $? "$2" -8
+    sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -8
 
     echo " - Testing systemd startup - Make sure service is really running"
-    if [[ `systemctl show -p SubState $1 | grep exited` != "" ]]; then
-        echo "$1 service is actually not really running"
+    if [[ `systemctl show -p SubState $CONTAINER | grep exited` != "" ]]; then
+        echo "$CONTAINER service is actually not really running"
         exit -13
     fi
 
-    #echo " - Testing systemd startup - stopping $1"
-    #sudo systemctl stop $1 >> $2 2>&1
-    #fail_if_error $? "$2" -9
+    #echo " - Testing systemd startup - stopping $CONTAINER"
+    #sudo systemctl stop $CONTAINER >> $LOG_FILE 2>&1
+    #fail_if_error $? "$LOG_FILE" -9
 
-    echo " - Enabling $1 on startup"
-    sudo systemctl enable $1 >> $2 2>&1
-    fail_if_error $? "$2" -10
+    echo " - Enabling $CONTAINER on startup"
+    sudo systemctl enable $CONTAINER >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -10
 
-    #echo " - Testing systemd startup - starting $1 (again)"
-    #sudo systemctl start $1 >> $2 2>&1
-    #fail_if_error $? "$2" -11
+    #echo " - Testing systemd startup - starting $CONTAINER (again)"
+    #sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
+    #fail_if_error $? "$LOG_FILE" -11
 }
 
 # Commit the container in the docker image and remove container
@@ -288,24 +293,26 @@ function commit_container() {
         echo "Container needs to be passed in argument"
         exit -2
     fi
+    export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit -3
     fi
+    export LOG_FILE=$2
 
     # Exit the container and commit the changes
     # Now that we've modified the container we have to commit the changes.
     echo " - Commiting the changes to the local template"
-    docker commit $1 eskimo:$1  >> $2 2>&1
-    fail_if_error $? "$2" -3
+    docker commit $CONTAINER eskimo:$CONTAINER  >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -3
 
     # Stop setup container and and delete it
-    docker stop $1  >> $2 2>&1
-    fail_if_error $? "$2" -4
+    docker stop $CONTAINER  >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -4
 
-    docker container rm $1 >> $2 2>&1
-    fail_if_error $? "$2" -5
+    docker container rm $CONTAINER >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -5
 
 }
 
@@ -319,38 +326,41 @@ function build_container() {
         echo "Container needs to be passed in argument"
         exit -2
     fi
+    export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Image (template) needs to be passed in argument"
         exit -1
     fi
+    export IMAGE=$2
 
     if [[ $3 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit -3
     fi
+    export LOG_FILE=$3
 
-    echo " - Deleting previous docker template for $2 if exist"
-    if [[ `docker images -q eskimo:$2_template 2>/dev/null` != "" ]]; then
-        docker image rm eskimo:$2_template >> $3 2>&1
-        fail_if_error $? "$3" -1
+    echo " - Deleting previous docker template for $IMAGE if exist"
+    if [[ `docker images -q eskimo:$IMAGE"_template" 2>/dev/null` != "" ]]; then
+        docker image rm eskimo:$IMAGE"_template" >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" -1
     fi
 
-    echo " - Importing latest docker template for $2"
-    gunzip -c ${SCRIPT_DIR}/docker_template_$2.tar.gz | docker load >> $3 2>&1
-    fail_if_error $? "$3" -1
+    echo " - Importing latest docker template for $IMAGE"
+    gunzip -c ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz | docker load >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -1
 
     echo " - Killing any previous containers"
-    sudo systemctl stop $1 > /dev/null 2>&1
-    if [[ `docker ps -a -q -f name=$1` != "" ]]; then
-        docker stop $1 > /dev/null 2>&1
-        docker container rm $1 > /dev/null 2>&1
+    sudo systemctl stop $CONTAINER > /dev/null 2>&1
+    if [[ `docker ps -a -q -f name=$CONTAINER` != "" ]]; then
+        docker stop $CONTAINER > /dev/null 2>&1
+        docker container rm $CONTAINER > /dev/null 2>&1
     fi
 
     # build
     echo " - Building docker container"
-    docker build --iidfile id_file --tag eskimo:$1 . >> $3 2>&1
-    fail_if_error $? "$3" -1
+    docker build --iidfile id_file --tag eskimo:$CONTAINER . >> $LOG_FILE 2>&1
+    fail_if_error $? "$LOG_FILE" -1
 }
 
 # This is used to create a command wrapper around a binary command in order to
@@ -360,31 +370,34 @@ function build_container() {
 # - $1 the source binary command to be wrapped
 # - $2 the wrapper location
 function create_binary_wrapper(){
+
     if [[ $1 == "" || $2 == "" ]]; then
-        echo "source and target have to be passed as argument of the create_binary_wrapper function"
+        echo "target and wrapper have to be passed as argument of the create_binary_wrapper function"
         exit -2
-    else
-        touch $2
-        chmod 777 $2
-        echo -e '#!/bin/bash' > $2
-        echo -e "" >> $2
-        echo -e "if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then" >> $2
-        echo -e "    # Injecting topoloy" >> $2
-        echo -e "    . /usr/local/sbin/inContainerInjectTopology.sh" >> $2
-        echo -e "fi" >> $2
-        echo -e "" >> $2
-        echo -e "__tmp_saved_dir=`pwd`" >> $2
-        echo -e "function __tmp_returned_to_saved_dir() {" >> $2
-        echo -e '     cd $__tmp_saved_dir' >> $2
-        echo -e "}" >> $2
-        echo -e "trap __tmp_returned_to_saved_dir 15" >> $2
-        echo -e "trap __tmp_returned_to_saved_dir EXIT" >> $2
-        echo -e "" >> $2
-        echo -e "$1 \"\$@\"" >> $2
-        echo -e "" >> $2
-        echo -e "__tmp_returned_to_saved_dir" >> $2
-        chmod 755 $2
     fi
+    TARGET=$1
+    WRAPPER=$2
+
+    touch $WRAPPER
+    chmod 777 $WRAPPER
+    echo -e '#!/bin/bash' > $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then" >> $WRAPPER
+    echo -e "    # Injecting topoloy" >> $WRAPPER
+    echo -e "    . /usr/local/sbin/inContainerInjectTopology.sh" >> $WRAPPER
+    echo -e "fi" >> $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "__tmp_saved_dir=`pwd`" >> $WRAPPER
+    echo -e "function __tmp_returned_to_saved_dir() {" >> $WRAPPER
+    echo -e '     cd $__tmp_saved_dir' >> $WRAPPER
+    echo -e "}" >> $WRAPPER
+    echo -e "trap __tmp_returned_to_saved_dir 15" >> $WRAPPER
+    echo -e "trap __tmp_returned_to_saved_dir EXIT" >> $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "$TARGET \"\$@\"" >> $WRAPPER
+    echo -e "" >> $WRAPPER
+    echo -e "__tmp_returned_to_saved_dir" >> $WRAPPER
+    chmod 755 $WRAPPER
 }
 
 # self explained
