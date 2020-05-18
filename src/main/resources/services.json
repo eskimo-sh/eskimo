@@ -203,8 +203,25 @@
       "proxyTargetPort" : 5050,
       "waitTime": 8000,
       "title" : "Mesos Console",
-      "statusPageLinktitle" : "Monitor Flink and Spark processes in Mesos",
+      "statusPageLinktitle" : "Monitor Mesos Processes",
       "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "'//' + leader_info.hostname + ':' + leader_info.port",
+          "target" : "'/{PREFIX_PATH}'"
+        },
+        {
+          "type": "PLAIN",
+          "source" : "/{{state.leader_info.hostname}}:{{state.leader_info.port}}",
+          "target" : "#/",
+          "__comment": "PREFIX PATH already added by standard proxy replacements (this is used for the left panel link)"
+        },
+        {
+          "type": "PLAIN",
+          "source" : "href=\"{{framework.webui_url}}\"",
+          "target" : "href=\"#\" onclick=\"javascript:alert('Framework WEB UI is not reachable from here through Eskimo proxy. Please use the Eskimo menu on the left to reach web application.'); event.preventDefault(); return false;\"",
+          "__comment": "Web UI is not reachable most of the time. Replacing with a warning for now. "
+        },
         {
           "type" : "PLAIN",
           "source" : "'//' + leader_info.hostname + ':' + leader_info.port",
