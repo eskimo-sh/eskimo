@@ -152,30 +152,19 @@ sudo cp $SCRIPT_DIR/glusterMountChecker.sh /usr/local/sbin/glusterMountChecker.s
 sudo chown root /usr/local/sbin/glusterMountChecker.sh
 sudo chmod 755 /usr/local/sbin/glusterMountChecker.sh
 
+if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountChecker.sh` == "" ]]; then
+    echo " - Scheduling periodic execution of glusterMountChecker.sh using crontab"
+    sudo rm -f /tmp/crontab
+    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+    sudo bash -c "echo \"* * * * * bash /usr/local/sbin/glusterMountChecker.sh\" >> /tmp/crontab"
+    sudo crontab -u root /tmp/crontab
+fi
+
+
 echo " - Copying gluster service docker container startup file"
 sudo cp startGlusterServiceContainer.sh /usr/local/sbin/startGlusterServiceContainer.sh
 sudo chown root /usr/local/sbin/startGlusterServiceContainer.sh
 sudo chmod 755 /usr/local/sbin/startGlusterServiceContainer.sh
-
-echo " - Creating glusterMountCheckerPeriodic.sh script"
-cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
-#!/usr/bin/env bash
-while true; do
-     sleep 10
-     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
-done
-EOF
-sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
-sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
-sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
-
-if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountCheckerPeriodic` == "" ]]; then
-    echo " - Scheduling periodic execution of glusterMountCheckerPeriodic using crontab"
-    sudo rm -f /tmp/crontab
-    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
-    sudo bash -c "echo \"* * * * * /usr/local/sbin/glusterMountCheckerPeriodic\" >> /tmp/crontab"
-    sudo crontab -u root /tmp/crontab
-fi
 
 
 #echo " - Installing and checking systemd service file"

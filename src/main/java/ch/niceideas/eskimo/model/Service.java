@@ -78,6 +78,23 @@ public class Service {
 
     private String icon;
 
+    private List<Command> commands = new ArrayList<>();
+
+    public List<Command> getCommands() {
+        return commands;
+    }
+
+    public void addCommand (Command command) {
+        commands.add (command);
+    }
+
+    public Command getCommand(String commandId) {
+        return commands.stream()
+                .filter(command -> command.getId().equals(commandId))
+                .findFirst()
+                .orElseGet(() -> null);
+    }
+
     public String getIcon() {
         return icon;
     }
@@ -109,6 +126,7 @@ public class Service {
     public MemoryConsumptionSize getMemoryConsumptionSize() {
         return memoryConsumptionSize;
     }
+
 
     public int getMemoryConsumptionParts (ServicesDefinition servicesDefinition) {
         AtomicInteger parts = new AtomicInteger (getMemoryConsumptionSize().getNbrParts());
@@ -275,7 +293,15 @@ public class Service {
         return new JSONObject(new HashMap<String, Object>() {{
             put("group", StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() : "");
             put("name", getStatusName());
+            put("commands", getCommandsJSON());
         }});
+    }
+
+    private JSONArray getCommandsJSON() {
+        List<JSONObject> commandJsonList = getCommands().stream()
+                .map (command -> command.toStatusConfigJSON())
+                .collect(Collectors.toList());
+        return new JSONArray(commandJsonList);
     }
 
     public JSONObject getEditableConfigurationsJSON() {
@@ -325,4 +351,5 @@ public class Service {
     public boolean isLink() {
         return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getStatusPageLinkTitle());
     }
+
 }

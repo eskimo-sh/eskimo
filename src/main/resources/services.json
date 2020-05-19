@@ -18,6 +18,14 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/ntp/ntp.log",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -42,7 +50,15 @@
         "mandatory": true
       }
     ],
-    "additionalEnvironment": [ "SERVICE_NUMBER_1_BASED" ]
+    "additionalEnvironment": [ "SERVICE_NUMBER_1_BASED" ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/zookeeper/zookeeper.log",
+        "icon": "fa-file"
+      }
+    ]
   },
 
 
@@ -70,6 +86,14 @@
     "additionalEnvironment": [
       "ALL_NODES_LIST_prometheus",
       "ALL_NODES_LIST_mesos-agent"
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/prometheus/prometheus.log",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -144,6 +168,20 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show GlusterFS Logs",
+        "command": "sudo cat /var/log/gluster/glusterfs.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_remote_log",
+        "name" : "Show Remote Server Logs",
+        "command": "cat /var/log/gluster/gluster_remote-log",
+        "icon": "fa-file"
       }
     ]
   },
@@ -252,6 +290,26 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
+    ],
+    "commands" : [
+      {
+        "id" : "show_info_log",
+        "name" : "Show INFO Logs",
+        "command": "cat /var/log/mesos/mesos-master.INFO | grep -v \"HTTP GET\" | grep -v \"Authorizing principal\"",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_warn_log",
+        "name" : "Show WARN Logs",
+        "command": "cat /var/log/mesos/mesos-master.WARNING",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_error_log",
+        "name" : "Show ERROR Logs",
+        "command": "cat /var/log/mesos/mesos-master.ERROR",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -311,6 +369,26 @@
           }
         ]
       }
+    ],
+    "commands" : [
+      {
+        "id" : "show_info_log",
+        "name" : "Show INFO Logs",
+        "command": "cat /var/log/mesos/mesos-slave.INFO | grep -v \"HTTP GET\"",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_warn_log",
+        "name" : "Show WARN Logs",
+        "command": "cat /var/log/mesos/mesos-slave.WARNING",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_error_log",
+        "name" : "Show ERROR Logs",
+        "command": "cat /var/log/mesos/mesos-slave.ERROR",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -362,7 +440,21 @@
         "mandatory": true
       }
     ],
-    "TODO_EDITABLE_CXONFIGURATION": ""
+    "TODO_EDITABLE_CXONFIGURATION": "",
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/marathon/marathon.log | grep -v \"GET /\"",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_registry_log",
+        "name" : "Show Registry Logs",
+        "command": "cat /var/log/marathon/docker_registry/docker_registry.log",
+        "icon": "fa-file"
+      }
+    ]
   },
 
 
@@ -432,6 +524,26 @@
           }
         ]
       }
+    ],
+    "commands" : [
+      {
+        "id" : "show_server_log",
+        "name" : "Show Server Logs",
+        "command": "cat /var/log/kafka/server.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_controller_log",
+        "name" : "Show Controller Logs",
+        "command": "cat /var/log/kafka/controller.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_state_change_log",
+        "name" : "Show State Change Logs",
+        "command": "cat /var/log/kafka/state-change.log",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -467,6 +579,14 @@
         "masterService": "kafka",
         "numberOfMasters": 1,
         "mandatory": true
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/kafka/kafka-manager/application.log",
+        "icon": "fa-file"
       }
     ]
   },
@@ -510,6 +630,14 @@
         "masterService": "spark-executor",
         "numberOfMasters": 1,
         "mandatory": true
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "sudo cat /var/log/spark/logs/`ls -t /var/log/spark/logs/ | grep HistoryServer | head -n 1`",
+        "icon": "fa-file"
       }
     ]
   },
@@ -596,6 +724,14 @@
             "defaultValue" : "[ESKIMO_DEFAULT]"
           }
         ]
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_shuffle_log",
+        "name" : "Show Mesos Shuffle Logs",
+        "command": "sudo cat /var/log/spark/logs/`ls -t /var/log/spark/logs/ | grep MesosExternalShuffleService | head -n 1`",
+        "icon": "fa-file"
       }
     ]
   },
@@ -685,6 +821,14 @@
           }
         ]
       }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "sudo cat /var/log/flink/log/`ls -t /var/log/flink/log/ | grep flink- | head -n 1`",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -748,6 +892,14 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_remote_log",
+        "name" : "Show Remote Server Logs",
+        "command": "cat /var/log/elasticsearch/logstash/logstash_remote.log",
+        "icon": "fa-file"
       }
     ]
   },
@@ -824,6 +976,32 @@
           }
         ]
       }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/elasticsearch/eskimo.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_search_slow_log",
+        "name" : "Show Search Slow Logs",
+        "command": "cat /var/log/elasticsearch/eskimo_index_search_slowlog.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_index_slow_log",
+        "name" : "Show Indexing Slow Logs",
+        "command": "cat /var/log/elasticsearch/eskimo_index_indexing_slowlog.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_gc_log",
+        "name" : "Show GC Logs",
+        "command": "cat /var/log/elasticsearch/gc.log",
+        "icon": "fa-file"
+      }
     ]
   },
 
@@ -877,6 +1055,14 @@
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "cat /var/log/elasticsearch/kibana/kibana.log",
+        "icon": "fa-file"
       }
     ]
   },
@@ -960,6 +1146,38 @@
         "masterService": "spark-executor",
         "numberOfMasters": 1,
         "mandatory": true
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_log",
+        "name" : "Show Logs",
+        "command": "sudo cat /var/log/spark/zeppelin/`ls -t /var/log/spark/zeppelin/ | grep zeppelin-eskimo- | head -n 1`",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_shell_log",
+        "name" : "Show Shell Int. Logs",
+        "command": "sudo cat /var/log/spark/zeppelin/`ls -t /var/log/spark/zeppelin/ | grep zeppelin-interpreter-sh | head -n 1`",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_python_log",
+        "name" : "Show Python Int. Logs",
+        "command": "sudo cat /var/log/spark/zeppelin/`ls -t /var/log/spark/zeppelin/ | grep zeppelin-interpreter-python | head -n 1`",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_spark_log",
+        "name" : "Show Spark Int. Logs",
+        "command": "sudo cat /var/log/spark/zeppelin/`ls -t /var/log/spark/zeppelin/ | grep zeppelin-interpreter-spark | head -n 1`",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_flink_log",
+        "name" : "Show Flink Int. Logs",
+        "command": "sudo cat /var/log/spark/zeppelin/`ls -t /var/log/spark/zeppelin/ | grep zeppelin-interpreter-flink | head -n 1`",
+        "icon": "fa-file"
       }
     ]
   }

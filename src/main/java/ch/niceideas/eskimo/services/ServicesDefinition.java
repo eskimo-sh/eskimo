@@ -228,7 +228,6 @@ public class ServicesDefinition implements InitializingBean {
                         dependency.setMasterService(masterServiceString);
                     }
 
-
                     Integer numberOfMaster = depObj.has("numberOfMasters") ? depObj.getInt("numberOfMasters") : null;
                     if (numberOfMaster != null) {
                         dependency.setNumberOfMasters(numberOfMaster);
@@ -239,6 +238,41 @@ public class ServicesDefinition implements InitializingBean {
                     dependency.setMandatory (depMandatory == null || depMandatory);
 
                     service.addDependency(dependency);
+                }
+            }
+
+            if (servicesConfig.hasPath(serviceString+".commands")) {
+                JSONArray commandsConf = servicesConfig.getSubJSONObject(serviceString).getJSONArray("commands");
+                for (int i = 0; i < commandsConf.length(); i++) {
+
+                    JSONObject commandObj = commandsConf.getJSONObject(i);
+                    Command command = new Command();
+
+                    String commandId = commandObj.getString("id");
+                    if (StringUtils.isBlank(commandId)) {
+                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without an id");
+                    }
+                    command.setId(commandId);
+
+                    String commandName = commandObj.getString("name");
+                    if (StringUtils.isBlank(commandName)) {
+                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without a name");
+                    }
+                    command.setName(commandName);
+
+                    String commandIcon = commandObj.getString("icon");
+                    if (StringUtils.isBlank(commandIcon)) {
+                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without an icon");
+                    }
+                    command.setIcon(commandIcon);
+
+                    String commandCmd = commandObj.getString("command");
+                    if (StringUtils.isBlank(commandCmd)) {
+                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without a command");
+                    }
+                    command.setCommand(commandCmd);
+
+                    service.addCommand(command);
                 }
             }
 

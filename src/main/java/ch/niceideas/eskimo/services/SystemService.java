@@ -280,6 +280,19 @@ public class SystemService {
         });
     }
 
+    public void callCommand(String commandId, String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, ipAddress, "Calling command " + commandId , () -> {
+            Service service = servicesDefinition.getService(serviceName);
+
+            Command command = service.getCommand (commandId);
+            if (command == null) {
+                throw new SSHCommandException("Command " + commandId + " is unknown for service " + serviceName);
+            }
+
+            return command.call (serviceName, ipAddress, sshCommandService);
+        });
+    }
+
     private void logOperationMessage(String operation) {
         messagingService.addLines(new String[]{
                 "\n" + operation

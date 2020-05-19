@@ -112,24 +112,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderNodesStatusFlat() throws Exception {
-
-        page.executeJavaScript("eskimoSystemStatus.setRenderInTable(false);");
-
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonStatus + ", false)");
-
-        String flatString = page.executeJavaScript("$('#nodes-status-carousel-content').html()").getJavaScriptResult().toString();
-
-        assertNotNull (flatString);
-
-        assertTrue (flatString.contains("192.168.10.11"));
-        assertTrue (flatString.contains("192.168.10.13"));
-    }
-
-    @Test
     public void testRenderNodesStatusTable() throws Exception {
-
-        page.executeJavaScript("eskimoSystemStatus.setRenderInTable(true);");
 
         page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonStatus + ", false)");
 
@@ -144,8 +127,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
     @Test
     public void testRenderNodesStatusTableFiltering() throws Exception {
-
-        page.executeJavaScript("eskimoSystemStatus.setRenderInTable(true);");
 
         JsonWrapper statusWrapper = new JsonWrapper(jsonStatus);
         statusWrapper.setValueForPath("service_kafka_192-168-10-13", "NA");

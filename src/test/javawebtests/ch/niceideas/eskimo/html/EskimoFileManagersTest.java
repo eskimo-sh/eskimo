@@ -67,7 +67,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
                 "    }" +
                 "});");
 
-        waitForElementIdInDOM("file-managers-file-manager-content");
+        waitForElementIdInDOM("file-upload-progress-modal");
 
         // mock functions
         page.executeJavaScript("eskimo.FileManagers.submitFormFileUpload = function (e) {}");
@@ -175,7 +175,9 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoFileManagers.selectFileManager('192.168.10.11', '192-168-10-11');");
 
-        System.err.println (page.asXml());
+        //System.err.println (page.asXml());
+
+        waitForElementIdInDOM("file-manager-close-192-168-10-11");
 
         page.getElementById("file-manager-close-192-168-10-11").click();
 

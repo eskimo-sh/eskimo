@@ -107,15 +107,15 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 // initialize menu
                 var menuContent = '' +
-                    '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n' +
-                    '    <li class="divider"></li>'+
                     '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
                     '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
                     '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
                     '    <li class="divider"></li>'+
-                    '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n';
+                    '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n' +
+                    '    <li class="divider"></li>'+
+                    '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n';
 
-                $("#serviceContextMenu").html(menuContent);
+                $("#serviceContextMenuTemplate").html(menuContent);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -130,9 +130,39 @@ eskimo.SystemStatus = function(constructorObject) {
                 // Open context menu
                 $(this).on("click", function (e) {
 
+                    var target = $(e.target);
+
+                    //var nodeAddress = $(target).closest("td.status-node-cell").data('eskimo-node');
+                    var service = $(target).closest("td.status-node-cell").data('eskimo-service');
+
+                    var additionalCommands = SERVICES_STATUS_CONFIG[service].commands;
+
+                    // TODO make it empty if no commmand
+                    var additionalCommandsHTML = '';
+
+                    if (additionalCommands.length > 0) {
+                        additionalCommandsHTML += '<li class="divider"></li>';
+                    }
+
+                    for (var i = 0; i < additionalCommands.length; i++) {
+                        additionalCommandsHTML +=
+                            '<li><a id="' + additionalCommands[i].id + '" ' +
+                            '       tabindex="-1" ' +
+                            '       href="#" ' +
+                            '       title="' + additionalCommands[i].name + '"' +
+                            '    >' +
+                            '<i class="fa ' + additionalCommands[i].icon + '"></i> ' +
+                            additionalCommands[i].name + '' +
+                            '</a>' +
+                            '</li>\n';
+                    }
+
+                    $("#serviceContextMenu").html($("#serviceContextMenuTemplate").html() + additionalCommandsHTML);
+
+
                     //open menu
-                    var $menu = $(settings.menuSelector)
-                        .data("invokedOn", $(e.target))
+                    var $menu = $("#serviceContextMenu")
+                        .data("invokedOn", target)
                         .show()
                         .css({
                             position: "absolute",
@@ -154,7 +184,7 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 //make sure menu closes on any click
                 $('body').click(function () {
-                    $(settings.menuSelector).hide();
+                    $("#serviceContextMenu").hide();
                 });
             });
         };
@@ -168,7 +198,7 @@ eskimo.SystemStatus = function(constructorObject) {
     function getMenuPosition(settings, mouse, direction, scrollDir) {
         var win = $("#inner-content-status")[direction](),
             scroll = $("#inner-content-status")[scrollDir](),
-            menu = $(settings.menuSelector)[direction](),
+            menu = $("#serviceContextMenu")[direction](),
             position = mouse + scroll;
 
         // opening menu would pass the side of the page
@@ -221,16 +251,6 @@ eskimo.SystemStatus = function(constructorObject) {
             error: errorHandler
         });
     }
-
-    function shouldRenderInTable () {
-        return renderInTable;
-    }
-    this.shouldRenderInTable = shouldRenderInTable;
-
-    function setRenderInTable (doTable) {
-        renderInTable = doTable;
-    }
-    this.setRenderInTable = setRenderInTable;
 
     function setNodeFilter (doNodeFilter) {
         nodeFilter = doNodeFilter;
@@ -309,6 +329,14 @@ eskimo.SystemStatus = function(constructorObject) {
     this.showStatusWhenServiceUnavailable = showStatusWhenServiceUnavailable;
 
     function serviceAction (action, service, nodeAddress) {
+        serviceActionInternal (action, service, nodeAddress, false);
+    }
+
+    function serviceActionCustom (action, service, nodeAddress) {
+        serviceActionInternal (action, service, nodeAddress, true);
+    }
+
+    function serviceActionInternal (action, service, nodeAddress, custom) {
 
         that.eskimoMessaging.showMessages();
 
@@ -320,7 +348,9 @@ eskimo.SystemStatus = function(constructorObject) {
             dataType: "json",
             timeout: 1000 * 3600,
             contentType: "application/json; charset=utf-8",
-            url: action + "?service=" + service + "&address=" + nodeAddress,
+            url: (custom ?
+                "service-custom-action?action=" + action + "&service=" + service + "&address=" + nodeAddress :
+                action + "?service=" + service + "&address=" + nodeAddress),
             success: function (data, status, jqXHR) {
 
                 // OK
@@ -378,6 +408,12 @@ eskimo.SystemStatus = function(constructorObject) {
         if (confirm ("Are you sure you want to reinstall " + service + " on " + nodeAddress + " ?")) {
             serviceAction("reinstall-service", service, nodeAddress);
         }
+    }
+    this.reinstallService = reinstallService;
+
+    function performServiceAction (action, service, nodeAddress) {
+        console.log("performServiceAction ", action, service, nodeAddress);
+        serviceActionCustom(action, service, nodeAddress);
     }
     this.reinstallService = reinstallService;
 
@@ -638,14 +674,7 @@ eskimo.SystemStatus = function(constructorObject) {
 
         } else {
 
-            if (this.shouldRenderInTable()) {
-
-                this.renderNodesStatusTable(nodeServicesStatus, blocking, availableNodes, nodeNamesByNbr);
-
-            } else {
-
-                this.renderNodesStatusCarousel(nodeServicesStatus, blocking, availableNodes, nodeNamesByNbr);
-            }
+            this.renderNodesStatusTable(nodeServicesStatus, blocking, availableNodes, nodeNamesByNbr);
         }
 
         that.eskimoMain.setAvailableNodes(availableNodes);
@@ -665,7 +694,6 @@ eskimo.SystemStatus = function(constructorObject) {
     function registerMenu(selector, dataSelector) {
         // register menu
         $(selector).serviceContextMenu({
-            menuSelector: "#serviceContextMenu",
             menuSelected: function (invokedOn, selectedMenu) {
 
                 var action = selectedMenu.attr('id');
@@ -688,138 +716,12 @@ eskimo.SystemStatus = function(constructorObject) {
                     reinstallService(service, nodeAddress);
 
                 } else {
-                    alert("Unknown action : " + action);
+                    performServiceAction (action, service, nodeAddress);
                 }
             }
         })
     }
     this.registerMenu = registerMenu;
-
-    this.renderNodesStatusCarousel = function (data, blocking, availableNodes, nodeNamesByNbr) {
-
-        var statusRenderOptions = $(".status-render-options");
-        statusRenderOptions.css("visibility", "hidden");
-        statusRenderOptions.css("display", "none");
-
-        var statusContainerCarousel = $("#status-node-container-carousel");
-        statusContainerCarousel.css("visibility", "inherit");
-        statusContainerCarousel.css("display", "inherit");
-
-        var carouselContent = $("#nodes-status-carousel-content");
-        carouselContent.html("");
-
-        for (var nbr = 1; nbr < nodeNamesByNbr.length; nbr++) { // 0 is empty
-
-            var nodeName = nodeNamesByNbr[nbr];
-
-            var nodeAddress = data["node_address_" + nodeName];
-            var nodeAlive = data["node_alive_" + nodeName];
-
-            var arrayRow = ' ' +
-                '<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 status-node-carousel" >\n' +
-                '    <div class="pad15"><div class="status-node-node-rep">\n';
-
-            if (nodeAlive == 'OK') {
-                arrayRow += '<div class="text-center"><p><image src="images/node-icon-white.png" class="status-node-image"></image></p></div>\n';
-            } else {
-                arrayRow += '<div class="text-center"><p><image src="images/node-icon-red.png" class="status-node-image"></image></p></div>\n';
-            }
-
-            arrayRow += '   <div class="text-center"> <p>' + nbr + ' : ' + nodeAddress + '</p></div>\n'
-
-            arrayRow += '    <p>\n';
-
-            for (var sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
-                var service = STATUS_SERVICES[sNb];
-                if (nodeAlive == 'OK') {
-
-                    var serviceStatus = data["service_" + service + "_" + nodeName];
-                    //console.log ("For service '" + service + "' on node '" + nodeName + "' got '"+ serviceStatus + "'");
-                    if (!serviceStatus) {
-
-                        arrayRow +=
-                            '<table class="node-status-carousel-table">\n' +
-                            '    <tbody><tr>\n' +
-                            '        <td><span class="font-weight-bold">&nbsp;</span></td>\n' +
-                            '        </tr></tbody></table>';
-
-                    } else if (serviceStatus == "NA") {
-
-                        arrayRow +=
-                            '<table class="node-status-carousel-table">\n' +
-                            '    <tbody><tr>\n' +
-                            '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
-                            '            class="nodes-status-carousel-status-na">' +
-                            '            <span class="font-weight-bold service-status-error '+
-                            '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
-                            '        ">' +
-                            service +
-                            '        </span></td>\n' +
-                            '        </tr>' +
-                            '</tbody></table>';
-
-                    } else if (serviceStatus == "KO") {
-
-                        arrayRow +=
-                            '<table class="node-status-carousel-table">\n' +
-                            '    <tbody><tr>\n' +
-                            '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
-                            '            class="nodes-status-carousel-status'+(that.eskimoMain.isOperationInProgress() ? '-pending': '') +'">' +
-                            '             <span class="font-weight-bold service-status-error '+
-                            '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
-                            '        ">' +
-                            service +
-                            '        </span></td>\n' +
-                            '    </tr>\n' +
-                            '</tbody></table>\n';
-
-                    } else {
-
-                        var color = "#EEEEEE;";
-                        if (serviceStatus == "TD") {
-                            color = "violet";
-                        } else if (serviceStatus == "restart") {
-                            color= "#CB4335"
-                        }
-
-                        arrayRow +=
-                            '<table class="node-status-carousel-table">\n' +
-                            '    <tbody><tr>\n' +
-                            '        <td data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" ' +
-                            '            class="nodes-status-carousel-status'+(that.eskimoMain.isOperationInProgress() ? '-pending': '') +'"><span class="font-weight-bold '+
-                            '        '+(that.eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
-                            '         " style="color: '+color+';">' +
-                            '            <div class="status-service-icon">' +
-                            '                <img class="status-service-icon-image" src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"/> ' +
-                            '            </div>' +
-                            '            <div class="status-service-text">' +
-                            '&nbsp;' + service +
-                            '            </div>' +
-                            '        </span></td>\n' +
-                            '    </tr>\n' +
-                            '</tbody></table>\n';
-
-                    }
-                } else {
-                    arrayRow +=
-                        '<table class="node-status-carousel-table">\n' +
-                        '    <tbody><tr>\n' +
-                        '        <td><span class="font-weight-bold">-</span></td>\n' +
-                        '        <td class="nodes-status-carousel-actions">'+
-                        '</td></tr></tbody></table>';
-                }
-            }
-
-            arrayRow += '</p></div></div>';
-
-            var newRow = $(arrayRow);
-
-            carouselContent.append(newRow);
-        }
-
-        registerMenu("#nodes-status-carousel-content td.nodes-status-carousel-status", "nodes-status-carousel-status");
-
-    };
 
     this.generateTableHeader = function() {
 

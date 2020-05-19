@@ -152,9 +152,18 @@ public class ServicesControllerTest {
 
         assertEquals ("{\n" +
                 "  \"uiServicesStatusConfig\": {\n" +
-                "    \"A\": {\"group\": \"\"},\n" +
-                "    \"B\": {\"group\": \"\"},\n" +
-                "    \"C\": {\"group\": \"\"}\n" +
+                "    \"A\": {\n" +
+                "      \"commands\": [],\n" +
+                "      \"group\": \"\"\n" +
+                "    },\n" +
+                "    \"B\": {\n" +
+                "      \"commands\": [],\n" +
+                "      \"group\": \"\"\n" +
+                "    },\n" +
+                "    \"C\": {\n" +
+                "      \"commands\": [],\n" +
+                "      \"group\": \"\"\n" +
+                "    }\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sc.getUIServicesStatusConfig());

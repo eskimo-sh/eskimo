@@ -216,6 +216,20 @@ public class SystemAdminController {
         }
     }
 
+    @GetMapping("service-custom-action")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String serviceActionCustom(
+            @RequestParam(name="action") String commandId,
+            @RequestParam(name="service") String serviceName,
+            @RequestParam(name="address") String address) {
+        Service service = servicesDefinition.getService(serviceName);
+
+        return performSystemOperation(
+                sysService -> sysService.callCommand(commandId, serviceName, address),
+                "command for " + serviceName + " has been executed successfuly on " + address + ".");
+    }
+
     @GetMapping("/reinstall-service")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
