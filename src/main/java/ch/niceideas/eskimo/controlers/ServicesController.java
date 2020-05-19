@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
@@ -198,7 +199,7 @@ public class ServicesController {
 
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
-                    .filter(service -> service.isMarathon())
+                    .filter(Service::isMarathon)
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
             return new JSONObject(new HashMap<String, Object>() {{

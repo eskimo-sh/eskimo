@@ -34,13 +34,12 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 
 public class EskimoAboutTest extends AbstractWebTest {
 
@@ -65,7 +64,7 @@ public class EskimoAboutTest extends AbstractWebTest {
         assertCssValue("#about-modal", "visibility", "visible");
 
         page.executeJavaScript("eskimoAbout.cancelAbout()");
-        Thread.sleep(2000);
+        await().atMost(10, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
 
         assertCssValue("#about-modal", "display", "none");
     }

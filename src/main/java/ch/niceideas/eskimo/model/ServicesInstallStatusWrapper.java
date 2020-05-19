@@ -39,14 +39,12 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.MarathonService;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -153,7 +151,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
     public List<Pair<String, String>> getAllServiceAndNodeNameInstallationPairs() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
-                .map(key -> parseInstallStatusFlag (key))
+                .map(ServicesInstallStatusWrapper::parseInstallStatusFlag)
                 .sorted((o1, o2) -> {
                     if (o1 == null) {
                         return -1;
@@ -192,7 +190,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .filter(key -> key.startsWith(service + "_"))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
                 .collect(Collectors.toList());
-        if (allNodes.size() <= 0) {
+        if (allNodes.isEmpty()) {
             return null;
         }
         return allNodes.get(0);

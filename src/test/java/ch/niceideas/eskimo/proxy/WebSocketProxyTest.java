@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static junit.framework.TestCase.*;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertFalse;
 
 public class WebSocketProxyTest {
@@ -157,13 +158,7 @@ public class WebSocketProxyTest {
     }
 
     WebSocketSession waitAndGetSession(AtomicReference<WebSocketSession> atomicSessionRef) throws InterruptedException {
-        // wait 10 seconds for the session to be built
-        for (int i = 0; i < 20; i++) {
-            if (atomicSessionRef.get() != null) {
-                break;
-            }
-            Thread.sleep(500);
-        }
+        await().atMost(10, TimeUnit.SECONDS).until(() -> atomicSessionRef.get() != null);
         assertNotNull(atomicSessionRef.get());
         return atomicSessionRef.get();
     }

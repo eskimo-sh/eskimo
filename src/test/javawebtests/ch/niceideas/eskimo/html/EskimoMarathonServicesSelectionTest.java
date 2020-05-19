@@ -40,7 +40,10 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 import static junit.framework.TestCase.*;
+import static org.awaitility.Awaitility.await;
 
 public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
@@ -80,7 +83,7 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoMarathonServicesSelection.showMarathonServiceSelection()");
 
-        Thread.sleep(10);
+        await().atMost(1, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#marathon-services-selection-modal').css('display')").getJavaScriptResult().toString().equals ("block"));
 
         assertCssValue("#marathon-services-selection-modal", "display", "block");
         assertCssValue("#marathon-services-selection-modal", "visibility", "visible");

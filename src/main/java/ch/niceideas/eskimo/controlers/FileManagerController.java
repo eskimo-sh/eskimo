@@ -35,9 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.FileManagerService;
-import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;

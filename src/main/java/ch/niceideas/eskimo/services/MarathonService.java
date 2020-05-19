@@ -1,7 +1,10 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.http.Header;
@@ -29,20 +32,24 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class MarathonService {
 
-    private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
+    private static final Logger logger = Logger.getLogger(MarathonService.class);
 
     public static final int MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS = 200;
 
     public static final String MARATHON_NA_FLAG = "MARATHON_NA";
     public static final String MARATHON_CONTEXT = "apps/";
     public static final String MARATHON = "marathon";
+    public static final String DEPLOYMENT_ID_FIELD = "deploymentId";
+    public static final String RUNNING_STATUS = "running";
+    public static final String MARATHON_NODE = "marathon node";
+    public static final String SEPARATOR = "--------------------------------------------------------------------------------\n";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -209,7 +216,7 @@ public class MarathonService {
 
             BasicHttpEntity requestContent = new BasicHttpEntity();
             requestContent.setContentType("application/json");
-            requestContent.setContent(new ByteArrayInputStream(content.getBytes("UTF-8")));
+            requestContent.setContent(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
             request.setEntity(requestContent);
 
             return sendHttpRequestAndGetResult(marathonTunnelConfig, request);
@@ -307,7 +314,7 @@ public class MarathonService {
 
             Integer tasksRunning = (Integer) serviceResult.getValueForPath("app.tasksRunning");
             if (tasksRunning != null && tasksRunning.intValue() == 1) {
-                status = "running";
+                status = RUNNING_STATUS;
             }
 
             return new Pair<>(nodeIp, status);
@@ -388,15 +395,11 @@ public class MarathonService {
 
             // Installation in batches (groups following dependencies) - deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getInstallations(), 1, marathonOperationWaitTimoutSeconds,
-                    (operation, error) -> {
-                        installMarathonService(operation, marathonIpAddress);
-                    });
+                    (operation, error) -> installMarathonService(operation, marathonIpAddress));
 
             // uninstallations - deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getUninstallations(), 1, marathonOperationWaitTimoutSeconds,
-                    (operation, error) -> {
-                        uninstallMarathonService(operation, marathonIpAddress);
-                    });
+                    (operation, error) -> uninstallMarathonService(operation, marathonIpAddress));
 
             /*
             // restarts
@@ -521,7 +524,7 @@ public class MarathonService {
         String killResultString = queryMarathon(MARATHON_CONTEXT + service, "DELETE");
         JsonWrapper killResult = new JsonWrapper(killResultString);
 
-        String deploymentId = killResult.getValueForPathAsString("deploymentId");
+        String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
         if (StringUtils.isBlank(deploymentId)) {
             sb.append("WARNING : Could not find any deployment ID when killing tasks for " + service + "\n");
         } else {
@@ -609,7 +612,7 @@ public class MarathonService {
                 }
 
                 boolean installed = StringUtils.isNotBlank(nodeIp);
-                boolean running = nodeNameAndStatus.getValue().equals("running");
+                boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
 
                 String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
 
@@ -637,7 +640,7 @@ public class MarathonService {
         }
     }
 
-    boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) throws SetupException, SystemException {
+    boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) {
         if (marathonConfig != null) {
             return marathonConfig.isServiceInstallRequired(service);
         }
@@ -646,7 +649,7 @@ public class MarathonService {
 
     public void showJournalMarathon(Service service) throws MarathonException, SSHCommandException {
         ensureMarathonAvailability();
-        systemService.applyServiceOperation(service.getName(), "marathon node", "Showing journal", () -> showJournalMarathonInternal(service));
+        systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Showing journal", () -> showJournalMarathonInternal(service));
     }
 
     String showJournalMarathonInternal(Service service) {
@@ -681,7 +684,7 @@ public class MarathonService {
             JsonWrapper serviceResult = new JsonWrapper(serviceJson);
 
             resultBuilder.append ("Marathon Service Definition for " + service.getName() + ":\n");
-            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (SEPARATOR);
             resultBuilder.append(serviceResult.getFormattedValue());
             resultBuilder.append ("\n\n");
 
@@ -743,7 +746,7 @@ public class MarathonService {
             }
 
             resultBuilder.append ("Mesos Information for service " + service.getName() + " :\n");
-            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (SEPARATOR);
             resultBuilder.append (" - Mesos Node IP              : " + mesosNodeIp + "\n");
             resultBuilder.append (" - Mesos Slave ID             : " + mesosSlaveId + "\n");
             resultBuilder.append (" - Marathon framework ID      : " + frameworkId + "\n");
@@ -754,7 +757,7 @@ public class MarathonService {
             String stdOutContent = queryMesosAgent(mesosNodeIp, "/files/download?path=" + mesosContainerDirectory + "/stdout");
 
             resultBuilder.append ("STDOUT :\n");
-            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (SEPARATOR);
             resultBuilder.append (stdOutContent);
             resultBuilder.append ("\n");
 
@@ -762,7 +765,7 @@ public class MarathonService {
             String stdErrContent = queryMesosAgent(mesosNodeIp, "/files/download?path=" + mesosContainerDirectory + "/stderr");
 
             resultBuilder.append ("STDERR :\n");
-            resultBuilder.append ("--------------------------------------------------------------------------------\n");
+            resultBuilder.append (SEPARATOR);
             resultBuilder.append (stdErrContent);
             resultBuilder.append ("\n");
 
@@ -788,7 +791,7 @@ public class MarathonService {
 
     public void startServiceMarathon(Service service) throws MarathonException, SSHCommandException {
         ensureMarathonAvailability();
-        systemService.applyServiceOperation(service.getName(), "marathon node", "Starting", () -> startServiceMarathonInternal(service));
+        systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Starting", () -> startServiceMarathonInternal(service));
     }
 
     String startServiceMarathonInternal(Service service) throws MarathonException {
@@ -800,7 +803,7 @@ public class MarathonService {
         String nodeIp = nodeNameAndStatus.getKey();
 
         boolean installed = StringUtils.isNotBlank(nodeIp);
-        boolean running = nodeNameAndStatus.getValue().equals("running");
+        boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
 
         if (!installed) {
             log.append("ERROR - Service " + service.getName() + " is not installed." + "\n");
@@ -828,7 +831,7 @@ public class MarathonService {
 
     public void  stopServiceMarathon(Service service) throws MarathonException, SSHCommandException {
         ensureMarathonAvailability();
-        systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> stopServiceMarathonInternal(service));
+        systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> stopServiceMarathonInternal(service));
     }
 
     String stopServiceMarathonInternal(Service service) throws MarathonException {
@@ -844,7 +847,7 @@ public class MarathonService {
 
         } else {
 
-            boolean running = nodeNameAndStatus.getValue().equals("running");
+            boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
             if (!running) {
                 log.append("Info: Service " + service.getName() + " was not running");
             } else {
@@ -868,7 +871,7 @@ public class MarathonService {
 
     public void restartServiceMarathon(Service service) throws MarathonException, SSHCommandException {
         ensureMarathonAvailability();
-        systemService.applyServiceOperation(service.getName(), "marathon node", "Stopping", () -> restartServiceMarathonInternal(service));
+        systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> restartServiceMarathonInternal(service));
     }
 
     protected String restartServiceMarathonInternal(Service service) throws MarathonException {
@@ -896,15 +899,12 @@ public class MarathonService {
 
     protected void waitForServiceShutdown(String service) throws MarathonException {
         Pair<String, String> nodeNameAndStatus;
-        String nodeIp;// wait for it to stop
 
         int i;
         for (i = 0; i < MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS; i++) { // 200 attemots
             nodeNameAndStatus = this.getServiceRuntimeNode(service);
 
-            nodeIp = nodeNameAndStatus.getKey();
-
-            boolean running = nodeNameAndStatus.getValue().equals("running");
+            boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
             if (!running) {
                 break;
             }

@@ -120,7 +120,7 @@ public class ApplicationStatusService {
         return StringUtils.isBlank(buildVersion) || buildVersion.endsWith("SNAPSHOT");
     }
 
-    public JsonWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+    public JsonWrapper getStatus(){
 
         // special case at application startup : if the UI request comes before the first status update
         if (lastStatus.get() == null) {

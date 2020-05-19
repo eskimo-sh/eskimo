@@ -694,38 +694,38 @@ eskimo.FileManagers = function(constructorObject) {
 
             // register on click handlers
             $('#select_file_manager_' + nodeName).click(function() {
-                var nodeName = this.id.substring("select_file_manager_".length);
-                selectFileManager(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("select_file_manager_".length);
+                selectFileManager(getNodeAddress(effNodeName), effNodeName);
             });
 
             $('#show_root_' + nodeName).click(function() {
-                var nodeName = this.id.substring("show_root_".length);
-                showRoot(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("show_root_".length);
+                showRoot(getNodeAddress(effNodeName), effNodeName);
             });
 
             $('#show_parent_' + nodeName).click(function() {
-                var nodeName = this.id.substring("show_parent_".length);
-                showParent(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("show_parent_".length);
+                showParent(getNodeAddress(effNodeName), effNodeName);
             });
 
             $('#show_previous_' + nodeName).click(function() {
-                var nodeName = this.id.substring("show_previous_".length);
-                showPrevious(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("show_previous_".length);
+                showPrevious(getNodeAddress(effNodeName), effNodeName);
             });
 
             $('#refresh_folder_' + nodeName).click(function() {
-                var nodeName = this.id.substring("refresh_folder_".length);
-                refreshFolder(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("refresh_folder_".length);
+                refreshFolder(getNodeAddress(effNodeName), effNodeName);
             });
 
             $('#upload_file_' + nodeName).click(function() {
-                var nodeName = this.id.substring("upload_file_".length);
-                uploadFile(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("upload_file_".length);
+                uploadFile(getNodeAddress(effNodeName), effNodeName);
             });
 
             $('#create_file_' + nodeName).click(function() {
-                var nodeName = this.id.substring("create_file_".length);
-                createFile(getNodeAddress(nodeName), nodeName);
+                var effNodeName = this.id.substring("create_file_".length);
+                createFile(getNodeAddress(effNodeName), effNodeName);
             });
 
             that.connectFileManager (nodeAddress, nodeName);

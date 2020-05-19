@@ -38,16 +38,11 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.Main = function() {
 
-    // constants
-    var MESSAGES_POLLING_STOP_DELAY = 12000;
-
-
     var that = this;
 
     var setupLoaded = false;
     var setupDone = false;
 
-    var isMenuMinimized = false;
     var dontMessWithSidebarSizeAnyMore = false;
 
     var eskimoSetup = null;
@@ -167,8 +162,6 @@ eskimo.Main = function() {
         //     + PROCESSING PENDING DETECTION LOGIC
 
         eskimoAbout = new eskimo.About();
-
-        isMenuMinimized = $('#hoeapp-container').hasClass("hoe-minimized-lpanel");
 
         $(window).resize (this.menuResize);
 
@@ -390,7 +383,6 @@ eskimo.Main = function() {
             } else {
                 $('#hoeapp-wrapper').addClass('hoe-hide-lpanel');
             }
-            isMenuMinimized = true;
         }
     };
 

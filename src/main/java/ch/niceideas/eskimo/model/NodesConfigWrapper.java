@@ -264,7 +264,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable {
 
     public String getFirstNodeName(String serviceName) {
         List<String> nodeAddresses = getAllNodeAddressesWithService(serviceName);
-        if (nodeAddresses.size() > 0) {
+        if (!nodeAddresses.isEmpty()) {
             return nodeAddresses.get(0).replace(".", "-");
         }
         return null;

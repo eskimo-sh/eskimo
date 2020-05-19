@@ -113,7 +113,7 @@ public class Service {
     public int getMemoryConsumptionParts (ServicesDefinition servicesDefinition) {
         AtomicInteger parts = new AtomicInteger (getMemoryConsumptionSize().getNbrParts());
         getAdditionalmemoryServices().stream()
-                .map(serviceName -> servicesDefinition.getService(serviceName))
+                .map(servicesDefinition::getService)
                 .forEach(service -> parts.addAndGet(service.getMemoryConsumptionSize().getNbrParts()));
         return parts.get();
     }

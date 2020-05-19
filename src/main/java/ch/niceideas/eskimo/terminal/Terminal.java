@@ -217,8 +217,8 @@ public class Terminal {
      * Set graphics rendition. This is the value that gets stored into the higher 8 bits of {@link #scr}
      */
     private int sgr;
-    private String buf; // TODO: switch to StringBuilder
-    private String outbuf;
+    private StringBuilder buffer; // TODO: switch to StringBuilder
+    private StringBuilder outBuffer;
     /**
      * The HTML that we returned from {@link #dumpHtml(boolean,int)} the last time.
      */
@@ -286,7 +286,9 @@ public class Terminal {
         cl = false;
         sgr = 0x700;
         showCursor = true;
-        buf = outbuf = lastHtml = "";
+        buffer = new StringBuilder();
+        outBuffer = new StringBuilder();
+        lastHtml = "";
         timestamp += 1000;
     }
 
@@ -377,25 +379,25 @@ public class Terminal {
     }
 
     void escape() {
-        if(buf.length()>32) {
+        if(buffer.length()>32) {
             // error
             if(LOGGER.isLoggable(Level.FINE))
-                LOGGER.fine("Unhandled escape sequence: "+buf.replaceAll("\u001B","<ESC>"));
-            buf = "";
+                LOGGER.fine("Unhandled escape sequence: "+buffer.toString().replaceAll("\u001B","<ESC>"));
+            buffer = new StringBuilder();
             return;
         }
-        EscapeSequence es = ESCAPE_SEQUENCES.get(buf);
+        EscapeSequence es = ESCAPE_SEQUENCES.get(buffer.toString());
         if(es!=null) {
-            es.handle(this, buf,null);
-            buf = "";
+            es.handle(this, buffer.toString(), null);
+            buffer = new StringBuilder();
             return;
         }
 
         for (Entry<Pattern, EscapeSequence> ent : REGEXP_ESCAPE_SEQUENCES.entrySet()) {
-            Matcher m = ent.getKey().matcher(buf);
+            Matcher m = ent.getKey().matcher(buffer.toString());
             if(m.matches()) {
-                ent.getValue().handle(this, buf,m);
-                buf = "";
+                ent.getValue().handle(this, buffer.toString(),m);
+                buffer = new StringBuilder();
                 return;
             }
         }
@@ -410,12 +412,12 @@ public class Terminal {
             LOGGER.finest("Received: "+s);
         for( int i=0; i<s.length(); i++ ) {
             char ch = s.charAt(i);
-            if(buf.length()>0 || ESCAPE_SEQUENCES.containsKey(""+ch)) {
-                buf += ch;
+            if(buffer.length()>0 || ESCAPE_SEQUENCES.containsKey(""+ch)) {
+                buffer.append (ch);
                 escape();
             } else
             if(ch=='\u001B') {
-                buf += ch;
+                buffer.append (ch);
             } else {
                 echo(ch);
             }
@@ -423,8 +425,8 @@ public class Terminal {
     }
 
     public String read() {
-        String b = outbuf;
-        outbuf = null;
+        String b = outBuffer.toString();
+        outBuffer = null;
         return b;
     }
 
@@ -514,16 +516,14 @@ public class Terminal {
     }
 
     @Esc({"\u0005","\u001B[c","\u001B[0c","\u001BZ"})
-    //NOSONAR
     void escDa() {
-        outbuf = "\u001B[?6c";
+        outBuffer = new StringBuilder("\u001B[?6c");
     }
 
     /**
      * Backspace.
      */
     @Esc("\u0008")
-    //NOSONAR
     void esc0x08() {
         cx = max(0,cx-1);
     }
@@ -532,7 +532,6 @@ public class Terminal {
      * Tab.
      */
     @Esc("\u0009")
-    //NOSONAR
     void esc0x09() {
         cx = (((cx/8)+1)*8)%width;
     }
@@ -541,7 +540,6 @@ public class Terminal {
      * Carriage return
      */
     @Esc("\r")
-    //NOSONAR
     void esc0x0d() {
         cl=false;
         cx=0;
@@ -567,30 +565,25 @@ public class Terminal {
     }
 
     @Esc("\u001BM")
-    //NOSONAR
     void escRi() {
         cy = max(st,cy-1);
         if(cy==st)
             scrollDown(st,sb);
     }
 
-    //NOSONAR
     void csiUpperA(int[] i) {
         cy = max(st,cy-defaultsTo(i,1));
     }
 
-    //NOSONAR
     void csiUpperB(int[] i) {
         cy = min(sb,cy+defaultsTo(i,1));
     }
 
-    //NOSONAR
     void csiUpperC(int[] i) {
         cx = min(width-1,cx+defaultsTo(i,1));
         cl = false;
     }
 
-    //NOSONAR
     void csiUpperD(int[] i) {
         cx = max(0,cx-defaultsTo(i,1));
         cl = false;
@@ -603,26 +596,22 @@ public class Terminal {
         return (args.length==0) ? defaultValue : args[0];
     }
 
-    //NOSONAR
     void csiUpperE(int[] i) {
         csiUpperB(i);
         cx = 0;
         cl = false;
     }
 
-    //NOSONAR
     void csiUpperF(int[] i) {
         csiUpperA(i);
         cx = 0;
         cl = false;
     }
 
-    //NOSONAR
     void csiUpperG(int[] i) {
         cx = min(width,i[0])-1;
     }
 
-    //NOSONAR
     void csiUpperH(int[] i) {
         if(i.length<2)  i=new int[]{1,1};
         cx = min(width,i[1])-1;
@@ -630,7 +619,6 @@ public class Terminal {
         cl = false;
     }
 
-    //NOSONAR
     void csiUpperJ(int[] i) {
         switch (defaultsTo(i,0)) {
             default:
@@ -640,7 +628,6 @@ public class Terminal {
         }
     }
 
-    //NOSONAR
     void csiUpperK(int... i) {
         switch (defaultsTo(i,0)) {
             default:
@@ -653,7 +640,6 @@ public class Terminal {
     /**
      * Insert lines.
      */
-    //NOSONAR
     void csiUpperL(int[] args) {
         for(int i=0;i<defaultsTo(args,1);i++)
             if(cy<sb)
@@ -663,7 +649,6 @@ public class Terminal {
     /**
      * Delete lines.
      */
-    //NOSONAR
     void csiUpperM(int[] args) {
         if(cy>=st && cy<=sb)
             for(int i=0;i<defaultsTo(args,1);i++)
@@ -673,7 +658,6 @@ public class Terminal {
     /**
      * Delete n chars
      */
-    //NOSONAR
     void csiUpperP(int[] args) {
         int _cy=cy;
         int _cx=cx;
@@ -682,47 +666,38 @@ public class Terminal {
         poke(_cy,_cx,end.substring(defaultsTo(args,1)));
     }
 
-    //NOSONAR
     void csiUpperX(int[] args) {
         zero(cy,cx,cy,cx+args[0]);
     }
 
-    //NOSONAR
     void csiLowerA(int[] args) {
         csiUpperC(args);
     }
 
-    //NOSONAR
-    void csi_owerC(int[] args) {
+    void csiLowerC(int[] args) {
         // noop
     }
 
-    //NOSONAR
     void csiLowerD(int[] args) {
         cy = min(height,args[0])-1;
     }
 
-    //NOSONAR
     void csiLowerE(int[] args) {
         csiUpperB(args);
     }
 
-    //NOSONAR
     void csiLowerF(int[] args) {
         csiUpperH(args);
     }
 
-    //NOSONAR
     void csiLowerH(int[] args) {
         showCursor = true;
     }
 
-    //NOSONAR
     void csiLowerL(int[] args) {
         showCursor = false;
     }
 
-    //NOSONAR
     void csiLowerM(int[] args) {
         if (args.length==0) {
             sgr = 0x0700;
@@ -743,7 +718,6 @@ public class Terminal {
        }
     }
 
-    //NOSONAR
     void csiLowerR(int[] args) {
         if(args.length<2)   args=new int[]{0,height};
         st=min(height,args[0])-1;
@@ -751,13 +725,11 @@ public class Terminal {
         sb=max(sb,st);
     }
 
-    //NOSONAR
     void csiLowerS(int[] args) {
         sb=max(sb,st);
         saveCursor();
     }
 
-    //NOSONAR
     void csiLowerU(int[] args) {
         restoreCursor();
     }

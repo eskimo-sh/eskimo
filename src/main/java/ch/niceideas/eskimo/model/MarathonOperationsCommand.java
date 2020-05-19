@@ -36,13 +36,16 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.*;
-import org.apache.log4j.Logger;
+import ch.niceideas.eskimo.services.MarathonException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SystemService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MarathonOperationsCommand implements Serializable {
 
@@ -79,12 +82,11 @@ public class MarathonOperationsCommand implements Serializable {
             String installedService = serviceAndNodePair.getKey();
             String nodeName = serviceAndNodePair.getValue();
 
-            if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)) {
-
+            if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
                 // search it in config
-                if (!rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
-                    retCommand.addUninstallation(installedService);
-                }
+                && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
+
+                retCommand.addUninstallation(installedService);
             }
         }
 

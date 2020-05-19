@@ -434,7 +434,7 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 // retry periodically
                 setTimeout(function () {
-                    that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod, forceRefresh);
+                    that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
                 }, 5000);
             }
         });

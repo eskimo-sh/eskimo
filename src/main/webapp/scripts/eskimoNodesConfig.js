@@ -181,7 +181,7 @@ eskimo.NodesConfig = function(constructorObject) {
             return "undefined";
         }
         return serviceConfig.icon;
-    };
+    }
     this.getServiceIconPath = getServiceIconPath;
 
     this.isServiceUnique = function (service) {

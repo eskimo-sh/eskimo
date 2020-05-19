@@ -149,6 +149,11 @@ Software.
             <artifactId>commons-compress</artifactId>
             <version>1.19</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.8</version>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>
@@ -204,9 +209,10 @@ Software.
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.8</version>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>3.0.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

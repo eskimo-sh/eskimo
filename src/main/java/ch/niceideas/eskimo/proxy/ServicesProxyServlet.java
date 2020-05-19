@@ -54,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -295,13 +296,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             throws ServletException, IOException {
         try {
             super.service(servletRequest, servletResponse);
-        } catch (IllegalStateException e) {
-            logger.error (servletRequest.getRequestURI() + " - got " + e.getClass() + ":" + e.getMessage());
-            servletResponse.sendError(500);
-        } catch (java.net.SocketException e) {
-            logger.error (servletRequest.getRequestURI() + " - got " + e.getClass() + ":" + e.getMessage());
-            servletResponse.sendError(500);
-        } catch (org.apache.http.NoHttpResponseException e) {
+        } catch (IllegalStateException | SocketException | NoHttpResponseException e) {
             logger.error (servletRequest.getRequestURI() + " - got " + e.getClass() + ":" + e.getMessage());
             servletResponse.sendError(500);
         }

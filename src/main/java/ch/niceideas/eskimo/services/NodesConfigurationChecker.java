@@ -160,15 +160,14 @@ public class NodesConfigurationChecker {
         for (String otherKey : nodesConfig.keySet()) {
 
             NodesConfigWrapper.ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
-            if (otherProperty != null && StringUtils.isNotBlank(otherProperty.getServiceName())) {
+            if (otherProperty != null
+                    && StringUtils.isNotBlank(otherProperty.getServiceName())
+                    && otherProperty.getServiceName().equals(dependency.getMasterService())) {
 
-                if (otherProperty.getServiceName().equals(dependency.getMasterService())) {
+                int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
+                if (otherNodeNbr == nodeNbr) {
 
-                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
-                    if (otherNodeNbr == nodeNbr) {
-
-                        serviceFound = true;
-                    }
+                    serviceFound = true;
                 }
             }
         }
@@ -220,16 +219,14 @@ public class NodesConfigurationChecker {
         for (String key : nodesConfig.keySet()) {
 
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
-            if (property != null) {
+            if (property != null
+                    && StringUtils.isNotBlank(property.getServiceName())
+                    && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
 
-                if (StringUtils.isNotBlank(property.getServiceName())
-                        && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
-
-                    Service service = servicesDefinition.getService(property.getServiceName());
-                    if (service.isMarathon()) {
-                        throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
-                                + " is a marathon service which should not be selectable here.");
-                    }
+                Service service = servicesDefinition.getService(property.getServiceName());
+                if (service.isMarathon()) {
+                    throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
+                            + " is a marathon service which should not be selectable here.");
                 }
             }
         }
@@ -298,17 +295,15 @@ public class NodesConfigurationChecker {
                         for (String otherKey : nodesConfig.keySet()) {
 
                             ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
-                            if (otherProperty != null) {
+                            if (otherProperty != null
+                                    && otherProperty.getServiceName().equals(uniqueServiceName)) {
 
-                                if (otherProperty.getServiceName().equals(uniqueServiceName)) {
-
-                                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
-                                    if (otherNodeNbr == nodeNbr) {
-                                        throw new NodesConfigurationException("Node "
-                                                + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length())
-                                                + " is a range an declares service " + otherProperty.getServiceName()
-                                                + " which is a unique service, hence forbidden on a range.");
-                                    }
+                                int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
+                                if (otherNodeNbr == nodeNbr) {
+                                    throw new NodesConfigurationException("Node "
+                                            + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length())
+                                            + " is a range an declares service " + otherProperty.getServiceName()
+                                            + " which is a unique service, hence forbidden on a range.");
                                 }
                             }
                         }

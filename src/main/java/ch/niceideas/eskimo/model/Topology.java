@@ -35,16 +35,13 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
+import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Topology {

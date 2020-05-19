@@ -41,9 +41,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.awaitility.Awaitility.await;
 
 public class EskimoServicesTest extends AbstractWebTest {
 
@@ -156,19 +158,8 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoServices.periodicRetryServices();");
 
-        int i = 0;
-        do {
-            Double size = (Double) page.executeJavaScript("eskimoServices.getUIConfigsToRetryForTests().length").getJavaScriptResult();
-            if (size == 0.0) {
-                break;
-            }
-            Thread.sleep (100);
-            i++;
-        } while (i < 50);
-
-        if (i == 50) {
-            fail ("Didn't work in 5 seconds");
-        }
+        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Double)page.executeJavaScript("eskimoServices.getUIConfigsToRetryForTests().length").getJavaScriptResult()) == 0.0);
+        assertJavascriptEquals("0.0", "eskimoServices.getUIConfigsToRetryForTests().length");
     }
 
     @Test
@@ -265,7 +256,8 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals("0.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
 
         page.executeJavaScript("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
-        Thread.sleep(2000); // FIXME
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> page.executeJavaScript("UI_SERVICES_CONFIG['cerebro'].refreshWaiting").getJavaScriptResult().toString().equals ("false"));
 
         assertJavascriptEquals("false", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
         assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");

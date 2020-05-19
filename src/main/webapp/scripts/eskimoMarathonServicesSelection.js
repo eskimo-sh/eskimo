@@ -42,11 +42,6 @@ eskimo.MarathonServicesSelection = function(constructorObject) {
 
     var that = this;
 
-    var nodeNbrInConfiguration = -1;
-    var servicesSelectedcallback = null;
-
-    var SERVICES_CONFIGURATION = [];
-
     // Initialize HTML Div from Template
     this.initialize = function() {
         $("#marathon-services-selection-modal-wrapper").load("html/eskimoMarathonServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {

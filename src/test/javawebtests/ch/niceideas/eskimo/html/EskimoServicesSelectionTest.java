@@ -40,8 +40,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.fail;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 public class EskimoServicesSelectionTest extends AbstractWebTest {
@@ -110,15 +112,8 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.getElementById("flink-app-master-choice").click();
 
-        // There's a timer, so let's do 10 attempts
-        for (int i = 0; i < 10; i++) {
-            String checked = page.executeJavaScript("$('#flink-app-master-choice').get(0).checked").getJavaScriptResult().toString();
-            if (!checked.equals("false")) {
-                Thread.sleep(500);
-                continue;
-            }
-            break;
-        }
+        await().atMost(10, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#flink-app-master-choice').get(0).checked").getJavaScriptResult().toString().equals ("false"));
+
         assertJavascriptEquals("false", "$('#flink-app-master-choice').get(0).checked");
     }
 

@@ -34,7 +34,10 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
@@ -172,7 +175,7 @@ public class SystemService {
             statusRefreshScheduler = Executors.newSingleThreadScheduledExecutor();
 
             logger.info("Initializing Status updater scheduler ...");
-            statusRefreshScheduler.schedule(() -> updateStatus(), statusUpdatePeriodSeconds, TimeUnit.SECONDS);
+            statusRefreshScheduler.schedule(this::updateStatus, statusUpdatePeriodSeconds, TimeUnit.SECONDS);
         } else {
             statusRefreshScheduler = null;
         }
@@ -442,7 +445,7 @@ public class SystemService {
             statusUpdateLock.unlock();
             // reschedule
             if (statusRefreshScheduler != null) {
-                statusRefreshScheduler.schedule(() -> updateStatus(), statusUpdatePeriodSeconds, TimeUnit.SECONDS);
+                statusRefreshScheduler.schedule(this::updateStatus, statusUpdatePeriodSeconds, TimeUnit.SECONDS);
             }
         }
     }
@@ -750,7 +753,7 @@ public class SystemService {
         return changes;
     }
 
-    void checkServiceDisappearance(SystemStatusWrapper systemStatus) throws FileException, SetupException {
+    void checkServiceDisappearance(SystemStatusWrapper systemStatus) {
 
         if (lastStatus.get() != null) {
 

@@ -44,6 +44,7 @@ import jscover.Main;
 import jscover.report.FileData;
 import jscover.report.JSONDataMerger;
 import org.apache.log4j.Logger;
+import org.awaitility.Duration;
 import org.junit.*;
 import org.junit.rules.TestName;
 
@@ -53,7 +54,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -61,8 +64,7 @@ public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
 
-    private static final int INCREMENTAL_WAIT_MS = 500;
-    private static final int MAX_WAIT_RETRIES = 40;
+    public static final int MAX_WAIT_TIME_SECS = 30;
 
     private static Thread server;
     private static Main main = null;
@@ -121,12 +123,7 @@ public abstract class AbstractWebTest {
             page.executeJavaScript("window.jscoverFinished = false;");
             page.executeJavaScript("jscoverage_report('', function(){window.jscoverFinished=true;});");
 
-            int attempt = 0;
-            while ((!((Boolean) (page.executeJavaScript("window.jscoverFinished").getJavaScriptResult())).booleanValue()) && attempt < 10) {
-                logger.debug("Waiting for coverage report to be written ...");
-                Thread.sleep(500);
-                attempt++;
-            }
+            await().atMost(MAX_WAIT_TIME_SECS, TimeUnit.SECONDS).until(() -> (Boolean) page.executeJavaScript("window.jscoverFinished").getJavaScriptResult());
 
             String json = (String) (page.executeJavaScript("jscoverage_serializeCoverageToJSON();")).getJavaScriptResult();
             coverages.add(json);
@@ -264,43 +261,35 @@ public abstract class AbstractWebTest {
     }
 
     @After
-    public void close() throws Exception {
+    public void close() {
         webClient.close();
     }
 
-    protected void assertAttrValue(String selector, String attribute, String value) throws Exception {
+    protected void assertAttrValue(String selector, String attribute, String value) {
         assertEquals (value, page.executeJavaScript("$('"+selector+"').attr('"+attribute+"')").getJavaScriptResult());
     }
 
-    protected void assertCssValue(String selector, String attribute, String value) throws Exception {
+    protected void assertCssValue(String selector, String attribute, String value) {
         assertEquals (value, page.executeJavaScript("$('"+selector+"').css('"+attribute+"')").getJavaScriptResult());
     }
 
-    protected void assertJavascriptEquals(String value, String javascript) throws Exception {
+    protected void assertJavascriptEquals(String value, String javascript) {
         assertEquals (value, page.executeJavaScript(javascript).getJavaScriptResult().toString());
     }
 
-    protected void assertJavascriptNull(String javascript) throws Exception {
+    protected void assertJavascriptNull(String javascript) {
         assertNull (page.executeJavaScript(javascript).getJavaScriptResult());
     }
 
-    protected void assertTagName(String elementId, String tagName) throws Exception {
+    protected void assertTagName(String elementId, String tagName) {
         assertEquals (tagName, page.getElementById(elementId).getTagName());
     }
 
-    protected void waitForElementIdInDOM(String elementId) throws InterruptedException {
-        int attempt = 0;
-        while (page.getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
-            Thread.sleep(INCREMENTAL_WAIT_MS);
-            attempt++;
-        }
+    protected void waitForElementIdInDOM(String elementId) {
+        await().atMost(MAX_WAIT_TIME_SECS, TimeUnit.SECONDS).until(() -> page.getElementById(elementId) != null);
     }
 
-    protected void waitForDefinition(String varName) throws InterruptedException {
-        int attempt = 0;
-        while (page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
-            Thread.sleep(INCREMENTAL_WAIT_MS);
-            attempt++;
-        }
+    protected void waitForDefinition(String varName)  {
+        await().atMost(MAX_WAIT_TIME_SECS, TimeUnit.SECONDS).until(() -> !page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined"));
     }
 }

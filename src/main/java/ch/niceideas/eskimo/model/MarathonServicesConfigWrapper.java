@@ -49,8 +49,6 @@ import java.util.stream.Collectors;
 
 public class MarathonServicesConfigWrapper extends JsonWrapper implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(MarathonServicesConfigWrapper.class);
-
     public static final String INSTALL_FLAG = "_install";
 
     public MarathonServicesConfigWrapper(File statusFile) throws FileException {
@@ -85,14 +83,6 @@ public class MarathonServicesConfigWrapper extends JsonWrapper implements Serial
     public boolean isServiceInstallRequired( String service) {
         return StringUtils.isNotBlank(getValueForPathAsString(service + INSTALL_FLAG))
                 && getValueForPath(service + INSTALL_FLAG).equals("on");
-    }
-
-    private static final class MarathonServicesConfigWrapperException extends RuntimeException {
-
-        public MarathonServicesConfigWrapperException (Throwable cause) {
-            super (cause);
-        }
-
     }
 
 }

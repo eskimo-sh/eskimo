@@ -38,7 +38,6 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.SystemService;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,7 +82,7 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
             return null;
         }
         if (serviceStatusFlag.startsWith(SERVICE_PREFIX)) {
-            return serviceStatusFlag.substring(SERVICE_PREFIX.length(), serviceStatusFlag.indexOf("_", SERVICE_PREFIX.length() + 1));
+            return serviceStatusFlag.substring(SERVICE_PREFIX.length(), serviceStatusFlag.indexOf('_', SERVICE_PREFIX.length() + 1));
         } else if (serviceStatusFlag.startsWith(NODE_ALIVE_FLAG)) {
             return "Node Alive";
         }
@@ -94,7 +93,7 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         if (StringUtils.isBlank(serviceStatusFlag)) {
             return null;
         }
-        return serviceStatusFlag.substring(serviceStatusFlag.indexOf("_", SERVICE_PREFIX.length() + 1) + 1);
+        return serviceStatusFlag.substring(serviceStatusFlag.indexOf('_', SERVICE_PREFIX.length() + 1) + 1);
     }
 
     public static String buildStatusFlag (String serviceName, String nodeName) {
@@ -155,7 +154,7 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
                 .filter(key -> key.startsWith(SERVICE_PREFIX + service + "_"))
                 .map(key -> key.substring( (SERVICE_PREFIX + service + "_").length()))
                 .collect(Collectors.toList());
-        if (allNodes.size() <= 0) {
+        if (allNodes.isEmpty()) {
             return null;
         }
         return allNodes.get(0);

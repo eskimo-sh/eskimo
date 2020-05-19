@@ -76,7 +76,6 @@ function enforceDependencies(setupConfig, servicesDependencies) {
 
     // check service dependencies
     for (var key in setupConfig) {
-        var re = /([a-zA-Z\-_]+)([0-9]*)/;
 
         var property = parseProperty(key);
         if (property != null) {
@@ -230,7 +229,6 @@ function checkIDSWithinNodeRanges(setupConfig, nodeCount) {
 
     // foolproof bug check : make sure all ids are within node count
     for (var key in setupConfig) {
-        //var re = /([a-zA-Z\-_]+)([0-9]+)/;
         var property = parseProperty(key);
         if (property.nodeNumber != null) {
             if (property.nodeNumber > nodeCount) {
