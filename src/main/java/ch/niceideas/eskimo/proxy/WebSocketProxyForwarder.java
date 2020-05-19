@@ -10,12 +10,14 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
 import java.net.URI;
-import java.security.Principal;
 import java.util.concurrent.TimeUnit;
 
 public class WebSocketProxyForwarder {
 
     public static final String WS_LOCALHOST_PREFIX = "ws://localhost:";
+
+    public static final int MESSAGE_SIZE_LIMIT = 10 * 1024 * 1024; // 10 Mb
+
     private final Logger logger = Logger.getLogger(this.getClass());
 
     private final String serviceId;
@@ -34,7 +36,7 @@ public class WebSocketProxyForwarder {
         this.targetPath = targetPath;
         this.proxyManagerService = proxyManagerService;
         this.webSocketServerSession = webSocketServerSession;
-        webSocketClientSession = createWebSocketClientSession(webSocketServerSession);
+        webSocketClientSession = createWebSocketClientSession();
     }
 
     public boolean isClosed() {
@@ -64,7 +66,7 @@ public class WebSocketProxyForwarder {
         return headers;
     }
 
-    WebSocketSession createWebSocketClientSession(WebSocketSession webSocketServerSession) {
+    WebSocketSession createWebSocketClientSession() {
         try {
 
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig(serviceId);
@@ -72,11 +74,14 @@ public class WebSocketProxyForwarder {
             String targetWsUri = WS_LOCALHOST_PREFIX + config.getLocalPort() + targetPath;
 
             WebSocketHttpHeaders headers = getWebSocketHttpHeaders(webSocketServerSession);
+
             WebSocketSession clientSession = new StandardWebSocketClient()
-                    .doHandshake(new WebSocketProxyClientHandler(webSocketServerSession), headers, new URI(targetWsUri))
+                    .doHandshake(new WebSocketServerHandshakeHandler(webSocketServerSession), headers, new URI(targetWsUri))
                     .get((long)30 * (long)1000, TimeUnit.MILLISECONDS);
-            clientSession.setBinaryMessageSizeLimit(10_000_000); // 10Mb
-            clientSession.setTextMessageSizeLimit(10_000_000); // 10Mb
+
+            clientSession.setBinaryMessageSizeLimit(MESSAGE_SIZE_LIMIT); // 10Mb
+            clientSession.setTextMessageSizeLimit(MESSAGE_SIZE_LIMIT); // 10Mb
+
             return clientSession;
         } catch (Exception e) {
             logger.error (e, e);
@@ -86,7 +91,8 @@ public class WebSocketProxyForwarder {
 
     public void forwardMessage(WebSocketMessage<?> webSocketMessage) throws IOException {
         if (!webSocketClientSession.isOpen()) {
-            webSocketClientSession = createWebSocketClientSession(webSocketServerSession);
+            // recreate it if it has been closed
+            webSocketClientSession = createWebSocketClientSession();
         }
         webSocketClientSession.sendMessage(webSocketMessage);
     }
@@ -101,11 +107,11 @@ public class WebSocketProxyForwarder {
         }
     }
 
-    public class WebSocketProxyClientHandler extends AbstractWebSocketHandler {
+    public class WebSocketServerHandshakeHandler extends AbstractWebSocketHandler {
 
         private final WebSocketSession webSocketServerSession;
 
-        public WebSocketProxyClientHandler(WebSocketSession webSocketServerSession) {
+        public WebSocketServerHandshakeHandler(WebSocketSession webSocketServerSession) {
             this.webSocketServerSession = webSocketServerSession;
         }
 

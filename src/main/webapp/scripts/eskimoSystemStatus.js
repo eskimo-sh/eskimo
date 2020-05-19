@@ -395,6 +395,52 @@ eskimo.SystemStatus = function(constructorObject) {
         return serviceAvailable;
     };
 
+    this.displayMonitoringDashboard = function (monitoringDashboardId, refreshPeriod) {
+
+        $.ajax({
+            type: "GET",
+            url: "grafana/api/dashboards/uid/" +monitoringDashboardId,
+            success: function (data, status, jqXHR) {
+
+                var forceRefresh = false;
+                if ($("#status-monitoring-dashboard-frame").css("display") == "none") {
+
+
+                    setTimeout (function() {
+                        $("#status-monitoring-dashboard-frame").css("display", "inherit");
+                        $("#status-monitoring-no-dashboard").css("display", "none");
+                    }, 500);
+
+                    forceRefresh = true;
+                }
+
+                var url = "grafana/d/" + monitoringDashboardId + "/eskimo-system-wide-monitoring?orgId=1&&kiosk&refresh="
+                    + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
+
+                var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
+                if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
+                    $("#status-monitoring-dashboard-frame").attr('src', url);
+
+                    setTimeout(that.monitoringDashboardFrameTamper, 4000);
+                }
+            },
+            error: function (jqXHR, status) {
+
+                // ignore
+                console.debug("error : could not fetch dashboard " + monitoringDashboardId);
+
+                // mention the fact that dashboard does not exist
+                $('#status-monitoring-no-dashboard').html("<b>Grafana doesn't know dashboard with ID " + monitoringDashboardId + "</b>");
+
+                // retry periodically
+                setTimeout(function () {
+                    that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod, forceRefresh);
+                }, 5000);
+            }
+        });
+
+    };
+
     this.handleSystemStatus = function (nodeServicesStatus, systemStatus, blocking) {
 
         // A. Handle Grafana Dashboard ID display
@@ -422,34 +468,11 @@ eskimo.SystemStatus = function(constructorObject) {
         // render iframe with refresh period (default 30s)
         else {
 
-            var forceRefresh = false;
-            if ($("#status-monitoring-dashboard-frame").css("display") == "none") {
-
-
-                setTimeout (function() {
-                    $("#status-monitoring-dashboard-frame").css("display", "inherit");
-                    $("#status-monitoring-no-dashboard").css("display", "none");
-                }, 500);
-
-                forceRefresh = true;
-            }
-
             var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
-            setTimeout (function() {
-
-                var url = "grafana/d/" + monitoringDashboardId + "/eskimo-system-wide-monitoring?orgId=1&&kiosk&refresh="
-                    + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
-
-                var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
-                if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
-                    $("#status-monitoring-dashboard-frame").attr('src', url);
-
-                    setTimeout (that.monitoringDashboardFrameTamper, 4000);
-
-                }
+            setTimeout(function () {
+                that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
             }, 5000);
-
         }
 
         // B. Inject information

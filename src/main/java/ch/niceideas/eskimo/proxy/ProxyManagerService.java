@@ -183,7 +183,7 @@ public class ProxyManagerService {
     }
 
     /** get a port number from 49152 to 65535 */
-    private int generateLocalPort() {
+    public static int generateLocalPort() {
         int portNumber = -1;
         int tryCount = 0;
         do {
@@ -197,7 +197,7 @@ public class ProxyManagerService {
         return portNumber;
     }
 
-    private boolean isLocalPortInUse(int port) {
+    private static boolean isLocalPortInUse(int port) {
         try {
             // ServerSocket try to open a LOCAL port
             new ServerSocket(port).close();

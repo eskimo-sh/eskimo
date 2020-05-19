@@ -268,6 +268,9 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
+            if (config == null) {
+                throw new IllegalStateException("Asked for procy for service " + key + " - but none has been configured !");
+            }
             input = input.replaceAll(config.getRemoteAddress()+":"+config.getLocalPort(), "/" + key);
         }
 
