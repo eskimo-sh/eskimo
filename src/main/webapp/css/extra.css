@@ -312,6 +312,13 @@ li.disabled a .menu-text {
     background-color: #F2F2F2;
     font-weight: bold;
 }
+
+.table > tbody > tr > td.status-node-cell i,
+.table > tbody > tr > td.status-node-cell-empty i,
+.table > tbody > tr > td.status-node-cell-intro i {
+    font-size: larger;
+}
+
 .disabled-label {
     color: #FF9999;
 }

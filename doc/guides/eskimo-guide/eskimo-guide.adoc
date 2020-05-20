@@ -567,7 +567,7 @@ file. See <<user_file>>
 [[user_file]]
 === Access eskimo
 
-With eskimo properly started using the above scripts, one can reach eskimo using http://machine_ip:9090. +
+With eskimo properly started using the scripts in `bin` discussed above , one can reach eskimo using http://machine_ip:9090. +
 The default port number is 9090. This can be changed in configuration file `eskimo.properties`.
 
 *The default login / password credentials are _admin_ / _password_.*
@@ -591,12 +591,57 @@ The structure of this file is as follows;
 
 The password is a `BCrypt` hash (11 rounds) of the actual password.
 
+[[user_configuration]]
+=== First run and initial setup
+
+Upon first run, eskimo needs to be setup before it can be used.
+
+Right after its first start, one single screen is available : *the setup page*. +
+It is the only accessible page as long as initial setup is not properly comèpleted and service
+docker images (plus mesos paclkages) have not been either downloaded or built.
+
+
+The setup page is as follows:
+
+image::pngs/eskimo-setup.png[800, 800, align="center"]
+
+On the setup page, the user needs to input following information:
+
+* *Configuration Storage Path* : a folder on the filesystem where the system user running eskimo needs to have write
+access to. The dynamic configuration and state persistence of eskimo will be stored in this location.
+* *SSH Username* : the name of the SSH user eskimo has to use to access the cluster nodes. Every node that need to be
+managed by eskimo needs to have granted access using SSH Public Key authentication to this user.
+* *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
+in regards to how to generate this key : <<ssh_key_authentication>>
+* *Mesos Origin* : the user needs to choose whether Mesos packages need to be *built locally* (on eskimo host node) or
+whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
+* *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
+they need to be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
+
+Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
+and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
+connection and/or the eskimo host machine processing abilities.
+
+Rgerading the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
+to enable eskimo to reach the cluster nodes.
+
+The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
+the nuts and bolts required in setting up a remote packages repository. +
+The remote repository URL is configuren in `eskimo.properties` using the configuration property : +
+`system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
+
+==== Checking for updates
+
+At any time after initial setup - and if any only if the chosen installation method is *downloading* packages, the user
+can _apply setup_ again to check on the packages server (by default https://www.eskimo.sh) if updates are available
+for service docker images or mesos packages.
+
 === Typical startup issues
 
 Several issues can happen upon first eskimo startup. +
 This section describes common issues and ways to resolve them.
 
-=== Failing to download package from remote docker images repository
+==== Failing to download package from remote docker images repository
 
 If you encounter an error message on the Setup Page - during initial setup or after - saying `Could not download latest
 package definition file from [Configured Remote Repository]`, this means likely that you are suffering from the empty
@@ -709,50 +754,6 @@ it is created by eskimo (with the default credentials above) at the path pointed
 If you experience the error above or something alike, change that propery to point to a location where the first
 version of the file can successfully be created.
 
-[[user_configuration]]
-=== First run and initial setup
-
-Upon first run, eskimo needs to be setup before it can be used.
-
-Right after its first start, one single screen is available : *the setup page*. +
-It is the only accessible page as long as initial setup is not properly comèpleted and service
-docker images (plus mesos paclkages) have not been either downloaded or built.
-
-
-The setup page is as follows:
-
-image::pngs/eskimo-setup.png[800, 800, align="center"]
-
-On the setup page, the user needs to input following information:
-
-* *Configuration Storage Path* : a folder on the filesystem where the system user running eskimo needs to have write
-access to. The dynamic configuration and state persistence of eskimo will be stored in this location.
-* *SSH Username* : the name of the SSH user eskimo has to use to access the cluster nodes. Every node that need to be
-managed by eskimo needs to have granted access using SSH Public Key authentication to this user.
-* *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
-in regards to how to generate this key : <<ssh_key_authentication>>
-* *Mesos Origin* : the user needs to choose whether Mesos packages need to be *built locally* (on eskimo host node) or
-whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
-* *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
-they need to be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
-
-Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
-and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
-connection and/or the eskimo host machine processing abilities.
-
-Rgerading the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
-to enable eskimo to reach the cluster nodes.
-
-The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
-the nuts and bolts required in setting up a remote packages repository. +
-The remote repository URL is configuren in `eskimo.properties` using the configuration property : +
-`system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
-
-==== Checking for updates
-
-At any time after initial setup - and if any only if the chosen installation method is *downloading* packages, the user
-can _apply setup_ again to check on the paclages server (by default https://www.niceideas.ch) if updates are available
-for service docker images or mesos packages.
 
 [[ssh_key_authentication]]
 === Setting up SSH Public Key Authentication
@@ -911,58 +912,40 @@ by eskimo, you can use the corresponding private key in the eskimo setup page to
 nodes.
 
 
-[[chap-usage]]
-== Eskimo User Guide
+[[chap-cluster-setup]]
+
+== Setting up the eskimo cluster
+
+Right after the initial setup presented in the previous chapter. The administrator can start setting up and installing
+the Eskimo Big Data Analytics cluster.
+
+The process is the following:
+
+1. *Service settings configuration*. Fine tune the settings for the services one is about to install on the Eskimo cluster
+2. *Nodes and native services layout configuration* : Declare the IP addresses of the nodes to me installed and operated
+by eskimo and select the native services that should run on these nodes
+3. *Marathon services selection* : Declare which of the marathon services you want to deploy on the cluster
+
+=== Services settings configuration
+
+The most essential settings for all eskimo pre-packaged services are set automatically in such a way that the nominal
+use cases of an eskimo cluster work out of the box.
+
+But for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
+For this reason, Eskimo CE embeds a settings editor enabling administrators to find tune runtime settings for eskimo
+embedded services.
+
+The settings editor is available from the menu under "Configured Services":
+
+image::pngs/eskimo-setttings.png[800, 800, align="center"]
+
+For every service, administrators have access to supported configuration files and supported settings. +
+The default values enforced by eskimo right after installation are indicated.
 
 
-This chapter is actually more of an administration guide since eskimo is a platform administration tool.
+=== Nodes and native services layout configuration
 
-=== Eskimo User Interface Introduction
-
-One of the most essential screen of the Eskimo Web Console, the one which is reach just after login, is the
-_System status screen_.
-
-This is an example of the status screen showing a three nodes cluster and the services installed on this cluster.
-
-image::pngs/eskimo-status.png[800, 800, align="center"]
-
-On the example above, all services are in _white_, which indicates that they are working fine.
-
-Services can be in:
-
-* [green]#OK# - (green) : the service is working alright
-* [red]#OK# - (red) : the service is working alright although it needs to be restarted following some dependencies
-  updates or re-installation.
-* [purple]#OK# : the service is running but pending removal from the node.
-* [red]#KO# : the service is reporting errors
-* [red]#NA# : the service should be available but cannot be found
-
-The user can choose between the node view (default) as above or the table view which is more suited to monitor large
-clusters with hundred of nodes.
-
-When _mouse-over_'ing a service on a node - both in the node view and in the table view - the user has access to the
-service context menu which he can use to stop / start / restart a service or even force its full reinstallation.
-
-=== Acting on services reporting errors
-
-Most of the time when a service is reporting an error, a first step is to try to reapply the configuration. +
-See <<apply_configuration>>
-
-=== The menu
-
-The menu on the left is separated in two parts :
-
-. *Eskimo Services* : Eskimo services declaring a web console are automatically available from within this menu. The
-  web console is available in an iframe from within eskimo. Clicking again on the menu entry while the web console is
-  already displayed forced a refresh of the iframe.
-
-. *Platform Administration* : This is where eskimo is configured, the layout of the services on cluster nodes defined
-  and the cluster monitored.
-
-
-=== Nodes and services layout configuration
-
-The third menu entry under "*Platform Administration*" is the most important part of the Eskimo Administration console:
+The fourth menu entry under "*Platform Administration*" is the most important part of the Eskimo Administration console:
 it provides the system administrators / Eskimo Users with the way to deploy the eskimo managed services on the cluster
 of nodes to be managed by eskimo.
 
@@ -1041,7 +1024,7 @@ initiate the *Nodes Configuration process*.
 That setup process can be quite long on large clusters with plenty of nodes even though a lot of tasks are performed in
 parallel.
 
-*One should note that this configuration can be changed at will ! Master services can be moved back and forth between
+*One should note that this configuration can be changed at will! Master services can be moved back and forth between
 nodes, slave services can be removed from nodes or added at will after the initial configuration has been applied,
 Eskimo takes care of everything !*
 
@@ -1053,9 +1036,11 @@ being reported as vanished. +
 In such cases a first step to resolve the problem is getting to the _"Configure Eskimo Nodes"_ screen and re-applying
 configuration.
 
-Finally, whenever an installation or another operation fails, after fixing the problem (most of the timecorrecting the
+Finally, whenever an installation or another operation fails, after fixing the problem (most of the time correcting the
 service installation scripts in the service installation framework), the installation or other operation process can be
-recovered fro mwhere it failed by simply re-applying the configuration from here.
+recovered from where it failed by simply re-applying the configuration from here.
+
+Applying node configuration is re-entrant / idempotent.
 
 ==== Forcing re-installation of a service.
 
@@ -1063,21 +1048,79 @@ The button "Force reinstall" enables the user to select services that will be re
 latest service docker image available. +
 Dependent services will be properly restarted.
 
-=== Services settings configuration
 
-The most essential settings for all eskimo pre-packaged services are set automatically in such a way that the nominal
-use cases of an eskimo cluster work out of the box.
+=== Marathon Services Selection
 
-But for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
-For this reason, Eskimo CE embeds a settings editor enabling administrators to find tune runtime settings for eskimo
-embedded services.
+The last step in the Eskimo cluster installation consists in deploying marathon services.
 
-The settings editor is available from the menu under "Configured Services":
+This is performed by the fifth menu entry under "*Platform Administration*" called "*Config. Marathon Services*".
 
-image::pngs/eskimo-setttings.png[800, 800, align="center"]
+The process is actually very simple and one just needs to select the serices to be installed and operated automatically
+by marathon.
 
-For every service, administrators have access to supported configuration files and supported settings. +
-The default values enforced by eskimo right after installation are indicated.
+image::pngs/eskimo-marathon-setup.png[800, 800, align="center"]
+
+Just as for native node host services, Eskimo provides a possibility to force the reinstallation of marathon services.
+
+
+
+[[chap-usage]]
+== Eskimo User Guide
+
+
+This chapter is the eskimo user guide and related to feature available to both administrators and standard users.
+
+=== The menu
+
+The menu on the left is separated in two parts :
+
+. *Eskimo Services* : Eskimo services declaring a web console are automatically available from within this menu. The
+  web console is available in an iframe from within eskimo. Clicking again on the menu entry while the web console is
+  already displayed forced a refresh of the iframe.
+
+. *Platform Administration* : This is where eskimo is configured, the layout of the services on cluster nodes defined
+  and the cluster monitored.
+
+=== Eskimo System Status Screen
+
+One of the most essential screen of the Eskimo Web Console, the one which is reach just after login, is the
+_System status screen_.
+
+This is an example of the status screen showing a three nodes cluster and the services installed on this cluster.
+
+image::pngs/eskimo-status.png[800, 800, align="center"]
+
+On the example above, all services are in _white_, which indicates that they are working fine.
+
+Services can be in:
+
+* [green]#OK# - (green) : the service is working alright
+* [red]#OK# - (red) : the service is working alright although it needs to be restarted following some dependencies
+  updates or re-installation.
+* [purple]#OK# : the service is running but pending removal from the node.
+* [red]#KO# : the service is reporting errors
+* [red]#NA# : the service should be available but cannot be found
+
+The user can choose between the node view (default) as above or the table view which is more suited to monitor large
+clusters with hundred of nodes.
+
+==== Action Menu
+
+When _mouse-over_'ing a service on a node in the table view, the user has access to the
+service action menu which he can use to stop / start / restart a service or even force its full re-installation.
+
+In addition to these default commands, Eskimo Services can provide additional custom commands made available to
+administrators and/or users in this action menu.
+
+This is for instance the action menu when clicking on Zeppelin in the table view:
+
+image::pngs/context-menu.png[300, 300, align="center"]
+
+
+=== Acting on services reporting errors
+
+Most of the time when a service is reporting an error, a first step is to try to reapply the configuration. +
+See <<apply_configuration>>
 
 
 === SSH and SFTP Client
@@ -1241,6 +1284,18 @@ The beauty of this script is that it takes care of everything:
 * Registering the local node with the gluster cluster if not already done
 * Creating the volume in gluster if not already done
 * Registering the mount point in `/etc/fstab` and systemd for automatic remount
+
+
+==== Gluster specificities within Eskimo
+
+Some notes regarding gluster usage within Eskimo:
+
+* Eskimo's pre-packaged services leverage on gluster for their data share need between marathon services and services
+running natively on node hosts and controlled by systemd. Gluster provides the abstraction of location of the filesystem
+for services deployed on the cluster by marathon.
+* Gluster mounts with fuse are pretty weak and not very tolerant to network issues. For this reason a watchdog runs
+periodically that fixes gluster mounts that might have been disconnected following a network cut or another network
+problem
 
 === GDASH
 

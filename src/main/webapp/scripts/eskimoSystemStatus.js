@@ -860,7 +860,7 @@ eskimo.SystemStatus = function(constructorObject) {
                         arrayRow +=
                             '    <td class="status-node-cell-empty"><span class="service-status-error '+
                             '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
-                            '      ">NA</span></td>\n';
+                            '      "><i class="fa fa-question"></i></span></td>\n';
                         nodeHasIssues = true;
 
                     } else if (serviceStatus == "KO") {
@@ -877,7 +877,7 @@ eskimo.SystemStatus = function(constructorObject) {
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold ' +
                             '        '+(that.eskimoMain.isOperationInProgress() ? 'blinking-status' : '') +
-                            '        ">KO</span></td>\n' +
+                            '        "><i class="fa fa-times"></i></span></td>\n' +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
                             '\n' +
@@ -907,7 +907,7 @@ eskimo.SystemStatus = function(constructorObject) {
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold '+
                             '        '+(that.eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
-                            '        ">OK</span></td>\n' +
+                            '        "><i class="fa fa-check"></i></span></td>\n' +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
                             '\n' +

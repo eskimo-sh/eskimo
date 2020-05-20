@@ -355,12 +355,32 @@ A service declaration in `services.json` for instance for `serviceX` would be de
           "defaultValue": "{default property value}" ## e.g. "3"
         }
       ]
-    },
+    }
+  ],
+
+  ## [optional] array of custom commands that are made available from the context menu
+  ## on the System Status Page (when clicking on services status (OK/KO/etc.)
+  "commands" : [
+    {
+
+      ## ID of the command. Needs to be a string with only [a-zA-Z_]
+      "id" : "{command_id}", ## e.g. "show_log"
+
+      ## Name of the command. This name is displayed in the menu
+      "name" : "{command_name}", ## e.g. "Show Logs"
+
+      ## The System command to be called on the node running the service
+      "command": "{system_command}", ## e.g. "cat /var/log/ntp/ntp.log"
+
+      ## The font-awesome icon to be displayed in the menu
+      "icon": "{fa-icon}" ## e.g. "fa-file"
+    }
+  ]
 }
 ----
 
 (Bear in mind that since json actually doesn't support such thing as comments, the example above is actually not a valid
-JSON snippet)
+JSON snippet - comments starting with '##' would need to be removed.)
 
 Everything is pretty straightforward and one should really look at the services pre-packaged within eskimo to get
 inspiration when designing a new service to be operated by eskimo.
@@ -663,7 +683,11 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-// marker for exclusion : line 650
+
+
+
+
+// marker for exclusion : line 690
 
 
 
