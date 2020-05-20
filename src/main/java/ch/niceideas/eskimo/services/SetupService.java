@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
@@ -69,6 +70,7 @@ public class SetupService {
     public static final String DOWNLOAD_FLAG = "download";
     public static final String BUILD_FLAG = "build";
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
+    public static final String NO_DOWNLOAD_IN_SNAPSHOT_ERROR = "Downloading packages is not supported on development version (SNAPSHOT)";
 
     @Autowired
     private MessagingService messagingService;
@@ -376,7 +378,7 @@ public class SetupService {
         } else {
 
             if (applicationStatusService.isSnapshot()) {
-                throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+                throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
             if (packagesVersion == null) {
@@ -395,7 +397,7 @@ public class SetupService {
         if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
             if (applicationStatusService.isSnapshot()) {
-                throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+                throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
             if (packagesVersion == null) {
@@ -498,7 +500,7 @@ public class SetupService {
                     .map(serviceName -> servicesDefinition.getService(serviceName))
                     .filter(service -> missingPackages.contains(service.getImageName()))
                     .sorted((one, other) -> servicesDefinition.compareServices(one, other))
-                    .map(service -> service.getImageName())
+                    .map(Service::getImageName)
                     .distinct()
                     .collect(Collectors.toList());
 
@@ -517,7 +519,7 @@ public class SetupService {
                 } else {
 
                     if (applicationStatusService.isSnapshot()) {
-                        throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+                        throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
                     if (packagesVersion == null) {
@@ -545,7 +547,7 @@ public class SetupService {
                 if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
                     if (applicationStatusService.isSnapshot()) {
-                        throw new SetupException("Downloading packages is not supported on development version (SNAPSHOT)");
+                        throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
                     if (packagesVersion == null) {

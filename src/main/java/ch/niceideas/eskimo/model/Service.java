@@ -299,7 +299,7 @@ public class Service {
 
     private JSONArray getCommandsJSON() {
         List<JSONObject> commandJsonList = getCommands().stream()
-                .map (command -> command.toStatusConfigJSON())
+                .map (Command::toStatusConfigJSON)
                 .collect(Collectors.toList());
         return new JSONArray(commandJsonList);
     }

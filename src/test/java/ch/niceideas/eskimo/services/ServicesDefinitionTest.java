@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
 
@@ -131,7 +132,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
     }
 
-
     @Test
     public void testRealLifeExampleComplete() throws Exception {
 
@@ -169,7 +169,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode(nodesConfig, emptyModel, 1));
-
     }
 
     @Test
@@ -217,7 +216,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode(nodesConfig, emptyModel, 1));
-
     }
 
     @Test
@@ -452,5 +450,34 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"));
 
         assertEquals(expectedServicesConfig, conf.toJSON().toString(2));
+    }
+
+    @Test
+    public void testCommandFrameworkDefinition() throws Exception {
+        Service ntp = def.getService("ntp");
+        assertNotNull (ntp.getCommands());
+        assertEquals (1, ntp.getCommands().size());
+
+        Command logCommand = ntp.getCommands().get(0);
+        assertNotNull (logCommand);
+        assertEquals ("show_log", logCommand.getId());
+        assertEquals ("Show Logs", logCommand.getName());
+        assertEquals ("fa-file", logCommand.getIcon());
+
+        assertEquals ("{\n" +
+                "  \"name\": \"Show Logs\",\n" +
+                "  \"icon\": \"fa-file\",\n" +
+                "  \"id\": \"show_log\"\n" +
+                "}", logCommand.toStatusConfigJSON().toString(2));
+
+        AtomicReference<String> callRef = new AtomicReference<>();
+        logCommand.call("192.168.10.11", new SSHCommandService() {
+            public String runSSHCommand(String hostAddress, String command) {
+                callRef.set(hostAddress + "-" + command);
+                return callRef.get();
+            }
+        });
+        assertNotNull(callRef.get());
+        assertEquals("192.168.10.11-cat /var/log/ntp/ntp.log", callRef.get());
     }
 }

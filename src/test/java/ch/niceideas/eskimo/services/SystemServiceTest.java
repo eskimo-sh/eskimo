@@ -142,6 +142,19 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testCallCommand() throws Exception {
+
+        SSHCommandException exception = assertThrows(SSHCommandException.class, () -> {
+            systemService.callCommand("dummy", "ntp", "192.168.10.11");
+        });
+        assertNotNull(exception);
+        assertEquals("Command dummy is unknown for service ntp", exception.getMessage());
+
+        systemService.callCommand("show_log", "ntp", "192.168.10.11");
+        assertEquals ("cat /var/log/ntp/ntp.log", testSSHCommandScript.toString().trim());
+    }
+
+    @Test
     public void testUpdateStatusWithMarathonException() throws Exception {
 
 

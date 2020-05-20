@@ -10,7 +10,7 @@ public class Command {
 
     private String id = null;
     private String name = null;
-    private String command = null;
+    private String commandCall = null;
     private String icon = null;
 
     public String getId() {
@@ -29,12 +29,12 @@ public class Command {
         this.name = name;
     }
 
-    public String getCommand() {
-        return command;
+    public String getCommandCall() {
+        return commandCall;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    public void setCommandCall(String commandCall) {
+        this.commandCall = commandCall;
     }
 
     public String getIcon() {
@@ -53,7 +53,7 @@ public class Command {
         }});
     }
 
-    public String call(String serviceName, String ipAddress, SSHCommandService sshCommandService) throws SSHCommandException {
-        return sshCommandService.runSSHCommand(ipAddress, command);
+    public String call(String ipAddress, SSHCommandService sshCommandService) throws SSHCommandException {
+        return sshCommandService.runSSHCommand(ipAddress, commandCall);
     }
 }

@@ -223,11 +223,9 @@ public class SystemAdminController {
             @RequestParam(name="action") String commandId,
             @RequestParam(name="service") String serviceName,
             @RequestParam(name="address") String address) {
-        Service service = servicesDefinition.getService(serviceName);
-
         return performSystemOperation(
                 sysService -> sysService.callCommand(commandId, serviceName, address),
-                "command for " + serviceName + " has been executed successfuly on " + address + ".");
+                "command " + commandId + " for " + serviceName + " has been executed successfuly on " + address + ".");
     }
 
     @GetMapping("/reinstall-service")

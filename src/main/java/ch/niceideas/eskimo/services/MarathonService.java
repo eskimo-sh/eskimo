@@ -818,7 +818,7 @@ public class MarathonService {
             String startResultString = updateMarathon(MARATHON_CONTEXT + service.getName(), "PATCH", "{ \"id\": \"/" + service.getName() + "\", \"instances\": 1}");
             JsonWrapper startResult = new JsonWrapper(startResultString);
 
-            String deploymentId = startResult.getValueForPathAsString("deploymentId");
+            String deploymentId = startResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
             if (StringUtils.isBlank(deploymentId)) {
                 log.append("WARNING : Could not find any deployment ID when starting tasks for " + service.getName() + "\n");
             } else {
@@ -857,7 +857,7 @@ public class MarathonService {
                 String killResultString = queryMarathon(MARATHON_CONTEXT + service.getName() + "/tasks?scale=true", "DELETE");
                 JsonWrapper killResult = new JsonWrapper(killResultString);
 
-                String deploymentId = killResult.getValueForPathAsString("deploymentId");
+                String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
                 if (StringUtils.isBlank(deploymentId)) {
                     log.append("WARNING : Could not find any deployment ID when killing tasks for " + service.getName());
                 } else {

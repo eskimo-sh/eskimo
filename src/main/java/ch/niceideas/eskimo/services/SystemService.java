@@ -289,7 +289,7 @@ public class SystemService {
                 throw new SSHCommandException("Command " + commandId + " is unknown for service " + serviceName);
             }
 
-            return command.call (serviceName, ipAddress, sshCommandService);
+            return command.call (ipAddress, sshCommandService);
         });
     }
 

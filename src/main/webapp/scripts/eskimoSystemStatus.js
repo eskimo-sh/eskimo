@@ -115,7 +115,7 @@ eskimo.SystemStatus = function(constructorObject) {
                     '    <li class="divider"></li>'+
                     '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n';
 
-                $("#serviceContextMenuTemplate").html(menuContent);
+                $('#serviceContextMenuTemplate').html(menuContent);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -140,21 +140,23 @@ eskimo.SystemStatus = function(constructorObject) {
                     // TODO make it empty if no commmand
                     var additionalCommandsHTML = '';
 
-                    if (additionalCommands.length > 0) {
-                        additionalCommandsHTML += '<li class="divider"></li>';
-                    }
+                    if (additionalCommands) {
+                        if (additionalCommands.length > 0) {
+                            additionalCommandsHTML += '<li class="divider"></li>';
+                        }
 
-                    for (var i = 0; i < additionalCommands.length; i++) {
-                        additionalCommandsHTML +=
-                            '<li><a id="' + additionalCommands[i].id + '" ' +
-                            '       tabindex="-1" ' +
-                            '       href="#" ' +
-                            '       title="' + additionalCommands[i].name + '"' +
-                            '    >' +
-                            '<i class="fa ' + additionalCommands[i].icon + '"></i> ' +
-                            additionalCommands[i].name + '' +
-                            '</a>' +
-                            '</li>\n';
+                        for (var i = 0; i < additionalCommands.length; i++) {
+                            additionalCommandsHTML +=
+                                '<li><a id="' + additionalCommands[i].id + '" ' +
+                                '       tabindex="-1" ' +
+                                '       href="#" ' +
+                                '       title="' + additionalCommands[i].name + '"' +
+                                '    >' +
+                                '<i class="fa ' + additionalCommands[i].icon + '"></i> ' +
+                                additionalCommands[i].name + '' +
+                                '</a>' +
+                                '</li>\n';
+                        }
                     }
 
                     $("#serviceContextMenu").html($("#serviceContextMenuTemplate").html() + additionalCommandsHTML);

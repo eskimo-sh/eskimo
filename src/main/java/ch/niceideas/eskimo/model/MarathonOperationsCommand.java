@@ -155,7 +155,7 @@ public class MarathonOperationsCommand implements Serializable {
     }
 
     public boolean hasChanges() {
-        return installations.size() > 0 || uninstallations.size() > 0;
+        return !installations.isEmpty() || !uninstallations.isEmpty();
     }
 
     public JSONObject toJSON () {

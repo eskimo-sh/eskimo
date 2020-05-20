@@ -114,8 +114,8 @@ eskimo.Consoles = function(constructorObject) {
 
                 // register on click handler to actually open console
                 $('#console_open_' + nodeObject.nodeName).click(function() {
-                    var nodeName = this.id.substring("console_open_".length);
-                    openConsole(getNodeAddress(nodeName), nodeName);
+                    var nodeNameEff = this.id.substring("console_open_".length);
+                    openConsole(getNodeAddress(nodeNameEff), nodeNameEff);
                 });
             }
         }
@@ -322,8 +322,8 @@ eskimo.Consoles = function(constructorObject) {
 
             // register on click handler to actually open console
             $('#select_console_' + nodeName).click(function() {
-                var nodeName = this.id.substring("select_console_".length);
-                selectConsole(getNodeAddress(nodeName), nodeName);
+                var nodeNameEff = this.id.substring("select_console_".length);
+                selectConsole(getNodeAddress(nodeNameEff), nodeNameEff);
             });
 
         }

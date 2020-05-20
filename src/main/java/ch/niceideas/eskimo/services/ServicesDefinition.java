@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesDefinition implements InitializingBean {
 
+    public static final String SERVICE_PREFIX = "Service ";
     @Autowired
     private SetupService setupService;
 
@@ -100,7 +101,7 @@ public class ServicesDefinition implements InitializingBean {
 
             Integer configOrder = (Integer) servicesConfig.getValueForPath(serviceString+".config.order");
             if (configOrder == null) {
-                throw new ServiceDefinitionException("Service " + serviceString + " it not properly declaring 'order' config");
+                throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " it not properly declaring 'order' config");
             }
             service.setConfigOrder(configOrder);
 
@@ -138,14 +139,14 @@ public class ServicesDefinition implements InitializingBean {
             if (selectionLayoutCol != null) {
                 service.setSelectionLayoutCol(selectionLayoutCol);
             } else if (selectionLayoutRow != null) {
-                throw new ServiceDefinitionException("Service " + serviceString + " defined a Row for selection layout but no column");
+                throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defined a Row for selection layout but no column");
             }
 
             // find out if another service is already defined at same location
             if (services.values().stream()
                     .filter(srv -> service.getSelectionLayoutCol() != -1)
                     .anyMatch(srv -> srv.getSelectionLayoutCol() == selectionLayoutCol && srv.getSelectionLayoutRow() == selectionLayoutRow)) {
-                throw new ServiceDefinitionException("Service " + serviceString + " defines a row and col for selection layout already defined by another service");
+                throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defines a row and col for selection layout already defined by another service");
             }
 
             String memoryConsumptionString = (String) servicesConfig.getValueForPath(serviceString+".config.memory");
@@ -250,27 +251,27 @@ public class ServicesDefinition implements InitializingBean {
 
                     String commandId = commandObj.getString("id");
                     if (StringUtils.isBlank(commandId)) {
-                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without an id");
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an id");
                     }
                     command.setId(commandId);
 
                     String commandName = commandObj.getString("name");
                     if (StringUtils.isBlank(commandName)) {
-                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without a name");
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a name");
                     }
                     command.setName(commandName);
 
                     String commandIcon = commandObj.getString("icon");
                     if (StringUtils.isBlank(commandIcon)) {
-                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without an icon");
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an icon");
                     }
                     command.setIcon(commandIcon);
 
-                    String commandCmd = commandObj.getString("command");
-                    if (StringUtils.isBlank(commandCmd)) {
-                        throw new ServiceDefinitionException("Service " + serviceString + " is declaring a command without a command");
+                    String commandCall = commandObj.getString("command");
+                    if (StringUtils.isBlank(commandCall)) {
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a command");
                     }
-                    command.setCommand(commandCmd);
+                    command.setCommandCall(commandCall);
 
                     service.addCommand(command);
                 }

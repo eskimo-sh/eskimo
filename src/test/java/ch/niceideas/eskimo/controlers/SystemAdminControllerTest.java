@@ -118,6 +118,20 @@ public class SystemAdminControllerTest {
     }
 
     @Test
+    public void testServiceActionCustom() {
+        sac.setSystemService(new SystemService(false) {
+            @Override
+            public void callCommand(String commandId, String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+                // No Op
+            }
+        });
+        assertEquals ("{\n" +
+                "  \"messages\": \"command show_log for zookeeper has been executed successfuly on 192.168.10.11.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.serviceActionCustom("show_log", "zookeeper", "192.168.10.11"));
+    }
+
+    @Test
     public void testReinstallService() throws Exception {
 
         AtomicBoolean called = new AtomicBoolean(false);

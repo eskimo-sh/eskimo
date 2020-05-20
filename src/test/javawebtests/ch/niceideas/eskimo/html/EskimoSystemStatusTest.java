@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.ComparisonFailure;
@@ -109,6 +110,41 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
             error = e;
         }
         assertNull(error);
+
+    }
+
+    @Test
+    public void testMenuTemplate() {
+        assertJavascriptEquals("" +
+                "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
+                "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
+                "    <li><a id=\"restart\" tabindex=\"-1\" href=\"#\" title=\"Restart Service\"><i class=\"fa fa-refresh\"></i> Restart Service</a></li>\n" +
+                "    <li class=\"divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
+                "    <li class=\"divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
+                "",
+                "$('#serviceContextMenuTemplate').html()");
+    }
+
+    @Test
+    public void testClickMenu() throws Exception {
+
+        testRenderNodesStatusTable();
+
+        assertNotNull (page.querySelector("#status-node-table-body td.status-node-cell"));
+
+        ((HtmlTableDataCell)page.querySelector("#status-node-table-body td.status-node-cell")).click();
+
+        assertJavascriptEquals("" +
+                        "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
+                        "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
+                        "    <li><a id=\"restart\" tabindex=\"-1\" href=\"#\" title=\"Restart Service\"><i class=\"fa fa-refresh\"></i> Restart Service</a></li>\n" +
+                        "    <li class=\"divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
+                        "    <li class=\"divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
+                        "<li class=\"divider\"></li><li><a id=\"show_log\" tabindex=\"-1\" href=\"#\" title=\"Show Logs\"><i class=\"fa fa-file\"></i> Show Logs</a></li>\n" +
+                        "",
+                "$('#serviceContextMenu').html()");
+
+        assertCssValue("#serviceContextMenu", "position", "absolute");
     }
 
     @Test

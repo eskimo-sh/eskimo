@@ -1,70 +1,273 @@
 {
   "gdash": {
-    "group": "Gluster",
-    "name": "Dash-board"
+    "name": "Dashboard",
+    "commands": [],
+    "group": "Gluster"
   },
-  "zookeeper": {
-    "group": "",
-    "name": "Zookeeper"
+  "marathon": {
+    "name": "Marathon",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      },
+      {
+        "name": "Show Registry Logs",
+        "icon": "fa-file",
+        "id": "show_registry_log"
+      }
+    ],
+    "group": "Mesos"
   },
   "mesos-master": {
-    "group": "Mesos",
-    "name": "Master"
+    "name": "Master",
+    "commands": [
+      {
+        "name": "Show INFO Logs",
+        "icon": "fa-file",
+        "id": "show_info_log"
+      },
+      {
+        "name": "Show WARN Logs",
+        "icon": "fa-file",
+        "id": "show_warn_log"
+      },
+      {
+        "name": "Show ERROR Logs",
+        "icon": "fa-file",
+        "id": "show_error_log"
+      }
+    ],
+    "group": "Mesos"
+  },
+  "zookeeper": {
+    "name": "Zookeeper",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": ""
+  },
+  "flink-worker": {
+    "name": "Worker",
+    "commands": [],
+    "group": "Flink"
   },
   "zeppelin": {
-    "group": "",
-    "name": "Zeppelin"
+    "name": "Zeppelin",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      },
+      {
+        "name": "Show Shell Int. Logs",
+        "icon": "fa-file",
+        "id": "show_shell_log"
+      },
+      {
+        "name": "Show Python Int. Logs",
+        "icon": "fa-file",
+        "id": "show_python_log"
+      },
+      {
+        "name": "Show Spark Int. Logs",
+        "icon": "fa-file",
+        "id": "show_spark_log"
+      },
+      {
+        "name": "Show Flink Int. Logs",
+        "icon": "fa-file",
+        "id": "show_flink_log"
+      }
+    ],
+    "group": ""
   },
   "ntp": {
-    "group": "",
-    "name": "NTP"
+    "name": "NTP",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": ""
   },
   "gluster": {
-    "group": "Gluster",
-    "name": "FS"
+    "name": "FS",
+    "commands": [
+      {
+        "name": "Show GlusterFS Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      },
+      {
+        "name": "Show Remote Server Logs",
+        "icon": "fa-file",
+        "id": "show_remote_log"
+      }
+    ],
+    "group": "Gluster"
+  },
+  "flink-app-master": {
+    "name": "App Master",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": "Flink"
   },
   "mesos-agent": {
-    "group": "Mesos",
-    "name": "Agent"
+    "name": "Agent",
+    "commands": [
+      {
+        "name": "Show INFO Logs",
+        "icon": "fa-file",
+        "id": "show_info_log"
+      },
+      {
+        "name": "Show WARN Logs",
+        "icon": "fa-file",
+        "id": "show_warn_log"
+      },
+      {
+        "name": "Show ERROR Logs",
+        "icon": "fa-file",
+        "id": "show_error_log"
+      }
+    ],
+    "group": "Mesos"
   },
   "logstash": {
-    "group": "Elastic Stack",
-    "name": "Logstash"
+    "name": "Logstash",
+    "commands": [
+      {
+        "name": "Show Remote Server Logs",
+        "icon": "fa-file",
+        "id": "show_remote_log"
+      }
+    ],
+    "group": "Elastic Stack"
   },
   "cerebro": {
-    "group": "Elastic Stack",
-    "name": "Cerebro"
+    "name": "Cerebro",
+    "commands": [],
+    "group": "Elastic Stack"
   },
   "elasticsearch": {
-    "group": "Elastic Stack",
-    "name": "Elastic-Search"
+    "name": "Elastic-Search",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      },
+      {
+        "name": "Show Search Slow Logs",
+        "icon": "fa-file",
+        "id": "show_search_slow_log"
+      },
+      {
+        "name": "Show Indexing Slow Logs",
+        "icon": "fa-file",
+        "id": "show_index_slow_log"
+      },
+      {
+        "name": "Show GC Logs",
+        "icon": "fa-file",
+        "id": "show_gc_log"
+      }
+    ],
+    "group": "Elastic Stack"
   },
   "grafana": {
-    "group": "Monitoring",
-    "name": "Grafana"
+    "name": "Grafana",
+    "commands": [],
+    "group": "Monitoring"
   },
   "kafka-manager": {
-    "group": "Kafka",
-    "name": "Manager"
+    "name": "Manager",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": "Kafka"
   },
   "kafka": {
-    "group": "Kafka",
-    "name": "Broker"
+    "name": "Broker",
+    "commands": [
+      {
+        "name": "Show Server Logs",
+        "icon": "fa-file",
+        "id": "show_server_log"
+      },
+      {
+        "name": "Show Controller Logs",
+        "icon": "fa-file",
+        "id": "show_controller_log"
+      },
+      {
+        "name": "Show State Change Logs",
+        "icon": "fa-file",
+        "id": "show_state_change_log"
+      }
+    ],
+    "group": "Kafka"
   },
   "spark-executor": {
-    "group": "Spark",
-    "name": "Executor"
+    "name": "Executor",
+    "commands": [
+      {
+        "name": "Show Mesos Shuffle Logs",
+        "icon": "fa-file",
+        "id": "show_shuffle_log"
+      }
+    ],
+    "group": "Spark"
   },
   "prometheus": {
-    "group": "Monitoring",
-    "name": "Prometheus"
+    "name": "Prometheus",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": "Monitoring"
   },
   "kibana": {
-    "group": "Elastic Stack",
-    "name": "Kibana"
+    "name": "Kibana",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": "Elastic Stack"
   },
   "spark-history-server": {
-    "group": "Spark",
-    "name": "History Server"
+    "name": "Console",
+    "commands": [
+      {
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }
+    ],
+    "group": "Spark"
   }
 }

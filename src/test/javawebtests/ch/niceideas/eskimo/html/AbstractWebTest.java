@@ -62,10 +62,10 @@ public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
 
-    public static final int MAX_WAIT_TIME_SECS = 50;
+    //public static final int MAX_WAIT_TIME_SECS = 50;
 
     private static final int INCREMENTAL_WAIT_MS = 500;
-    private static final int MAX_WAIT_RETRIES = 40;
+    private static final int MAX_WAIT_RETRIES = 50;
 
     private static Thread server;
     private static Main main = null;
