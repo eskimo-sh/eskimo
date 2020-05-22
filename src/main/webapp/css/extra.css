@@ -444,8 +444,8 @@ table.system-information tr td.info-label {
     margin-bottom: 3px;
 }
 .status-monitoring-info {
-    height: 413px;
-    min-height: 413px;
+    height: 220px;
+    min-height: 220px;
     overflow-y: auto;
 }
 .status-monitoring-dashboard-panel{

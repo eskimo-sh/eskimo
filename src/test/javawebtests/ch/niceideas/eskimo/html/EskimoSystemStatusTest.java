@@ -114,6 +114,25 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
+    public void testHideShowGrafanaDashboard() {
+
+        page.executeJavaScript("eskimoSystemStatus.hideGrafanaDashboard()");
+
+        assertCssValue("#status-monitoring-grafana", "display", "none");
+        assertJavascriptEquals("col-xs-12 col-sm-12 col-md-12", "$('#status-monitoring-info-container').attr('class')");
+
+        page.executeJavaScript("eskimoSystemStatus.showGrafanaDashboard()");
+
+        assertCssValue("#status-monitoring-grafana", "display", "block");
+        assertJavascriptEquals("col-xs-12 col-sm-12 col-md-4", "$('#status-monitoring-info-container').attr('class')");
+
+        page.executeJavaScript("eskimoSystemStatus.hideGrafanaDashboard()");
+
+        assertCssValue("#status-monitoring-grafana", "display", "none");
+        assertJavascriptEquals("col-xs-12 col-sm-12 col-md-12", "$('#status-monitoring-info-container').attr('class')");
+    }
+
+    @Test
     public void testMenuTemplate() {
         assertJavascriptEquals("" +
                 "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +

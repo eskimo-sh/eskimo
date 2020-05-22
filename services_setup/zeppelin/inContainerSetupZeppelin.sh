@@ -205,6 +205,17 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 
+echo " - making interpreter processes isolated"
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'        \"isExistingProcess\": false,\n'\
+'/'\
+'        \"isExistingProcess\": false,\n'\
+'        \"perNote\": \"isolated\",\n'\
+'        \"perUser\": \"\",\n'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+
 
 echo " - Enabling spark to change configuration at runtime"
 chown -R spark. "/usr/local/lib/zeppelin/conf/"

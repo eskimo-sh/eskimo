@@ -44,42 +44,46 @@ Software.
         </div>
 
         <div class="col-md-12">
-            <div class="col-xs-12 col-sm-12 col-md-4">
+            <div class="col-xs-12 col-sm-12 col-md-12" id="status-monitoring-info-container">
                 <div class="panel panel-default">
                     <div class="panel-heading">Eskimo System Information</div>
                     <div class="panel-body status-monitoring-info">
-                        <table class="system-information">
-                            <tr>
-                                <td class="info-label">Eskimo version</td><td> : <span id="eskimo-flavour"></span> - <span id="system-information-version"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Eskimo build timestamp</td><td> : <span id="system-information-timestamp"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Eskimo Runtime Start timestamp</td><td> : <span id="system-information-start-timestamp"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Eskimo SSH User</td><td> : <span id="system-information-user"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Nodes Status</td><td> : <span id="system-information-nodes-status"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Services Status</td><td> : <span id="system-information-services-status"></span></td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Actions from here</td><td> : </td>
-                            </tr>
-                        </table>
-                        <div id="system-information-actions"></div>
+                        <div class="col-md-6" id="status-monitoring-info-panel">
+                            <table class="system-information">
+                                <tr>
+                                    <td class="info-label">Eskimo version</td><td> : <span id="eskimo-flavour"></span> - <span id="system-information-version"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="info-label">Eskimo build timestamp</td><td> : <span id="system-information-timestamp"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="info-label">Eskimo Runtime Start timestamp</td><td> : <span id="system-information-start-timestamp"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="info-label">Eskimo SSH User</td><td> : <span id="system-information-user"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="info-label">Nodes Status</td><td> : <span id="system-information-nodes-status"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="info-label">Services Status</td><td> : <span id="system-information-services-status"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td class="info-label">Actions from here</td><td> : </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6" id="status-monitoring-info-actions">
+                            <div id="system-information-actions"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xs-12 col-sm-12 col-md-8">
+            <div class="col-xs-12 col-sm-12 col-md-8" id="status-monitoring-grafana" style="visibility: hidden; display: none;">
                 <div class="panel panel-default">
                     <div class="panel-heading">Eskimo Cluster Wide System Monitoring</div>
                     <div class="panel-body status-monitoring-dashboard-panel">

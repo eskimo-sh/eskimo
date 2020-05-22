@@ -62,17 +62,14 @@ public class NotificationService extends AbstractInformationService<JSONObject, 
         return getSubList(lastLine);
     }
 
-    @Transactional
     public void addError (String message) {
         addEvent ("Error", message);
     }
 
-    @Transactional
     public void addDoing (String message) {
         addEvent ("Doing", message);
     }
 
-    @Transactional
     public void addInfo (String message) {
         addEvent ("Info", message);
     }
@@ -91,10 +88,5 @@ public class NotificationService extends AbstractInformationService<JSONObject, 
         }});
 
         addElement(newEvent);
-    }
-
-    @Transactional
-    public Integer getLastEvent() {
-        return getLastElement();
     }
 }

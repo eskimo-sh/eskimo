@@ -68,7 +68,7 @@ public class ApplicationStatusService {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    @Value("${status.monitoringDashboardID}")
+    @Value("${status.monitoringDashboardID:NONE}")
     private String monitoringDashboardId = null;
 
     @Value("${status.monitoringDashboardRefreshPeriod}")

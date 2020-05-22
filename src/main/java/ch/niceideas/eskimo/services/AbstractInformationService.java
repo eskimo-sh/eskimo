@@ -70,12 +70,10 @@ public abstract class AbstractInformationService<T, R> {
         elements.addAll(newElements);
     }
 
-    @Transactional
     public void clear () {
         elements.clear();
     }
 
-    @Transactional
     public Integer getLastElement() {
         return elements.size();
     }

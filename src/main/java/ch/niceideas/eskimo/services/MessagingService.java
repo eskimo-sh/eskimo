@@ -62,23 +62,15 @@ public class MessagingService extends AbstractInformationService<String, String>
         return ret.toString();
     }
 
-    @Transactional
     public void addLine (String lines) {
         addElement(lines);
     }
 
-    @Transactional
     public void addLines (String[] lines) {
         addAllElements(Arrays.asList(lines));
     }
 
-    @Transactional
     public void addLines (String lines) {
         this.addLines(lines.split("\n"));
-    }
-
-    @Transactional
-    public Integer getLastLine() {
-        return getLastElement();
     }
 }

@@ -479,6 +479,36 @@ eskimo.SystemStatus = function(constructorObject) {
 
     };
 
+    function hideGrafanaDashboard() {
+
+        $('.status-monitoring-info').css("min-height", "220px");
+        $('.status-monitoring-info').css("height", "220px");
+
+        $("#status-monitoring-info-panel").attr("class", "col-md-6");
+        $("#status-monitoring-info-actions").attr("class", "col-md-6");
+
+        $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-12");
+
+        $('#status-monitoring-grafana').css("display", "none");
+        $('#status-monitoring-grafana').css("visibility", "hidden");
+    }
+    this.hideGrafanaDashboard = hideGrafanaDashboard;
+
+    function showGrafanaDashboard() {
+
+        $('.status-monitoring-info').css("min-height", "413px");
+        $('.status-monitoring-info').css("height", "413px");
+
+        $("#status-monitoring-info-panel").attr("class", "col-md-12");
+        $("#status-monitoring-info-actions").attr("class", "col-md-12");
+
+        $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-4");
+
+        $('#status-monitoring-grafana').css("display", "block");
+        $('#status-monitoring-grafana').css("visibility", "visible");
+    }
+    this.showGrafanaDashboard = showGrafanaDashboard;
+
     this.handleSystemStatus = function (nodeServicesStatus, systemStatus, blocking) {
 
         // A. Handle Grafana Dashboard ID display
@@ -488,29 +518,39 @@ eskimo.SystemStatus = function(constructorObject) {
 
         var monitoringDashboardId = systemStatus.monitoringDashboardId;
 
-        // no dashboard configured
-        if (   !grafanaAvailable
-            || monitoringDashboardId == null
-            || monitoringDashboardId == ""
-            || monitoringDashboardId == "null"
-            // or service grafana not yet available
-            || !that.eskimoServices.isServiceAvailable("grafana")
+        // grafana disabled (no dashboard configured)
+        if (monitoringDashboardId == null
+                || monitoringDashboardId == ""
+                || monitoringDashboardId == "null"
+                || monitoringDashboardId == "NONE"
+                || monitoringDashboardId == "none") {
+
+            hideGrafanaDashboard();
+
+        } else {
+
+            showGrafanaDashboard();
+
+            if (!grafanaAvailable
+                // or service grafana not yet available
+                || !that.eskimoServices.isServiceAvailable("grafana")
             ) {
 
-            $("#status-monitoring-no-dashboard").css("display", "inherit");
-            $("#status-monitoring-dashboard-frame").css("display", "none");
+                $("#status-monitoring-no-dashboard").css("display", "inherit");
+                $("#status-monitoring-dashboard-frame").css("display", "none");
 
-            $("#status-monitoring-dashboard-frame").attr('src', "html/emptyPage.html");
+                $("#status-monitoring-dashboard-frame").attr('src', "html/emptyPage.html");
 
-        }
-        // render iframe with refresh period (default 30s)
-        else {
+            }
+            // render iframe with refresh period (default 30s)
+            else {
 
-            var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
+                var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
-            setTimeout(function () {
-                that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
-            }, 5000);
+                setTimeout(function () {
+                    that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
+                }, 5000);
+            }
         }
 
         // B. Inject information
