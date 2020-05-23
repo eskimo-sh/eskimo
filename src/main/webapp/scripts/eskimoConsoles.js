@@ -70,8 +70,43 @@ eskimo.Consoles = function(constructorObject) {
         return openedConsoles;
     };
     this.setAvailableNodes = function(nodes) {
+
+        var consoleToDisable=[];
+        main: for (var i = 0; i < availableNodes.length; i++) {
+            for (j = 0; j < nodes.length; j++) {
+                if (availableNodes[i].nodeName == nodes[j].nodeName) {
+                    continue main;
+                }
+            }
+            consoleToDisable.push(availableNodes[i]);
+        }
+
+        //console.log (consoleToDisable);
+        //console.log (openedConsoles);
+
+        for (var i = 0; i < consoleToDisable.length; i++) {
+
+            var openedConsole = null;
+            var closedConsoleNbr;
+            for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
+                if (openedConsoles[closedConsoleNbr].nodeName == consoleToDisable[i].nodeName) {
+                    openedConsole = openedConsoles[closedConsoleNbr];
+                    break;
+                }
+            }
+
+            // disable console
+            if (openedConsole != null) {
+                console.log ("Disabling console " + openedConsole.nodeName);
+                openedConsole.terminal.close();
+            }
+        }
+
         availableNodes = nodes;
+
+        updateMenu();
     };
+
     this.getAvailableNodes = function () {
         return availableNodes;
     };
@@ -86,6 +121,29 @@ eskimo.Consoles = function(constructorObject) {
         return null;
     }
 
+    var updateMenu = function () {
+
+        // Find available nodes and add them to open console dropdown
+        // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+        var actionOpenConsole = $("#consoles-action-open-console");
+        actionOpenConsole.html("");
+        for (var i = 0; i < availableNodes.length; i++) {
+            var nodeObject = availableNodes[i];
+            var newLi = '' +
+                '<li><a id="console_open_' + nodeObject.nodeName + '" href="#">' +
+                nodeObject.nodeAddress +
+                '</a></li>';
+
+            actionOpenConsole.append($(newLi));
+
+            // register on click handler to actually open console
+            $('#console_open_' + nodeObject.nodeName).click(function () {
+                var nodeNameEff = this.id.substring("console_open_".length);
+                openConsole(getNodeAddress(nodeNameEff), nodeNameEff);
+            });
+        }
+    };
+
     function showConsoles() {
 
         if (!that.eskimoMain.isSetupDone()) {
@@ -98,26 +156,7 @@ eskimo.Consoles = function(constructorObject) {
             that.eskimoMain.hideProgressbar();
 
             that.eskimoMain.showOnlyContent("consoles");
-
-            // Find available nodes and add them to open console dropdown
-            // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-            var actionOpenConsole = $("#consoles-action-open-console");
-            actionOpenConsole.html("");
-            for (var i = 0; i < availableNodes.length; i++) {
-                var nodeObject = availableNodes[i];
-                var newLi = ''+
-                    '<li><a id="console_open_' + nodeObject.nodeName + '" href="#">' +
-                    nodeObject.nodeAddress +
-                    '</a></li>';
-
-                actionOpenConsole.append($(newLi));
-
-                // register on click handler to actually open console
-                $('#console_open_' + nodeObject.nodeName).click(function() {
-                    var nodeNameEff = this.id.substring("console_open_".length);
-                    openConsole(getNodeAddress(nodeNameEff), nodeNameEff);
-                });
-            }
+            updateMenu();
         }
     }
     this.showConsoles = showConsoles;
@@ -217,65 +256,72 @@ eskimo.Consoles = function(constructorObject) {
 
         console.log (terminalToClose);
 
-        // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-        var nodeToClose = null;
-        for (var i = 0; i < availableNodes.length; i++) {
-            if (availableNodes[i].nodeName == terminalToClose) {
-                nodeToClose = availableNodes[i];
+        // remove from open console
+        var openedConsole = null;
+        var closedConsoleNbr;
+        for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
+            if (openedConsoles[closedConsoleNbr].nodeName == terminalToClose) {
+                openedConsole = openedConsoles[closedConsoleNbr];
+                openedConsoles.splice(closedConsoleNbr, 1);
                 break;
             }
         }
-        if (nodeToClose == null) {
-            alert ("Node " + nodeToClose + " not found");
+
+        // remove menu
+        $("#console_" + nodeName).remove();
+
+        // remove div
+        $("#consoles-console-" + nodeName).remove();
+
+        // close session on backend
+        if (openedConsole == null) {
+            alert("Console " + terminalToClose + " not found");
         } else {
-
-            // remove from open console
-            var openedConsole = null;
-            var closedConsoleNbr;
-            for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
-                if (openedConsoles[closedConsoleNbr].nodeName == terminalToClose) {
-                    openedConsole = openedConsoles[closedConsoleNbr];
-                    openedConsoles.splice(closedConsoleNbr, 1);
-                    break;
+            console.log(openedConsole.terminal);
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
+                success: function (data, status, jqXHR) {
+                    console.log(data);
+                    //alert(data);
+                },
+                error: function(error) {
+                    console.debug (error);
                 }
-            }
+            });
 
-            // remove menu
-            $("#console_" + nodeName).remove();
+            openedConsole.terminal.close();
+        }
 
-            // remove div
-            $("#consoles-console-" + nodeName).remove();
-
-            // close session on backend
-            if (openedConsole == null) {
-                alert("Console " + nodeToClose + " not found");
+        // show another console if available
+        if (openedConsoles.length > 0) {
+            if (closedConsoleNbr < openedConsoles.length) {
+                selectConsole(openedConsoles[closedConsoleNbr].nodeAddress, openedConsoles[closedConsoleNbr].nodeName);
             } else {
-                console.log(openedConsole.terminal);
-                $.ajax({
-                    type: "GET",
-                    dataType: "json",
-                    url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
-                    success: function (data, status, jqXHR) {
-                        console.log(data);
-                        //alert(data);
-                    },
-                    error: errorHandler
-                });
-
-                openedConsole.terminal.close();
-            }
-
-            // show another console if available
-            if (openedConsoles.length > 0) {
-                if (closedConsoleNbr < openedConsoles.length) {
-                    selectConsole(openedConsoles[closedConsoleNbr].nodeAddress, openedConsoles[closedConsoleNbr].nodeName);
-                } else {
-                    selectConsole(openedConsoles[closedConsoleNbr - 1].nodeAddress, openedConsoles[closedConsoleNbr - 1].nodeName);
-                }
+                selectConsole(openedConsoles[closedConsoleNbr - 1].nodeAddress, openedConsoles[closedConsoleNbr - 1].nodeName);
             }
         }
     }
     this.closeConsole = closeConsole;
+
+    function getTerminalWidth() {
+        return Math.round(
+            ($("#consoles-management").outerWidth()
+                - 80) // decoration
+            / 8.1  // width of column
+        );
+    }
+
+    function getTerminalHeight() {
+        return Math.round(
+            ($("#consoles-management").outerHeight()
+                - 220 // decoration
+                //- 28 // toolbar
+            )
+            / 19  // Height of line
+        );
+    }
 
     function openConsole (nodeAddress, nodeName) {
 
@@ -311,8 +357,8 @@ eskimo.Consoles = function(constructorObject) {
             });
 
             var t = new ajaxterm.Terminal("term_"+nodeName, {
-                width: 80,
-                height: 25,
+                width: getTerminalWidth(),
+                height: getTerminalHeight(),
                 endpoint: "./terminal?node="+nodeAddress
             });
             t.setShowNextTab(showNextTab);

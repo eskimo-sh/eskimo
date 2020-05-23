@@ -131,37 +131,133 @@ public abstract class AbstractSetupShellTest {
 
         for (String scriptToExecute: getScriptsToEnhance()) {
 
-            String scriptContent = FileUtils.readFile(new File(jailPath + "/" + scriptToExecute));
-            if (StringUtils.isNotBlank(scriptContent)) {
-
-                // inject overriding of path to use jail commands
-                scriptContent = scriptContent.replace("#!/usr/bin/env bash\n", "" +
-                        "#!/usr/bin/env bash\n" +
-                        "\n" +
-                        "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
-                        "\n" +
-                        "# Change current folder to script dir (important !)\n" +
-                        "cd $SCRIPT_DIR\n"+
-                        "\n" +
-                        "# Avoid sleeps everywhere\n" +
-                        "export NO_SLEEP=true\n" +
-                        "\n"+
-                        "# Set test mode\n" +
-                        "export TEST_MODE=true\n" +
-                        "\n"+
-                        "# Using local commands\n" +
-                        "export PATH=$SCRIPT_DIR:$PATH\n");
-
-                // inject custom topology loading
-                scriptContent = scriptContent.replace(". /etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
-
-                scriptContent = scriptContent.replace(". /host_etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
-
-                copyResource(scriptToExecute, jailPath, scriptContent);
-            }
+            enhanceScript(jailPath, scriptToExecute);
         }
 
     }
+
+    protected void enhanceScript(String jailPath, String scriptToExecute) throws FileException {
+        String scriptContent = FileUtils.readFile(new File(jailPath + "/" + scriptToExecute));
+        if (StringUtils.isNotBlank(scriptContent)) {
+
+            // inject overriding of path to use jail commands
+            scriptContent = scriptContent.replace("#!/usr/bin/env bash\n", "" +
+                    "#!/usr/bin/env bash\n" +
+                    "\n" +
+                    "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
+                    "\n" +
+                    "# Change current folder to script dir (important !)\n" +
+                    "cd $SCRIPT_DIR\n"+
+                    "\n" +
+                    "# Avoid sleeps everywhere\n" +
+                    "export NO_SLEEP=true\n" +
+                    "\n"+
+                    "# Set test mode\n" +
+                    "export TEST_MODE=true\n" +
+                    "\n"+
+                    "# Using local commands\n" +
+                    "export PATH=$SCRIPT_DIR:$PATH\n");
+
+            // inject custom topology loading
+            scriptContent = scriptContent.replace(". /etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
+
+            scriptContent = scriptContent.replace(". /host_etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
+
+            copyResource(scriptToExecute, jailPath, scriptContent);
+        }
+    }
+
+    protected abstract String getServiceName();
+
+    protected String getTemplateName() {
+        return getServiceName();
+    }
+
+    protected abstract void copyScripts(String jailPath) throws IOException;
+
+    protected abstract String[] getScriptsToExecute();
+
+    protected String[] getScriptsToEnhance() {
+        return getScriptsToExecute();
+    }
+
+    protected final String executeScripts(String jailPath) throws ProcessHelper.ProcessHelperException {
+        StringBuilder resultBuilder = new StringBuilder();
+        for (String scriptToExecute: getScriptsToExecute()) {
+            logger.info ("Executing " + scriptToExecute);
+            resultBuilder.append(ProcessHelper.exec(new String[]{"bash", jailPath + "/" + scriptToExecute}, true));
+        }
+        return resultBuilder.toString();
+    }
+
+    /**
+     * @return the path of the new jail where setup has to be executed
+     */
+    public static String createJail() throws Exception {
+        File tempFile = File.createTempFile("eskimoshell_", "_test");
+        tempFile.delete();
+        tempFile.mkdir();
+
+        // copy bash and everything bash requires to jail bin
+        createLoggingExecutable("cp", tempFile.getAbsolutePath());
+        createLoggingExecutable("gunzip", tempFile.getAbsolutePath());
+        createLoggingExecutable("curl", tempFile.getAbsolutePath());
+        createLoggingExecutable("mkdir", tempFile.getAbsolutePath());
+        createLoggingExecutable("useradd", tempFile.getAbsolutePath());
+        createLoggingExecutable("chown", tempFile.getAbsolutePath());
+        createLoggingExecutable("chmod", tempFile.getAbsolutePath());
+        createLoggingExecutable("curl", tempFile.getAbsolutePath());
+        createLoggingExecutable("ln", tempFile.getAbsolutePath());
+        createLoggingExecutable("rm", tempFile.getAbsolutePath());
+        createLoggingExecutable("bash", tempFile.getAbsolutePath());
+        createLoggingExecutable("systemctl", tempFile.getAbsolutePath());
+        createLoggingExecutable("echo", tempFile.getAbsolutePath());
+        createLoggingExecutable("touch", tempFile.getAbsolutePath());
+        createLoggingExecutable("wget", tempFile.getAbsolutePath());
+        createLoggingExecutable("mv", tempFile.getAbsolutePath());
+        createLoggingExecutable("gluster_call_remote.sh", tempFile.getAbsolutePath());
+
+        createDummyExecutable("id", tempFile.getAbsolutePath());
+        createDummyExecutable("docker", tempFile.getAbsolutePath());
+        createDummyExecutable("sed", tempFile.getAbsolutePath());
+        createDummyExecutable("sudo", tempFile.getAbsolutePath());
+
+        return tempFile.getAbsolutePath();
+    }
+
+    private static void createLoggingExecutable(String command, String targetDir) throws Exception {
+
+        File targetPath = new File (targetDir + "/" + command);
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "echo \"$@\" >> .log_" + command + "\n");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+    }
+
+    private static void createDummyExecutable(String script, String targetDir) throws Exception {
+        File targetPath = createResourceFile(script, targetDir);
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+    }
+
+    private static File createResourceFile(String resourceFile, String targetDir) throws IOException, FileException {
+        String resourceString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractSetupShellTest/" + resourceFile));
+
+        return copyResource(resourceFile, targetDir, resourceString);
+    }
+
+    private static File copyResource(String resourceFile, String targetDir, String resourceString) throws FileException {
+        File targetPath = new File (targetDir + "/" + resourceFile);
+        FileUtils.writeFile(targetPath, resourceString);
+
+        return targetPath;
+    }
+
+    public String getCaemlCaseServiceName() {
+        return StringUtils.toCamelCase(getServiceName());
+    }
+
 
     protected final void assertMarathonCommands() throws IOException {
         //System.err.println (setupLogs);
@@ -314,96 +410,6 @@ public abstract class AbstractSetupShellTest {
         } else {
             fail ("file 'testFile.conf.result' is missing in " + getCaemlCaseServiceName()+"SetupShellTest/");
         }
-    }
-
-    protected abstract String getServiceName();
-
-    protected String getTemplateName() {
-        return getServiceName();
-    }
-
-    protected abstract void copyScripts(String jailPath) throws IOException;
-
-    protected abstract String[] getScriptsToExecute();
-
-    protected String[] getScriptsToEnhance() {
-        return getScriptsToExecute();
-    }
-
-    protected final String executeScripts(String jailPath) throws ProcessHelper.ProcessHelperException {
-        StringBuilder resultBuilder = new StringBuilder();
-        for (String scriptToExecute: getScriptsToExecute()) {
-            logger.info ("Executing " + scriptToExecute);
-            resultBuilder.append(ProcessHelper.exec(new String[]{"bash", jailPath + "/" + scriptToExecute}, true));
-        }
-        return resultBuilder.toString();
-    }
-
-    /**
-     * @return the path of the new jail where setup has to be executed
-     */
-    public static String createJail() throws Exception {
-        File tempFile = File.createTempFile("eskimoshell_", "_test");
-        tempFile.delete();
-        tempFile.mkdir();
-
-        // copy bash and everything bash requires to jail bin
-        createLoggingExecutable("cp", tempFile.getAbsolutePath());
-        createLoggingExecutable("gunzip", tempFile.getAbsolutePath());
-        createLoggingExecutable("curl", tempFile.getAbsolutePath());
-        createLoggingExecutable("mkdir", tempFile.getAbsolutePath());
-        createLoggingExecutable("useradd", tempFile.getAbsolutePath());
-        createLoggingExecutable("chown", tempFile.getAbsolutePath());
-        createLoggingExecutable("chmod", tempFile.getAbsolutePath());
-        createLoggingExecutable("curl", tempFile.getAbsolutePath());
-        createLoggingExecutable("ln", tempFile.getAbsolutePath());
-        createLoggingExecutable("rm", tempFile.getAbsolutePath());
-        createLoggingExecutable("bash", tempFile.getAbsolutePath());
-        createLoggingExecutable("systemctl", tempFile.getAbsolutePath());
-        createLoggingExecutable("echo", tempFile.getAbsolutePath());
-        createLoggingExecutable("touch", tempFile.getAbsolutePath());
-        createLoggingExecutable("wget", tempFile.getAbsolutePath());
-        createLoggingExecutable("mv", tempFile.getAbsolutePath());
-
-        createDummyExecutable("id", tempFile.getAbsolutePath());
-        createDummyExecutable("docker", tempFile.getAbsolutePath());
-        createDummyExecutable("sed", tempFile.getAbsolutePath());
-        createDummyExecutable("sudo", tempFile.getAbsolutePath());
-
-        return tempFile.getAbsolutePath();
-    }
-
-    private static void createLoggingExecutable(String command, String targetDir) throws Exception {
-
-        File targetPath = new File (targetDir + "/" + command);
-        FileUtils.writeFile(targetPath, "" +
-                "#/bin/bash\n" +
-                "\n" +
-                "echo \"$@\" >> .log_" + command + "\n");
-
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
-    }
-
-    private static void createDummyExecutable(String script, String targetDir) throws Exception {
-        File targetPath = createResourceFile(script, targetDir);
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
-    }
-
-    private static File createResourceFile(String resourceFile, String targetDir) throws IOException, FileException {
-        String resourceString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractSetupShellTest/" + resourceFile));
-
-        return copyResource(resourceFile, targetDir, resourceString);
-    }
-
-    private static File copyResource(String resourceFile, String targetDir, String resourceString) throws FileException {
-        File targetPath = new File (targetDir + "/" + resourceFile);
-        FileUtils.writeFile(targetPath, resourceString);
-
-        return targetPath;
-    }
-
-    public String getCaemlCaseServiceName() {
-        return StringUtils.toCamelCase(getServiceName());
     }
 
 }

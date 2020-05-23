@@ -217,8 +217,8 @@ public class Terminal {
      * Set graphics rendition. This is the value that gets stored into the higher 8 bits of {@link #scr}
      */
     private int sgr;
-    private StringBuilder buffer; // TODO: switch to StringBuilder
-    private StringBuilder outBuffer;
+    private StringBuilder buffer = new StringBuilder();
+    private StringBuilder outBuffer = new StringBuilder();
     /**
      * The HTML that we returned from {@link #dumpHtml(boolean,int)} the last time.
      */
@@ -426,7 +426,7 @@ public class Terminal {
 
     public String read() {
         String b = outBuffer.toString();
-        outBuffer = null;
+        outBuffer = new StringBuilder();
         return b;
     }
 

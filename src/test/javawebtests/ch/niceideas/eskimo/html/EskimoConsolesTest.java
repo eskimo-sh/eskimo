@@ -91,6 +91,11 @@ public class EskimoConsolesTest extends AbstractWebTest {
     }
 
     @Test
+    public void testNodeVanish() throws Exception {
+        fail ("Assess when a node vanish opened console is disabled");
+    }
+
+    @Test
     public void testShowConsoles() {
         page.executeJavaScript("eskimoConsoles.showConsoles()");
 

@@ -45,6 +45,7 @@ if [[ $SHADOW_IP_ADDRESS == "" ]]; then
    exit -1
 fi
 
+echo "-> __force-remove-peers.sh"
 echo " - Forcing removal of $SHADOW_IP_ADDRESS from local ($SELF_IP_ADDRESS) peer list"
 
 echo "    + Listing local volumes"
@@ -70,7 +71,7 @@ for vol in $volumes; do
 
 
     if [[ "$brick" != "" ]]; then
-        echo "   + Removing brick $brick"
+        echo "    + Removing brick $brick"
         share_name=`echo $brick | rev | cut -d'/' -f 1 | rev`
         echo "y" | gluster volume remove-brick $share_name replica 1 $brick force >/tmp/remove_brick 2>&1
         if [[ $? != 0 ]]; then

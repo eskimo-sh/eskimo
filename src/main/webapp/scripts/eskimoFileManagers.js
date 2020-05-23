@@ -82,7 +82,55 @@ eskimo.FileManagers = function(constructorObject) {
     };
 
     this.setAvailableNodes = function(nodes) {
+
+        // FIXME If some nodes are removed from previous list, check if a console was opened that should be disabled
+
+        var fmToDisable=[];
+        main: for (var i = 0; i < availableNodes.length; i++) {
+            for (j = 0; j < nodes.length; j++) {
+                if (availableNodes[i].nodeName == nodes[j].nodeName) {
+                    continue main;
+                }
+            }
+            fmToDisable.push(availableNodes[i]);
+        }
+
+        //console.log (fmToDisable);
+        //console.log (openedFileManagers);
+
+        for (var i = 0; i < fmToDisable.length; i++) {
+
+            var openedFm = null;
+            var closedFmNbr;
+            for (closedFmNbr = 0; closedFmNbr < openedFileManagers.length; closedFmNbr++) {
+                if (openedFileManagers[closedFmNbr].nodeName == fmToDisable[i].nodeName) {
+                    openedFm = openedFileManagers[closedFmNbr];
+                    break;
+                }
+            }
+
+            // disable console
+            if (openedFm != null) {
+                console.log ("Disabling file manager " + openedFm.nodeName);
+
+                // Disable file manager
+                $('#file-manager-folder-menu-' + openedFm.nodeName).html('' +
+                    '            <div class="btn-group">'+
+                    '                <button id="file-manager-close-' + openedFm.nodeName + '" name="file-manager-close-' + openedFm.nodeName + '" class="btn btn-primary">Close</button>\n' +
+                    '            </div>');
+
+                $('#file-manager-folder-content-' + openedFm.nodeName).html('(connection to backend lost)');
+
+                $("#file-manager-close-" + openedFm.nodeName).click(function () {
+                    var effNodeName = this.id.substring("file-manager-close-".length);
+                    closeFileManager(effNodeName);
+                });
+            }
+        }
+
         availableNodes = nodes;
+
+        updateMenu();
     };
     this.getAvailableNodes = function () {
         return availableNodes;
@@ -98,6 +146,27 @@ eskimo.FileManagers = function(constructorObject) {
         return null;
     }
 
+    var updateMenu = function () {
+
+        // Find available nodes and add them to open sftp dropdown
+        // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+        var actionOpen = $("#file-managers-action-open-file-manager");
+        actionOpen.html("");
+        for (var i = 0; i < availableNodes.length; i++) {
+            var nodeObject = availableNodes[i];
+            var newLi = '<li><a id="file_manager_open_' + nodeObject.nodeName + '" href="#">'
+                + nodeObject.nodeAddress + '</a></li>';
+
+            actionOpen.append($(newLi));
+
+            // register on click handler to actually open console
+            $('#file_manager_open_' + nodeObject.nodeName).click(function () {
+                var nodeName = this.id.substring("file_manager_open_".length);
+                openFileManager(getNodeAddress(nodeName), nodeName);
+            });
+        }
+    };
+
     function showFileManagers() {
 
         if (!that.eskimoMain.isSetupDone()) {
@@ -110,24 +179,7 @@ eskimo.FileManagers = function(constructorObject) {
             that.eskimoMain.hideProgressbar();
 
             that.eskimoMain.showOnlyContent("file-managers");
-
-            // Find available nodes and add them to open sftp dropdown
-            // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-            var actionOpen = $("#file-managers-action-open-file-manager");
-            actionOpen.html("");
-            for (var i = 0; i < availableNodes.length; i++) {
-                var nodeObject = availableNodes[i];
-                var newLi = '<li><a id="file_manager_open_' + nodeObject.nodeName + '" href="#">'
-                    + nodeObject.nodeAddress + '</a></li>';
-
-                actionOpen.append($(newLi));
-
-                // register on click handler to actually open console
-                $('#file_manager_open_' + nodeObject.nodeName).click(function() {
-                    var nodeName = this.id.substring("file_manager_open_".length);
-                    openFileManager(getNodeAddress(nodeName), nodeName);
-                });
-            }
+            updateMenu();
         }
     }
     this.showFileManagers = showFileManagers;
@@ -565,6 +617,53 @@ eskimo.FileManagers = function(constructorObject) {
         });
     };
 
+    var closeFileManager = function (nodeName) {
+        console.log(nodeName);
+        // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+
+        // remove from open File Manager
+        var openedFileManager = null;
+        var closedFileManagerNbr = -1;
+        for (closedFileManagerNbr = 0; closedFileManagerNbr < openedFileManagers.length; closedFileManagerNbr++) {
+            if (openedFileManagers[closedFileManagerNbr].nodeName == nodeName) {
+                openedFileManager = openedFileManagers[closedFileManagerNbr];
+                openedFileManagers.splice(closedFileManagerNbr, 1);
+                break;
+            }
+        }
+
+        // remove menu
+        $("#file-manager_" + nodeName).remove();
+
+        // remove div
+        $("#file-managers-file-manager-" + nodeName).remove();
+
+        // close session on backend
+        if (openedFileManager == null) {
+            alert("File Manager " + terminalToClose + " not found");
+        } else {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "file-manager-remove?address=" + openedFileManager.nodeAddress,
+                success: function (data, status, jqXHR) {
+                    console.log(data);
+                    //alert(data);
+                },
+                error: errorHandler
+            });
+        }
+
+        // show another File Manager if available
+        if (openedFileManagers.length > 0) {
+            if (closedFileManagerNbr < openedFileManagers.length) {
+                selectFileManager(openedFileManagers[closedFileManagerNbr].nodeAddress, openedFileManagers[closedFileManagerNbr].nodeName);
+            } else {
+                selectFileManager(openedFileManagers[closedFileManagerNbr - 1].nodeAddress, openedFileManagers[closedFileManagerNbr - 1].nodeName);
+            }
+        }
+    };
+
     function openFileManager (nodeAddress, nodeName) {
 
         // add tab entry
@@ -633,63 +732,8 @@ eskimo.FileManagers = function(constructorObject) {
             // $('input[type=file]').simpleUpload(url, options);
 
             $("#file-manager-close-" + nodeName).click(function () {
-                var terminalToClose = this.id.substring("file-manager-close-".length);
-                console.log (terminalToClose);
-                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-                var nodeToClose = null;
-                for (var i = 0; i < availableNodes.length; i++) {
-                    if (availableNodes[i].nodeName == terminalToClose) {
-                        nodeToClose = availableNodes[i];
-                        break;
-                    }
-                }
-                if (nodeToClose == null) {
-                    alert ("Node " + nodeToClose + " not found");
-                } else {
-
-                    // remove from open File Manager
-                    var openedFileManager = null;
-                    var closedFileManagerNbr = -1;
-                    for (closedFileManagerNbr = 0; closedFileManagerNbr < openedFileManagers.length; closedFileManagerNbr++) {
-                        if (openedFileManagers[closedFileManagerNbr].nodeName == terminalToClose) {
-                            openedFileManager = openedFileManagers[closedFileManagerNbr];
-                            openedFileManagers.splice(closedFileManagerNbr, 1);
-                            break;
-                        }
-                    }
-
-                    // remove menu
-                    $("#file-manager_" + nodeName).remove();
-
-                    // remove div
-                    $("#file-managers-file-manager-" + nodeName).remove();
-
-                    // close session on backend
-                    if (openedFileManager == null) {
-                        alert ("File Manager " + nodeToClose + " not found");
-                    } else {
-                        $.ajax({
-                            type: "GET",
-                            dataType: "json",
-                            url: "file-manager-remove?address=" + openedFileManager.nodeAddress,
-                            success: function (data, status, jqXHR) {
-                                console.log (data);
-                                //alert(data);
-                            },
-                            error: errorHandler
-                        });
-                    }
-
-                    // show another File Manager if available
-                    if (openedFileManagers.length > 0) {
-                        if (closedFileManagerNbr < openedFileManagers.length) {
-                            selectFileManager(openedFileManagers[closedFileManagerNbr].nodeAddress, openedFileManagers[closedFileManagerNbr].nodeName);
-                        } else {
-                            selectFileManager(openedFileManagers[closedFileManagerNbr - 1].nodeAddress, openedFileManagers[closedFileManagerNbr - 1].nodeName);
-                        }
-                    }
-                }
-
+                var effNodeName = this.id.substring("file-manager-close-".length);
+                closeFileManager(effNodeName);
             });
 
             // register on click handlers

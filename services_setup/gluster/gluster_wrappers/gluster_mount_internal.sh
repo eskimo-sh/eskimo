@@ -61,6 +61,7 @@ if [[ $4 == "" ]]; then
 fi
 export OWNER_ID=$4
 
+echo "-> gluster_mount_internal.sh"
 echo " - Proceeding with gluster mount with :"
 echo "   + volume           : $VOLUME"
 echo "   + mount point      : $MOUNT_POINT"

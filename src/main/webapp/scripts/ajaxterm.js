@@ -35,6 +35,10 @@ Software.
 var ajaxterm={};
 
 ajaxterm.Terminal=function(id,options) {
+
+    this.id = id;
+    var that = this;
+
     // options
     var width  = options.width || 80; // dimension of the terminal
     var height = options.height || 25;
@@ -54,13 +58,18 @@ ajaxterm.Terminal=function(id,options) {
 	var sending=0;
 	var rmax=1;
 
+	var closed = false;
+
+    var systemPasteReady = false;
+    var systemPasteContent;
+    var cpTextArea;
+
 	var div=(typeof(id)=="string" ? document.getElementById(id) : id);
     var fitter=document.createElement('div');   // for shrinking the screen area to the right size
 	var dstat=document.createElement('pre');
 	var sled=document.createElement('span');    // status LED. indicate the communication with the server
 	var opt_get=document.createElement('a');    //
 	var opt_color=document.createElement('a');
-	var opt_paste=document.createElement('a');
 	var sdebug=document.createElement('span');
     var spacer=document.createElement('div');   // creates border & padding around the main screen
     var screen = document.createElement('div'); // holds dterm&cursor. origin of the cursor positioning
@@ -68,104 +77,69 @@ ajaxterm.Terminal=function(id,options) {
     var cursor=document.createElement('div');   // cursor
 	var showPrevTab = null;
     var showNextTab = null;
+
 	this.getSessionId = function () {
 		return sid;
-	}
+	};
+
 	this.close = function() {
 		if (timeout && timeout != null) {
             window.clearTimeout(timeout);
         }
-	}
+        $("#" + that.id).find("pre").each(function() {
+            $(this).addClass('dead');
+        });
+
+        div.onkeypress=null;
+        div.onkeydown=null;
+
+        closed = true;
+	};
+
 	this.setShowPrevTab = function (showPrevTabFct){
 	    showPrevTab = showPrevTabFct;
     };
+
     this.setShowNextTab = function (showNextTabFct){
         showNextTab = showNextTabFct;
     };
+
 	function debug(s) {
 		sdebug.innerHTML=s;
 	}
+
 	function error() {
 		sled.className='off';
 		debug("Connection lost timeout ts:"+((new Date).getTime()));
 	}
+
 	function opt_add(opt,name) {
 		opt.className='off';
 		opt.innerHTML=' '+name+' ';
 		dstat.appendChild(opt);
 		dstat.appendChild(document.createTextNode(' '));
 	}
+
 	function do_get(event) {
 		opt_get.className=(opt_get.className=='off')?'on':'off';
 		debug('GET '+opt_get.className);
 	}
+
 	function do_color(event) {
 		var o=opt_color.className=(opt_color.className=='off')?'on':'off';
-		if(o=='on')
-			query1=query0+"&c=1&k=";
-		else
-			query1=query0+"&k=";
+		if (o == 'on') {
+            query1 = query0 + "&c=1&k=";
+        } else {
+            query1 = query0 + "&k=";
+        }
 		debug('Color '+opt_color.className);
 	}
-	function is_clipboard_support() {
-		if (window.clipboardData) {
-			return true;
-		} else if(window.netscape) {
-			return is_mozilla_clipboard_support() == '';
-		}
-		return false;
-	}
-	function is_mozilla_clipboard_support(){
-		try {
-			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		} catch (err) {
-			return err + '\nAccess denied, <a href="http://kb.mozillazine.org/Granting_JavaScript_access_to_the_clipboard" target="_blank">more info</a>';
-		}
-		return '';
-	}
-	function mozilla_clipboard() {
-		 // mozilla sucks
-        var err;
-		if ((err=is_mozilla_clipboard_support()) != '') {
-			debug(err);
-			return undefined;
-		}
-		var clip = Components.classes["@mozilla.org/widget/clipboard;1"].createInstance(Components.interfaces.nsIClipboard);
-		var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable);
-		if (!clip || !trans) {
-			return undefined;
-		}
-		trans.addDataFlavor("text/unicode");
-		clip.getData(trans,clip.kGlobalClipboard);
-		var str=new Object();
-		var strLength=new Object();
-		try {
-			trans.getTransferData("text/unicode",str,strLength);
-		} catch(err) {
-			return "";
-		}
-		if (str) {
-			str=str.value.QueryInterface(Components.interfaces.nsISupportsString);
-		}
-		if (str) {
-			return str.data.substring(0,strLength.value / 2);
-		} else {
-			return "";
-		}
-	}
-	function do_paste(event) {
-		var p=undefined;
-		if (window.clipboardData) {
-			p=window.clipboardData.getData("Text");
-		} else if(window.netscape) {
-			p=mozilla_clipboard();
-		}
-		if (p) {
-			debug('Pasted');
-			queue(encodeURIComponent(p));
-		}
-	}
+
 	function update() {
+	    if (closed) {
+	        return;
+        }
+
 //		debug("ts: "+((new Date).getTime())+" rmax:"+rmax);
 		if(sending==0) {
 			sending=1;
@@ -224,22 +198,29 @@ ajaxterm.Terminal=function(id,options) {
 						debug("Connection error status:"+r.status);
 					}
 				}
-			}
+			};
+
 			error_timeout=window.setTimeout(error,5000);
-			if(opt_get.className=='on') {
+
+			if(opt_get.className == 'on') {
 				r.send(null);
 			} else {
 				r.send(query);
 			}
 		}
 	}
+
 	function queue(s) {
+        if (closed) {
+            return;
+        }
 		keybuf.unshift(s);
-		if(sending==0) {
+		if (sending == 0) {
 			window.clearTimeout(timeout);
 			timeout=window.setTimeout(update,1);
 		}
 	}
+
     // special keys that don't result in the keypress event.
     // we need to handle these in keydown
     var keyDownKeyCodes = {
@@ -260,6 +241,7 @@ ajaxterm.Terminal=function(id,options) {
         46:1,   // Del
         112:1, 113:1, 114:1, 115:1, 116:1, 117:1, 118:1, 119:1, 120:1, 121:1, 122:1, 123:1 // F1-F12
     };
+
 	function keydown(ev) {
 		if (!ev) {
 		    ev=window.event;
@@ -269,6 +251,7 @@ ajaxterm.Terminal=function(id,options) {
             return handleKey(ev,0);
         }
 	}
+
 	function keypress(ev) {
         if ((keyDownKeyCodes[ev.keyCode] && ev.charCode==0) || ev.ctrlKey || ev.altKey) {
             // we handled these in keydown
@@ -277,12 +260,12 @@ ajaxterm.Terminal=function(id,options) {
         }
     }
 
-    // which==0 appears to be used as a signel but not sure exactly why --- Kohsuke
+    // which==0 appears to be used as a signel but not sure exactly why
     function handleKey(ev,which) {
 		if (!ev) {
             ev=window.event;
         }
-        console.log ("kp keyCode="+ev.keyCode+" which="+ev.which+" shiftKey="+ev.shiftKey+" ctrlKey="+ev.ctrlKey+" altKey="+ev.altKey);
+        console.log ("kp keyCode="+ev.keyCode+" which="+which+" shiftKey="+ev.shiftKey+" ctrlKey="+ev.ctrlKey+" altKey="+ev.altKey);
 //		debug(s);
 //		return false;
 //		else { if (!ev.ctrlKey || ev.keyCode==17) { return; }
@@ -322,17 +305,33 @@ ajaxterm.Terminal=function(id,options) {
 			else if (kc==219) k=String.fromCharCode(0);  // Ctrl-@
 			*/
 
-            if (kc==33) {
-                k=""; // PgUp
-                if (showPrevTab && showPrevTab != null) {
-                    showPrevTab();
+			if (ev.shiftKey) {
+				if (kc == 37) { // Ctrl+Shift+Left
+					k = "";
+					if (showPrevTab && showPrevTab != null) {
+						showPrevTab();
+					}
+				}
+				else if (kc == 39) { // Ctrl+Shift+Left
+                    k = "";
+                    if (showNextTab && showNextTab != null) {
+                        showNextTab();
+                    }
+                } else if (kc == 86) { // Ctrl+Shift+V
+					doPaste (ev);
+                    return true;
+                } else if (kc == 67) { // Ctrl+Shift+C
+                    doCopy (ev);
+                    ev.cancelBubble=true;
+                    if (ev.stopPropagation) ev.stopPropagation();
+                    if (ev.preventDefault)  ev.preventDefault();
+                    return false;
                 }
-            }
-            else if (kc==34) {
-                k=""; // PgDn
-                if (showNextTab && showNextTab != null) {
-                    showNextTab();
-                }
+			}
+
+            if (kc == 86) { // Ctrl+V
+                doPaste (ev);
+                return true;
             }
 
 		} else if (which==0) {
@@ -383,9 +382,84 @@ ajaxterm.Terminal=function(id,options) {
 		}
 		ev.cancelBubble=true;
 		if (ev.stopPropagation) ev.stopPropagation();
-		if (ev.preventDefault)  ev.preventDefault();
+		if (ev.preventDefault) ev.preventDefault();
 		return false;
 	}
+
+    function systemPasteListener(evt) {
+        //console.debug (systemPasteListener);
+        systemPasteContent = evt.clipboardData.getData('text/plain');
+        systemPasteReady = true;
+    }
+
+    function getSelectionText() {
+        var text = "";
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            text = document.selection.createRange().text;
+        }
+        return text;
+    }
+
+    function doCopy(evt) {
+        console.debug ("doCopy");
+
+        var target = evt.target;
+
+        // standard way of copying
+        var selectedText = getSelectionText();
+        console.debug (selectedText);
+        cpTextArea.value = selectedText;
+        cpTextArea.select();
+        document.execCommand('copy');
+        setTimeout (function() {
+            cpTextArea.value = "";
+            div.focus();
+        });
+
+    }
+
+    function doPaste(evt) {
+        //console.debug ("doPaste");
+
+        systemPasteReady = false;
+        cpTextArea.value = "";
+
+	    var target = evt.target;
+	    var counter = 0;
+
+        if (window.clipboardData) {
+            //target.innerText = window.clipboardData.getData('Text');
+            queue(encodeURIComponent(window.clipboardData.getData('Text')));
+            return;
+        }
+        function waitForPaste() {
+            //console.debug ("waitForPaste");
+            if (counter > 100) {
+                console.warn("Could not get paste event within 2 second");
+                systemPasteReady = false;
+                cpTextArea.value = "";
+                return;
+            }
+            counter++;
+            if (!systemPasteReady) {
+                setTimeout(waitForPaste, 20);
+                return;
+            }
+            queue(encodeURIComponent(systemPasteContent));
+            systemPasteReady = false;
+            cpTextArea.value = "";
+            div.focus();
+        }
+        // FireFox requires at least one editable
+        // element on the screen for the paste event to fire
+        cpTextArea.select();
+
+        waitForPaste();
+        //document.execCommand('paste');
+    }
+
 	function init() {
 		sled.appendChild(document.createTextNode('\xb7'));
 		sled.className='off';
@@ -393,15 +467,18 @@ ajaxterm.Terminal=function(id,options) {
 		dstat.appendChild(document.createTextNode(' '));
 		opt_add(opt_color,'Colors');
 		opt_color.className='on';
-		opt_add(opt_get,'GET');
-		if (is_clipboard_support()) {
-			opt_add(opt_paste,'Paste');
-		}
+		//opt_add(opt_get,'GET');
 		dstat.appendChild(sdebug);
 		dstat.className='stat';
         div.appendChild(fitter);
         fitter.className = 'fitter';
+
         //fitter.appendChild(dstat);
+
+        cpTextArea = document.createElement('textarea');
+        cpTextArea.setAttribute('style', 'position: absolute; top: 0px; left: 0px; width:1px; height: 1px; border:0; opacity:0;');
+        document.body.appendChild(cpTextArea);
+
         fitter.appendChild(spacer);
         spacer.className='spacer';
         spacer.appendChild(screen);
@@ -410,19 +487,15 @@ ajaxterm.Terminal=function(id,options) {
 		if(opt_color.addEventListener) {
 			opt_get.addEventListener('click',do_get,true);
 			opt_color.addEventListener('click',do_color,true);
-			if (is_clipboard_support()) {
-				opt_paste.addEventListener('click',do_paste,true);
-			}
 		} else {
 			opt_get.attachEvent("onclick", do_get);
 			opt_color.attachEvent("onclick", do_color);
-			if (is_clipboard_support()) {
-				opt_paste.attachEvent("onclick", do_paste);
-			}
 		}
         div.onkeypress=keypress;
         div.onkeydown=keydown;
 		timeout=window.setTimeout(update,100);
+
+        window.addEventListener('paste',systemPasteListener);
 
         cursor.style.position="absolute";
         cursor.style.color="white";

@@ -94,7 +94,6 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @Test
     public void testNominal() throws Exception {
 
-
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
         assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
@@ -102,6 +101,11 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         // if this is set then we want as far as listFolder function
         assertJavascriptEquals("/", "eskimoFileManagers.getOpenedFileManagers()[0].current");
+    }
+
+    @Test
+    public void testNodeVanish() throws Exception {
+        fail ("Assess when a node vanish opened file manager is disabled");
     }
 
     @Test

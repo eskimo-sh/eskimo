@@ -45,6 +45,9 @@ fi
 
 UIDTOSET=$2
 
+echo "-> gluster-prepare-mount.sh"
+echo " Preparing mount of $VOL_NAME"
+
 # Inject topology
 . /etc/eskimo_topology.sh
 

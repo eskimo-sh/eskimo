@@ -51,6 +51,9 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
     exit -3
 fi
 
+echo "-> gluster-address-peer-inconsistency.sh"
+echo " - Checking gluster connection between $SELF_IP_ADDRESS and $MASTER_IP_ADDRESS"
+
 # typical single node cluster or back to single node cluster
 if [[ "$MASTER_IP_ADDRESS" == "$SELF_IP_ADDRESS" ]]; then
 

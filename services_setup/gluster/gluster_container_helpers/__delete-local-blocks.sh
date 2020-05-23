@@ -41,10 +41,11 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
    exit -1
 fi
 
-
+echo "-> __delete-local-blocks.sh"
 echo " - Removing de-synchronized local blocks"
 
-master_volumes=`/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS volume list 2>/tmp/remote_volumes_log`
+export PATH=/usr/local/sbin/:$PATH
+master_volumes=`gluster_call_remote.sh $MASTER_IP_ADDRESS volume list 2>/tmp/remote_volumes_log`
 if [[ $? != 0 ]]; then
     echo "    + Failed to fetch remote volumes"
     echo $master_volumes

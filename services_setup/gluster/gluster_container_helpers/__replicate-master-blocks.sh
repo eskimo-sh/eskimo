@@ -42,4 +42,52 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
    exit -1
 fi
 
-# TODO Implement me
+# load topology
+. /etc/eskimo_topology.sh
+
+echo "-> __replicate-master-blocks.sh"
+echo " - Replicating single blocks to $MASTER_IP_ADDRESS"
+
+# No need to take any loock, it's taken already by caller gluster-update-peers.sh
+
+if [[ $SELF_IP_ADDRESS == $MASTER_IP_ADDRESS ]]; then
+
+    echo " - NO NEED TO REPLICATE ANY BLOCK - Master is self node - likely only one node in gluster cluster"
+
+else
+
+    # list all volumes
+    volumes=`gluster volume list 2>/dev/null`
+    IFS=$'\n'
+    for volume in $volumes; do
+
+        echo " - Analyzing volume $volume"
+
+        local_brick_flag=`gluster volume info $volume 2>/dev/null | grep Brick | grep $SELF_IP_ADDRESS`
+
+        # If a volume has a local brick
+        if [[ $local_brick_flag != "" ]]; then
+
+            echo "    + Volume $volume has a local brick on $SELF_IP_ADDRESS"
+            #echo "      $local_brick_flag"
+
+            # and if it has only that local brick (1 single brick), then create another brick for it on master and replicate
+            bricks_count=`gluster volume info $volume | grep "Number of Bricks"`
+            if [[ $bricks_count == "Number of Bricks: 1" ]]; then
+
+                echo "    + Volume $volume has only 1 brick, need to replicate it"
+                gluster_call_remote.sh $MASTER_IP_ADDRESS volume add-brick $volume replica 2 $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$volume
+                if [[ $? != 0 ]]; then
+
+                    echo "\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!"
+                    echo "Adding brick to $volume on $MASTER_IP_ADDRESS failed \!\!\!\!"
+                    echo "This failure is not crashing the startup and will be ignored"
+                    echo "Another attempt will be made at next service restart"
+                    echo "\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!"
+                fi
+
+            fi
+        fi
+    done
+
+fi

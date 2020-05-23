@@ -51,6 +51,9 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
     exit -3
 fi
 
+echo "-> gluster-update-peers.sh"
+echo " Checking and fixing peers for $SELF_IP_ADDRESS (with master $MASTER_IP_ADDRESS)"
+
 if [[ $SELF_IP_ADDRESS == $MASTER_IP_ADDRESS ]]; then
 
     echo " - NO NEED TO ADD ANY PEER - Master is self node - likely only one node in gluster cluster"
@@ -80,6 +83,8 @@ else
                 exit -31
             fi
         done
+
+        touch /var/lib/gluster/gluster_management_lock
 
         trap delete_gluster_management_lock_file 15
         trap delete_gluster_management_lock_file EXIT

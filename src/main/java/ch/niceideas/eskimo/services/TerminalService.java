@@ -121,21 +121,22 @@ public class TerminalService {
 
         Session session = sessions.get(sessionId);
         if (session == null) {
-            throw new IllegalStateException("Session not found : " + sessionId);
-        }
+            logger.error("Session not found : " + sessionId);
+        } else {
 
-        sessions.remove(sessionId);
+            sessions.remove(sessionId);
 
-        try {
-            session.getChildProcess(). getOutputStream().close();
-        } catch (IOException e) {
-            logger.error (e, e);
-            throw new IOException(e.getMessage(), e);
-        } finally {
-            session.getChildProcess().destroy();
+            try {
+                session.getChildProcess().getOutputStream().close();
+            } catch (IOException e) {
+                logger.error(e, e);
+                throw new IOException(e.getMessage(), e);
+            } finally {
+                session.getChildProcess().destroy();
 
-            // Closing private connection
-            session.getConnection().close();
+                // Closing private connection
+                session.getConnection().close();
+            }
         }
     }
 
@@ -146,12 +147,19 @@ public class TerminalService {
 
            String s = extractArgument (terminalBody, "s");
 
-           Session session = getSession(terminalBody, defaultSessionWidth, defaultSessionWHeight, s);
+           String w = extractArgument (terminalBody, "w");
+           String h = extractArgument (terminalBody, "h");
+
+           Session session = getSession(
+                   terminalBody,
+                   StringUtils.isBlank(w) ? defaultSessionWidth : Integer.parseInt(w),
+                   StringUtils.isBlank(h) ? defaultSessionWHeight : Integer.parseInt(h),
+                   s);
 
            String k = urlDecode(terminalBody);
            String c = extractArgument (terminalBody, "c");
            String tStr = extractArgument (terminalBody, "t");
-           int t = StringUtils.isBlank(tStr) && tStr.equals("null") ? 0 : Integer.parseInt(tStr);
+           int t = StringUtils.isBlank(tStr) || tStr.equals("null") ? 0 : Integer.parseInt(tStr);
 
            return session.handleUpdate(k, StringUtils.isNotBlank(c), t);
 
