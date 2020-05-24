@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
+import org.apache.sshd.server.auth.UserAuthFactory;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.apache.sshd.server.command.Command;
@@ -51,6 +52,7 @@ import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
+import org.apache.sshd.server.subsystem.SubsystemFactory;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.junit.After;
@@ -66,6 +68,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -109,7 +112,7 @@ public abstract class AbstractBaseSSHTest {
         sshd.setPort(sshPort);
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Paths.get("/tmp/hostkey.ser")));
 
-        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
+        List<UserAuthFactory> userAuthFactories = new ArrayList<>();
         userAuthFactories.add(new UserAuthPublicKeyFactory());
         sshd.setUserAuthFactories(userAuthFactories);
 
@@ -133,9 +136,9 @@ public abstract class AbstractBaseSSHTest {
         //sshd.setCommandFactory(new ProcessShellCommandFactory());
         sshd.setCommandFactory(getSShSubsystemToUse());
 
-        sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/bash", "-i" }));
+        sshd.setShellFactory(new ProcessShellFactory("bash", Arrays.asList(new String [] {"/bin/bash", "-i"})));
 
-        List<NamedFactory<Command>> namedFactoryList = new ArrayList<NamedFactory<Command>>();
+        List<SubsystemFactory> namedFactoryList = new ArrayList<>();
         namedFactoryList.add(new SftpSubsystemFactory());
         sshd.setSubsystemFactories(namedFactoryList);
 

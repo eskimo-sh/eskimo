@@ -66,6 +66,7 @@ public class SystemService {
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
     public static final String TMP_PATH_PREFIX = "/tmp/";
+    public static final String SERVICE_PREFIX = "Service ";
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -751,8 +752,8 @@ public class SystemService {
 
                 servicesInstallationStatus.removeInstallationFlag(savedService, originalNodeName);
                 serviceMissingCounter.remove(savedService + "-" + nodeName);
-                notificationService.addError("Service " + savedService + " on " + nodeName + " vanished!");
-                logger.warn ("Service " + savedService + " on " + nodeName + " has been removed from ServiceInstallationStatus!");
+                notificationService.addError(SERVICE_PREFIX + savedService + " on " + nodeName + " vanished!");
+                logger.warn (SERVICE_PREFIX + savedService + " on " + nodeName + " has been removed from ServiceInstallationStatus!");
 
                 // unconfigure proxy if required
                 proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
@@ -776,7 +777,7 @@ public class SystemService {
                 if (!systemStatus.isServiceStatusFlagOK(serviceStatusFlag) && lastStatus.get().isServiceStatusFlagOK(serviceStatusFlag)) {
 
                     logger.warn("For service " + serviceStatusFlag + " - previous status was OK and status is " + systemStatus.getValueForPath(serviceStatusFlag));
-                    notificationService.addError("Service " + SystemStatusWrapper.getServiceName(serviceStatusFlag)
+                    notificationService.addError(SERVICE_PREFIX + SystemStatusWrapper.getServiceName(serviceStatusFlag)
                             + " on " +  Objects.requireNonNull(SystemStatusWrapper.getNodeName(serviceStatusFlag)).replace("-", ".")
                             + " got into problem");
                 }

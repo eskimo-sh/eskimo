@@ -62,7 +62,7 @@ public class MarathonOperationsCommand implements Serializable {
             ServicesDefinition servicesDefinition,
             SystemService systemService,
             ServicesInstallStatusWrapper servicesInstallStatus,
-            MarathonServicesConfigWrapper rawMarathonServicesConfig) throws MarathonException {
+            MarathonServicesConfigWrapper rawMarathonServicesConfig) {
 
         MarathonOperationsCommand retCommand = new MarathonOperationsCommand(rawMarathonServicesConfig);
 

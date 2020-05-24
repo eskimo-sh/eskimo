@@ -54,7 +54,6 @@ eskimo.SystemStatus = function(constructorObject) {
     var STATUS_SERVICES = [];
     var SERVICES_STATUS_CONFIG = {};
 
-    var renderInTable = true;
     var nodeFilter = "";
 
     var disconnectedFlag = true;
@@ -70,16 +69,6 @@ eskimo.SystemStatus = function(constructorObject) {
             if (statusTxt == "success") {
 
                 loadUIStatusServicesConfig();
-
-                $('#show-machine-view-btn').click($.proxy (function () {
-                    setRenderInTable (false);
-                    showStatus(true);
-                }, this));
-
-                $('#show-table-view-btn').click($.proxy (function () {
-                    setRenderInTable (true);
-                    showStatus(true);
-                }, this));
 
                 $('#show-all-nodes-btn').click($.proxy (function () {
                     $(".filter-btn").attr("class", "btn btn-default filter-btn");

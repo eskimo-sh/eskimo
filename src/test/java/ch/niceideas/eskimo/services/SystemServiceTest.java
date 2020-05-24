@@ -307,7 +307,9 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
-        assertTrue(new JSONObject(expectedFullStatus).similar(systemStatus.getJSONObject()));
+
+        JSONObject actual = systemStatus.getJSONObject();
+        assertTrue(actual.toString(2), new JSONObject(expectedFullStatus).similar(actual));
     }
 
     @Test

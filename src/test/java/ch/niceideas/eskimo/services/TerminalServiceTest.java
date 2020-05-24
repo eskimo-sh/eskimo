@@ -106,6 +106,9 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
         assertNotNull (cm);
 
         ScreenImage si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
+
+        //System.err.println(si.screen);
+
         assertTrue (si.screen.startsWith("<pre class='term '><span class='"));
 
         /* FIXME Test nexts

@@ -46,7 +46,7 @@ Software.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.4.RELEASE</version>
+        <version>2.1.14.RELEASE</version>
     </parent>
 
     <properties>
@@ -99,13 +99,6 @@ Software.
             <version>1.11</version>
         </dependency>
 
-        <!-- Ajaxterm4j -->
-        <!-- https://github.com/java-native-access/jna -->
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>3.3.0</version>
-        </dependency>
         <!-- https://github.com/jenkinsci/trilead-ssh2 -->
         <dependency>
             <groupId>org.jenkins-ci</groupId>
@@ -135,19 +128,19 @@ Software.
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.26</version>
+            <version>1.7.30</version>
         </dependency>
 
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <version>4.2.8.RELEASE</version>
+            <version>4.3.13.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.19</version>
+            <version>1.20</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -159,19 +152,19 @@ Software.
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13-beta-3</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
-            <version>2.35.0</version>
+            <version>2.40.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.tntim96</groupId>
             <artifactId>JSCover</artifactId>
-            <version>2.0.8</version>
+            <version>2.0.9</version>
             <scope>test</scope>
         </dependency>
 
@@ -179,7 +172,7 @@ Software.
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>9.4.16.v20190411</version>
+            <version>9.4.29.v20200521</version>
             <scope>test</scope>
         </dependency>
 
@@ -187,25 +180,25 @@ Software.
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
-            <version>2.2.0</version>
+            <version>2.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-sftp</artifactId>
-            <version>2.2.0</version>
+            <version>2.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-scp</artifactId>
-            <version>2.2.0</version>
+            <version>2.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.60</version>
+            <version>1.65</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -214,6 +207,15 @@ Software.
             <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Web testing -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-ssi</artifactId>
+            <version>9.0.30</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -261,7 +263,7 @@ Software.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M3</version>
+                <version>3.0.0-M4</version>
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
@@ -271,7 +273,7 @@ Software.
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.1.4.RELEASE</version>
+                <version>2.1.14.RELEASE</version>
             </plugin>
 
             <!-- dereference symlinks in services_setup and packages_dev-->
@@ -303,7 +305,7 @@ Software.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.1</version>
                 <executions>
 
                     <!-- First: Utility jar -->
@@ -388,7 +390,7 @@ Software.
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.3</version>
+                        <version>0.8.5</version>
                         <executions>
                             <execution>
                                 <id>prepare-agent</id>

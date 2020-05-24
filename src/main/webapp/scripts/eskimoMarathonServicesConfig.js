@@ -44,7 +44,6 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
 
     // initialized by backend
     var MARATHON_SERVICES = [];
-    var MARATHON_SERVICES_CONFIGURATION = [];
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -112,10 +111,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
 
                     MARATHON_SERVICES = data.marathonServices;
 
-                    MARATHON_SERVICES_CONFIGURATION = data.marathonServicesConfigurations;
-
                     //console.log (MARATHON_SERVICES);
-                    //console.log (MARATHON_SERVICES_CONFIGURATION);
 
                 } else {
                     alert(data.error);

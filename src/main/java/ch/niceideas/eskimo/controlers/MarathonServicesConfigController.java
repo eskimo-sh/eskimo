@@ -167,7 +167,7 @@ public class MarathonServicesConfigController {
 
             return returnCommand (command);
 
-        } catch (JSONException | SetupException | FileException | MarathonException | MarathonServicesConfigException e) {
+        } catch (JSONException | SetupException | FileException | MarathonServicesConfigException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
@@ -217,7 +217,7 @@ public class MarathonServicesConfigController {
 
             return returnCommand (command);
 
-        } catch (JSONException | FileException | MarathonException | SetupException | SystemException e) {
+        } catch (JSONException | FileException | SetupException | SystemException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             return ErrorStatusHelper.createEncodedErrorStatus(e);

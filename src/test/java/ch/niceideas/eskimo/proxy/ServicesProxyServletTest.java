@@ -34,14 +34,12 @@
 
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.trilead.ssh2.Connection;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -52,12 +50,10 @@ import org.junit.Test;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class ServicesProxyServletTest {

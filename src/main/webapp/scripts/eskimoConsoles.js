@@ -73,7 +73,7 @@ eskimo.Consoles = function(constructorObject) {
 
         var consoleToDisable=[];
         main: for (var i = 0; i < availableNodes.length; i++) {
-            for (j = 0; j < nodes.length; j++) {
+            for (var j = 0; j < nodes.length; j++) {
                 if (availableNodes[i].nodeName == nodes[j].nodeName) {
                     continue main;
                 }

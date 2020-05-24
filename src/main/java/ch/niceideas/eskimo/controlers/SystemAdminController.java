@@ -289,7 +289,7 @@ public class SystemAdminController {
                         sysService -> sysService.delegateApplyNodesConfig(operationsCommand),
                         serviceName + " has been reinstalled successfuly on " + address + ".");
             }
-        } catch (SetupException | SystemException | MarathonException | FileException | JSONException | NodesConfigurationException e) {
+        } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
