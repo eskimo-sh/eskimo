@@ -96,7 +96,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT);
+        cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
         cm.setSetupService (setupService);
 
         sc = new FileManagerService();

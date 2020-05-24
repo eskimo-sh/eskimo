@@ -66,7 +66,7 @@ public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
     public void testPutAndGetFile() throws Exception {
         JSch jsch = createjSchInstance();
 
-        Session session = jsch.getSession( "remote-username", "localhost", SSH_PORT);
+        Session session = jsch.getSession( "remote-username", "localhost", getSShPort());
         session.connect();
 
         Channel channel = session.openChannel( "sftp" );

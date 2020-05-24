@@ -76,7 +76,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT);
+        cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
         cm.setSetupService (setupService);
 
         pms = new ProxyManagerService();
@@ -123,10 +123,10 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         final List<String> createCalledFor = new ArrayList<>();
         final List<String> dropCalledFor = new ArrayList<>();
 
-        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT) {
+        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
             protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
-                return new Connection(ipAddress, SSH_PORT) {
+                return new Connection(ipAddress, getSShPort()) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
                         createCalledFor.add(""+port_to_connect);
                         return null;
@@ -191,10 +191,10 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testForceRecreateConnection() throws Exception {
 
-        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, SSH_PORT) {
+        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
             protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
-                return new Connection(ipAddress, SSH_PORT) {
+                return new Connection(ipAddress, getSShPort()) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
                         return null;
                     }

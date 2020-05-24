@@ -36,6 +36,7 @@ package ch.niceideas.eskimo;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import org.apache.commons.codec.binary.Base64;
@@ -72,8 +73,6 @@ public abstract class AbstractBaseSSHTest {
 
     private static final Logger logger = Logger.getLogger(AbstractBaseSSHTest.class);
 
-    protected static int SSH_PORT = 63022;
-
     protected SshServer sshd = null;
 
     protected String privateKeyRaw = null;
@@ -85,6 +84,12 @@ public abstract class AbstractBaseSSHTest {
     protected byte[] privateKeyBytes = null;
     protected byte[] publicKeyBytes = null;
 
+    private int sshPort;
+
+    protected final int getSShPort() {
+        return sshPort;
+    }
+
     @After
     public void afterTestTeardown() throws Exception {
         sshd.close(true);
@@ -95,11 +100,13 @@ public abstract class AbstractBaseSSHTest {
     @Before
     public void beforeTestSetup() throws Exception {
 
+        sshPort = ProxyManagerService.generateLocalPort();
+
         privateKeyRaw = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractBaseSSHTest/id_rsa"));
         publicKeyRaw = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractBaseSSHTest/id_rsa.pub"));
 
         sshd = SshServer.setUpDefaultServer();
-        sshd.setPort(SSH_PORT);
+        sshd.setPort(sshPort);
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Paths.get("/tmp/hostkey.ser")));
 
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
