@@ -40,7 +40,7 @@ eskimo.Services = function (constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var PERIODIC_RETRY_SERVICE_MS = 2000;
+    var PERIODIC_RETRY_SERVICE_MS = 5000;
 
     var DEBUG = false;
 
@@ -155,17 +155,17 @@ eskimo.Services = function (constructorObject) {
 
         var uiConfig = UI_SERVICES_CONFIG[service];
         if (uiConfig == null) {
-            console.log ("service " + service + " - has not uiConfig (A)");
+            //console.log ("service " + service + " - has not uiConfig (A)");
             return false;
         }
 
-        if (uiConfigsToRetry.length > 0 && uiConfigsToRetry.includes(uiConfig)) {
-            console.log ("service " + service + " - is pending retry (B)");
+        if (uiConfigsToRetry.length > 0 && alreadyInRetry(uiConfig)) {
+            //console.log ("service " + service + " - is pending retry (B)");
             return false;
         }
 
         if (uiConfig.refreshWaiting) {
-            console.log ("service " + service + " - is pending refresh (C)");
+            //console.log ("service " + service + " - is pending refresh (C)");
             return false;
         }
 
@@ -253,7 +253,7 @@ eskimo.Services = function (constructorObject) {
         for (var j = 0; j < uiConfigsToRetry.length; j++) {
             if (uiConfigsToRetry[j] == uiConfig) {
                 //console.trace();
-                console.log("removing from retry " + uiConfigsToRetry[j].service);
+                //console.log("removing from retry " + uiConfigsToRetry[j].service);
                 uiConfigsToRetry.splice(j, 1);
                 break;
             }
@@ -305,7 +305,7 @@ eskimo.Services = function (constructorObject) {
                     },
                     error: function (jqXHR, status) {
                         // ignore
-                        console.log("error : " + effUIConfig.service + " - " + effUIConfig.targetUrl);
+                        //console.log("error : " + effUIConfig.service + " - " + effUIConfig.targetUrl);
                     }
                 });
             }, 0, uiConfig);
@@ -330,8 +330,6 @@ eskimo.Services = function (constructorObject) {
 
         var reinitialize = shouldReinitialize(service, nodeAddress);
 
-        var waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
-
         /*
         console.log ("service display : " + service +
             " - uiConfig.title? " + uiConfig.title +
@@ -345,6 +343,8 @@ eskimo.Services = function (constructorObject) {
         */
 
         if ((!serviceInitialized[service] || reinitialize) && !uiConfig.refreshWaiting) {
+
+            var waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
 
             uiConfig.targetUrl = buildUrl(uiConfig, nodeAddress);
             uiConfig.service = service;

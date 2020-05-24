@@ -73,7 +73,7 @@ eskimo.OperationsCommand = function(constructorObject) {
 
     function showCommand (command) {
 
-        console.log (command);
+        //console.log (command);
 
         var commandDescription = "<b>Following Operations are about to be applied</b><br><br>";
 
@@ -125,8 +125,7 @@ eskimo.OperationsCommand = function(constructorObject) {
             url:"apply-nodes-config",
             success: function (data, status, jqXHR) {
 
-                // OK
-                console.log(data);
+                //console.log(data);
 
                 if (!data || data.error) {
                     console.error(atob(data.error));

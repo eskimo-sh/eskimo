@@ -114,8 +114,8 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
 
                     MARATHON_SERVICES_CONFIGURATION = data.marathonServicesConfigurations;
 
-                    console.log (MARATHON_SERVICES);
-                    console.log (MARATHON_SERVICES_CONFIGURATION);
+                    //console.log (MARATHON_SERVICES);
+                    //console.log (MARATHON_SERVICES_CONFIGURATION);
 
                 } else {
                     alert(data.error);

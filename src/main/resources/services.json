@@ -113,7 +113,7 @@
     },
     "ui": {
       "proxyTargetPort" : 31300,
-      "waitTime": 8000,
+      "waitTime": 5000,
       "title" : "Grafana Monitoring",
       "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
       "proxyReplacements" : [
@@ -239,7 +239,7 @@
     },
     "ui": {
       "proxyTargetPort" : 5050,
-      "waitTime": 8000,
+      "waitTime": 6000,
       "title" : "Mesos Console",
       "statusPageLinktitle" : "Monitor Mesos Processes",
       "proxyReplacements" : [
@@ -408,7 +408,7 @@
     },
     "ui": {
       "proxyTargetPort" : 28080,
-      "waitTime": 8000,
+      "waitTime": 6000,
       "title" : "Marathon",
       "statusPageLinktitle" : "Manage Marathon Services",
       "proxyReplacements" : [
@@ -563,7 +563,7 @@
     },
     "ui": {
       "proxyTargetPort" : 31220,
-      "waitTime": 8000,
+      "waitTime": 6000,
       "title" : "Kafka manager",
       "statusPageLinktitle" : "Manage your kafka topics"
     },
@@ -751,7 +751,7 @@
     },
     "ui": {
       "proxyTargetPort" : 8081,
-      "waitTime": 8000,
+      "waitTime": 6000,
       "title" : "Flink App Master",
       "statusPageLinktitle" : "Manage and Monitor your Flink jobs"
     },
@@ -1022,7 +1022,7 @@
     "ui": {
       "urlTemplate": "./kibana/app/kibana",
       "proxyTargetPort" : 31561,
-      "waitTime": 10000,
+      "waitTime": 8000,
       "title" : "Kibana",
       "applyStandardProxyReplacements": false,
       "statusPageLinktitle" : "Visualize your data in Elasticsearch",
@@ -1084,7 +1084,7 @@
     },
     "ui": {
       "proxyTargetPort" : 38080,
-      "waitTime": 10000,
+      "waitTime": 8000,
       "title" : "Zeppelin",
       "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",
       "proxyReplacements" : [

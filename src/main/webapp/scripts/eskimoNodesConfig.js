@@ -81,7 +81,7 @@ eskimo.NodesConfig = function(constructorObject) {
 
                     var setupConfig = $("form#nodes-config").serializeObject();
 
-                    console.log(setupConfig);
+                    //console.log(setupConfig);
 
                     try {
                         checkNodesSetup(setupConfig, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES);
@@ -232,7 +232,7 @@ eskimo.NodesConfig = function(constructorObject) {
             }
         }
         nodeIds.sort();
-        console.log(nodeIds);
+        //console.log(nodeIds);
         for (var i = 0; i < nodeIds.length; i++) {
             var ipAddress = data[nodeIds[i]];
             if (ipAddress.indexOf("-") > -1) { // range
@@ -524,7 +524,7 @@ eskimo.NodesConfig = function(constructorObject) {
         }
 
         var next = nodes.length + 1;
-        console.log ("Node node ID : " + next);
+        //console.log ("Node node ID : " + next);
 
         var uniqueServicesDiv = '' +
             '<div class="col-md-3 configured-unique-services-placeholder"></div>' +
@@ -623,8 +623,7 @@ eskimo.NodesConfig = function(constructorObject) {
 
                 that.eskimoMain.hideProgressbar();
 
-                // OK
-                console.log(data);
+                //console.log(data);
 
                 if (!data || data.error) {
                     console.error(atob(data.error));

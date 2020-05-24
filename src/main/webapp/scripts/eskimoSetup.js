@@ -131,7 +131,7 @@ eskimo.Setup = function(constructorObject) {
     function handleSetup(data, initializationTime) {
         that.eskimoMain.setSetupLoaded();
 
-        console.log(data);
+        //console.log(data);
 
         if (data.setup_storage != null) {
             $("#setup_storage").val(data.setup_storage);

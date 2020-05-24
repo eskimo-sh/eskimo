@@ -158,6 +158,12 @@ eskimo.Messaging = function(constructorObject) {
                 if (callback != null && typeof callback === "function") {
                     callback();
                 }
+
+                if (that.eskimoMain.isOperationInProgress() && !callback) {
+                    messagingPollingHandle = setTimeout(
+                        fetchLastMessages,
+                        MESSAGING_POLLING_DELAY);
+                }
             },
             error: function (jqXHR, status) {
 
@@ -166,6 +172,12 @@ eskimo.Messaging = function(constructorObject) {
                 }
 
                 errorHandler(jqXHR, status);
+
+                if (that.eskimoMain.isOperationInProgress() && !callback) {
+                    messagingPollingHandle = setTimeout(
+                        fetchLastMessages,
+                        MESSAGING_POLLING_DELAY);
+                }
             }
         });
     }
@@ -180,7 +192,7 @@ eskimo.Messaging = function(constructorObject) {
 
         $("#pending-message-content").html("");
 
-        messagingPollingHandle = setInterval(
+        messagingPollingHandle = setTimeout(
             fetchLastMessages,
             MESSAGING_POLLING_DELAY);
     }
@@ -194,7 +206,7 @@ eskimo.Messaging = function(constructorObject) {
     function stopOperationInProgress (success, callback) {
 
         // cancel periodic message fetching
-        clearInterval (messagingPollingHandle);
+        clearTimeout (messagingPollingHandle);
 
         // fetch messages one last time and close OperationInProgress in the end
         that.fetchLastMessages (function() {

@@ -480,7 +480,7 @@ eskimo.Main = function() {
         var actualMenuHeight = $("#menu-container").height();
         var menuContainerHeight = $("#hoe-left-panel").height();
 
-        console.log (menuContainerHeight + " -  " + actualMenuHeight);
+        //console.log (menuContainerHeight + " -  " + actualMenuHeight);
 
         if (menuContainerHeight - 80 < actualMenuHeight) {
             $("#menu-scroll-up").css ("display", "inherit");

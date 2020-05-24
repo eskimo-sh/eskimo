@@ -283,7 +283,7 @@ eskimo.Consoles = function(constructorObject) {
                 dataType: "json",
                 url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
                 success: function (data, status, jqXHR) {
-                    console.log(data);
+                    //console.log(data);
                     //alert(data);
                 },
                 error: function(error) {
