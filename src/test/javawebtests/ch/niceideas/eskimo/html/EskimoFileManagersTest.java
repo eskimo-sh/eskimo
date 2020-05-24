@@ -105,7 +105,21 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
     @Test
     public void testNodeVanish() throws Exception {
-        fail ("Assess when a node vanish opened file manager is disabled");
+
+        testClickOpenFileManagers();
+
+        // node 192-168-10-13 vanishes !
+        page.executeJavaScript("eskimoFileManagers.setAvailableNodes (" +
+                "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"} ] );");
+
+        // ensure console was disabled
+        //System.err.println (page.asXml());
+
+        assertJavascriptEquals("\n" +
+                "    <div id=\"file-manager-actions-192-168-10-13\">\n" +
+                "        <nav id=\"file-manager-folder-menu-192-168-10-13\" class=\"btn-toolbar file-manager-folder-menu\">            <div class=\"btn-group\">                <button id=\"file-manager-close-192-168-10-13\" name=\"file-manager-close-192-168-10-13\" class=\"btn btn-primary\">Close</button>\n" +
+                "            </div></nav>        <div id=\"file-manager-folder-content-192-168-10-13\">(connection to backend lost)</div>\n" +
+                "    </div>", "$('#file-managers-file-manager-192-168-10-13').html()");
     }
 
     @Test

@@ -42,13 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . /etc/eskimo_topology.sh
 
-# Defining topology variables
-export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
-if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
-    echo " - No zookeeper master found in topology"
-    exit -3
-fi
-
 
 echo "-- SETTING UP KAFKA MANAGER-----------------------------------------------------"
 
@@ -84,73 +77,7 @@ sudo ln -s /var/log/kafka/kafka-manager /usr/local/lib/kafka-manager/logs
 
 echo " - Adapting Configuration file (first time for config run)"
 
-sudo sed -i s/"kafka-manager.zkhosts=\"kafka-manager-zookeeper:2181\""/"kafka-manager.zkhosts=\"$MASTER_ZK_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
-
-
-echo " - Starting kafka manager to inject eskimo cluster payload"
-/usr/local/lib/kafka-manager/bin/kafka-manager \
-        -Dapplication.home=/usr/local/lib/kafka-manager/ \
-        -Dpidfile.path=/tmp/kafka-manager-temp.pid \
-        -Dconfig.file=/usr/local/lib/kafka-manager/conf/application.conf \
-        -Dhttp.port=22080 >> kafka-manager_install_log 2>&1 &
-KAFKA_MANAGER_PID=$!
-fail_if_error $? "kafka-manager_install_log" -5
-
-if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
-
-if ps -p $KAFKA_MANAGER_PID > /dev/null; then
-    echo " - Kafka Manager successfully started"
-else
-    echo "Could not successfully start kafka manager in container"
-    cat kafka-manager_install_log
-    echo "Could not successfully start kafka manager in container"
-    exit -10
-fi
-
-set +e
-for i in $(seq 1 10); do
-
-    if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
-
-    echo "   + Attempt $i"
-    clusterSearch=`curl -XGET http://localhost:22080/clusters/Eskimo 2>&1`
-    if [[ $? == 0 ]]; then
-        break
-    fi
-    if [[ "$i" == "10" ]]; then
-        echo "Fetching 10 times of Eskimo cluster page failed"
-        echo $clusterSearch
-    fi
-done
-set -e
-
-
-if [[ `echo $clusterSearch | grep "Unknown cluster"` != "" ]]; then
-    echo " - Creating Eskimo Cluster in Kafka Manager"
-    payload="name=Eskimo&zkHosts=$MASTER_ZK_IP_ADDRESS%3A2181&kafkaVersion=2.2.0&jmxEnabled=true&jmxUser=&jmxPass=&pollConsumers=true"
-    payload+='&filterConsumers=true&tuning.brokerViewUpdatePeriodSeconds=15&tuning.clusterManagerThreadPoolSize=2'
-    payload+='&tuning.clusterManagerThreadPoolQueueSize=100&tuning.kafkaCommandThreadPoolSize=2'
-    payload+='&tuning.kafkaCommandThreadPoolQueueSize=100&tuning.logkafkaCommandThreadPoolSize=2'
-    payload+='&tuning.logkafkaCommandThreadPoolQueueSize=100&tuning.logkafkaUpdatePeriodSeconds=30'
-    payload+='&tuning.partitionOffsetCacheTimeoutSecs=5&tuning.brokerViewThreadPoolSize=2'
-    payload+='&tuning.brokerViewThreadPoolQueueSize=1000&tuning.offsetCacheThreadPoolSize=2'
-    payload+='&tuning.offsetCacheThreadPoolQueueSize=1000&tuning.kafkaAdminClientThreadPoolSize=2'
-    payload+='&tuning.kafkaAdminClientThreadPoolQueueSize=1000&tuning.kafkaManagedOffsetMetadataCheckMillis=30000'
-    payload+='&tuning.kafkaManagedOffsetGroupCacheSize=1000000&tuning.kafkaManagedOffsetGroupExpireDays=7'
-    payload+='&securityProtocol=PLAINTEXT&saslMechanism=DEFAULT&jaasConfig='
-
-    curl -XPOST http://localhost:22080/clusters -d $payload >> kafka-manager_install_log 2>&1
-    fail_if_error $? "kafka-manager_install_log" -4
-else
-    echo " - (Creating Eskimo Cluster in Kafka Manager"
-fi
-
-echo " - Stopping kafka manager"
-kill $KAFKA_MANAGER_PID  >> kafka-manager_install_log 2>&1
-fail_if_error $? "kafka-manager_install_log" -5
-
-echo " - Changing zookeeper host back to marker for startup topology injection"
-sudo sed -i s/"kafka-manager.zkhosts=\"$MASTER_ZK_IP_ADDRESS:2181\""/"kafka-manager.zkhosts=\"MASTER_ZK_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
+sudo sed -i s/"kafka-manager.zkhosts=\"kafka-manager-zookeeper:2181\""/"kafka-manager.zkhosts=\"MASTER_ZK_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
 
 
 echo " - Changing owner of config directory to kafka"

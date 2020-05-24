@@ -254,7 +254,7 @@ eskimo.Consoles = function(constructorObject) {
 
     function closeConsole (nodeName, terminalToClose) {
 
-        console.log (terminalToClose);
+        //console.log (terminalToClose);
 
         // remove from open console
         var openedConsole = null;
@@ -277,7 +277,7 @@ eskimo.Consoles = function(constructorObject) {
         if (openedConsole == null) {
             alert("Console " + terminalToClose + " not found");
         } else {
-            console.log(openedConsole.terminal);
+            //console.log(openedConsole.terminal);
             $.ajax({
                 type: "GET",
                 dataType: "json",

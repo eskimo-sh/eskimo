@@ -50,9 +50,10 @@ public class EskimoConsolesTest extends AbstractWebTest {
 
         // mock ajax term
         page.executeJavaScript("ajaxterm = {};");
-        page.executeJavaScript("ajaxterm.Terminal = function() {\n" +
+        page.executeJavaScript("ajaxterm.Terminal = function(id, options) {\n" +
                 "this.setShowNextTab = function() {};\n" +
                 "this.setShowPrevTab = function() {};\n" +
+                "this.close = function () {if (!window.terminalCloseCalled) { window.terminalCloseCalled = []; }; window.terminalCloseCalled.push(id); };\n" +
                 "}\n");
 
         // instantiate test object
@@ -92,7 +93,25 @@ public class EskimoConsolesTest extends AbstractWebTest {
 
     @Test
     public void testNodeVanish() throws Exception {
-        fail ("Assess when a node vanish opened console is disabled");
+
+        testClickOpenConsle();
+
+        // node 192-168-10-13 vanishes !
+        page.executeJavaScript("eskimoConsoles.setAvailableNodes (" +
+                "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"} ] );");
+
+        // ensure console was disabled
+        //System.err.println (page.asXml());
+
+        assertJavascriptEquals ("[\"term_192-168-10-13\"]", "JSON.stringify (window.terminalCloseCalled)");
+
+        assertJavascriptEquals("\n" +
+                "    <div id=\"term_192-168-10-11\" class=\"ajaxterm\" tabindex=\"0\"></div>\n" +
+                "    <div id=\"console-actions-192-168-10-11\">\n" +
+                "        <button id=\"console-close-192-168-10-11\" name=\"console-close-1\" class=\"btn btn-primary\">\n" +
+                "            Close\n" +
+                "        </button>\n" +
+                "    </div>", "$('#consoles-console-192-168-10-11').html()");
     }
 
     @Test
