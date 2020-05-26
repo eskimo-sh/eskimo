@@ -64,7 +64,9 @@ public class EskimoAboutTest extends AbstractWebTest {
         assertCssValue("#about-modal", "visibility", "visible");
 
         page.executeJavaScript("eskimoAbout.cancelAbout()");
-        await().atMost(15, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
+        await().atMost(20, TimeUnit.SECONDS).until(() ->
+                   page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult() != null
+                && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
 
         assertCssValue("#about-modal", "display", "none");
     }
