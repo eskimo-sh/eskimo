@@ -225,7 +225,7 @@ public abstract class AbstractSetupShellTest {
         return tempFile.getAbsolutePath();
     }
 
-    private static void createLoggingExecutable(String command, String targetDir) throws Exception {
+    protected static void createLoggingExecutable(String command, String targetDir) throws Exception {
 
         File targetPath = new File (targetDir + "/" + command);
         FileUtils.writeFile(targetPath, "" +

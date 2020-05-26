@@ -65,6 +65,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         handleScript("__replicate-master-blocks.sh");
         handleScript("__delete-local-blocks.sh");
         handleScript("__force-remove-peer.sh");
+        handleScript("gluster-address-peer-inconsistency.sh");
     }
 
     void handleScript(String scriptName) throws IOException, FileException {
@@ -100,6 +101,163 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
     @Override
     protected String[] getScriptsToExecute() {
         return new String[0];
+    }
+
+    @Test
+    public void testGlusterAddressPeerInconsistency_MasterMissesLocal() throws Exception {
+
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'pool' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $2 == 'pool' ]]; then \n" +
+                "    if [[ $3 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\tlocalhost    \tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster_call_remote");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        createLoggingExecutable("__force-remove-peer.sh", getJailPath());
+
+        // master IP == self IP
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-address-peer-inconsistency.sh"}, false);
+        assertEquals("-> gluster-address-peer-inconsistency.sh\n" +
+                " - Checking gluster connection between 192.168.10.11 and 192.168.10.13\n" +
+                " - Attempting to take gluster_management_lock\n" +
+                " - Checking if master is in local pool\n" +
+                " - Checking if local in master pool\n" +
+                " - Checking consistency \n" +
+                " -> gluster cluster is inconsistent. Master doesn't know local but local knows master\n" +
+                " - Attempting to remove master from local pool list\n" +
+                " - releasing gluster_management_lock\n", result);
+
+        assertEquals("192.168.10.13\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log___force-remove-peer.sh")));
+
+        assertEquals("192.168.10.13 pool list\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
+    }
+
+    @Test
+    public void testGlusterAddressPeerInconsistency_LocalMissesMaster() throws Exception {
+
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'pool' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $2 == 'pool' ]]; then \n" +
+                "    if [[ $3 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\tlocalhost    \tConnected'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\t192.168.10.11\tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster_call_remote");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        createLoggingExecutable("__delete-local-blocks.sh", getJailPath());
+
+        // master IP == self IP
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-address-peer-inconsistency.sh"}, false);
+        assertEquals("-> gluster-address-peer-inconsistency.sh\n" +
+                " - Checking gluster connection between 192.168.10.11 and 192.168.10.13\n" +
+                " - Attempting to take gluster_management_lock\n" +
+                " - Checking if master is in local pool\n" +
+                " - Checking if local in master pool\n" +
+                " - Checking consistency \n" +
+                " -> gluster cluster is inconsistent. Local doesn't know master but master knows local\n" +
+                " - Attempting to remove local from master pool list\n" +
+                " - Deleting corresponding local blocks\n" +
+                " - releasing gluster_management_lock\n", result);
+
+        assertEquals("192.168.10.13\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log___delete-local-blocks.sh")));
+
+        assertEquals("192.168.10.13 pool list\n" +
+                "192.168.10.13 force-remove-peer now 192.168.10.11\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
+    }
+
+    @Test
+    public void testGlusterAddressPeerInconsistency_ClusterConsistent() throws Exception {
+
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'pool' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $2 == 'pool' ]]; then \n" +
+                "    if [[ $3 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\tlocalhost    \tConnected'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\t192.168.10.11\tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster_call_remote");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        // master IP == self IP
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-address-peer-inconsistency.sh"}, false);
+        assertEquals("-> gluster-address-peer-inconsistency.sh\n" +
+                " - Checking gluster connection between 192.168.10.11 and 192.168.10.13\n" +
+                " - Attempting to take gluster_management_lock\n" +
+                " - Checking if master is in local pool\n" +
+                " - Checking if local in master pool\n" +
+                " - Checking consistency \n" +
+                " -> gluster cluster is consistent. both local and master know each others\n" +
+                " - releasing gluster_management_lock\n", result);
+
+        assertEquals("192.168.10.13 pool list\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
     }
 
     @Test

@@ -1009,7 +1009,6 @@ eskimo.SystemStatus = function(constructorObject) {
         $.ajax({
             type: "GET",
             dataType: "json",
-            context: that,
             url: "get-status",
             success: function (data, status, jqXHR) {
 
@@ -1021,9 +1020,9 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 if (!data.clear) {
 
-                    this.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
+                    that.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
 
-                    this.renderNodesStatus (data.nodeServicesStatus, blocking);
+                    that.renderNodesStatus (data.nodeServicesStatus, blocking);
 
                 } else if (data.clear == "setup"){
 
@@ -1036,7 +1035,7 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 } else if (data.clear == "nodes"){
 
-                    this.renderNodesStatusEmpty();
+                    that.renderNodesStatusEmpty();
                 }
 
                 if (data.processingPending) {  // if backend says there is some processing going on
@@ -1045,7 +1044,7 @@ eskimo.SystemStatus = function(constructorObject) {
                 } else {                         // if backend says there is nothing going on
                     if (that.eskimoMain.isOperationInProgress()  // but frontend still things there is ...
                             && that.eskimoMain.isOperationInProgressOwner()) {  // ... and if that is my fault
-                        this.fetchOperationResult();
+                        that.fetchOperationResult();
                     }
                 }
 

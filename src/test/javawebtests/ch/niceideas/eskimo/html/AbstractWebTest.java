@@ -184,6 +184,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("var eskimoServices = {};");
         page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook = function (){};");
         page.executeJavaScript("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
+        page.executeJavaScript("eskimoServices.isServiceAvailable = function (){ return true; };");
 
         page.executeJavaScript("var eskimoConsoles = {}");
         page.executeJavaScript("eskimoConsoles.setAvailableNodes = function () {};");
@@ -198,6 +199,7 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMessaging.showMessages = function() {};");
 
         page.executeJavaScript("var eskimoNotifications = {}");
+        page.executeJavaScript("eskimoNotifications.fetchNotifications = function() {};");
 
         page.executeJavaScript("var eskimoSetup = {}");
         page.executeJavaScript("eskimoSetup.setSnapshot = function () {};");
@@ -243,6 +245,8 @@ public abstract class AbstractWebTest {
         page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress = function() {}");
         page.executeJavaScript("eskimoMain.handleMarathonSubsystem = function() {}");
         page.executeJavaScript("eskimoMain.showProgressbar = function() {}");
+        page.executeJavaScript("eskimoMain.isSetupLoaded = function() { return true; }");
+        page.executeJavaScript("eskimoMain.serviceMenuClear = function() { return true; }");
 
         page.executeJavaScript("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 

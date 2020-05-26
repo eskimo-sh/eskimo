@@ -41,7 +41,6 @@ import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -53,13 +52,15 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(EskimoSystemStatusTest.class);
 
-    private String jsonStatus = null;
+    private String jsonFullStatus = null;
+    private String jsonNodesStatus = null;
     private String jsonStatusConfig = null;
 
     @Before
     public void setUp() throws Exception {
 
-        jsonStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatus.json"));
+        jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));
+        jsonNodesStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testNodeStatus.json"));
         jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"));
 
         loadScript(page, "eskimoUtils.js");
@@ -169,7 +170,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testRenderNodesStatusTable() throws Exception {
 
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonStatus + ", false)");
+        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", false)");
 
         String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
@@ -180,15 +181,52 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testStatusTableNodeFilteringWithButtons() throws Exception {
-        fail ("To Be Implemented");
+    public void testShowStatus() throws Exception {
+
+        page.executeJavaScript("$.ajax = function (options) {" +
+                "    options.success(" + jsonFullStatus + ")" +
+                "}");
+
+        page.executeJavaScript("eskimoSystemStatus.showStatus()");
+
+        System.err.println (page.asXml());
+
+        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+
+        assertNotNull (tableString);
+
+        assertTrue (tableString.contains("192.168.10.11"));
+
+        String infoActionsString = page.executeJavaScript("$('#status-monitoring-info-actions').html()").getJavaScriptResult().toString();
+
+        assertNotNull (infoActionsString);
+
+        assertTrue (infoActionsString.contains(" Use Zeppelin for your Data Science projects"));
     }
 
     @Test
-    public void testShowStatus() throws Exception {
-        fail ("To Be Implemented");
+    public void testStatusTableNodeFilteringWithButtons() throws Exception {
+
+        testShowStatus();
+
+        page.getElementById("show-issues-btn").click();
+
+        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+
+        assertNotNull (tableString);
+
+        assertFalse (tableString.contains("192.168.10.11"));
+
+        page.getElementById("show-master-services-btn").click();
+
+        tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+
+        assertNotNull (tableString);
+
+        assertTrue (tableString.contains("192.168.10.11"));
     }
 
+    /*
     @Test
     public void testServiceAction() throws Exception {
         fail ("To Be Implemented");
@@ -198,16 +236,12 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     public void testDisplayMonitoringDashboard() throws Exception {
         fail ("To Be Implemented");
     }
-
-    @Test
-    public void testUpdateStatus() throws Exception {
-        fail ("To Be Implemented");
-    }
+    */
 
     @Test
     public void testRenderNodesStatusTableFiltering() throws Exception {
 
-        JsonWrapper statusWrapper = new JsonWrapper(jsonStatus);
+        JsonWrapper statusWrapper = new JsonWrapper(jsonNodesStatus);
         statusWrapper.setValueForPath("service_kafka_192-168-10-13", "NA");
         statusWrapper.setValueForPath("service_logstash_192-168-10-13", "KO");
 

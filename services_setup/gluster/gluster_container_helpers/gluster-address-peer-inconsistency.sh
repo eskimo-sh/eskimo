@@ -51,6 +51,8 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
     exit -3
 fi
 
+export PATH=/usr/local/sbin/:$PATH
+
 echo "-> gluster-address-peer-inconsistency.sh"
 echo " - Checking gluster connection between $SELF_IP_ADDRESS and $MASTER_IP_ADDRESS"
 
@@ -63,7 +65,7 @@ if [[ "$MASTER_IP_ADDRESS" == "$SELF_IP_ADDRESS" ]]; then
     for peer in $gluster_peers; do
         if [[ $peer != "localhost" ]]; then
             echo "Deleting peer $peer from pool list"
-            /usr/local/sbin/__force-remove-peer.sh $peer
+            __force-remove-peer.sh $peer
         fi
     done
 
@@ -97,7 +99,7 @@ else
     fi
     localPeerList=`gluster pool list 2>/tmp/local_gluster_check`
     if [[ $? != 0 ]]; then
-        echo "Calling 'gluster pool list'"
+        echo "Calling 'gluster pool list' ended up in error !"
         cat /tmp/local_gluster_check
         echo "Cannot proceed any further with consistency checking ... SKIPPING"
         exit 10
@@ -110,7 +112,7 @@ else
 
     echo " - Checking if local in master pool"
     set +e
-    remote_result=`/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
+    remote_result=`gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
     if [[ $? != 0 ]]; then
         echo "Calling remote gluster on $MASTER_IP_ADDRESS failed !"
         echo "Cannot proceed any further with consistency checking ... SKIPPING"
@@ -139,7 +141,7 @@ else
             echo " -> gluster cluster is inconsistent. Local doesn't know master but master knows local"
 
             echo " - Attempting to remove local from master pool list"
-            /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS force-remove-peer now $SELF_IP_ADDRESS
+            gluster_call_remote.sh $MASTER_IP_ADDRESS force-remove-peer now $SELF_IP_ADDRESS
             if [[ $? != 0 ]] ; then
                 echo " - FAILED to remove local from master pool list"
                 exit -1
@@ -157,7 +159,7 @@ else
         if [[ $LOCAL_IN_MASTER == 0 ]] ; then
             echo " -> gluster cluster is inconsistent. Master doesn't know local but local knows master"
             echo " - Attempting to remove master from local pool list"
-            /usr/local/sbin/__force-remove-peer.sh $MASTER_IP_ADDRESS
+            __force-remove-peer.sh $MASTER_IP_ADDRESS
             if [[ $? != 0 ]] ; then
                 echo " - FAILED to remove master from local pool list"
                 exit -1
