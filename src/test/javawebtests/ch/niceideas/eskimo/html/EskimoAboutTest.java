@@ -37,10 +37,6 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
-
 public class EskimoAboutTest extends AbstractWebTest {
 
     @Before
@@ -64,11 +60,16 @@ public class EskimoAboutTest extends AbstractWebTest {
         assertCssValue("#about-modal", "visibility", "visible");
 
         page.executeJavaScript("eskimoAbout.cancelAbout()");
+
+        /* FIXME WTF ?!?
         await().atMost(20, TimeUnit.SECONDS).until(() ->
                    page.executeJavaScript("$('#about-modal').css('display')") != null
                 && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult() != null
                 && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString() != null
                 && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
+        */
+        Thread.sleep(3000);
+
 
         assertCssValue("#about-modal", "display", "none");
     }
