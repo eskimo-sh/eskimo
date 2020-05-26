@@ -409,17 +409,15 @@ eskimo.SystemStatus = function(constructorObject) {
     this.reinstallService = reinstallService;
 
     this.serviceIsUp = function (nodeServicesStatus, service) {
-        var serviceAvailable = false;
         for (var key in nodeServicesStatus) {
             if (key.indexOf("service_"+service+"_") > -1) {
                 var serviceStatus = nodeServicesStatus[key];
                 if (serviceStatus == "OK") {
-                    serviceAvailable = true;
-                    break;
+                    return true;
                 }
             }
         }
-        return serviceAvailable;
+        return false;
     };
 
     this.displayMonitoringDashboard = function (monitoringDashboardId, refreshPeriod) {
@@ -459,10 +457,16 @@ eskimo.SystemStatus = function(constructorObject) {
                 // mention the fact that dashboard does not exist
                 $('#status-monitoring-no-dashboard').html("<b>Grafana doesn't know dashboard with ID " + monitoringDashboardId + "</b>");
 
-                // retry periodically
-                setTimeout(function () {
-                    that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
-                }, 5000);
+
+                var grafanaAvailable = that.serviceIsUp (nodeServicesStatus, "grafana");
+                if (grafanaAvailable
+                    && !that.eskimoServices.isServiceAvailable("grafana")) {
+
+                    // retry periodically
+                    setTimeout(function () {
+                        that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
+                    }, 5000);
+                }
             }
         });
 
@@ -530,6 +534,8 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 $("#status-monitoring-dashboard-frame").attr('src', "html/emptyPage.html");
 
+                $('#status-monitoring-no-dashboard').html("(Grafana not available or no dashboard configured)");
+
             }
             // render iframe with refresh period (default 30s)
             else {
@@ -538,13 +544,13 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 setTimeout(function () {
                     that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
-                }, 5000);
+                }, blocking ? 0 : 5000);
             }
         }
 
         // B. Inject information
 
-        $("#eskimo-flavour").html()
+        //$("#eskimo-flavour").html()
 
         $("#system-information-version").html(systemStatus.buildVersion);
 

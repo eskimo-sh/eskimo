@@ -223,9 +223,7 @@ public class ConnectionManagerService {
 
                     if (connectionAge + maximumConnectionAge < System.currentTimeMillis()) {
                         logger.warn ("Previous connection to " + ipAddress + " is too old. Recreating ...");
-                        connectionMap.remove(ipAddress);
-                        connectionAges.remove(ipAddress);
-                        closeConnection(connection);
+                        closeAndRemoveConnection(ipAddress, connection);
                         return getConnectionInternal(ipAddress);
                     }
 
@@ -239,8 +237,7 @@ public class ConnectionManagerService {
 
                 } catch (IOException | IllegalStateException e) {
                     logger.warn ("Previous connection to " + ipAddress + " got into problems ("+e.getMessage()+"). Recreating ...");
-                    connectionMap.remove(ipAddress);
-                    connectionAges.remove(ipAddress);
+                    closeAndRemoveConnection(ipAddress, connection);
                     return getConnectionInternal(ipAddress);
                 }
             }
@@ -256,6 +253,12 @@ public class ConnectionManagerService {
             connectionMapLock.unlock();
         }
 
+    }
+
+    private void closeAndRemoveConnection(String ipAddress, Connection connection) {
+        connectionMap.remove(ipAddress);
+        connectionAges.remove(ipAddress);
+        closeConnection(connection);
     }
 
     protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {

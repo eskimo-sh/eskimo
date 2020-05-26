@@ -334,18 +334,23 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(0, setupService.compareSoftwareVersion("8.a1", "8.a1"));
         assertEquals(0, setupService.compareSoftwareVersion("abc", "abc"));
         assertEquals(0, setupService.compareSoftwareVersion("a.b.1", "a.b.1"));
+        assertEquals(0, setupService.compareSoftwareVersion("1", "1"));
 
         assertEquals(1, setupService.compareSoftwareVersion("1.1.2", "1.1.1"));
         assertEquals(1, setupService.compareSoftwareVersion("1.1.10", "1.1.9"));
         assertEquals(1, setupService.compareSoftwareVersion("1.10.1", "1.9.1"));
         assertEquals(1, setupService.compareSoftwareVersion("abd", "abc"));
         assertEquals(1, setupService.compareSoftwareVersion("1.1-abd", "1.1-abc"));
+        assertEquals(1, setupService.compareSoftwareVersion("2", "1"));
+        assertEquals(1, setupService.compareSoftwareVersion("1.1", "1"));
 
         assertEquals(-1, setupService.compareSoftwareVersion("1.1.1", "1.1.2"));
         assertEquals(-1, setupService.compareSoftwareVersion("1.1.9", "1.1.10"));
         assertEquals(-1, setupService.compareSoftwareVersion("1.9.1", "1.10.1"));
         assertEquals(-1, setupService.compareSoftwareVersion("abc", "abd"));
         assertEquals(-1, setupService.compareSoftwareVersion("1.1-abc", "1.1-abd"));
+        assertEquals(-1, setupService.compareSoftwareVersion("1", "2"));
+        assertEquals(-1, setupService.compareSoftwareVersion("1", "1.1"));
     }
 
     @Test

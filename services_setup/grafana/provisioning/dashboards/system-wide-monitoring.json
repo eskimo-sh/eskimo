@@ -740,8 +740,8 @@
     "list": []
   },
   "time": {
-    "from": "2020-05-18T20:03:24.962Z",
-    "to": "2020-05-18T20:32:42.564Z"
+    "from": "now-6h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -763,5 +763,5 @@
   "variables": {
     "list": []
   },
-  "version": 432
+  "version": 248
 }

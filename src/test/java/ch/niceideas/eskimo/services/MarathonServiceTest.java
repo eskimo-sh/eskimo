@@ -141,6 +141,32 @@ public class MarathonServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    public void testQueryMesosAgent() throws Exception {
+        MarathonService marathonService = resetupMarathonService(new MarathonService() {
+            @Override
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+                // just return the URI
+                return request.getRequestLine().getUri();
+            }
+        });
+
+        marathonService.setProxyManagerService(new ProxyManagerService() {
+            @Override
+            public ProxyTunnelConfig getTunnelConfig(String serviceId) {
+                if (serviceId.equals("mesos-agent/192-168-10-11")) {
+                    return new ProxyTunnelConfig("mesos-agent", 1234, "dummy", -1);
+                } else {
+                    throw new UnsupportedOperationException(serviceId);
+                }
+            }
+        });
+
+        assertEquals("http://localhost:1234/test/test", marathonService.queryMesosAgent("192.168.10.11", "test/test"));
+
+        assertEquals("http://localhost:1234/test/test", marathonService.queryMesosAgent("192.168.10.11", "test/test", "POST"));
+    }
+
+    @Test
     public void testUpdateMarathon () throws Exception {
 
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
