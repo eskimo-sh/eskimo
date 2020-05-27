@@ -86,6 +86,12 @@ bash -c "echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticse
 bash -c "echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 bash -c "echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
+bash -c "echo -e \"\n# Esimo Default indices settings\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
+bash -c "echo -e \"\n# Set the number of shards (splits) of an index (5 by default):\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
+bash -c "echo \"index.number_of_shards=DEFAULT\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
+bash -c "echo -e \"\n# Set the number of replicas (additional copies) of an index (0 by default - only master replica):\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
+bash -c "echo \"index.number_of_replicas=DEFAULT\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
+
 echo " - Adapting configuration in file jvm.options"
 sed -i s/"-Xms2g"/"-Xms1000m"/g /usr/local/lib/elasticsearch/config/jvm.options
 sed -i s/"-Xmx2g"/"-Xmx1000m"/g /usr/local/lib/elasticsearch/config/jvm.options

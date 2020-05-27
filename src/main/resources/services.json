@@ -975,6 +975,30 @@
             "defaultValue": "true"
           }
         ]
+      },
+      {
+        "filename": "elasticsearch-index-defaults.properties",
+        "propertyType": "variable",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
+        "filesystemService": "elasticsearch",
+        "properties" : [
+          {
+            "name" :  "index.refresh_interval",
+            "comment": "Default refresh interval on new indices. Use format such as 10s, 1m, etc. \nUSE [ESKIMO_DEFAULT] to leave ElasticSearch default value.",
+            "defaultValue" : "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name" :  "index.number_of_replicas",
+            "comment": "Default number of additional replicas on new indices.  \nUSE [ESKIMO_DEFAULT] to let Eskimo compute best value.",
+            "defaultValue" : "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name" :  "index.number_of_shards",
+            "comment": "Default number of additional replicas on new indices.  \nUSE [ESKIMO_DEFAULT] to leave ElasticSearch default value (5).",
+            "defaultValue" : "[ESKIMO_DEFAULT]"
+          }
+        ]
       }
     ],
     "commands" : [

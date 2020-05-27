@@ -117,6 +117,9 @@ fi
 echo " - Handling topology and setting injection"
 handle_topology_settings elasticsearch cerebro_install_log
 
+echo " - Copying inContainerInjectIndexSettings.sh Script"
+docker_cp_script inContainerInjectIndexSettings.sh sbin elasticsearch es_install_log
+
 #echo " - TODO"
 #docker exec -it elasticsearch TODO
 

@@ -73,7 +73,7 @@ Type=simple
 
 Restart=always
 StartLimitBurst=3
-StartLimitInterval=60
+StartLimitInterval=200
 
 # Specifies the maximum file descriptor number that can be opened by this process
 LimitNOFILE=65536

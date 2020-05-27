@@ -226,7 +226,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertTrue (tableString.contains("192.168.10.11"));
     }
 
-    /*
     @Test
     public void testServiceAction() throws Exception {
         fail ("To Be Implemented");
@@ -236,7 +235,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     public void testDisplayMonitoringDashboard() throws Exception {
         fail ("To Be Implemented");
     }
-    */
 
     @Test
     public void testRenderNodesStatusTableFiltering() throws Exception {

@@ -42,5 +42,36 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh elasticsearch
 
-echo " - Starting service"
-/usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+echo " - Filling elasticsearch logs"
+for i in `seq 1 21`; do
+    echo "(Pre-start log filler $i)" >> /var/log/elasticsearch/eskimo.log
+done
+
+echo " - Starting ElasticSearch"
+/usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid &
+ES_PID=$!
+
+echo " - Waiting for ElasticSearch to be successfuly started"
+sleep 10
+for i in `seq 1 240`; do
+    sleep 1
+    if [[ `tail -20 /var/log/elasticsearch/eskimo.log  | grep Node | grep started` != "" ]]; then
+        break
+    fi
+    if [[ `ps -o pid= -p $ES_PID` == "" ]]; then
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        echo "Elasticsearch process seems dead"
+        exit -2
+    fi
+    if [[ $i == 100 ]]; then
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        echo "Could not start elasticsearch successfully in 240 seconds"
+        exit -1
+    fi
+done
+
+echo " - Injecting index settings"
+/usr/local/sbin/inContainerInjectIndexSettings.sh
+
+echo " - Waiting on ES process $ES_PID"
+wait $ES_PID
