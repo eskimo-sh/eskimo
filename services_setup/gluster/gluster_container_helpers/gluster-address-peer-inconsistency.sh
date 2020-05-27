@@ -97,6 +97,7 @@ else
     if [[ $MASTER_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
         additional_search=marathon.registry
     fi
+    set +e
     localPeerList=`gluster pool list 2>/tmp/local_gluster_check`
     if [[ $? != 0 ]]; then
         echo "Calling 'gluster pool list' ended up in error !"
@@ -111,14 +112,13 @@ else
     fi
 
     echo " - Checking if local in master pool"
-    set +e
     remote_result=`gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
     if [[ $? != 0 ]]; then
         echo "Calling remote gluster on $MASTER_IP_ADDRESS failed !"
         echo "Cannot proceed any further with consistency checking ... SKIPPING"
         exit 0
     fi
-    set -e
+
     # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
     additional_search=$SELF_IP_ADDRESS
     if [[ $SELF_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
@@ -129,8 +129,6 @@ else
     else
         LOCAL_IN_MASTER=1
     fi
-
-    set +e
 
     echo " - Checking consistency "
     if [[ $MASTER_IN_LOCAL == 0 ]]; then
