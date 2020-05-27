@@ -439,7 +439,7 @@ eskimo.SystemStatus = function(constructorObject) {
                     forceRefresh = true;
                 }
 
-                var url = "grafana/d/" + monitoringDashboardId + "/eskimo-system-wide-monitoring?orgId=1&&kiosk&refresh="
+                var url = "grafana/d/" + monitoringDashboardId + "/monitoring?orgId=1&&kiosk&refresh="
                     + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
 
                 var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
@@ -456,17 +456,6 @@ eskimo.SystemStatus = function(constructorObject) {
 
                 // mention the fact that dashboard does not exist
                 $('#status-monitoring-no-dashboard').html("<b>Grafana doesn't know dashboard with ID " + monitoringDashboardId + "</b>");
-
-
-                var grafanaAvailable = that.serviceIsUp (nodeServicesStatus, "grafana");
-                if (grafanaAvailable
-                    && !that.eskimoServices.isServiceAvailable("grafana")) {
-
-                    // retry periodically
-                    setTimeout(function () {
-                        that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
-                    }, 5000);
-                }
             }
         });
 

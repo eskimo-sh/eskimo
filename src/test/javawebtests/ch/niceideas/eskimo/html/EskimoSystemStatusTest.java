@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -227,13 +228,30 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testServiceAction() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
     public void testDisplayMonitoringDashboard() throws Exception {
-        fail ("To Be Implemented");
+
+        page.executeJavaScript("$.ajax = function (options) {" +
+                "    options.error()" +
+                "}");
+
+        page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
+
+        assertJavascriptEquals("<b>Grafana doesn't know dashboard with ID abcd</b>", "$('#status-monitoring-no-dashboard').html()");
+
+        page.executeJavaScript("$.ajax = function (options) {" +
+                "    options.success()" +
+                "}");
+
+        // HTMLUnit cannot load grafana
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
+        });
+        assertTrue(exception.getMessage().endsWith("grafana/d/abcd/monitoring?orgId=1&&kiosk&refresh=50"));
+
+        await().atMost(15, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#status-monitoring-no-dashboard').css('display')").getJavaScriptResult().toString().equals("none"));
+
+        assertCssValue("#status-monitoring-dashboard-frame", "display", "inherit");
+        assertCssValue("#status-monitoring-no-dashboard", "display", "none");
     }
 
     @Test
