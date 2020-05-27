@@ -196,7 +196,9 @@ eskimo.ServicesConfig = function (constructorObject) {
                     serviceName +
                     '</h5></td>' +
                     '</tr></table></div>'+
-                    '</a>';
+                    '</a>'+
+                    '<div id="collapse-'+serviceName+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
+                    '<div class="panel-body">';
 
                 for (var j = 0; j < serviceEditableConfigsArray.length; j++) {
 
@@ -204,8 +206,7 @@ eskimo.ServicesConfig = function (constructorObject) {
                     console.log (serviceEditableConfig);
 
                     servicesConfigContent = servicesConfigContent +
-                        '<div id="collapse-'+serviceName+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
-                        '<div class="panel-body">'+
+
                         '<div class="col-md-12 col-sd-12">' +
                         '<h5><b>Configuration file</b> : ' + serviceEditableConfig.filename + '</h5>' +
                         '</div>';
@@ -236,17 +237,14 @@ eskimo.ServicesConfig = function (constructorObject) {
                             '     <br>\n' +
                             '</div>'
                     }
-
-                    servicesConfigContent = servicesConfigContent +
-                        '</div>' +
-                        '</div>';
-
                 }
+
+                servicesConfigContent += '</div></div>';
 
             }
         }
 
-        servicesConfigContent += "</div>"
+        servicesConfigContent += '</div>';
 
         $("#services-config-placeholder").html(servicesConfigContent)
     }
