@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
 import ch.niceideas.eskimo.services.NodeRangeResolver;
@@ -205,13 +206,13 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
         OperationsCommand oc = new OperationsCommand(NodesConfigWrapper.empty());
 
-        oc.addInstallation("elasticsearch", "192.168.10.11");
-        oc.addInstallation("kibana", "192.168.10.11");
-        oc.addInstallation("cerebro", "192.168.10.11");
+        oc.addInstallation(new SerializablePair<>("elasticsearch", "192.168.10.11"));
+        oc.addInstallation(new SerializablePair<>("kibana", "192.168.10.11"));
+        oc.addInstallation(new SerializablePair<>("cerebro", "192.168.10.11"));
 
-        oc.addUninstallation("cerebro", "192.168.10.13");
-        oc.addUninstallation("kibana", "192.168.10.13");
-        oc.addUninstallation("logstash", "192.168.10.13");
+        oc.addUninstallation(new SerializablePair<>("cerebro", "192.168.10.13"));
+        oc.addUninstallation(new SerializablePair<>("kibana", "192.168.10.13"));
+        oc.addUninstallation(new SerializablePair<>("logstash", "192.168.10.13"));
 
         oc.addRestartIfNotInstalled("zeppelin", "192.168.10.13");
 

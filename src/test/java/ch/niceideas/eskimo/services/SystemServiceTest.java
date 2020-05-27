@@ -68,7 +68,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         SystemService ss = new SystemService(false) {
             @Override
             protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
-                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
+                File retFile = new File ("/tmp/" + serviceOrFlag + "-" + testRunUUID + "-" + ipAddress + extension);
                 retFile.createNewFile();
                 return retFile;
             }
@@ -157,7 +157,6 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testUpdateStatusWithMarathonException() throws Exception {
 
-
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         configurationService.saveNodesConfig(nodesConfig);
 
@@ -216,7 +215,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         //System.out.println(expectedStatusWrapper.getFormattedValue());
 
-        assertTrue(expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()));
+        assertTrue(systemStatus.getFormattedValue(), expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()));
     }
 
     @Test

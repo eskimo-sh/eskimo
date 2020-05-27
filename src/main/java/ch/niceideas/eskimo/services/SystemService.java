@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -66,7 +67,9 @@ public class SystemService {
     private static final Logger logger = Logger.getLogger(SystemService.class);
 
     public static final String TMP_PATH_PREFIX = "/tmp/";
+
     public static final String SERVICE_PREFIX = "Service ";
+    public static final String SHOULD_NOT_HAPPEN_FROM_HERE = " should not happen from here.";
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -241,7 +244,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Showing journal of", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Showing marathon service journal for " + serviceName + " should not happen from here.");
+                throw new UnsupportedOperationException("Showing marathon service journal for " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + serviceName);
             }
@@ -252,7 +255,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Starting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Starting marathon service " + serviceName + " should not happen from here.");
+                throw new UnsupportedOperationException("Starting marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + serviceName);
             }
@@ -263,7 +266,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Stopping marathon service " + serviceName + " should not happen from here.");
+                throw new UnsupportedOperationException("Stopping marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + serviceName);
             }
@@ -274,7 +277,7 @@ public class SystemService {
         applyServiceOperation(serviceName, ipAddress, "Restarting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Restarting marathon service " + serviceName + " should not happen from here.");
+                throw new UnsupportedOperationException("Restarting marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + serviceName);
             }
@@ -670,40 +673,14 @@ public class SystemService {
                     // => so nothing to do, don't touch anything in installed services registry
 
                     // c. if node is both down and not configured anymore, we just remove all services whatever their statuses
-                    if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
-                        if (countErrorAndRemoveServices(servicesInstallationStatus, savedService, nodeName, originalNodeName)) {
-                            changes = true;
-                        }
+                    if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)
+                            && countErrorAndRemoveServices(servicesInstallationStatus, savedService, nodeName, originalNodeName)) {
+                        changes = true;
                     }
 
                     // D. In other cases, node is configured but down. We don't make any assumption on node down.
                     //    Admin is left with uninstalling it if he wants.
                     // => so nothing to do, don't touch anything in installed services registry
-
-                    /*
-                    // this means that node is not configured anymore ! (no status has been obtained)
-                    if (nodeAlive == null) {
-
-                        // => we want to consider removing services in any case if not is not only not configured anymore but down
-                        // so if node is down in addition to being not configured anymore, we remove all services from saved install stazus
-                        if (nodeIp == null && !configuredAddressesAndOtherLiveAddresses.contains(nodeIp)) {
-
-                        }
-                        // on the other hand if node is not configured but up,
-                        else {
-                            if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
-                                changes = true;
-                            }
-                        }
-
-                    }
-                    else if (nodeAlive) { // this means that the node is configured and up
-
-                        if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, serviceStatusFullString, savedService, nodeName)) {
-                            changes = true;
-                        }
-                    } // else if node is configured but down, don't do anything
-                    */
                 }
 
                 if (changes) {
@@ -885,16 +862,14 @@ public class SystemService {
 
         // 1.2 Create archive
 
-
         // Get the temporary directory and print it.
         String tempDir = System.getProperty("java.io.tmpdir");
         if (StringUtils.isBlank(tempDir)) {
             throw new SystemException("Unable to get system temporary directory.");
         }
         File tmpArchiveFile = createTempFile(service, ipAddress, ".tgz");
-        if (!tmpArchiveFile.delete()) { // I just want te file name
-            logger.debug ("Deleting of temp file shoudln't have failed.");
-        }
+        Files.delete(tmpArchiveFile.toPath());
+
         File archive = new File(tempDir + "/" + tmpArchiveFile.getName());
         FileUtils.createTarFile(servicesSetupPath + "/" + service, archive);
         if (!archive.exists()) {

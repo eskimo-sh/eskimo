@@ -53,6 +53,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -461,7 +462,7 @@ public class SetupService {
             dowloadFile(new StringBuilder(), tempPackagesVersionFile, downloadUrl, "");
 
             JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
-            tempPackagesVersionFile.delete();
+            Files.delete(tempPackagesVersionFile.toPath());
             return packagesVersion;
         } catch (IOException | FileException e) {
             logger.error (e, e);

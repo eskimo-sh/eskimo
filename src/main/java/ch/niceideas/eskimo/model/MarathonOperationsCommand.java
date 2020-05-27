@@ -36,23 +36,18 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.MarathonException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-public class MarathonOperationsCommand implements Serializable {
+public class MarathonOperationsCommand extends JSONOpCommand<String> implements Serializable {
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
 
-    private final ArrayList<String> installations = new ArrayList<>();
-    private final ArrayList<String> uninstallations = new ArrayList<>();
     private String warnings = null;
 
     // TODO marathon dependent services not supported for now
@@ -130,22 +125,6 @@ public class MarathonOperationsCommand implements Serializable {
         return rawMarathonServicesConfig;
     }
 
-    void addInstallation(String service) {
-        installations.add(service);
-    }
-
-    void addUninstallation(String service) {
-        uninstallations.add(service);
-    }
-
-    public List<String> getInstallations() {
-        return installations;
-    }
-
-    public List<String> getUninstallations() {
-        return uninstallations;
-    }
-
     public String getWarnings() {
         return warnings;
     }
@@ -155,13 +134,13 @@ public class MarathonOperationsCommand implements Serializable {
     }
 
     public boolean hasChanges() {
-        return !installations.isEmpty() || !uninstallations.isEmpty();
+        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
     }
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("installations", new JSONArray(installations));
-            put("uninstallations", new JSONArray(uninstallations));
+            put("installations", new JSONArray(getInstallations()));
+            put("uninstallations", new JSONArray(getUninstallations()));
             put("warnings", warnings);
         }});
     }

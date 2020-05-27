@@ -126,21 +126,20 @@ public class NodesConfigurationChecker {
 
         for (String otherKey : nodesConfig.keySet()) {
             NodesConfigWrapper.ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
-            if (otherProperty != null && StringUtils.isNotBlank(otherProperty.getServiceName())) {
+            if (otherProperty != null
+                    && StringUtils.isNotBlank(otherProperty.getServiceName())
+                    && otherProperty.getServiceName().equals(dependency.getMasterService())) {
 
-                if (otherProperty.getServiceName().equals(dependency.getMasterService())) {
+                // RANDOM_NODE_AFTER wants a different node, I need to check IPs
+                if (nodeNbr != null && dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
 
-                    // RANDOM_NODE_AFTER wants a different node, I need to check IPs
-                    if (nodeNbr != null && dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
-
-                        int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
-                        if (otherNodeNbr == nodeNbr) {
-                            continue;
-                        }
+                    int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
+                    if (otherNodeNbr == nodeNbr) {
+                        continue;
                     }
-
-                    actualCount++;
                 }
+
+                actualCount++;
             }
         }
 
@@ -197,11 +196,11 @@ public class NodesConfigurationChecker {
 
                     ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
 
-                    if (property != null && StringUtils.isNotBlank(property.getServiceName())) {
+                    if (property != null
+                            && StringUtils.isNotBlank(property.getServiceName())
+                            && property.getServiceName().equals(mandatoryServiceName)) {
 
-                        if (property.getServiceName().equals(mandatoryServiceName)) {
-                            foundNodes++;
-                        }
+                        foundNodes++;
                     }
                 }
 

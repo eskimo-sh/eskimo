@@ -50,7 +50,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OperationsCommand implements Serializable {
+public class OperationsCommand extends JSONOpCommand<SerializablePair<String, String>> implements Serializable {
 
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
 
@@ -58,8 +58,6 @@ public class OperationsCommand implements Serializable {
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private ArrayList<SerializablePair<String, String>> installations = new ArrayList<>();
-    private ArrayList<SerializablePair<String, String>> uninstallations = new ArrayList<>();
     private ArrayList<SerializablePair<String, String>> restarts = new ArrayList<>();
 
     public static OperationsCommand create (
@@ -81,9 +79,8 @@ public class OperationsCommand implements Serializable {
 
                 if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
 
-                    retCommand.addInstallation(service, ipAddress);
+                    retCommand.addInstallation(new SerializablePair<>(service, ipAddress));
                 }
-
             }
         }
 
@@ -112,12 +109,12 @@ public class OperationsCommand implements Serializable {
                     }
 
                     if (!found) {
-                        retCommand.addUninstallation(installedService, ipAddress);
+                        retCommand.addUninstallation(new SerializablePair<>(installedService, ipAddress));
                     }
 
                 } catch (SystemException e) {
                     logger.debug(e, e);
-                    retCommand.addUninstallation(installedService, ipAddress);
+                    retCommand.addUninstallation(new SerializablePair<>(installedService, ipAddress));
                 }
             }
         }
@@ -195,27 +192,11 @@ public class OperationsCommand implements Serializable {
         return rawNodesConfig;
     }
 
-    void addInstallation(String service, String ipAddress) {
-        installations.add(new SerializablePair<>(service, ipAddress));
-    }
-
-    void addUninstallation(String service, String ipAddress) {
-        uninstallations.add(new SerializablePair<>(service, ipAddress));
-    }
-
     void addRestartIfNotInstalled(String service, String ipAddress) {
         SerializablePair<String, String> addedPair = new SerializablePair<>(service, ipAddress);
-        if (!installations.contains(addedPair)) {
+        if (!getInstallations().contains(addedPair)) {
             restarts.add(addedPair);
         }
-    }
-
-    public List<SerializablePair<String, String>> getInstallations() {
-        return installations;
-    }
-
-    public List<SerializablePair<String, String>> getUninstallations() {
-        return uninstallations;
     }
 
     public List<SerializablePair<String, String>> getRestarts() {
@@ -224,8 +205,8 @@ public class OperationsCommand implements Serializable {
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("installations", new JSONArray(toJsonList(installations)));
-            put("uninstallations", new JSONArray(toJsonList(uninstallations)));
+            put("installations", new JSONArray(toJsonList(getInstallations())));
+            put("uninstallations", new JSONArray(toJsonList(getUninstallations())));
             put("restarts", new JSONArray(toJsonList(restarts)));
         }});
     }
@@ -246,10 +227,10 @@ public class OperationsCommand implements Serializable {
 
     public Set<String> getAllIpAddresses() {
         Set<String> retSet = new HashSet<>();
-        installations.stream()
+        getInstallations().stream()
                 .map(Pair::getValue)
                 .forEach(retSet::add);
-        uninstallations.stream()
+        getUninstallations().stream()
                 .map(Pair::getValue)
                 .forEach(retSet::add);
         restarts.stream()

@@ -375,6 +375,31 @@ capacity for this node is as follows:
 * 32 GB RAM (64 GB RAM recommended)
 
 
+===== Fedora nodes specificities
+
+Fedora has switched to cgroups v2 by default now, but Mesos (and some Docker versions) are not working well with cgroups v2 and
+may fail to start. With Eskimo and current versions of mesos, one needs to revert cgroups to v1 on Fedora
+nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
+
+.Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
+----
+sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+----
+
+Then rebuild your GRUB config.
+
+.If you’re using BIOS boot
+----
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+----
+
+.If you’re running EFI
+----
+sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
+----
+
+Finally mesos should be able to start successfully after a reboot.
+
 
 ===== Protecting eskimo nodes with a firewall
 

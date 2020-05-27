@@ -34,135 +34,32 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.MarathonException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemService;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class MarathonOperationsCommand implements Serializable {
+public abstract class JSONOpCommand<T extends Serializable> implements Serializable {
 
-    private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
+    private final ArrayList<T> installations = new ArrayList<>();
+    private final ArrayList<T> uninstallations = new ArrayList<>();
 
-    private final ArrayList<String> installations = new ArrayList<>();
-    private final ArrayList<String> uninstallations = new ArrayList<>();
-    private String warnings = null;
-
-    // TODO marathon dependent services not supported for now
-    //private ArrayList<String> restarts = new ArrayList<>();
-
-    public static MarathonOperationsCommand create (
-            ServicesDefinition servicesDefinition,
-            SystemService systemService,
-            ServicesInstallStatusWrapper servicesInstallStatus,
-            MarathonServicesConfigWrapper rawMarathonServicesConfig) {
-
-        MarathonOperationsCommand retCommand = new MarathonOperationsCommand(rawMarathonServicesConfig);
-
-        // 1. Find out about services that need to be installed
-        for (String service : servicesDefinition.listMarathonServices()) {
-            if (rawMarathonServicesConfig.isServiceInstallRequired(service)
-                    && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
-
-                retCommand.addInstallation(service);
-            }
-        }
-
-        // 2. Find out about services that need to be uninstalled
-        for (String installStatusFlag : servicesInstallStatus.getRootKeys()) {
-
-            Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
-            String installedService = serviceAndNodePair.getKey();
-            String nodeName = serviceAndNodePair.getValue();
-
-            if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
-                // search it in config
-                && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
-
-                retCommand.addUninstallation(installedService);
-            }
-        }
-
-        // 3. If Marathon is not available, issue a warning in regards to what is going to happen
-        if (retCommand.hasChanges()) {
-            try {
-                SystemStatusWrapper lastStatus = systemService.getStatus();
-
-                String marathonNodeName = lastStatus.getFirstNodeName("marathon");
-                if (StringUtils.isBlank(marathonNodeName)) {
-                    retCommand.setWarnings("Marathon is not available. The changes in marathon services configuration and " +
-                            "deployments will be saved but they will <b>need to be applied again</b> another time when " +
-                            "marathon is available");
-
-                } else {
-
-                    if (!lastStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
-
-                        retCommand.setWarnings("Marathon is not properly running. The changes in marathon services configuration and " +
-                                "deployments will be saved but they will <b>need to be applied again</b> another time when " +
-                                "marathon is available");
-                    }
-                }
-
-            } catch (SystemService.StatusExceptionWrapperException e) {
-
-                String warnings = "Couldn't get last marathon Service status to assess feasibility of marathon setup\n";
-                warnings += e.getCause().getCause() + ":" + e.getCause().getMessage();
-                retCommand.setWarnings(warnings);
-            }
-        }
-
-        return retCommand;
-    }
-
-    MarathonOperationsCommand(MarathonServicesConfigWrapper rawMarathonServicesConfig) {
-        this.rawMarathonServicesConfig = rawMarathonServicesConfig;
-    }
-
-    public MarathonServicesConfigWrapper getRawConfig() {
-        return rawMarathonServicesConfig;
-    }
-
-    void addInstallation(String service) {
+    void addInstallation(T service) {
         installations.add(service);
     }
 
-    void addUninstallation(String service) {
+    void addUninstallation(T service) {
         uninstallations.add(service);
     }
 
-    public List<String> getInstallations() {
+    public List<T> getInstallations() {
         return installations;
     }
 
-    public List<String> getUninstallations() {
+    public List<T> getUninstallations() {
         return uninstallations;
     }
 
-    public String getWarnings() {
-        return warnings;
-    }
-
-    public void setWarnings(String warnings) {
-        this.warnings = warnings;
-    }
-
-    public boolean hasChanges() {
-        return !installations.isEmpty() || !uninstallations.isEmpty();
-    }
-
-    public JSONObject toJSON () {
-        return new JSONObject(new HashMap<String, Object>() {{
-            put("installations", new JSONArray(installations));
-            put("uninstallations", new JSONArray(uninstallations));
-            put("warnings", warnings);
-        }});
-    }
+    public abstract JSONObject toJSON ();
 }

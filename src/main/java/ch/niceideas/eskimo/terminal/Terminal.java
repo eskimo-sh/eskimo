@@ -85,7 +85,7 @@ public class Terminal {
     static {
         for( final Method m : Terminal.class.getDeclaredMethods() ) {
             Esc esc = m.getAnnotation(Esc.class);
-            if(esc!=null) {
+            if(esc != null) {
                 for( String s : esc.value() ) {
                     ESCAPE_SEQUENCES.put(s, (t, s1, matcher) -> {
                         try {
