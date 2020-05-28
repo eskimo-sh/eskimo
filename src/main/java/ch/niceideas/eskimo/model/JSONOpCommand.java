@@ -62,4 +62,8 @@ public abstract class JSONOpCommand<T extends Serializable> implements Serializa
     }
 
     public abstract JSONObject toJSON ();
+
+    public boolean hasChanges() {
+        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
+    }
 }

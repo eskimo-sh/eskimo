@@ -1382,6 +1382,11 @@ https://zookeeper.apache.org/
 
 Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
 
+==== Zookeeper specificities within Eskimo
+
+The script `zkCli.sh` enabling an administrator to browse, query and manipulate zookeeper is available on the host
+running the zookeeper container as `/usr/local/bin/zookeeperCli.sh`
+
 === glusterFS
 
 image::pngs/gluster-logo.png[50, 50, align="center"]

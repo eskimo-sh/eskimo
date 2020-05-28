@@ -228,7 +228,7 @@ eskimo.ServicesConfig = function (constructorObject) {
                             property.comment.replace("\n", "<br>") +
                             ' (default value : ' + property.defaultValue + ')'+
                             '     </div>'+
-                            '     <div class="col-md-12" style="margin-bottom: 5px;">\n' +
+                            '     <div class="col-lg-8 col-md-10 col-sm-12" style="margin-bottom: 5px;">\n' +
                             '         <input id="' + inputName + '" name="' + inputName + '" type="text"\n' +
                             '                placeholder="' + property.defaultValue + '" class="form-control input-md"' +
                             '                value="' + (property.value != null ? property.value : '') + '"'+

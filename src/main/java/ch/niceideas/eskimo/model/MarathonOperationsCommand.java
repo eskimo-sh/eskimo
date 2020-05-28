@@ -50,8 +50,7 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
 
     private String warnings = null;
 
-    // TODO marathon dependent services not supported for now
-    //private ArrayList<String> restarts = new ArrayList<>();
+    // Note : marathon dependent services not supported for now
 
     public static MarathonOperationsCommand create (
             ServicesDefinition servicesDefinition,
@@ -131,10 +130,6 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
 
     public void setWarnings(String warnings) {
         this.warnings = warnings;
-    }
-
-    public boolean hasChanges() {
-        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
     }
 
     public JSONObject toJSON () {
