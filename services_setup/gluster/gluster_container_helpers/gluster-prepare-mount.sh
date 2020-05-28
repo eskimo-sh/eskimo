@@ -83,6 +83,7 @@ for i in 1 2 3 ; do
                 continue
             fi
         else
+           echo " - Creating multiple replicas since running on multi-node cluster"
             gluster volume create $VOL_NAME replica $NBR_REPLICAS transport tcp \
                     $SELF_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME \
                     $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME

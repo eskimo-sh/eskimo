@@ -259,25 +259,6 @@ Software.
                     </execution>
                 </executions>
             </plugin>
-            
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.3</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${project.build.directory}/generated-docs</directory>
-                            <targetPath>docs</targetPath>
-                            <excludes>
-                                <exclude>*.pdf</exclude>
-                            </excludes>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-            -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -592,6 +573,22 @@ Software.
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>3.2.3</version>
+                        <configuration>
+                            <webResources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-docs</directory>
+                                    <targetPath>docs</targetPath>
+                                    <excludes>
+                                        <exclude>*.pdf</exclude>
+                                    </excludes>
+                                </resource>
+                            </webResources>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

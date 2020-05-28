@@ -42,6 +42,8 @@ function delete_gluster_management_lock_file() {
 
 set -e
 
+export PATH=/usr/local/sbin/:$PATH
+
 # Inject topology
 . /etc/eskimo_topology.sh
 
@@ -92,8 +94,8 @@ else
         # 4 attempts (to address concurrency issues coming from parallel installations)
         set +e
         for i in 1 2 3 4; do
-            echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS"
-            /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
+            echo " - Trying : gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS"
+            gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
             if [[ $? != 0 ]]; then
                 sleep 2
                 continue
@@ -106,8 +108,8 @@ else
         if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
             echo " - Adding $MASTER_IP_ADDRESS to $SELF_IP_ADDRESS cluster failed. Trying the other way around ..."
             for i in 1 2 3 4; do
-                echo " - Trying : /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
-                /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS
+                echo " - Trying : gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
+                gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS
                 if [[ $? != 0 ]]; then
                     sleep 2
                     continue

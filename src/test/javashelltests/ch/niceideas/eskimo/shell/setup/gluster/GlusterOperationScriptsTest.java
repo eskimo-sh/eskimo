@@ -66,6 +66,8 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         handleScript("__delete-local-blocks.sh");
         handleScript("__force-remove-peer.sh");
         handleScript("gluster-address-peer-inconsistency.sh");
+        handleScript("gluster-prepare-mount.sh");
+        handleScript("gluster-update-peers.sh");
     }
 
     void handleScript(String scriptName) throws IOException, FileException {
@@ -75,12 +77,14 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         enhanceScript(jailPath, scriptName);
     }
 
+    /*
     @After
     public void tearDown() throws Exception {
         if (StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));
         }
     }
+    */
 
     @Override
     protected String getJailPath() {
@@ -101,6 +105,204 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
     @Override
     protected String[] getScriptsToExecute() {
         return new String[0];
+    }
+
+    @Test
+    public void testGlusterUpdatePeers_NotInPoolList() throws Exception {
+
+        fail ("To Be Implemented");
+
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'volume' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'flink_completed_jobs'\n" +
+                "        echo 'flink_data'\n" +
+                "        echo 'logstash_data'\n" +
+                "        echo 'marathon_registry'\n" +
+                "        echo 'spark_data'\n" +
+                "        echo 'spark_eventlog'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "if [[ $1 == 'pool' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                //"        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "if [[ $1 == 'peer' ]]; then \n" +
+                "    if [[ $2 == 'status' ]]; then \n" +
+                "        echo 'Number of Peers: 1'\n" +
+                "        echo 'Hostname: 192.168.10.13'\n" +
+                "        echo 'Uuid: 3beb15d1-fb6a-44b2-9a41-587329315116'\n" +
+                "        echo 'State: Peer in Cluster (Connected)'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        // missing argument
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-update-peers.sh"}, false);
+        assertEquals("-> gluster-update-peers.sh\n" +
+                " Checking and fixing peers for 192.168.10.11 (with master 192.168.10.13)\n", result);
+    }
+
+    @Test
+    public void testGlusterUpdatePeers_AllGoodAlready() throws Exception {
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'volume' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'flink_completed_jobs'\n" +
+                "        echo 'flink_data'\n" +
+                "        echo 'logstash_data'\n" +
+                "        echo 'marathon_registry'\n" +
+                "        echo 'spark_data'\n" +
+                "        echo 'spark_eventlog'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "if [[ $1 == 'pool' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "if [[ $1 == 'peer' ]]; then \n" +
+                "    if [[ $2 == 'status' ]]; then \n" +
+                "        echo 'Number of Peers: 1'\n" +
+                "        echo 'Hostname: 192.168.10.13'\n" +
+                "        echo 'Uuid: 3beb15d1-fb6a-44b2-9a41-587329315116'\n" +
+                "        echo 'State: Peer in Cluster (Connected)'\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        // missing argument
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-update-peers.sh"}, false);
+        assertEquals("-> gluster-update-peers.sh\n" +
+                " Checking and fixing peers for 192.168.10.11 (with master 192.168.10.13)\n", result);
+    }
+
+    @Test
+    public void testGlusterPrepareMount_SingleReplica() throws Exception {
+
+        ProcessHelper.exec(new String[]{"sed", "-i", "-E", "s/MASTER_GLUSTER_1921681011=192\\.168\\.10\\.13/MASTER_GLUSTER_1921681011=192\\.168\\.10\\.11/g", jailPath + "/eskimo-topology.sh"}, true);
+
+        FileUtils.delete(new File ("/tmp/first_done_flag"));
+        FileUtils.delete(new File ("/tmp/first_info_flag"));
+
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'volume' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'flink_completed_jobs'\n" +
+                "        echo 'flink_data'\n" +
+                "        echo 'logstash_data'\n" +
+                "        echo 'marathon_registry'\n" +
+                "        echo 'spark_data'\n" +
+                "        echo 'spark_eventlog'\n" +
+                "        if [[ -f /tmp/first_done_flag ]]; then \n" +
+                "            echo 'test'\n" +
+                "        else\n" +
+                "            /bin/touch /tmp/first_done_flag\n" +
+                "        fi\n" +
+                "    fi\n" +
+                "    if [[ $2 == 'info' ]]; then \n" +
+                "        if [[ -f /tmp/first_info_flag ]]; then \n" +
+                "            echo 'Status: Started'\n" +
+                "        else\n" +
+                "            /bin/touch /tmp/first_info_flag\n" +
+                "        fi\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        // Testing multiple replicas
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-prepare-mount.sh", "test"}, false);
+        assertEquals("-> gluster-prepare-mount.sh\n" +
+                " Preparing mount of test\n" +
+                " - Creating single replica since likely single node in cluster\n", result);
+
+        assertEquals("volume list\n" +
+                "volume create test transport tcp 192.168.10.11:/var/lib/gluster/volume_bricks/test\n" +
+                "volume list\n" +
+                "volume info test\n" +
+                "volume start test\n" +
+                "volume info test\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster")));
+    }
+
+    @Test
+    public void testGlusterPrepareMount_MultipleReplicas() throws Exception {
+
+        FileUtils.delete(new File ("/tmp/first_done_flag"));
+        FileUtils.delete(new File ("/tmp/first_info_flag"));
+
+        File targetPath = new File(getJailPath() + "/gluster");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "if [[ $1 == 'volume' ]]; then \n" +
+                "    if [[ $2 == 'list' ]]; then \n" +
+                "        echo 'flink_completed_jobs'\n" +
+                "        echo 'flink_data'\n" +
+                "        echo 'logstash_data'\n" +
+                "        echo 'marathon_registry'\n" +
+                "        echo 'spark_data'\n" +
+                "        echo 'spark_eventlog'\n" +
+                "        if [[ -f /tmp/first_done_flag ]]; then \n" +
+                "            echo 'test'\n" +
+                "        else\n" +
+                "            /bin/touch /tmp/first_done_flag\n" +
+                "        fi\n" +
+                "    fi\n" +
+                "    if [[ $2 == 'info' ]]; then \n" +
+                "        if [[ -f /tmp/first_info_flag ]]; then \n" +
+                "            echo 'Status: Started'\n" +
+                "        else\n" +
+                "            /bin/touch /tmp/first_info_flag\n" +
+                "        fi\n" +
+                "    fi\n" +
+                "fi\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
+        // Testing multiple replicas
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-prepare-mount.sh", "test"}, false);
+        assertEquals("-> gluster-prepare-mount.sh\n" +
+                " Preparing mount of test\n" +
+                " - Creating multiple replicas since running on multi-node cluster\n", result);
+
+        assertEquals("volume list\n" +
+                "volume create test replica 2 transport tcp 192.168.10.11:/var/lib/gluster/volume_bricks/test 192.168.10.13:/var/lib/gluster/volume_bricks/test\n" +
+                "volume list\n" +
+                "volume info test\n" +
+                "volume start test\n" +
+                "volume info test\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster")));
+    }
+
+    @Test
+    public void testGlusterPrepareMount_MissingArgument() throws Exception {
+        // missing argument
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-prepare-mount.sh"}, false);
+        assertEquals("Expecting volume name as first argument\n", result);
     }
 
     @Test

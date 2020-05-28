@@ -98,13 +98,23 @@ else
         additional_search=marathon.registry
     fi
     set +e
-    localPeerList=`gluster pool list 2>/tmp/local_gluster_check`
-    if [[ $? != 0 ]]; then
-        echo "Calling 'gluster pool list' ended up in error !"
-        cat /tmp/local_gluster_check
-        echo "Cannot proceed any further with consistency checking ... SKIPPING"
-        exit 10
-    fi
+    rm /tmp/local_gluster_check
+    for i in 1 2 3 ; do
+        echo "Attempt $i" >> /tmp/local_gluster_check
+        export localPeerList=`gluster pool list 2>>/tmp/local_gluster_check`
+        if [[ $? == 0 ]]; then
+            break
+        else
+            if [[ $i == 3 ]] ; then
+                echo "Calling 'gluster pool list' ended up in error 3 times !"
+                cat /tmp/local_gluster_check
+                echo "Cannot proceed any further with consistency checking ... SKIPPING"
+                exit 10
+             else
+                sleep 1
+             fi
+        fi
+    done
     if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
         MASTER_IN_LOCAL=0
     else
