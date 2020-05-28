@@ -259,7 +259,8 @@ Software.
                     </execution>
                 </executions>
             </plugin>
-
+            
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -268,7 +269,7 @@ Software.
                     <webResources>
                         <resource>
                             <directory>${project.build.directory}/generated-docs</directory>
-                            <targetPath>docs</targetPath> <!-- introduced in plugin v 2.1 -->
+                            <targetPath>docs</targetPath>
                             <excludes>
                                 <exclude>*.pdf</exclude>
                             </excludes>
@@ -276,6 +277,7 @@ Software.
                     </webResources>
                 </configuration>
             </plugin>
+            -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
