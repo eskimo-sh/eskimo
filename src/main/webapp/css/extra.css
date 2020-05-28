@@ -1384,3 +1384,8 @@ table.system-information tr td.info-label {
 .nav-tabs > li.active > a:focus {
     font-weight: bolder;
 }
+
+.top-menu-small {
+    margin-left: 2px;
+    margin-right: 2px;
+}

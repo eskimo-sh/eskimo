@@ -262,6 +262,23 @@ Software.
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.build.directory}/generated-docs</directory>
+                            <targetPath>docs</targetPath> <!-- introduced in plugin v 2.1 -->
+                            <excludes>
+                                <exclude>*.pdf</exclude>
+                            </excludes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M4</version>
                 <configuration>
@@ -410,7 +427,7 @@ Software.
             </build>
         </profile>
         <profile>
-            <id>pdfDoc</id>
+            <id>doc</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -518,72 +535,7 @@ Software.
                                     <skip>false</skip>
                                 </configuration>
                             </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>htmlDoc</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctor-maven-plugin</artifactId>
-                        <version>1.5.7.1</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.asciidoctor</groupId>
-                                <artifactId>asciidoctorj-pdf</artifactId>
-                                <version>1.5.0-alpha.16</version>
-                            </dependency>
-                            <!-- Comment this section to use the default jruby artifact provided by the plugin -->
-                            <dependency>
-                                <groupId>org.jruby</groupId>
-                                <artifactId>jruby-complete</artifactId>
-                                <version>9.1.17.0</version>
-                            </dependency>
-                            <!-- Comment this section to use the default AsciidoctorJ artifact provided by the plugin -->
-                            <dependency>
-                                <groupId>org.asciidoctor</groupId>
-                                <artifactId>asciidoctorj</artifactId>
-                                <version>1.5.8</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.asciidoctor</groupId>
-                                <artifactId>asciidoctorj-diagram</artifactId>
-                                <version>1.5.9</version>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
 
-                            <requires>
-                                <require>asciidoctor-diagram</require>
-                            </requires>
-
-                            <!-- Attributes common to all output formats -->
-                            <attributes>
-                                <sourcedir>${project.build.sourceDirectory}</sourcedir>
-                                <imagesoutdir>pngs</imagesoutdir>
-                                <toclevels>4</toclevels>
-                            </attributes>
-                            <resources>
-                                <resource>
-                                    <directory>doc/fonts</directory>
-                                </resource>
-                                <resource>
-                                    <directory>doc/guides/eskimo-guide/pngs</directory>
-                                    <!-- (Optional) Directory to copy to. By default uses the option `outputDirectory` -->
-                                    <targetPath>pngs</targetPath>
-                                </resource>
-                                <resource>
-                                    <directory>doc/guides/service-dev-guide/pngs</directory>
-                                    <!-- (Optional) Directory to copy to. By default uses the option `outputDirectory` -->
-                                    <targetPath>pngs</targetPath>
-                                </resource>
-                            </resources>
-                        </configuration>
-                        <executions>
                             <execution>
                                 <id>eskimo-guide-html</id>
                                 <phase>generate-resources</phase>

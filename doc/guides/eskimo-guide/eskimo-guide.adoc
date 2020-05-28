@@ -34,8 +34,8 @@ Software.
 
 :sectnums:
 :toc:
-:authors: eskimo.sh / https://www.eskimo.sh / 2019
-:copyright: eskimo.sh / https://www.eskimo.sh / 2019
+:authors: eskimo.sh / https://www.eskimo.sh / 2019-2020
+:copyright: eskimo.sh / https://www.eskimo.sh / 2019-2020
 
 = Eskimo User and Administration Guide
 
@@ -283,6 +283,11 @@ image::pngs/system_architecture.png[800, 800, align="center"]
 The Eskimo application itself can be deployed on any of the cluster nodes or on another, separated machine (as in the
 example above),
 
+Requirements on machines to be used as Eskimo Cluster nodes are presented in the following sections:
+
+* <<eskimo_nodes_prerequisites>>
+* <<eskimo_nodes_required_packages>>
+
 === Eskimo building
 
 Eskimo build instructions are given in the file `README.adoc` located in the root folder of the *eskimo source code
@@ -338,6 +343,7 @@ In order to run eskimo, one needs to have
 be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
 the eskimo cluster.
 
+[[eskimo_nodes_prerequisites]]
 ==== Prerequisites on eskimo cluster nodes
 
 Linux distributions successfully tested with Eskimo and officially supported are the following:
@@ -378,7 +384,7 @@ capacity for this node is as follows:
 ===== Fedora nodes specificities
 
 Fedora has switched to cgroups v2 by default now, but Mesos (and some Docker versions) are not working well with cgroups v2 and
-may fail to start. With Eskimo and current versions of mesos, one needs to revert cgroups to v1 on Fedora
+may fail to start. With Eskimo and current version of mesos, one needs to revert cgroups to v1 on Fedora
 nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
 
 .Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
@@ -398,62 +404,9 @@ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
 ----
 
-Finally mesos should be able to start successfully after a reboot.
+With this, Mesos should be able to start successfully on your fedora nodes after a reboot.
 
-
-===== Protecting eskimo nodes with a firewall
-
-The different sevices operated by Eskimo require different set of ports to communicate with each others.
-
-In case a firewall (firewalld or simple iptables configuration) is installed on eskimo cluster nodes, then
-the following port numbers need to be explicitly open (for both UDP and TCP) on every single node in the cluster for
-eskimo access:
-
-*IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE MESOS MASTER. MESOS AGENTS,
-MARATHON, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE FLY
-AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
-
-*For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
-firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
-Every eskimo node should have wide accedd to every other eskimo node. Period.*
-
-However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
-only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
-Eskimo console to the nodes from the Eskimo cluster happens through SSH tunnels.
-
-For the sake of precision, the list of static ports used by the different services are listed here:
-
-* [cerebro] : 9000, 31900
-* [elasticsearch] : 9200, 9300
-* [gdash] : 28180, 31180
-* [gluster] : 24007, 24008, 24009, 24010, 49152, 38465, 38466, 38467
-* [grafana] : 3000, 31300
-* [kafka] : 9092, 9093, 9999
-* [kafka-manager] : 22080, 31220
-* [kibana] : 5601, 31561
-* [mesos] : 53, 61003, 61003, 61091, 61420, 62080, 62501, 64000, 5050, 7070, 8101, 8123, 8200, 8201, 8443, 8888, 9090,
-9443, 9990, 15055, 15201, 61053, 61430, 61053
-* [ntp] 123
-* [prometheus] : 9090, 9091, 9093, 9094, 9100
-* [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
-* [flink] : 6121, 6122, 6123, 6130, 8081
-* [spark-history-server] : 18080, 31810
-* [zeppelin] : 38080, 38081, 31008, 31009
-* [zookeeper] : 2181, 2888, 3888
-* [marathon] : 5000, 28080
-
-Again, this list is incomplete since it doesn't reveal the dyxnamic port ranges mentionned above.
-
-===== Eskimo system user
-
-Eskimo requires to have a system user properly defined and with SSH access to reach and operate the cluster nodes.
-That user can be any user but it has to be configured in Eskimo - see <<user_configuration>> - and has to have SSH
-access to every single node to be operated by eskimo using SSH Public Key Authentication -
-see <<ssh_key_authentication>>.
-
-*In addition, that user needs to have sudo access without requiring to enter a password!*
-
-
+[[eskimo_nodes_required_packages]]
 ==== Required packages installation and Internet access on cluster nodes
 
 Eskimo performs some initial setup operations on every node of the cluster it needs to operate. Some of these
@@ -468,6 +421,12 @@ Following commands are executed on a debian-based node:
 
 .debian based node setup
 ----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
 # system update
 apt-get -yq update
 
@@ -496,6 +455,12 @@ Following commands are executed on a redhat-based node:
 
 .redhat based node setup
 ----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
 # system update
 sudo yum -y update
 
@@ -536,9 +501,63 @@ sudo zypper install -y net-tools cron
 sudo zypper install -y glusterfs
 ----
 
+*Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding
+packages* (this listed above and their transitive dependencies) *before you can use these machines as
+eskimo cluster nodes.*
 
-*Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding packages
-before you can use your nodes within eskimo.*
+===== Eskimo system user
+
+Eskimo requires to have a system user properly defined and with SSH access to reach and operate the cluster nodes.
+That user can be any user but it has to be configured in Eskimo - see <<user_configuration>> - and has to have SSH
+access to every single node to be operated by eskimo using SSH Public Key Authentication -
+see <<ssh_key_authentication>>.
+
+*In addition, that user needs to have sudo access without requiring to enter a password!*
+
+
+===== Protecting eskimo nodes with a firewall
+
+The different sevices operated by Eskimo require different set of ports to communicate with each others.
+
+In case a firewall (firewalld or simple iptables configuration) is installed on eskimo cluster nodes, then
+the following port numbers need to be explicitly open (for both UDP and TCP) on every single node in the cluster for
+eskimo access:
+
+*IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE MESOS MASTER. MESOS AGENTS,
+MARATHON, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE FLY
+AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
+
+*For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
+firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
+Every eskimo node should have wide accedd to every other eskimo node. Period.*
+
+However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
+only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
+Eskimo console to the nodes from the Eskimo cluster happens through SSH tunnels.
+
+For the sake of information, the list of static ports used by the different services are listed here:
+
+* [cerebro] : 9000, 31900
+* [elasticsearch] : 9200, 9300
+* [gdash] : 28180, 31180
+* [gluster] : 24007, 24008, 24009, 24010, 49152, 38465, 38466, 38467
+* [grafana] : 3000, 31300
+* [kafka] : 9092, 9093, 9999
+* [kafka-manager] : 22080, 31220
+* [kibana] : 5601, 31561
+* [mesos] : 53, 61003, 61003, 61091, 61420, 62080, 62501, 64000, 5050, 7070, 8101, 8123, 8200, 8201, 8443, 8888, 9090,
+9443, 9990, 15055, 15201, 61053, 61430, 61053
+* [ntp] 123
+* [prometheus] : 9090, 9091, 9093, 9094, 9100
+* [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
+* [flink] : 6121, 6122, 6123, 6130, 8081
+* [spark-history-server] : 18080, 31810
+* [zeppelin] : 38080, 38081, 31008, 31009
+* [zookeeper] : 2181, 2888, 3888
+* [marathon] : 5000, 28080
+
+Again, this list is incomplete since it doesn't reveal the dynamic port ranges mentionned above.
+
 
 === Extract archive.
 
@@ -1284,7 +1303,7 @@ These Single Point of Failure services - not highly available - are: Zookeeper, 
 Marathon itself.
 
 If full high-availability is an important requirement for one's applications, then one should consider upgrading to
-*Eskimo Enterprise Edition which provides 100% high availability for every components*.
+*Eskimo Enterprise Edition which implements 100% high availability for every components*.
 
 
 == Eskimo pre-Packaged services
@@ -1376,7 +1395,7 @@ synchronize eskimo cluster nodes.
 
 https://www.gluster.org/
 
-=== Gluster Infrastructure
+==== Gluster Infrastructure
 
 Eskimo approaches gluster shares manmagement in a specific way. +
 Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
