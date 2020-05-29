@@ -34,79 +34,51 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.EditablePropertyType;
+import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.File;
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class EditableConfiguration {
+public class ServicesSettingsWrapper extends JsonWrapper implements Serializable {
 
-    private final Service service;
-    private final String filename;
-    private final EditablePropertyType propertyType;
-    private final String propertyFormat;
-    private final String filesystemService;
-    private String commentPrefix = "";
-    private final List<EditableProperty> properties = new ArrayList<>();
-
-    public EditableConfiguration(Service service, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
-        this.filesystemService = filesystemService;
-        this.service = service;
-        this.filename = filename;
-        this.propertyType = propertyType;
-        this.propertyFormat = propertyFormat;
+    public ServicesSettingsWrapper(File configFile) throws FileException {
+        super(FileUtils.readFile(configFile));
     }
 
-    public String getFilesystemService() {
-        return filesystemService;
-    }
+    public static ServicesSettingsWrapper initEmpty(ServicesDefinition def) {
 
-    public String getFilename() {
-        return filename;
-    }
+        List<JSONObject> allConfigurations = Arrays.stream(def.listAllServices())
+                .map(def::getService)
+                .map (Service::getEditableConfigurationsJSON)
+                .collect(Collectors.toList());
 
-    public String getPropertyFormat() {
-        return propertyFormat;
-    }
-
-    public String getCommentPrefix() {
-        return commentPrefix;
-    }
-
-    public void setCommentPrefix(String commentPrefix) {
-        this.commentPrefix = commentPrefix;
-    }
-
-    public EditablePropertyType getPropertyType() {
-        return propertyType;
-    }
-
-    public List<EditableProperty> getProperties() {
-        return Collections.unmodifiableList(properties);
-    }
-
-    public void addProperty (EditableProperty property) {
-        properties.add(property);
-    }
-
-    public JSONObject toJSON() {
-        JSONArray propertiesArray = new JSONArray(properties.stream()
-                .map(EditableProperty::toJSON)
-                .collect(Collectors.toList())
-        );
-        return new JSONObject(new HashMap<String, Object>() {{
-            put("service", service.getName());
-            put("filesystemService", getFilesystemService());
-            put("filename", getFilename());
-            put("propertyType", getPropertyType());
-            put("propertyFormat", getPropertyFormat());
-            put("commentPrefix", getCommentPrefix());
-            put("properties", propertiesArray);
+        JSONObject configObject = new JSONObject(new HashMap<String, Object>() {{
+            put("settings", new JSONArray(allConfigurations));
         }});
+
+        return new ServicesSettingsWrapper(configObject.toString(2));
     }
+
+    public ServicesSettingsWrapper(JSONObject json) {
+        super(json);
+    }
+
+    public ServicesSettingsWrapper(Map<String, Object> map) {
+        super(new JSONObject(map));
+    }
+
+    public ServicesSettingsWrapper(String jsonString) {
+        super(jsonString);
+    }
+
 }

@@ -130,7 +130,7 @@ eskimo.Services = function (constructorObject) {
 
         } else if (that.eskimoMain.getSystemStatus().isDisconnected()) {
 
-            that.eskimoMain.showStatus();
+            that.eskimoMain.getSystemStatus().showStatus();
 
         } else {
 

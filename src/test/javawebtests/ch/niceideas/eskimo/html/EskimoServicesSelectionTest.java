@@ -69,7 +69,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        page.executeJavaScript("eskimoServicesSelection.setServicesConfigForTest(SERVICES_CONFIGURATION);");
+        page.executeJavaScript("eskimoServicesSelection.setServicesSettingsForTest(SERVICES_CONFIGURATION);");
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 

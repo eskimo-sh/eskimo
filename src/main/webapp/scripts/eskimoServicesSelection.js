@@ -90,7 +90,7 @@ eskimo.ServicesSelection = function(constructorObject) {
         });
     }
 
-    this.setServicesConfigForTest = function (servicesConfig) {
+    this.setServicesSettingsForTest = function (servicesConfig) {
         SERVICES_CONFIGURATION = servicesConfig;
     };
 

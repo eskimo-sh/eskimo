@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.ServicesConfig = function (constructorObject) {
+eskimo.ServicesSettings = function (constructorObject) {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -43,22 +43,22 @@ eskimo.ServicesConfig = function (constructorObject) {
 
     var that = this;
 
-    var SERVICES_CONFIGURATION = [];
+    var SERVICES_SETTINGS = [];
 
     // Initialize HTML Div from Template
     this.initialize = function() {
-        $("#inner-content-services-config").load("html/eskimoServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-services-settings").load("html/eskimoServicesSettings.html", function (responseTxt, statusTxt, jqXHR) {
 
             if (statusTxt == "success") {
 
-                $("#save-services-config-btn").click(function (e) {
-                    saveServicesConfig();
+                $("#save-services-settings-btn").click(function (e) {
+                    saveServicesSettings();
 
                     e.preventDefault();
                     return false;
                 });
 
-                $("#reset-services-config-btn").click(function (e) {
+                $("#reset-services-settings-btn").click(function (e) {
                     showServicesConfig();
 
                     e.preventDefault();
@@ -72,18 +72,18 @@ eskimo.ServicesConfig = function (constructorObject) {
         });
     };
 
-    function loadServicesConfig() {
+    function loadServicesSettings() {
         $.ajax({
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "load-services-config",
+            url: "load-services-settings",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
 
-                    SERVICES_CONFIGURATION = data.configs;
-                    layoutServicesConfig();
+                    SERVICES_SETTINGS = data.settings;
+                    layoutServicesSettings();
 
 
                 } else {
@@ -93,43 +93,40 @@ eskimo.ServicesConfig = function (constructorObject) {
             error: errorHandler
         });
     }
-    this.setServicesConfigForTest = function (servicesConfig) {
-        SERVICES_CONFIGURATION = servicesConfig;
+    this.setServicesSettingsForTest = function (servicesConfig) {
+        SERVICES_SETTINGS = servicesConfig;
     };
 
-    function saveServicesConfig() {
+    function saveServicesSettings() {
 
-        var servicesConfigForm = $("form#services-config").serializeObject();
+        var servicesConfigForm = $("form#services-settings").serializeObject();
 
-        that.eskimoMessaging.showMessages();
-
-        that.eskimoMain.startOperationInProgress();
+        that.eskimoMain.showProgressbar();
 
         $.ajax({
             type: "POST",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
             timeout: 1000 * 7200,
-            url: "apply-services-config",
+            url: "save-services-settings",
             data: JSON.stringify(servicesConfigForm),
             success: function (data, status, jqXHR) {
 
+                that.eskimoMain.hideProgressbar();
+
                 // OK
                 console.log(data);
-                if (data && data.status) {
-                    if (data.status == "KO") {
-                        showServicesConfigMessage(data.error, false);
-                    } else {
-                        showServicesConfigMessage("Configuration applied successfully", true);
-                    }
-                } else {
-                    showServicesConfigMessage("No status received back from backend.", false);
-                }
 
-                if (data.error) {
-                    that.eskimoMain.scheduleStopOperationInProgress (false);
+                if (!data || data.error) {
+                    console.error(atob(data.error));
+                    alert(atob(data.error));
                 } else {
-                    that.eskimoMain.scheduleStopOperationInProgress (true);
+
+                    if (!data.command) {
+                        alert ("Expected pending operations command but got none !");
+                    } else {
+                        that.eskimoMain.getSettingsOperationsCommand().showCommand (data.command);
+                    }
                 }
             },
 
@@ -137,29 +134,28 @@ eskimo.ServicesConfig = function (constructorObject) {
                 // error handler
                 console.log(jqXHR);
                 console.log(status);
-                showServicesConfigMessage('fail : ' + status, false);
+                showServicesSettingsMessage('fail : ' + status, false);
 
-                that.eskimoMain.scheduleStopOperationInProgress (false);
                 that.eskimoMain.hideProgressbar();
             }
         });
     }
 
-    function showServicesConfigMessage(message, success) {
-        var servicesConfigWarning = $("#services-config-warning");
-        servicesConfigWarning.css("display", "inherit");
-        servicesConfigWarning.css("visibility", "inherit");
+    function showServicesSettingsMessage(message, success) {
+        var servicesSettingsWarning = $("#services-settings-warning");
+        servicesSettingsWarning.css("display", "inherit");
+        servicesSettingsWarning.css("visibility", "inherit");
 
-        var servicesConfigWarningMessage = $("#services-config-warning-message");
-        servicesConfigWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
-        servicesConfigWarningMessage.html(message);
+        var servicesSettingsWarningMessage = $("#services-settings-warning-message");
+        servicesSettingsWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
+        servicesSettingsWarningMessage.html(message);
 
         setTimeout(function() {
-            servicesConfigWarning.css("display", "none");
-            servicesConfigWarning.css("visibility", "hidden");
+            servicesSettingsWarning.css("display", "none");
+            servicesSettingsWarning.css("visibility", "hidden");
         }, 5000);
     }
-    this.showServicesConfigMessage = showServicesConfigMessage;
+    this.showServicesSettingsMessage = showServicesSettingsMessage;
 
     function showServicesConfig () {
 
@@ -172,23 +168,23 @@ eskimo.ServicesConfig = function (constructorObject) {
             that.eskimoMain.showProgressbar();
         }
 
-        loadServicesConfig();
+        loadServicesSettings();
 
-        that.eskimoMain.showOnlyContent("services-config");
+        that.eskimoMain.showOnlyContent("services-settings");
     }
-    this.showServicesConfig = showServicesConfig;
+    this.showServicesSettings = showServicesConfig;
 
-    function layoutServicesConfig() {
+    function layoutServicesSettings() {
 
-        var servicesConfigContent = '<div class="panel panel-default">';
+        var servicesSettingsContent = '<div class="panel panel-default">';
 
-        for (var i = 0; i < SERVICES_CONFIGURATION.length; i++) {
-            var serviceEditableConfigs = SERVICES_CONFIGURATION[i];
-            var serviceName = serviceEditableConfigs.name;
-            var serviceEditableConfigsArray = serviceEditableConfigs.configs;
-            if (serviceEditableConfigsArray.length > 0) {
+        for (var i = 0; i < SERVICES_SETTINGS.length; i++) {
+            var serviceEditableSettings = SERVICES_SETTINGS[i];
+            var serviceName = serviceEditableSettings.name;
+            var serviceEditableSettingsArray = serviceEditableSettings.settings;
+            if (serviceEditableSettingsArray.length > 0) {
 
-                servicesConfigContent = servicesConfigContent +
+                servicesSettingsContent = servicesSettingsContent +
                     '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
                     '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
                     '<td><img class="nodes-config-logo" src="' + that.eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" /></td>'+
@@ -200,24 +196,24 @@ eskimo.ServicesConfig = function (constructorObject) {
                     '<div id="collapse-'+serviceName+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
                     '<div class="panel-body">';
 
-                for (var j = 0; j < serviceEditableConfigsArray.length; j++) {
+                for (var j = 0; j < serviceEditableSettingsArray.length; j++) {
 
-                    var serviceEditableConfig = serviceEditableConfigsArray[j];
-                    console.log (serviceEditableConfig);
+                    var serviceEditableSettingsFile = serviceEditableSettingsArray[j];
+                    console.log (serviceEditableSettingsFile);
 
-                    servicesConfigContent = servicesConfigContent +
+                    servicesSettingsContent = servicesSettingsContent +
 
                         '<div class="col-md-12 col-sd-12">' +
-                        '<h5><b>Configuration file</b> : ' + serviceEditableConfig.filename + '</h5>' +
+                        '<h5><b>Configuration file</b> : ' + serviceEditableSettingsFile.filename + '</h5>' +
                         '</div>';
 
-                    for (var k = 0; k < serviceEditableConfig.properties.length; k++) {
+                    for (var k = 0; k < serviceEditableSettingsFile.properties.length; k++) {
 
-                        var property = serviceEditableConfig.properties[k];
+                        var property = serviceEditableSettingsFile.properties[k];
 
                         var inputName = serviceName + "-" + property.name.replace(/\./g, "-");
 
-                        servicesConfigContent = servicesConfigContent +
+                        servicesSettingsContent = servicesSettingsContent +
                             '<div class="col-md-12 col-sd-12">\n' +
                             '     <label class="col-md-12 control-label">'+
                             '         <b>'+
@@ -239,16 +235,16 @@ eskimo.ServicesConfig = function (constructorObject) {
                     }
                 }
 
-                servicesConfigContent += '</div></div>';
+                servicesSettingsContent += '</div></div>';
 
             }
         }
 
-        servicesConfigContent += '</div>';
+        servicesSettingsContent += '</div>';
 
-        $("#services-config-placeholder").html(servicesConfigContent)
+        $("#services-settings-placeholder").html(servicesSettingsContent)
     }
-    this.layoutServicesConfig = layoutServicesConfig;
+    this.layoutServicesSettings = layoutServicesSettings;
 
     // inject constructor object in the end
     if (constructorObject != null) {

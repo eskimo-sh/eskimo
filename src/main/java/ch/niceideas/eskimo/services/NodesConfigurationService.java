@@ -54,7 +54,7 @@ public class NodesConfigurationService {
     private MessagingService messagingService;
 
     @Autowired
-    private ServicesConfigService servicesConfigService;
+    private ServicesSettingsService servicesSettingsService;
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -109,8 +109,8 @@ public class NodesConfigurationService {
     void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
     }
-    void setServicesConfigService (ServicesConfigService servicesConfigService) {
-        this.servicesConfigService = servicesConfigService;
+    void setServicesSettingsService(ServicesSettingsService servicesSettingsService) {
+        this.servicesSettingsService = servicesSettingsService;
     }
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
@@ -334,9 +334,9 @@ public class NodesConfigurationService {
         sshChmod755(ipAddress, "/etc/eskimo_topology.sh");
 
         try {
-            ServicesConfigWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
+            ServicesSettingsWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
-            File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-config", ipAddress, ".json");
+            File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-settings", ipAddress, ".json");
             try {
                 FileUtils.delete(tempServicesSettingsFile);
             } catch (FileUtils.FileDeleteFailedException e) {
@@ -347,8 +347,8 @@ public class NodesConfigurationService {
             FileUtils.writeFile(tempServicesSettingsFile, servicesConfig.getFormattedValue());
 
             sshCommandService.copySCPFile(ipAddress, tempServicesSettingsFile.getAbsolutePath());
-            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-config.json"});
-            sshChmod755(ipAddress, "/etc/eskimo_services-config.json");
+            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-settings.json"});
+            sshChmod755(ipAddress, "/etc/eskimo_services-settings.json");
 
 
         } catch (FileException | SetupException e) {

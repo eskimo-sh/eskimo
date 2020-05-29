@@ -208,7 +208,7 @@ eskimo.NodesConfig = function(constructorObject) {
         return SERVICES_DEPENDENCIES;
     };
 
-    this.setServicesConfigForTest = function (uniqueServices, multiplesServices, configuredServices, mandatoryServices) {
+    this.setServicesSettingsForTest = function (uniqueServices, multiplesServices, configuredServices, mandatoryServices) {
         UNIQUE_SERVICES = uniqueServices;
         MULTIPLE_SERVICES = multiplesServices;
         CONFIGURED_SERVICES = configuredServices;

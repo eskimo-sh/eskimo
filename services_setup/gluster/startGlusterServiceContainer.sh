@@ -49,7 +49,7 @@ nohup /usr/bin/docker run \
         -v /var/log/gluster:/var/log/gluster\
         -v /var/run/gluster:/var/run/gluster\
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
         eskimo:gluster \
         /usr/local/sbin/inContainerStartService.sh | tee /var/log/gluster/gluster-container-out-log &

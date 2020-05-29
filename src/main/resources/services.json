@@ -349,7 +349,7 @@
         "mandatory": true
       }
     ],
-    "editableConfigurations": [
+    "editableSettings": [
       {
         "filename": "agent-resources-temporary-file.properties",
         "filesystemService": "mesos",
@@ -479,7 +479,7 @@
       }
     ],
     "additionalEnvironment": [ "SERVICE_NUMBER_0_BASED" ],
-    "editableConfigurations": [
+    "editableSettings": [
       {
         "filename": "server.properties",
         "filesystemService": "kafka",
@@ -675,7 +675,7 @@
         "mandatory": true
       }
     ],
-    "editableConfigurations": [
+    "editableSettings": [
       {
         "filename": "spark-defaults.conf",
         "propertyType": "variable",
@@ -781,7 +781,7 @@
         "mandatory": true
       }
     ],
-    "editableConfigurations": [
+    "editableSettings": [
       {
         "filename": "flink-conf.yaml",
         "propertyType": "variable",
@@ -956,7 +956,7 @@
         "mandatory": false
       }
     ],
-    "editableConfigurations": [
+    "editableSettings": [
       {
         "filename": "elasticsearch.yml",
         "propertyType": "variable",

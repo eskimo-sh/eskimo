@@ -72,6 +72,8 @@ else
     localPeerList=`gluster pool list`
     if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
 
+        echo " - Master is not in pool lost. Need to add it"
+
         echo " - Attempting to take gluster_management_lock"
 
         # From here we will be messing with gluster and hence we need to take a lock

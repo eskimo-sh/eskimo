@@ -295,11 +295,11 @@ public class ServicesDefinition implements InitializingBean {
                 }
             }
 
-            if (servicesConfig.hasPath(serviceString+".editableConfigurations")) {
+            if (servicesConfig.hasPath(serviceString+".editableSettings")) {
 
-                JSONArray editableConfArray = servicesConfig.getSubJSONObject(serviceString).getJSONArray("editableConfigurations");
-                for (int i = 0; i < editableConfArray.length(); i++) {
-                    JSONObject conf = editableConfArray.getJSONObject(i);
+                JSONArray editableSettingsArray = servicesConfig.getSubJSONObject(serviceString).getJSONArray("editableSettings");
+                for (int i = 0; i < editableSettingsArray.length(); i++) {
+                    JSONObject conf = editableSettingsArray.getJSONObject(i);
 
                     String filename = conf.getString("filename");
                     String propertyTypeAsString = conf.getString("propertyType");
@@ -307,11 +307,11 @@ public class ServicesDefinition implements InitializingBean {
                     String propertyFormat = conf.getString("propertyFormat");
                     String filesystemService = conf.getString("filesystemService");
 
-                    EditableConfiguration configuration = new EditableConfiguration(service, filename, propertyType, propertyFormat, filesystemService);
+                    EditableSettings editableSettings = new EditableSettings(service, filename, propertyType, propertyFormat, filesystemService);
 
                     if (conf.has("commentPrefix")) {
                         String commentPrefix = conf.getString("commentPrefix");
-                        configuration.setCommentPrefix(commentPrefix);
+                        editableSettings.setCommentPrefix(commentPrefix);
                     }
 
 
@@ -325,10 +325,10 @@ public class ServicesDefinition implements InitializingBean {
 
                         EditableProperty property = new EditableProperty(propName, comment, defaultValue);
 
-                        configuration.addProperty(property);
+                        editableSettings.addProperty(property);
                     }
 
-                    service.addEditableConfiguration(configuration);
+                    service.addEditableSettings(editableSettings);
                 }
             }
 

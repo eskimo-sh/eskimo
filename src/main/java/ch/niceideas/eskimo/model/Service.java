@@ -49,7 +49,7 @@ public class Service {
 
     private final List<Dependency> dependencies = new ArrayList<>();
     private final List<String> additionalEnvironment= new ArrayList<>();
-    private final List<EditableConfiguration> editableConfigurations = new ArrayList<>();
+    private final List<EditableSettings> editableSettings = new ArrayList<>();
 
     // configuration
     private String imageName;
@@ -253,12 +253,12 @@ public class Service {
         dependencies.add (dep);
     }
 
-    public void addEditableConfiguration (EditableConfiguration conf) {
-        editableConfigurations.add(conf);
+    public void addEditableSettings(EditableSettings conf) {
+        editableSettings.add(conf);
     }
 
-    public List<EditableConfiguration> getEditableConfigurations() {
-        return Collections.unmodifiableList(editableConfigurations);
+    public List<EditableSettings> getEditableSettings() {
+        return Collections.unmodifiableList(editableSettings);
     }
 
     public int getRelevantDependenciesCount() {
@@ -306,14 +306,14 @@ public class Service {
 
     public JSONObject getEditableConfigurationsJSON() {
 
-        JSONArray configsArray = new JSONArray(getEditableConfigurations().stream()
-                .map(EditableConfiguration::toJSON)
+        JSONArray settingsArray = new JSONArray(getEditableSettings().stream()
+                .map(EditableSettings::toJSON)
                 .collect(Collectors.toList())
         );
 
         return new JSONObject(new HashMap<String, Object>() {{
             put("name", getName());
-            put("configs", configsArray);
+            put("settings", settingsArray);
         }});
     }
 

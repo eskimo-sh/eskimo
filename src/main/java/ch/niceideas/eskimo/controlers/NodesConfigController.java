@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.JSONOpCommand;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -54,6 +55,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 import java.util.HashMap;
 
 
@@ -181,7 +183,7 @@ public class NodesConfigController {
         }
     }
 
-    private String returnCommand(OperationsCommand command) {
+    static String returnCommand(JSONOpCommand<? extends Serializable> command) {
         try {
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");

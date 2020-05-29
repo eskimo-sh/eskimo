@@ -283,8 +283,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   },
                   {
                     "mode":"RO",
@@ -448,8 +448,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -599,8 +599,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -786,8 +786,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -963,8 +963,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -1170,8 +1170,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -1325,8 +1325,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -1480,8 +1480,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -1645,8 +1645,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -1805,8 +1805,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -1975,8 +1975,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -2135,8 +2135,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -2300,8 +2300,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -2460,8 +2460,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -2625,8 +2625,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -2790,8 +2790,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -2950,8 +2950,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -3105,8 +3105,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -3265,8 +3265,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -3420,8 +3420,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -3580,8 +3580,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -3735,8 +3735,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -3895,8 +3895,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -4050,8 +4050,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -4210,8 +4210,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -4370,8 +4370,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{
@@ -4525,8 +4525,8 @@
                   },
                   {
                     "mode":"RO",
-                    "container_path":"/etc/eskimo_services-config.json",
-                    "host_path":"/etc/eskimo_services-config.json"
+                    "container_path":"/etc/eskimo_services-settings.json",
+                    "host_path":"/etc/eskimo_services-settings.json"
                   }
                 ],
                 "docker":{

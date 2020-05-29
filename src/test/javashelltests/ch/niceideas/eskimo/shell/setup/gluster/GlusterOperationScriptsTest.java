@@ -60,7 +60,6 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
     public void setUp() throws Exception {
         jailPath = setupJail(getServiceName());
         File glusterScriptsFile = new File(jailPath+"/gluster_container_helpers");
-        //System.err.println (glusterScriptsFile.getAbsolutePath());
         assertTrue (glusterScriptsFile.mkdir());
         handleScript("__replicate-master-blocks.sh");
         handleScript("__delete-local-blocks.sh");
@@ -77,14 +76,12 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         enhanceScript(jailPath, scriptName);
     }
 
-    /*
     @After
     public void tearDown() throws Exception {
         if (StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));
         }
     }
-    */
 
     @Override
     protected String getJailPath() {
@@ -98,8 +95,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
-        // setup.sh and common.sh are automatic
-        //copyFile(jailPath, "gluster_container_helpers/__replicate-master-blocks.sh");
+        // Don't copy anything here
     }
 
     @Override
@@ -110,7 +106,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
     @Test
     public void testGlusterUpdatePeers_NotInPoolList() throws Exception {
 
-        fail ("To Be Implemented");
+        FileUtils.delete(new File ("/tmp/first_done_flag"));
 
         File targetPath = new File(getJailPath() + "/gluster");
         FileUtils.writeFile(targetPath, "" +
@@ -129,7 +125,11 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 "if [[ $1 == 'pool' ]]; then \n" +
                 "    if [[ $2 == 'list' ]]; then \n" +
                 "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                //"        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "        if [[ -f /tmp/first_done_flag ]]; then \n" +
+                "            echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "        else\n" +
+                "            /bin/touch /tmp/first_done_flag\n" +
+                "        fi\n" +
                 "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
                 "    fi\n" +
                 "fi\n" +
@@ -146,10 +146,30 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
 
         ProcessHelper.exec("chmod 755 " + targetPath, true);
 
+        targetPath = new File(getJailPath() + "/__replicate-master-blocks.sh");
+        FileUtils.writeFile(targetPath, "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "echo $@ >> .log_replicate-master-blocks.sh");
+
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
+
         // missing argument
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-update-peers.sh"}, false);
         assertEquals("-> gluster-update-peers.sh\n" +
-                " Checking and fixing peers for 192.168.10.11 (with master 192.168.10.13)\n", result);
+                " Checking and fixing peers for 192.168.10.11 (with master 192.168.10.13)\n" +
+                " - Master is not in pool lost. Need to add it\n" +
+                " - Attempting to take gluster_management_lock\n" +
+                " - Trying : gluster_call_remote.sh 192.168.10.11 peer probe 192.168.10.13\n" +
+                " - releasing gluster_management_lock\n", result);
+
+        assertEquals("pool list\n" +
+                "pool list\n" +
+                "pool list\n" +
+                "pool list\n" +
+                "peer status\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster")));
+
+        assertEquals("192.168.10.11 peer probe 192.168.10.13\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote.sh")));
     }
 
     @Test
@@ -192,6 +212,9 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-update-peers.sh"}, false);
         assertEquals("-> gluster-update-peers.sh\n" +
                 " Checking and fixing peers for 192.168.10.11 (with master 192.168.10.13)\n", result);
+
+        assertEquals("pool list\n" +
+                "peer status\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster")));
     }
 
     @Test

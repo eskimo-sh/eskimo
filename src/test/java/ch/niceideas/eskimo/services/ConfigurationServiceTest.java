@@ -3,7 +3,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -57,14 +57,14 @@ public class ConfigurationServiceTest {
     @Test
     public void testLoadAndSaveServicesConfig() throws Exception {
 
-        ServicesConfigWrapper sc = configurationService.loadServicesConfig();
+        ServicesSettingsWrapper sc = configurationService.loadServicesSettings();
         assertNotNull(sc);
         assertFalse(sc.isEmpty()); // services config is initialized with defaults
 
-        sc = new ServicesConfigWrapper("{\"test\": \"OK\"}");
-        configurationService.saveServicesConfig(sc);
+        sc = new ServicesSettingsWrapper("{\"test\": \"OK\"}");
+        configurationService.saveServicesSettings(sc);
 
-        ServicesConfigWrapper sc2 = configurationService.loadServicesConfig();
+        ServicesSettingsWrapper sc2 = configurationService.loadServicesSettings();
         assertTrue(sc.getJSONObject().similar(sc2.getJSONObject()));
     }
 

@@ -15,8 +15,8 @@ Marathon Service Definition for zeppelin:
             },
             {
                 "mode": "RO",
-                "containerPath": "/etc/eskimo_services-config.json",
-                "hostPath": "/etc/eskimo_services-config.json"
+                "containerPath": "/etc/eskimo_services-settings.json",
+                "hostPath": "/etc/eskimo_services-settings.json"
             },
             {
                 "mode": "RO",

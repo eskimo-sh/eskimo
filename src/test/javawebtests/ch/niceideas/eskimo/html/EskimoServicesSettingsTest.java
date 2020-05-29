@@ -41,7 +41,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class EskimoServicesConfigTest extends AbstractWebTest {
+public class EskimoServicesSettingsTest extends AbstractWebTest {
 
     private String jsonConfig = null;
 
@@ -49,44 +49,44 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServicesConfig.js");
+        loadScript(page, "eskimoServicesSettings.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesConfig = new eskimo.ServicesConfig({" +
+        page.executeJavaScript("eskimoServicesSettings = new eskimo.ServicesSettings({" +
                 "    eskimoMain: eskimoMain," +
                 "    eskimoMessaging: eskimoMessaging" +
                 "});");
 
-        waitForElementIdInDOM("reset-services-config-btn");
+        waitForElementIdInDOM("reset-services-settings-btn");
 
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesConfigTest/testConfig.json"));
+        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));
 
-        page.executeJavaScript("var TEST_SERVICE_CONFIG = " + jsonConfig + ";");
+        page.executeJavaScript("var TEST_SERVICE_SETTINGS = " + jsonConfig + ";");
 
-        page.executeJavaScript("eskimoServicesConfig.setServicesConfigForTest(TEST_SERVICE_CONFIG.configs)");
+        page.executeJavaScript("eskimoServicesSettings.setServicesSettingsForTest(TEST_SERVICE_SETTINGS.settings)");
 
-        page.executeJavaScript("$('#inner-content-services-config').css('display', 'inherit')");
-        page.executeJavaScript("$('#inner-content-services-config').css('visibility', 'visible')");
+        page.executeJavaScript("$('#inner-content-services-settings').css('display', 'inherit')");
+        page.executeJavaScript("$('#inner-content-services-settings').css('visibility', 'visible')");
     }
 
     @Test
-    public void testSaveServicesConfigWithButton() throws Exception {
+    public void testSaveServicesSettingsWithButton() throws Exception {
 
-        page.executeJavaScript("eskimoServicesConfig.showServicesConfig();");
+        page.executeJavaScript("eskimoServicesSettings.showServicesSettings();");
 
         page.executeJavaScript("$.ajax = function(object) {" +
                 "    object.success({status: \"OK\"})" +
                 "}");
 
-        page.getElementById("save-services-config-btn").click();
+        page.getElementById("save-services-settings-btn").click();
 
-        assertJavascriptEquals("Configuration applied successfully", "$('#services-config-warning-message').html()");
+        assertJavascriptEquals("Settings applied successfully", "$('#services-settings-warning-message').html()");
     }
 
     @Test
-    public void testLayoutServicesConfig() throws Exception {
+    public void testLayoutServicesSettings() throws Exception {
 
-        page.executeJavaScript("eskimoServicesConfig.layoutServicesConfig();");
+        page.executeJavaScript("eskimoServicesSettings.layoutServicesSettings();");
 
         //System.out.println (page.asXml());
 
@@ -104,20 +104,20 @@ public class EskimoServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowServicesConfigMessage() throws Exception {
+    public void testShowServicesSettingsMessage() throws Exception {
 
-        page.executeJavaScript("eskimoServicesConfig.showServicesConfigMessage ('test');");
+        page.executeJavaScript("eskimoServicesSettings.showServicesSettingsMessage ('test');");
 
-        assertCssValue("#services-config-warning", "display", "inherit");
-        assertCssValue("#services-config-warning", "visibility", "inherit");
+        assertCssValue("#services-settings-warning", "display", "inherit");
+        assertCssValue("#services-settings-warning", "visibility", "inherit");
 
-        assertAttrValue("#services-config-warning-message", "class", "alert alert-danger");
+        assertAttrValue("#services-settings-warning-message", "class", "alert alert-danger");
 
-        assertJavascriptEquals("test", "$('#services-config-warning-message').html()");
+        assertJavascriptEquals("test", "$('#services-settings-warning-message').html()");
 
-        page.executeJavaScript("eskimoServicesConfig.showServicesConfigMessage ('test', true);");
+        page.executeJavaScript("eskimoServicesSettings.showServicesSettingsMessage ('test', true);");
 
-        assertAttrValue("#services-config-warning-message", "class", "alert alert-info");
+        assertAttrValue("#services-settings-warning-message", "class", "alert alert-info");
     }
 
 }

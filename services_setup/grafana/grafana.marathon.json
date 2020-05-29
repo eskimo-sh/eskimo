@@ -46,8 +46,8 @@
         "mode": "RO"
       },
       {
-        "hostPath": "/etc/eskimo_services-config.json",
-        "containerPath": "/etc/eskimo_services-config.json",
+        "hostPath": "/etc/eskimo_services-settings.json",
+        "containerPath": "/etc/eskimo_services-settings.json",
         "mode": "RO"
       }
     ]

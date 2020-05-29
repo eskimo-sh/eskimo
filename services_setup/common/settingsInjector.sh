@@ -52,7 +52,7 @@ if [[ $1 == "" ]]; then
 fi
 export SERVICE=$1
 
-export SETTINGS_FILE=/etc/eskimo_services-config.json
+export SETTINGS_FILE=/etc/eskimo_services-settings.json
 if [[ ! -f $SETTINGS_FILE ]]; then
     if [[ $2 == "" ]]; then
         echo "file $SETTINGS_FILE doesn't exist and no other settings file given as second argument"

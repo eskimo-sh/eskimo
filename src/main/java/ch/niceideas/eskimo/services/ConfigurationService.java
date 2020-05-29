@@ -40,7 +40,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -60,7 +60,9 @@ public class ConfigurationService {
     private static final Logger logger = Logger.getLogger(ConfigurationService.class);
 
     public static final String SERVICE_INSTALLATION_STATUS_PATH = "/service-install-status.json";
-    public static final String SERVICES_CONFIG_JSON_PATH = "/services-config.json";
+    public static final String SERVICES_SETTINGS_JSON_PATH = "/services-settings.json";
+    public static final String MARATHON_SERVICES_CONFIG_JSON = "/marathon-services-config.json";
+    public static final String CONFIG_JSON = "/config.json";
 
     private ReentrantLock statusFileLock = new ReentrantLock();
     private ReentrantLock nodesConfigFileLock = new ReentrantLock();
@@ -82,39 +84,39 @@ public class ConfigurationService {
     }
 
 
-    public void saveServicesConfig(ServicesConfigWrapper status) throws FileException, SetupException {
+    public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + SERVICES_CONFIG_JSON_PATH), status.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH), settings.getFormattedValue());
         } finally {
             servicesConfigFileLock.unlock();
         }
     }
 
-    public ServicesConfigWrapper loadServicesConfig() throws FileException, SetupException {
+    public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_PATH);
+            File statusFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
             if (!statusFile.exists()) {
-                return ServicesConfigWrapper.initEmpty(servicesDefinition);
+                return ServicesSettingsWrapper.initEmpty(servicesDefinition);
             }
 
-            return new ServicesConfigWrapper(statusFile);
+            return new ServicesSettingsWrapper(statusFile);
         } finally {
             servicesConfigFileLock.unlock();
         }
     }
 
-    public ServicesConfigWrapper loadServicesConfigNoLock() throws FileException, SetupException {
+    public ServicesSettingsWrapper loadServicesConfigNoLock() throws FileException, SetupException {
         String configStoragePath = setupService.getConfigStoragePath();
-        File statusFile = new File(configStoragePath + SERVICES_CONFIG_JSON_PATH);
+        File statusFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
         if (!statusFile.exists()) {
-            return ServicesConfigWrapper.initEmpty(servicesDefinition);
+            return ServicesSettingsWrapper.initEmpty(servicesDefinition);
         }
 
-        return new ServicesConfigWrapper(statusFile);
+        return new ServicesSettingsWrapper(statusFile);
     }
 
 
@@ -211,12 +213,12 @@ public class ConfigurationService {
     }
 
     public void saveSetupConfig(String configAsString) throws SetupException, FileException {
-        File configFile = new File(setupService.getConfigStoragePath() + "/config.json");
+        File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
         FileUtils.writeFile(configFile, configAsString);
     }
 
     public String loadSetupConfig() throws FileException, SetupException {
-        File configFile = new File(setupService.getConfigStoragePath() + "/config.json");
+        File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
         if (!configFile.exists()) {
             throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
         }
@@ -228,7 +230,7 @@ public class ConfigurationService {
         marathonServicesFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File marathonServicesConfigFile = new File(configStoragePath + "/marathon-services-config.json");
+            File marathonServicesConfigFile = new File(configStoragePath + MARATHON_SERVICES_CONFIG_JSON);
             if (!marathonServicesConfigFile.exists()) {
                 return null;
             }
@@ -246,7 +248,7 @@ public class ConfigurationService {
         marathonServicesFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + "/marathon-services-config.json"), marathonServicesConfig.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + MARATHON_SERVICES_CONFIG_JSON), marathonServicesConfig.getFormattedValue());
         } finally {
             marathonServicesFileLock.unlock();
         }

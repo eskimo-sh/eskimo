@@ -55,11 +55,12 @@ eskimo.Main = function() {
     var eskimoServicesSelection = null;
     var eskimoMarathonServicesSelection = null;
     var eskimoMarathonServicesConfig = null;
-    var eskimoServicesConfig = null;
+    var eskimoServicesSettings = null;
     var eskimoFileManagers = null;
     var eskimoOperationsCommand = null;
     var eskimoSetupCommand = null;
     var eskimoMarathonOperationsCommand = null;
+    var eskimoSettingsOperationsCommand = null;
     var eskimoAbout = null;
 
     var operationInProgress = false;
@@ -114,11 +115,18 @@ eskimo.Main = function() {
         // loadServicesConfig -> get-services-config
         // - initModalServicesConfig()
 
-        eskimoServicesConfig = new eskimo.ServicesConfig({
+        eskimoServicesSettings = new eskimo.ServicesSettings({
             eskimoMain: that,
             eskimoMessaging: eskimoMessaging
         });
         // loadServicesConfig -> load-services-config
+
+        eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand({
+            eskimoMain: that,
+            eskimoMessaging : eskimoMessaging,
+            eskimoServicesSettings: eskimoServicesSettings
+        });
+        // (nothing)
 
         eskimoNodesConfig = new eskimo.NodesConfig({
             eskimoMain: that,
@@ -182,7 +190,7 @@ eskimo.Main = function() {
         $("#main-menu-show-file-managers-link").click(eskimoFileManagers.showFileManagers);
         $("#main-menu-show-status-link").click(eskimoSystemStatus.showStatus);
         $("#main-menu-show-setup-link").click(eskimoSetup.showSetup);
-        $("#main-menu-show-services-config-link").click(eskimoServicesConfig.showServicesConfig);
+        $("#main-menu-show-services-settings-link").click(eskimoServicesSettings.showServicesSettings);
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
         $("#main-menu-show-marathon-config-link").click(eskimoMarathonServicesConfig.showMarathonServicesConfig);
         $("#main-menu-show-messages-link").click(eskimoMessaging.showMessages);
@@ -452,8 +460,8 @@ eskimo.Main = function() {
     this.getMarathonServicesSelection = function() {
         return eskimoMarathonServicesSelection;
     };
-    this.getServicesConfig = function() {
-        return eskimoServicesConfig;
+    this.getServicesSettings = function() {
+        return eskimoServicesSettings;
     };
     this.getMarathonServicesConfig = function() {
         return eskimoMarathonServicesConfig;
@@ -469,6 +477,9 @@ eskimo.Main = function() {
     };
     this.getMarathonOperationsCommand = function() {
         return eskimoMarathonOperationsCommand;
+    };
+    this.getSettingsOperationsCommand = function() {
+        return eskimoSettingsOperationsCommand;
     };
     this.getAbout = function() {
         return eskimoAbout;

@@ -35,11 +35,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.ServicesConfigWrapper;
-import ch.niceideas.eskimo.services.ConfigurationService;
-import ch.niceideas.eskimo.services.ServicesConfigService;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
+import ch.niceideas.eskimo.model.SettingsOperationsCommand;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -53,34 +51,51 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 
 @Controller
-public class ServicesConfigController {
+public class ServicesSettingsController {
 
-    private static final Logger logger = Logger.getLogger(ServicesConfigController.class);
+    private static final Logger logger = Logger.getLogger(ServicesSettingsController.class);
+
+    public static final String PENDING_SETTINGS_OPERATIONS_STATUS_OVERRIDE = "PENDING_SETTINGS_OPERATIONS_STATUS_OVERRIDE";
+    public static final String PENDING_SETTINGS_OPERATIONS_COMMAND = "PENDING_SETTINGS_OPERATIONS_COMMAND";
 
     @Autowired
-    private ServicesConfigService servicesConfigService;
+    private ServicesSettingsService servicesSettingsService;
 
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private MessagingService messagingService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private SystemService systemService;
+
+
     /* For tests */
-    void setServicesConfigService(ServicesConfigService servicesConfigService) {
-        this.servicesConfigService = servicesConfigService;
+    void setServicesSettingsService(ServicesSettingsService servicesSettingsService) {
+        this.servicesSettingsService = servicesSettingsService;
     }
     void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
 
-    @GetMapping("/load-services-config")
+    @GetMapping("/load-services-settings")
     @ResponseBody
-    public String loadServicesConfig() {
+    public String loadServicesSettings() {
         try {
 
-            ServicesConfigWrapper wrapper = configurationService.loadServicesConfig();
+            ServicesSettingsWrapper wrapper = configurationService.loadServicesSettings();
 
             wrapper.setValueForPath("status", "OK");
 
@@ -91,24 +106,66 @@ public class ServicesConfigController {
         }
     }
 
-    @PostMapping("/apply-services-config")
+    @PostMapping("/save-services-settings")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String saveAndApplyServicesConfig(@RequestBody String configFormAsString) {
+    public String saveServicesSettings(@RequestBody String settingsFormAsString, HttpSession session) {
 
-        logger.info("Got config : " + configFormAsString);
+        logger.info("Got config : " + settingsFormAsString);
 
         try {
-            servicesConfigService.saveAndApplyServicesConfig(configFormAsString);
+
+            // first of all check nodes config
+
+            // Create OperationsCommand
+            SettingsOperationsCommand command = SettingsOperationsCommand.create(settingsFormAsString, servicesSettingsService);
+
+            // store command and config in HTTP Session
+            session.setAttribute(PENDING_SETTINGS_OPERATIONS_COMMAND, command);
 
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
+                put("command", command.toJSON());
             }}).toString(2);
 
-        } catch (JSONException | FileException | SetupException | SystemException e) {
+        } catch (JSONException | SetupException | FileException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus (e);
+            messagingService.addLines (e.getMessage());
+            notificationService.addError("Service Settings Application preparation failed !");
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
+    @PostMapping("/apply-services-settings")
+    @Transactional(isolation= Isolation.REPEATABLE_READ)
+    @ResponseBody
+    public String saveServicesSettings(HttpSession session) {
+
+        try {
+
+            if (systemService.isProcessingPending()) {
+                return new JSONObject(new HashMap<String, Object>() {{
+                    put("status", "OK");
+                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                }}).toString(2);
+            }
+
+            SettingsOperationsCommand command = (SettingsOperationsCommand) session.getAttribute(PENDING_SETTINGS_OPERATIONS_COMMAND);
+            session.removeAttribute(PENDING_SETTINGS_OPERATIONS_COMMAND);
+
+            servicesSettingsService.applyServicesSettings(command);
+
+            return "{\"status\": \"OK\" }";
+
+        } catch (SystemException e) {
+            logger.error(e, e);
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
+
+        } catch (JSONException | SetupException | FileException e) {
+            logger.error(e, e);
+            messagingService.addLines (e.getMessage());
+            notificationService.addError("Setting application failed !");
+            return ErrorStatusHelper.createEncodedErrorStatus(e);
+        }
+    }
 }

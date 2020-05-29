@@ -38,7 +38,8 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
-import ch.niceideas.eskimo.model.ServicesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
+import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,15 +48,14 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class ServicesConfigService {
+public class ServicesSettingsService {
 
-    private static final Logger logger = Logger.getLogger(ServicesConfigService.class);
+    private static final Logger logger = Logger.getLogger(ServicesSettingsService.class);
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -69,7 +69,7 @@ public class ServicesConfigService {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
-    private ReentrantLock servicesConfigApplyLock = new ReentrantLock();
+    private ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
 
     /* For tests */
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
@@ -85,26 +85,24 @@ public class ServicesConfigService {
         this.nodesConfigurationService = nodesConfigurationService;
     }
 
-    public void saveAndApplyServicesConfig(String configFormAsString)  throws FileException, SetupException, SystemException  {
+    public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
 
-        servicesConfigApplyLock.lock();
+        servicesSettingsApplyLock.lock();
         try {
 
+            ServicesSettingsWrapper servicesSettings = command.getNewSettings();
 
-            // 1. load saved config (or initialized one)
-            ServicesConfigWrapper servicesConfig = configurationService.loadServicesConfig();
+            List<String> dirtyServices = command.getRestartedServices();
 
-            String[] dirtyServices = fillInEditedConfigs(new JSONObject(configFormAsString), servicesConfig.getSubJSONArray("configs"));
+            configurationService.saveServicesSettings(servicesSettings);
 
-            configurationService.saveServicesConfig (servicesConfig);
-
-            if (dirtyServices != null && dirtyServices.length > 0) {
+            if (dirtyServices != null && dirtyServices.size() > 0) {
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
                 OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
                         servicesDefinition,
                         nodeRangeResolver,
-                        dirtyServices,
+                        dirtyServices.toArray(new String[0]),
                         nodesConfig);
 
                 nodesConfigurationService.applyNodesConfig(restartCommand);
@@ -115,11 +113,26 @@ public class ServicesConfigService {
             throw new SystemException(e);
 
         } finally {
-            servicesConfigApplyLock.unlock();
+            servicesSettingsApplyLock.unlock();
         }
     }
 
-    String[] fillInEditedConfigs(JSONObject configForm, JSONArray configArrayForService) {
+    public ServicesSettingsWrapper prepareSaveSettings (
+            String settingsFormAsString,
+            Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+            List<String> restartedServices) throws FileException, SetupException  {
+
+        ServicesSettingsWrapper servicesSettings = configurationService.loadServicesSettings();
+
+        String[] dirtyServices = fillInEditedConfigs(changedSettings, new JSONObject(settingsFormAsString), servicesSettings.getSubJSONArray("settings"));
+
+        restartedServices.addAll(Arrays.asList(dirtyServices));
+
+        return servicesSettings;
+    }
+
+    String[] fillInEditedConfigs(Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+                                 JSONObject settingsForm, JSONArray configArrayForService) {
 
         Set<String> dirtyServices = new HashSet<>();
 
@@ -127,13 +140,13 @@ public class ServicesConfigService {
         for (String service : servicesDefinition.listAllServices()) {
 
             // get all properties for service
-            for (String configKey : configForm.keySet()) {
+            for (String settingsKey : settingsForm.keySet()) {
 
-                if (configKey.startsWith(service)) {
+                if (settingsKey.startsWith(service)) {
 
-                    String value = configForm.getString(configKey);
+                    String value = settingsForm.getString(settingsKey);
 
-                    String propertyKey = configKey.substring(service.length() + 1).replace("-", ".");
+                    String propertyKey = settingsKey.substring(service.length() + 1).replace("-", ".");
 
                     // now iterate through saved (existing) configs and update values
                     main:
@@ -143,10 +156,11 @@ public class ServicesConfigService {
                         if (serviceName.equals(service)) {
 
                             // iterate through all editableConfiguration
-                            JSONArray editableConfigurations = object.getJSONArray("configs");
+                            JSONArray editableConfigurations = object.getJSONArray("settings");
                             for (int j = 0; j < editableConfigurations.length(); j++) {
                                 JSONObject editableConfiguration = editableConfigurations.getJSONObject(j);
 
+                                String filename = editableConfiguration.getString("filename");
                                 JSONArray properties = editableConfiguration.getJSONArray("properties");
                                 for (int k = 0; k < properties.length(); k++) {
 
@@ -158,12 +172,22 @@ public class ServicesConfigService {
                                         String defaultValue = property.getString("defaultValue");
                                         String previousValue = property.has("value") ? property.getString("value") : null;
 
-                                        // Handle service dirtyness
+                                        // Handle service dirtiness
                                         if (   (StringUtils.isBlank(previousValue) && StringUtils.isNotBlank(value))
                                             || (StringUtils.isNotBlank(previousValue) && StringUtils.isBlank(value))
                                             || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value) && !previousValue.equals(value)
                                                 )) {
+
                                             dirtyServices.add(serviceName);
+
+                                            Map<String, List<SettingsOperationsCommand.ChangedSettings>> changedSettingsforService =
+                                                    changedSettings.computeIfAbsent(serviceName, ser -> new HashMap<>());
+
+                                            List<SettingsOperationsCommand.ChangedSettings> changeSettingsForFile =
+                                                    changedSettingsforService.computeIfAbsent(filename, fn -> new ArrayList<>());
+
+                                            changeSettingsForFile.add(new SettingsOperationsCommand.ChangedSettings (
+                                                    service, filename, propertyName, value, previousValue));
                                         }
 
                                         // Handle value saving

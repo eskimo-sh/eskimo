@@ -80,7 +80,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
         // set services for tests
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfigForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
+        page.executeJavaScript("eskimoNodesConfig.setServicesSettingsForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
 
         page.executeJavaScript("$('#inner-content-nodes').css('display', 'inherit')");
         page.executeJavaScript("$('#inner-content-nodes').css('visibility', 'visible')");

@@ -46,12 +46,8 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Set;
 
 public abstract class AbstractSystemTest {
@@ -76,7 +72,7 @@ public abstract class AbstractSystemTest {
 
     protected ServicesInstallationSorter servicesInstallationSorter = null;
 
-    protected ServicesConfigService servicesConfigService = null;
+    protected ServicesSettingsService servicesSettingsService = null;
 
     protected MemoryComputer memoryComputer = null;
 
@@ -209,9 +205,9 @@ public abstract class AbstractSystemTest {
         servicesInstallationSorter = new ServicesInstallationSorter ();
         servicesInstallationSorter.setServicesDefinition(servicesDefinition);
 
-        servicesConfigService = new ServicesConfigService();
-        servicesConfigService.setNodeRangeResolver(nodeRangeResolver);
-        servicesConfigService.setServicesDefinition(servicesDefinition);
+        servicesSettingsService = new ServicesSettingsService();
+        servicesSettingsService.setNodeRangeResolver(nodeRangeResolver);
+        servicesSettingsService.setServicesDefinition(servicesDefinition);
 
         marathonService = createMarathonService();
         marathonService.setServicesDefinition(servicesDefinition);
@@ -241,7 +237,7 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService.setMessagingService(messagingService);
         nodesConfigurationService.setNodeRangeResolver(nodeRangeResolver);
         nodesConfigurationService.setProxyManagerService(proxyManagerService);
-        nodesConfigurationService.setServicesConfigService(servicesConfigService);
+        nodesConfigurationService.setServicesSettingsService(servicesSettingsService);
         nodesConfigurationService.setServicesDefinition(servicesDefinition);
         nodesConfigurationService.setServicesInstallationSorter(servicesInstallationSorter);
         nodesConfigurationService.setSetupService(setupService);

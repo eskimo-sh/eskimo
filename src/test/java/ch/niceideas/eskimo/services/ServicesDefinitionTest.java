@@ -415,11 +415,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         Service sparkService = def.getService("spark-executor");
         assertNotNull(sparkService);
 
-        List<EditableConfiguration> confs = sparkService.getEditableConfigurations();
+        List<EditableSettings> confs = sparkService.getEditableSettings();
         assertNotNull(confs);
         assertEquals(1, confs.size());
 
-        EditableConfiguration conf = confs.get(0);
+        EditableSettings conf = confs.get(0);
         assertNotNull(conf);
 
         assertEquals("spark-defaults.conf", conf.getFilename());

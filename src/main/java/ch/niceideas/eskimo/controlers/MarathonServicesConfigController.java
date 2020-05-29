@@ -165,12 +165,12 @@ public class MarathonServicesConfigController {
             // store command and config in HTTP Session
             session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
 
-            return returnCommand (command);
+            return NodesConfigController.returnCommand (command);
 
         } catch (JSONException | SetupException | FileException | MarathonServicesConfigException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
-            notificationService.addError("Nodes installation failed !");
+            notificationService.addError("Marathon Services installation preparation failed !");
             return ErrorStatusHelper.createEncodedErrorStatus(e);
         }
     }
@@ -215,23 +215,12 @@ public class MarathonServicesConfigController {
             session.setAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
             session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
 
-            return returnCommand (command);
+            return NodesConfigController.returnCommand (command);
 
         } catch (JSONException | FileException | SetupException | SystemException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
-    }
-
-    private String returnCommand(MarathonOperationsCommand command) {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("command", command.toJSON());
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
         }
     }
 

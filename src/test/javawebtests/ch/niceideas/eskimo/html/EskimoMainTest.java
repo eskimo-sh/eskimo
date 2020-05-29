@@ -70,7 +70,7 @@ public class EskimoMainTest extends AbstractWebTest {
                 "   this.handleServiceHiding = function() {}" +
                 "};");
         page.executeJavaScript("eskimo.ServicesSelection = function(){};");
-        page.executeJavaScript("eskimo.ServicesConfig = function(){};");
+        page.executeJavaScript("eskimo.ServicesSettings = function(){};");
         page.executeJavaScript("eskimo.MarathonServicesConfig = function(){};");
         page.executeJavaScript("eskimo.MarathonServicesSelection = function(){};");
         page.executeJavaScript("eskimo.OperationsCommand = function(){};");
@@ -98,7 +98,7 @@ public class EskimoMainTest extends AbstractWebTest {
         assertCssValue("#inner-content-consoles", "visibility", "hidden");
         assertCssValue("#inner-content-setup", "visibility", "hidden");
         assertCssValue("#inner-content-nodes", "visibility", "hidden");
-        assertCssValue("#inner-content-services-config", "visibility", "hidden");
+        assertCssValue("#inner-content-services-settings", "visibility", "hidden");
         assertCssValue("#inner-content-file-managers", "visibility", "hidden");
 
         assertCssValue("#inner-content-pending", "visibility", "visible");

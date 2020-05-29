@@ -68,7 +68,7 @@ ExecStart=/bin/bash -c ". /run/spark_mesos_environment && /usr/bin/docker run \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-config.json,target=/etc/eskimo_services-config.json \
+        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
         eskimo:spark-mesos-shuffle-service \
         /usr/local/sbin/inContainerStartMesosShuffleService.sh"
