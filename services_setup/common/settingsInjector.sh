@@ -154,20 +154,20 @@ function injectVariableProperty () {
 echoDebug "finding filenames"
 
 IFS=$'\n'
-for configFile in `jq -c  ".configs | .[] | .configs | .[] | select (.service==\"$SERVICE\") | {filename,propertyType,propertyFormat,commentPrefix,filesystemService}" $SETTINGS_FILE`; do
+for settingsFile in `jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\") | {filename,propertyType,propertyFormat,commentPrefix,filesystemService}" $SETTINGS_FILE`; do
 
-    echoDebug "$configFile"
+    echoDebug "$settingsFile"
 
-    export filename=`echo $configFile | jq -r ' .filename'`
-    export propertyType=`echo $configFile | jq -r ' .propertyType'`
-    export propertyFormat=`echo $configFile | jq -r ' .propertyFormat'`
-    export commentPrefix=`echo $configFile | jq -r ' .commentPrefix'`
-    export filesystemService=`echo $configFile | jq -r ' .filesystemService'`
+    export filename=`echo $settingsFile | jq -r ' .filename'`
+    export propertyType=`echo $settingsFile | jq -r ' .propertyType'`
+    export propertyFormat=`echo $settingsFile | jq -r ' .propertyFormat'`
+    export commentPrefix=`echo $settingsFile | jq -r ' .commentPrefix'`
+    export filesystemService=`echo $settingsFile | jq -r ' .filesystemService'`
 
     echoDebug "Processing properties for \"$filename\""
 
     IFS=$'\n'
-    for property in `jq -c  ".configs | .[] | .configs | .[] | select (.service==\"$SERVICE\" and .filename==\"$filename\") | .properties | .[] | select (.value) " $SETTINGS_FILE`; do
+    for property in `jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\" and .filename==\"$filename\") | .properties | .[] | select (.value) " $SETTINGS_FILE`; do
 
         export name=`echo $property | jq -r ' .name'`
         export value=`echo $property | jq -r ' .value'`

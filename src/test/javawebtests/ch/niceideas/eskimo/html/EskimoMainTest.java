@@ -75,6 +75,7 @@ public class EskimoMainTest extends AbstractWebTest {
         page.executeJavaScript("eskimo.MarathonServicesSelection = function(){};");
         page.executeJavaScript("eskimo.OperationsCommand = function(){};");
         page.executeJavaScript("eskimo.MarathonOperationsCommand = function(){};");
+        page.executeJavaScript("eskimo.SettingsOperationsCommand = function(){};");
         page.executeJavaScript("eskimo.SetupCommand = function(){};");
         page.executeJavaScript("eskimo.FileManagers = function(){};");
         page.executeJavaScript("eskimo.Setup = function(){};");
