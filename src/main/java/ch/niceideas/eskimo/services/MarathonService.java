@@ -212,7 +212,6 @@ public class MarathonService {
 
             // apps/cerebro
             BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, "http://localhost:" + marathonTunnelConfig.getLocalPort() + "/v2/" + endpoint);
-            //request.setHeader("Content-Type", "application/json");
 
             BasicHttpEntity requestContent = new BasicHttpEntity();
             requestContent.setContentType("application/json");

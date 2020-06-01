@@ -70,6 +70,7 @@ public class SystemService {
 
     public static final String SERVICE_PREFIX = "Service ";
     public static final String SHOULD_NOT_HAPPEN_FROM_HERE = " should not happen from here.";
+    public static final String MARATHON_SERVICE_NAME = "marathon";
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -397,7 +398,7 @@ public class SystemService {
                 } catch (MarathonException e) {
                     logger.debug(e, e);
                     // workaround : flag all marathon services as KO on marathon node
-                    String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress("marathon");
+                    String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress(MARATHON_SERVICE_NAME);
                     if (StringUtils.isNotBlank(marathonIpAddress)) {
                         String marathonNode = marathonIpAddress.replace(".", "-");
                         MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
@@ -633,14 +634,14 @@ public class SystemService {
                     if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)) {
 
                         // if marathon is not available, don't do anything
-                        String marathonNodeName = systemStatus.getFirstNodeName("marathon");
+                        String marathonNodeName = systemStatus.getFirstNodeName(MARATHON_SERVICE_NAME);
                         if (StringUtils.isBlank(marathonNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
                             //notificationService.addError("Marathon inconsistency.");
                             //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
                             continue;
                         }
 
-                        if (!systemStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
+                        if (!systemStatus.isServiceOKOnNode(MARATHON_SERVICE_NAME, marathonNodeName)) {
                             //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
                             continue;
                         }

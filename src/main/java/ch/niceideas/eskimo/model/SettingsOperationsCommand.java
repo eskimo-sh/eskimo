@@ -37,8 +37,6 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.NodesConfigurationService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.SetupException;
 import org.json.JSONArray;
@@ -51,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class SettingsOperationsCommand {
+public class SettingsOperationsCommand implements Serializable {
 
     private Map<String, Map<String, List<ChangedSettings>>> changedSettings = null;
     private List<String> restartedServices = null;
@@ -116,7 +114,7 @@ public class SettingsOperationsCommand {
 
                 String filename = fileEntry.getKey();
                 JSONArray settingsArray = new JSONArray(fileEntry.getValue().stream()
-                    .map(settings -> settings.toJSON())
+                    .map(ChangedSettings::toJSON)
                     .collect(Collectors.toList())
                 );
 

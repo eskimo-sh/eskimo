@@ -96,7 +96,7 @@ public class ServicesSettingsService {
 
             configurationService.saveServicesSettings(servicesSettings);
 
-            if (dirtyServices != null && dirtyServices.size() > 0) {
+            if (dirtyServices != null && !dirtyServices.isEmpty()) {
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
                 OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
