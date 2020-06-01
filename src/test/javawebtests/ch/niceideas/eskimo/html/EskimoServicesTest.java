@@ -93,7 +93,7 @@ public class EskimoServicesTest extends AbstractWebTest {
         // 2. disconnected
         page.executeJavaScript("eskimoMain.isSetupDone = function() { return true; }");
         page.executeJavaScript("eskimoSystemStatus.isDisconnected = function() { return true; }");
-        page.executeJavaScript("eskimoMain.showStatus = function() { window.showStatusCalled = true; }");
+        page.executeJavaScript("eskimoSystemStatus.showStatus = function() { window.showStatusCalled = true; }");
 
         page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
 

@@ -75,12 +75,16 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
         page.executeJavaScript("eskimoServicesSettings.showServicesSettings();");
 
         page.executeJavaScript("$.ajax = function(object) {" +
-                "    object.success({status: \"OK\"})" +
+                "    object.success({status: \"OK\", command: true})" +
                 "}");
+
+        page.executeJavaScript("eskimoMain.getSettingsOperationsCommand = function () {" +
+                "    return { showCommand : function () {window.showCommandCalled = true;  } }; " +
+                "};");
 
         page.getElementById("save-services-settings-btn").click();
 
-        assertJavascriptEquals("Settings applied successfully", "$('#services-settings-warning-message').html()");
+        assertJavascriptEquals("true", "window.showCommandCalled");
     }
 
     @Test

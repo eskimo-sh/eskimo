@@ -1,7 +1,21 @@
 {
   "command": {
-    "uninstallations": ["kafka-manager"],
-    "installations": ["cerebro", "gdash", "kibana", "zeppelin"]
+    "settings": {
+      "elasticsearch": {"elasticsearch-index-defaults.properties": [{
+        "value": "4",
+        "key": "index.number_of_shards",
+        "oldValue": "5"
+      }]},
+      "mesos-agent": {"agent-resources-temporary-file.properties": [{
+        "value": "3200",
+        "key": "ram_additional",
+        "oldValue": "3000"
+      }]}
+    },
+    "restarts": [
+      "elasticsearch",
+      "mesos-agent"
+    ]
   },
   "status": "OK"
 }

@@ -89,6 +89,8 @@ public class ServicesSettingsController {
     void setSystemService(SystemService systemService) {
         this.systemService = systemService;
     }
+    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
+    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
 
     @GetMapping("/load-services-settings")
     @ResponseBody
@@ -109,7 +111,7 @@ public class ServicesSettingsController {
     @PostMapping("/save-services-settings")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
-    public String saveServicesSettings(@RequestBody String settingsFormAsString, HttpSession session) {
+    public String prepareSaveServicesSettings(@RequestBody String settingsFormAsString, HttpSession session) {
 
         logger.info("Got config : " + settingsFormAsString);
 

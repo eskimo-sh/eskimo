@@ -5,10 +5,15 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
+import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.*;
 import org.junit.Test;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -51,62 +56,99 @@ public class ServicesSettingsControllerTest {
     }
 
     @Test
-    public void testSaveServicesConfig() throws Exception {
+    public void testPrepareAndSaveServicesConfig() throws Exception {
 
-        fail ("To Be Implemented");
+        injectDummyService();
 
-        /*
-        scc.setServicesSettingsService(new ServicesSettingsService() {
+        scc.setSystemService(new SystemService() {
             @Override
-            public void saveAndApplyServicesSettings(String settingsFormAsString)  throws FileException, SetupException, SystemException  {
-                // No Op
+            public boolean isProcessingPending() {
+                return false;
             }
         });
 
-        assertEquals ("{\"status\": \"OK\"}", scc.saveAndApplyServicesSettings("{\"dummyJson\" : \"dummyJson\"}"));
+        StringBuilder messages = new StringBuilder();
+
+        scc.setMessagingService(new MessagingService() {
+            @Override
+            public void addLines (String lines) {
+                messages.append(lines);
+            }
+        });
+
+        StringBuilder notifications = new StringBuilder();
+
+        scc.setNotificationService(new NotificationService() {
+            @Override
+            public void addError (String message) {
+                notifications.append (message);
+            }
+        });
+
+        Map<String, Object> sessionContent = new HashMap<>();
+
+        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+
+        assertEquals ("{\n" +
+                "  \"command\": {\n" +
+                "    \"settings\": {},\n" +
+                "    \"restarts\": []\n" +
+                "  },\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", scc.prepareSaveServicesSettings("{\"dummyJson\" : \"dummyJson\"}", session));
+
+        assertEquals ("{\"status\": \"OK\" }", scc.saveServicesSettings(session));
 
         scc.setServicesSettingsService(new ServicesSettingsService() {
             @Override
-            public void saveAndApplyServicesSettings(String settingsFormAsString)  throws FileException, SetupException, SystemException  {
+            public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
                 throw new SetupException("Test Error");
             }
         });
 
         assertEquals ("{\n" +
-                "  \"error\": \"Test Error\",\n" +
+                "  \"error\": \"VGVzdCBFcnJvcg==\",\n" +
                 "  \"status\": \"KO\"\n" +
-                "}", scc.saveAndApplyServicesSettings("{\"dummyJson\" : \"dummyJson\"}"));
+                "}", scc.saveServicesSettings(session));
 
-                */
+        assertEquals("Setting application failed !", notifications.toString());
+
+        assertEquals("Test Error", messages.toString());
+
+        scc.setSystemService(new SystemService() {
+            @Override
+            public boolean isProcessingPending() {
+                return true;
+            }
+        });
+
+        injectDummyService();
+
+        assertEquals("{\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", scc.saveServicesSettings(session));
     }
 
-    @Test
-    public void testApplyServicesConfig() throws Exception {
-
-        fail ("To Be Implemented");
-
-        /*
+    void injectDummyService() {
         scc.setServicesSettingsService(new ServicesSettingsService() {
             @Override
-            public void saveAndApplyServicesSettings(String settingsFormAsString)  throws FileException, SetupException, SystemException  {
+            public ServicesSettingsWrapper prepareSaveSettings (
+                    String settingsFormAsString,
+                    Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+                    List<String> restartedServices) throws FileException, SetupException {
+                String jsonConfig = null;
+                try {
+                    jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));
+                } catch (IOException e) {
+                    fail (e.getMessage());
+                }
+                return new ServicesSettingsWrapper(jsonConfig);
+            }
+            @Override
+            public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException {
                 // No Op
             }
         });
-
-        assertEquals ("{\"status\": \"OK\"}", scc.saveAndApplyServicesSettings("{\"dummyJson\" : \"dummyJson\"}"));
-
-        scc.setServicesSettingsService(new ServicesSettingsService() {
-            @Override
-            public void saveAndApplyServicesSettings(String settingsFormAsString)  throws FileException, SetupException, SystemException  {
-                throw new SetupException("Test Error");
-            }
-        });
-
-        assertEquals ("{\n" +
-                "  \"error\": \"Test Error\",\n" +
-                "  \"status\": \"KO\"\n" +
-                "}", scc.saveAndApplyServicesSettings("{\"dummyJson\" : \"dummyJson\"}"));
-
-                */
     }
 }

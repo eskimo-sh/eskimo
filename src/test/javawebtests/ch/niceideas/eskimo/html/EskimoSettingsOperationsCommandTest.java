@@ -60,8 +60,6 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
     @Test
     public void testShowCommand() throws Exception {
 
-        fail ("To Be Implemented");
-
         String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/command.json"));
 
         page.executeJavaScript("eskimoSettingsOperationsCommand.showCommand("+command+".command)");

@@ -225,6 +225,7 @@ public abstract class AbstractWebTest {
                 "};");
 
         page.executeJavaScript("var eskimoSystemStatus = {};");
+        page.executeJavaScript("eskimoSystemStatus.showStatus = function () {};");
 
 
         page.executeJavaScript("var eskimoMain = {};");

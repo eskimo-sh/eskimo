@@ -1,43 +1,43 @@
 {
-  "configs": [
+  "settings": [
     {
-      "configs": [],
+      "settings": [],
       "name": "gdash"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "mesos-master"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "zookeeper"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "zeppelin"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "ntp"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "gluster"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "mesos-agent"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "logstash"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "cerebro"
     },
     {
-      "configs": [{
+      "settings": [{
         "filename": "elasticsearch.yml",
         "propertyFormat": "{name}: {value}",
         "commentPrefix": "#",
@@ -62,15 +62,15 @@
       "name": "elasticsearch"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "grafana"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "kafka-manager"
     },
     {
-      "configs": [{
+      "settings": [{
         "filename": "server.properties",
         "propertyFormat": "{name}={value}",
         "commentPrefix": "#",
@@ -137,7 +137,7 @@
       "name": "kafka"
     },
     {
-      "configs": [{
+      "settings": [{
         "filename": "spark-defaults.conf",
         "propertyFormat": "{name}={value}",
         "commentPrefix": "#",
@@ -199,15 +199,15 @@
       "name": "spark-executor"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "prometheus"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "kibana"
     },
     {
-      "configs": [],
+      "settings": [],
       "name": "spark-history-server"
     }
   ],
