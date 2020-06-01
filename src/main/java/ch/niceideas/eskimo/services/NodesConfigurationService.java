@@ -174,7 +174,7 @@ public class NodesConfigurationService {
                             // topology
                             if (!systemService.isInterrupted() && (error.get() == null)) {
                                 systemOperationService.applySystemOperation("Installation of Topology and settings on " + ipAddress,
-                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, ipAddress, deadIps), null);
+                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, ipAddress), null);
                             }
 
                             if (!systemService.isInterrupted() && (error.get() == null && !isInstalledOnNode("mesos", ipAddress))) {
@@ -191,7 +191,7 @@ public class NodesConfigurationService {
 
             // first thing first, flag services that need to be restarted as "needing to be restarted"
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
-                    command.getRestarts(), nodesConfig, deadIps)) {
+                    command.getRestarts(), nodesConfig)) {
                 for (Pair<String, String> operation : restarts) {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
@@ -212,7 +212,7 @@ public class NodesConfigurationService {
 
             // Installation in batches (groups following dependencies)
             for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (
-                    command.getInstallations(), nodesConfig, deadIps)) {
+                    command.getInstallations(), nodesConfig)) {
 
                 systemService.performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
@@ -226,7 +226,7 @@ public class NodesConfigurationService {
 
             // uninstallations
             List<List<Pair<String, String>>> orderedUninstallations =  servicesInstallationSorter.orderOperations (
-                    command.getUninstallations(), nodesConfig, deadIps);
+                    command.getUninstallations(), nodesConfig);
             Collections.reverse(orderedUninstallations);
 
             for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
@@ -250,7 +250,7 @@ public class NodesConfigurationService {
 
             // restarts
             for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
-                    command.getRestarts(), nodesConfig, deadIps)) {
+                    command.getRestarts(), nodesConfig)) {
                 systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
@@ -311,7 +311,7 @@ public class NodesConfigurationService {
         }
     }
 
-    String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress, Set<String> deadIps)
+    String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress)
             throws SystemException, SSHCommandException, IOException {
 
         File tempTopologyFile = systemService.createTempFile("eskimo_topology", ipAddress, ".sh");
@@ -323,7 +323,7 @@ public class NodesConfigurationService {
         }
         try {
             FileUtils.writeFile(tempTopologyFile, servicesDefinition
-                    .getTopology(nodesConfig, marathonConfig, deadIps, ipAddress)
+                    .getTopology(nodesConfig, marathonConfig, ipAddress)
                     .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (ipAddress)));
         } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
             logger.error (e, e);

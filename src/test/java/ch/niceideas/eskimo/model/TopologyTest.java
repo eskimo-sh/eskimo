@@ -58,7 +58,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         NodesConfigWrapper nodesConfig = createStandardNodesConfig();
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
@@ -84,23 +84,6 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
     }
 
     @Test
-    public void testMasterElectionStrategyFirstNodeDeadIp() throws Exception {
-
-        initFirstNodeDependencies();
-
-        NodesConfigWrapper nodesConfig = createStandardNodesConfig();
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-                    Topology.create(nodesConfig, marathonServicesConfig, new HashSet<String>() {{
-                        add("192.168.10.13");
-                    }}, def, null, "192.168.10.11");
-                });
-
-        assertEquals("Dependency service_c for service service_b could not found occurence 2", exception.getMessage());
-    }
-
-    @Test
     public void testMasterElectionStrategySameNodeOrRandom() throws Exception {
 
         initSameNodeOrRandomDependencies();
@@ -108,21 +91,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         NodesConfigWrapper nodesConfig = createStandardNodesConfig();
         nodesConfig.setValueForPath("service_b", "1");
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
-
-        assertEquals ("export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
-    }
-
-    @Test
-    public void testMasterElectionStrategySameNodeOrRandomDeadIp() throws Exception {
-
-        initSameNodeOrRandomDependencies();
-
-        NodesConfigWrapper nodesConfig = createStandardNodesConfig();
-        nodesConfig.setValueForPath("service_b", "1");
-
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<String>(){{ add("192.168.10.13"); }}, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
                 "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
@@ -137,29 +106,11 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
                 "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
-    }
-
-    @Test
-    public void testMasterElectionStrategyRandomDeadIp() throws Exception {
-
-        initRandomDependencies();
-
-        NodesConfigWrapper nodesConfig = createStandardNodesConfig();
-
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-                Topology.create(nodesConfig, marathonServicesConfig, new HashSet<String>() {{
-                    add("192.168.10.13");
-                }}, def, null, "192.168.10.11");
-            });
-
-        assertEquals ("Dependency service_c for service service_b could not found occurence 2", exception.getMessage());
     }
 
     @Test
@@ -178,7 +129,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
@@ -201,7 +152,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_c3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
@@ -220,7 +171,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_c1", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
@@ -248,7 +199,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
@@ -283,35 +234,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("gluster3", "on");
         }});
 
-        Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), MarathonServicesConfigWrapper.empty(),  def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.14\n" +
                 "export MASTER_GLUSTER_1921681013=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681014=192.168.10.11\n", topology.getTopologyScript());
-    }
-
-    @Test
-    public void testMasterElectionStrategyRandomNodeAfterDeadIp() throws Exception {
-
-        initRandomNodeAfterDependencies();
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("service_a1", "on");
-                put("service_c1", "on");
-                put("node_id2", "192.168.10.12");
-                put("service_b", "2");
-                put("node_id3", "192.168.10.13");
-                put("service_b3", "on");
-                put("service_c3", "on");
-        }});
-
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<String>(){{ add("192.168.10.13"); }}, def, null, "192.168.10.11");
-
-        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
-                "export MASTER_SERVICE_C_1921681012=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript());
     }
 
     @Test
@@ -328,7 +256,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_b3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("", topology.getTopologyScript());
     }
@@ -348,7 +276,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -403,7 +331,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_c1", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -442,7 +370,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_b1", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -485,7 +413,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.12\n" +
@@ -538,7 +466,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -568,7 +496,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c5", "on");
         }});
 
-        topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -624,7 +552,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
         ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class, () -> {
-            Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+            Topology.create(nodesConfig, marathonServicesConfig,  def, null, "192.168.10.11");
         });
 
         assertEquals("Service service_d defines a SAME_NODE dependency which is not supported for marathon services", exception.getMessage());
@@ -632,7 +560,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
 
         exception = assertThrows(ServiceDefinitionException.class, () -> {
-            Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+            Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
         });
 
         assertEquals("Service service_d defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services", exception.getMessage());
@@ -656,7 +584,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_C_1=192.168.10.11\n" +
                 "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
@@ -685,7 +613,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +

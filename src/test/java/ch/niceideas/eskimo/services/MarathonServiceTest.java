@@ -236,7 +236,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
         marathonService.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
             String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
-                                              MemoryModel memoryModel, String ipAddress, Set<String> deadIps) {
+                                              MemoryModel memoryModel, String ipAddress) {
                 // No-Op
                 return "OK";
             }

@@ -77,7 +77,7 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         OperationsCommand oc = OperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
 
-        List<List<Pair<String, String>>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig, new HashSet<>());
+        List<List<Pair<String, String>>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig);
 
         assertNotNull(orderedInstall);
 

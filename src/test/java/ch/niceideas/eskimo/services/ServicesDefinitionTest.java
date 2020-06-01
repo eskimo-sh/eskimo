@@ -86,36 +86,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         Topology topology = def.getTopology(
                 new NodesConfigWrapper(jsonNodesConfig),
                 new MarathonServicesConfigWrapper(jsonMarathonConfig),
-                new HashSet<>(), "192.168.10.11");
+                "192.168.10.11");
 
         assertEquals ("export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
                 "export MASTER_ELASTICSEARCH_1921681012=192.168.10.13\n" +
-                "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
-                "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
-                "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
-                "export MASTER_MARATHON_1=192.168.10.11\n" +
-                "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
-                "export MASTER_NTP_1=192.168.10.11\n" +
-                "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
-                "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921681012=192.168.10.12\n" +
-                "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
-    }
-
-    @Test
-    public void testRealLifeExampleDeadIp() throws Exception {
-
-        Topology topology = def.getTopology(
-                new NodesConfigWrapper(jsonNodesConfig),
-                new MarathonServicesConfigWrapper(jsonMarathonConfig),
-                new HashSet<String>(){{add("192.168.10.13");}}, "192.168.10.11");
-
-        assertEquals ("export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
-                "export MASTER_ELASTICSEARCH_1921681012=192.168.10.11\n" +
                 "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
@@ -140,7 +114,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         Topology topology = def.getTopology(
                 nodesConfig,
                 new MarathonServicesConfigWrapper(jsonMarathonConfig),
-                new HashSet<>(), "192.168.10.11");
+                "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
@@ -197,7 +171,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         Topology topology = def.getTopology(
                 nodesConfig,
                 marathonConfig,
-                new HashSet<>(), "192.168.10.11");
+                "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
@@ -390,7 +364,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         Topology topology = def.getTopology(
                 nrr.resolveRanges(nodesConfig),
                 marathonConfig,
-                new HashSet<>(), "192.168.10.11");
+                "192.168.10.11");
 
         assertEquals ("#Topology\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.13\n" +

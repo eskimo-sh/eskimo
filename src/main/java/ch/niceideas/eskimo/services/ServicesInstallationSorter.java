@@ -59,8 +59,7 @@ public class ServicesInstallationSorter {
 
     public List<List<Pair<String, String>>> orderOperations(
             List<? extends Pair<String, String>> operations,
-            NodesConfigWrapper nodesConfig,
-            Set<String> deadIps) throws NodesConfigurationException, ServiceDefinitionException {
+            NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException {
 
 
         // 1. group services togethers
@@ -84,7 +83,7 @@ public class ServicesInstallationSorter {
         // 3. Reprocess and separate master installation
         List<List<Pair<String, String>>> orderedOperationsSteps = new ArrayList<>();
 
-        Topology topology = servicesDefinition.getTopology(nodesConfig, null, deadIps, null);
+        Topology topology = servicesDefinition.getTopology(nodesConfig, null, null);
 
         for (Service service : services) {
 

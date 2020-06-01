@@ -387,7 +387,7 @@ public class MarathonService {
                         // topology
                         if (error.get() == null) {
                             systemOperationService.applySystemOperation("Installation of Topology and settings on " + operation,
-                                    builder -> nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation, deadIps), null);
+                                    builder -> nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation), null);
                         }
 
                     });

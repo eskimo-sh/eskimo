@@ -106,7 +106,7 @@ public abstract class AbstractSetupShellTest {
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, new HashSet<>(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
 
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
