@@ -308,7 +308,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 " - Creating multiple replicas since running on multi-node cluster\n", result);
 
         assertEquals("volume list\n" +
-                "volume create test replica 2 transport tcp 192.168.10.11:/var/lib/gluster/volume_bricks/test 192.168.10.13:/var/lib/gluster/volume_bricks/test\n" +
+                "volume create test replica 2 transport tcp 192.168.10.11:/var/lib/gluster/volume_bricks/test 192.168.10.13:/var/lib/gluster/volume_bricks/test force\n" +
                 "volume list\n" +
                 "volume info test\n" +
                 "volume start test\n" +

@@ -173,7 +173,7 @@ public class CommonDevShellTest {
 
         // no error reported
         assertEquals (" - Checking if base eskimo image is available\n" +
-                        " - Trying to loads base eskimo image\n" +
+                        " - Trying to load base eskimo image\n" +
                         " - Deleting any previous containers\n" +
                         " - building docker image cerebro\n" +
                         " - Starting container cerebro_template\n",
