@@ -410,7 +410,7 @@ service will be given as dependency to the declaring service.
 * `SAME_NODE_OR_RANDOM` : This is used to define a simple dependency on another service. In details,
 `SAME_NODE_OR_RANDOM` indicates that the first service wants to know about at least one node where the dependency
 service is available. +
-In the case of `SAME_NODE_OR_RANDOM`, eskimo tries to find the depencency service on the very same node than
+In the case of `SAME_NODE_OR_RANDOM`, eskimo tries to find the dependency service on the very same node than
 the one running the declaring service if that dependent service is available on that very same node. +
 If no instance of the dependency service is not running on the very same node, then any other random node running the
 dependency service is used as dependency.
@@ -421,12 +421,12 @@ any other node of the cluster where the dependency service is installed.
 indicates that the first service wants to know about at least one node where that dependency service is available. +
 That other node should be any node of the cluster where the second service is installed yet with a *node number*
 (internal eskimo node declaration order) greater than the current node where the first service is installed. +
-This is usefull to define a chain of dependencies where every node instance depends on another node instance in a
+This is useful to define a chain of dependencies where every node instance depends on another node instance in a
 circular way (pretty nifty for instance for elasticsearch discovery configuration).
 * `SAME_NODE` : This means that the dependency service is expected to be available on the same node than the first
 service, otherwise eskimo will report an error during service installation.
 
-*The best way to understand this is to look at the exanples in eskimo pre-packaged services declared in the bundled
+*The best way to understand this is to look at the examples in eskimo pre-packaged services declared in the bundled
 `services.json`.*
 
 For instance:
@@ -446,7 +446,7 @@ instance by using the following dependency declaration:
     ]
 ----
 
-* elasticsearch instances on the different nodes search for each other in a round robin fashion by declating the
+* elasticsearch instances on the different nodes search for each other in a round robin fashion by declaring the
 following dependencies (mandatory false ise used to support single node deployments):
 
 .elasticsearch dependency on next elasticsearch instance
@@ -576,11 +576,11 @@ Eskimo supports two modes for providing these web consoles in its own UI as pres
 1. (A) Configuration of an `urlTemplate` which is used by eskimo to show an iframe displaying directly the web console
 from the node on which it is installed. *This method is supported for backwards compatibility purpose but it is not
 recommended*
-2. (B) Configuration of a `proxyTargetPort` for full proxying and tnneling (using SSH) of the whole HTTP flow to the
-web console using eskimo embedded proxying and tunneling feature. *This is the recommanded way* and this is the way
+2. (B) Configuration of a `proxyTargetPort` for full proxying and tunnelling (using SSH) of the whole HTTP flow to the
+web console using eskimo embedded proxying and tunneling feature. *This is the recommended way* and this is the way
 used by all eskimo pre-packaged services and web consoles.
 
-Proxying works as explained  in the User Guide in the section "SSH Tunelling".
+Proxying works as explained  in the User Guide in the section "SSH Tunnelling".
 
 Proxying is however a little more complicated to set up since eskimo needs to perform a lot of rewriting on the text
 resources (javascript, html and json) served by the proxied web console to rewrite served URLs to make them pass
@@ -604,7 +604,7 @@ replaced and define a *rewrite rule* for each of them.
 A set of standard rewrite rules are implemented once and for all by the eskimo HTTP proxy for all services. By default
 these standard rewrite rules are enabled for a service unless the service config declares
 `"applyStandardProxyReplacements": false` in which case they are not applied to that specific service. +
-This is usefull when a standard rule is actually harming a specific web console behaviour.
+This is useful when a standard rule is actually harming a specific web console behaviour.
 
 The standard rewrite rules are as follows:
 
@@ -669,7 +669,7 @@ are searched, respectively injected, in the text stream:
 
 * `CONTEXT_PATH` will be resolved by the context root at which the eskimo web application is deployed, such as for
 instance `eskimo`
-* `PREFIX_PATH` will be resolved by the specific context path of the service web console context, suchas for instance
+* `PREFIX_PATH` will be resolved by the specific context path of the service web console context, such as for instance
 for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no context root is used.
 
 

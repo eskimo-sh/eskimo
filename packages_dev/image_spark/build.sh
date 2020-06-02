@@ -48,7 +48,28 @@ rm -f /tmp/spark_build_log
 echo " - Building image spark"
 build_image spark /tmp/spark_build_log
 
-echo " - Installing the latest OpenJDK"
+
+# HACK : AS LONG AS SPARK DOESNT SUPPORT JAVA 11, I am building outside of eskimo base system
+# Hence the need to repeat eskimo base system installation here
+# ----------------------------------------------------------------------------------------------------------------------
+echo " - (Hack) Creating missing directory /usr/share/man/man1/"
+docker exec -i spark mkdir -p /usr/share/man/man1/ >> /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -2
+
+echo " - Updating the packages"
+docker exec -i spark apt-get update >> /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -2
+
+echo " - Upgrading the appliance"
+docker exec -i -e DEBIAN_FRONTEND=noninteractive spark apt-get -yq upgrade >> /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -2
+
+echo " - Installing required utility tools for eskimo framework"
+docker exec -i spark apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq >> /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -2
+# ----------------------------------------------------------------------------------------------------------------------
+
+echo " - Installing OpenJDK 8 (Keeping JDK 8 for spark for compatibility)"
 docker exec -i spark apt-get install -y openjdk-8-jdk >> /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3
 

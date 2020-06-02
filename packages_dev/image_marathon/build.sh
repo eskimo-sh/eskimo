@@ -50,23 +50,8 @@ echo " - Building image marathon"
 build_image marathon /tmp/marathon_build_log
 
 echo " - Installing the latest OpenJDK"
-docker exec -i marathon apt-get install -y openjdk-8-jdk >> /tmp/marathon_build_log 2>&1
+docker exec -i marathon apt-get install -y openjdk-11-jdk >> /tmp/marathon_build_log 2>&1
 fail_if_error $? "/tmp/marathon_build_log" -3
-
-#echo " - Installing scala"
-#docker exec -i marathon apt-get install -y scala >> /tmp/marathon_build_log 2>&1
-#fail_if_error $? "/tmp/marathon_build_log" -4
-
-#echo " - Installing python"
-#docker exec -i marathon apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/marathon_build_log 2>&1
-#fail_if_error $? "/tmp/marathon_build_log" -5
-
-#echo " - Installing python elasticsearch and kafka clients and other utilities"
-#docker exec -i marathon pip install elasticsearch kafka-python >> /tmp/marathon_build_log 2>&1
-#fail_if_error $? "/tmp/marathon_build_log" -6
-
-#echo " - Installing other python packages"
-#docker exec -i marathon pip install requests filelock >> /tmp/marathon_build_log 2>&1
 
 echo " - Installing Docker Registry"
 docker exec -i marathon bash /scripts/installDockerRegistry.sh | tee -a /tmp/marathon_build_log 2>&1

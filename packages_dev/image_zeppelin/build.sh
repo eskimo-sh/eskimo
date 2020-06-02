@@ -62,15 +62,6 @@ fi
 echo " - Building image zeppelin"
 build_image zeppelin /tmp/zeppelin_build_log
 
-# Got those from the spark image
-#echo " - Installing the latest OpenJDK"
-#docker exec -i zeppelin apt-get install -y openjdk-8-jdk >> /tmp/zeppelin_build_log 2>&1
-#fail_if_error $? "/tmp/zeppelin_build_log" -3
-
-#echo " - Installing scala"
-#docker exec -i zeppelin apt-get install -y scala >> /tmp/zeppelin_build_log 2>&1
-#fail_if_error $? "/tmp/zeppelin_build_log" -4
-
 echo " - Installing a few utilities"
 docker exec -i zeppelin apt-get install -y zip netcat sshpass >> /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -11

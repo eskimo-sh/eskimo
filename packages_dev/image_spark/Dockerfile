@@ -1,2 +1,2 @@
-FROM eskimo:base-eskimo_template
+FROM debian:stretch-slim
 MAINTAINER Eskimo <eskimo@niceideas.ch>

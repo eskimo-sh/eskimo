@@ -45,7 +45,10 @@ if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     exit -2
 fi
 
-echo " - Adapting Configuration file"
-sed -i s/"kafka-manager.zkhosts=\"MASTER_ZK_IP_ADDRESS:2181\""/"kafka-manager.zkhosts=\"$ZOOKEEPER_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
+#echo " - Adapting Configuration file"
+#sed -i s/"cmak.zkhosts=\"MASTER_ZK_IP_ADDRESS:2181\""/"cmak.zkhosts=\"$ZOOKEEPER_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
+
+# Actually this is fairly straightforward, only need to set ENV VAR ZK_HOSTS
+export ZK_HOSTS="$ZOOKEEPER_IP_ADDRESS:2181"
 
 

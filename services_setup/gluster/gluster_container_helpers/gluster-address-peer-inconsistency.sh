@@ -98,7 +98,7 @@ else
         additional_search=marathon.registry
     fi
     set +e
-    rm /tmp/local_gluster_check
+    rm -f /tmp/local_gluster_check
     for i in 1 2 3 ; do
         echo "Attempt $i" >> /tmp/local_gluster_check
         export localPeerList=`gluster pool list 2>>/tmp/local_gluster_check`

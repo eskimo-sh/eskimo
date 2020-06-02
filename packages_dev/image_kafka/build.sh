@@ -50,7 +50,7 @@ echo " - Building image kafka"
 build_image kafka /tmp/kafka_build_log
 
 echo " - Installing the latest OpenJDK"
-docker exec -i kafka apt-get install -y openjdk-8-jdk >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka apt-get install -y openjdk-11-jdk >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -3
 
 echo " - Installing scala"

@@ -76,9 +76,10 @@ sudo rm -Rf /usr/local/lib/kafka-manager/logs
 sudo ln -s /var/log/kafka/kafka-manager /usr/local/lib/kafka-manager/logs
 
 echo " - Adapting Configuration file (first time for config run)"
-
-sudo sed -i s/"kafka-manager.zkhosts=\"kafka-manager-zookeeper:2181\""/"kafka-manager.zkhosts=\"MASTER_ZK_IP_ADDRESS:2181\""/g /usr/local/lib/kafka-manager/conf/application.conf
-
+# removing all declarations except the one user ENV VAR
+sudo sed -i s/"kafka-manager.zkhosts=\"kafka-manager-zookeeper:2181\""/""/g /usr/local/lib/kafka-manager/conf/application.conf
+sudo sed -i s/"kafka-manager.zkhosts=\${?ZK_HOSTS}"/""/g /usr/local/lib/kafka-manager/conf/application.conf
+sudo sed -i s/"cmak.zkhosts=\"kafka-manager-zookeeper:2181\""/""/g /usr/local/lib/kafka-manager/conf/application.conf
 
 echo " - Changing owner of config directory to kafka"
 sudo chown -R kafka. /usr/local/lib/kafka-manager/conf

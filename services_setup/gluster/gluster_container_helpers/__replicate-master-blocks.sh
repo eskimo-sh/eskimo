@@ -48,7 +48,7 @@ fi
 echo "-> __replicate-master-blocks.sh"
 echo " - Replicating single blocks to $MASTER_IP_ADDRESS"
 
-# No need to take any loock, it's taken already by caller gluster-update-peers.sh
+# No need to take any lock, it's taken already by caller gluster-update-peers.sh
 
 if [[ $SELF_IP_ADDRESS == $MASTER_IP_ADDRESS ]]; then
 

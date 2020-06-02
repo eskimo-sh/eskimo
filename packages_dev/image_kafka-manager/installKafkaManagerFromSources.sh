@@ -68,19 +68,24 @@ if [[ $? != 0 ]]; then
     fail_if_error $? "/tmp/kafka_manager_install_log" -1
 fi
 
-mv $KAFKA_MANAGER_VERSION.zip kafka-manager-$KAFKA_MANAGER_VERSION.zip
+mv $KAFKA_MANAGER_VERSION.zip CMAK-$KAFKA_MANAGER_VERSION.zip
 
-echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
-unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+echo " - Extracting CMAK-$KAFKA_MANAGER_VERSION"
+unzip CMAK-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
-echo " - Building source tree (./sbt clean dist) (this can take a few minutes)"
 cd ./CMAK-$KAFKA_MANAGER_VERSION/
+
+echo " - !! HACK : PATCHING build.sbt for zookeeper 3.4.x"
+patch < /scripts/patch-for-zookeeper-3.4.diff >> /tmp/kafka_manager_install_log 2>&1
+fail_if_error $? "/tmp/kafka_manager_install_log" -1
+
+echo " - Building source tree (./sbt clean dist) (this can take a few minutes)"
 ./sbt clean dist   >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -1
 
 
-mv /tmp/kafka_manager_source_setup/CMAK-$KAFKA_MANAGER_VERSION/target/universal/kafka-manager-$KAFKA_MANAGER_VERSION.zip \
+mv /tmp/kafka_manager_source_setup/CMAK-$KAFKA_MANAGER_VERSION/target/universal/cmak-$KAFKA_MANAGER_VERSION.zip \
    /tmp/kafka_manager_setup/kafka-manager-$KAFKA_MANAGER_VERSION.zip
 cd /tmp/kafka_manager_setup
 
@@ -90,11 +95,16 @@ unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 echo " - Installing kafka_managser"
-sudo chown root.staff -R kafka-manager-$KAFKA_MANAGER_VERSION
-sudo mv kafka-manager-$KAFKA_MANAGER_VERSION /usr/local/lib
+sudo chown root.staff -R cmak-$KAFKA_MANAGER_VERSION
+sudo mv cmak-$KAFKA_MANAGER_VERSION /usr/local/lib/kafka-manager-$KAFKA_MANAGER_VERSION
 
 echo " - symlinking /usr/local/lib/kafka-manager/ to /usr/local/lib/kafka-manager-$KAFKA_MANAGER_VERSION"
 sudo ln -s /usr/local/lib/kafka-manager-$KAFKA_MANAGER_VERSION /usr/local/lib/kafka-manager
+
+echo " - symlinking kadka-manager to cmak exec"
+cd /usr/local/lib/kafka-manager/bin/
+sudo ln -s cmak kafka-manager
+cd /tmp/kafka_manager_setup
 
 # installation tests
 
@@ -130,6 +140,8 @@ fi
 echo " - Stopping Kafka Manager"
 kill -15 $KAFKA_MANAGER_PROC_ID
 export KAFKA_MANAGER_PROC_ID=-1
+
+rm -Rf /tmp/kafka-manager.pid
 
 echo " - Cleaning build folder"
 cd $saved_dir

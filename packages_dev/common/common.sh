@@ -36,9 +36,9 @@
 
 # Version of software to install
 export ESKIMO_VERSION=0.2
-export DEBIAN_VERSION=debian_09_stretch
+export DEBIAN_VERSION=debian_10_buster
 
-export FLINK_VERSION=1.10.0
+export FLINK_VERSION=1.10.1
 export FLINK_HADOOP_VERSION=2.8.3-10.0
 
 export HADOOP_MAJOR_VERSION=2.8
@@ -59,7 +59,7 @@ export ES_VERSION_MAJOR=7
 export CEREBRO_VERSION=0.8.5
 
 export KAFKA_VERSION=2.2.2
-export KAFKA_MANAGER_VERSION=2.0.0.2
+export KAFKA_MANAGER_VERSION=3.0.0.4
 
 export SCALA_VERSION=2.11
 export SPARK_STREAMING_KAFKA_CON_VERSION=0-10
@@ -193,7 +193,7 @@ function build_image() {
     if [[ -z "$NO_BASE_IMAGE" ]]; then
         echo " - Checking if base eskimo image is available"
         if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
-            echo " - Trying to loads base eskimo image"
+            echo " - Trying to load base eskimo image"
             for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
                 echo "   + loading image $i"
                 gunzip -c $i | docker load >> $LOG_FILE 2>&1

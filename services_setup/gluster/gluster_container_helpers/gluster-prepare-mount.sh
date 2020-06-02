@@ -70,7 +70,7 @@ set +e
 
 # 3 attempts (to address concurrency issues coming from parallel installations)
 for i in 1 2 3 ; do
-    if [[ `gluster volume list | grep $VOL_NAME` == "" ]]; then
+    if [[ `gluster volume list 2>/dev/null | grep $VOL_NAME` == "" ]]; then
 
         rm -Rf /var/lib/gluster/volume_bricks/$VOL_NAME
 
@@ -82,11 +82,14 @@ for i in 1 2 3 ; do
                 sleep 2
                 continue
             fi
+
         else
+
            echo " - Creating multiple replicas since running on multi-node cluster"
             gluster volume create $VOL_NAME replica $NBR_REPLICAS transport tcp \
                     $SELF_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME \
-                    $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME
+                    $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME \
+                    force
             if [[ $? != 0 ]]; then
                 sleep 2
                 continue

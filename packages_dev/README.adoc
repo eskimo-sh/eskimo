@@ -65,7 +65,7 @@ This document presents "1. The *Docker Images Development Framework*"
 The Docker Images Development Framework provides tools and define standards to build the docker images deployed on the
 eskimo cluster nodes.
 
-Eskimo is leveraging on docker to deploy services accross the cluster ndes and to ensure independence from host
+Eskimo is leveraging on docker to deploy services across the cluster ndes and to ensure independence from host
 OSes and specificities as well as proper isolation between services.
 
 Docker images can be downloaded from internet (or the internal corporation network) or build locally on the machine
@@ -74,7 +74,7 @@ The later is achieved using the packages development framework which is presente
 
 === Requirements
 
-In order for one to be able to either build the eskimo software compontnents packages locally (or have eskimo building
+In order for one to be able to either build the eskimo software components packages locally (or have eskimo building
 them locally), there are a few requirements:
 
 * Docker must be installed and available on the user local computer (or the eskimo host machine in case Eskimo builds
@@ -214,7 +214,7 @@ etc.) and SUSE.
 ==== Building Mesos
 
 The Eskimo build system for Mesos is based on Vagrant and either VirtualBox or libvirt + QEMU/kvm. Vagrant takes care
-of building VMs using either VirtualBox or LibVirt, installs all the requred packages for building mesos, builds mesos
+of building VMs using either VirtualBox or LibVirt, installs all the required packages for building mesos, builds mesos
 and creates installable packages.
 
 .For instance, toBuild Mesos package for Debian

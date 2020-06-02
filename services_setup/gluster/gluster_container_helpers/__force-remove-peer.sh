@@ -38,7 +38,7 @@
 # Inject topology
 . /etc/eskimo_topology.sh
 
-# Remove all bricks I believe the shabow has and then force remove the shadow from my peers
+# Remove all bricks I believe the shadow has and then force remove the shadow from my peers
 SHADOW_IP_ADDRESS=$1
 if [[ $SHADOW_IP_ADDRESS == "" ]]; then
    echo "Expecting Gluster Shadow (vanished !) IP address as first argument"

@@ -60,6 +60,7 @@ echo " - Downloading grafana-$GRAFANA_VERSION"
 wget https://dl.grafana.com/oss/release/grafana-$GRAFANA_VERSION.linux-amd64.tar.gz   > /tmp/grafana_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad grafana-$GRAFANA_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
+    # shellcheck disable=SC2242
     exit -1
     #wget http://niceideas.ch/mes/grafana-$GRAFANA_VERSION.tar.gz >> /tmp/grafana_install_log 2>&1
     #fail_if_error $? "/tmp/grafana_install_log" -1

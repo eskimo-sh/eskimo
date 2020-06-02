@@ -118,7 +118,7 @@ Eskimo is based on Mesos, ElasticSearch, Kafka and Spark,
 cutting edge components from a newer generation.
 
 * *Leveraging on docker* +
-Most if not all private-cloud Big Data Platform such as those mentionned above would install components natively,
+Most if not all private-cloud Big Data Platform such as those mentioned above would install components natively,
 thus having strong requirements and impacts on underlying nodes. +
 Eskimo uses docker to isolates Eskimo components from the underlying host OS and vice versa.
 
@@ -233,7 +233,7 @@ Choose your services and let eskimo take care of everything.
 
 ==== Techical Architecture
 
-Eskimo's technical architecture can be illustraed as follows:
+Eskimo's technical architecture can be illustrated as follows:
 
 image::pngs/technical_architecture.png[800, 800, align="center"]
 
@@ -250,7 +250,7 @@ The processing layer makes the following services available:
 * *Apache Flink* : a distributed processing engine for real-time and streaming stateful computations over data stream
 * *Elastic Logstash* : used for data ingestion, processing and dispatching
 * As a sidenote, ElasticSearch can also be considered part of the processing tier since it provides many processing
-abilities (ppeline computations, aggregations, etc.)
+abilities (pipeline computations, aggregations, etc.)
 
 Spark and Flink are operated by *Apache Mesos* to achieve optimal cluster resources booking and negotiation.
 
@@ -263,7 +263,7 @@ Console* for platform administration.
 
 Each and every software components is executed with Docker and packaged as a docker container.
 Runtime operation is ensured using Mesos and Marathon for most services and static services are handled with SystemD
-directly and defined as SyystemD units.
+directly and defined as SystemD units.
 
 ==== Typical Application architecture
 
@@ -373,7 +373,7 @@ replication factor.
 
 *Single Machine Eskimo deployment, minimum requirement for the single node*
 
-In cases where Eskimo is deployed on a single node (such as the host node running Eskimo itself), the minumum hardware
+In cases where Eskimo is deployed on a single node (such as the host node running Eskimo itself), the minimum hardware
 capacity for this node is as follows:
 
 * 30 GB HDD storage space for the system, additional storage space depending on the data to be manipulated.
@@ -386,7 +386,7 @@ capacity for this node is as follows:
 Fedora has switched to cgroups v2 by default now, but Mesos (and some Docker versions) are not working well with cgroups v2 and
 may fail to start. With Eskimo and current version of mesos, one needs to revert cgroups to v1 on Fedora
 nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
-
+b
 .Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
 ----
 sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
@@ -529,7 +529,7 @@ AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
 
 *For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
 firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
-Every eskimo node should have wide accedd to every other eskimo node. Period.*
+Every eskimo node should have wide access to every other eskimo node. Period.*
 
 However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
 only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
@@ -556,7 +556,7 @@ For the sake of information, the list of static ports used by the different serv
 * [zookeeper] : 2181, 2888, 3888
 * [marathon] : 5000, 28080
 
-Again, this list is incomplete since it doesn't reveal the dynamic port ranges mentionned above.
+Again, this list is incomplete since it doesn't reveal the dynamic port ranges mentioned above.
 
 
 === Extract archive.
@@ -574,12 +574,12 @@ Then in the folder `bin` under the newly extracted eskimo binary distribution fo
 One extracted on the filesystem the Eskimo folder contains the following elements:
 
 * `bin` : contains executables required to start Eskimo as well as utility commands
-* `conf` : contains Eskimo configuration foles
+* `conf` : contains Eskimo configuration files
 * `lib` : contains eskimo runtime binaries
 * `packages-dev` : contains the Eskimo _docker images (packages) development framework_ which is used to build eskimo
 services docker packages locally (this is not required if the administrators decides to download packages
 from www.eskimo.sh)
-* `packages_distrib`: contains eventually the eskimo services docker image packages (ethier build locally or downloaded
+* `packages_distrib`: contains eventually the eskimo services docker image packages (either build locally or downloaded
 from internet)
 * `services_setup`: contains the services installation framework. *Each and every customization an administrator wishes
 to apply on eskimo services is done by modifying / extending / customizing the shell scripts in this folder*.
@@ -601,7 +601,7 @@ The default port number is 9090. This can be changed in configuration file `eski
 
 *The default login / password credentials are _admin_ / _password_.*
 
-This login is configured in the file pointed to by the confguration property `security.userJsonFile`. +
+This login is configured in the file pointed to by the configuration property `security.userJsonFile`. +
 A sample file is created automatically if the target file doesn't exist with the `admin` login above.
 
 The structure of this file is as follows;
@@ -626,8 +626,8 @@ The password is a `BCrypt` hash (11 rounds) of the actual password.
 Upon first run, eskimo needs to be setup before it can be used.
 
 Right after its first start, one single screen is available : *the setup page*. +
-It is the only accessible page as long as initial setup is not properly comèpleted and service
-docker images (plus mesos paclkages) have not been either downloaded or built.
+It is the only accessible page as long as initial setup is not properly completed and service
+docker images (plus mesos packages) have not been either downloaded or built.
 
 
 The setup page is as follows:
@@ -651,12 +651,12 @@ Once the settings have been chosen by the user, clicking "Save and Apply Setup" 
 and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
 connection and/or the eskimo host machine processing abilities.
 
-Rgerading the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
+Regarding the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
 to enable eskimo to reach the cluster nodes.
 
 The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
 the nuts and bolts required in setting up a remote packages repository. +
-The remote repository URL is configuren in `eskimo.properties` using the configuration property : +
+The remote repository URL is configured in `eskimo.properties` using the configuration property : +
 `system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
 
 ==== Checking for updates
@@ -676,7 +676,7 @@ If you encounter an error message on the Setup Page - during initial setup or af
 package definition file from [Configured Remote Repository]`, this means likely that you are suffering from the empty
 `cacert` file problem affecting OpenJDK and Oracle JDK 9 and perhaps further versions as well.
 
-These Java Development Kits do indeed suffer fom a quite annying issue: the `lib/security/cacert` file referencing the
+These Java Development Kits do indeed suffer fom a quite annoying issue: the `lib/security/cacert` file referencing the
 SSL certifications authorities is empty. +
 This prevents most of the time to download any file from a remote web server using HTTPS, as is the case during initial
 setup of Eskimo.
@@ -780,7 +780,7 @@ Eskimo uses a local file to define users and access credentials. Upon first star
 it is created by eskimo (with the default credentials above) at the path pointed to by the property
 `security.userJsonFile` in `eskimo.properties`.
 
-If you experience the error above or something alike, change that propery to point to a location where the first
+If you experience the error above or something alike, change that property to point to a location where the first
 version of the file can successfully be created.
 
 
@@ -936,7 +936,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzlL9Wo8ywEFXSvMJ8FYmxP6HHHMDTyYAWwM3AOtsc
 
 ==== Use the private key in eskimo
 
-Once the above procedure properly followed and the public keys addedd to the authorized key for your the user to be used
+Once the above procedure properly followed and the public keys added to the authorized key for your the user to be used
 by eskimo, you can use the corresponding private key in the eskimo setup page to grand access to eskimo to the cluster
 nodes.
 
@@ -982,7 +982,7 @@ Eskimo services are docker containers managed (started / stopped / monitored / e
 
 Setting up a cluster with eskimo usually boils down to these 2 phases :
 
-* Adding nodes to the eskimo cluster - using the _Add Node_ buttong or ranges of nodes using the _Add Range_ button.
+* Adding nodes to the eskimo cluster - using the _Add Node_ button or ranges of nodes using the _Add Range_ button.
 * Selecting the services that should be deployed and operated and the configured nodes
 
 Below is an example of a tiny cluster with two nodes setup:
@@ -993,7 +993,7 @@ On the above example, we can see:
 
 * One master node being configured as a standalone node configuration (which is always the case for nodes running
   master or unique services) declaring master services as well as slave services.
-* Two slave nodes being configured as a range of nodes whith a single configuration declaring slave services.
+* Two slave nodes being configured as a range of nodes with a single configuration declaring slave services.
 
 ==== Adding nodes to the eskimo cluster
 
@@ -1009,12 +1009,13 @@ if the resolution of the various ranges and single nodes leads to an IP address 
 
 Also, all nodes in a range are expected to be up and running and Eskimo will consider them so and report errors if one
 node in a range is not answering. +
-Should you have holdes in your range of IP addresses, you are expected to define multiple ranges, getting rid of the
-holes in your range of IPs.
+*Should you have holes in your range of IP addresses, you are expected to define multiple ranges, getting rid of the
+holes in your range of IPs.* This is fairly important if you want Eskimo to be able to
+successfully manage your cluster.
 
 WARNING: In its current version (0.2 at the time of writing this document), eskimo *requires at all cost* nodes to be
 defined using IP addresses and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
-adresses are supported, period. +
+addresses are supported, period. +
 Unfortunately with big data technologies and especially spark and mesos, supporting DNS or hostnames is significantly
 more complicated than direct IP addresses resolutions. +
 We are working on this and the next version of eskimo will support working with hostnames instead of IP addresses. But
@@ -1084,7 +1085,7 @@ The last step in the Eskimo cluster installation consists in deploying marathon 
 
 This is performed by the fifth menu entry under "*Platform Administration*" called "*Config. Marathon Services*".
 
-The process is actually very simple and one just needs to select the serices to be installed and operated automatically
+The process is actually very simple and one just needs to select the services to be installed and operated automatically
 by marathon.
 
 image::pngs/eskimo-marathon-setup.png[800, 800, align="center"]
@@ -1179,8 +1180,8 @@ can access the clipboard)
 
 *Various notes related to Eskimo terminal console usage:*
 
-* The initial terminal size is computed automatically from the abailable window size. Unfortunately in the current
-version, resizing the terminal is not supppported. Whenever the user resizes its Web Browser window, the only way to
+* The initial terminal size is computed automatically from the available window size. Unfortunately in the current
+version, resizing the terminal is not suppported. Whenever the user resizes its Web Browser window, the only way to
 resize the terminal is by closing it and reopening it.
 * `Shift + PgUp` and `Shift + PgDown` to scroll the terminal is not supported. A sound usage of `| less` is recommended
 when pagination is required.
@@ -1246,22 +1247,22 @@ When building eskimo cluster nodes, administrators should ensure to leverage on 
 
 * Only IP addresses within the Eskimo cluster nodes range or sub-network can have open and wide access to the Eskimo
 nodes.
-* All external IP addresses (external to the eskimo cluster) whould have acces only to
+* All external IP addresses (external to the eskimo cluster) would have access only to
 ** Port 22 for eskimo to be able to reach them - if the eskimo application itself is installed outside of the eskimo
 cluster
-** Port 80 of the node running eskimo - if the eskimo application itself is insztalled on one of the eskimo cluster node
+** Port 80 of the node running eskimo - if the eskimo application itself is installed on one of the eskimo cluster node
 (or the port on which Eskimo is answering
 
 This principle is illustrated by the schema at <<sample_system_archi>>.
 
-When setting up Eskimo, administrators ahve to provide the SSH private key certificate that Eskimo will use to access
+When setting up Eskimo, administrators have to provide the SSH private key certificate that Eskimo will use to access
 all services running on internal eskimo cluster nodes.
-It is of utomost importance to treat this key with great confidentiality and ensure it is only usable by the Eskimo
+It is of utmost importance to treat this key with great confidentiality and ensure it is only usable by the Eskimo
 system user.
 
 ==== Data Encryption
 
-Eskimo recommends to encrypt filesystem partitionsed use for data storage, either at hardware level if that is supported
+Eskimo recommends to encrypt filesystem partitions use for data storage, either at hardware level if that is supported
 or at Operating System level.
 
 Especially following folders or mount points have to be encrypted:
@@ -1282,7 +1283,7 @@ administration features.
 
 If user rights segregation, authorizations enforcement and user impersonation are key concerns for one's enterprise
 environment, one should consider upgrading to *Eskimo Enterprise Edition which provides state of the art implementations
-of each and every Enterprise Grade requireement*.
+of each and every Enterprise Grade requirement*.
 
 
 === High availability
@@ -1291,10 +1292,10 @@ Eskimo Community Edition provides only partial HA - High Availability - support.
 
 Basically:
 
-* Flink and Spark applications leveraging on mesos are natively Highly Avaulable and resilient to slave nodes vanishing.
+* Flink and Spark applications leveraging on mesos are natively Highly Available and resilient to slave nodes vanishing.
 * ElasticSearch as well is natively highly-available as long as the applications reaching it support using multiple
 bootstrap nodes.
-* All web consoles and administration applications leveraging on marathon (such as Kibana, Zeppelin, Cerenro,
+* All web consoles and administration applications leveraging on marathon (such as Kibana, Zeppelin, Cerebro,
  the kafka-manager, etc. are natively available as well.
 
 However in Eskimo Community Edition, some services are not highly-available and form single point of failure forcing
@@ -1402,7 +1403,7 @@ https://www.gluster.org/
 
 ==== Gluster Infrastructure
 
-Eskimo approaches gluster shares manmagement in a specific way. +
+Eskimo approaches gluster shares management in a specific way. +
 Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
 scripts and tools to manipulated gluster shares.
 
@@ -1542,7 +1543,7 @@ https://www.elastic.co/products/kibana
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
 
-Kafka is a distributed and low-latency data distribution and processing framework. It is a  ditributed Streaming platform.
+Kafka is a distributed and low-latency data distribution and processing framework. It is a  distributed Streaming platform.
 
 Kafka is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant,
 wicked fast, and runs in production in thousands of companies.

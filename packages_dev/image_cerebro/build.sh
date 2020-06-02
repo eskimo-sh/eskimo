@@ -57,7 +57,7 @@ build_image cerebro /tmp/cerebro_build_log
 # See what I do in config.sh
 
 echo " - Installing the latest OpenJDK"
-docker exec -i cerebro apt-get install -y openjdk-8-jdk  >> /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro apt-get install -y openjdk-11-jdk  >> /tmp/cerebro_build_log 2>&1
 fail_if_error $? "/tmp/cerebro_build_log" -3
 
 echo " - Installing scala"

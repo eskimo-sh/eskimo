@@ -79,7 +79,7 @@ check_for_internet
 
 if [[ $package == "mesos-redhat" ]] ; then
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-"$AMESOS_VERSION"_1.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-redhat.sh"
     else
         echo "RedHat Mesos package already built"
@@ -87,7 +87,7 @@ if [[ $package == "mesos-redhat" ]] ; then
 
 elif [[ $package == "mesos-debian" ]] ; then
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-"$AMESOS_VERSION"_1.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-debian.sh"
     else
         echo "Debian Mesos package already built"
@@ -95,7 +95,7 @@ elif [[ $package == "mesos-debian" ]] ; then
 
 elif [[ $package == "mesos-suse" ]] ; then
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-""$AMESOS_VERSION"_1".tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-suse.sh"
     else
         echo "Suse Mesos package already built"
@@ -105,19 +105,19 @@ elif [[ $package == "mesos-all" ]] ; then
 
     check_for_vagrant
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-debian-"$AMESOS_VERSION"_1.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-debian.sh"
     else
         echo "Debian Mesos package already built"
     fi
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-redhat-"$AMESOS_VERSION"_1.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-redhat.sh"
     else
         echo "RedHat Mesos package already built"
     fi
 
-    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-$AMESOS_VERSION.tar.gz ]]; then
+    if [[ $DONT_OVERWRITE == 0 || ! -f ../packages_distrib/eskimo_mesos-suse-"$AMESOS_VERSION"_1.tar.gz ]]; then
         bash -c "cd binary_mesos && bash build-for-suse.sh"
     else
         echo "Suse Mesos package already built"
@@ -130,27 +130,11 @@ elif [[ $package == "all_images" ]]; then
     echo "BUILDING ALL PACKAGES"
     set -e
 
-    all_services='base-eskimo\
-        ntp\
-        zookeeper\
-        gluster\
-        gdash\
-        mesos-master\
-        prometheus\
-        grafana\
-        elasticsearch\
-        logstash\
-        cerebro\
-        marathon\
-        kibana\
-        kafka\
-        flink\
-        kafka-manager\
-        spark\
-        zeppelin'
+    all_services='base-eskimo ntp zookeeper gluster gdash mesos-master prometheus grafana elasticsearch logstash cerebro marathon kibana kafka flink kafka-manager spark zeppelin'
 
     IFS=$' '
     for service in $all_services; do
+        service=`echo $service | sed 's/ *$//g'`
         if [[ $DONT_OVERWRITE == 0 || `ls -1 ../packages_distrib/ | grep docker_template_"$service"_` == "" ]]; then
             bash -c "cd image_$service && bash build.sh"
         else

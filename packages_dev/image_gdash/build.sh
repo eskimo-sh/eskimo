@@ -46,7 +46,7 @@ echo "--------------------------------------------------------------------------
 # reinitializing log
 rm -f /tmp/gdash_build_log
 
-echo " - Building image elasticsearch"
+echo " - Building image gdash"
 echo " - Checking if gluster image is available"
 if [[ `docker images -q eskimo:gluster_template 2>/dev/null` == "" ]]; then
     echo " - Trying to loads gluster image"

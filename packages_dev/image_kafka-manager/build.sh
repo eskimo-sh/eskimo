@@ -49,8 +49,8 @@ rm -f /tmp/kafkamanager_build_log
 echo " - Building image kafka"
 build_image kafka-manager /tmp/kafkamanager_build_log
 
-echo " - Installing the latest OpenJDK"
-docker exec -i kafka-manager apt-get install -y openjdk-8-jdk >> /tmp/kafkamanager_build_log 2>&1
+echo " - Installing OpenJDK 11"
+docker exec -i kafka-manager apt-get install -y openjdk-11-jdk >> /tmp/kafkamanager_build_log 2>&1
 fail_if_error $? "/tmp/kafkamanager_build_log" -3
 
 echo " - Installing scala"

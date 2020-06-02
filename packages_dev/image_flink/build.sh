@@ -50,7 +50,7 @@ echo " - Building image flink"
 build_image flink /tmp/flink_build_log
 
 echo " - Installing the latest OpenJDK"
-docker exec -i flink apt-get install -y openjdk-8-jdk >> /tmp/flink_build_log 2>&1
+docker exec -i flink apt-get install -y openjdk-11-jdk >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -3
 
 echo " - Installing scala"
