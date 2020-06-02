@@ -40,11 +40,13 @@ eskimo.Services = function (constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var PERIODIC_RETRY_SERVICE_MS = 5000;
+    const PERIODIC_RETRY_SERVICE_MS = 5000;
 
-    var DEBUG = false;
+    const DEBUG = false;
 
-    var that = this;
+    const that = this;
+
+    const EMPTY_FRAMETARGET = "html/emptyPage.html";
 
     var UI_SERVICES = [];
     var UI_SERVICES_CONFIG = {};
@@ -53,7 +55,6 @@ eskimo.Services = function (constructorObject) {
 
     var uiConfigsToRetry = [];
 
-    var EMPTY_FRAMETARGET = "html/emptyPage.html";
 
     this.initialize = function () {
 
@@ -239,7 +240,7 @@ eskimo.Services = function (constructorObject) {
         if (!DEBUG) {
             setTimeout(function () {
                 var iFrame = $(iFrameId).get(0);
-                if (iFrame && iFrame != null) {
+                if (iFrame) {
                     iFrame.contentWindow.console.log = function () {
                         // No Op
                     };
@@ -364,7 +365,7 @@ eskimo.Services = function (constructorObject) {
     this.handleServiceHiding = function (service, uiConfig) {
 
         var comingFromMenuHook = true;
-        if (!uiConfig || uiConfig == null) { // if coming from eskimoMain.serviceMenuClear()
+        if (!uiConfig) { // if coming from eskimoMain.serviceMenuClear()
             uiConfig = UI_SERVICES_CONFIG[service];
             comingFromMenuHook = false;
         }

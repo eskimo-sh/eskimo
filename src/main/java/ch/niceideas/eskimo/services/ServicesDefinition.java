@@ -67,9 +67,9 @@ public class ServicesDefinition implements InitializingBean {
     @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
 
-    private ReentrantLock persistEnvLock = new ReentrantLock();
+    private final ReentrantLock persistEnvLock = new ReentrantLock();
 
-    private Map<String, Service> services = new HashMap<>();
+    private final Map<String, Service> services = new HashMap<>();
 
     /** For tests only */
     public void addService(Service service) {

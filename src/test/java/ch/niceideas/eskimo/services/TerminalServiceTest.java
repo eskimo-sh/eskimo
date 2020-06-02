@@ -52,8 +52,6 @@ import static org.junit.Assert.assertTrue;
 
 public class TerminalServiceTest extends AbstractBaseSSHTest {
 
-    private static final Logger logger = Logger.getLogger(TerminalServiceTest.class);
-
     @Override
     protected CommandFactory getSShSubsystemToUse() {
         return new ProcessShellCommandFactory();

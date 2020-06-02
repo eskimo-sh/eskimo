@@ -37,22 +37,16 @@ package ch.niceideas.eskimo.shell.setup.gluster;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
-import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.*;
 
 public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
-
-    private static final Logger logger = Logger.getLogger(GlusterOperationScriptsTest.class);
 
     protected static String jailPath = null;
 

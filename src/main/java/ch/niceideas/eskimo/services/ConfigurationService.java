@@ -64,10 +64,10 @@ public class ConfigurationService {
     public static final String MARATHON_SERVICES_CONFIG_JSON = "/marathon-services-config.json";
     public static final String CONFIG_JSON = "/config.json";
 
-    private ReentrantLock statusFileLock = new ReentrantLock();
-    private ReentrantLock nodesConfigFileLock = new ReentrantLock();
-    private ReentrantLock marathonServicesFileLock = new ReentrantLock();
-    private ReentrantLock servicesConfigFileLock = new ReentrantLock();
+    private final ReentrantLock statusFileLock = new ReentrantLock();
+    private final ReentrantLock nodesConfigFileLock = new ReentrantLock();
+    private final ReentrantLock marathonServicesFileLock = new ReentrantLock();
+    private final ReentrantLock servicesConfigFileLock = new ReentrantLock();
 
     @Autowired
     private SetupService setupService;
@@ -199,7 +199,9 @@ public class ConfigurationService {
         File storagePath = new File(configStoragePath);
         if (!storagePath.exists()) {
 
-            storagePath.mkdirs();
+            if (!storagePath.mkdirs()) {
+                logger.debug ("mkdirs " + storagePath + " failed. Will crash on next line.");
+            }
 
             if (!storagePath.exists()) {
                 throw new SetupException("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");

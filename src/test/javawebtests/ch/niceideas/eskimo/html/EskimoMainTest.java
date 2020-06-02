@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class EskimoMainTest extends AbstractWebTest {

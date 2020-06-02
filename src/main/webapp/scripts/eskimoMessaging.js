@@ -40,9 +40,9 @@ eskimo.Messaging = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var MESSAGING_POLLING_DELAY = 5000;
+    const MESSAGING_POLLING_DELAY = 5000;
 
-    var that = this;
+    const that = this;
 
     var messagingPollingHandle = null;
 

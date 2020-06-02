@@ -294,26 +294,22 @@ public class NodeRangeResolverTest {
         assertEquals("node_id1,node_id2,node_id3,node_id4,node_id5,node_id6,node_id7", String.join(",",
                 resolvedConfig.getIpAddressKeys().stream()
                         .sorted(Comparators.comparable())
-                        .collect(Collectors.toList())
-                        .toArray(new String[0])));
+                        .toArray(String[]::new)));
 
         assertEquals("192.168.10.11,192.168.10.13,192.168.10.14,192.168.10.15,192.168.10.16,192.168.10.17,192.168.10.18", String.join(",",
                 resolvedConfig.getAllNodeAddressesWithService("ntp").stream()
                         .sorted(Comparators.comparable())
-                        .collect(Collectors.toList())
-                        .toArray(new String[0])));
+                        .toArray(String[]::new)));
 
         assertEquals("192.168.10.13,192.168.10.14,192.168.10.15,192.168.10.16,192.168.10.17,192.168.10.18", String.join(",",
                 resolvedConfig.getAllNodeAddressesWithService("kafka").stream()
                         .sorted(Comparators.comparable())
-                        .collect(Collectors.toList())
-                        .toArray(new String[0])));
+                        .toArray(String[]::new)));
 
         assertEquals("192.168.10.11", String.join(",",
                 resolvedConfig.getAllNodeAddressesWithService("mesos-master").stream()
                         .sorted(Comparators.comparable())
-                        .collect(Collectors.toList())
-                        .toArray(new String[0])));
+                        .toArray(String[]::new)));
     }
 
 }

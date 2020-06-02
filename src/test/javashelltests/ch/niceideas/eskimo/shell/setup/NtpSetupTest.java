@@ -52,8 +52,6 @@ import static junit.framework.TestCase.fail;
 
 public class NtpSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(NtpSetupTest.class);
-
     protected static String jailPath = null;
 
     private static boolean initialized = false;

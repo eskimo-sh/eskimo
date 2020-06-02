@@ -120,18 +120,18 @@ public class SystemService {
     @Value("${system.statusUpdatePeriodSeconds}")
     private int statusUpdatePeriodSeconds = 5;
 
-    private ReentrantLock systemActionLock = new ReentrantLock();
+    private final ReentrantLock systemActionLock = new ReentrantLock();
 
-    private ReentrantLock statusUpdateLock = new ReentrantLock();
+    private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final ScheduledExecutorService statusRefreshScheduler;
     private final AtomicReference<SystemStatusWrapper> lastStatus = new AtomicReference<>();
     private final AtomicReference<Exception> lastStatusException = new AtomicReference<>();
 
-    private AtomicBoolean interruption = new AtomicBoolean(false);
-    private AtomicBoolean interruptionNotified = new AtomicBoolean(false);
+    private final AtomicBoolean interruption = new AtomicBoolean(false);
+    private final AtomicBoolean interruptionNotified = new AtomicBoolean(false);
     private boolean lastOperationSuccess;
 
-    private Map<String, Integer> serviceMissingCounter = new ConcurrentHashMap<>();
+    private final Map<String, Integer> serviceMissingCounter = new ConcurrentHashMap<>();
 
     /**
      * for tests
@@ -661,7 +661,7 @@ public class SystemService {
                     // A. In case target node both configured and up, check services actual statuses before doing anything
                     if (    // nodes is configured and responding (up and running
 
-                            nodeAlive != null && nodeAlive.booleanValue()
+                            nodeAlive != null && nodeAlive
                             ) {
 
                         if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, nodeName, originalNodeName)) {
@@ -760,6 +760,25 @@ public class SystemService {
                             + " got into problem");
                 }
             }
+        }
+    }
+
+    void callUninstallScript(StringBuilder sb, String ipAddress, String service) throws SystemException {
+        File containerFolder = new File(servicesSetupPath + "/" + service);
+        if (!containerFolder.exists()) {
+            throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
+        }
+
+        try {
+            File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
+            if (uninstallScriptFile.exists()) {
+                sb.append(" - Calling uninstall script\n");
+
+                sb.append(sshCommandService.runSSHScriptPath(ipAddress, uninstallScriptFile.getAbsolutePath()));
+            }
+        } catch (SSHCommandException e) {
+            logger.warn (e, e);
+            sb.append (e.getMessage());
         }
     }
 
@@ -903,7 +922,7 @@ public class SystemService {
             File containerFile = new File(packageDistributionPath + "/" + imageFileName);
             if (containerFile.exists()) {
 
-                sb.append(" - Copying over docker image " + imageFileName + "\n");
+                sb.append(" - Copying over docker image ").append(imageFileName).append("\n");
                 sshCommandService.copySCPFile(ipAddress, packageDistributionPath + "/" + imageFileName);
 
                 exec(ipAddress, sb, new String[]{"mv", imageFileName, SystemService.TMP_PATH_PREFIX + service + "/"});
@@ -924,7 +943,7 @@ public class SystemService {
 
     interface PooledOperation<T> {
         void call(T operation, AtomicReference<Exception> error)
-                throws SystemException, FileException, SetupException, ConnectionManagerException;
+                throws SystemException;
     }
 
     interface ServiceOperation<V> {

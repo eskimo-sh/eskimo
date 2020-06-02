@@ -41,7 +41,7 @@ eskimo.ServicesSettings = function (constructorObject) {
     this.eskimoMain = null;
     this.eskimoMessaging = null;
 
-    var that = this;
+    const that = this;
 
     var SERVICES_SETTINGS = [];
 

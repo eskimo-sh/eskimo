@@ -52,17 +52,17 @@ import static java.lang.String.format;
 public class GenerateLCOV {
 
     public static final String SOURCE_DIRECTORY = "src/main/webapp";
-    private static Logger logger = Logger.getLogger(GenerateLCOV.class);
+    private static final Logger logger = Logger.getLogger(GenerateLCOV.class);
 
-    private static String jsCoverReportDir = "target/jscov-report";
+    private static final String jsCoverReportDir = "target/jscov-report";
 
-    private static String mergedJsCoverReportDir = "target/jscov-report-merged";
+    private static final String mergedJsCoverReportDir = "target/jscov-report-merged";
 
-    private static String lcovReportDir = "target/jscov-lcov";
+    private static final String lcovReportDir = "target/jscov-lcov";
 
-    private static JSONDataMerger jsonDataMerger = new JSONDataMerger();
+    private static final JSONDataMerger jsonDataMerger = new JSONDataMerger();
 
-    private static LCovGenerator lCovGenerator = new LCovGenerator();
+    private static final LCovGenerator lCovGenerator = new LCovGenerator();
 
     public static void main (String[] args) {
 

@@ -60,7 +60,6 @@ public class ServicesSettingsController {
 
     private static final Logger logger = Logger.getLogger(ServicesSettingsController.class);
 
-    public static final String PENDING_SETTINGS_OPERATIONS_STATUS_OVERRIDE = "PENDING_SETTINGS_OPERATIONS_STATUS_OVERRIDE";
     public static final String PENDING_SETTINGS_OPERATIONS_COMMAND = "PENDING_SETTINGS_OPERATIONS_COMMAND";
 
     @Autowired

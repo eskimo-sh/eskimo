@@ -41,7 +41,6 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,11 +52,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class NodesConfigurationServiceTest extends AbstractSystemTest {
-
-    private static final Logger logger = Logger.getLogger(NodesConfigurationServiceTest.class);
 
     private String testRunUUID = UUID.randomUUID().toString();
 
@@ -94,7 +90,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
     @Override
     protected MarathonService createMarathonService() {
-        MarathonService marathonService = new MarathonService() {
+        return new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
                 return new Pair<>("192.168.10.11", "running");
@@ -109,8 +105,6 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return "";
             }
         };
-
-        return marathonService;
     }
 
     @Test
@@ -141,7 +135,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     @Test
     public void testGetNodeFlavour() throws Exception {
 
-        AtomicReference command = new AtomicReference();
+        AtomicReference<String> command = new AtomicReference<>();
 
         nodesConfigurationService.setSshCommandService(new SSHCommandService() {
             @Override
@@ -228,7 +222,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
             }
             @Override
             public synchronized String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+                testSSHCommandScript.append(command).append("\n");
                 if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
                     return "OK";
                 }

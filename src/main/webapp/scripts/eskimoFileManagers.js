@@ -41,7 +41,7 @@ eskimo.FileManagers = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var that = this;
+    const that = this;
 
     this.fileEditHook = null;
 
@@ -300,11 +300,11 @@ eskimo.FileManagers = function(constructorObject) {
                 '                    <td>' + subFolderProps.size + '</td>\n' +
                 '                    <td>' + subFolderProps.timestamp + '</td>\n' +
                 '                    <td>' +
-                '                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().deletePath(\'' +
+                '                       <button type="button" onclick="eskimoMain.getFileManagers().deletePath(\'' +
                                         nodeAddress + '\', \'' + nodeName + '\', \'' + folderName + '\', \'' + sortedFilesArray[i] + '\');" ' +
                 '                               class="btn btn-xs btn-default" title="Delete"><i class="fa fa-close"></i></button>\n' +
                                          (!isFolder && !isLink ?
-                '                       <button type="button" onclick="javascript:eskimoMain.getFileManagers().downloadFile(\'' +
+                '                       <button type="button" onclick="eskimoMain.getFileManagers().downloadFile(\'' +
                                         nodeAddress + '\', \'' + nodeName + '\', \'' + folderName + '\', \'' + sortedFilesArray[i] + '\');" ' +
                 '                               class="btn btn-xs btn-default" title="Download"><i class="fa fa-arrow-down"></i></button>\n'
                                              : '')+
@@ -333,7 +333,6 @@ eskimo.FileManagers = function(constructorObject) {
         $.ajax({
             type: "GET",
             dataType: "json",
-            context: this,
             contentType: "application/json; charset=utf-8",
             url: "file-manager-open-file?address=" + nodeAddress + "&folder=" + currentFolder + "&file=" + file,
             success: function (data, status, jqXHR) {
@@ -343,7 +342,7 @@ eskimo.FileManagers = function(constructorObject) {
                     if (data.folder != null && data.folder != "" ) {
 
                         // file was actually a folder
-                        this.listFolder (nodeAddress, nodeName, data.folder, data.content);
+                        that.listFolder (nodeAddress, nodeName, data.folder, data.content);
 
                     } else if (!data.accessible) {
                         alert ("User used by eskimo has no read permission to this file");
@@ -352,8 +351,8 @@ eskimo.FileManagers = function(constructorObject) {
 
                         if (data.fileViewable) {
 
-                            if (this.fileEditHook != null) {
-                                this.fileEditHook (nodeAddress, nodeName, data.fileName);
+                            if (that.fileEditHook != null) {
+                                that.fileEditHook (nodeAddress, nodeName, data.fileName);
 
                             } else {
 
@@ -366,7 +365,7 @@ eskimo.FileManagers = function(constructorObject) {
 
                         } else {
 
-                            this.downloadFile(nodeAddress, nodeName, currentFolder, file);
+                            that.downloadFile(nodeAddress, nodeName, currentFolder, file);
                         }
                     }
                 } else {
@@ -540,8 +539,9 @@ eskimo.FileManagers = function(constructorObject) {
         $("#file-manager-upload-form-"+nodeName).on('submit',(function(event) {
 
             // reset modal
-            $('#file-upload-progress-bar').attr('aria-valuenow', "1%").css('width', "1%");
-            $('#file-upload-progress-bar').html("1%");
+            var fileUploadprogressBar = $('#file-upload-progress-bar');
+            fileUploadprogressBar.attr('aria-valuenow', "1%").css('width', "1%");
+            fileUploadprogressBar.html("1%");
             $('#file-upload-progress-modal').modal("show");
 
             var completeCallback = function (data) {
@@ -571,8 +571,9 @@ eskimo.FileManagers = function(constructorObject) {
                             var percentComplete = evt.loaded / evt.total;
                             console.log(percentComplete);
                             var newProgress = Math.ceil(percentComplete * 100);
-                            $('#file-upload-progress-bar').attr('aria-valuenow', newProgress+"%").css('width', newProgress+"%");
-                            $('#file-upload-progress-bar').html(newProgress+"%");
+                            var fileUploadprogressBar = $('#file-upload-progress-bar');
+                            fileUploadprogressBar.attr('aria-valuenow', newProgress+"%").css('width', newProgress+"%");
+                            fileUploadprogressBar.html(newProgress+"%");
                         }
                     }, false);
                     return xhr;
@@ -623,7 +624,7 @@ eskimo.FileManagers = function(constructorObject) {
 
         // remove from open File Manager
         var openedFileManager = null;
-        var closedFileManagerNbr = -1;
+        var closedFileManagerNbr;
         for (closedFileManagerNbr = 0; closedFileManagerNbr < openedFileManagers.length; closedFileManagerNbr++) {
             if (openedFileManagers[closedFileManagerNbr].nodeName == nodeName) {
                 openedFileManager = openedFileManagers[closedFileManagerNbr];

@@ -40,9 +40,9 @@ eskimo.ServicesSelection = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var that = this;
+    const that = this;
 
-    var NODE_ID_FIELD = "node_id";
+    const NODE_ID_FIELD = "node_id";
 
     var nodeNbrInConfiguration = -1;
     var servicesSelectedcallback = null;

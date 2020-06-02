@@ -52,29 +52,11 @@ public abstract class ResourceUtils {
     /** Pseudo URL prefix for loading from the class path: "classpath:" */
     public static final String CLASSPATH_URL_PREFIX = "classpath:";
 
-    /** URL prefix for loading from the file system: "file:" */
-    public static final String FILE_URL_PREFIX = "file:";
-
     /** URL protocol for a file in the file system: "file" */
     public static final String URL_PROTOCOL_FILE = "file";
 
     /** URL protocol for an entry from a jar file: "jar" */
     public static final String URL_PROTOCOL_JAR = "jar";
-
-    /** URL protocol for an entry from a zip file: "zip" */
-    public static final String URL_PROTOCOL_ZIP = "zip";
-
-    /** URL protocol for an entry from a JBoss jar file: "vfszip" */
-    public static final String URL_PROTOCOL_VFSZIP = "vfszip";
-
-    /** URL protocol for an entry from a WebSphere jar file: "wsjar" */
-    public static final String URL_PROTOCOL_WSJAR = "wsjar";
-
-    /** URL protocol for an entry from an OC4J jar file: "code-source" */
-    public static final String URL_PROTOCOL_CODE_SOURCE = "code-source";
-
-    /** Separator between JAR URL and file path within the JAR */
-    public static final String JAR_URL_SEPARATOR = "!/";
 
     public static final String RESOURCE_LOCATION_MUST_NOT_BE_NULL = "Resource location must not be null";
     public static final String UNRESOLVABLE_PATH_ERROR = " cannot be resolved to absolute file path because it does not reside in the file system";
@@ -197,7 +179,7 @@ public abstract class ResourceUtils {
      * be found.
      * 
      * @param fileName the name of the file to look for.
-     * @return
+     * @return inputstream on file
      */   
 	public static InputStream getResourceAsStream(String fileName) {
 

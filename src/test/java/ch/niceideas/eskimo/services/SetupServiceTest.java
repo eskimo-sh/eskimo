@@ -53,8 +53,6 @@ import static org.junit.Assert.*;
 
 public class SetupServiceTest extends AbstractSystemTest {
 
-    private static final Logger logger = Logger.getLogger(SetupServiceTest.class);
-
     private String setupConfig = null;
 
     private String packagesVersionFile = null;
@@ -86,19 +84,19 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         Pair<String, String> version = setupService.parseVersion("docker_template_base-eskimo_0.2_1.tar.gz");
         assertNotNull(version);
-        assertEquals(new Pair<String, String> ("0.2", "1"), version);
+        assertEquals(new Pair<> ("0.2", "1"), version);
 
         version = setupService.parseVersion("docker_template_gluster_debian_09_stretch_1.tar.gz");
         assertNotNull(version);
-        assertEquals(new Pair<String, String> ("debian_09_stretch", "1"), version);
+        assertEquals(new Pair<> ("debian_09_stretch", "1"), version);
 
         version = setupService.parseVersion("docker_template_logstash_6.8.3_1.tar.gz");
         assertNotNull(version);
-        assertEquals(new Pair<String, String> ("6.8.3", "1"), version);
+        assertEquals(new Pair<> ("6.8.3", "1"), version);
 
         version = setupService.parseVersion("docker_template_mesos-master_1.8.1_1.tar.gz");
         assertNotNull(version);
-        assertEquals(new Pair<String, String> ("1.8.1", "1"), version);
+        assertEquals(new Pair<> ("1.8.1", "1"), version);
     }
 
 
@@ -157,9 +155,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfig);
 
-        SetupException exception = assertThrows(SetupException.class, () -> {
-            setupService.ensureSetupCompleted();
-        });
+        SetupException exception = assertThrows(SetupException.class, setupService::ensureSetupCompleted);
         assertEquals(
                 "Following services are missing and need to be downloaded or built base-eskimo, cerebro, elasticsearch, " +
                         "flink, gdash, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
@@ -171,9 +167,7 @@ public class SetupServiceTest extends AbstractSystemTest {
             FileUtils.writeFile(new File(tempPackagesDistribPath + "/docker_template_" + service + "_0.0.1_1.tar.gz"), "DUMMY");
         }
 
-        exception = assertThrows(SetupException.class, () -> {
-            setupService.ensureSetupCompleted();
-        });
+        exception = assertThrows(SetupException.class, setupService::ensureSetupCompleted);
         assertEquals(
                 "Following services are missing and need to be downloaded or built mesos-debian, mesos-redhat, mesos-suse",
                 exception.getMessage());
@@ -317,9 +311,8 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
-        SetupException exception = assertThrows(SetupException.class, () -> {
-                setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
-        });
+        SetupException exception = assertThrows(SetupException.class,
+                () -> setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate));
 
         assertNotNull(exception);
         assertEquals("Downloading packages is not supported on development version (SNAPSHOT)", exception.getMessage());

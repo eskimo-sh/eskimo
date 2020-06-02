@@ -83,9 +83,9 @@ public class ApplicationStatusService {
     @Value("${eskimo.enableMarathonSubsystem}")
     private String enableMarathon = "true";
 
-    private ThreadLocal<SimpleDateFormat> localDateFormatter = new ThreadLocal<>();
+    private final ThreadLocal<SimpleDateFormat> localDateFormatter = new ThreadLocal<>();
 
-    private ReentrantLock statusUpdateLock = new ReentrantLock();
+    private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final Timer timer;
     private final AtomicReference<JsonWrapper> lastStatus = new AtomicReference<>();
 

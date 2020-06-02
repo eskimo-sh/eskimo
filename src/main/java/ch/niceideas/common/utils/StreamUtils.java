@@ -98,11 +98,6 @@ public abstract class StreamUtils {
 
     /**
      * Copy chars from a <code>InputStream</code> to a <code>Writer</code>.
-     * 
-     * @param is
-     * @param output
-     * @return
-     * @throws IOException
      */
     public static long copy(InputStream is, Writer output) throws IOException {
         return copy(new InputStreamReader(is), output);

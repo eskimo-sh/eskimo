@@ -80,7 +80,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testNominal() throws Exception {
+    public void testNominal() {
 
         try {
             page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");

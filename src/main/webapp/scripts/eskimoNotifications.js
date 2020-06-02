@@ -37,7 +37,7 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.Notifications = function(constructorObject) {
 
-    var that = this;
+    const that = this;
 
     var lastLineNotifications = 0;
     var notifications = [];
@@ -108,9 +108,7 @@ eskimo.Notifications = function(constructorObject) {
     function addNotification(notification) {
 
         var today = new Date();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-
-        notification.tstamp = time;
+        notification.tstamp = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
         notifications.push(notification);
         newNotificationsCount++;

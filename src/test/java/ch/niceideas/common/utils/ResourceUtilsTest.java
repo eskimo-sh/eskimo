@@ -28,9 +28,8 @@ public class ResourceUtilsTest {
         assertNotNull(ResourceUtils.getURL("file:///etc/passwd"));
         assertNotNull(ResourceUtils.getURL("classpath:application.properties"));
 
-        FileNotFoundException exception = assertThrows(FileNotFoundException.class, () -> {
-            ResourceUtils.getURL("classpath:testInexistent.properties");
-        });
+        FileNotFoundException exception = assertThrows(FileNotFoundException.class,
+                () -> ResourceUtils.getURL("classpath:testInexistent.properties"));
         assertNotNull(exception);
     }
 

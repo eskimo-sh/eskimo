@@ -41,7 +41,7 @@ public class ConfigurationServiceTest {
 
         SetupService setupService = new SetupService() {
             @Override
-            public String getConfigStoragePath() throws SetupException {
+            public String getConfigStoragePath() {
                 return tmpFile.getAbsolutePath();
             }
         };
@@ -84,9 +84,7 @@ public class ConfigurationServiceTest {
     @Test
     public void testLoadAndSaveSetupConfig() throws Exception {
 
-        SetupException exception = assertThrows(SetupException.class, () -> {
-            configurationService.loadSetupConfig();
-        });
+        SetupException exception = assertThrows(SetupException.class, () -> configurationService.loadSetupConfig());
 
         assertEquals("Application is not initialized properly. Missing file 'config.conf' system configuration", exception.getMessage());
 

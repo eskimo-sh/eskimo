@@ -3,6 +3,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.log4j.Logger;
@@ -164,7 +165,7 @@ public class NodesConfigurationService {
                         String ipAddress = operation.getValue();
                         if (nodesConfig.getIpAddresses().contains(ipAddress) && liveIps.contains(ipAddress)) {
 
-                            if (!systemService.isInterrupted() && (error.get() == null && !isInstalledOnNode("base_system", ipAddress))) {
+                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("base_system", ipAddress))) {
                                 systemOperationService.applySystemOperation("Installation of Base System on " + ipAddress,
                                         builder -> installEskimoBaseSystem(builder, ipAddress), null);
 
@@ -177,7 +178,7 @@ public class NodesConfigurationService {
                                         builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, ipAddress), null);
                             }
 
-                            if (!systemService.isInterrupted() && (error.get() == null && !isInstalledOnNode("mesos", ipAddress))) {
+                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("mesos", ipAddress))) {
                                 systemOperationService.applySystemOperation("Installation of Mesos on " + ipAddress,
                                         builder -> {
                                             uploadMesos(ipAddress);
@@ -299,19 +300,19 @@ public class NodesConfigurationService {
         sshChmod755(ipAddress, target);
     }
 
-    private boolean isInstalledOnNode(String installation, String ipAddress) {
+    private boolean isMissingOnNode(String installation, String ipAddress) {
 
         try {
             messagingService.addLine("\nChecking " + installation + " on node " + ipAddress);
             String result = sshCommandService.runSSHCommand(ipAddress, "cat /etc/eskimo_flag_" + installation + "_installed");
-            return result.contains("OK");
+            return StringUtils.isBlank(result) || !result.contains("OK");
         } catch (SSHCommandException e) {
             logger.debug(e, e);
-            return false;
+            return true;
         }
     }
 
-    String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress)
+    void installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress)
             throws SystemException, SSHCommandException, IOException {
 
         File tempTopologyFile = systemService.createTempFile("eskimo_topology", ipAddress, ".sh");
@@ -350,13 +351,10 @@ public class NodesConfigurationService {
             sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-settings.json"});
             sshChmod755(ipAddress, "/etc/eskimo_services-settings.json");
 
-
         } catch (FileException | SetupException e) {
             logger.error (e, e);
             throw new SystemException(e);
         }
-
-        return null;
     }
 
     private void flagInstalledOnNode(String installation, String ipAddress) throws SystemException {
@@ -429,26 +427,11 @@ public class NodesConfigurationService {
     }
 
 
-    private String proceedWithServiceUninstallation(StringBuilder sb, String ipAddress, String service)
+    private void proceedWithServiceUninstallation(StringBuilder sb, String ipAddress, String service)
             throws SSHCommandException, SystemException {
 
         // 1. Calling uninstall.sh script if it exists
-        File containerFolder = new File(servicesSetupPath + "/" + service);
-        if (!containerFolder.exists()) {
-            throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
-        }
-
-        try {
-            File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
-            if (uninstallScriptFile.exists()) {
-                sb.append(" - Calling uninstall script\n");
-
-                sb.append(sshCommandService.runSSHScriptPath(ipAddress, uninstallScriptFile.getAbsolutePath()));
-            }
-        } catch (SSHCommandException e) {
-            logger.warn (e, e);
-            sb.append (e.getMessage());
-        }
+        systemService.callUninstallScript(sb, ipAddress, service);
 
         // 2. Stop service
         sb.append(" - Stopping Service\n");
@@ -476,8 +459,6 @@ public class NodesConfigurationService {
         sb.append(" - Reloading systemd daemon \n");
         sshCommandService.runSSHCommand(ipAddress, "sudo systemctl daemon-reload");
         sshCommandService.runSSHCommand(ipAddress, "sudo systemctl reset-failed");
-
-        return sb.toString();
     }
 
     private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String service)

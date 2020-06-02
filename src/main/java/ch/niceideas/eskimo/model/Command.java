@@ -29,10 +29,6 @@ public class Command {
         this.name = name;
     }
 
-    public String getCommandCall() {
-        return commandCall;
-    }
-
     public void setCommandCall(String commandCall) {
         this.commandCall = commandCall;
     }

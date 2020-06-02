@@ -40,7 +40,7 @@ eskimo.Consoles = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var that = this;
+    const that = this;
 
     // Caution : this variable is populated by EskimoNodesStatus.
     var availableNodes = [];
@@ -186,6 +186,23 @@ eskimo.Consoles = function(constructorObject) {
     }
     this.selectConsole = selectConsole;
 
+    let showTarget = function (target, other) {
+        if (target == null) {
+            target = other;
+        }
+
+        var selectedName = target.id.substring(8);
+        //console.log ("to be selected is " + selectedName);
+
+        // select previous console
+        for (var i = 0; i < availableNodes.length; i++) {
+            if (availableNodes[i].nodeName == selectedName) {
+                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
+                selectConsole(availableNodes[i].nodeAddress, availableNodes[i].nodeName);
+            }
+        }
+    };
+
     function showPrevTab() {
         //console.log ("showPrevTab");
         // Find previous link
@@ -199,20 +216,8 @@ eskimo.Consoles = function(constructorObject) {
             }
             prev = this;
         });
-        if (target == null) {
-            target = prev;
-        }
 
-        var selectedName = target.id.substring(8);
-        //console.log ("to be selected is " + selectedName);
-
-        // select previous console
-        for (var i = 0; i < availableNodes.length; i++) {
-            if (availableNodes[i].nodeName == selectedName) {
-                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-                selectConsole (availableNodes[i].nodeAddress, availableNodes[i].nodeName);
-            }
-        }
+        showTarget(target, prev);
     }
     this.showPrevTab = showPrevTab;
 
@@ -234,21 +239,8 @@ eskimo.Consoles = function(constructorObject) {
                 takeNext = false;
             }
         });
-        if (target == null) {
-            target = first;
-        }
 
-        var selectedName = target.id.substring(8);
-        //console.log ("to be selected is " + selectedName);
-
-        // select previous console
-        for (var i = 0; i < availableNodes.length; i++) {
-            //console.log (i, availableNodes[i]);
-            if (availableNodes[i].nodeName == selectedName) {
-                // {"nbr": nbr, "nodeName": nodeName, "nodeAddress" : nodeAddress}
-                selectConsole (availableNodes[i].nodeAddress, availableNodes[i].nodeName);
-            }
-        }
+        showTarget(target, first);
     }
     this.showNextTab = showNextTab;
 

@@ -49,7 +49,7 @@ public class SetupCommand implements Serializable {
 
     private final JsonWrapper rawSetup;
 
-    private String packageDownloadUrl;
+    private final String packageDownloadUrl;
 
     private final Set<String> downloadPackages;
     private final Set<String> buildPackage;
@@ -120,6 +120,7 @@ public class SetupCommand implements Serializable {
         return buildMesos;
     }
 
+    // TODO find out what I wanted to use this
     public Set<String> getPackageUpdates() {
         return packageUpdates;
     }

@@ -52,8 +52,6 @@ import static junit.framework.TestCase.fail;
 
 public class MesosAgentSearchSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(MesosAgentSearchSetupTest.class);
-
     protected static String jailPath = null;
 
     private static boolean initialized = false;

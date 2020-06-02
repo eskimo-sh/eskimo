@@ -137,7 +137,7 @@ public class SetupConfigControllerTest {
                 return "dummy";
             }
             @Override
-            public String applySetup(JsonWrapper setupConfig) throws SetupException, JSONException {
+            public String applySetup(JsonWrapper setupConfig) throws JSONException {
                 // No Op
                 return "OK";
             }

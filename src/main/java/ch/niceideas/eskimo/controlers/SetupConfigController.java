@@ -159,24 +159,18 @@ public class SetupConfigController {
     @ResponseBody
     public String applySetup(HttpSession session) {
 
-        try {
-
-            if (systemService.isProcessingPending()) {
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
-                }}).toString(2);
-            }
-
-            SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
-            session.removeAttribute(PENDING_SETUP_COMMAND);
-
-            return setupService.applySetup(command.getRawSetup());
-
-        } catch (SetupException e) {
-            logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus (e);
+        if (systemService.isProcessingPending()) {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+            }}).toString(2);
         }
+
+        SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
+        session.removeAttribute(PENDING_SETUP_COMMAND);
+
+        return setupService.applySetup(command.getRawSetup());
+
     }
 
 }

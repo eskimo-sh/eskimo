@@ -41,7 +41,7 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
     this.eskimoMain = null;
     this.eskimoMessaging = null;
 
-    var that = this;
+    const that = this;
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -102,7 +102,7 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
         commandDescription += "<br>";
         */
 
-        if (command.warnings && command.warnings != null && command.warnings.trim() != "") {
+        if (command.warnings && command.warnings.trim() != "") {
 
             commandDescription = commandDescription +
                 '<div class="col-xs-12 col-md-12">' +

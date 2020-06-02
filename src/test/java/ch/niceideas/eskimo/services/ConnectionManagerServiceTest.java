@@ -101,14 +101,14 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         // get a second connection and make sure it matches
         Connection second = cm.getSharedConnection("localhost");
         assertNotNull(second);
-        assertTrue(connection == second);
+        assertSame(connection, second);
 
         // close connection and make sure it gets properly recreated
         second.close();
 
         Connection newOne = cm.getSharedConnection("localhost");
         assertNotNull(newOne);
-        assertTrue (newOne != second);
+        assertNotSame (newOne, second);
     }
 
     @Test
@@ -125,13 +125,13 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
-            protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
+            protected Connection createConnectionInternal(String ipAddress) {
                 return new Connection(ipAddress, getSShPort()) {
-                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
+                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
                         createCalledFor.add(""+port_to_connect);
                         return null;
                     }
-                    public synchronized void sendIgnorePacket() throws IOException {
+                    public synchronized void sendIgnorePacket() {
                         // NO-OP
                     }
                 };
@@ -193,22 +193,22 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
-            protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
+            protected Connection createConnectionInternal(String ipAddress) {
                 return new Connection(ipAddress, getSShPort()) {
-                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
+                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
                         return null;
                     }
-                    public synchronized void sendIgnorePacket() throws IOException {
+                    public synchronized void sendIgnorePacket() {
                         // NO-OP
                     }
                 };
             }
             @Override
-            protected void dropTunnels(Connection connection, String ipAddress)  {
+            protected void dropTunnels(Connection connection, String ipAddress) {
                 // NO-OP
             }
             @Override
-            protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+            protected void recreateTunnels(Connection connection, String ipAddress) {
                 // NO-OP
             }
         };
@@ -217,11 +217,11 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         Connection con1 = cm.getSharedConnection("localhost");
         Connection con2 = cm.getSharedConnection("localhost");
 
-        assertTrue (con1 == con2);
+        assertSame (con1, con2);
 
         cm.forceRecreateConnection("localhost");
 
         Connection con3 = cm.getSharedConnection("localhost");
-        assertFalse (con1 == con3);
+        assertNotSame (con1, con3);
     }
 }

@@ -47,8 +47,6 @@ import java.io.IOException;
 
 public class CerebroSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(CerebroSetupTest.class);
-
     protected static String jailPath = null;
 
     private static boolean initialized = false;

@@ -34,12 +34,7 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.services.MarathonServicesConfigException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import org.apache.log4j.Logger;
@@ -50,8 +45,6 @@ import org.junit.Test;
 import java.util.HashMap;
 
 import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
@@ -59,12 +52,8 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(EskimoMarathonServicesConfigCheckerTest.class);
 
-    private String jsonServices = null;
-
     @Before
     public void setUp() throws Exception {
-
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
         loadScript(page, "eskimoNodesConfigurationChecker.js");
         loadScript(page, "eskimoMarathonServicesConfigChecker.js");

@@ -368,7 +368,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             // Context path starts with a / if it is not blank
             String contextPath = servletRequest.getContextPath();
             if (StringUtils.isNotBlank(contextPath)) {
-                curUrl.append(contextPath + "/");
+                curUrl.append(contextPath).append("/");
             } else {
                 curUrl.append("/");
             }

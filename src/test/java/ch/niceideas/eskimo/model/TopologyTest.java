@@ -34,15 +34,16 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
+import ch.niceideas.eskimo.services.NodeRangeResolver;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -196,8 +197,6 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_b4", "on");
                 put("service_c4", "on");
         }});
-
-        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
         Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
@@ -551,17 +550,15 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
 
-        ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class, () -> {
-            Topology.create(nodesConfig, marathonServicesConfig,  def, null, "192.168.10.11");
-        });
+        ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
+                () -> Topology.create(nodesConfig, marathonServicesConfig,  def, null, "192.168.10.11"));
 
         assertEquals("Service service_d defines a SAME_NODE dependency which is not supported for marathon services", exception.getMessage());
 
         depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
 
-        exception = assertThrows(ServiceDefinitionException.class, () -> {
-            Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
-        });
+        exception = assertThrows(ServiceDefinitionException.class,
+                () -> Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11"));
 
         assertEquals("Service service_d defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services", exception.getMessage());
     }

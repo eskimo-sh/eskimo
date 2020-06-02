@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class NodesConfigurationChecker {
 
-    private static Pattern ipAddressCheck = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+){0,1}");
+    private static final Pattern ipAddressCheck = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)?");
 
     @Autowired
     private ServicesDefinition servicesDefinition;

@@ -44,8 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class MemoryComputerTest {
 
@@ -60,7 +59,7 @@ public class MemoryComputerTest {
         jsonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
 
         servicesDefinition = new ServicesDefinition();
-        servicesDefinition.afterPropertiesSet();;
+        servicesDefinition.afterPropertiesSet();
 
         memoryComputer = new MemoryComputer();
         memoryComputer.setServicesDefinition(servicesDefinition);
@@ -104,7 +103,7 @@ public class MemoryComputerTest {
         assertEquals(Long.valueOf(370), memmModel1.get("logstash"));
         assertEquals(Long.valueOf(1110), memmModel1.get("elasticsearch"));
         assertEquals(Long.valueOf(740), memmModel1.get("kafka"));
-        assertEquals(null, memmModel1.get("spark-executor"));
+        assertNull(memmModel1.get("spark-executor"));
         assertEquals(Long.valueOf(1850), memmModel1.get("mesos-agent"));
 
         Map<String, Long> memmModel2 = res.get("192.168.10.12");
@@ -114,7 +113,7 @@ public class MemoryComputerTest {
         assertEquals(Long.valueOf(357), memmModel2.get("logstash"));
         assertEquals(Long.valueOf(1071), memmModel2.get("elasticsearch"));
         assertEquals(Long.valueOf(714), memmModel2.get("kafka"));
-        assertEquals(null, memmModel2.get("spark-executor"));
+        assertNull(memmModel2.get("spark-executor"));
 
         Map<String, Long> memmModel3 = res.get("192.168.10.13");
         assertNotNull(memmModel3);
@@ -122,7 +121,7 @@ public class MemoryComputerTest {
 
         assertEquals(Long.valueOf(723), memmModel3.get("elasticsearch"));
         assertEquals(Long.valueOf(482), memmModel3.get("kafka"));
-        assertEquals(null, memmModel3.get("spark-executor"));
+        assertNull(memmModel3.get("spark-executor"));
         assertEquals(Long.valueOf(1205), memmModel3.get("mesos-agent"));
 
     }
@@ -145,7 +144,7 @@ public class MemoryComputerTest {
             put("service_b4", "on");
         }});
 
-        Map<String, Long> memMap = memoryComputer.getMemoryMap(nodesConfig, new HashSet<String>());
+        Map<String, Long> memMap = memoryComputer.getMemoryMap(nodesConfig, new HashSet<>());
 
         assertNotNull(memMap);
         assertEquals(4, memMap.size());
@@ -185,21 +184,21 @@ public class MemoryComputerTest {
         assertNotNull(memmModel1);
         assertEquals(4, memmModel1.size());
 
-        assertEquals(null, memmModel1.get("ntp"));
-        assertEquals(null, memmModel1.get("prometheus"));
-        assertEquals(null, memmModel1.get("gluster"));
-        assertEquals(null, memmModel1.get("cerebro"));
-        assertEquals(null, memmModel1.get("grafana"));
-        assertEquals(null, memmModel1.get("kafka-manager"));
-        assertEquals(null, memmModel1.get("zeppelin"));
-        assertEquals(null, memmModel1.get("kibana"));
-        assertEquals(null, memmModel1.get("gdash"));
+        assertNull(memmModel1.get("ntp"));
+        assertNull(memmModel1.get("prometheus"));
+        assertNull(memmModel1.get("gluster"));
+        assertNull(memmModel1.get("cerebro"));
+        assertNull(memmModel1.get("grafana"));
+        assertNull(memmModel1.get("kafka-manager"));
+        assertNull(memmModel1.get("zeppelin"));
+        assertNull(memmModel1.get("kibana"));
+        assertNull(memmModel1.get("gdash"));
         assertEquals(Long.valueOf(3960), memmModel1.get("elasticsearch"));
         assertEquals(Long.valueOf(1320), memmModel1.get("logstash"));
         assertEquals(Long.valueOf(2640), memmModel1.get("kafka"));
-        assertEquals(null, memmModel1.get("spark-executor"));
-        assertEquals(null, memmModel1.get("flink-worker"));
+        assertNull(memmModel1.get("spark-executor"));
+        assertNull(memmModel1.get("flink-worker"));
         assertEquals(Long.valueOf(6600), memmModel1.get("mesos-agent"));
-        assertEquals(null, memmModel1.get("zookeeper"));
+        assertNull(memmModel1.get("zookeeper"));
     }
 }

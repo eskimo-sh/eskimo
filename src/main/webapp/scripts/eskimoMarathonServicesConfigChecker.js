@@ -44,7 +44,7 @@ function checkMarathonSetup (marathonSetupConfig, servicesDependencies, successC
             try {
                 doCheckMarathonSetup (data, marathonSetupConfig, servicesDependencies);
 
-                if(successCallback && successCallback != null && successCallback instanceof Function) {
+                if(successCallback && successCallback instanceof Function) {
                     successCallback();
                 } else {
                     throw "TECHNICAL ERROR : successCallback is not a function.";

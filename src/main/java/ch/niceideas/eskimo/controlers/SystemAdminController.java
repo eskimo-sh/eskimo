@@ -123,7 +123,7 @@ public class SystemAdminController {
                 put("messages", message);
             }}).toString(2);
 
-        } catch (JSONException | ServiceDefinitionException | SSHCommandException | SystemException | MarathonException e) {
+        } catch (JSONException | SSHCommandException | MarathonException e) {
             logger.error(e, e);
             return ErrorStatusHelper.createErrorStatus(e);
 
@@ -302,7 +302,7 @@ public class SystemAdminController {
     }
 
     private interface MarathonOperation {
-        void performOperation (MarathonService marathonService) throws ServiceDefinitionException, SSHCommandException, SystemException, MarathonException;
+        void performOperation (MarathonService marathonService) throws SSHCommandException, MarathonException;
     }
 
 }

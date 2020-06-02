@@ -41,12 +41,12 @@ eskimo.Setup = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var that = this;
+    const MESSAGE_SHOW_DURATION = 10000;
+
+    const that = this;
 
     this.isSnapshot = true;
 
-    // constants
-    var MESSAGE_SHOW_DURATION = 10000;
 
     // Initialize HTML Div from Template
     this.initialize = function() {
@@ -170,7 +170,7 @@ eskimo.Setup = function(constructorObject) {
                 that.eskimoMain.getSystemStatus().updateStatus(false);
             }
 
-            if (data.message && data.message != null) {
+            if (data.message) {
                 showSetupMessage(data.message, true);
             }
         }

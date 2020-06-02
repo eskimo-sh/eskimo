@@ -51,7 +51,7 @@ import java.util.List;
 
 
 @Controller
-public class NotificationController extends AbstractInformationController {
+public class NotificationController extends AbstractInformationController<JSONObject, List<JSONObject>> {
 
     private static final Logger logger = Logger.getLogger(NotificationController.class);
 

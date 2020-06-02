@@ -58,7 +58,7 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private ArrayList<SerializablePair<String, String>> restarts = new ArrayList<>();
+    private final ArrayList<SerializablePair<String, String>> restarts = new ArrayList<>();
 
     public static OperationsCommand create (
             ServicesDefinition servicesDefinition,
@@ -129,7 +129,7 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
         changedServices.forEach(service -> restartedServices.addAll (servicesDefinition.getDependentServices(service)));
 
         // also add services simply flagged as needed restart previously
-        servicesInstallStatus.getRootKeys().stream().forEach(installStatusFlag -> {
+        servicesInstallStatus.getRootKeys().forEach(installStatusFlag -> {
             Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
             String installedService = Objects.requireNonNull(serviceAndNodePair).getKey();
             String status = (String) servicesInstallStatus.getValueForPath(installStatusFlag);

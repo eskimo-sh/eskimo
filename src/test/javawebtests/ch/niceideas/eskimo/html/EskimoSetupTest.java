@@ -39,8 +39,6 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.fail;
-
 public class EskimoSetupTest extends AbstractWebTest {
 
     @Before

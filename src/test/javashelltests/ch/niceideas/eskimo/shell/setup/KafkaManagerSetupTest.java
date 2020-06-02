@@ -38,7 +38,6 @@ package ch.niceideas.eskimo.shell.setup;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
-import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,8 +46,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class KafkaManagerSetupTest extends AbstractSetupShellTest {
-
-    private static final Logger logger = Logger.getLogger(KafkaManagerSetupTest.class);
 
     protected static String jailPath = null;
 

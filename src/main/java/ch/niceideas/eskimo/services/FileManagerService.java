@@ -96,7 +96,7 @@ public class FileManagerService {
     protected int maxFileSize = 2097152;
 
     /* Controlers are singleton */
-    private Map<String, SFTPv3Client> sftpClients = new ConcurrentHashMap<>();
+    private final Map<String, SFTPv3Client> sftpClients = new ConcurrentHashMap<>();
 
 
     /** For tests */

@@ -1,20 +1,15 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.fail;
 
 public class ApplicationStatusServiceTest extends AbstractSystemTest {
 
-    private static final Logger logger = Logger.getLogger(ApplicationStatusServiceTest.class);
-
     @Test
-    public void testUpdateAndGetStatus() throws Exception {
+    public void testUpdateAndGetStatus() {
 
         applicationStatusService.updateStatus();
 

@@ -43,8 +43,6 @@ public class WebSocketProxyTest {
 
     private static final Logger logger = Logger.getLogger(WebSocketProxyTest.class);
 
-    static final String WEBSOCKET_TOPIC = "/topic";
-
     private AtomicReference<WebSocketSession> clientSessionReference;
     private BlockingQueue<String> clientBlockingQueue;
 
@@ -214,7 +212,7 @@ public class WebSocketProxyTest {
                         },
                         sd),
                         Arrays.stream(sd.listProxiedServices())
-                        .map(serviceName -> sd.getService(serviceName))
+                        .map(sd::getService)
                         .map(service -> "/ws/" + service.getName() + "/**/*")
                         .toArray(String[]::new))
                     .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy));

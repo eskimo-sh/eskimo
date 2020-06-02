@@ -42,7 +42,6 @@ import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,12 +49,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class SystemServiceNodesStatusTest extends AbstractSystemTest {
-
-    private static final Logger logger = Logger.getLogger(SystemServiceNodesStatusTest.class);
 
     private String testRunUUID = UUID.randomUUID().toString();
 
@@ -116,7 +112,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
             }
             @Override
             public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+                testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override

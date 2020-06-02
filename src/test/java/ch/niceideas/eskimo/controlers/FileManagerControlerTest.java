@@ -41,7 +41,7 @@ public class FileManagerControlerTest {
             @Override
             public Pair<String, JSONObject> navigateFileManager(String hostAddress, String folder, String subFolder) throws IOException {
 
-                return new Pair<String, JSONObject>("/etc/", new JSONObject(new HashMap<String, Object>(){{
+                return new Pair<>("/etc/", new JSONObject(new HashMap<String, Object>(){{
                     put("passwd", new JSONObject(new HashMap<String, Object>() {{
                         put ("permissions", "rwxrwxrwx");
                         put ("count", "1");
@@ -85,7 +85,7 @@ public class FileManagerControlerTest {
         fmc.setFileManagerService(new FileManagerService() {
             @Override
             public Pair<String, JSONObject> createFile(String hostAddress, String folder, String fileName) throws IOException {
-                return new Pair<String, JSONObject>("/etc/", new JSONObject(new HashMap<String, Object>(){{
+                return new Pair<>("/etc/", new JSONObject(new HashMap<String, Object>(){{
                     put("passwd", new JSONObject(new HashMap<String, Object>() {{
                         put ("permissions", "rwxrwxrwx");
                         put ("count", "1");

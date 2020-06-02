@@ -107,7 +107,7 @@ public class WebSocketProxyForwarder {
         }
     }
 
-    public class WebSocketServerHandshakeHandler extends AbstractWebSocketHandler {
+    public static class WebSocketServerHandshakeHandler extends AbstractWebSocketHandler {
 
         private final WebSocketSession webSocketServerSession;
 

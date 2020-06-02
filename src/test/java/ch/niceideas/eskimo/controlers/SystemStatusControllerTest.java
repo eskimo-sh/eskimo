@@ -1,9 +1,11 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ApplicationStatusService;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.SystemService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -35,9 +37,8 @@ public class SystemStatusControllerTest {
             }
         });
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            ssc.getLastOperationResult();
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> ssc.getLastOperationResult());
 
         assertEquals ("org.json.JSONException: Test Error", exception.getMessage());
     }

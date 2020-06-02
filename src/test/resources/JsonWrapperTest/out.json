@@ -9,7 +9,7 @@
         "contentObject": {
             "dummy": {
                 "property": null,
-                "internalArray": [],                
+                "internalArray": []
             },
             "identifier": {
                 "value": "123456789",

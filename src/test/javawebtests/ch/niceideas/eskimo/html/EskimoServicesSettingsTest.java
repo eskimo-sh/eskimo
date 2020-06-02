@@ -39,8 +39,6 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class EskimoServicesSettingsTest extends AbstractWebTest {
 
     private String jsonConfig = null;

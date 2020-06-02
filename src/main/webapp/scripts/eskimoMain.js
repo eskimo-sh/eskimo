@@ -38,7 +38,7 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.Main = function() {
 
-    var that = this;
+    const that = this;
 
     var setupLoaded = false;
     var setupDone = false;
@@ -309,7 +309,7 @@ eskimo.Main = function() {
     };
 
     function getDisplayedService () {
-        var displayService;
+        var displayService = null;
         $(".inner-content").each(function (nbr, innerContent) {
             if ($(innerContent).css("visibility") == "visible") {
                 displayService = $(innerContent).attr('id').substring("inner-content-".length);
@@ -327,7 +327,7 @@ eskimo.Main = function() {
     function serviceMenuClear(nodeServicesStatus) {
 
         // remove all menu entries (cannot find out which service is here :-(
-        if (!nodeServicesStatus || nodeServicesStatus == null) {
+        if (!nodeServicesStatus) {
 
             $(".folder-menu-items").each(function () {
 
@@ -423,7 +423,7 @@ eskimo.Main = function() {
     this.showSetupNotDone = function (message) {
         eskimoSetup.showSetup();
 
-        if (message && message != null && message != "") {
+        if (message && message != "") {
             eskimoSetup.showSetupMessage(message);
         }
     };

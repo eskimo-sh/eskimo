@@ -41,7 +41,7 @@ eskimo.OperationsCommand = function(constructorObject) {
     this.eskimoMain = null;
     this.eskimoMessaging = null;
 
-    var that = this;
+    const that = this;
 
     this.initialize = function() {
         // Initialize HTML Div from Template

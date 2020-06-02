@@ -45,10 +45,9 @@ eskimo.SystemStatus = function(constructorObject) {
     this.eskimoServices = null;
     this.eskimoMain = null;
 
-    var that = this;
+    const that = this;
 
-    // constants
-    var STATUS_UPDATE_INTERVAL = 4000;
+    const STATUS_UPDATE_INTERVAL = 4000;
 
     // initialized by backend
     var STATUS_SERVICES = [];
@@ -148,11 +147,12 @@ eskimo.SystemStatus = function(constructorObject) {
                         }
                     }
 
-                    $("#serviceContextMenu").html($("#serviceContextMenuTemplate").html() + additionalCommandsHTML);
+                    var serviceMenu = $("#serviceContextMenu");
+                    serviceMenu.html($("#serviceContextMenuTemplate").html() + additionalCommandsHTML);
 
 
                     //open menu
-                    var $menu = $("#serviceContextMenu")
+                    var $menu = serviceMenu
                         .data("invokedOn", target)
                         .show()
                         .css({
@@ -298,12 +298,13 @@ eskimo.SystemStatus = function(constructorObject) {
         serviceStatusWarning.css("display", "block");
         serviceStatusWarning.css("visibility", "visible");
 
-        $("#service-status-warning-message").html(message);
+        var serviceStatusWarningMessage = $("#service-status-warning-message");
+        serviceStatusWarningMessage.html(message);
 
         if (error) {
-            $("#service-status-warning-message").attr('class', "alert alert-danger");
+            serviceStatusWarningMessage.attr('class', "alert alert-danger");
         } else {
-            $("#service-status-warning-message").attr('class', "alert alert-warning");
+            serviceStatusWarningMessage.attr('class', "alert alert-warning");
         }
 
         prevHidingMessageTimeout = setTimeout(function () {
@@ -463,31 +464,35 @@ eskimo.SystemStatus = function(constructorObject) {
 
     function hideGrafanaDashboard() {
 
-        $('.status-monitoring-info').css("min-height", "220px");
-        $('.status-monitoring-info').css("height", "220px");
+        var statusMonitoringInfo = $('.status-monitoring-info');
+        statusMonitoringInfo.css("min-height", "220px");
+        statusMonitoringInfo.css("height", "220px");
 
         $("#status-monitoring-info-panel").attr("class", "col-md-6");
         $("#status-monitoring-info-actions").attr("class", "col-md-6");
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-12");
 
-        $('#status-monitoring-grafana').css("display", "none");
-        $('#status-monitoring-grafana').css("visibility", "hidden");
+        var statusMonitoringGrafana = $('#status-monitoring-grafana');
+        statusMonitoringGrafana.css("display", "none");
+        statusMonitoringGrafana.css("visibility", "hidden");
     }
     this.hideGrafanaDashboard = hideGrafanaDashboard;
 
     function showGrafanaDashboard() {
 
-        $('.status-monitoring-info').css("min-height", "413px");
-        $('.status-monitoring-info').css("height", "413px");
+        var statusMonitoringInfo = $('.status-monitoring-info');
+        statusMonitoringInfo.css("min-height", "413px");
+        statusMonitoringInfo.css("height", "413px");
 
         $("#status-monitoring-info-panel").attr("class", "col-md-12");
         $("#status-monitoring-info-actions").attr("class", "col-md-12");
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-4");
 
-        $('#status-monitoring-grafana').css("display", "block");
-        $('#status-monitoring-grafana').css("visibility", "visible");
+        var statusMonitoringGrafana = $('#status-monitoring-grafana');
+        statusMonitoringGrafana.css("display", "block");
+        statusMonitoringGrafana.css("visibility", "visible");
     }
     this.showGrafanaDashboard = showGrafanaDashboard;
 
@@ -805,7 +810,7 @@ eskimo.SystemStatus = function(constructorObject) {
             var serviceName = STATUS_SERVICES[i];
             var serviceStatusConfig = SERVICES_STATUS_CONFIG[serviceName];
 
-            if (serviceStatusConfig.group && serviceStatusConfig.group != null && serviceStatusConfig.group != "") {
+            if (serviceStatusConfig.group && serviceStatusConfig.group != "") {
                 tableHeaderHtml = tableHeaderHtml +
                     '<td class="status-node-cell">' +
                     //'   <img class="control-logo-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) +
@@ -851,10 +856,10 @@ eskimo.SystemStatus = function(constructorObject) {
 
             if (nodeAlive == 'OK') {
                 arrayRow +=
-                    '        <image src="images/node-icon.png" class="status-node-image"></image>\n';
+                    '        <img src="images/node-icon.png" class="status-node-image"></img>\n';
             } else {
                 arrayRow +=
-                    '        <image src="images/node-icon-red.png" class="status-node-image"></image>\n';
+                    '        <img src="images/node-icon-red.png" class="status-node-image"></img>\n';
                 nodeHasIssues = true;
             }
 
@@ -949,9 +954,7 @@ eskimo.SystemStatus = function(constructorObject) {
             var newRow = $(arrayRow);
 
             // filtering
-            if (   (!nodeFilter || nodeFilter == null)
-                ||
-                   ((nodeFilter == "master") && nodeHasMasters)
+            if (   !nodeFilter || ((nodeFilter == "master") && nodeHasMasters)
                 ||
                    ((nodeFilter == "issues") && nodeHasIssues)) {
                 statusContainerTableBody.append(newRow);

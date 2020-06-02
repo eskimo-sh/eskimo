@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -43,7 +42,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -54,7 +52,6 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
     private ServicesInstallationSorter sio = null;
 
     NodesConfigWrapper nodesConfig = null;
-    MarathonServicesConfigWrapper marathonServicesConfig = null;
 
     @Before
     public void setUp() throws Exception {
@@ -63,16 +60,12 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         sio.setServicesDefinition(def);
 
         nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-
     }
 
     @Test
     public void testNominal() throws Exception {
 
-        ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<String, Object>() {{
-            // empty status, fresh install
-        }} );
+        ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>());
 
 
         OperationsCommand oc = OperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);

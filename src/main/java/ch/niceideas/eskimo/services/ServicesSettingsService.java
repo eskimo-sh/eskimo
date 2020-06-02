@@ -69,7 +69,7 @@ public class ServicesSettingsService {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
-    private ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
+    private final ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
 
     /* For tests */
     void setServicesDefinition(ServicesDefinition servicesDefinition) {

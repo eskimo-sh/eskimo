@@ -37,9 +37,6 @@ package ch.niceideas.eskimo.html;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-
 public class EskimoMessagingTest extends AbstractWebTest {
 
     @Before

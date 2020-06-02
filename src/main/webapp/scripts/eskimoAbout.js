@@ -37,7 +37,7 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.About = function() {
 
-    var that = this;
+    const that = this;
 
     this.initialize = function() {
         // Initialize HTML Div from Template

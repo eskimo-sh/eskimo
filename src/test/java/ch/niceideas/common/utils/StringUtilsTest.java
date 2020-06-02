@@ -38,6 +38,7 @@ package ch.niceideas.common.utils;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -154,18 +155,12 @@ public class StringUtilsTest  {
         assertEquals("          ", StringUtils.padLeft(null, 10));
     }
 
-    /**
-     * Utile dans le cadre des tests
-     */
-    static class PseudoCGLIBClass extends StringUtilsTest {
-    }
-    
     @Test 
     public void testGetHexString() throws Exception {
         
-        assertEquals ("616161", StringUtils.getHexString("aaa".getBytes("UTF-8")));
+        assertEquals ("616161", StringUtils.getHexString("aaa".getBytes(StandardCharsets.UTF_8)));
         
-        assertEquals ("c3a9c3a0c3a8", StringUtils.getHexString("éàè".getBytes("UTF-8")));
+        assertEquals ("c3a9c3a0c3a8", StringUtils.getHexString("éàè".getBytes(StandardCharsets.UTF_8)));
         
     }
     
@@ -217,7 +212,7 @@ public class StringUtilsTest  {
     public void testMultipleSearches() throws Exception {
         int[] results = StringUtils.multipleSearch(SOURCE, new String[]{"abc", "ad", "self"});
         StringBuilder sb = new StringBuilder();
-        Arrays.stream(results).forEach(intVal -> sb.append (intVal+"_"));
+        Arrays.stream(results).forEach(intVal -> sb.append(intVal).append("_"));
         assertEquals("0_87_55_", sb.toString());
     }
 }

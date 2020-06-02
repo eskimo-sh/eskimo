@@ -1,14 +1,16 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.MarathonOperationsCommand;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
 import javax.servlet.http.HttpSession;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 

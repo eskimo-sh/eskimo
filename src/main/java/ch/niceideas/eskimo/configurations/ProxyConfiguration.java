@@ -92,14 +92,14 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     @Bean
     public ConfigurableServletWebServerFactory webServerFactory() {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> connector.setProperty("relaxedQueryChars", "|{}[]"));
+        factory.addConnectorCustomizers(connector -> connector.setProperty("relaxedQueryChars", "|{}[]"));
         return factory;
     }
 
     @Bean
-    public ServletRegistrationBean servletRegistrationBean(){
+    public ServletRegistrationBean<ServicesProxyServlet> proxyServletRegistrationBean(){
 
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean<>(
+        ServletRegistrationBean<ServicesProxyServlet> servletRegistrationBean = new ServletRegistrationBean<>(
                 new ServicesProxyServlet(proxyManagerService, servicesDefinition, configuredContextPath),
                 Arrays.stream(servicesDefinition.listProxiedServices())
                         .map(serviceName -> servicesDefinition.getService(serviceName))

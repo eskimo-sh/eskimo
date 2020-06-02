@@ -86,7 +86,7 @@ public class JsonWrapperTest {
 
         JsonWrapper parser = new JsonWrapper(sourceJSONInput);
 
-        assertEquals(null, parser.getValueForPath("a.tuguduChapeauPointu"));
+        assertNull(parser.getValueForPath("a.tuguduChapeauPointu"));
         assertEquals("ABCD", parser.getValueForPath("name"));
         assertEquals("20.08.2010", parser.getValueForPath("date"));
         assertEquals("12346579", parser.getValueForPath("underObject.value"));
@@ -105,7 +105,7 @@ public class JsonWrapperTest {
 
         assertNull(parser.getValueForPath("dto.contentObject.netAmount.amount.sarace"));
 
-        assertEquals(null, parser.getValueForPath("dto.identifier.a.b.c.d"));
+        assertNull(parser.getValueForPath("dto.identifier.a.b.c.d"));
     }
 
     @Test

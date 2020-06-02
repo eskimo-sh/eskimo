@@ -84,16 +84,16 @@ public class ConnectionManagerService {
     @Value("${connectionManager.sshOperationTimeout}")
     private int sshOperationTimeout = 60000;
 
-    private ReentrantLock connectionMapLock = new ReentrantLock();
+    private final ReentrantLock connectionMapLock = new ReentrantLock();
 
-    private Map<String, Connection> connectionMap = new HashMap<>();
-    private Map<Connection, List<LocalPortForwarderWrapper>> portForwardersMap = new HashMap<>();
+    private final Map<String, Connection> connectionMap = new HashMap<>();
+    private final Map<Connection, List<LocalPortForwarderWrapper>> portForwardersMap = new HashMap<>();
 
-    private Map<String, Long> connectionAges = new HashMap<>();
+    private final Map<String, Long> connectionAges = new HashMap<>();
 
     private String privateSShKeyContent = null;
 
-    private List<Connection> connectionsToCloseLazily = new ArrayList<>();
+    private final List<Connection> connectionsToCloseLazily = new ArrayList<>();
 
     private final Timer timer;
 
@@ -374,7 +374,7 @@ public class ConnectionManagerService {
         }
     }
 
-    private class LocalPortForwarderWrapper {
+    private static class LocalPortForwarderWrapper {
 
         private final LocalPortForwarder forwarder;
 

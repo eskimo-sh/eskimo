@@ -163,7 +163,7 @@ public class JsonWrapper implements Serializable {
     public Object getValueForPath(String path)  {
         String[] splittedPath = path.split("\\.");
         Object current = json;
-        int i = 0;
+        int i;
         for (i = 0; i < splittedPath.length; i++) {
             String nextPath = splittedPath[i];
 
@@ -205,7 +205,7 @@ public class JsonWrapper implements Serializable {
         Object current = json;
         Object parent = null;
         String parentPath = null;
-        int i = 0;
+        int i;
         for (i = 0; i < splittedPath.length - 1; i++) {
             String nextPath = splittedPath[i];
 
@@ -327,7 +327,7 @@ public class JsonWrapper implements Serializable {
     public boolean hasPath(String path)  {
         String[] splittedPath = path.split("\\.");
         Object current = json;
-        int i = 0;
+        int i;
         for (i = 0; i < splittedPath.length; i++) {
             String nextPath = splittedPath[i];
 

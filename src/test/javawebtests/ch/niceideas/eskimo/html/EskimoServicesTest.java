@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +43,6 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
 import static org.awaitility.Awaitility.await;
 
 public class EskimoServicesTest extends AbstractWebTest {

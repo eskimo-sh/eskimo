@@ -38,10 +38,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.Session;
-import org.apache.log4j.Logger;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.json.JSONObject;
@@ -63,8 +60,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.*;
 
 public class FileManagerServiceTest extends AbstractBaseSSHTest {
-
-    private static final Logger logger = Logger.getLogger(FileManagerServiceTest.class);
 
     @Override
     protected CommandFactory getSShSubsystemToUse() {
@@ -171,11 +166,11 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         File tempFile = File.createTempFile("test-", "test");
         FileUtils.writeFile(tempFile, "Test File Content");
-        assertTrue(tempFile.exists());;
+        assertTrue(tempFile.exists());
 
         sc.deletePath("localhost", tempFile.getParent(), tempFile.getName());
 
-        assertFalse(tempFile.exists());;
+        assertFalse(tempFile.exists());
     }
 
     @Test
@@ -183,7 +178,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         File tempFile = File.createTempFile("test-", "test");
         FileUtils.writeFile(tempFile, "Test File Content");
-        assertTrue(tempFile.exists());;
+        assertTrue(tempFile.exists());
 
         OutputStream testStream = new ByteArrayOutputStream();
 
@@ -377,9 +372,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         assertTrue(tempFile.exists());
 
-        IOException exception = assertThrows(IOException.class, () -> {
-            sc.createFile("localhost", "/", tempFile.getName());
-        });
+        IOException exception = assertThrows(IOException.class, () -> sc.createFile("localhost", "/", tempFile.getName()));
 
         assertTrue(exception.getMessage().contains("Permission denied"));
 

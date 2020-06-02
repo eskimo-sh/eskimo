@@ -43,9 +43,9 @@ eskimo.NodesConfig = function(constructorObject) {
     this.eskimoServices = null;
     this.eskimoOperationsCommand = null;
 
-    var that = this;
+    const that = this;
 
-    var NODE_ID_FIELD = "node_id";
+    const NODE_ID_FIELD = "node_id";
 
     // initialized by backend
     var UNIQUE_SERVICES = [];
@@ -198,7 +198,7 @@ eskimo.NodesConfig = function(constructorObject) {
     };
 
     this.getNodesCount = function() {
-        return !nodes || nodes == null ? 0 : nodes.length;
+        return !nodes ? 0 : nodes.length;
     };
 
     this.setServicesDependenciesForTest = function(testServiceDeps) {
@@ -252,10 +252,11 @@ eskimo.NodesConfig = function(constructorObject) {
 
                 var nbr = match[2];
 
-                var placeHolderMs = $("#field" + nbr).find(".configured-multiple-services-placeholder");
+                var field = $("#field" + nbr);
+                var placeHolderMs = field.find(".configured-multiple-services-placeholder");
                 placeHolderMs.html("");
 
-                var placeHolderUs = $("#field" + nbr).find(".configured-unique-services-placeholder");
+                var placeHolderUs = field.find(".configured-unique-services-placeholder");
                 placeHolderUs.html("");
             }
         }
@@ -580,7 +581,7 @@ eskimo.NodesConfig = function(constructorObject) {
 
         $("#nodes-placeholder").append(newIn);
 
-        nodes[next-1] = new Object();
+        nodes[next-1] = {};
         nodes[next-1]["type"] = isRange ? "range" : "node";
         nodes[next-1]["field"] = "#field"+next;
         nodes[next-1]["input"] = "#"+NODE_ID_FIELD+next;

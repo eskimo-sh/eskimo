@@ -43,7 +43,7 @@ import java.util.List;
 
 public abstract class AbstractInformationService<T, R> {
 
-    protected List<T> elements = Collections.synchronizedList(new UnboundList<>(getMaxHistorySize()));
+    protected final List<T> elements = Collections.synchronizedList(new UnboundList<>(getMaxHistorySize()));
 
     @Transactional
     public Pair<Integer, R> fetchElements(int lastLine) {

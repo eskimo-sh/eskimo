@@ -47,8 +47,6 @@ import static junit.framework.TestCase.*;
 
 public class CommonSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(CerebroSetupTest.class);
-
     protected String jailPath = null;
 
     @Before
@@ -69,28 +67,27 @@ public class CommonSetupShellTest {
     }
 
     private void createTestScript(String scriptName, String command) throws FileException {
-        StringBuilder scriptBuilder = new StringBuilder("#!/bin/bash\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append("SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append("# Change current folder to script dir (important !)\n");
-        scriptBuilder.append("cd $SCRIPT_DIR\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append("# Avoid sleeps everywhere\n");
-        scriptBuilder.append("export NO_SLEEP=true\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append("# Set test mode\n");
-        scriptBuilder.append("export TEST_MODE=true\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append("# Using local commands\n");
-        scriptBuilder.append("export PATH=$SCRIPT_DIR:$PATH\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append(". $SCRIPT_DIR/common.sh\n");
-        scriptBuilder.append("\n");
-        scriptBuilder.append("# Call command\n");
-        scriptBuilder.append(command);
 
-        FileUtils.writeFile(new File (jailPath + "/" + scriptName), scriptBuilder.toString());
+        String script = "#!/bin/bash\n" + "\n" +
+                "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
+                "\n" +
+                "# Change current folder to script dir (important !)\n" +
+                "cd $SCRIPT_DIR\n" +
+                "\n" +
+                "# Avoid sleeps everywhere\n" +
+                "export NO_SLEEP=true\n" +
+                "\n" +
+                "# Set test mode\n" +
+                "export TEST_MODE=true\n" +
+                "\n" +
+                "# Using local commands\n" +
+                "export PATH=$SCRIPT_DIR:$PATH\n" +
+                "\n" +
+                ". $SCRIPT_DIR/common.sh\n" +
+                "\n" +
+                "# Call command\n" +
+                command;
+        FileUtils.writeFile(new File (jailPath + "/" + scriptName), script);
     }
 
     @Test
@@ -197,7 +194,7 @@ public class CommonSetupShellTest {
             assertTrue(indexOfDelete > -1);
 
             int indexOfPost = curlLogs.indexOf("-X POST -H Content-Type: application/json -d @cerebro.marathon.json http://:28080/v2/apps", indexOfDelete);
-            assertTrue(indexOfDelete > -1);
+            assertTrue(indexOfPost > -1);
 
         } else {
             fail ("No curl manipulations found");

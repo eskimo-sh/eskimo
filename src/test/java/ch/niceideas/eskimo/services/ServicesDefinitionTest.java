@@ -42,7 +42,6 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -358,8 +357,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("prometheus2", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
-        }});
+        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>());
 
         Topology topology = def.getTopology(
                 nrr.resolveRanges(nodesConfig),

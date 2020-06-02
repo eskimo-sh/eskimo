@@ -72,7 +72,7 @@ public class Topology {
 
         try {
             if (property != null && property.getNodeNumber() != null) {
-                return property.getNodeNumber().intValue();
+                return property.getNodeNumber();
             }
 
             return Integer.parseInt((String) nodesConfig.getValueForPath(key));
@@ -324,7 +324,6 @@ public class Topology {
         int nodeNbr = Integer.MAX_VALUE;
 
         for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            String ipAddress = findNodeIp (nodesConfig, candidateNbr);
             if (candidateNbr < nodeNbr) {
                 nodeNbr = candidateNbr;
             }
@@ -374,7 +373,6 @@ public class Topology {
         int masterNumber = -1;
 
         for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            String ipAddress = findNodeIp (nodesConfig, otherNbr);
             if (otherNbr > currentNodeNumber && (masterNumber == -1 || otherNbr < masterNumber) // try to find closest one (next in a chain)
                     ) {
                 masterNumber = otherNbr;

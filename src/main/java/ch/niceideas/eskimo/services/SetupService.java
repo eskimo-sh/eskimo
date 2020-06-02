@@ -73,6 +73,8 @@ public class SetupService {
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
     public static final String NO_DOWNLOAD_IN_SNAPSHOT_ERROR = "Downloading packages is not supported on development version (SNAPSHOT)";
 
+    private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+
     @Autowired
     private MessagingService messagingService;
 
@@ -292,8 +294,6 @@ public class SetupService {
         }
     }
 
-    private Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
-
     Pair<String,String> parseVersion(String name) {
 
         Matcher matcher = imageFileNamePattern.matcher(name);
@@ -325,7 +325,7 @@ public class SetupService {
     Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
 
         List<File> imageFiles = Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
-                .filter(file -> file.getName().contains(prefix) && file.getName().contains(packageName))
+                .filter(file -> file.getName().contains(prefix) && file.getName().contains("_"+packageName+"_"))
                 .collect(Collectors.toList());
 
         File lastVersionFile = null;
@@ -471,7 +471,7 @@ public class SetupService {
     }
 
 
-    public String applySetup(JsonWrapper setupConfig) throws SetupException {
+    public String applySetup(JsonWrapper setupConfig) {
 
         boolean success = false;
         systemService.setProcessingPending();

@@ -55,8 +55,7 @@ public class SystemStatusParser {
      * while (true) ; do sleep 2 ; echo -e "\n" ; date; systemctl status -a 2>/dev/null | grep ● -A 5 | grep ".service" -A 5  | grep "Active:" -A 5 | grep logstash -A 2; done
      */
 
-    static Pattern pattern = Pattern.compile(" *Active: ([^\\( ]+) \\(([^\\(\\)]+)\\).*");
-
+    static final Pattern pattern = Pattern.compile(" *Active: ([^\\( ]+) \\(([^\\(\\)]+)\\).*");
 
     private final Map<String, String> serviceStatus = new HashMap<>();
 

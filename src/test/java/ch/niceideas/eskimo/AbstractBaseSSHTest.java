@@ -41,13 +41,10 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
-import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.SshServer;
-import org.apache.sshd.server.auth.UserAuth;
 import org.apache.sshd.server.auth.UserAuthFactory;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
-import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
@@ -94,7 +91,7 @@ public abstract class AbstractBaseSSHTest {
     }
 
     @After
-    public void afterTestTeardown() throws Exception {
+    public void afterTestTeardown() {
         sshd.close(true);
     }
 
@@ -116,19 +113,17 @@ public abstract class AbstractBaseSSHTest {
         userAuthFactories.add(new UserAuthPublicKeyFactory());
         sshd.setUserAuthFactories(userAuthFactories);
 
-        sshd.setPublickeyAuthenticator(new PublickeyAuthenticator() {
-            public boolean authenticate(String username, PublicKey key, ServerSession session) {
-                // oh what the hell
-                return true;
-                /*
-                if(key instanceof RSAPublicKey) {
-                    String s1 = new String(encode((RSAPublicKey) key));
-                    String s2 = new String(Base64.decodeBase64(publicKeyRaw.getBytes()));
-                    return s1.equals(s2); //Returns true if the key matches our known key, this allows auth to proceed.
-                }
-                return false; //Doesn't handle other key types currently.
-                */
+        sshd.setPublickeyAuthenticator((username, key, session) -> {
+            // oh what the hell
+            return true;
+            /*
+            if(key instanceof RSAPublicKey) {
+                String s1 = new String(encode((RSAPublicKey) key));
+                String s2 = new String(Base64.decodeBase64(publicKeyRaw.getBytes()));
+                return s1.equals(s2); //Returns true if the key matches our known key, this allows auth to proceed.
             }
+            return false; //Doesn't handle other key types currently.
+            */
         });
 
 
@@ -159,7 +154,7 @@ public abstract class AbstractBaseSSHTest {
     JSch createjSchInstance() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, JSchException {
         JSch jsch = new JSch();
 
-        String privateKeyPath = ResourceUtils.getURL("classpath:AbstractBaseSSHTest/id_rsa").getPath();
+        //String privateKeyPath = ResourceUtils.getURL("classpath:AbstractBaseSSHTest/id_rsa").getPath();
         String publicKeyPath = ResourceUtils.getURL("classpath:AbstractBaseSSHTest/id_rsa.pub").getPath();
 
         File tempFileForKey = File.createTempFile("test", "key");
@@ -175,26 +170,21 @@ public abstract class AbstractBaseSSHTest {
 
         jsch.addIdentity(tempFileForKey.getAbsolutePath(), publicKeyPath, new byte[]{});
 
-        Hashtable<String, String> config = new Hashtable<String, String>();
+        Hashtable<String, String> config = new Hashtable<>();
         config.put("StrictHostKeyChecking", "no");
         JSch.setConfig(config);
 
         return jsch;
     }
 
-    String getFileContents(File downloadedFile)
-            throws FileNotFoundException, IOException
-    {
-        StringBuffer fileData = new StringBuffer();
-        BufferedReader reader = new BufferedReader(new FileReader(downloadedFile));
+    String getFileContents(File downloadedFile) throws IOException {
+        StringBuilder fileData = new StringBuilder();
 
-        try {
+        try (BufferedReader reader = new BufferedReader(new FileReader(downloadedFile))) {
             char[] buf = new char[1024];
-            for(int numRead = 0; (numRead = reader.read(buf)) != -1; buf = new char[1024]) {
+            for (int numRead = 0; (numRead = reader.read(buf)) != -1; buf = new char[1024]) {
                 fileData.append(String.valueOf(buf, 0, numRead));
             }
-        } finally {
-            reader.close();
         }
 
         return fileData.toString();

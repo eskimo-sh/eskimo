@@ -54,8 +54,8 @@ public abstract class StringUtils {
 
     private static final Logger logger = Logger.getLogger(StringUtils.class);
     
-    private static final Pattern INTEGER_VALUE = Pattern.compile(" *[\\-+]{0,1} *[0-9]+(\\.(0)*){0,1}");
-    private static final Pattern NUMERIC_VALUE = Pattern.compile(" *[\\-+]{0,1} *[0-9]+( *\\.[0-9]+){0,1}( *[Ee][0-9]+){0,1}");
+    private static final Pattern INTEGER_VALUE = Pattern.compile(" *[\\-+]? *[0-9]+(\\.(0)*)?");
+    private static final Pattern NUMERIC_VALUE = Pattern.compile(" *[\\-+]? *[0-9]+( *\\.[0-9]+)?( *[Ee][0-9]+)?");
 
     private static final char[] PHRASE_ENDING_CHARS = { '.', '!', '?' };
 
@@ -96,7 +96,7 @@ public abstract class StringUtils {
     }
 
     /** A table of hex digits */
-    private static char[] hexDigit = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    private static final char[] hexDigit = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     /**
      * Convert a nibble to a hex character
@@ -133,11 +133,6 @@ public abstract class StringUtils {
         return result;
     }
 
-    /**
-     * 
-     * @param value
-     * @return
-     */
     public static boolean isNumericValue(Object value) {        
         if (value == null) {
             return false;
@@ -146,12 +141,7 @@ public abstract class StringUtils {
         Matcher matcher = NUMERIC_VALUE.matcher(value.toString());
         return matcher.matches();        
     }
-    
-    /**
-     * 
-     * @param value
-     * @return
-     */
+
     public static boolean isIntegerValue(Object value) {        
         if (value == null) {
             return false;
@@ -532,7 +522,7 @@ public abstract class StringUtils {
         // the index of an occurrence we've found, or -1
         int patLen = oldPattern.length();
         while (index >= 0) {
-            sbuf.append(inString.substring(pos, index));
+            sbuf.append(inString, pos, index);
             sbuf.append(newPattern);
             pos = index + patLen;
             index = inString.indexOf(oldPattern, pos);
@@ -542,12 +532,6 @@ public abstract class StringUtils {
         return sbuf.toString();
     }
 
-    /**
-     * 
-     * @param source
-     * @param searches
-     * @return
-     */
     public static int[] multipleSearch (String source, String[] searches) {
         int[] ret = new int[searches.length]; 
         int[] temp  = new int[searches.length]; 
@@ -573,12 +557,6 @@ public abstract class StringUtils {
         return ret;
     }
 
-    
-    /**
-     * 
-     * @param source
-     * @return
-     */
     public static String reverseString (String source) {
     	for (int i = 0; i < source.length(); i++) {
     		if (source.charAt(i) == ' ') {

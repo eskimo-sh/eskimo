@@ -56,7 +56,6 @@ public class FileUtils {
      * Supports recursive deletion of directories
      * 
      * @param file the file to be deleted
-     * @throws IOException in case anything goes wrong
      */
     public static void delete(File file) throws FileDeleteFailedException {
 
@@ -155,7 +154,7 @@ public class FileUtils {
     public static String readFile (File file) throws FileException {
 
         StringBuilder resultBuilder = new StringBuilder();
-        try (BufferedReader fileReader= new BufferedReader(new FileReader(file));) {
+        try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
             String line = null;
 
             boolean first = true;

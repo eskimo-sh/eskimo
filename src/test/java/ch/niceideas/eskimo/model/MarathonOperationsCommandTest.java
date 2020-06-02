@@ -47,8 +47,6 @@ import static org.junit.Assert.*;
 
 public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTest {
 
-    private NodeRangeResolver nrr;
-
     private SystemService systemService = new SystemService() {
 
     };
@@ -57,7 +55,6 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        nrr = new NodeRangeResolver();
     }
 
     @Test

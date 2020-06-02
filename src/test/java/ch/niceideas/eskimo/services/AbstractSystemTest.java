@@ -128,7 +128,7 @@ public abstract class AbstractSystemTest {
 
         proxyManagerService.setConnectionManagerService(new ConnectionManagerService() {
             @Override
-            public void recreateTunnels(String host) throws ConnectionManagerException {
+            public void recreateTunnels(String host) {
             }
         });
         proxyManagerService.setWebSocketProxyServer(new WebSocketProxyServer(proxyManagerService, servicesDefinition) {
@@ -154,7 +154,7 @@ public abstract class AbstractSystemTest {
 
         sshCommandService = new SSHCommandService() {
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
                 if (script.equals("sudo cat /proc/meminfo | grep MemTotal")) {
                     switch (hostAddress) {
                         case "192.168.10.11":
@@ -165,17 +165,17 @@ public abstract class AbstractSystemTest {
                             return "MemTotal:        3999444 kB";
                     }
                 }
-                testSSHCommandScript.append(script + "\n");
+                testSSHCommandScript.append(script).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+            public String runSSHCommand(String hostAddress, String command) {
+                testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
-                testSCPCommands.append(hostAddress + "-" + filePath + "\n");
+            public void copySCPFile(String hostAddress, String filePath) {
+                testSCPCommands.append(hostAddress).append("-").append(filePath).append("\n");
             }
         };
 
@@ -186,7 +186,7 @@ public abstract class AbstractSystemTest {
         notificationService = new NotificationService();
 
         systemOperationService = new SystemOperationService();
-        systemOperationService.setNotificationService(notificationService);;
+        systemOperationService.setNotificationService(notificationService);
         systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
@@ -279,7 +279,7 @@ public abstract class AbstractSystemTest {
     protected MarathonService createMarathonService() {
         return new MarathonService() {
             @Override
-            protected String queryMarathon (String endpoint, String method) throws MarathonException {
+            protected String queryMarathon (String endpoint, String method) {
                 return "{}";
             }
         };

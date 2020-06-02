@@ -39,7 +39,6 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
-import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,8 +50,6 @@ import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
-
-    private static final Logger logger = Logger.getLogger(FlinkWorkerSetupTest.class);
 
     protected static String jailPath = null;
 

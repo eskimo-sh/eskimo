@@ -40,7 +40,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
 
-    var that = this;
+    const that = this;
 
     // initialized by backend
     var MARATHON_SERVICES = [];

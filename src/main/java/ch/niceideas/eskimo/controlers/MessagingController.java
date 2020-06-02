@@ -50,7 +50,7 @@ import java.util.HashMap;
 
 
 @Controller
-public class MessagingController extends AbstractInformationController {
+public class MessagingController extends AbstractInformationController<String, String> {
 
     private static final Logger logger = Logger.getLogger(MessagingController.class);
 

@@ -43,6 +43,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
 
@@ -125,7 +126,7 @@ public class SystemStatusParserTest {
             throw new ProcessHelper.ProcessHelperException("Impossible to load file " + fileName);
         }
 
-        BufferedReader reader = new BufferedReader( new InputStreamReader(scriptIs, "UTF-8"));
+        BufferedReader reader = new BufferedReader( new InputStreamReader(scriptIs, StandardCharsets.UTF_8));
         String line = null;
         StringBuilder sb = new StringBuilder();
         while ( (line = reader.readLine()) != null) {

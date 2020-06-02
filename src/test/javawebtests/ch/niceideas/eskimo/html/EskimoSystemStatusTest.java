@@ -51,8 +51,6 @@ import static org.junit.Assert.*;
 
 public class EskimoSystemStatusTest extends AbstractWebTest {
 
-    private static final Logger logger = Logger.getLogger(EskimoSystemStatusTest.class);
-
     private String jsonFullStatus = null;
     private String jsonNodesStatus = null;
     private String jsonStatusConfig = null;
@@ -243,9 +241,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                 "}");
 
         // HTMLUnit cannot load grafana
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
-        });
+        ScriptException exception = assertThrows(ScriptException.class,
+                () -> page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');"));
         assertTrue(exception.getMessage().endsWith("grafana/d/abcd/monitoring?orgId=1&&kiosk&refresh=50"));
 
         await().atMost(15, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#status-monitoring-no-dashboard').css('display')").getJavaScriptResult().toString().equals("none"));

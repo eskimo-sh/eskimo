@@ -33,10 +33,10 @@ Software.
 */
 
 
-var nodesConfigPropertyRE = /([a-zA-Z\-_]+)([0-9]*)/;
-var ipAddressCheck = /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+){0,1}/;
+const nodesConfigPropertyRE = /([a-zA-Z\-_]+)([0-9]*)/;
+const ipAddressCheck = /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)?/;
 
-var NODE_ID_FIELD = "node_id";
+const NODE_ID_FIELD = "node_id";
 
 
 function parseProperty (key) {
@@ -81,7 +81,7 @@ function enforceDependencies(setupConfig, servicesDependencies) {
         if (property != null) {
 
             var nodeNbr = -1;
-            if (property != null && property.nodeNumber != null) {
+            if (property.nodeNumber != null) {
                 nodeNbr = parseInt(property.nodeNumber);
             } else {
                 var nbr = setupConfig[key];
@@ -213,7 +213,7 @@ function checkNoMarathonServicesSelected(setupConfig, servicesConfiguration) {
         var property = parseProperty(key);
         if (property != null) {
 
-            if (property != null && property.serviceName != NODE_ID_FIELD) {
+            if (property.serviceName != NODE_ID_FIELD) {
                 var serviceConfig = servicesConfiguration[property.serviceName];
 
                 if (serviceConfig == null || serviceConfig.marathon) {

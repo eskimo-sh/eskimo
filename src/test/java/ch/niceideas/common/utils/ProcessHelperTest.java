@@ -4,7 +4,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertThrows;
@@ -34,9 +33,8 @@ public class ProcessHelperTest {
         String result = ProcessHelper.exec("ls /etc", true);
         assertTrue(result.contains("passwd"));
 
-        ProcessHelper.ProcessHelperException exception = assertThrows(ProcessHelper.ProcessHelperException.class, () -> {
-            ProcessHelper.exec("ls /zuasdzugzugsuzdg", true);
-        });
+        ProcessHelper.ProcessHelperException exception = assertThrows(ProcessHelper.ProcessHelperException.class,
+                () -> ProcessHelper.exec("ls /zuasdzugzugsuzdg", true));
 
         assertNotNull(exception);
         assertTrue(exception.getMessage().contains("No such file or directory"));
@@ -48,9 +46,8 @@ public class ProcessHelperTest {
         String result = ProcessHelper.exec(new String[] {"ls", "/etc"}, true);
         assertTrue(result.contains("passwd"));
 
-        ProcessHelper.ProcessHelperException exception = assertThrows(ProcessHelper.ProcessHelperException.class, () -> {
-            ProcessHelper.exec(new String[] {"ls", "/zuasdzugzugsuzdg"}, true);
-        });
+        ProcessHelper.ProcessHelperException exception = assertThrows(ProcessHelper.ProcessHelperException.class,
+                () -> ProcessHelper.exec(new String[] {"ls", "/zuasdzugzugsuzdg"}, true));
 
         assertNotNull(exception);
         assertTrue(exception.getMessage().contains("No such file or directory"));

@@ -42,7 +42,7 @@ eskimo.SettingsOperationsCommand = function(constructorObject) {
     this.eskimoMessaging = null;
     this.eskimoServicesSettings = null;
 
-    var that = this;
+    const that = this;
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -110,7 +110,7 @@ eskimo.SettingsOperationsCommand = function(constructorObject) {
 
         commandDescription += "<br>";
 
-        if (command.warnings && command.warnings != null && command.warnings.trim() != "") {
+        if (command.warnings && command.warnings.trim() != "") {
 
             commandDescription = commandDescription +
                 '<div class="col-xs-12 col-md-12">' +

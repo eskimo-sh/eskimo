@@ -40,7 +40,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class EskimoFileManagersTest extends AbstractWebTest {
@@ -92,7 +91,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testNominal() throws Exception {
+    public void testNominal() {
 
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
@@ -123,7 +122,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testFindFileManager() throws Exception {
+    public void testFindFileManager() {
 
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
@@ -137,7 +136,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testUpdateCurrentFolder() throws Exception {
+    public void testUpdateCurrentFolder() {
 
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
         page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");

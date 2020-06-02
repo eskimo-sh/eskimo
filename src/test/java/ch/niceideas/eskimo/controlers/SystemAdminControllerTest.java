@@ -152,7 +152,7 @@ public class SystemAdminControllerTest {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 ServicesInstallStatusWrapper retWrapper = StandardSetupHelpers.getStandard2NodesInstallStatus();
-                assertTrue(retWrapper.getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13").equals("OK"));
+                assertEquals ("OK", retWrapper.getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
                 return retWrapper;
             }
             @Override

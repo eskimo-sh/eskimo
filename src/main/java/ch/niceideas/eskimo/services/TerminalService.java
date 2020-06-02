@@ -78,7 +78,7 @@ public class TerminalService {
     private ConnectionManagerService connectionManagerService;
 
     /* Controlers are singleton */
-    private Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
     private final Timer timer;
 
@@ -90,7 +90,7 @@ public class TerminalService {
         timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    for (String sessionId : new ArrayList<String>(sessions.keySet())) {
+                    for (String sessionId : new ArrayList<>(sessions.keySet())) {
                         Session session = sessions.get (sessionId);
                         if (System.currentTimeMillis() - session.getLastAccess() > idleTimeoutSeconds * 1000) {
                             try {

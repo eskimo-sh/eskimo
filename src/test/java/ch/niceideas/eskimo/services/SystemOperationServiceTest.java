@@ -48,15 +48,12 @@ import static org.junit.Assert.assertNotNull;
 
 public class SystemOperationServiceTest extends AbstractSystemTest {
 
-    private static final Logger logger = Logger.getLogger(SystemOperationServiceTest.class);
-
     @Test
     public void testApplySystemOperation() throws Exception {
 
         systemOperationService.applySystemOperation("Test",
-            result -> {
-                result.append("In operation\n");
-            }, null);
+                result -> result.append("In operation\n"),
+                null);
 
         Pair<Integer, String> messages = messagingService.fetchElements(0);
         assertNotNull (messages);

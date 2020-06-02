@@ -72,13 +72,13 @@ public class Service {
 
     private MemoryConsumptionSize memoryConsumptionSize;
 
-    private List<String> additionalmemoryServices = new ArrayList<>();
+    private final List<String> additionalmemoryServices = new ArrayList<>();
 
     private String logo;
 
     private String icon;
 
-    private List<Command> commands = new ArrayList<>();
+    private final List<Command> commands = new ArrayList<>();
 
     public List<Command> getCommands() {
         return commands;
@@ -92,7 +92,7 @@ public class Service {
         return commands.stream()
                 .filter(command -> command.getId().equals(commandId))
                 .findFirst()
-                .orElseGet(() -> null);
+                .orElse(null);
     }
 
     public String getIcon() {

@@ -37,7 +37,7 @@ var ajaxterm={};
 ajaxterm.Terminal=function(id,options) {
 
     this.id = id;
-    var that = this;
+    const that = this;
 
     // options
     var width  = options.width || 80; // dimension of the terminal
@@ -83,7 +83,7 @@ ajaxterm.Terminal=function(id,options) {
 	};
 
 	this.close = function() {
-		if (timeout && timeout != null) {
+		if (timeout) {
             window.clearTimeout(timeout);
         }
         $("#" + that.id).find("pre").each(function() {
@@ -308,13 +308,13 @@ ajaxterm.Terminal=function(id,options) {
 			if (ev.shiftKey) {
 				if (kc == 37) { // Ctrl+Shift+Left
 					k = "";
-					if (showPrevTab && showPrevTab != null) {
+					if (showPrevTab) {
 						showPrevTab();
 					}
 				}
 				else if (kc == 39) { // Ctrl+Shift+Left
                     k = "";
-                    if (showNextTab && showNextTab != null) {
+                    if (showNextTab) {
                         showNextTab();
                     }
                 } else if (kc == 86) { // Ctrl+Shift+V

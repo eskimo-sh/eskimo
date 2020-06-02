@@ -118,15 +118,16 @@ public class ServicesProxyServletTest {
                 ServicesProxyServletTest.class.getClassLoader(),
                 new Class[] { HttpServletRequest.class },
                 (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getRequestURI")) {
-                        return "/mesos-master/statistics?server=192.168.10.13";
-                    } else if (method.getName().equals("getPathInfo")) {
-                        return "/mesos-master/statistics";
-                    } else if (method.getName().equals("getQueryString")) {
-                        return "server=192.168.10.13";
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
+                    switch (method.getName()) {
+                        case "getRequestURI":
+                            return "/mesos-master/statistics?server=192.168.10.13";
+                        case "getPathInfo":
+                            return "/mesos-master/statistics";
+                        case "getQueryString":
+                            return "server=192.168.10.13";
+                        default:
+                            throw new UnsupportedOperationException(
+                                    "Unsupported method: " + method.getName());
                     }
                 });
         pms.updateServerForService("mesos-master", "192.168.10.11");
@@ -143,19 +144,20 @@ public class ServicesProxyServletTest {
                 ServicesProxyServletTest.class.getClassLoader(),
                 new Class[] { HttpServletRequest.class },
                 (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getRequestURI")) {
-                        return "/mesos-master/statistics?server=192.168.10.13";
-                    } else if (method.getName().equals("getPathInfo")) {
-                        return "/mesos-master/statistics";
-                    } else if (method.getName().equals("getRequestURL")) {
-                        return new StringBuffer("http://localhost:9090/mesos-master/statistics");
-                    } else if (method.getName().equals("getQueryString")) {
-                        return "server=192.168.10.13";
-                    } else if (method.getName().equals("getContextPath")) {
-                        return null;
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
+                    switch (method.getName()) {
+                        case "getRequestURI":
+                            return "/mesos-master/statistics?server=192.168.10.13";
+                        case "getPathInfo":
+                            return "/mesos-master/statistics";
+                        case "getRequestURL":
+                            return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                        case "getQueryString":
+                            return "server=192.168.10.13";
+                        case "getContextPath":
+                            return null;
+                        default:
+                            throw new UnsupportedOperationException(
+                                    "Unsupported method: " + method.getName());
                     }
                 });
         pms.updateServerForService("mesos-master", "192.168.10.11");
@@ -298,19 +300,20 @@ public class ServicesProxyServletTest {
                 ServicesProxyServletTest.class.getClassLoader(),
                 new Class[] { HttpServletRequest.class },
                 (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getRequestURI")) {
-                        return "/mesos-master/statistics?server=192.168.10.13";
-                    } else if (method.getName().equals("getPathInfo")) {
-                        return "/mesos-master/statistics";
-                    } else if (method.getName().equals("getRequestURL")) {
-                        return new StringBuffer("http://localhost:9090/mesos-master/statistics");
-                    } else if (method.getName().equals("getQueryString")) {
-                        return "server=192.168.10.13";
-                    } else if (method.getName().equals("getContextPath")) {
-                        return null;
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
+                    switch (method.getName()) {
+                        case "getRequestURI":
+                            return "/mesos-master/statistics?server=192.168.10.13";
+                        case "getPathInfo":
+                            return "/mesos-master/statistics";
+                        case "getRequestURL":
+                            return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                        case "getQueryString":
+                            return "server=192.168.10.13";
+                        case "getContextPath":
+                            return null;
+                        default:
+                            throw new UnsupportedOperationException(
+                                    "Unsupported method: " + method.getName());
                     }
                 });
 
@@ -368,19 +371,20 @@ public class ServicesProxyServletTest {
                 ServicesProxyServletTest.class.getClassLoader(),
                 new Class[] { HttpServletRequest.class },
                 (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getRequestURI")) {
-                        return "/mesos-master/statistics?server=192.168.10.13";
-                    } else if (method.getName().equals("getPathInfo")) {
-                        return "/mesos-master/statistics";
-                    } else if (method.getName().equals("getRequestURL")) {
-                        return new StringBuffer("http://localhost:9090/mesos-master/statistics");
-                    } else if (method.getName().equals("getQueryString")) {
-                        return "server=192.168.10.13";
-                    } else if (method.getName().equals("getContextPath")) {
-                        return null;
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
+                    switch (method.getName()) {
+                        case "getRequestURI":
+                            return "/mesos-master/statistics?server=192.168.10.13";
+                        case "getPathInfo":
+                            return "/mesos-master/statistics";
+                        case "getRequestURL":
+                            return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                        case "getQueryString":
+                            return "server=192.168.10.13";
+                        case "getContextPath":
+                            return null;
+                        default:
+                            throw new UnsupportedOperationException(
+                                    "Unsupported method: " + method.getName());
                     }
                 });
 

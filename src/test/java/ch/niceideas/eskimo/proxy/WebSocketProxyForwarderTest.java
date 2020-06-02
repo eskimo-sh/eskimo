@@ -88,6 +88,6 @@ public class WebSocketProxyForwarderTest {
         assertTrue (serverMessages.isEmpty());
         assertFalse (clientMessages.isEmpty());
 
-        assertEquals("ABC", ((WebSocketMessage)clientMessages.get(0)).getPayload());
+        assertEquals("ABC", ((WebSocketMessage<?>)clientMessages.get(0)).getPayload());
     }
 }

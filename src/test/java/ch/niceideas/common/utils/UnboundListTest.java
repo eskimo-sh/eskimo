@@ -74,16 +74,12 @@ public class UnboundListTest {
         addElementsFirst();
 
         testList.get(4);
-        IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.get(5);
-        });
+        IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.get(5));
         assertEquals("Index: 5, Size: 5", exception.getMessage());
 
         addElementsSecond();
         testList.get(10);
-        exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.get(11);
-        });
+        exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.get(11));
         assertEquals("11 is beyond last element index 10", exception.getMessage());
     }
 
@@ -95,9 +91,7 @@ public class UnboundListTest {
         assertEquals("0,1", String.join(",", testList.subList(0, 2)));
         assertEquals("0,1,2,3", String.join(",", testList.subList(0, 4)));
 
-        IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.subList(4, 6);
-        });
+        IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.subList(4, 6));
         assertEquals("toIndex = 6", exception.getMessage());
 
         addElementsSecond();
@@ -108,19 +102,13 @@ public class UnboundListTest {
         assertEquals("1", String.join(",", testList.subList(0, 2)));
         assertEquals("1,2,3,4", String.join(",", testList.subList(0, 5)));
 
-        exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.subList(-1, 2);
-        });
+        exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.subList(-1, 2));
         assertEquals("fromIndex = -1", exception.getMessage());
 
-        exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.subList(10, 12);
-        });
+        exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.subList(10, 12));
         assertEquals("toIndex = 12", exception.getMessage());
 
-        exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.subList(11, 15);
-        });
+        exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.subList(11, 15));
         assertEquals("toIndex = 15", exception.getMessage());
 
         // add some more elements
@@ -172,14 +160,10 @@ public class UnboundListTest {
         assertEquals(0, testList.size());
         assertTrue(testList.isEmpty());
 
-        IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.get(0);
-        });
+        IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.get(0));
         assertEquals("Index: 0, Size: 0", exception.getMessage());
 
-        exception = assertThrows(IndexOutOfBoundsException.class, () -> {
-            testList.subList(0, 1);
-        });
+        exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.subList(0, 1));
         assertEquals("toIndex = 1", exception.getMessage());
     }
 

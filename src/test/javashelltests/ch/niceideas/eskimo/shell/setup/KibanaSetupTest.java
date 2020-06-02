@@ -47,8 +47,6 @@ import java.io.IOException;
 
 public class KibanaSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(KibanaSetupTest.class);
-
     protected static String jailPath = null;
 
     private static boolean initialized = false;

@@ -42,7 +42,7 @@ eskimo.SetupCommand = function(constructorObject) {
     this.eskimoMessaging = null;
     this.eskimoSetup = null;
 
-    var that = this;
+    const that = this;
 
     this.initialize = function() {
         // Initialize HTML Div from Template

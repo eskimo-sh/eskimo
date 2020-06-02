@@ -56,7 +56,7 @@ public abstract class AbstractServicesDefinitionTest {
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }
 
-    public void initFirstNodeDependencies() throws Exception {
+    public void initFirstNodeDependencies() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -92,7 +92,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initSameNodeOrRandomDependencies() throws Exception {
+    public void initSameNodeOrRandomDependencies() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -128,7 +128,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initRandomDependencies() throws Exception {
+    public void initRandomDependencies() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -164,7 +164,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initRandomDependenciesFewer() throws Exception {
+    public void initRandomDependenciesFewer() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -195,7 +195,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initRandomNodeAfterOrSameDependencies() throws Exception {
+    public void initRandomNodeAfterOrSameDependencies() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -231,7 +231,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initRandomNodeAfterDependencies() throws Exception {
+    public void initRandomNodeAfterDependencies() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -267,7 +267,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initAdditionalEnvironment() throws Exception {
+    public void initAdditionalEnvironment() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -289,7 +289,7 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
-    public void initAdditionalNodeList() throws Exception {
+    public void initAdditionalNodeList() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -321,7 +321,7 @@ public abstract class AbstractServicesDefinitionTest {
     }
 
 
-    public void initAdditionalNodeListWithAdditionalMemory() throws Exception {
+    public void initAdditionalNodeListWithAdditionalMemory() {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");

@@ -35,9 +35,7 @@ public class MessagingControllerTest {
             }
         });
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            messagingController.fetchMessages(0);
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> messagingController.fetchMessages(0));
 
         assertEquals ("org.json.JSONException: Test Error", exception.getMessage());
     }

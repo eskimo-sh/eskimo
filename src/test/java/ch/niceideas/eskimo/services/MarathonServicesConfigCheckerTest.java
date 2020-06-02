@@ -41,7 +41,6 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -67,7 +66,7 @@ public class MarathonServicesConfigCheckerTest {
         marathonConfigChecker.setServicesDefinition(def);
 
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
-        marathonConfigChecker.setConfigurationService(configurationService);;
+        marathonConfigChecker.setConfigurationService(configurationService);
 
         ServicesDefinition servicesDefinition = new ServicesDefinition();
         servicesDefinition.afterPropertiesSet();

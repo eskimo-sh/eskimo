@@ -39,8 +39,6 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +47,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,9 +55,6 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
 public class MarathonServiceTest extends AbstractSystemTest {
-
-    private static final Logger logger = Logger.getLogger(MarathonServiceTest.class);
-
 
     @Before
     @Override
@@ -221,9 +215,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
-        MarathonException exception = assertThrows(MarathonException.class, () -> {
-            marathonService.applyMarathonServicesConfig(command);
-        });
+        MarathonException exception = assertThrows(MarathonException.class, () -> marathonService.applyMarathonServicesConfig(command));
         assertNotNull(exception);
         assertEquals("ch.niceideas.eskimo.services.SystemException: Marathon doesn't seem to be installed", exception.getMessage());
 
@@ -235,10 +227,9 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         marathonService.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
-            String installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
+            void installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
                                               MemoryModel memoryModel, String ipAddress) {
                 // No-Op
-                return "OK";
             }
         });
 
@@ -294,7 +285,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         status = marathonService.getAndWaitServiceRuntimeNode ("cerebro", 1);
         assertNotNull(status);
-        assertEquals(null, status.getKey());
+        assertNull(status.getKey());
         assertEquals("NA", status.getValue());
 
         /* FIXME Find out why I cann't make this work
@@ -369,9 +360,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
-        MarathonException exception = assertThrows(MarathonException.class, () -> {
-            marathonService.ensureMarathonAvailability();
-        });
+        MarathonException exception = assertThrows(MarathonException.class, () -> marathonService.ensureMarathonAvailability());
         assertNotNull(exception);
         assertEquals("Couldn't get last marathon Service status", exception.getMessage());
 
@@ -383,9 +372,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
-        exception = assertThrows(MarathonException.class, () -> {
-            marathonService.ensureMarathonAvailability();
-        });
+        exception = assertThrows(MarathonException.class, () -> marathonService.ensureMarathonAvailability());
         assertNotNull(exception);
         assertEquals("Marathon is not available", exception.getMessage());
 
@@ -397,9 +384,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
-        exception = assertThrows(MarathonException.class, () -> {
-            marathonService.ensureMarathonAvailability();
-        });
+        exception = assertThrows(MarathonException.class, marathonService::ensureMarathonAvailability);
         assertNotNull(exception);
         assertEquals("Marathon is not properly running", exception.getMessage());
 
@@ -699,8 +684,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournalMarathon () throws Exception {
-
-        final List<String> marathonApiCalls = new ArrayList<>();
 
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override

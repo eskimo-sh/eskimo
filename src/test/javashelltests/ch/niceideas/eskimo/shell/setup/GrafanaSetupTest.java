@@ -48,8 +48,6 @@ import java.io.IOException;
 
 public class GrafanaSetupTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(GrafanaSetupTest.class);
-
     protected static String jailPath = null;
 
     private static boolean initialized = false;

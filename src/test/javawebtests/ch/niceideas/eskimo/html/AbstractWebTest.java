@@ -52,9 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -113,8 +111,8 @@ public abstract class AbstractWebTest {
     }
 
     @Before
-    public void setUpClassName() throws Exception {
-        Class clazz = this.getClass(); //if you want to get Class object
+    public void setUpClassName() {
+        Class<?> clazz = this.getClass(); //if you want to get Class object
         className = clazz.getCanonicalName(); //you want to get only class name
     }
 
@@ -145,14 +143,13 @@ public abstract class AbstractWebTest {
 
     private static String mergeJSON() {
         SortedMap<String, FileData> total = new TreeMap<>();
-        for (int i = 0; i < coverages.size(); i++) {
-            String json = coverages.get(i);
+        for (String json : coverages) {
             total = jsonDataMerger.mergeJSONCoverageMaps(total, jsonDataMerger.jsonToMap(json));
         }
         return GenerateLCOV.toJSON(total);
     }
 
-    protected static final boolean isCoverageRun() {
+    protected static boolean isCoverageRun() {
         //return true;
         return jsCoverageFlagFile.exists();
     }

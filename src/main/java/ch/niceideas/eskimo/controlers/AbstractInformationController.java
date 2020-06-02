@@ -44,11 +44,11 @@ import java.util.HashMap;
 
 
 @Controller
-public class AbstractInformationController {
+public class AbstractInformationController<T, R>  {
 
     private static final Logger logger = Logger.getLogger(AbstractInformationController.class);
 
-    String getLastlineElement(AbstractInformationService is) {
+    String getLastlineElement(AbstractInformationService<T, R>  is) {
         return lastLine(is.getLastElement());
     }
 
@@ -64,7 +64,7 @@ public class AbstractInformationController {
         }
     }
 
-    public String clear(AbstractInformationService is) {
+    public String clear(AbstractInformationService<T, R>  is) {
         try {
             is.clear();
             return new JSONObject(new HashMap<String, Object>() {{

@@ -44,46 +44,52 @@ Software.
 
                 <div id="marathon-servicesplaceholder" class="col-md-12 col-xs-12">
 
-                    <div class="col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-offset-2 col-md-offset-1" id="marathon-services-container-table">
+                    <div class="col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-offset-2 col-md-offset-1"
+                         id="marathon-services-container-table">
                         <div class="table-responsive">
                             <table id="marathon-services-table" class="table table-bordered table-hover">
                                 <thead id="marathon-services-table-head">
-                                    <tr>
-                                        <td></td>
-                                        <td>Service</td>
-                                        <td>Enabled on Marathon</td>
-                                    </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>Service</td>
+                                    <td>Enabled on Marathon</td>
+                                </tr>
                                 </thead>
                                 <tbody id="marathon-services-table-body">
                                 </tbody>
                             </table>
                         </div>
 
-                </div>
+                    </div>
 
-                <div class="col-md-12 col-xs-12 btn-toolbar" id="save-nodes">
-                    <div class="btn-group">
-                        <button id="save-marathon-servicesbtn" name="save-marathon-servicesbtn" class="btn btn-primary">
-                            Apply Configuration
-                        </button>
+                    <div class="col-md-12 col-xs-12 btn-toolbar" id="save-nodes">
+                        <div class="btn-group">
+                            <button id="save-marathon-servicesbtn" name="save-marathon-servicesbtn"
+                                    class="btn btn-primary">
+                                Apply Configuration
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button id="reinstall-marathon-servicesbtn" name="reinstall-marathon-servicesbtn"
+                                    class="btn btn-primary">
+                                Force Reinstall
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button id="select-all-marathon-servicesconfig" name="select-all-marathon-servicesconfig"
+                                    class="btn btn-default">
+                                Select All
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button id="reset-marathon-servicesconfig" name="reset-marathon-servicesconfig"
+                                    class="btn btn-default">
+                                Reset
+                            </button>
+                        </div>
                     </div>
-                    <div class="btn-group">
-                        <button id="reinstall-marathon-servicesbtn" name="reinstall-marathon-servicesbtn" class="btn btn-primary">
-                            Force Reinstall
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button id="select-all-marathon-servicesconfig" name="select-all-marathon-servicesconfig" class="btn btn-default">
-                            Select All
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button id="reset-marathon-servicesconfig" name="reset-marathon-servicesconfig" class="btn btn-default">
-                            Reset
-                        </button>
-                    </div>
-                </div>
 
+                </div>
             </div>
         </div>
     </form>

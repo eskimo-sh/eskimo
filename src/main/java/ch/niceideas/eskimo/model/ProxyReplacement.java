@@ -5,7 +5,7 @@ import ch.niceideas.common.utils.StringUtils;
 public class ProxyReplacement {
 
     public enum ProxyReplacementType {
-        PLAIN;
+        PLAIN
     }
 
     private ProxyReplacementType type;

@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
-import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;

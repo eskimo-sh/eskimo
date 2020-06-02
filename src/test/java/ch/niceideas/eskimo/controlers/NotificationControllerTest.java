@@ -50,9 +50,7 @@ public class NotificationControllerTest {
             }
         });
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            notificationController.fetchNotifications(0);
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> notificationController.fetchNotifications(0));
 
         assertEquals ("org.json.JSONException: Test Error", exception.getMessage());
     }

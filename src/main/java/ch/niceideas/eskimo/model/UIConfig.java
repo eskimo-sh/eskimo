@@ -51,7 +51,7 @@ public class UIConfig {
 
     private boolean applyStandardProxyReplacements = true;
     private String statusPageLinkTitle;
-    private List<ProxyReplacement> proxyReplacements = new ArrayList<>();
+    private final List<ProxyReplacement> proxyReplacements = new ArrayList<>();
 
     public UIConfig (Service service) {
         this.service = service;

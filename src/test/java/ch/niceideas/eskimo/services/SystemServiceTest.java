@@ -89,7 +89,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Override
     protected MarathonService createMarathonService() {
-        MarathonService marathonService = new MarathonService() {
+        return new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
                 return new Pair<>("192.168.10.11", "running");
@@ -104,8 +104,6 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return "";
             }
         };
-
-        return marathonService;
     }
 
     public static String createTempStoragePath() throws Exception {
@@ -144,9 +142,8 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testCallCommand() throws Exception {
 
-        SSHCommandException exception = assertThrows(SSHCommandException.class, () -> {
-            systemService.callCommand("dummy", "ntp", "192.168.10.11");
-        });
+        SSHCommandException exception = assertThrows(SSHCommandException.class,
+                () -> systemService.callCommand("dummy", "ntp", "192.168.10.11"));
         assertNotNull(exception);
         assertEquals("Command dummy is unknown for service ntp", exception.getMessage());
 
@@ -180,7 +177,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
             @Override
             public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+                testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
@@ -246,7 +243,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
             @Override
             public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+                testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
@@ -260,7 +257,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertEquals(9, statusMap.size());
 
-        assertEquals(null, statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to marathon
+        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_spark-executor_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
@@ -293,7 +290,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
             @Override
             public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+                testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
@@ -339,7 +336,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
             @Override
             public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command + "\n");
+                testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
@@ -355,7 +352,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertEquals(9, statusMap.size());
 
-        assertEquals(null, statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to marathon
+        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
         assertEquals("restart", statusMap.get("service_spark-executor_192-168-10-11"));
         assertEquals("restart", statusMap.get("service_gluster_192-168-10-11"));
@@ -434,7 +431,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getRootKeys().stream()
                 .filter(key -> key.contains("192-168-10-13") && !key.contains("nbr")  && !key.contains("alive"))
                 .forEach(toBeremoved::add);
-        toBeremoved.stream()
+        toBeremoved
                 .forEach(systemStatus::removeRootKey);
         systemStatus.setValueForPath(SystemStatusWrapper.NODE_ALIVE_FLAG + "192-168-10-13", "KO");
 
@@ -496,7 +493,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getRootKeys().stream()
                 .filter(key -> key.contains("192-168-10-13") && !key.contains("nbr")  && !key.contains("alive"))
                 .forEach(toBeremoved::add);
-        toBeremoved.stream()
+        toBeremoved
                 .forEach(systemStatus::removeRootKey);
         systemStatus.setValueForPath("node_alive_192-168-10-13", "KO");
 
@@ -608,7 +605,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getRootKeys().stream()
                 .filter(key -> key.contains("192-168-10-13") && !key.contains("kafka") && !key.contains("elasticsearch") && !key.contains("nbr")  && !key.contains("alive"))
                 .forEach(toBeremoved::add);
-        toBeremoved.stream()
+        toBeremoved
                 .forEach(systemStatus::removeRootKey);
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
@@ -669,7 +666,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getRootKeys().stream()
                 .filter(key -> key.contains("192-168-10-13"))
                 .forEach(toBeremoved::add);
-        toBeremoved.stream()
+        toBeremoved
                 .forEach(systemStatus::removeRootKey);
 
 
@@ -719,7 +716,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemStatus.getRootKeys().stream()
                 .filter(key -> key.contains("192-168-10-13"))
                 .forEach(toBeremoved::add);
-        toBeremoved.stream()
+        toBeremoved
                 .forEach(systemStatus::removeRootKey);
 
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);

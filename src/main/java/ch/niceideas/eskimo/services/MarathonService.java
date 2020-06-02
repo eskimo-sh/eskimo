@@ -96,7 +96,7 @@ public class MarathonService {
     @Value("${system.baseInstallWaitTimoutSeconds}")
     private int baseInstallWaitTimout = 1000;
 
-    private HttpClient httpClient;
+    private final HttpClient httpClient;
 
     /* For tests */
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
@@ -245,7 +245,7 @@ public class MarathonService {
     protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws
             MarathonException  {
 
-        ServicesInstallStatusWrapper servicesInstallStatus = null;
+        ServicesInstallStatusWrapper servicesInstallStatus;
         try {
             servicesInstallStatus = configurationService.loadServicesInstallationStatus();
         } catch (FileException | SetupException e) {
@@ -312,7 +312,7 @@ public class MarathonService {
             //Integer tasksUnhealthy = (Integer) serviceResult.getValueForPath("app.tasksUnhealthy");
 
             Integer tasksRunning = (Integer) serviceResult.getValueForPath("app.tasksRunning");
-            if (tasksRunning != null && tasksRunning.intValue() == 1) {
+            if (tasksRunning != null && tasksRunning == 1) {
                 status = RUNNING_STATUS;
             }
 
@@ -497,37 +497,22 @@ public class MarathonService {
                 status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
     }
 
-    private String proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonIpAddress, String service)
+    private void proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonIpAddress, String service)
             throws SSHCommandException, SystemException, MarathonException {
 
         // 1. Calling uninstall.sh script if it exists
-        File containerFolder = new File(servicesSetupPath + "/" + service);
-        if (!containerFolder.exists()) {
-            throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
-        }
-
-        try {
-            File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
-            if (uninstallScriptFile.exists()) {
-                sb.append(" - Calling uninstall script\n");
-
-                sb.append(sshCommandService.runSSHScriptPath(marathonIpAddress, uninstallScriptFile.getAbsolutePath()));
-            }
-        } catch (SSHCommandException e) {
-            logger.warn (e, e);
-            sb.append (e.getMessage());
-        }
+        systemService.callUninstallScript(sb, marathonIpAddress, service);
 
         // 2. Stop service
-        sb.append("Deleting marathon application for " + service + "\n");
+        sb.append("Deleting marathon application for ").append(service).append("\n");
         String killResultString = queryMarathon(MARATHON_CONTEXT + service, "DELETE");
         JsonWrapper killResult = new JsonWrapper(killResultString);
 
         String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
         if (StringUtils.isBlank(deploymentId)) {
-            sb.append("WARNING : Could not find any deployment ID when killing tasks for " + service + "\n");
+            sb.append("WARNING : Could not find any deployment ID when killing tasks for ").append(service).append("\n");
         } else {
-            sb.append("Tasks killing deployment ID for " + service + " is " + deploymentId + "\n");
+            sb.append("Tasks killing deployment ID for ").append(service).append(" is ").append(deploymentId).append("\n");
         }
 
         // 3. Wait for service to be stopped
@@ -547,8 +532,6 @@ public class MarathonService {
         sb.append(" - Running garbage collection \n");
         sshCommandService.runSSHCommand(marathonIpAddress,
                 "docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
-
-        return sb.toString();
     }
 
     private void proceedWithMarathonServiceInstallation(StringBuilder sb, String marathonIpAddress, String service)
@@ -655,7 +638,7 @@ public class MarathonService {
 
         StringBuilder resultBuilder = new StringBuilder();
 
-        JsonWrapper mesosInfo = null;
+        JsonWrapper mesosInfo;
         try {
             String mesosInfoResult = queryMarathon("info");
 
@@ -682,7 +665,7 @@ public class MarathonService {
 
             JsonWrapper serviceResult = new JsonWrapper(serviceJson);
 
-            resultBuilder.append ("Marathon Service Definition for " + service.getName() + ":\n");
+            resultBuilder.append("Marathon Service Definition for ").append(service.getName()).append(":\n");
             resultBuilder.append (SEPARATOR);
             resultBuilder.append(serviceResult.getFormattedValue());
             resultBuilder.append ("\n\n");
@@ -694,7 +677,7 @@ public class MarathonService {
 
             String mesosTaskId = serviceResult.getValueForPathAsString("app.tasks.0.id"); // 3
 
-            JsonWrapper mesosAgentState = null;
+            JsonWrapper mesosAgentState;
             try {
 
                 String mesosAgentStateString = queryMesosAgent (mesosNodeIp, "state");
@@ -709,7 +692,7 @@ public class MarathonService {
 
             } catch (MarathonException e) {
                 logger.error (e, e);
-                resultBuilder.append ("Failed to fetch mesos agent information for " + mesosNodeIp + " !\n");
+                resultBuilder.append("Failed to fetch mesos agent information for ").append(mesosNodeIp).append(" !\n");
                 resultBuilder.append ("Got exception\n");
                 resultBuilder.append (e.getMessage());
 
@@ -744,14 +727,14 @@ public class MarathonService {
                 }
             }
 
-            resultBuilder.append ("Mesos Information for service " + service.getName() + " :\n");
+            resultBuilder.append("Mesos Information for service ").append(service.getName()).append(" :\n");
             resultBuilder.append (SEPARATOR);
-            resultBuilder.append (" - Mesos Node IP              : " + mesosNodeIp + "\n");
-            resultBuilder.append (" - Mesos Slave ID             : " + mesosSlaveId + "\n");
-            resultBuilder.append (" - Marathon framework ID      : " + frameworkId + "\n");
-            resultBuilder.append (" - Mesos Task ID              : " + mesosTaskId + "\n");
-            resultBuilder.append (" - Mesos Container ID         : " + mesosContainerId + "\n");
-            resultBuilder.append (" - Mesos Container directory  : " + mesosContainerDirectory + "\n\n");
+            resultBuilder.append(" - Mesos Node IP              : ").append(mesosNodeIp).append("\n");
+            resultBuilder.append(" - Mesos Slave ID             : ").append(mesosSlaveId).append("\n");
+            resultBuilder.append(" - Marathon framework ID      : ").append(frameworkId).append("\n");
+            resultBuilder.append(" - Mesos Task ID              : ").append(mesosTaskId).append("\n");
+            resultBuilder.append(" - Mesos Container ID         : ").append(mesosContainerId).append("\n");
+            resultBuilder.append(" - Mesos Container directory  : ").append(mesosContainerDirectory).append("\n\n");
 
             String stdOutContent = queryMesosAgent(mesosNodeIp, "/files/download?path=" + mesosContainerDirectory + "/stdout");
 
@@ -780,7 +763,7 @@ public class MarathonService {
 
         } catch (MarathonException e) {
             logger.error (e, e);
-            resultBuilder.append ("Failed to fetch journal for " + service.getName() + " !\n");
+            resultBuilder.append("Failed to fetch journal for ").append(service.getName()).append(" !\n");
             resultBuilder.append ("Got exception\n");
             resultBuilder.append (e.getMessage());
         }
@@ -805,12 +788,12 @@ public class MarathonService {
         boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
 
         if (!installed) {
-            log.append("ERROR - Service " + service.getName() + " is not installed." + "\n");
+            log.append("ERROR - Service ").append(service.getName()).append(" is not installed.").append("\n");
             throw new MarathonException("Service " + service.getName() + " is not installed.");
 
         } else if (running) {
 
-            log.append("WARNING - Service " + service.getName() + " is already started" + "\n");
+            log.append("WARNING - Service ").append(service.getName()).append(" is already started").append("\n");
 
         } else {
 
@@ -819,9 +802,9 @@ public class MarathonService {
 
             String deploymentId = startResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
             if (StringUtils.isBlank(deploymentId)) {
-                log.append("WARNING : Could not find any deployment ID when starting tasks for " + service.getName() + "\n");
+                log.append("WARNING : Could not find any deployment ID when starting tasks for ").append(service.getName()).append("\n");
             } else {
-                log.append("Tasks starting deployment ID for " + service.getName() + " is " + deploymentId + "\n");
+                log.append("Tasks starting deployment ID for ").append(service.getName()).append(" is ").append(deploymentId).append("\n");
             }
         }
 
@@ -842,25 +825,25 @@ public class MarathonService {
 
         boolean installed = StringUtils.isNotBlank(nodeIp);
         if (!installed) {
-            log.append ("Warning : Service " + service.getName() + " is not installed");
+            log.append("Warning : Service ").append(service.getName()).append(" is not installed");
 
         } else {
 
             boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
             if (!running) {
-                log.append("Info: Service " + service.getName() + " was not running");
+                log.append("Info: Service ").append(service.getName()).append(" was not running");
             } else {
 
                 // 1. Kill all tasks for service
-                log.append("Killing tasks for " + service.getName() + "\n");
+                log.append("Killing tasks for ").append(service.getName()).append("\n");
                 String killResultString = queryMarathon(MARATHON_CONTEXT + service.getName() + "/tasks?scale=true", "DELETE");
                 JsonWrapper killResult = new JsonWrapper(killResultString);
 
                 String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
                 if (StringUtils.isBlank(deploymentId)) {
-                    log.append("WARNING : Could not find any deployment ID when killing tasks for " + service.getName());
+                    log.append("WARNING : Could not find any deployment ID when killing tasks for ").append(service.getName());
                 } else {
-                    log.append("Tasks killing deployment ID for " + service.getName() + " is " + deploymentId);
+                    log.append("Tasks killing deployment ID for ").append(service.getName()).append(" is ").append(deploymentId);
                 }
             }
         }
@@ -881,7 +864,7 @@ public class MarathonService {
 
         boolean installed = StringUtils.isNotBlank(nodeIp);
         if (!installed) {
-            log.append ("Warning : Service " + service.getName() + " is not installed");
+            log.append("Warning : Service ").append(service.getName()).append(" is not installed");
 
         } else {
 

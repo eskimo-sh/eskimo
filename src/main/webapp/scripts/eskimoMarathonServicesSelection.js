@@ -40,7 +40,7 @@ eskimo.MarathonServicesSelection = function(constructorObject) {
     // will be injected eventually from constructorObject
     this.eskimoMarathonServicesConfig = null;
 
-    var that = this;
+    const that = this;
 
     // Initialize HTML Div from Template
     this.initialize = function() {

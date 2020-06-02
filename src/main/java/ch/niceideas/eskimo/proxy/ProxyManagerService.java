@@ -74,7 +74,7 @@ public class ProxyManagerService {
     @Autowired
     private WebSocketProxyServer webSocketProxyServer;
 
-    private Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
+    private final Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
     /** For tests */
     public void setServicesDefinition (ServicesDefinition servicesDefinition) {
