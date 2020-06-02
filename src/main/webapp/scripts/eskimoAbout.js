@@ -76,6 +76,6 @@ eskimo.About = function() {
     this.cancelAbout = cancelAbout;
 
 
-    // call constriuctor
+    // call constructor
     this.initialize();
 };
