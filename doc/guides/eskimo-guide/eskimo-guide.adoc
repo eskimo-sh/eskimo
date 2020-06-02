@@ -305,9 +305,9 @@ prevents the user from building his own containers, he may only download pre-bui
 
 Some noteworthy elements need to be beared in mind regarding eskimo prerequisites.
 
-==== Java 8 or greater
+==== Java 11 or greater
 
-Eskimo needs Java 8 or greater to run.
+Eskimo needs Java 11 or greater to run.
 
 In addition, one needs to have either `java` in the path or the `JAVA_HOME` environment variable properly set in prior
 to starting eskimo.
@@ -316,7 +316,7 @@ Use for instance the following commands on Linux:
 
 .Put java in PATH on Linux
 ----
-export JAVA_HOME=/usr/local/lib/jdk-9
+export JAVA_HOME=/usr/local/lib/jdk-11
 export PATH=$JAVA_HOME/bin:$PATH
 ----
 
@@ -326,7 +326,7 @@ Use for instance the following commands on Windows:
 
 .Put java in PATH on Windows
 ----
-set JAVA_HOME=C:\programs\jdk-9
+set JAVA_HOME=C:\programs\jdk-11
 set PATH=%JAVA_HOME%\bin;%PATH%
 ----
 
@@ -338,10 +338,18 @@ Variables")
 
 In order to run eskimo, one needs to have
 
-* At least 10Gb of disk storage space on the machine running Eskimo
+* At least 15Gb of disk storage space on the machine running Eskimo
 * *At least one linux machine* available on the network (can be the same machine than the one running Eskimo) that will
 be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
 the eskimo cluster.
+
+Eskimo is reached using a web browser (see startup logs). Supported web browsers are:
+
+* Microsoft Edge 12 or greater
+* Mozilla FireFox 36 or greater
+* Google Chrome 41 or greater
+
+Note: there may be other browsers / versions supported (Safari, Opera but they are not certified to work with Eskimo)
 
 [[eskimo_nodes_prerequisites]]
 ==== Prerequisites on eskimo cluster nodes
@@ -670,6 +678,8 @@ for service docker images or mesos packages.
 Several issues can happen upon first eskimo startup. +
 This section describes common issues and ways to resolve them.
 
+////
+
 ==== Failing to download package from remote docker images repository
 
 If you encounter an error message on the Setup Page - during initial setup or after - saying `Could not download latest
@@ -754,6 +764,8 @@ manual.
 Eskimo provides however  a default `cacert` file in the sub-folder `utils` of its root installation. This `cacert` file
 is a default Debian `cacert` file as of July 2019 and is guaranteed safe as of July 2019. No guarantee whatsoever are
 ensured by eskimo.sh and one can use it at his own risk.
+
+////
 
 ==== eskimo-users.json cannot be written
 
@@ -1090,7 +1102,8 @@ by marathon.
 
 image::pngs/eskimo-marathon-setup.png[800, 800, align="center"]
 
-Just as for native node host services, Eskimo provides a possibility to force the reinstallation of marathon services.
+Just as for native node host services, Eskimo provides a possibility to force the reinstallation of marathon services. +
+Just click on the "Force Reinstall" button and choose which services should be re-installed on marathon.
 
 
 

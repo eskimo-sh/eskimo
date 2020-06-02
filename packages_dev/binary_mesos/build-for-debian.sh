@@ -100,7 +100,7 @@ docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq 
 echo " - Upgrading the appliance"
 docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade" >> /tmp/build-mesos-debian-log 2>&1
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 8 (keeping old version for mesos compatibility)"
 docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk" >>/tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing a few utility tools"

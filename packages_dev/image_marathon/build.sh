@@ -49,7 +49,7 @@ rm -f /tmp/marathon_build_log
 echo " - Building image marathon"
 build_image marathon /tmp/marathon_build_log
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 11"
 docker exec -i marathon apt-get install -y openjdk-11-jdk >> /tmp/marathon_build_log 2>&1
 fail_if_error $? "/tmp/marathon_build_log" -3
 

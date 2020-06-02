@@ -90,18 +90,18 @@ Reach http://www.eskimo.sh for more information on Eskimo or look at the documen
 
 === Requirements
 
-Eskimo uses plain old _Apache Maven_ for building (https://maven.apache.org/) as well as JDK 8+
+Eskimo uses plain old _Apache Maven_ for building (https://maven.apache.org/) as well as JDK 11+
 (https://openjdk.java.net/) for both building and execution.
 
 Minimum requirements are as follows:
 
-* JDK 8 or greater
+* JDK 11 or greater
 * Apache maven 3.5 or greater.
 
 Every other dependency will be downloaded during the maven build process.
 
-Theoretically, Eskimo can be built on any Operating System providing a command line and supporting Java 8+ (Java 9
-recommended) and Maven 3+.
+Theoretically, Eskimo can be built on any Operating System providing a command line and supporting Java 11+ (Note :
+previous versions of JDK down to 8 may be supported without any guarantee) and Maven 3+. +
 *However, the eskimo source tree makes an extensive use of symbolic links wich - unfortunately - are not supported on
 Microsoft Windows*. +
 For this reason, building eskimo on windows is absolutely possible but it is highly discouraged to develop eskimo on
@@ -133,7 +133,7 @@ Use for instance the following commands on Linux:
 
 .Put maven and java in PATH on Linux
 ----
-export JAVA_HOME=/usr/local/lib/jdk-9
+export JAVA_HOME=/usr/local/lib/jdk-11
 export MAVEN_HOME=/usr/local/lib/apache-maven-3.5.3
 export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
 ----
@@ -144,7 +144,7 @@ And for instance the following commands on Windows
 
 .Put maven and java in PATH on Windows
 ----
-set JAVA_HOME=C:\programs\jdk-9
+set JAVA_HOME=C:\programs\jdk-11
 set MAVEN_HOME=C:\programs\apache-maven-3.6.1
 set PATH=%MAVEN_HOME%\bin;%JAVA_HOME%\bin;%PATH%
 ----
@@ -164,7 +164,7 @@ cd libs
 bash install_libs.sh
 ----
 
-
+////
 ==== OpenJDK 9 empty cacerts
 
 The Open JDK 9 comes with a quite annoying issue. The `lib/security/cacert` file referencing the SSL certifications
@@ -269,15 +269,7 @@ working by following the following procedure, for instance for Windows:
 Unfortunately that wouldn't work for adressing JRuby's issue when generating the eskimo documentation and you would
 need to comment the asciidoctor part out of the maven build.
 
-==== Building HTML documentation
-
-Optionnally, the HTML documentation of eskimo (in addition to the PDF documentation which is always built) can be built
-using the `htmlDoc` maven profile:
-
-.Build Eskimo with HTML Documentation
-----
-mvn clean install -PhtmlDoc
-----
+////
 
 === Eskimo Build result
 
@@ -288,6 +280,9 @@ The results are two archive files:
 * A tarball archive : `eskimo-_version_-bin.tar.gz`
 
 You can find pre-built packages of Eskimo on https://www.eskimo.sh.
+
+The archive contains the full software packages with all dependencies and command line executables required to
+start it as well as the full documentation, etc.
 
 == Running Eskimo
 
@@ -302,9 +297,20 @@ supported running Linux.
 
 In order to run eskimo, one needs to have
 
-* At least 8Gb of disk storage space on the machine running Eskimo
+* At least 15Gb of disk storage space on the machine running Eskimo
 * At least one linux machine available on the network (can be the same machine than the one running Eskimo) with either
   a debian-based (Ubuntu, Debian, etc.), red-hat-based (CentOS, Fedora, etc.) or OpenSUSE Operating System.
+
+(See https://github.com/eskimo-sh/eskimo/blob/master/doc/guides/eskimo-guide/eskimo-guide.adoc[The Eskimo User Guide]
+for more information on Eskimo cluster requirements.)
+
+Eskimo is reached using a web browser (see startup logs). Supported web browsers are:
+
+* Microsoft Edge 12 or greater
+* Mozilla FireFox 36 or greater
+* Google Chrome 41 or greater
+
+Note: there may be other browsers / versions supported (Safari, Opera but they are not certified to work with Eskimo)
 
 ==== Available JVM with Java in PATH
 

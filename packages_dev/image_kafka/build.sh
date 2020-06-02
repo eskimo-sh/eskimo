@@ -49,7 +49,7 @@ rm -f /tmp/kafka_build_log
 echo " - Building image kafka"
 build_image kafka /tmp/kafka_build_log
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 11"
 docker exec -i kafka apt-get install -y openjdk-11-jdk >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -3
 

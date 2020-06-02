@@ -98,7 +98,7 @@ docker exec -i build_suse bash -c "zypper --no-gpg-checks --non-interactive refr
 echo " - Updating the appliance"
 docker exec -i build_suse bash -c "zypper --no-gpg-checks --non-interactive update" >> /tmp/build-mesos-suse-log 2>&1
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 8 (keeping old version for mesos compatibility)"
 docker exec -i build_suse bash -c "zypper install -y java-1_8_0-openjdk java-1_8_0-openjdk-devel" >> /tmp/build-mesos-suse-log 2>&1
 
 echo " - Installing a few utility tools"

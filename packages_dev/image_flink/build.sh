@@ -49,7 +49,7 @@ rm -f /tmp/flink_build_log
 echo " - Building image flink"
 build_image flink /tmp/flink_build_log
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 11"
 docker exec -i flink apt-get install -y openjdk-11-jdk >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -3
 

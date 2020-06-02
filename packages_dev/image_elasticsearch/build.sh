@@ -49,7 +49,7 @@ rm -f /tmp/es_build_log
 echo " - Building image elasticsearch"
 build_image elasticsearch /tmp/es_build_log
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 11"
 docker exec -i elasticsearch apt-get install -y openjdk-11-jdk >> /tmp/es_build_log 2>&1
 fail_if_error $? "/tmp/es_build_log" -3
 

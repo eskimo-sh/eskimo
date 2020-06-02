@@ -96,7 +96,7 @@ build_image build_redhat /tmp/build-mesos-redhat-log
 echo " - Updating the appliance"
 docker exec -i build_redhat bash -c "yum update -y" >> /tmp/build-mesos-redhat-log 2>&1
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 8 (keeping old version for mesos compatibility)"
 docker exec -i build_redhat bash -c "yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel" >> /tmp/build-mesos-redhat-log 2>&1
 
 echo " - Installing a few utility tools"

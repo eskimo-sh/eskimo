@@ -49,7 +49,7 @@ rm -f /tmp/logstash_build_log
 echo " - Building image logstash"
 build_image logstash /tmp/logstash_build_log
 
-echo " - Installing the latest OpenJDK"
+echo " - Installing OpenJDK 11"
 docker exec -i logstash apt-get install -y openjdk-11-jdk >> /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -2
 

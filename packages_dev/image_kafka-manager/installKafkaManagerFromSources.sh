@@ -152,6 +152,8 @@ fail_if_error $? "/tmp/kafka_manager_install_log" -10
 rm -Rf /tmp/kafka_manager_source_setup >> /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -10
 
+echo " - Cleaning coursier cache"
+sudo rm -Rf /root/.cache/coursier
 
 
 
