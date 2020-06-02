@@ -46,7 +46,7 @@ eskimo.Services = function (constructorObject) {
 
     const that = this;
 
-    const EMPTY_FRAMETARGET = "html/emptyPage.html";
+    let EMPTY_FRAMETARGET = "html/emptyPage.html";
 
     var UI_SERVICES = [];
     var UI_SERVICES_CONFIG = {};
