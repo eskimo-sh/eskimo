@@ -68,12 +68,14 @@ public class SetupService {
     public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
     public static final String TEMP_DOWNLOAD_SUFFIX = "__temp_download";
     public static final String DOCKER_TEMPLATE_PREFIX = "docker_template_";
+    public static final String MESOS_PREFIX = "eskimo_";
     public static final String DOWNLOAD_FLAG = "download";
     public static final String BUILD_FLAG = "build";
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
     public static final String NO_DOWNLOAD_IN_SNAPSHOT_ERROR = "Downloading packages is not supported on development version (SNAPSHOT)";
 
     private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+
 
     @Autowired
     private MessagingService messagingService;
@@ -223,7 +225,7 @@ public class SetupService {
                             file.getName().contains(mesosPackage)
                                     && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX)
                                     && file.getName().endsWith(TAR_GZ_EXTENSION)
-                                    && file.getName().startsWith("eskimo_") )) {
+                                    && file.getName().startsWith(MESOS_PREFIX) )) {
                 missingServices.add(mesosPackage);
             }
         }
@@ -294,7 +296,7 @@ public class SetupService {
         }
     }
 
-    Pair<String,String> parseVersion(String name) {
+    public Pair<String,String> parseVersion(String name) {
 
         Matcher matcher = imageFileNamePattern.matcher(name);
         if (!matcher.matches()) {
@@ -337,10 +339,7 @@ public class SetupService {
                     lastVersionFile = imageFile;
                     lastFileVersion = imageVersion;
                 } else {
-                    if (   (compareSoftwareVersion (imageVersion.getKey(), lastFileVersion.getKey()) > 0)
-                         ||
-                            (compareSoftwareVersion (imageVersion.getKey(), lastFileVersion.getKey()) == 0
-                              && imageVersion.getValue().compareTo(lastFileVersion.getValue()) > 0)) {
+                    if (compareVersion (imageVersion, lastFileVersion) > 0) {
                         lastVersionFile = imageFile;
                         lastFileVersion = imageVersion;
                     }
@@ -350,7 +349,6 @@ public class SetupService {
 
         return new Pair<>(lastVersionFile, lastFileVersion);
     }
-
 
     public void prepareSetup (
             JsonWrapper setupConfig,
@@ -431,9 +429,8 @@ public class SetupService {
                     String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
                     String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
 
-                    if (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) > 0
-                            || (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) == 0
-                            && Integer.valueOf(newDistributionVersion).compareTo(Integer.valueOf (lastVersionValues.getValue())) > 0)) {
+                    if (compareVersion (new Pair<String, String> (newSoftwareVersion, newDistributionVersion),
+                            lastVersionValues) > 0) {
                         updates.add(imageName);
                     }
                 }
@@ -591,10 +588,8 @@ public class SetupService {
                         String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
                         String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
 
-                        if (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) > 0
-                                || (compareSoftwareVersion (newSoftwareVersion, lastVersionValues.getKey()) == 0
-                                && Integer.valueOf(newDistributionVersion).compareTo(Integer.valueOf (lastVersionValues.getValue())) > 0)) {
-
+                        if (compareVersion (new Pair<String, String> (newSoftwareVersion, newDistributionVersion),
+                                lastVersionValues) > 0) {
                             downloadPackage(DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION);
                         }
                     }
@@ -616,7 +611,28 @@ public class SetupService {
         }
     }
 
-    protected int compareSoftwareVersion (String firstVersion, String secondVersion) {
+    public int compareVersion(Pair<String, String> first, Pair<String, String> second) {
+
+        if (first == null) {
+            if (second == null) {
+                throw new IllegalArgumentException("Both versions are null");
+            } else {
+                return -1;
+            }
+        }
+        if (second == null) {
+            return 1;
+        }
+
+        int softwareVersionComparison = compareSoftwareVersion(first.getKey(), second.getKey());
+        if (softwareVersionComparison != 0) {
+            return softwareVersionComparison;
+        }
+
+        return Integer.valueOf (first.getValue()).compareTo(Integer.valueOf(second.getValue()));
+    }
+
+    public int compareSoftwareVersion (String firstVersion, String secondVersion) {
 
         String[] unitsFirst = firstVersion.split("[,\\.\\-_]");
         String[] unitsSecond = secondVersion.split("[,\\.\\-_]");
