@@ -51,7 +51,10 @@ echo " Preparing mount of $VOL_NAME"
 # Inject topology
 . /etc/eskimo_topology.sh
 
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_GLUSTER_$SELF_IP_ADDRESS | tr -d .)`
+# Load common gluster functions
+. /usr/local/sbin/commonGlusterFunctions.sh
+
+export MASTER_IP_ADDRESS=`get_gluster_master`
 if [[ $MASTER_IP_ADDRESS == "" ]]; then
     echo " - No gluster master found in topology"
     exit -3
@@ -70,6 +73,7 @@ set +e
 
 # 3 attempts (to address concurrency issues coming from parallel installations)
 for i in 1 2 3 ; do
+    echo " - Searching in volume list for $VOL_NAME - attempt $i"
     if [[ `gluster volume list 2>/dev/null | grep $VOL_NAME` == "" ]]; then
 
         rm -Rf /var/lib/gluster/volume_bricks/$VOL_NAME
@@ -97,6 +101,7 @@ for i in 1 2 3 ; do
         fi
 
         if [[ $UIDTOSET != "" ]]; then
+           echo " - Setting UID to $UUIDTOSET"
            gluster volume set $VOL_NAME storage.owner-uid $UIDTOSET
         fi
 

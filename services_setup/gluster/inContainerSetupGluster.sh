@@ -70,7 +70,9 @@ sudo bash -c "echo \"    option transport.socket.keepalive-time 10\" >> /var/lib
 sudo bash -c "echo \"    option transport.socket.keepalive-interval 2\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option transport.socket.read-fail-log off\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option ping-timeout 0\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
-sudo bash -c "echo \"    option event-threads 1\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
+sudo bash -c "echo \"    option event-threads 2\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
+# Not working in anyway ...
+#sudo bash -c "echo \"    option nfs.addr-namelookup off\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option transport.rdma.bind-address $SELF_IP_ADDRESS\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option transport.socket.bind-address $SELF_IP_ADDRESS\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option transport.tcp.bind-address $SELF_IP_ADDRESS\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"

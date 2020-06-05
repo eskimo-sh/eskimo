@@ -78,10 +78,10 @@ ExecStop=/usr/bin/docker stop spark-mesos-shuffle-service
 Type=simple
 
 Restart=always
-StartLimitBurst=5
+StartLimitBurst=3
 # Giving a little time to gluster to recover in case of issues
 RestartSec=3
-StartLimitInterval=60
+StartLimitInterval=120
 
 StandardOutput=syslog
 StandardError=syslog

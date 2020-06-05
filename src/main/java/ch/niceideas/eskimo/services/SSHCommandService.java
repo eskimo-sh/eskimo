@@ -62,7 +62,7 @@ public class SSHCommandService {
     private ConfigurationService configurationService;
 
     @Value("${connectionManager.sshOperationTimeout}")
-    private int sshOperationTimeout = 30000;
+    private int sshOperationTimeout = 60000;
 
     /** For tests */
     public void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
@@ -199,7 +199,8 @@ public class SSHCommandService {
 
             Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
-            SCPClient scp = new SCPClient(connection);
+            //SCPClient scp = new SCPClient(connection);
+            SCPClient scp = connection.createSCPClient();
 
             scp.put(filePath, "/home/" + systemConfig.getValueForPath("ssh_username"), "0755");
 

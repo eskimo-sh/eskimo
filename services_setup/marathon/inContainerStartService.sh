@@ -67,7 +67,7 @@ echo " - Starting service"
     --zk zk://$ZOOKEEPER_IP_ADDRESS:2181/marathon  \
     --http_port 28080 \
     --metrics_prometheus \
-    --task_launch_timeout 420000 \
+    --task_launch_timeout 540000 \
     --zk_connection_timeout 15000 \
     --zk_session_timeout 15000 \
     --hostname $SELF_IP_ADDRESS > /var/log/marathon/marathon.log 2>&1 &

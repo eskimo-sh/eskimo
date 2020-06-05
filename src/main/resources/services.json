@@ -84,8 +84,7 @@
       }
     ],
     "additionalEnvironment": [
-      "ALL_NODES_LIST_prometheus",
-      "ALL_NODES_LIST_mesos-agent"
+      "ALL_NODES_LIST_prometheus"
     ],
     "commands" : [
       {
@@ -154,7 +153,6 @@
       "imageName" : "gluster",
       "order": 4,
       "mandatory": true,
-      "conditional": "MULTIPLE_NODES",
       "group" : "Gluster",
       "name" : "FS",
       "selectionLayout" : { "row" : 2, "col" : 1},
@@ -169,6 +167,9 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
+    ],
+    "additionalEnvironment": [
+      "ALL_NODES_LIST_gluster"
     ],
     "commands" : [
       {
@@ -348,6 +349,9 @@
         "numberOfMasters": 1,
         "mandatory": true
       }
+    ],
+    "additionalEnvironment": [
+      "ALL_NODES_LIST_mesos-agent"
     ],
     "editableSettings": [
       {

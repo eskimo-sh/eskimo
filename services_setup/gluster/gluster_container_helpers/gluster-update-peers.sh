@@ -35,11 +35,6 @@
 #
 
 
-function delete_gluster_management_lock_file() {
-    echo " - releasing gluster_management_lock"
-    rm -Rf /var/lib/gluster/gluster_management_lock
-}
-
 set -e
 
 export PATH=/usr/local/sbin/:$PATH
@@ -47,10 +42,13 @@ export PATH=/usr/local/sbin/:$PATH
 # Inject topology
 . /etc/eskimo_topology.sh
 
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_GLUSTER_$SELF_IP_ADDRESS | tr -d .)`
+# Load common gluster functions
+. /usr/local/sbin/commonGlusterFunctions.sh
+
+export MASTER_IP_ADDRESS=`get_gluster_master`
 if [[ $MASTER_IP_ADDRESS == "" ]]; then
     echo " - No gluster master found in topology"
-    exit -3
+    exit 3
 fi
 
 echo "-> gluster-update-peers.sh"
@@ -63,14 +61,8 @@ if [[ $SELF_IP_ADDRESS == $MASTER_IP_ADDRESS ]]; then
 else
 
     # add other master if not done
-
-    # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
-    additional_search=$MASTER_IP_ADDRESS
-    if [[ $MASTER_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
-        additional_search=marathon.registry
-    fi
-    localPeerList=`gluster pool list`
-    if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+    localPeerList=`get_pool_ips`
+    if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" ]]; then
 
         echo " - Master is not in pool lost. Need to add it"
 
@@ -84,14 +76,15 @@ else
             let wait_counter=$wait_counter+1
             if [[ $wait_counter -gt 30 ]]; then
                 echo " - Attempted during 60 seconds to get gluster_management_lock unsuccessfully. Stopping here"
-                exit -31
+                exit 31
             fi
         done
 
-        touch /var/lib/gluster/gluster_management_lock
-
         trap delete_gluster_management_lock_file 15
         trap delete_gluster_management_lock_file EXIT
+        trap delete_gluster_management_lock_file 1
+
+        touch /var/lib/gluster/gluster_management_lock
 
         # 4 attempts (to address concurrency issues coming from parallel installations)
         set +e
@@ -106,8 +99,8 @@ else
         done
 
         # Trying the other way around
-        localPeerList=`gluster pool list`
-        if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+        localPeerList=`get_pool_ips`
+        if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" ]]; then
             echo " - Adding $MASTER_IP_ADDRESS to $SELF_IP_ADDRESS cluster failed. Trying the other way around ..."
             for i in 1 2 3 4; do
                 echo " - Trying : gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $SELF_IP_ADDRESS"
@@ -120,10 +113,10 @@ else
             done
         fi
 
-        # checking Here as weil, giving it a few tries
+        # checking Here as well, giving it a few tries
         for i in 1 2 3 4 5; do
-            localPeerList=`gluster pool list`
-            if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+            localPeerList=`get_pool_ips`
+            if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" ]]; then
                 sleep 2
                 continue
             fi
@@ -131,10 +124,12 @@ else
         done
 
         # and one last time
-        localPeerList=`gluster pool list`
-        if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+        localPeerList=`get_pool_ips`
+        if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" ]]; then
             echo "Failed to add $SELF_IP_ADDRESS to cluster where master is $MASTER_IP_ADDRESS"
-            exit -41
+            echo "Local pool list is :"
+            echo $localPeerList
+            exit 41
         fi
 
         set -e
@@ -145,11 +140,12 @@ else
      fi
 
      # ensure peer is well connected
-     sleep 1
-     localPeerStatus=`gluster peer status`
-     if [[ `echo $localPeerStatus | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerStatus | grep $additional_search` == "" ]]; then
-        echo "Error : $MASTER_IP_ADDRESS not found in peers"
-        gluster peer status
-        exit -1
-     fi
+# FIXME need to convert hostnames to IPs as well
+#     sleep 1
+#     localPeerStatus=`gluster peer status`
+#     if [[ `echo $localPeerStatus | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerStatus | grep $additional_search` == "" ]]; then
+#        echo "Error : $MASTER_IP_ADDRESS not found in peers"
+#        gluster peer status
+#        exit -1
+#     fi
 fi

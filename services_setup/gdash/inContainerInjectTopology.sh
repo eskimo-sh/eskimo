@@ -40,12 +40,6 @@ echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
 # gdash connects to the gluster on same node
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_GLUSTER_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $MASTER_IP_ADDRESS == "" ]]; then
-    echo " - No gluster master found in topology"
-    exit -3
-fi
-
 
 echo " - replacing marker in startup script"
-sed -i s/"MASTER_IP_ADDRESS"/"$MASTER_IP_ADDRESS"/g /usr/local/bin/launch-gdash.sh
+sed -i s/"MASTER_IP_ADDRESS"/"$SELF_IP_ADDRESS"/g /usr/local/bin/launch-gdash.sh

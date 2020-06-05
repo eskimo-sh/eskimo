@@ -78,7 +78,8 @@ if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_
     exit -20
 fi
 
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_GLUSTER_$SELF_IP_ADDRESS | tr -d .)`
+# Zeppelin connects on gluster on same node
+export MASTER_IP_ADDRESS=$SELF_IP_ADDRESS
 
 echo " - Mounting gluster shares for zeppelin"
 echo "   + mounting spark shares"

@@ -788,7 +788,7 @@ public class SystemService {
         } catch (SSHCommandException e) {
             logger.debug (e, e);
             sb.append(e.getMessage());
-            throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.");
+            throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.", e);
         }
     }
 

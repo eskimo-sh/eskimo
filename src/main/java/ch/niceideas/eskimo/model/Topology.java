@@ -179,7 +179,9 @@ public class Topology {
 
                 String varName = addEnv.replace("-", "_");
 
-                String allAddresses = String.join(",", nodesConfig.getAllNodeAddressesWithService(serviceToList).toArray(new String[0]));
+                List<String> allNodeList = new ArrayList<>(nodesConfig.getAllNodeAddressesWithService(serviceToList));
+                Collections.sort(allNodeList);
+                String allAddresses = String.join(",", allNodeList.toArray(new String[0]));
 
                 if (StringUtils.isNotBlank(allAddresses)) {
                     addEnvForService.put(varName, allAddresses);

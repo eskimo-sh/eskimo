@@ -135,11 +135,17 @@ docker_cp_script inContainerStartService.sh sbin gluster gluster_install_log
 echo " - Copying settingsInjector.sh Script"
 docker_cp_script settingsInjector.sh sbin gluster gluster_install_log
 
+echo " - Copying commonGlusterFunctions.sh Script"
+docker_cp_script commonGlusterFunctions.sh sbin gluster gluster_install_log
+
 echo " - Committing changes to local template and exiting container gluster"
 commit_container gluster gluster_install_log
 
+echo " - Copying gluster common functions script to /usr/local/sbin"
+sudo cp commonGlusterFunctions.sh /usr/local/sbin
+sudo chmod 755 /usr/local/sbin/commonGlusterFunctions.sh
 
-echo " - Copying gluster command line programs docker wrappers to /usr/local/bin"
+echo " - Copying gluster command line programs docker wrappers to /usr/local/sbin"
 for i in `find ./gluster_wrappers -mindepth 1`; do
     sudo cp $i /usr/local/sbin
     filename=`echo $i | cut -d '/' -f 3`

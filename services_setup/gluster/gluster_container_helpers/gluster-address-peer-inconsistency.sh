@@ -34,18 +34,15 @@
 # Software.
 #
 
-
-function delete_gluster_management_lock_file() {
-    echo " - releasing gluster_management_lock"
-    rm -Rf /var/lib/gluster/gluster_management_lock
-}
-
 set -e
 
 # Inject topology
 . /etc/eskimo_topology.sh
 
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_GLUSTER_$SELF_IP_ADDRESS | tr -d .)`
+# Load common gluster functions
+. /usr/local/sbin/commonGlusterFunctions.sh
+
+export MASTER_IP_ADDRESS=`get_gluster_master`
 if [[ $MASTER_IP_ADDRESS == "" ]]; then
     echo " - No gluster master found in topology"
     exit -3
@@ -60,7 +57,7 @@ echo " - Checking gluster connection between $SELF_IP_ADDRESS and $MASTER_IP_ADD
 if [[ "$MASTER_IP_ADDRESS" == "$SELF_IP_ADDRESS" ]]; then
 
     echo "Specific situation: master is self node. Need to ensure no other peer remain in the pool"
-    gluster_peers=`gluster pool list  | sed -E 's/[a-zA-Z0-9\-]+[ \t]+([0-9\.]+|localhost|marathon\.registry)[^.]+/\1/;t;d'`
+    gluster_peers=`get_pool_ips | sed -E 's/[a-zA-Z0-9\-]+[ \t]+([0-9\.]+|localhost|marathon\.registry)[^.]+/\1/;t;d'`
 
     for peer in $gluster_peers; do
         if [[ $peer != "localhost" ]]; then
@@ -88,20 +85,16 @@ else
 
     trap delete_gluster_management_lock_file 15
     trap delete_gluster_management_lock_file EXIT
+    trap delete_gluster_management_lock_file 1
 
     touch /var/lib/gluster/gluster_management_lock
 
     echo " - Checking if master is in local pool"
-    # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
-    additional_search=$MASTER_IP_ADDRESS
-    if [[ $MASTER_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
-        additional_search=marathon.registry
-    fi
     set +e
     rm -f /tmp/local_gluster_check
     for i in 1 2 3 ; do
         echo "Attempt $i" >> /tmp/local_gluster_check
-        export localPeerList=`gluster pool list 2>>/tmp/local_gluster_check`
+        export localPeerList=`get_pool_ips 2>>/tmp/local_gluster_check`
         if [[ $? == 0 ]]; then
             break
         else
@@ -115,26 +108,21 @@ else
              fi
         fi
     done
-    if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerList | grep $additional_search` == "" ]]; then
+    if [[ `echo $localPeerList | grep $MASTER_IP_ADDRESS` == "" ]]; then
         MASTER_IN_LOCAL=0
     else
         MASTER_IN_LOCAL=1
     fi
 
     echo " - Checking if local in master pool"
-    remote_result=`gluster_call_remote.sh $MASTER_IP_ADDRESS pool list`
+    remote_result=`get_pool_ips $MASTER_IP_ADDRESS`
     if [[ $? != 0 ]]; then
         echo "Calling remote gluster on $MASTER_IP_ADDRESS failed !"
         echo "Cannot proceed any further with consistency checking ... SKIPPING"
         exit 0
     fi
 
-    # XXX Hack for gluster knowing it's IP address by IP sometimes and by 'marathon.registry' some other times
-    additional_search=$SELF_IP_ADDRESS
-    if [[ $SELF_IP_ADDRESS == $MASTER_MARATHON_1 ]]; then
-        additional_search=marathon.registry
-    fi
-    if [[ `echo $remote_result | grep $SELF_IP_ADDRESS` == "" && `echo $remote_result | grep $additional_search` == "" ]]; then
+    if [[ `echo $remote_result | grep $SELF_IP_ADDRESS` == "" ]]; then
         LOCAL_IN_MASTER=0
     else
         LOCAL_IN_MASTER=1

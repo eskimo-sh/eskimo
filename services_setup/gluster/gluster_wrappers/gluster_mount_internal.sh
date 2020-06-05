@@ -157,7 +157,7 @@ touch /var/lib/gluster/volume_management_lock_$VOLUME
 if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
 
     echo " - Just trying to remount $MOUNT_POINT first"
-    /bin/systemctl restart $MOUNT_POINT_NAME.mount >> /tmp/gluster_mount_$1_log 2>&1
+    /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_$1_log 2>&1
 
     sleep 1
     if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
@@ -201,7 +201,7 @@ fi
 # Now we have everything ready to actually proceed with the mount
 if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
     echo " - Mounting $MOUNT_POINT"
-    /bin/systemctl restart $MOUNT_POINT_NAME.mount >> /tmp/gluster_mount_$1_log 2>&1
+    /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_$1_log 2>&1
     if [[ $? != 0 ]]; then
         echo "Failed to mount $MOUNT_POINT"
         cat /tmp/gluster_mount_$1_log
