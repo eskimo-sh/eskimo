@@ -36,11 +36,13 @@
 
 set -e
 
+export PATH=$PATH:/usr/local/sbin/
+
 # Inject topology
 . /etc/eskimo_topology.sh
 
 # Load common gluster functions
-. /usr/local/sbin/commonGlusterFunctions.sh
+. commonGlusterFunctions.sh
 
 export MASTER_IP_ADDRESS=`get_gluster_master`
 if [[ $MASTER_IP_ADDRESS == "" ]]; then

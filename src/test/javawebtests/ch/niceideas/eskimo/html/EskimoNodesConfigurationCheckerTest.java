@@ -92,6 +92,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11-192.168.10.15");
             put("ntp1", "on");
+            put("gluster1", "on");
             put("prometheus1", "on");
         }});
 
@@ -182,6 +183,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
                 put("ntp1", "on");
+                put("gluster1", "on");
                 put("logstash1", "on");
                 put("mesos-agent1", "on");
                 put("mesos-master", "1");
@@ -331,20 +333,26 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testNoGlusterOnSingleNode() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("marathon", "1");
-            put("elasticsearch1", "on");
-            put("ntp1", "on");
-            put("kafka1", "on");
-            put("logstash1", "on");
-            put("mesos-agent1", "on");
-            put("mesos-master", "1");
-            put("spark-executor1", "on");
-            put("zookeeper", "1");
-        }});
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("marathon", "1");
+                put("elasticsearch1", "on");
+                put("ntp1", "on");
+                put("kafka1", "on");
+                put("logstash1", "on");
+                put("mesos-agent1", "on");
+                put("mesos-master", "1");
+                put("spark-executor1", "on");
+                put("zookeeper", "1");
+            }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
     }
 
     @Test
@@ -355,6 +363,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id1", "192.168.10.11");
                 put("mesos-master", "1");
                 put("ntp", "1");
+                put("gluster", "1");
                 put("spark-executor1", "on");
                 put("marathon", "1");
                 put("zookeeper", "1");
@@ -377,6 +386,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("spark-executor1", "on");
                 put("zookeeper", "1");
                 put("ntp1", "on");
+                put("gluster1", "on");
             }});
 
             page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
@@ -394,6 +404,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
                 put("ntp1", "on");
+                put("gluster", "on");
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
             }});

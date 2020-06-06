@@ -61,13 +61,36 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         handleScript("gluster-address-peer-inconsistency.sh");
         handleScript("gluster-prepare-mount.sh");
         handleScript("gluster-update-peers.sh");
+
+        //handleScript("../commonGlusterFunctions.sh", "commonGlusterFunctions.sh");
+
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.21'\n" +
+                "}\n" +
+                "\n" +
+                "function get_pool_ips() {\n" +
+                "    echo -e '192.168.10.21\n192.168.10.22'\n" +
+                "}\n" +
+                "\n" +
+                "function delete_gluster_management_lock_file() {\n" +
+                "    echo \" - releasing gluster_management_lock\"\n" +
+                "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
+                "}\n" +
+                "echo $@ >> .log_gluster");
     }
 
     void handleScript(String scriptName) throws IOException, FileException {
+        handleScript (scriptName, scriptName);
+    }
+
+    void handleScript(String source, String dest) throws IOException, FileException {
         FileUtils.copy(
-                new File("./services_setup/" + getServiceName() + "/gluster_container_helpers/" + scriptName),
-                new File (jailPath + "/" + scriptName));
-        enhanceScript(jailPath, scriptName);
+                new File("./services_setup/" + getServiceName() + "/gluster_container_helpers/" + source),
+                new File (jailPath + "/" + dest));
+        enhanceScript(jailPath, dest);
     }
 
     @After

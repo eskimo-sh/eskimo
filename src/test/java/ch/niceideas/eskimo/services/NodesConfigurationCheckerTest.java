@@ -61,6 +61,7 @@ public class NodesConfigurationCheckerTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11-192.168.10.15");
             put("ntp1", "on");
+            put("gluster1", "on");
             put("prometheus1", "on");
         }});
 
@@ -152,6 +153,7 @@ public class NodesConfigurationCheckerTest {
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
                 put("ntp1", "on");
+                put("gluster1", "on");
                 put("prometheus1", "on");
                 put("logstash1", "on");
                 put("mesos-agent1", "on");
@@ -262,6 +264,7 @@ public class NodesConfigurationCheckerTest {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
                     put("node_id1", "192.168.10.11");
                     put("ntp1", "on");
+                    put("gluster1", "on");
             }});
 
             nodeConfigChecker.checkNodesSetup(nodesConfig);
@@ -321,6 +324,7 @@ public class NodesConfigurationCheckerTest {
             put("elasticsearch1", "on");
             put("kafka1", "on");
             put("ntp1", "on");
+            put("gluster1", "on");
             put("prometheus1", "on");
             put("logstash1", "on");
             put("mesos-agent1", "on");
@@ -343,6 +347,7 @@ public class NodesConfigurationCheckerTest {
                 put("spark-executor1", "on");
                 put("marathon", "1");
                 put("ntp1", "on");
+                put("gluster1", "on");
                 put("prometheus1", "on");
                 put("zookeeper", "1");
             }});
@@ -364,6 +369,7 @@ public class NodesConfigurationCheckerTest {
                 put("spark-executor1", "on");
                 put("zookeeper", "1");
                 put("ntp1", "on");
+                put("gluster1", "on");
                 put("prometheus1", "on");
             }});
 
@@ -383,6 +389,7 @@ public class NodesConfigurationCheckerTest {
                 put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("ntp1", "on");
+                put("gluster1", "on");
                 put("prometheus1", "on");
                 //put("zookeeper", "1");
             }});

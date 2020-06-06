@@ -134,9 +134,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
+                "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.12\n" +
                 "export NODE_NBR_KAFKA_1921681011=0\n" +
                 "export NODE_NBR_KAFKA_1921681012=1\n" +
                 "export NODE_NBR_KAFKA_1921681013=2\n" +
+                "export ALL_NODES_LIST_mesos_agent=192.168.10.11,192.168.10.12,192.168.10.13\n" +
                 "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
                 "\n" +
                 "#Self identification\n" +
@@ -184,6 +186,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Additional Environment\n" +
                 "export NODE_NBR_KAFKA_1921681011=0\n" +
+                "export ALL_NODES_LIST_mesos_agent=192.168.10.11\n" +
                 "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
                 "\n" +
                 "#Self identification\n" +
@@ -373,6 +376,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
+                "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13,192.168.10.14\n" +
                 "export ALL_NODES_LIST_prometheus=192.168.10.11,192.168.10.13,192.168.10.14\n" +
                 "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
                 "\n" +

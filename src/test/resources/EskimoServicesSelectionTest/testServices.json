@@ -67,7 +67,7 @@
   "gluster": {
     "col": 1,
     "marathon": false,
-    "conditional": "MULTIPLE_NODES",
+    "conditional": "NONE",
     "configOrder": 4,
     "unique": false,
     "name": "gluster",
