@@ -70,7 +70,6 @@ function hostnames_to_ips () {
         return -1
     fi
 
-    ip_addresses=""
     hostnames=`echo "$pool_list" | cut -d$'\t' -f 2 | sed  '/^$/d'`
     IFS=$'\n'
     for hostname in $hostnames; do
@@ -78,10 +77,7 @@ function hostnames_to_ips () {
         #echo $hostname
         ip_address=`ping -c 1 $hostname 2>/dev/null  | grep PING | sed -E s/'PING ([^ ]+) \(([^ ]+)\).*'/'\2'/g`
         echo $ip_address
-        ip_addresses=`echo -e "$ip_addresses\n$ip_address"`
     done
-
-    echo "$ip_addresses"
 }
 
 
