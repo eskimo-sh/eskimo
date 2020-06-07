@@ -444,7 +444,22 @@
         "mandatory": true
       }
     ],
-    "TODO_EDITABLE_CXONFIGURATION": "",
+    "editableSettings": [
+      {
+        "filename": "runtime_vars.conf",
+        "filesystemService": "marathon",
+        "propertyType": "variable",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
+        "properties": [
+          {
+            "name": "task_launch_timeout",
+            "comment": "The timeout in second to wait for a task to be launched successfuly before considering it failed. (Default : 420'000 milliseconds)",
+            "defaultValue": "420000"
+          }
+        ]
+      }
+    ],
     "commands" : [
       {
         "id" : "show_log",

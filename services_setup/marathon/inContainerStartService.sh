@@ -39,6 +39,9 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector.sh marathon
+
 echo " - Creating required directories (as marathon)"
 mkdir -p /var/log/marathon/log
 
@@ -60,6 +63,9 @@ echo " - Starting Docker registry"
 docker-registry serve /etc/docker_registry/config.yml > /var/log/marathon/docker_registry/docker_registry.log 2>&1 &
 export DOCKER_REGISTRY_PID=$!
 
+echo " - Sourcing env variables conf file"
+. /usr/local/lib/marathon/etc/runtime_vars.conf
+
 echo " - Starting service"
 # giving 420000 ms timeout for task launch (7 minutes)
 /usr/local/lib/marathon/bin/marathon \
@@ -67,7 +73,7 @@ echo " - Starting service"
     --zk zk://$ZOOKEEPER_IP_ADDRESS:2181/marathon  \
     --http_port 28080 \
     --metrics_prometheus \
-    --task_launch_timeout 540000 \
+    --task_launch_timeout $task_launch_timeout \
     --zk_connection_timeout 15000 \
     --zk_session_timeout 15000 \
     --hostname $SELF_IP_ADDRESS > /var/log/marathon/marathon.log 2>&1 &
