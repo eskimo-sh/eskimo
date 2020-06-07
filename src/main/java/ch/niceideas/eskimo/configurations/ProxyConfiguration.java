@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.configurations;
 
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
+import ch.niceideas.eskimo.proxy.WebSocketProxyForwarder;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 import java.util.Arrays;
 
@@ -126,5 +128,13 @@ public class ProxyConfiguration implements WebSocketConfigurer {
                 .map(serviceName -> servicesDefinition.getService(serviceName))
                 .map(service -> "/ws/" + service.getName() + "/*")
                 .toArray(String[]::new));
+    }
+
+    @Bean
+    public ServletServerContainerFactoryBean createServletServerContainerFactoryBean() {
+        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+        container.setMaxTextMessageBufferSize(WebSocketProxyForwarder.MESSAGE_SIZE_LIMIT);
+        container.setMaxBinaryMessageBufferSize(WebSocketProxyForwarder.MESSAGE_SIZE_LIMIT);
+        return container;
     }
 }
