@@ -38,7 +38,6 @@ import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -106,7 +105,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
                         .map(service -> "/" + service.getName() + "/*")
                         .toArray(String[]::new));
 
-        servletRegistrationBean.addInitParameter(ProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
+        servletRegistrationBean.addInitParameter(ServicesProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
 
         servletRegistrationBean.setName("eskimo-proxy");
         return servletRegistrationBean;

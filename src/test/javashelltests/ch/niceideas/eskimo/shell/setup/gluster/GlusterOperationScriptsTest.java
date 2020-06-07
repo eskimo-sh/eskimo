@@ -68,18 +68,17 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 "#/bin/bash\n" +
                 "\n" +
                 "function get_gluster_master() {\n" +
-                "   echo '192.168.10.21'\n" +
+                "   echo '192.168.10.13'\n" +
                 "}\n" +
                 "\n" +
                 "function get_pool_ips() {\n" +
-                "    echo -e '192.168.10.21\n192.168.10.22'\n" +
+                "    echo -e '192.168.10.11\n192.168.10.13'\n" +
                 "}\n" +
                 "\n" +
                 "function delete_gluster_management_lock_file() {\n" +
                 "    echo \" - releasing gluster_management_lock\"\n" +
                 "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
-                "}\n" +
-                "echo $@ >> .log_gluster");
+                "}\n");
     }
 
     void handleScript(String scriptName) throws IOException, FileException {
@@ -139,27 +138,29 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 "        echo 'spark_eventlog'\n" +
                 "    fi\n" +
                 "fi\n" +
-                "if [[ $1 == 'pool' ]]; then \n" +
-                "    if [[ $2 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
+                "\n" +
+                "echo $@ >> .log_gluster");
+
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.13'\n" +
+                "}\n" +
+                "\n" +
+                "function get_pool_ips() {\n" +
                 "        if [[ -f /tmp/first_done_flag ]]; then \n" +
-                "            echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
+                "            echo -e '192.168.10.13\n127.0.0.1'\n" +
                 "        else\n" +
                 "            /bin/touch /tmp/first_done_flag\n" +
                 "        fi\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
-                "    fi\n" +
-                "fi\n" +
-                "if [[ $1 == 'peer' ]]; then \n" +
-                "    if [[ $2 == 'status' ]]; then \n" +
-                "        echo 'Number of Peers: 1'\n" +
-                "        echo 'Hostname: 192.168.10.13'\n" +
-                "        echo 'Uuid: 3beb15d1-fb6a-44b2-9a41-587329315116'\n" +
-                "        echo 'State: Peer in Cluster (Connected)'\n" +
-                "    fi\n" +
-                "fi\n" +
+                "        echo -e '127.0.0.1'\n" +
+                "}\n" +
                 "\n" +
-                "echo $@ >> .log_gluster");
+                "function delete_gluster_management_lock_file() {\n" +
+                "    echo \" - releasing gluster_management_lock\"\n" +
+                "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
+                "}\n");
 
         ProcessHelper.exec("chmod 755 " + targetPath, true);
 
@@ -180,12 +181,6 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 " - Trying : gluster_call_remote.sh 192.168.10.11 peer probe 192.168.10.13\n" +
                 " - releasing gluster_management_lock\n", result);
 
-        assertEquals("pool list\n" +
-                "pool list\n" +
-                "pool list\n" +
-                "pool list\n" +
-                "peer status\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster")));
-
         assertEquals("192.168.10.11 peer probe 192.168.10.13\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote.sh")));
     }
 
@@ -205,23 +200,24 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 "        echo 'spark_eventlog'\n" +
                 "    fi\n" +
                 "fi\n" +
-                "if [[ $1 == 'pool' ]]; then \n" +
-                "    if [[ $2 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
-                "    fi\n" +
-                "fi\n" +
-                "if [[ $1 == 'peer' ]]; then \n" +
-                "    if [[ $2 == 'status' ]]; then \n" +
-                "        echo 'Number of Peers: 1'\n" +
-                "        echo 'Hostname: 192.168.10.13'\n" +
-                "        echo 'Uuid: 3beb15d1-fb6a-44b2-9a41-587329315116'\n" +
-                "        echo 'State: Peer in Cluster (Connected)'\n" +
-                "    fi\n" +
-                "fi\n" +
                 "\n" +
                 "echo $@ >> .log_gluster");
+
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.13'\n" +
+                "}\n" +
+                "\n" +
+                "function get_pool_ips() {\n" +
+                "    echo -e '192.168.10.13\n127.0.0.1'\n" +
+                "}\n" +
+                "\n" +
+                "function delete_gluster_management_lock_file() {\n" +
+                "    echo \" - releasing gluster_management_lock\"\n" +
+                "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
+                "}\n");
 
         ProcessHelper.exec("chmod 755 " + targetPath, true);
 
@@ -229,15 +225,17 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-update-peers.sh"}, false);
         assertEquals("-> gluster-update-peers.sh\n" +
                 " Checking and fixing peers for 192.168.10.11 (with master 192.168.10.13)\n", result);
-
-        assertEquals("pool list\n" +
-                "peer status\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster")));
     }
 
     @Test
     public void testGlusterPrepareMount_SingleReplica() throws Exception {
 
-        ProcessHelper.exec(new String[]{"sed", "-i", "-E", "s/MASTER_GLUSTER_1921681011=192\\.168\\.10\\.13/MASTER_GLUSTER_1921681011=192\\.168\\.10\\.11/g", jailPath + "/eskimo-topology.sh"}, true);
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
+                "#/bin/bash\n" +
+                "\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.11'\n" +
+                "}\n");
 
         FileUtils.delete(new File ("/tmp/first_done_flag"));
         FileUtils.delete(new File ("/tmp/first_info_flag"));
@@ -277,6 +275,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-prepare-mount.sh", "test"}, false);
         assertEquals("-> gluster-prepare-mount.sh\n" +
                 " Preparing mount of test\n" +
+                " - Searching in volume list for test - attempt 1\n" +
                 " - Creating single replica since likely single node in cluster\n", result);
 
         assertEquals("volume list\n" +
@@ -328,6 +327,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-prepare-mount.sh", "test"}, false);
         assertEquals("-> gluster-prepare-mount.sh\n" +
                 " Preparing mount of test\n" +
+                " - Searching in volume list for test - attempt 1\n" +
                 " - Creating multiple replicas since running on multi-node cluster\n", result);
 
         assertEquals("volume list\n" +
@@ -348,36 +348,25 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
     @Test
     public void testGlusterAddressPeerInconsistency_MasterMissesLocal() throws Exception {
 
-        File targetPath = new File(getJailPath() + "/gluster");
-        FileUtils.writeFile(targetPath, "" +
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
                 "#/bin/bash\n" +
                 "\n" +
-                "if [[ $1 == 'pool' ]]; then \n" +
-                "    if [[ $2 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.13'\n" +
+                "}\n" +
+                "\n" +
+                "function get_pool_ips() {\n" +
+                "    if [[ \"$1\" != \"\" ]]; then \n" +
+                "        echo -e '127.0.0.1'\n" +
+                "    else\n" +
+                "        echo -e '192.168.10.13\n127.0.0.1'\n" +
                 "    fi\n" +
-                "fi\n" +
+                "}\n" +
                 "\n" +
-                "echo $@ >> .log_gluster");
-
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
-
-        targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
-        FileUtils.writeFile(targetPath, "" +
-                "#/bin/bash\n" +
-                "\n" +
-                "if [[ $2 == 'pool' ]]; then \n" +
-                "    if [[ $3 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\tlocalhost    \tConnected'\n" +
-                "    fi\n" +
-                "fi\n" +
-                "\n" +
-                "echo $@ >> .log_gluster_call_remote");
-
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
+                "function delete_gluster_management_lock_file() {\n" +
+                "    echo \" - releasing gluster_management_lock\"\n" +
+                "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
+                "}\n");
 
         createLoggingExecutable("__force-remove-peer.sh", getJailPath());
 
@@ -394,40 +383,34 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 " - releasing gluster_management_lock\n", result);
 
         assertEquals("192.168.10.13\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log___force-remove-peer.sh")));
-
-        assertEquals("192.168.10.13 pool list\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
     }
 
     @Test
     public void testGlusterAddressPeerInconsistency_LocalMissesMaster() throws Exception {
 
-        File targetPath = new File(getJailPath() + "/gluster");
-        FileUtils.writeFile(targetPath, "" +
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
                 "#/bin/bash\n" +
                 "\n" +
-                "if [[ $1 == 'pool' ]]; then \n" +
-                "    if [[ $2 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
-                "    fi\n" +
-                "fi\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.13'\n" +
+                "}\n" +
                 "\n" +
-                "echo $@ >> .log_gluster");
+                "function get_pool_ips() {\n" +
+                "    if [[ \"$1\" == \"\" ]]; then \n" +
+                "        echo -e '127.0.0.1'\n" +
+                "    else\n" +
+                "        echo -e '192.168.10.11\n127.0.0.1'\n" +
+                "    fi\n" +
+                "}\n" +
+                "\n" +
+                "function delete_gluster_management_lock_file() {\n" +
+                "    echo \" - releasing gluster_management_lock\"\n" +
+                "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
+                "}\n");
 
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
-
-        targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
+        File targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
         FileUtils.writeFile(targetPath, "" +
                 "#/bin/bash\n" +
-                "\n" +
-                "if [[ $2 == 'pool' ]]; then \n" +
-                "    if [[ $3 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\tlocalhost    \tConnected'\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\t192.168.10.11\tConnected'\n" +
-                "    fi\n" +
-                "fi\n" +
-                "\n" +
                 "echo $@ >> .log_gluster_call_remote");
 
         ProcessHelper.exec("chmod 755 " + targetPath, true);
@@ -449,44 +432,31 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
 
         assertEquals("192.168.10.13\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log___delete-local-blocks.sh")));
 
-        assertEquals("192.168.10.13 pool list\n" +
-                "192.168.10.13 force-remove-peer now 192.168.10.11\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
+        assertEquals("192.168.10.13 force-remove-peer now 192.168.10.11\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
     }
 
     @Test
     public void testGlusterAddressPeerInconsistency_ClusterConsistent() throws Exception {
 
-        File targetPath = new File(getJailPath() + "/gluster");
-        FileUtils.writeFile(targetPath, "" +
+        FileUtils.writeFile(new File(jailPath+"/commonGlusterFunctions.sh"), "" +
                 "#/bin/bash\n" +
                 "\n" +
-                "if [[ $1 == 'pool' ]]; then \n" +
-                "    if [[ $2 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\t192.168.10.13\tConnected'\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\tlocalhost    \tConnected'\n" +
+                "function get_gluster_master() {\n" +
+                "   echo '192.168.10.13'\n" +
+                "}\n" +
+                "\n" +
+                "function get_pool_ips() {\n" +
+                "    if [[ \"$1\" == \"\" ]]; then \n" +
+                "        echo -e '192.168.10.13\n127.0.0.1'\n" +
+                "    else\n" +
+                "        echo -e '192.168.10.11\n127.0.0.1'\n" +
                 "    fi\n" +
-                "fi\n" +
+                "}\n" +
                 "\n" +
-                "echo $@ >> .log_gluster");
-
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
-
-        targetPath = new File(getJailPath() + "/gluster_call_remote.sh");
-        FileUtils.writeFile(targetPath, "" +
-                "#/bin/bash\n" +
-                "\n" +
-                "if [[ $2 == 'pool' ]]; then \n" +
-                "    if [[ $3 == 'list' ]]; then \n" +
-                "        echo 'UUID\t\t\t\t\tHostname     \tState'\n" +
-                "        echo 'c39d9210-61a2-4682-821a-541143d17c64\tlocalhost    \tConnected'\n" +
-                "        echo '2245e590-aa3a-4668-b852-c73b4a700770\t192.168.10.11\tConnected'\n" +
-                "    fi\n" +
-                "fi\n" +
-                "\n" +
-                "echo $@ >> .log_gluster_call_remote");
-
-        ProcessHelper.exec("chmod 755 " + targetPath, true);
+                "function delete_gluster_management_lock_file() {\n" +
+                "    echo \" - releasing gluster_management_lock\"\n" +
+                "    rm -Rf /var/lib/gluster/gluster_management_lock\n" +
+                "}\n");
 
         // master IP == self IP
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/gluster-address-peer-inconsistency.sh"}, false);
@@ -498,8 +468,6 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 " - Checking consistency \n" +
                 " -> gluster cluster is consistent. both local and master know each others\n" +
                 " - releasing gluster_management_lock\n", result);
-
-        assertEquals("192.168.10.13 pool list\n", StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_gluster_call_remote")));
     }
 
     @Test

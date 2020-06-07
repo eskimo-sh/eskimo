@@ -52,7 +52,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.*;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.mitre.dsmiley.httpproxy.ProxyServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -104,9 +103,9 @@ public class ServicesProxyServlet extends HttpServlet {
     /** The parameter name for the target (destination) URI to proxy to. */
     protected static final String P_TARGET_URI = "targetUri";
     protected static final String ATTR_TARGET_URI =
-            ProxyServlet.class.getSimpleName() + ".targetUri";
+            ServicesProxyServlet.class.getSimpleName() + ".targetUri";
     protected static final String ATTR_TARGET_HOST =
-            ProxyServlet.class.getSimpleName() + ".targetHost";
+            ServicesProxyServlet.class.getSimpleName() + ".targetHost";
     public static final String SESSION_HTTP_CLIENT = "SESSION_HTTP_CLIENT";
 
     /* MISC */

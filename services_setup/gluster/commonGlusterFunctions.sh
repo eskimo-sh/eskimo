@@ -160,4 +160,7 @@ function get_gluster_master () {
         ALL_NODES=("${ALL_NODES[@]:1}")
     done
 
+    # If I reached this stage it means this node is eitehr the single one (single node cluster)
+    # or the single onne answering
+    echo $SELF_IP_ADDRESS
 }

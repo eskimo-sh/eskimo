@@ -123,7 +123,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoSystemStatus.showGrafanaDashboard()");
 
-        assertCssValue("#status-monitoring-grafana", "display", "block");
+        assertCssValue("#status-monitoring-grafana", "display", "inherit");
         assertJavascriptEquals("col-xs-12 col-sm-12 col-md-4", "$('#status-monitoring-info-container').attr('class')");
 
         page.executeJavaScript("eskimoSystemStatus.hideGrafanaDashboard()");
