@@ -93,9 +93,9 @@ Software.
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mitre.dsmiley.httpproxy</groupId>
-            <artifactId>smiley-http-proxy-servlet</artifactId>
-            <version>1.11</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.12</version>
         </dependency>
 
         <!-- https://github.com/jenkinsci/trilead-ssh2 -->

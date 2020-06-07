@@ -42,6 +42,7 @@ import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -109,6 +110,15 @@ public class ProxyConfiguration implements WebSocketConfigurer {
 
         servletRegistrationBean.setName("eskimo-proxy");
         return servletRegistrationBean;
+    }
+
+    @Bean
+    public ServletListenerRegistrationBean<ServicesProxyServlet.ProxySessionListener> sessionListenerWithMetrics() {
+        ServletListenerRegistrationBean<ServicesProxyServlet.ProxySessionListener> listenerRegBean =
+                new ServletListenerRegistrationBean<>();
+
+        listenerRegBean.setListener(new ServicesProxyServlet.ProxySessionListener());
+        return listenerRegBean;
     }
 
     @Override

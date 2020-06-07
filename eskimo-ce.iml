@@ -17,7 +17,7 @@
       <configuration />
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -66,10 +66,10 @@
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.1.10.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.1.10.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.1.10.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.mitre.dsmiley.httpproxy:smiley-http-proxy-servlet:1.11" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.11" level="project" />
+    <orderEntry type="library" name="Maven: org.mitre.dsmiley.httpproxy:smiley-http-proxy-servlet:1.11" level="project" />
     <orderEntry type="library" name="Maven: org.jenkins-ci:trilead-ssh2:build-217-jenkins-16" level="project" />
     <orderEntry type="library" name="Maven: org.connectbot.jbcrypt:jbcrypt:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: net.i2p.crypto:eddsa:0.3.0" level="project" />

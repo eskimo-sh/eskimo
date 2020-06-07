@@ -491,7 +491,7 @@ eskimo.SystemStatus = function(constructorObject) {
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-4");
 
         var statusMonitoringGrafana = $('#status-monitoring-grafana');
-        statusMonitoringGrafana.css("display", "block");
+        statusMonitoringGrafana.css("display", "inherit");
         statusMonitoringGrafana.css("visibility", "visible");
     }
     this.showGrafanaDashboard = showGrafanaDashboard;
