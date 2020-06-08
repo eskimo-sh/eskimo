@@ -214,7 +214,29 @@ Software.
             <version>9.0.30</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.httpunit</groupId>
+            <artifactId>httpunit</artifactId>
+            <version>1.7.3</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.12</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
