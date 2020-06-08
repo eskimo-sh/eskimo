@@ -310,32 +310,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     protected String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
         StringBuilder uri = buildRequestUriPath(servletRequest);
 
-        // Handle the query string & fragment
-        String queryString = servletRequest.getQueryString();//ex:(following '?'): name=value&foo=bar#fragment
-        String fragment = null;
-        //split off fragment from queryString, updating queryString if found
-        if (queryString != null) {
-            int fragIdx = queryString.indexOf('#');
-            if (fragIdx >= 0) {
-                fragment = queryString.substring(fragIdx + 1);
-                queryString = queryString.substring(0, fragIdx);
-            }
-        }
-
-        queryString = rewriteQueryStringFromRequest(servletRequest, queryString);
-        if (queryString != null && queryString.length() > 0) {
-            uri.append('?');
-            // queryString is not decoded, so we need encodeUriQuery not to encode "%" characters, to avoid double-encoding
-            uri.append(encodeUriQuery(queryString, false));
-        }
-
-        if (doSendUrlFragment && fragment != null) {
-            uri.append('#');
-            // fragment is not decoded, so we need encodeUriQuery not to encode "%" characters, to avoid double-encoding
-            uri.append(encodeUriQuery(fragment, false));
-        }
-        logger.debug ("Redirecting " + servletRequest.getRequestURI() + "  - to - " + uri);
-        return uri.toString();
+        return returnRewriteUrl(servletRequest, uri);
     }
 
     @Override

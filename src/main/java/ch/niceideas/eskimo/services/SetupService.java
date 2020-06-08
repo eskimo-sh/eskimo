@@ -429,7 +429,7 @@ public class SetupService {
                     String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
                     String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
 
-                    if (compareVersion (new Pair<String, String> (newSoftwareVersion, newDistributionVersion),
+                    if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
                             lastVersionValues) > 0) {
                         updates.add(imageName);
                     }
@@ -520,9 +520,7 @@ public class SetupService {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
-                    if (packagesVersion == null) {
-                        packagesVersion = loadRemotePackagesVersionFile();
-                    }
+                    packagesVersion = loadRemotePackagesVersionFile();
 
                     for (String packageName : sortedServices) {
 
@@ -588,7 +586,7 @@ public class SetupService {
                         String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
                         String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
 
-                        if (compareVersion (new Pair<String, String> (newSoftwareVersion, newDistributionVersion),
+                        if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
                                 lastVersionValues) > 0) {
                             downloadPackage(DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION);
                         }
@@ -634,8 +632,8 @@ public class SetupService {
 
     public int compareSoftwareVersion (String firstVersion, String secondVersion) {
 
-        String[] unitsFirst = firstVersion.split("[,\\.\\-_]");
-        String[] unitsSecond = secondVersion.split("[,\\.\\-_]");
+        String[] unitsFirst = firstVersion.split("[,.\\-_]");
+        String[] unitsSecond = secondVersion.split("[,.\\-_]");
 
         for (int i = 0; i < Math.max(unitsFirst.length, unitsSecond.length); i++) {
 
@@ -686,7 +684,9 @@ public class SetupService {
                                 dowloadFile(builder, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
 
                                 FileUtils.delete(targetFile);
-                                tempFile.renameTo(targetFile);
+                                if (!tempFile.renameTo(targetFile)) {
+                                    throw new SystemException("Failed to rename " + tempFile.getName() + " to " + targetFile.getName());
+                                }
                             }
                         }, null);
             } catch (SystemException e) {

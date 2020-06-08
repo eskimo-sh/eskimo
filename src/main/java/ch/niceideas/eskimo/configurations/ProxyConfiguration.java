@@ -34,10 +34,7 @@
 
 package ch.niceideas.eskimo.configurations;
 
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
-import ch.niceideas.eskimo.proxy.WebSocketProxyForwarder;
-import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
+import ch.niceideas.eskimo.proxy.*;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,18 +104,18 @@ public class ProxyConfiguration implements WebSocketConfigurer {
                         .map(service -> "/" + service.getName() + "/*")
                         .toArray(String[]::new));
 
-        servletRegistrationBean.addInitParameter(ServicesProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
+        servletRegistrationBean.addInitParameter(ProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
 
         servletRegistrationBean.setName("eskimo-proxy");
         return servletRegistrationBean;
     }
 
     @Bean
-    public ServletListenerRegistrationBean<ServicesProxyServlet.ProxySessionListener> sessionListenerWithMetrics() {
-        ServletListenerRegistrationBean<ServicesProxyServlet.ProxySessionListener> listenerRegBean =
+    public ServletListenerRegistrationBean<ProxyServlet.ProxySessionListener> sessionListenerWithMetrics() {
+        ServletListenerRegistrationBean<ProxyServlet.ProxySessionListener> listenerRegBean =
                 new ServletListenerRegistrationBean<>();
 
-        listenerRegBean.setListener(new ServicesProxyServlet.ProxySessionListener());
+        listenerRegBean.setListener(new ProxyServlet.ProxySessionListener());
         return listenerRegBean;
     }
 

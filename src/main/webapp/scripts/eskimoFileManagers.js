@@ -571,7 +571,6 @@ eskimo.FileManagers = function(constructorObject) {
                             var percentComplete = evt.loaded / evt.total;
                             console.log(percentComplete);
                             var newProgress = Math.ceil(percentComplete * 100);
-                            var fileUploadprogressBar = $('#file-upload-progress-bar');
                             fileUploadprogressBar.attr('aria-valuenow', newProgress+"%").css('width', newProgress+"%");
                             fileUploadprogressBar.html(newProgress+"%");
                         }

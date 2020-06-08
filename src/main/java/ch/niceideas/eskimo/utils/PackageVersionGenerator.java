@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class PackageVersionGenerator {
 
-    private static final Logger logger = Logger.getLogger(EncodedPasswordGenerator.class);
+    private static final Logger logger = Logger.getLogger(PackageVersionGenerator.class);
 
     public static void main (String[] args) {
 

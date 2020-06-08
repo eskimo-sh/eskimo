@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
 
+import ch.niceideas.common.utils.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
@@ -99,7 +100,7 @@ public class ProxyServlet extends HttpServlet {
 
     protected boolean doLog = false;
     protected boolean doForwardIP = true;
-    
+
     /**
      * User agents shouldn't send the url fragment but what if it does?
      */
@@ -141,52 +142,52 @@ public class ProxyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         String doLogStr = getConfigParam(P_LOG);
-        if (doLogStr != null) {
+        if (StringUtils.isNotBlank(doLogStr)) {
             this.doLog = Boolean.parseBoolean(doLogStr);
         }
 
         String doForwardIPString = getConfigParam(P_FORWARDEDFOR);
-        if (doForwardIPString != null) {
+        if (StringUtils.isNotBlank(doForwardIPString)) {
             this.doForwardIP = Boolean.parseBoolean(doForwardIPString);
         }
 
         String preserveHostString = getConfigParam(P_PRESERVEHOST);
-        if (preserveHostString != null) {
+        if (StringUtils.isNotBlank(preserveHostString)) {
             this.doPreserveHost = Boolean.parseBoolean(preserveHostString);
         }
 
         String preserveCookiesString = getConfigParam(P_PRESERVECOOKIES);
-        if (preserveCookiesString != null) {
+        if (StringUtils.isNotBlank(preserveCookiesString)) {
             this.doPreserveCookies = Boolean.parseBoolean(preserveCookiesString);
         }
 
         String handleRedirectsString = getConfigParam(P_HANDLEREDIRECTS);
-        if (handleRedirectsString != null) {
+        if (StringUtils.isNotBlank(handleRedirectsString)) {
             this.doHandleRedirects = Boolean.parseBoolean(handleRedirectsString);
         }
 
         String connectTimeoutString = getConfigParam(P_CONNECTTIMEOUT);
-        if (connectTimeoutString != null) {
+        if (StringUtils.isNotBlank(connectTimeoutString)) {
             this.connectTimeout = Integer.parseInt(connectTimeoutString);
         }
 
         String readTimeoutString = getConfigParam(P_READTIMEOUT);
-        if (readTimeoutString != null) {
+        if (StringUtils.isNotBlank(readTimeoutString)) {
             this.readTimeout = Integer.parseInt(readTimeoutString);
         }
 
-        String connectionRequestTimeout = getConfigParam(P_CONNECTIONREQUESTTIMEOUT);
-        if (connectionRequestTimeout != null) {
-            this.connectionRequestTimeout = Integer.parseInt(connectionRequestTimeout);
+        String connectionRequestTimeoutString = getConfigParam(P_CONNECTIONREQUESTTIMEOUT);
+        if (StringUtils.isNotBlank(connectionRequestTimeoutString)) {
+            this.connectionRequestTimeout = Integer.parseInt(connectionRequestTimeoutString);
         }
 
-        String maxConnections = getConfigParam(P_MAXCONNECTIONS);
-        if (maxConnections != null) {
-            this.maxConnections = Integer.parseInt(maxConnections);
+        String maxConnectionsString = getConfigParam(P_MAXCONNECTIONS);
+        if (StringUtils.isNotBlank(maxConnectionsString)) {
+            this.maxConnections = Integer.parseInt(maxConnectionsString);
         }
 
         String useSystemPropertiesString = getConfigParam(P_USESYSTEMPROPERTIES);
-        if (useSystemPropertiesString != null) {
+        if (StringUtils.isNotBlank(useSystemPropertiesString)) {
             this.useSystemProperties = Boolean.parseBoolean(useSystemPropertiesString);
         }
 
@@ -253,7 +254,7 @@ public class ProxyServlet extends HttpServlet {
         HttpClient proxyClient = (HttpClient) session.getAttribute(SESSION_HTTP_CLIENT);
         if (proxyClient == null) {
             proxyClient = createHttpClient();
-            session.setAttribute("SESSION_HTTP_CLIENT", proxyClient);
+            session.setAttribute(SESSION_HTTP_CLIENT, proxyClient);
         }
 
         return proxyClient;
@@ -264,7 +265,7 @@ public class ProxyServlet extends HttpServlet {
         @SuppressWarnings("deprecation")
         @Override
         public void sessionDestroyed(HttpSessionEvent se) {
-            HttpClient proxyClient = (HttpClient) se.getSession().getAttribute("SESSION_HTTP_CLIENT");
+            HttpClient proxyClient = (HttpClient) se.getSession().getAttribute(SESSION_HTTP_CLIENT);
             if (proxyClient != null) {
                 if (proxyClient instanceof Closeable) {
                     try {
@@ -280,6 +281,7 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
             throws ServletException, IOException {
@@ -319,7 +321,7 @@ public class ProxyServlet extends HttpServlet {
             // Pass the response code. This method with the "reason phrase" is deprecated but it's the
             //   only way to pass the reason along too.
             int statusCode = proxyResponse.getStatusLine().getStatusCode();
-            //noinspection deprecation
+
             servletResponse.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
 
             // Copying response headers to make sure SESSIONID or other Cookie which comes from the remote
@@ -364,7 +366,13 @@ public class ProxyServlet extends HttpServlet {
         if (e instanceof IOException) {
             throw (IOException) e;
         }
-        throw new RuntimeException(e);
+        throw new ProxyServletRuntimeException(e);
+    }
+
+    public static class ProxyServletRuntimeException extends RuntimeException {
+        public ProxyServletRuntimeException (Exception e) {
+            super (e);
+        }
     }
 
     protected HttpResponse doExecute(HttpServletRequest servletRequest, HttpRequest proxyRequest) throws IOException {
@@ -590,6 +598,11 @@ public class ProxyServlet extends HttpServlet {
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters
             uri.append(encodeUriQuery(pathInfo, true));
         }
+
+        return returnRewriteUrl(servletRequest, uri);
+    }
+
+    protected String returnRewriteUrl(HttpServletRequest servletRequest, StringBuilder uri) {
         // Handle the query string & fragment
         String queryString = servletRequest.getQueryString();//ex:(following '?'): name=value&foo=bar#fragment
         String fragment = null;
@@ -719,17 +732,17 @@ public class ProxyServlet extends HttpServlet {
     protected static final BitSet asciiQueryChars;
 
     static {
-        char[] c_unreserved = "_-!.~'()*".toCharArray();//plus alphanum
-        char[] c_punct = ",;:$&+=".toCharArray();
-        char[] c_reserved = "?/[]@".toCharArray();//plus punct
+        char[] cUnreserved = "_-!.~'()*".toCharArray();//plus alphanum
+        char[] cPunct = ",;:$&+=".toCharArray();
+        char[] cReserved = "?/[]@".toCharArray();//plus punct
 
         asciiQueryChars = new BitSet(128);
         for (char c = 'a'; c <= 'z'; c++) asciiQueryChars.set(c);
         for (char c = 'A'; c <= 'Z'; c++) asciiQueryChars.set(c);
         for (char c = '0'; c <= '9'; c++) asciiQueryChars.set(c);
-        for (char c : c_unreserved) asciiQueryChars.set(c);
-        for (char c : c_punct) asciiQueryChars.set(c);
-        for (char c : c_reserved) asciiQueryChars.set(c);
+        for (char c : cUnreserved) asciiQueryChars.set(c);
+        for (char c : cPunct) asciiQueryChars.set(c);
+        for (char c : cReserved) asciiQueryChars.set(c);
 
         asciiQueryChars.set('%');//leave existing percent escapes in place
     }
