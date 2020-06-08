@@ -1189,6 +1189,12 @@
         "masterService": "spark-executor",
         "numberOfMasters": 1,
         "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "kafka",
+        "numberOfMasters": 1,
+        "mandatory": false
       }
     ],
     "commands" : [
