@@ -214,7 +214,7 @@ fi
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin zeppelin zeppelin_install_log
 
-echo " - HACK import of rawe samples archived in docker container"
+echo " - HACK import of raw samples archived in docker container"
 docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> zeppelin_install_log 2>&1
 fail_if_error $? "zeppelin_install_log" -40
 

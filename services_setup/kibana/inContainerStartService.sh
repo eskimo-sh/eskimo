@@ -48,4 +48,57 @@ echo " - Inject settings"
 
 echo " - Starting service"
 # Use file created from inContainerInjectTopology.sh
-/tmp/kibana.eskimo
+/tmp/kibana.eskimo &
+export KIBANA_PID=$!
+
+echo " - Waiting for Kibana to be up and running"
+set +e
+for i in `seq 1 60`; do
+
+    sleep 5
+
+    if [[ `ps -p $KIBANA_PID -o comm=` == "" ]]; then
+        echo "!!! Kibana process not detected up anymore. Crashing."
+        exit 1
+    fi
+
+    echo "   + Querying kibana - attempt $i"
+    curl -XGET http://localhost:5601/api/features > /tmp/kibana_features 2>&1
+    if [[ $? == 0 ]]; then
+        if [[ `grep \"id\" /tmp/kibana_features` != "" ]]; then
+            break;
+        fi
+    fi
+
+    if [[ $i == 60 ]]; then
+        echo "!!! Couldn't get kibana up and running within 300 seconds. Crashing"
+        exit 2
+    fi
+done
+
+echo " - Provisioning sample files"
+# convention: dashboard files have same name as dashboard
+
+for sample in $(find /usr/local/lib/kibana/samples/); do
+
+    if [[ `echo $sample | grep ndjson` != "" ]]; then
+
+        echo "   + checking $sample"
+        dashboard_name="${sample%.*}"
+        exist=`curl -XGET "http://localhost:5601/api/saved_objects/_find?type=dashboard&search_fields=title&search=$dashboard_name*" 2>/dev/null | jq -r " .total"`
+
+        if [[ $exist == 0 ]]; then
+            curl -X POST "http://localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@"$sample" > /tmp/upload_$sample 2>&1
+            if [[ $? != 0 ]]; then
+                echo "!!! Failed to import $sample"
+                cat /tmp/upload_$sample
+                exit 3
+            fi
+        fi
+    fi
+done
+
+set -e
+
+echo " - Waiting on Kibana process"
+wait $KIBANA_PID

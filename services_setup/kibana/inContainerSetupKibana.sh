@@ -67,6 +67,12 @@ sudo sed -i s/"#server.basePath: \"\""/"server.basePath: \"\/kibana\""/g /usr/lo
 echo " - enabling user elasticsearch to change config"
 chown -R elasticsearch. /usr/local/lib/kibana/config
 
+echo " - Copying sample objects"
+sudo mkdir /usr/local/lib/kibana/samples/
+sudo cp -Rf /eskimo/samples/* /usr/local/lib/kibana/samples/
+sudo chown -R elasticsearch. /usr/local/lib/kibana/samples/
+
+
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"
 

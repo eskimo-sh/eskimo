@@ -67,6 +67,7 @@ docker run \
         -v $PWD/../common:/common \
         -v /var/log/elasticsearch:/var/log/elasticsearch \
         -v /var/run/elasticsearch:/var/run/elasticsearch \
+        -v $SCRIPT_DIR/samples:/eskimo/samples \
         -d --name kibana \
         -i \
         -t eskimo:kibana bash >> /tmp/kibana_install_log 2>&1
