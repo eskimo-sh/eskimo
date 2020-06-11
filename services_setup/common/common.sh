@@ -44,25 +44,25 @@ docker_cp_script() {
 
     if [[ $1 == "" ]]; then
         echo "expected Script filename as first argument"
-        exit -1
+        exit 1
     fi
     export SCRIPT=$1
 
     if [[ $2 == "" ]]; then
         echo "expected target folder as second argument"
-        exit -2
+        exit 2
     fi
     export FOLDER=$2
 
     if [[ $3 == "" ]]; then
         echo "expected docker container name folder as third argument"
-        exit -3
+        exit 3
     fi
     export CONTAINER=$3
 
     if [[ $4 == "" ]]; then
         echo "expected target folder as fourth argument"
-        exit -4
+        exit 4
     fi
     export LOGFILE=$4
 
@@ -87,13 +87,13 @@ function handle_topology_settings() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit -3
+        exit 3
     fi
     export LOG_FILE=$2
 
@@ -124,7 +124,7 @@ function loadTopology() {
 
     if [[ ! -f /etc/eskimo_topology.sh ]]; then
         echo "  - ERROR : no topology file defined !"
-        exit -123
+        exit 2
     fi
 
     . /etc/eskimo_topology.sh
@@ -138,13 +138,13 @@ function deploy_marathon() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit -3
+        exit 3
     fi
     export LOG_FILE=$2
 
@@ -152,20 +152,20 @@ function deploy_marathon() {
     docker tag eskimo:$CONTAINER marathon.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not re-tag marathon container image"
-        exit -30
+        exit 4
     fi
 
     docker push marathon.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         echo "Image push in docker registry failed !"
-        exit -22
+        exit 5
     fi
 
     echo " - removing local image"
     docker image rm eskimo:$CONTAINER  >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         echo "local image removal failed !"
-        exit -32
+        exit 6
     fi
 
     echo " - Removing any previously deployed $CONTAINER service from marathon"
@@ -173,7 +173,7 @@ function deploy_marathon() {
     if [[ $? != 0 ]]; then
         echo "   + Could not reach marathon"
         cat "$LOG_FILE"_marathon_deploy
-        exit -23
+        exit 7
     fi
 
     if [[ `cat "$LOG_FILE"_marathon_deploy` != "" && `grep "does not exist" "$LOG_FILE"_marathon_deploy` == "" ]]; then
@@ -191,14 +191,14 @@ function deploy_marathon() {
         if [[ $? != 0 ]]; then
             echo "   + Could not deploy $CONTAINER application in marathon"
             cat "$LOG_FILE"_deploy
-            exit -24
+            exit 8
         fi
         if [[ `grep "App is locked by one or more deployments" "$LOG_FILE"_deploy` == "" ]]; then
             break
         fi
         if [[ "$i" == "10" ]]; then
             echo "   + Failed 10 times !!"
-            exit -25
+            exit 9
         fi
         if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
     done
@@ -216,13 +216,13 @@ function install_and_check_service_file() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit -3
+        exit 3
     fi
     export LOG_FILE=$2
 
@@ -232,7 +232,7 @@ function install_and_check_service_file() {
         export systemd_units_dir=/usr/lib/systemd/system/
     else
         echo "Couldn't find systemd unit files directory"
-        exit -10
+        exit 4
     fi
 
     echo " - Copying $CONTAINER systemd file"
@@ -247,12 +247,12 @@ function install_and_check_service_file() {
     echo " - Checking Systemd file"
     if [[ `sudo systemctl status $CONTAINER | grep 'could not be found'` != "" ]]; then
         echo "$CONTAINER systemd file installation failed"
-        exit -12
+        exit 5
     fi
     sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 && $? != 3 ]]; then
         echo "$CONTAINER systemd file doesn't work as expected"
-        exit -12
+        exit 6
     fi
 
     echo " - Testing systemd startup - starting $CONTAINER"
@@ -267,7 +267,7 @@ function install_and_check_service_file() {
     echo " - Testing systemd startup - Make sure service is really running"
     if [[ `systemctl show -p SubState $CONTAINER | grep exited` != "" ]]; then
         echo "$CONTAINER service is actually not really running"
-        exit -13
+        exit 7
     fi
 
     #echo " - Testing systemd startup - stopping $CONTAINER"
@@ -291,13 +291,13 @@ function commit_container() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit -3
+        exit 3
     fi
     export LOG_FILE=$2
 
@@ -324,19 +324,19 @@ function build_container() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Image (template) needs to be passed in argument"
-        exit -1
+        exit 3
     fi
     export IMAGE=$2
 
     if [[ $3 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit -3
+        exit 4
     fi
     export LOG_FILE=$3
 
@@ -373,7 +373,7 @@ function create_binary_wrapper(){
 
     if [[ $1 == "" || $2 == "" ]]; then
         echo "target and wrapper have to be passed as argument of the create_binary_wrapper function"
-        exit -2
+        exit 2
     fi
     TARGET=$1
     WRAPPER=$2
@@ -424,7 +424,7 @@ function preinstall_unmount_gluster_share () {
             i=$((i+1))
             if [[ $1 == 5 ]]; then
                 echo " - Failed to unmount $1 after 5 attempts"
-                exit -125
+                exit 1
             fi
         done
     fi

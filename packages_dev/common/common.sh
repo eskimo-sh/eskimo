@@ -88,11 +88,11 @@ check_for_internet() {
         wget https://www.google.com -O /tmp/test.html >/dev/null 2>&1
         if [[ $? != 0 ]]; then
             echo "No internet connection available"
-            exit -10
+            exit 10
         fi
     else
         echo "No wget command available"
-        exit -11
+        exit 11
     fi
 }
 
@@ -100,10 +100,10 @@ check_for_internet() {
 # Docker is required to build package images that will be installed on cluster nodes
 check_for_docker() {
     if [ -x "$(command -v docker)" ]; then
-        echo "Found docker : "`docker -v`
+        echo "Found docker : $(docker -v)"
     else
         echo "Docker is not available on system"
-        exit -1
+        exit 1
     fi
 }
 
@@ -115,19 +115,19 @@ function close_and_save_image() {
 
     if [[ $1 == "" ]]; then
         echo "Image needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     IMAGE=$1
 
 	if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
-        exit -2
+        exit 3
     fi
     LOG_FILE=$2
 
     if [[ $3 == "" ]]; then
         echo "Software version needs to be passed in argument"
-        exit -3
+        exit 4
     fi
     VERSION=$3
 	
@@ -138,7 +138,7 @@ function close_and_save_image() {
     # Exit the container and commit the changes
     # Now that we've modified the container we have to commit the changes. First exit the container with the command exit.
     # To commit the changes and create a new image based on said changes, issue the command:
-    echo " - Comitting changes from container $IMAGE on image "$IMAGE"_template"
+    echo " - Comitting changes from container $IMAGE on image ""$IMAGE""_template"
     docker commit $IMAGE eskimo:"$IMAGE"_template >> $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -3
 
@@ -152,14 +152,14 @@ function close_and_save_image() {
     fail_if_error $? $LOG_FILE -5
 
     # save base image
-    echo " - Saving image "$IMAGE"_template"
+    echo " - Saving image ""$IMAGE""_template"
 	if [[ -z $TEST_MODE ]]; then set -e; fi
     docker save eskimo:"$IMAGE"_template | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
     set +e
 
     echo " - versioning image"
     for i in `seq 1 100`; do
-        if [[ ! -f "../../packages_distrib/docker_template_"$IMAGE"_"$VERSION"_$i.tar.gz" ]]; then
+        if [[ ! -f "../../packages_distrib/docker_template_""$IMAGE""_""$VERSION""_$i.tar.gz" ]]; then
             mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_"$IMAGE"_"$VERSION"_$i.tar.gz
             break;
         fi
@@ -180,13 +180,13 @@ function build_image() {
 
     if [[ $1 == "" ]]; then
         echo "Image needs to be passed in argument"
-        exit -2
+        exit 2
     fi
     IMAGE=$1
 	
 	if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
-        exit -2
+        exit 3
     fi
     LOG_FILE=$2
 
@@ -222,7 +222,7 @@ function build_image() {
         fail_if_error $? $LOG_FILE -11
     fi
 
-    echo " - Starting container "$IMAGE"_template"
+    echo " - Starting container ""$IMAGE""_template"
     # create and start container
     docker run \
             --privileged \

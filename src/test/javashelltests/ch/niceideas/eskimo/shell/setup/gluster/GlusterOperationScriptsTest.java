@@ -156,6 +156,9 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 "        fi\n" +
                 "        echo -e '127.0.0.1'\n" +
                 "}\n" +
+                "function get_peer_ips() {\n" +
+                "        echo -e '192.168.10.13'\n" +
+                "}\n" +
                 "\n" +
                 "function delete_gluster_management_lock_file() {\n" +
                 "    echo \" - releasing gluster_management_lock\"\n" +
@@ -212,6 +215,9 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
                 "\n" +
                 "function get_pool_ips() {\n" +
                 "    echo -e '192.168.10.13\n127.0.0.1'\n" +
+                "}\n" +
+                "function get_peer_ips() {\n" +
+                "    echo -e '192.168.10.13'\n" +
                 "}\n" +
                 "\n" +
                 "function delete_gluster_management_lock_file() {\n" +

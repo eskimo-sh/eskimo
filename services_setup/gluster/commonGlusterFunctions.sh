@@ -34,26 +34,6 @@
 # Software.
 #
 
-# This script acts as a Watch Dog for docker containers when docker containers star background processes.
-# When this happens, the docker container won't die unless the main process invoked by the run command - the one that
-# keeps it waiting . stops.
-# As a consequence, the background process have no chance to be restarted since the container won't ire if they crash
-# unless the main process dies as well.
-#
-# Here comes the Watch Dog, it monitors a background process carefully and kills the main container process in case
-# the background process dies.
-# The Watch Dog takes both process IDs in argument
-# - the first parameter is the PID is the background process to be monitored
-# - the second parameter is
-#   + either PID if the process to be killed in case the monitored background process vanishes
-#   + or a command enabling to find that PID at runtime
-# - A third argument is passed to log actions in the given log file
-#
-# A Watch Dog command should be invoked in background as well AFTER all the container process have been launched in
-# background and BEFORE waiting on the main process.
-# when using Watdh Dogs, even the main container process is started in background and "waited" (wait PID) in the end
-# wait PID should be the last command in the startup script.
-
 
 # Take care of deleting the gluster management lock file upon maintenance script exit
 function delete_gluster_management_lock_file() {
@@ -70,14 +50,35 @@ function hostnames_to_ips () {
         return -1
     fi
 
-    hostnames=`echo "$pool_list" | cut -d$'\t' -f 2 | sed  '/^$/d'`
     IFS=$'\n'
     for hostname in $hostnames; do
         hostname=`echo $hostname | xargs`
         #echo $hostname
-        ip_address=`ping -c 1 $hostname 2>/dev/null  | grep PING | sed -E s/'PING ([^ ]+) \(([^ ]+)\).*'/'\2'/g`
+        ip_address=$(ping -c 1 $hostname 2>/dev/null  | grep PING | sed -E s/'PING ([^ ]+) \(([^ ]+)\).*'/'\2'/g)
         echo $ip_address
     done
+}
+
+# This function extracts the IP addresses from gluster's "peer list" command
+function get_peer_ips() {
+
+    for i in 1 2 3 4 5; do
+        peer_status=$(gluster peer status)
+        if [[ $? != 0 ]]; then
+            echo "    + listing gluster peer status failed - attempt $i" > /dev/stderr
+            if [[ $i == 5 ]]; then
+                echo "    + Counld't get peer status in 5 attempts. crashing" > /dev/stderr
+                return 1
+            fi
+            sleep 2
+        else
+            break
+        fi
+    done
+
+    hostnames=$(echo "$peer_status" | grep Hostname | cut -d ':' -f 2 | sed 's/^ *//g' | sed 's/^ *$//g')
+
+    hostnames_to_ips $hostnames
 }
 
 
@@ -126,7 +127,9 @@ function get_pool_ips() {
         done
     fi
 
-    hostnames_to_ips $pool_list
+    hostnames=$(echo "$pool_list" | cut -d$'\t' -f 2 | sed  '/^$/d')
+
+    hostnames_to_ips $hostnames
 }
 
 # This is used to dynamically elect a gluster node as a master in a consistent way accross node

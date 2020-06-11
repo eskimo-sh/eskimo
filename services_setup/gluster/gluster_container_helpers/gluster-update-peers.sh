@@ -140,12 +140,11 @@ else
      fi
 
      # ensure peer is well connected
-# FIXME need to convert hostnames to IPs as well
-#     sleep 1
-#     localPeerStatus=`gluster peer status`
-#     if [[ `echo $localPeerStatus | grep $MASTER_IP_ADDRESS` == "" && `echo $localPeerStatus | grep $additional_search` == "" ]]; then
-#        echo "Error : $MASTER_IP_ADDRESS not found in peers"
-#        gluster peer status
-#        exit -1
-#     fi
+     sleep 2
+     localPeerStatus=`get_peer_ips`
+     if [[ `echo $localPeerStatus | grep $MASTER_IP_ADDRESS` == "" ]]; then
+        echo "Error : $MASTER_IP_ADDRESS not found in peers"
+        gluster peer status
+        exit 33
+     fi
 fi

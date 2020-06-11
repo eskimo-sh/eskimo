@@ -88,10 +88,10 @@ for sample in $(find /usr/local/lib/kibana/samples/); do
         exist=`curl -XGET "http://localhost:5601/api/saved_objects/_find?type=dashboard&search_fields=title&search=$dashboard_name*" 2>/dev/null | jq -r " .total"`
 
         if [[ $exist == 0 ]]; then
-            curl -X POST "http://localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@"$sample" > /tmp/upload_$sample 2>&1
+            curl -X POST "http://localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@"$sample" > /tmp/kibana_provision 2>&1
             if [[ $? != 0 ]]; then
                 echo "!!! Failed to import $sample"
-                cat /tmp/upload_$sample
+                cat /tmp/kibana_provision
                 exit 3
             fi
         fi

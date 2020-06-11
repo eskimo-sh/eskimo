@@ -320,7 +320,7 @@ Use for instance the following commands on Linux:
 
 .Put java in PATH on Linux
 ----
-export JAVA_HOME=/usr/local/lib/jdk-9
+export JAVA_HOME=/usr/local/lib/jdk-11
 export PATH=$JAVA_HOME/bin:$PATH
 ----
 
@@ -330,7 +330,7 @@ And for instance the following commands on Windows
 
 .Put java in PATH on Windows
 ----
-set JAVA_HOME=C:\programs\jdk-9
+set JAVA_HOME=C:\programs\jdk-11
 set PATH=%JAVA_HOME%\bin;%PATH%
 ----
 
