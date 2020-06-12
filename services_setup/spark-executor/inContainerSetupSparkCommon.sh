@@ -39,10 +39,11 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
+
 SPARK_USER_ID=$1
 if [[ $SPARK_USER_ID == "" ]]; then
     echo " - Didn't get SPARK User ID as argument"
-    exit -2
+    exit 2
 fi
 
 
@@ -92,6 +93,14 @@ done
 for i in `ls -1 /usr/local/lib/spark/sbin/stop*`; do
     create_binary_wrapper $i /usr/local/sbin/spark-`basename $i`
 done
+
+echo " - Symlinking some RHEL mesos dependencies "
+saved_dir=`pwd`
+cd /usr/lib/x86_64-linux-gnu/
+sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
+sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
+sudo ln -s libsasl2.so.2 libsasl2.so.3
+cd $saved_dir
 
 #echo " - Opening rights to logs folder to user spark"
 #sudo mkdir -p /usr/local/lib/spark/logs
@@ -190,6 +199,26 @@ sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.network=host\"  >
 # This is not working
 #sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.rm=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.mesos.executor.docker.volumes=/var/log/spark:/var/log/spark:rw,/var/lib/spark:/var/lib/spark:rw\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+
+echo " - Creating hive-site.xml configuration file"
+cat > /tmp/hive-site.xml <<- "EOF"
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+<property>
+  <name>javax.jdo.option.ConnectionURL</name>
+  <value>jdbc:derby:;databaseName=/var/lib/spark/metastore_db;create=true</value>
+  <description>JDBC connect string for a JDBC metastore in /var/lib/spark/metastore_db</description>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionDriverName</name>
+  <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+</property>
+</configuration>
+EOF
+sudo mv /tmp/hive-site.xml /usr/local/lib/spark/conf/
+
 
 echo " - Enabling spark to change configuration at runtime"
 chown -R spark. "/usr/local/lib/spark/conf/"

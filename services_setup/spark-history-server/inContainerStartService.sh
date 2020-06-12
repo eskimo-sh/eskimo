@@ -36,8 +36,9 @@
 
 set -e
 
-echo " - Injecting topology"
-. /usr/local/sbin/inContainerInjectTopology.sh
+# Spark History doesn't need this (It's even harming !)
+#echo " - Injecting topology"
+#. /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Injecting topology (Spark History)"
 . /usr/local/sbin/inContainerInjectTopologySparkHistory.sh

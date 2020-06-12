@@ -69,13 +69,6 @@ bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChe
 # still need to be able to manipulate that directory !
 chown spark /var/lib/spark
 
-echo " - Symlinking some RHEL mesos dependencies "
-saved_dir=`pwd`
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-sudo ln -s libsasl2.so.2 libsasl2.so.3
-cd $saved_dir
 
 echo " - Finding mesos"
 bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"

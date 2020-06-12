@@ -59,3 +59,8 @@ fi
 
 # replacing driver bind IP address at runtime
 sed -i s/"spark.driver.host=RUNTIME_IP_ADDRESS"/"spark.driver.host="$SELF_IP_ADDRESS""/g  /usr/local/lib/spark/conf/spark-defaults.conf
+
+echo " - Updating spark environment file"
+bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
+bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"

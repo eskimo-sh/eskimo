@@ -65,14 +65,18 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-
+# Find of mesos for directory mount
 export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
+
+# Find external IP for libprocess (mesos) configuration
+. /etc/eskimo_topology.sh
 
 /usr/bin/docker run \
         -it \
         --rm \
         --network host \
         --user spark \
+        -e LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS \
         $DOCKER_VOLUMES_ARGS \
         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \

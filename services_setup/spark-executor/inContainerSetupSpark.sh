@@ -40,18 +40,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo " - Symlinking some RHEL mesos dependencies "
-saved_dir=`pwd`
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-sudo ln -s libsasl2.so.2 libsasl2.so.3
-cd $saved_dir
-
-echo " - Updating spark environment file"
-sudo bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
-sudo bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
-sudo bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"
