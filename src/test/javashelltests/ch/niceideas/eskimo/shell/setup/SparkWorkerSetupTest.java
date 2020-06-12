@@ -122,17 +122,5 @@ public class SparkWorkerSetupTest extends AbstractSetupShellTest {
     @Test
     public void testConfigurationFileUpdate() throws Exception {
         assertTestConfFileUpdate();
-
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
-        if (StringUtils.isNotBlank(sudoLogs)) {
-
-            //System.err.println (sudoLogs);
-
-            assertTrue(sudoLogs.contains("bash -c echo -e \"export LIBPROCESS_IP=\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
-            assertTrue(sudoLogs.contains("bash -c echo -e \"export SPARK_LOCAL_IP=\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
-
-        } else {
-            fail ("Expected to find sudo logs in .log_sudo");
-        }
     }
 }
