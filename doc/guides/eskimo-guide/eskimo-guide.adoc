@@ -1326,7 +1326,17 @@ In the current version, eskimo provides pre-packaged docker images as well as se
 pre-packaged software components.
 
 Eskimo takes care of everything regarding the building of the docker images for these software components as well
-their setup, installation and operation on the eskimo cluster nodes.
+their setup, installation and operation on the eskimo cluster nodes. +
+Supported packaged services are defined at three different leveks in order to be operable by Eskimo:
+
+1. They must be defined and configured in the configuration file `services.json`
+2. They must have a `setup.sh` script in their `services_setup` folder.
+3. They must have a docker image available containing the _ready-to-run_ vanilla software.
+
+This is detailed in the
+https://www.eskimo.sh/doc/service-dev-guide.html#services_installation_framework[Service Installation Framework Guide].
+
+
 
 This chapter gives some additional information related to these software components as well as present some design
 decisions regarding their operation.

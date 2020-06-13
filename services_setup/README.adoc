@@ -70,8 +70,8 @@ other single instances services
 
 * An eskimo package has to be a docker image
 * An eskimo package has to provide
-** either a systemd unit configuration file to enable eskimo to operate the component on the cluster.
-** or a marathon JSON configuration file to delegate this marathon
+** either a *systemd unit configuration file* to enable eskimo to operate the component on the cluster.
+** or a *marathon JSON configuration file* to delegate this marathon
 
 The Eskimo Nodes Configuration process takes care of installing the services defined in the _services.json_
 configuration file and and copies them over to the nodes where they are intended to run. After the proper installation,
@@ -503,6 +503,10 @@ Look at other examples to get inspired.
 Another pretty important property in a service configuration in `services.json` is the memory consumption property:
 `memory`.
 
+This setting only applies to native (or SystemD) services, marathon services memory is defined in another way.
+
+===== Native (SystemD) services memory configuration
+
 The possible values for that property are as follows :
 
 * `neglectable` : the service is not accounted in memory allocation
@@ -549,8 +553,45 @@ size of total RAM.
 |===================
 
 *Importantly*, all marathon services - such as Kibana, Cerebro, Kafka-manager, etc. - as well as all services operated by mesos -
-such as the spark executors and flink workers - don't get any specific amount of memory assigned. +
-*Instead, they share the memory available for mesos-agent.*
+such as the spark executors and flink workers - don't get any specific amount of memory assigned here. +
+*Instead, they share the memory available for mesos-agents accross all nodes.* +
+The amount of memory they will request from mesos is explained in the next section.
+
+===== Marathon services memory configuration
+
+Marathon services define the memory they will request from mesos in the *marathon service configuration file*.
+
+For Instance the file `cerebro.marathon.json` configures the resources that _Cerebro_ will request from Mesos as follows:
+
+.portion of cerebro.marathon.json
+----
+{
+  "id": "cerebro",
+  "cmd": "/usr/local/sbin/inContainerStartService.sh",
+  "cpus": 0.1,
+  "mem": 300,
+  "disk": 100,
+  "instances": 1,
+  ...
+----
+
+So cerebro requests only 300 MB from Mesos.
+
+Another example would be the Zeppelin configuration file:
+
+.portion of zeppelin.marathon.json
+----
+{
+  "id": "zeppelin",
+  "cmd": "/usr/local/sbin/inContainerStartService.sh",
+  "cpus": 0.5,
+  "mem": 4500,
+  "disk": 800,
+  "instances": 1,
+  ...
+----
+
+So Zeppelin request 4.5 GB of RAM from mesos (which wouldn't be sufficient in a production environment BTW.)
 
 
 ==== Topology file on cluster nodes
@@ -687,7 +728,7 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-// marker for exclusion : line 690
+// marker for exclusion : line 730
 
 
 

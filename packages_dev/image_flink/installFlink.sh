@@ -159,9 +159,10 @@ fail_if_error $? "/tmp/flink_run_log" -3
 sleep 5
 if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
     echo "Flink process not started successfully !"
-    exit -10
+    exit 10
 fi
 
+sudo rm -Rf /tmp/flink_download_connectors
 sudo rm -Rf /tmp/flink_setup
 returned_to_saved_dir
 

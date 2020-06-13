@@ -61,9 +61,15 @@ echo " - Installing python"
 docker exec -i flink apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
-echo " - Installing python elasticsearch and kafka clients and other utilities"
-docker exec -i flink pip install elasticsearch kafka-python >> /tmp/flink_build_log 2>&1
-fail_if_error $? "/tmp/flink_build_log" -6
+#echo " - Installing python elasticsearch and kafka clients and other utilities"
+#docker exec -i flink pip install elasticsearch kafka-python >> /tmp/flink_build_log 2>&1
+#fail_if_error $? "/tmp/flink_build_log" -6
+
+echo " - Switching python default version to 3.x"
+docker exec -it flink update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 >> /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
+docker exec -it flink update-alternatives --install /usr/bin/python python /usr/bin/python3.7 2 >> /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing other python packages"
 docker exec -i flink pip install requests filelock >> /tmp/flink_build_log 2>&1
