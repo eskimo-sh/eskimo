@@ -1720,6 +1720,13 @@ An additional share exist in order to be able to share data to the zeppelin dock
 ** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
 gluster when deploying in cluster mode).
 
+==== A note on memory.
+
+In the zeppelin _services installation framework_ root folder the zeppelin marathon configuration file
+`zeppelin.marathon.json` defines the memory available for zeppelin as 4.5 GB (`"mem": 4500`). +
+While this is fine for a single user usage, it's far from sufficient for a multi-user production environment.
+This should be increased to a minimal additional 2Gb for every user intending to use Zeppelin concurrently.
+
 ==== Sample Zeppelin notebooks
 
 Upon Zeppelin installation, Eskimo sets up a set of Sample notebooks in Zeppelin to illustrate the behaviour of the

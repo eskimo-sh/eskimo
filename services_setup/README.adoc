@@ -727,7 +727,6 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-
 // marker for exclusion : line 730
 
 

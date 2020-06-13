@@ -61,12 +61,12 @@ for i in `seq 1 240`; do
     if [[ `ps -o pid= -p $ES_PID` == "" ]]; then
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         echo "Elasticsearch process seems dead"
-        exit -2
+        exit 2
     fi
     if [[ $i == 100 ]]; then
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         echo "Could not start elasticsearch successfully in 240 seconds"
-        exit -1
+        exit 1
     fi
 done
 
