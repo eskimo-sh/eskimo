@@ -40,8 +40,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 
 public class NodesConfigurationCheckerTest {
 
@@ -109,6 +108,39 @@ public class NodesConfigurationCheckerTest {
                 put("spark-executor1", "on");
                 put("spark-executor2", "on");
                 put("zookeeper", "1");
+        }});
+
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
+    }
+
+    @Test
+    public void testCheckNodesSetupMultipleOKWithFlink() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.12");
+            put("marathon", "2");
+            put("elasticsearch1", "on");
+            put("elasticsearch2", "on");
+            put("kafka1", "on");
+            put("kafka2", "on");
+            put("ntp1", "on");
+            put("ntp2", "on");
+            put("prometheus1", "on");
+            put("prometheus2", "on");
+            put("gluster1", "on");
+            put("gluster2", "on");
+            put("logstash1", "on");
+            put("logstash2", "on");
+            put("mesos-agent1", "on");
+            put("mesos-agent2", "on");
+            put("mesos-master", "1");
+            put("flink-app-master", "2");
+            put("spark-executor1", "on");
+            put("spark-executor2", "on");
+            put("flink-worker1", "on");
+            put("flink-worker2", "on");
+            put("zookeeper", "1");
         }});
 
         nodeConfigChecker.checkNodesSetup(nodesConfig);
@@ -380,6 +412,64 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
+    public void testMesosAgentButNoSparkExecutor() throws Exception {
+
+        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("mesos-agent1", "on");
+                put("mesos-master", "1");
+                //put("spark-executor1", "on");
+                put("zookeeper", "1");
+                put("ntp1", "on");
+                put("gluster1", "on");
+                put("prometheus1", "on");
+            }});
+
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
+        });
+
+        assertEquals("Inconsistency found : Service mesos-agent was expecting a service spark-executor on same node, but none were found !", exception.getMessage());
+    }
+
+    @Test
+    public void testMesosAgentFlinkAppMasterButNoFlinkWorker() throws Exception {
+
+        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("mesos-agent1", "on");
+                put("mesos-master", "1");
+                put("flink-app-master", "1");
+                put("spark-executor1", "on");
+                //put("flink-worker1", "on");
+                put("zookeeper", "1");
+                put("ntp1", "on");
+                put("gluster1", "on");
+                put("prometheus1", "on");
+            }});
+
+            nodeConfigChecker.checkNodesSetup(nodesConfig);
+        });
+
+        assertEquals("Inconsistency found : Service mesos-agent was expecting a service flink-worker on same node, but none were found !", exception.getMessage());
+    }
+
+    @Test
+    public void testOnlyESIsOK() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("elasticsearch1", "on");
+            put("ntp1", "on");
+            put("gluster1", "on");
+            put("prometheus1", "on");
+        }});
+
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
+    }
+
+    @Test
     public void testMesosMasterButNoZookeeper() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
@@ -416,6 +506,8 @@ public class NodesConfigurationCheckerTest {
             put("gluster2", "on");
             put("mesos-master", "1");
             put("zookeeper", "1");
+            put("spark-executor1", "on");
+            put("spark-executor2", "on");
             put("flink-worker1", "on");
             put("flink-worker2", "on");
             put("flink-app-master", "2");

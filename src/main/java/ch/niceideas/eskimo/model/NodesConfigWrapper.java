@@ -55,7 +55,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class NodesConfigWrapper extends JsonWrapper implements Serializable {
+public class NodesConfigWrapper extends JsonWrapper implements Serializable, ConfigurationOwner {
 
     private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
 

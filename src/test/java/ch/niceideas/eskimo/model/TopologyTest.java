@@ -34,10 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
-import ch.niceideas.eskimo.services.NodeRangeResolver;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.*;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -258,6 +255,51 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
         assertEquals ("", topology.getTopologyScript());
+    }
+
+    @Test
+    public void testConditionalDependency() throws Exception {
+
+        initConditionalDependency();
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("node_id2", "192.168.10.12");
+            put("service_b", "1");
+        }});
+
+        Topology topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+
+        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n", topology.getTopologyScript());
+
+        final NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("node_id2", "192.168.10.12");
+            put("service_b", "1");
+            put("service_d", "1");
+        }});
+
+        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class,
+                () -> Topology.create(nodesConfig2, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11")
+        );
+
+        assertEquals ("Dependency service_c for service service_b could not found occurence 1", exception.getMessage());
+
+        nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("node_id2", "192.168.10.12");
+            put("service_b", "1");
+            put("service_c", "2");
+            put("service_d", "1");
+        }});
+
+        topology = Topology.create(nodesConfig, MarathonServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+
+        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_1=192.168.10.12\n", topology.getTopologyScript());
     }
 
     @Test

@@ -238,6 +238,11 @@ public class ServicesDefinition implements InitializingBean {
                     // default is true
                     dependency.setMandatory (depMandatory == null || depMandatory);
 
+                    String conditionalDependency = depObj.has("conditional") ? depObj.getString("conditional") : null;
+                    if (StringUtils.isNotBlank(conditionalDependency)) {
+                        dependency.setConditional (conditionalDependency);
+                    }
+
                     service.addDependency(dependency);
                 }
             }

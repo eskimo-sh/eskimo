@@ -67,7 +67,6 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>());
 
-
         OperationsCommand oc = OperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
 
         List<List<Pair<String, String>>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig);
@@ -90,12 +89,12 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         assertEquals("192.168.10.11", group3.get(0).getValue());
         assertEquals("gluster", group3.get(1).getKey());
 
-        List<Pair<String, String>> group9 = orderedInstall.get(9);
-        assertEquals(2, group9.size());
-        assertEquals("spark-executor", group9.get(0).getKey());
-        assertEquals("192.168.10.11", group9.get(0).getValue());
-        assertEquals("spark-executor", group9.get(1).getKey());
-        assertEquals("192.168.10.13", group9.get(1).getValue());
+        List<Pair<String, String>> group8 = orderedInstall.get(8);
+        assertEquals(2, group8.size());
+        assertEquals("spark-executor", group8.get(0).getKey());
+        assertEquals("192.168.10.11", group8.get(0).getValue());
+        assertEquals("spark-executor", group8.get(1).getKey());
+        assertEquals("192.168.10.13", group8.get(1).getValue());
 
 
     }

@@ -48,6 +48,7 @@ import java.util.HashMap;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
 public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
@@ -138,6 +139,37 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("mesos-master", "1");
             put("spark-executor1", "on");
             put("spark-executor2", "on");
+            put("zookeeper", "1");
+        }});
+
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+    }
+
+    @Test
+    public void testCheckNodesSetupMultipleOKWithFlink() throws Exception {
+
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.12");
+            put("marathon", "2");
+            put("elasticsearch1", "on");
+            put("elasticsearch2", "on");
+            put("kafka1", "on");
+            put("kafka2", "on");
+            put("ntp1", "on");
+            put("ntp2", "on");
+            put("gluster1", "on");
+            put("gluster2", "on");
+            put("logstash1", "on");
+            put("logstash2", "on");
+            put("mesos-agent1", "on");
+            put("mesos-agent2", "on");
+            put("mesos-master", "1");
+            put("flink-app-master", "2");
+            put("spark-executor1", "on");
+            put("spark-executor2", "on");
+            put("flink-worker1", "on");
+            put("flink-worker2", "on");
             put("zookeeper", "1");
         }});
 
@@ -383,6 +415,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("mesos-agent1", "on");
+                //put("mesos-master", "1");
                 put("spark-executor1", "on");
                 put("zookeeper", "1");
                 put("ntp1", "on");
@@ -394,6 +427,63 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         logger.debug (exception.getMessage());
         assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent expects 1 mesos-master instance(s). But only 0 has been found !"));
+    }
+
+    @Test
+    public void testMesosAgentButNoSparkExecutor() throws Exception {
+
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("mesos-agent1", "on");
+                put("mesos-master", "1");
+                //put("spark-executor1", "on");
+                put("zookeeper", "1");
+                put("ntp1", "on");
+                put("gluster1", "on");
+            }});
+
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent was expecting a service spark-executor on same node, but none were found !"));
+    }
+
+    @Test
+    public void testMesosAgentFlinkAppMasterButNoFlinkWorker() throws Exception {
+
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("mesos-agent1", "on");
+                put("mesos-master", "1");
+                put("flink-app-master", "1");
+                put("spark-executor1", "on");
+                //put("flink-worker1", "on");
+                put("zookeeper", "1");
+                put("ntp1", "on");
+                put("gluster1", "on");
+            }});
+
+            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent was expecting a service flink-worker on same node, but none were found !"));
+    }
+
+    @Test
+    public void testOnlyESIsOK() throws Exception {
+        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("elasticsearch1", "on");
+            put("ntp1", "on");
+            put("gluster1", "on");
+            put("prometheus1", "on");
+        }});
+
+        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -432,6 +522,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("gluster2", "on");
             put("mesos-master", "1");
             put("zookeeper", "1");
+            put("spark-executor1", "on");
+            put("spark-executor2", "on");
             put("flink-worker1", "on");
             put("flink-worker2", "on");
             put("flink-app-master", "2");

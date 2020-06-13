@@ -162,6 +162,8 @@ public class NodesConfigControllerTest {
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
                 "      {\"marathon\": \"192.168.10.11\"},\n" +
+                "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
+                "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
                 "      {\"gdash\": \"(marathon)\"},\n" +
                 "      {\"spark-history-server\": \"(marathon)\"},\n" +
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
@@ -243,10 +245,10 @@ public class NodesConfigControllerTest {
                         "    \"restarts\": [\n" +
                         "      {\"kafka\": \"192.168.10.11\"},\n" +
                         "      {\"kafka\": \"192.168.10.13\"},\n" +
-                        "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
-                        "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
                         "      {\"spark-executor\": \"192.168.10.11\"},\n" +
                         "      {\"spark-executor\": \"192.168.10.13\"},\n" +
+                        "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
+                        "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
                         "      {\"gdash\": \"(marathon)\"},\n" +
                         "      {\"cerebro\": \"(marathon)\"},\n" +
                         "      {\"kibana\": \"(marathon)\"},\n" +

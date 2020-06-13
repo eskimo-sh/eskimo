@@ -92,6 +92,36 @@ public abstract class AbstractServicesDefinitionTest {
         def.addService(serviceD);
     }
 
+    public void initConditionalDependency() {
+
+        Service serviceA = new Service();
+        serviceA.setName("service_a");
+        Dependency depA = new Dependency();
+        depA.setMes(MasterElectionStrategy.FIRST_NODE);
+        depA.setMasterService("service_b");
+        depA.setNumberOfMasters(1);
+        serviceA.addDependency (depA);
+        def.addService(serviceA);
+
+        Service serviceB = new Service();
+        serviceB.setName("service_b");
+        Dependency depB = new Dependency();
+        depB.setMes(MasterElectionStrategy.FIRST_NODE);
+        depB.setMasterService("service_c");
+        depB.setNumberOfMasters(1);
+        depB.setConditional("service_d");
+        serviceB.addDependency (depB);
+        def.addService(serviceB);
+
+        Service serviceC = new Service();
+        serviceC.setName("service_c");
+        def.addService(serviceC);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+        def.addService(serviceD);
+    }
+
     public void initSameNodeOrRandomDependencies() {
 
         Service serviceA = new Service();

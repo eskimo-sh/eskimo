@@ -98,7 +98,7 @@ public class MarathonServicesConfigChecker {
                     }
 
                     // I want the dependency somewhere
-                    else if (dependency.isMandatory()) {
+                    else if (dependency.isMandatory(nodesConfig)) {
 
                         // ensure count of dependencies are available
                         try {

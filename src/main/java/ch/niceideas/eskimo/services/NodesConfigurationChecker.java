@@ -106,7 +106,7 @@ public class NodesConfigurationChecker {
                     }
 
                     // I want the dependency somewhere
-                    else if (dependency.isMandatory()) {
+                    else if (dependency.isMandatory(nodesConfig)) {
 
                         // ensure count of dependencies are available
                         enforceMandatoryDependency(nodesConfig, property.getServiceName(), nodeNbr, dependency);
@@ -171,7 +171,7 @@ public class NodesConfigurationChecker {
             }
         }
 
-        if (!serviceFound && dependency.isMandatory()) {
+        if (!serviceFound && dependency.isMandatory(nodesConfig)) {
             throw new NodesConfigurationException(
                     "Inconsistency found : Service " + serviceName + " was expecting a service " +
                             dependency.getMasterService() + " on same node, but none were found !");

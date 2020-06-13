@@ -54,28 +54,28 @@ function parseProperty (key) {
     }
 }
 
-function checkNodesSetup (setupConfig, uniqueServices, mandatoryServices, servicesConfiguration, servicesDependencies) {
+function checkNodesSetup (nodesConfig, uniqueServices, mandatoryServices, servicesConfiguration, servicesDependencies) {
 
     // check IP addresses and ranges configuration
-    var nodeCount = checkIPAddressesAndRanges(setupConfig, uniqueServices);
+    var nodeCount = checkIPAddressesAndRanges(nodesConfig, uniqueServices);
 
     // foolproof bug check : make sure all ids are within node count
-    checkIDSWithinNodeRanges(setupConfig, nodeCount);
+    checkIDSWithinNodeRanges(nodesConfig, nodeCount);
 
     // foolproof bug check : make sure no marathon service can be selected here
-    checkNoMarathonServicesSelected(setupConfig, servicesConfiguration);
+    checkNoMarathonServicesSelected(nodesConfig, servicesConfiguration);
 
     // enforce mandatory services
-    enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, setupConfig);
+    enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, nodesConfig);
 
     // check service dependencies
-    enforceDependencies(setupConfig, servicesDependencies);
+    enforceDependencies(nodesConfig, servicesDependencies);
 }
 
-function enforceDependencies(setupConfig, servicesDependencies) {
+function enforceDependencies(nodesConfig, servicesDependencies) {
 
     // check service dependencies
-    for (var key in setupConfig) {
+    for (var key in nodesConfig) {
 
         var property = parseProperty(key);
         if (property != null) {
@@ -84,7 +84,7 @@ function enforceDependencies(setupConfig, servicesDependencies) {
             if (property.nodeNumber != null) {
                 nodeNbr = parseInt(property.nodeNumber);
             } else {
-                var nbr = setupConfig[key];
+                var nbr = nodesConfig[key];
                 nodeNbr = parseInt(nbr);
             }
 
@@ -98,14 +98,14 @@ function enforceDependencies(setupConfig, servicesDependencies) {
                     // I want the dependency on same node
                     if (dependency.mes == "SAME_NODE") {
 
-                        enforceDependencySameNode(setupConfig, dependency, nodeNbr, property.serviceName);
+                        enforceDependencySameNode(nodesConfig, dependency, nodeNbr, property.serviceName);
                     }
 
                     // I want the dependency somewhere
-                    else if (dependency.mandatory) {
+                    else if (isMandatory (nodesConfig, dependency)) {
 
                         // ensure count of dependencies are available
-                        enforceMandatoryDependency(dependency, setupConfig, nodeNbr, property.serviceName);
+                        enforceMandatoryDependency(dependency, nodesConfig, nodeNbr, property.serviceName);
                     }
                 }
             }
@@ -113,13 +113,13 @@ function enforceDependencies(setupConfig, servicesDependencies) {
     }
 }
 
-function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, serviceName) {
+function enforceMandatoryDependency(dependency, nodesConfig, nodeNbr, serviceName) {
 
     // ensure count of dependencies are available
     var expectedCount = dependency.numberOfMasters;
     var actualCount = 0;
 
-    for (var otherKey in setupConfig) {
+    for (var otherKey in nodesConfig) {
 
         var otherProperty = parseProperty(otherKey);
         if (otherProperty != null) {
@@ -147,10 +147,10 @@ function enforceMandatoryDependency(dependency, setupConfig, nodeNbr, serviceNam
     }
 }
 
-function enforceDependencySameNode(setupConfig, dependency, nodeNbr, serviceName) {
+function enforceDependencySameNode(nodesConfig, dependency, nodeNbr, serviceName) {
     var serviceFound = false;
 
-    for (var otherKey in setupConfig) {
+    for (var otherKey in nodesConfig) {
 
         var otherProperty = parseProperty(otherKey);
         if (otherProperty != null) {
@@ -161,7 +161,7 @@ function enforceDependencySameNode(setupConfig, dependency, nodeNbr, serviceName
                 if (otherProperty.nodeNumber != null) {
                     otherNodeNbr = otherProperty.nodeNumber;
                 } else {
-                    var otherNbr = setupConfig[otherKey];
+                    var otherNbr = nodesConfig[otherKey];
                     otherNodeNbr = parseInt(otherNbr);
                 }
                 if (otherNodeNbr == nodeNbr) {
@@ -171,13 +171,31 @@ function enforceDependencySameNode(setupConfig, dependency, nodeNbr, serviceName
         }
     }
 
-    if (!serviceFound && dependency.mandatory) {
+    if (!serviceFound && isMandatory (nodesConfig, dependency)) {
         throw "Inconsistency found : Service " + serviceName + " was expecting a service " +
         dependency.masterService + " on same node, but none were found !";
     }
 }
 
-function enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, setupConfig) {
+function isMandatory (nodesConfig, dependency) {
+    if (dependency.mandatory) {
+        return true;
+    }
+
+    if (dependency.conditional && dependency.conditional != "") {
+        for (var key in nodesConfig) {
+
+            var property = parseProperty(key);
+            if (property != null && property.serviceName == dependency.conditional) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, nodesConfig) {
 
     // enforce mandatory services
     for (var i = 0; i < mandatoryServices.length; i++) {
@@ -189,7 +207,7 @@ function enforceMandatoryServices(mandatoryServices, servicesConfiguration, node
 
             var foundNodes = 0;
             // just make sure it is installed on every node
-            for (var key in setupConfig) {
+            for (var key in nodesConfig) {
 
                 var property = parseProperty(key);
                 if (property != null && property.serviceName == mandatoryServiceName) {
@@ -205,10 +223,10 @@ function enforceMandatoryServices(mandatoryServices, servicesConfiguration, node
     }
 }
 
-function checkNoMarathonServicesSelected(setupConfig, servicesConfiguration) {
+function checkNoMarathonServicesSelected(nodesConfig, servicesConfiguration) {
 
     // foolproof bug check : make sure no marathon service can be selected here
-    for (var key in setupConfig) {
+    for (var key in nodesConfig) {
 
         var property = parseProperty(key);
         if (property != null) {
@@ -225,17 +243,17 @@ function checkNoMarathonServicesSelected(setupConfig, servicesConfiguration) {
     }
 }
 
-function checkIDSWithinNodeRanges(setupConfig, nodeCount) {
+function checkIDSWithinNodeRanges(nodesConfig, nodeCount) {
 
     // foolproof bug check : make sure all ids are within node count
-    for (var key in setupConfig) {
+    for (var key in nodesConfig) {
         var property = parseProperty(key);
         if (property.nodeNumber != null) {
             if (property.nodeNumber > nodeCount) {
                 throw "Inconsistency found : got key " + key + " which is greater than node number " + nodeCount;
             }
         } else {
-            var nbr = setupConfig[key];
+            var nbr = nodesConfig[key];
             if (parseInt(nbr) > nodeCount) {
                 throw "Inconsistency found : got key " + key + " with nbr " + nbr
                         + " which is greater than node number " + nodeCount;
@@ -244,16 +262,16 @@ function checkIDSWithinNodeRanges(setupConfig, nodeCount) {
     }
 }
 
-function checkIPAddressesAndRanges(setupConfig, uniqueServices) {
+function checkIPAddressesAndRanges(nodesConfig, uniqueServices) {
 
     var nodeCount = 0;
 
     // check IP addresses and ranges configuration
-    for (var key in setupConfig) {
+    for (var key in nodesConfig) {
         if (key.indexOf(NODE_ID_FIELD) > -1) {
             nodeCount++;
             var nodeNbr = parseInt(key.substring(NODE_ID_FIELD.length));
-            var ipAddress = setupConfig[key];
+            var ipAddress = nodesConfig[key];
             if (ipAddress == null || ipAddress == "") {
                 throw "Node " + key.substring(NODE_ID_FIELD.length) + " has no IP configured."
             } else {
@@ -269,14 +287,14 @@ function checkIPAddressesAndRanges(setupConfig, uniqueServices) {
                             var uniqueServiceName = uniqueServices[j];
 
                             // just make sure it is installed on every node
-                            for (var otherKey in setupConfig) {
+                            for (var otherKey in nodesConfig) {
 
                                 var otherProperty = parseProperty(otherKey);
                                 if (otherProperty != null) {
 
                                     if (otherProperty.serviceName == uniqueServiceName) {
 
-                                        var otherNodeNbr = parseInt(setupConfig[otherKey]);
+                                        var otherNodeNbr = parseInt(nodesConfig[otherKey]);
                                         console.log("  - " + otherNodeNbr + " - " + nodeNbr);
                                         if (otherNodeNbr == nodeNbr) {
                                             throw "Node " + key.substring(NODE_ID_FIELD.length)

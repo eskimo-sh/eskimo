@@ -348,6 +348,19 @@
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true
+      },
+      {
+        "___comment": "This makes spark-executor kind of mandatory when mesos is installed. We accept this for now.",
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "spark-executor",
+        "numberOfMasters": 1,
+        "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "flink-worker",
+        "numberOfMasters": 1,
+        "conditional": "flink-app-master"
       }
     ],
     "additionalEnvironment": [

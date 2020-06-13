@@ -160,8 +160,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "cerebro=(marathon), " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
@@ -295,8 +295,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "cerebro=(marathon), " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
@@ -346,8 +346,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "kafka=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "cerebro=(marathon), " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
@@ -399,8 +399,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "cerebro=(marathon), " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
@@ -446,8 +446,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "kafka=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "cerebro=(marathon), " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
@@ -500,8 +500,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "cerebro=(marathon), " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
@@ -549,8 +549,8 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("[" +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
-                "mesos-agent=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
+                "mesos-agent=192.168.10.13, " +
                 "kibana=(marathon), " +
                 "kafka-manager=(marathon), " +
                 "spark-history-server=(marathon), " +

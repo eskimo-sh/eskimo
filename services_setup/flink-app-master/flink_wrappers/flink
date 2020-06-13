@@ -49,7 +49,7 @@ for argument in "$@"; do
             export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
         fi
     fi
-    if [[ $argument == "-j" || $argument=="--jarfile" || $argument=="-p" || $argument=="--savepointPath" || $argument=="-s" || $argument=="--withSavepoint" ]]; then
+    if [[ $argument == "-j" || $argument == "--jarfile" || $argument == "-p" || $argument == "--savepointPath" || $argument == "-s" || $argument == "--withSavepoint" ]]; then
         export PROCESS_NEXT="1"
     else
         export PROCESS_NEXT="0"

@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.common.utils.StringUtils;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -44,9 +45,25 @@ public class Dependency {
     private String masterService = null;
     private int numberOfMasters = 0;
     private boolean mandatory = true; // default is true
+    private String conditional = null;
 
-    public boolean isMandatory() {
-        return mandatory;
+    public boolean isMandatory(ConfigurationOwner wrapper) {
+        if (mandatory) {
+            return true;
+        }
+        if (StringUtils.isNotBlank(conditional)) {
+            return wrapper.hasServiceConfigured(conditional);
+        }
+        return false;
+    }
+
+    public String getConditional() {
+        return conditional;
+    }
+
+    public void setConditional(String conditional) {
+        this.mandatory = false;
+        this.conditional = conditional;
     }
 
     public void setMandatory(boolean mandatory) {
@@ -84,6 +101,7 @@ public class Dependency {
             put("masterService", masterService == null ? "" : masterService);
             put("numberOfMasters", numberOfMasters);
             put("mandatory", mandatory);
+            put("conditional", conditional);
         }});
     }
 }
