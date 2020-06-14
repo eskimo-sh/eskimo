@@ -57,7 +57,8 @@ mkdir -p /tmp/grafana_setup
 cd /tmp/grafana_setup
 
 echo " - Downloading grafana-$GRAFANA_VERSION"
-wget https://dl.grafana.com/oss/release/grafana-$GRAFANA_VERSION.linux-amd64.tar.gz   > /tmp/grafana_install_log 2>&1
+wget https://dl.grafana.com/oss/release/grafana-6.7.4.linux-amd64.tar.gz  > /tmp/grafana_install_log 2>&1
+
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad grafana-$GRAFANA_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
     # shellcheck disable=SC2242
@@ -105,39 +106,39 @@ trap check_stop_es_grafana EXIT
 echo " - Installing required Grafana plugins"
 
 echo "   + grafana-piechart-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install grafana-piechart-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install grafana-piechart-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + grafana-clock-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install grafana-clock-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install grafana-clock-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + grafana-worldmap-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install grafana-worldmap-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install grafana-worldmap-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + ryantxu-ajax-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install ryantxu-ajax-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install ryantxu-ajax-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + digrich-bubblechart-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install digrich-bubblechart-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install digrich-bubblechart-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + aidanmountford-html-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install aidanmountford-html-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install aidanmountford-html-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + natel-plotly-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install natel-plotly-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install natel-plotly-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + snuids-radar-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install snuids-radar-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install snuids-radar-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 echo "   + marcuscalidus-svg-panel"
-/usr/local/lib/grafana/bin/grafana-cli plugins install marcuscalidus-svg-panel > /tmp/grafana_install_log 2>&1
+sudo /usr/local/lib/grafana/bin/grafana-cli plugins install marcuscalidus-svg-panel > /tmp/grafana_install_log 2>&1
 fail_if_error $? "/tmp/grafana_install_log" -2
 
 

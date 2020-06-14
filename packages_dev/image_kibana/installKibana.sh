@@ -79,6 +79,43 @@ sudo chmod -R 777 /usr/local/lib/kibana-$ES_VERSION/data
 echo " - symlinking /usr/local/lib/kibana/ to /usr/local/lib/kibana-$ES_VERSION/"
 sudo ln -s /usr/local/lib/kibana-$ES_VERSION /usr/local/lib/kibana
 
+#echo " - Installing nodejs and npm (required to build plugins)"
+#
+#echo " - Configuring nodejs repo"
+#curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -  > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+#
+#echo " - Installing nodejs"
+#apt-get -y install nodejs  > /tmp/gdash_install_log 2>&1
+#fail_if_error $? "/tmp/gdash_install_log" -2
+#
+#echo " - Downloading sankey plugin"
+#sudo rm -Rf /tmp/installsankey
+#mkdir /tmp/installsankey
+#cd /tmp/installsankey
+#wget https://github.com/uniberg/kbn_sankey_vis/archive/$ES_VERSION.zip > /tmp/kb_install_log 2>&1
+#fail_if_error $? "/tmp/kb_install_log" -2
+#
+#echo " - Extracing sankey plugin"
+#unzip $ES_VERSION.zip > /tmp/kb_install_log 2>&1
+#fail_if_error $? "/tmp/kb_install_log" -2
+#
+#cd kbn_sankey_vis-$ES_VERSION
+#
+#echo " - Building sankey plugin"
+#npm install --production > /tmp/kb_install_log 2>&1
+#fail_if_error $? "/tmp/kb_install_log" -2
+#
+#echo " - Installing sankey plugin"
+#rm -Rf test
+#sudo cp -R ../kbn_sankey_vis-$ES_VERSION /usr/local/lib/kibana/plugins/kbn_sankey_vis > /tmp/kb_install_log 2>&1
+#fail_if_error $? "/tmp/kb_install_log" -2
+#
+#echo " - HACK - Fixing version in sankey plugin"
+#sudo sed -i s/"\"version\": \"7.3.0\""/"\"version\": \"$ES_VERSION\""/g /usr/local/lib/kibana/plugins/kbn_sankey_vis/package.json
+## FIXME HACK - use a REGEXP
+#sudo sed -i s/"\"version\": \"7.6.3\""/"\"version\": \"$ES_VERSION\""/g /usr/local/lib/kibana/plugins/kbn_sankey_vis/package.json
+
 echo " - Registering test cleaning traps"
 export ES_PROC_ID=-1
 export KIBANA_PROC_ID=-1

@@ -44,12 +44,12 @@
       "dateFinished": "2019-11-20T15:53:25+0000",
       "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:290"
+      "$$hashKey": "object:453"
     },
     {
-      "text": "%sh\n\ncurl -XDELETE 'http://localhost:9200/berka-*'",
+      "text": "%sh\n\n# Delete all berka indices\ncurl -XDELETE 'http://localhost:9200/berka-*'\n",
       "user": "anonymous",
-      "dateUpdated": "2020-06-13T11:46:55+0000",
+      "dateUpdated": "2020-06-13T15:43:57+0000",
       "config": {
         "editorSetting": {
           "language": "sh",
@@ -76,10 +76,10 @@
       "jobName": "paragraph_1574265140719_-1212682067",
       "id": "paragraph_1573144770167_1974251292",
       "dateCreated": "2019-11-20T15:52:20+0000",
+      "dateStarted": "2020-06-13T13:11:59+0000",
+      "dateFinished": "2020-06-13T13:12:00+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:291",
-      "dateFinished": "2020-06-13T11:46:56+0000",
-      "dateStarted": "2020-06-13T11:46:55+0000"
+      "$$hashKey": "object:454"
     },
     {
       "text": "%md \n\n### 2. Define Index template for berka data",
@@ -104,17 +104,6 @@
         "params": {},
         "forms": {}
       },
-      "apps": [],
-      "runtimeInfos": {},
-      "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1592048248549_875848488",
-      "id": "paragraph_1592048248549_875848488",
-      "dateCreated": "2020-06-13T11:37:28+0000",
-      "status": "FINISHED",
-      "focus": true,
-      "$$hashKey": "object:1033",
-      "dateFinished": "2020-06-13T11:41:19+0000",
-      "dateStarted": "2020-06-13T11:41:17+0000",
       "results": {
         "code": "SUCCESS",
         "msg": [
@@ -123,12 +112,22 @@
             "data": "<div class=\"markdown-body\">\n<h3>2. Define Index template for berka data</h3>\n\n</div>"
           }
         ]
-      }
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1592048248549_875848488",
+      "id": "paragraph_1592048248549_875848488",
+      "dateCreated": "2020-06-13T11:37:28+0000",
+      "dateStarted": "2020-06-13T11:41:17+0000",
+      "dateFinished": "2020-06-13T11:41:19+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:455"
     },
     {
-      "text": "%sh\n\ncurl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/berka-template -d '\n{\n  \"index_patterns\": [\"berka*\"],\n  \"mappings\": {\n    \"_source\": {\n      \"enabled\": true\n    },\n    \"properties\": {\n      \"amount\": {\n        \"type\": \"float\"\n      },\n      \"balance\": {\n        \"type\": \"float\"\n      }\n    }\n  }\n}'",
+      "text": "%sh\n\ncurl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/berka-template -d '\n{\n  \"index_patterns\": [\"berka*\"],\n  \"mappings\": {\n    \"dynamic_templates\": [\n      {\n        \"amount_as_float\": {\n          \"match_mapping_type\": \"string\",\n          \"match\":   \"amount\",\n          \"mapping\": {\n            \"type\": \"float\"\n          }\n        }\n      },\n      {\n        \"balance_as_float\": {\n          \"match_mapping_type\": \"string\",\n          \"match\":   \"balance\",\n          \"mapping\": {\n            \"type\": \"float\"\n          }\n        }\n      }\n    ]\n  }\n}'",
       "user": "anonymous",
-      "dateUpdated": "2020-06-13T11:42:24+0000",
+      "dateUpdated": "2020-06-13T13:11:36+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -152,11 +151,10 @@
       "jobName": "paragraph_1592048236546_788859320",
       "id": "paragraph_1592048236546_788859320",
       "dateCreated": "2020-06-13T11:37:16+0000",
+      "dateStarted": "2020-06-13T13:11:36+0000",
+      "dateFinished": "2020-06-13T13:11:36+0000",
       "status": "FINISHED",
-      "focus": true,
-      "$$hashKey": "object:964",
-      "dateFinished": "2020-06-13T11:42:24+0000",
-      "dateStarted": "2020-06-13T11:42:24+0000"
+      "$$hashKey": "object:456"
     },
     {
       "text": "%md \n### 3. Download Berka dataset from niceideas.ch\n\nHere we download the individual files from the Berka Dataset from niceideas.ch and put them in /var/lib/elasticsearch/logstash/data/test_berka/\n/var/lib/elasticsearch/logstash/data/ is a folder shared between the logstash docker containre and the zeppelin docker container.\nIn a multi-node cluster deployment, /var/lib/elasticsearch/logstash/data/test_berka/ is shared between all nodes using gluster.\n",
@@ -198,10 +196,10 @@
       "jobName": "paragraph_1574265140719_1663799918",
       "id": "paragraph_1573145010348_1692553399",
       "dateCreated": "2019-11-20T15:52:20+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:292",
+      "dateStarted": "2020-06-13T11:41:33+0000",
       "dateFinished": "2020-06-13T11:41:33+0000",
-      "dateStarted": "2020-06-13T11:41:33+0000"
+      "status": "FINISHED",
+      "$$hashKey": "object:457"
     },
     {
       "text": "%sh\n\n# Have to use /var/lib/elasticsearch/logstash/data/ since it's shared between logstash and zeppelin containers\nmkdir -p /var/lib/elasticsearch/logstash/data/test_berka/\n\n# Downloading all berka datasets\ndownload_dataset() {\n    if [[ ! -f \"/var/lib/elasticsearch/logstash/data/test_berka/$1.asc\" ]]; then\n        echo \" - downloading berka $1 dataset\"\n        wget http://niceideas.ch/mes/berka/$1.asc > /tmp/download_data 2>&1    \n        if [[ $? != 0 ]]; then\n            echo \"-> Failed to download berka/$1.asc data from niceideas.ch \"\n            cat /tmp/download_data\n        fi\n        mv $1.asc /var/lib/elasticsearch/logstash/data/test_berka/$1.asc\n    fi\n}\n\n# Now call the 'download_dataset' function defined above for all datasets\ndownload_dataset account\ndownload_dataset card\ndownload_dataset client\ndownload_dataset disp\ndownload_dataset district\ndownload_dataset loan\ndownload_dataset order\ndownload_dataset trans\n",
@@ -236,7 +234,7 @@
       "dateStarted": "2020-06-12T19:55:56+0000",
       "dateFinished": "2020-06-12T19:56:15+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:293"
+      "$$hashKey": "object:458"
     },
     {
       "text": "%md\n\n### 4. Ingest Raw Berka Data in ElasticSearch\n\nIn this paragraph, we use logstash-cli to ingest the individual Berka datasets into ElasticSearch, in different indices.\nlogstash-cli is a client using HTTP to reach a command server running on the logstash container.\n\n*Notes*:\n\n* Warning : STDIN piping is done with logstash-cli using the specific -std_in argument.\n* **If the logstash service is not installed on every node of the eskimo cluster, you have to change the \"localhost\" target host in the code below**",
@@ -281,12 +279,12 @@
       "dateStarted": "2020-06-13T11:41:49+0000",
       "dateFinished": "2020-06-13T11:41:49+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:294"
+      "$$hashKey": "object:459"
     },
     {
       "text": "%sh\n\n# logstash ingestion configuration\ningest_dataset() {\n\n    echo -e \"\ninput {\n    stdin { }\n}\nfilter {\n  csv {\n    separator => \\\";\\\"\n    columns => [$3] \n  }\n  if ([col1] == \\\"$2\\\") {\n    drop { }\n  }  \n  mutate {\n    rename => { \\\"@timestamp\\\" => \\\"timestamp\\\" }\n  }\n  date {\n    match => [ \\\"$4\\\", \\\"$5\\\" ]\n    target => \\\"$6\\\"\n  }\n}\noutput {\n   if \\\"_dateparsefailure\\\" not in [tags] {\n      elasticsearch {\n        hosts => \\\"http://localhost:9200\\\"\n        index => \\\"berka-$1\\\"\n      }\n   }\n}\n\" > /var/lib/elasticsearch/logstash/data/test_berka/import_berka_$1.conf\n\n\n    # logstash call (using logstash container on same host)\n    echo \" - Executing logstash on $1 (this takes time)\"\n    rm -f /tmp/logstash_raw_berka_$1.log\n    logstash-cli -target_host localhost -std_in /var/lib/elasticsearch/logstash/data/test_berka/$1.asc -f /var/lib/elasticsearch/logstash/data/test_berka/import_berka_$1.conf > /tmp/logstash_raw_berka_$1.log \n    if [[ $? != 0 ]]; then\n        echo \"-> Failed !\"\n        cat /tmp/logstash_raw_berka_$1.log \n    fi\n    \n}\n\ningest_dataset account '\\\"account_id\\\"' '\"account_id\",\"district_id\",\"frequency\",\"date\"' date 'YYMMdd' creation_date\ningest_dataset card '\\\"card_id\\\"' '\"card_id\",\"disp_id\",\"type\",\"issued\"' issued 'YYMMdd 00:00:00' creation_date\ningest_dataset client '\\\"client_id\\\"' '\"client_id\",\"birth_number\",\"district_id\"' none 'YYMMdd' creation_date\ningest_dataset disp '\\\"disp_id\\\"' '\"disp_id\",\"client_id\",\"account_id\",\"type\"' none 'YYMMdd' creation_date\ningest_dataset district 'A1' '\"district_id\",\"district_name\",\"region_name\",\"num_inhabitants\",\"num_munipalities_gt499\",\"num_munipalities_500to1999\",\"num_munipalities_2000to9999\",\"num_munipalities_gt10000\",\"num_cities\",\"ratio_urban\",\"average_salary\",\"unemp_rate95\",\"unemp_rate96\",\"num_entrep_per1000\",\"num_crimes95\",\"num_crimes96\"'  none 'YYMMdd' creation_date\ningest_dataset loan '\\\"load_id\\\"' '\"loan_id\",\"account_id\",\"date\",\"amount\",\"duration\",\"payments\",\"status\"' date 'YYMMdd' @timestamp\ningest_dataset order '\\\"order_id\\\"' '\"order_id\",\"account_id\",\"bank_to\",\"account_to\",\"amount\",\"k_symbol\"' none 'YYMMdd' creation_date\ningest_dataset trans '\\\"trans_id\\\"' '\"trans_id\",\"account_id\",\"date\",\"type\",\"operation\",\"amount\",\"balance\",\"k_symbol\",\"bank\",\"account\"' date 'YYMMdd' @timestamp\n\n\n",
       "user": "anonymous",
-      "dateUpdated": "2020-06-12T20:59:56+0000",
+      "dateUpdated": "2020-06-13T13:12:22+0000",
       "config": {
         "editorSetting": {
           "language": "sh",
@@ -312,10 +310,10 @@
       "jobName": "paragraph_1574265140722_-108928902",
       "id": "paragraph_1573145219945_2112967654",
       "dateCreated": "2019-11-20T15:52:20+0000",
-      "dateStarted": "2020-06-12T20:59:56+0000",
-      "dateFinished": "2020-06-12T21:21:36+0000",
+      "dateStarted": "2020-06-13T13:12:22+0000",
+      "dateFinished": "2020-06-13T13:30:44+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:295"
+      "$$hashKey": "object:460"
     },
     {
       "text": "%md\n\n### Data is now on ElasticSearch. Go to kibana and visualize it :-)\n",
@@ -358,7 +356,7 @@
       "id": "paragraph_1573145385601_1262117494",
       "dateCreated": "2019-11-20T15:52:20+0000",
       "status": "READY",
-      "$$hashKey": "object:296"
+      "$$hashKey": "object:461"
     }
   ],
   "name": "Logstash Demo",
@@ -376,6 +374,6 @@
   "info": {},
   "path": "/Logstash Demo",
   "checkpoint": {
-    "message": "tst"
+    "message": "ss"
   }
 }
