@@ -34,10 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.Dependency;
-import ch.niceideas.eskimo.model.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.MemoryConsumptionSize;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.*;
 import org.junit.Before;
 
 public abstract class AbstractServicesDefinitionTest {
@@ -120,6 +117,16 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
         def.addService(serviceD);
+    }
+
+    public void initConditionalMandatory() {
+
+        Service serviceA = new Service();
+        serviceA.setName("service_a");
+        serviceA.setMandatory(true);
+        serviceA.setConditional(ConditionalInstallation.MULTIPLE_NODES);
+        def.addService(serviceA);
+
     }
 
     public void initSameNodeOrRandomDependencies() {

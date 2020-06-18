@@ -301,6 +301,46 @@ WARNING: Eskimo cluster nodes support only the Linux operating system and have t
 The eskimo application itself can very well run on windows though. However, running the Eskimo application on Windows
 prevents the user from building his own containers, he may only download pre-built containers for use with Eskimo.
 
+
+=== Installation target
+
+The eskimo backend itself can either be installed:
+
+* on one of the nodes from the eskimo cluster (for instance one of the node where master services will be installed). +
+Doing so is however not recommended since that node would need to have the HTTP port on which Eskimo is listening opened
+to external accesses and in addition Eskimo would eat some of the RAM and disk that is better left to the business
+services.
+* or one a dedicated node where only the eskimo backend runs (i.e. separated from the Esimo cluster nodes). This is the
+recommended approach.
+
+==== Local Eskimo installation
+
+Eskimo can also be installed on the local computer of the user. +
+This is for instance useful when eskimo is intended to be used as a local _Data Science_ laboratory and not targeted
+towards large scale Big Data Analytics.
+
+Installing Eskimo on the local user machine is hoever tricky. +
+Eskimo does required indeed a target IP address for the installation. +
+A first idea one migth have in this case is to use `127.0.0.1` as single node target IP to procees with the installation.
+Unfortunately, this doesn't work qs 127.0.0.1 resolved to different loopback interfaces in the various docker containers
+running eskimo services and as a consequence eskimo services are not able to reach each others when `127.0.0.1` is used
+as installation target.
+
+So something else needs to be found as target IP address.
+
+The easiest way out here is to use the docker host address (most of the time `172.17.0.1` but may be configured
+differently on one's specific local docker environment).
+
+In case one doesn't have docker installed locally on his machine when proceesing with Docker installation, Eskimo
+usually installed docker on its own. +
+Unfortunately, there is a chicken and egg problem wince the docker host IP address needs to be passed as target IP
+address for the Eskimo node in "Node configuration" before Eskimo can proceed with docker installation.
+
+So one's left with installing docker on his own before proceeded with Eskimo Node setup on his local machine.
+
+One might want to look at the script `services_setup/base-eskimo/install-eskimo-base-system.sh` and sepcifically the
+functions `install_docker_*_based` to find out how Eskimo installs docker on target nodes.
+
 === Prerequisites
 
 Some noteworthy elements need to be beared in mind regarding eskimo prerequisites.
@@ -604,8 +644,8 @@ file. See <<user_file>>
 [[user_file]]
 === Access eskimo
 
-With eskimo properly started using the scripts in `bin` discussed above , one can reach eskimo using http://machine_ip:9090. +
-The default port number is 9090. This can be changed in configuration file `eskimo.properties`.
+With eskimo properly started using the scripts in `bin` discussed above , one can reach eskimo using http://machine_ip:9191. +
+The default port number is 9191. This can be changed in configuration file `eskimo.properties`.
 
 *The default login / password credentials are _admin_ / _password_.*
 
@@ -698,7 +738,7 @@ Search for the following error message:
 
 .Impossible to download
 ----
-2019-12-24T11:08:55,431 ERROR [http-nio-9090-exec-5] c.n.e.s.SetupService: javax.net.ssl.SSLException: java.lang.RuntimeException:
+2019-12-24T11:08:55,431 ERROR [http-nio-9191-exec-5] c.n.e.s.SetupService: javax.net.ssl.SSLException: java.lang.RuntimeException:
  Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
 javax.net.ssl.SSLException: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the tr
 ustAnchors parameter must be non-empty

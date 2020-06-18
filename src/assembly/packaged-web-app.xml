@@ -95,6 +95,7 @@ Software.
                 <include>eskimo.bat</include>
                 <include>eskimo.sh</include>
             </includes>
+            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/distrib/utils</directory>
@@ -103,6 +104,7 @@ Software.
                 <include>encode-password.bat</include>
                 <include>encode-password.sh</include>
             </includes>
+            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/distrib</directory>
@@ -110,6 +112,21 @@ Software.
             <includes>
                 <include>cacert</include>
             </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/distrib</directory>
+            <outputDirectory>utils</outputDirectory>
+            <includes>
+                <include>eskimo.service</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/distrib</directory>
+            <outputDirectory>bin/utils</outputDirectory>
+            <includes>
+                <include>__install-eskimo-systemD-unit-file.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
             <directory>${basedir}/packages_distrib</directory>

@@ -457,4 +457,41 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertNotNull(callRef.get());
         assertEquals("192.168.10.11-cat /var/log/ntp/ntp.log", callRef.get());
     }
+
+    @Test
+    public void testConditionalMandatory() throws Exception {
+
+        def = new ServicesDefinition();
+
+        initConditionalMandatory();
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+        }});
+
+        NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
+        nodeConfigChecker.setServicesDefinition(def);
+
+        nodeConfigChecker.checkNodesSetup(nodesConfig);
+
+        NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.12");
+        }});
+
+        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
+            nodeConfigChecker.checkNodesSetup(nodesConfig2);
+        });
+
+        assertEquals("Inconsistency found : service service_a is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
+
+        NodesConfigWrapper nodesConfig3 = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.12");
+            put("service_a1", "on");
+            put("service_a2", "on");
+        }});
+
+        nodeConfigChecker.checkNodesSetup(nodesConfig3);
+    }
 }

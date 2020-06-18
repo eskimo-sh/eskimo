@@ -512,7 +512,7 @@ body{position:relative;}
 .hoe-minimized-lpanel #hoe-left-panel .panel-list > li:focus > a {
     display: block;
     position: relative;
-    width: 230px;
+    width: 250px;
     margin-bottom: -1px;
     border-radius: 0px 4px 4px 0px;
 }

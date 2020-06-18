@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------
-Application : ${application.title}
-Version : ${build.version}
+Application       : ${application.title}
+Version           : ${build.version}
+Working Directory : ${user.dir}
 --------------------------------------------------------------------------
 ${welcome.message}
 --------------------------------------------------------------------------

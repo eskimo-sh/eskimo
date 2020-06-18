@@ -39,11 +39,13 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+set -e
+
 # Find out about script path
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # KK. First thing, find the eskimo.service SystemD unit file (in utils sub-folder)
-SYSTEM_D_FILE=SCRIPT_DIR/utils/eskimo.service
+SYSTEM_D_FILE=$SCRIPT_DIR/../../utils/eskimo.service
 if [[ ! -f $SYSTEM_D_FILE ]]; then
     echo "Can't find find file $SYSTEM_D_FILE"
     exit 2
@@ -59,65 +61,140 @@ else
     exit 3
 fi
 
-# REPLACE ESKIMO_PATH
 cp $SYSTEM_D_FILE /tmp/eskimo.service
-escaped_path=$(echo "$SCRIPT_DIR" | sed 's/\//\\\//g')
-sed -i -E 's/\{ESKIMO_PATH\}/$escaped_path/g' /tmp/eskimo.service
 
-# Find out about capsh possibilities
-if [[ `which capsh` == "" ]]; then
-    export CAPSH_FOUND=1
+# REPLACE ESKIMO_PATH
+escaped_path=$(echo "$SCRIPT_DIR/../.." | sed 's/\//\\\//g')
+sed -i -E "s/\{ESKIMO_PATH\}/$escaped_path/g" /tmp/eskimo.service
 
-    if [[ `capsh --help | grep 'addamb'` == "" ]]; then
-        export CAPSH_OLD=1
-    else
-        export CAPSH_OLD=0
-    fi
-
-else
-    export CAPSH_FOUND=2
-fi
-
+# Handle capsh usage or installation
 install_capsh(){
-    set -1
 
     mkdir -p /tmp/build_capsh
     cd /tmp/build_capsh
 
-    echo "Git cloning capsh"
+    echo " - Git cloning capsh"
     git clone git://git.kernel.org/pub/scm/linux/kernel/git/morgan/libcap.git
 
     cd libcap/
 
-    echo "Building capsh"
+    echo " - Building capsh"
     make
 
-    echo "Installing capsh"
-    cp ./progs/capsh $SCRIPT_DIR/bin/utils/capsh
+    echo " - Installing capsh"
+    cp ./progs/capsh $SCRIPT_DIR/capsh
 
+    rm -Rf /tmp/build_capsh
 }
 
-if [[ $CAPSH_FOUND == 1 || $CAPSH_OLD == 1 ]]; then
-    echo "capsh is either not available in path or an old version"
-    echo "eskimo needs capsh from package libcap2-bin version 1:2.22-1.2 or greater"
-    echo "Eskimo can attempt to download and build its own version of capsh"
-    echo "(git, make and gcc are required on your system for this to succeed))"
+if [[ ! -f $SCRIPT_DIR/capsh ]]; then
+    # Find out about capsh possibilities
+    if [[ `which capsh` == "" ]]; then
+        export CAPSH_NOT_FOUND=1
+
+        if [[ `capsh --help | grep 'addamb'` == "" ]]; then
+            export CAPSH_OLD=1
+        else
+            export CAPSH_OLD=0
+        fi
+
+    else
+        export CAPSH_NOT_FOUND=0
+    fi
+
+    if [[ $CAPSH_NOT_FOUND == 1 || $CAPSH_OLD == 1 ]]; then
+        echo "capsh is either not available in path or an old version"
+        echo "eskimo needs capsh from package libcap2-bin version 1:2.22-1.2 or greater"
+        echo "Eskimo can attempt to download and build its own version of capsh"
+        echo "(git, make and gcc are required on your system for this to succeed))"
+
+        while true; do
+            read -p "Do you want to attempt this ? (y/n)" yn
+            case $yn in
+                [Yy]* ) install_capsh; break;;
+                [Nn]* ) exit;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
+    else
+        # link system capsh to local capsh
+        ln -s `which capsh` $SCRIPT_DIR/capsh
+    fi
+fi
+
+# Handle Eskimo user creation
+create_eskimo_user() {
+
+    echo " - Creating user eskimo (if not exist)"
+    sudo useradd eskimo
+    new_user_id=`id -u eskimo`
+    if [[ $new_user_id == "" ]]; then
+        echo "Failed to add user eskimo"
+        exit 43
+    fi
+
+    echo " - Creating user system folders"
+    sudo mkdir -p /var/lib/eskimo
+    sudo chown -R eskimo /var/lib/eskimo
+
+    sudo mkdir -p /home/eskimo
+    sudo chown -R eskimo /home/eskimo
+}
+
+# Find out if user eskimo exists
+set +e
+eskimo_id=`id -u eskimo`
+if [[ $eskimo_id == "" ]]; then
+    echo "Eskimo runs under user 'eskimo'"
+    echo "User 'eskimo' has not been found on this system"
 
     while true; do
-        read -p "Do you want to attempt this ? (y/n)" yn
+        read -p "Do you want to create user eskimo now ? (y/n)" yn
         case $yn in
-            [Yy]* ) install_capsh; break;;
+            [Yy]* ) create_eskimo_user; break;;
             [Nn]* ) exit;;
             * ) echo "Please answer y or n.";;
         esac
     done
-else
-    # TODO link system capsh to local capsh
-    ln -s `which capsh` $SCRIPT_DIR/bin/utils/capsh
 fi
+set -e
 
-FIXME CREATE ESKIMO USER IF NOT EXIST
 
 # Move it to SystemD units configuration folder
 mv /tmp/eskimo.service $systemd_units_dir
 chmod 755 $systemd_units_dir
+
+# Try Service startup
+try_eskimo_startup(){
+
+    # TODO
+    echo
+}
+
+if [[ `systemctl status eskimo | grep 'dead'` == "" ]]; then
+    while true; do
+        read -p "Do you want to try to start Eskimo as SystemD service now ? (y/n)" yn
+        case $yn in
+            [Yy]* ) try_eskimo_startup; break;;
+            [Nn]* ) break;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+fi
+
+# Enable Service eskimo
+enable_eskimo(){
+
+    # TODO
+    echo
+}
+
+# FIXME TODO Don't do it if it's already enabled (make script idempotent)
+while true; do
+    read -p "Do you want to try to Enable Eskimo to start as SystemD service on machine startup ? (y/n)" yn
+    case $yn in
+        [Yy]* ) enable_eskimo; break;;
+        [Nn]* ) break;;
+        * ) echo "Please answer y or n.";;
+    esac
+done

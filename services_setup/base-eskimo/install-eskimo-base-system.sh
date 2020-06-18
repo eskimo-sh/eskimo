@@ -51,7 +51,7 @@ echo "  - checking if user $USER has sudo access"
 sudo -n ls /dev/null >/dev/null 1>&2
 if [[ $? != 0 ]]; then
     echoerr "$USER requires sudo access on machine $HOSTNAME"
-    exit -1
+    exit 1
 fi
 
 # make sure systemd is installed
@@ -61,13 +61,13 @@ if [[ -f "/etc/debian_version" ]]; then
     systemd_command=`which systemd`
     if [[ ! `$pidof_command $systemd_command` ]]; then
         echoerr "Systemd is not running on node !"
-        exit -101
+        exit 101
     fi
 else
     # works for both suse and RHEL
     if [[ ! `$pidof_command /usr/lib/systemd/systemd` ]]; then
         echoerr "Systemd is not running on node !"
-        exit -101
+        exit 102
     fi
 fi
 
@@ -79,7 +79,7 @@ function enable_docker() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to enable docker"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 71
     fi
 
     echo "  - Starting docker service"
@@ -87,7 +87,7 @@ function enable_docker() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to start docker"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 72
     fi
 
     echo "  - Adding current user to docker group"
@@ -95,7 +95,7 @@ function enable_docker() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to add user $USER to docker"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 73
     fi
 
     echo "  - Registering marathon.registry as insecure registry"
@@ -114,7 +114,7 @@ EOF
     if [[ $? != 0 ]]; then
         echoerr "Unable to reload docker"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 74
     fi
 
 }
@@ -127,11 +127,9 @@ function install_docker_suse_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to install required packages"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 69
     fi
 }
-
-
 
 function install_docker_redhat_based() {
 
@@ -144,7 +142,7 @@ function install_docker_redhat_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to install required packages"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 66
     fi
 
     echo "  - set up the stable repository."
@@ -160,7 +158,7 @@ function install_docker_redhat_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to setup stable repo"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 67
     fi
 
     echo "  - Install the latest version of Docker CE and containerd"
@@ -168,7 +166,7 @@ function install_docker_redhat_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to install docker"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 68
     fi
 }
 
@@ -185,7 +183,7 @@ function install_docker_debian_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to install packages"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 61
     fi
 
     echo "  - attempting packages installation that are different between ubuntu and debian"
@@ -197,7 +195,7 @@ function install_docker_debian_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to add docker GPG key"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 62
     fi
 
     echo "  - Add Docker repository"
@@ -209,7 +207,7 @@ function install_docker_debian_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to add docker repository"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 63
     fi
 
     echo "  - Update the apt package index."
@@ -217,7 +215,7 @@ function install_docker_debian_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to apt package index"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 64
     fi
 
     echo "  - Install the latest version of Docker CE and containerd"
@@ -225,7 +223,7 @@ function install_docker_debian_based() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to install docker"
         cat /tmp/install_docker 1>&2
-        exit -1
+        exit 65
     fi
 }
 
@@ -236,7 +234,7 @@ function install_suse_mesos_dependencies() {
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
-        exit -1
+        exit 53
     fi
 
 }
@@ -248,7 +246,7 @@ function install_redhat_mesos_dependencies() {
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
-        exit -1
+        exit 52
     fi
 
 }
@@ -261,7 +259,7 @@ function install_debian_mesos_dependencies() {
     if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
-        exit -1
+        exit 51
     fi
 
 }
@@ -270,13 +268,13 @@ function create_user_infrastructure() {
 
     if [[ "$1" == "" ]]; then
         echo "Expecting user name as first argument"
-        exit -41
+        exit 41
     fi
     USER_NAME=$1
 
     if [[ "$2" == "" ]]; then
         echo "Expecting user ID as second argument"
-        exit -42
+        exit 42
     fi
     USER_ID=$2
 
@@ -287,7 +285,7 @@ function create_user_infrastructure() {
         new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
         if [[ $new_user_id == "" ]]; then
             echo "Failed to add user $USER_NAME"
-            exit -4
+            exit 43
         fi
     fi
 
@@ -381,7 +379,7 @@ elif [[ -f "/etc/SUSE-brand" ]]; then
 else
     echo " - !! ERROR : Could not find any brand marker file "
     echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
-    exit -101
+    exit 101
 
 fi
 
@@ -396,7 +394,7 @@ elif [[ -f "/etc/SUSE-brand" ]]; then
 else
     echo " - !! ERROR : Could not find any brand marker file "
     echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
-    exit -101
+    exit 102
 fi
 
 
@@ -416,7 +414,7 @@ elif [[ -f "/etc/SUSE-brand" ]]; then
 else
     echo " - !! ERROR : Could not find any brand marker file "
     echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
-    exit -101    
+    exit 103
 fi
 
 
@@ -440,7 +438,7 @@ if [[ $? != 0 ]]; then
 
         echo " - !! ERROR : Could not find any brand marker file "
         echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
-        exit -101
+        exit 104
 
     fi
 fi

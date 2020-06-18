@@ -33,57 +33,29 @@
 #
 
 [Unit]
-Description=Flink App master
+Description=Eskimo Console
 Wants=network-online.target
-After=docker.service
-Requires=docker.service
-After=gluster.service
-#After=var-lib-flink-data.mount
-#After=var-lib-félink-eventlog.mount
 
 [Service]
-TimeoutStartSec=180sec
-RemainAfterExit=false
+TimeoutStartSec=60sec
+RemainAfterExit=true
 
 # Run ExecStartPre with root-permissions
 PermissionsStartOnly=true
 
-ExecStartPre=-/usr/bin/docker kill flink-app-master
-ExecStartPre=-/usr/bin/docker rm -f flink-app-master
+WorkingDirectory=/home/eskimo
 
-# attempt to recreate  / remount gluster shares
-ExecStartPre=/bin/bash /usr/local/sbin/setupFlinkGlusterShares.sh
-
-# Find out about version of mesos available
-ExecStartPre=/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/flink_mesos_environment"
-#EnvironmentFile=/run/system_mesos_environment
-
-ExecStart=/bin/bash -c ". /run/flink_mesos_environment && /usr/bin/docker run \
-        -i \
-        --name flink-app-master \
-        --user flink \
-        --network host \
-        -v /var/log/flink:/var/log/flink \
-        -v /var/lib/flink:/var/lib/flink:rshared \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:flink-app-master \
-        /usr/local/sbin/inContainerStartService.sh"
-
-#        -p 6123:6123 \
-#        -p 6130:6130 \
-#        -p 8081:8081 \
-#        -p 8082:8082 \
-
-ExecStop=/usr/bin/docker stop flink-app-master
+ExecStart={ESKIMO_PATH}/bin/utils/capsh \
+    --user=eskimo \
+    --caps='cap_net_bind_service=+eip cap_setpcap,cap_setuid,cap_setgid=+ep' \
+    --addamb=cap_net_bind_service \
+    --keep=1 \
+    -- {ESKIMO_PATH}/bin/eskimo.sh
 
 Type=simple
 
 Restart=always
-StartLimitBurst=5
+StartLimitBurst=3
 StartLimitInterval=30
 
 StandardOutput=syslog

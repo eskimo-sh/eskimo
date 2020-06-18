@@ -93,8 +93,8 @@ eskimo.SystemStatus = function(constructorObject) {
                     that.eskimoNodesConfig.showNodesConfig();
                 });
 
-                // initialize menu
-                var menuContent = '' +
+                // initialize menus
+                var serviceMenuContent = '' +
                     '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
                     '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
                     '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
@@ -103,12 +103,61 @@ eskimo.SystemStatus = function(constructorObject) {
                     '    <li class="divider"></li>'+
                     '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n';
 
-                $('#serviceContextMenuTemplate').html(menuContent);
+                $('#serviceContextMenuTemplate').html(serviceMenuContent);
+
+                var nodeMenuContent = '' +
+                    '    <li><a id="terminal" tabindex="-1" href="#" title="Start Service"><i class="fa fa-terminal"></i> SSH Terminal</a></li>\n' +
+                    '    <li><a id="file_manager" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-folder"></i> SFTP File Manager</a></li>\n';
+
+                $('#nodeContextMenuTemplate').html(nodeMenuContent);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });
+
+        // register menu handler on nodes
+        $.fn.nodeContextMenu = function (settings) {
+
+            return this.each(function () {
+
+                // Open context menu
+                $(this).on("click", function (e) {
+
+                    var target = $(e.target);
+
+                    var nodeMenu = $("#nodeContextMenu");
+                    nodeMenu.html($("#nodeContextMenuTemplate").html());
+
+
+                    //open menu
+                    var $menu = nodeMenu
+                        .data("invokedOn", target)
+                        .show()
+                        .css({
+                            position: "absolute",
+                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#nodeContextMenu") - $("#inner-content-status").offset().left,
+                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#nodeContextMenu") - $("#inner-content-status").offset().top
+                        })
+                        .off('click')
+                        .on('click', 'a', function (evt) {
+                            $menu.hide();
+
+                            var $invokedOn = $menu.data("invokedOn");
+                            var $selectedMenu = $(evt.target);
+
+                            settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+                        });
+
+                    return false;
+                });
+
+                //make sure menu closes on any click
+                $('body').click(function () {
+                    $("#nodeContextMenu").hide();
+                });
+            });
+        };
 
         // register menu handler on services
         $.fn.serviceContextMenu = function (settings) {
@@ -157,8 +206,8 @@ eskimo.SystemStatus = function(constructorObject) {
                         .show()
                         .css({
                             position: "absolute",
-                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft') - $("#inner-content-status").offset().left,
-                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop') - $("#inner-content-status").offset().top
+                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#serviceContextMenu") - $("#inner-content-status").offset().left,
+                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#serviceContextMenu") - $("#inner-content-status").offset().top
                         })
                         .off('click')
                         .on('click', 'a', function (evt) {
@@ -179,17 +228,16 @@ eskimo.SystemStatus = function(constructorObject) {
                 });
             });
         };
-
     };
 
     this.isDisconnected = function() {
         return disconnectedFlag;
     };
 
-    function getMenuPosition(settings, mouse, direction, scrollDir) {
+    function getMenuPosition(settings, mouse, direction, scrollDir, menu) {
         var win = $("#inner-content-status")[direction](),
             scroll = $("#inner-content-status")[scrollDir](),
-            menu = $("#serviceContextMenu")[direction](),
+            menu = $(menu)[direction](),
             position = mouse + scroll;
 
         // opening menu would pass the side of the page
@@ -410,6 +458,9 @@ eskimo.SystemStatus = function(constructorObject) {
     this.reinstallService = reinstallService;
 
     this.serviceIsUp = function (nodeServicesStatus, service) {
+        if (!nodeServicesStatus) {
+            return false;
+        }
         for (var key in nodeServicesStatus) {
             if (key.indexOf("service_"+service+"_") > -1) {
                 var serviceStatus = nodeServicesStatus[key];
@@ -555,13 +606,15 @@ eskimo.SystemStatus = function(constructorObject) {
         $("#system-information-start-timestamp").html (systemStatus.startTimestamp);
 
         // C. Cluster nodes and services
-        var nodesWithproblem = [];
-        for (var key in nodeServicesStatus) {
-            if (key.indexOf("node_alive_") > -1) {
-                var nodeName = key.substring("node_alive_".length);
-                var nodeAlive = nodeServicesStatus[key];
-                if (nodeAlive != "OK") {
-                    nodesWithproblem.push(nodeName.replace(/-/g, "."));
+        let nodesWithproblem = [];
+        if (nodeServicesStatus) {
+            for (var key in nodeServicesStatus) {
+                if (key.indexOf("node_alive_") > -1) {
+                    var nodeName = key.substring("node_alive_".length);
+                    var nodeAlive = nodeServicesStatus[key];
+                    if (nodeAlive != "OK") {
+                        nodesWithproblem.push(nodeName.replace(/-/g, "."));
+                    }
                 }
             }
         }
@@ -576,14 +629,16 @@ eskimo.SystemStatus = function(constructorObject) {
         }
 
         // find out about services status
-        var servicesWithproblem = [];
-        for (var key in nodeServicesStatus) {
-            if (key.indexOf("service_") > -1) {
-                var serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
-                var serviceAlive = nodeServicesStatus[key];
-                if (serviceAlive != "OK") {
-                    if (servicesWithproblem.length <= 0 || !servicesWithproblem.includes(serviceName)) {
-                        servicesWithproblem.push(serviceName);
+        let servicesWithproblem = [];
+        if (nodeServicesStatus) {
+            for (var key in nodeServicesStatus) {
+                if (key.indexOf("service_") > -1) {
+                    var serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
+                    var serviceAlive = nodeServicesStatus[key];
+                    if (serviceAlive != "OK") {
+                        if (servicesWithproblem.length <= 0 || !servicesWithproblem.includes(serviceName)) {
+                            servicesWithproblem.push(serviceName);
+                        }
                     }
                 }
             }
@@ -646,11 +701,11 @@ eskimo.SystemStatus = function(constructorObject) {
 
     this.renderNodesStatus = function (nodeServicesStatus, blocking) {
 
-        var nodeNamesByNbr = [];
+        let nodeNamesByNbr = [];
 
         that.eskimoMain.handleSetupCompleted();
 
-        var availableNodes = [];
+        let availableNodes = [];
 
         // loop on node nbrs and get Node Name + create table row
         for (var key in nodeServicesStatus) {
@@ -722,7 +777,40 @@ eskimo.SystemStatus = function(constructorObject) {
         statusContainerEmpty.css("display", "inherit");
     };
 
-    function registerMenu(selector, dataSelector) {
+    function showTerminal(nodeAddress, nodeName) {
+        that.eskimoMain.getConsoles().showConsoles();
+        that.eskimoMain.getConsoles().openConsole(nodeAddress, nodeName)
+    }
+
+    function showFileManager(nodeAddress, nodeName) {
+        that.eskimoMain.getFileManagers().showFileManagers();
+        that.eskimoMain.getFileManagers().openFileManager(nodeAddress, nodeName)
+    }
+
+    function registerNodeMenu(selector, dataSelector) {
+        // register menu
+        $(selector).nodeContextMenu({
+            menuSelected: function (invokedOn, selectedMenu) {
+
+                var action = selectedMenu.attr('id');
+                var nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
+                var nodeName = $(invokedOn).closest("td."+dataSelector).data('eskimo-node-name');
+
+                if (action == "terminal") {
+                    showTerminal(nodeAddress, nodeName);
+
+                } else if (action == "file_manager") {
+                    showFileManager(nodeAddress, nodeName);
+
+                } else {
+                    alert ("Unknown action : " + action);
+                }
+            }
+        })
+    }
+    this.registerNodeMenu = registerNodeMenu;
+
+    function registerServiceMenu(selector, dataSelector) {
         // register menu
         $(selector).serviceContextMenu({
             menuSelected: function (invokedOn, selectedMenu) {
@@ -752,7 +840,7 @@ eskimo.SystemStatus = function(constructorObject) {
             }
         })
     }
-    this.registerMenu = registerMenu;
+    this.registerServiceMenu = registerServiceMenu;
 
     this.generateTableHeader = function() {
 
@@ -865,8 +953,12 @@ eskimo.SystemStatus = function(constructorObject) {
 
             arrayRow +=
                 '    </td>\n' +
-                '    <td class="status-node-cell-intro">' + nbr + '</td>\n' +
-                '    <td class="status-node-cell-intro">' + nodeAddress + '</td>\n';
+                '    <td class="status-node-cell-intro"' +
+                '        data-eskimo-node="' + nodeAddress + '"' +
+                '        data-eskimo-node-name="' + nodeName + '">' + nbr + '</td>\n' +
+                '    <td class="status-node-cell-intro" ' +
+                '        data-eskimo-node="' + nodeAddress + '"' +
+                '        data-eskimo-node-name="' + nodeName + '">' + nodeAddress + '</td>\n';
 
             for (var sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
 
@@ -930,7 +1022,7 @@ eskimo.SystemStatus = function(constructorObject) {
 
                         arrayRow +=
                             '    <td class="status-node-cell'+(that.eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
-                            '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
+                            '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'">\n' +
                             '<span style="color: '+color+';">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
@@ -961,7 +1053,8 @@ eskimo.SystemStatus = function(constructorObject) {
             }
         }
 
-        registerMenu("#status-node-table-body td.status-node-cell", "status-node-cell");
+        registerNodeMenu("#status-node-table-body td.status-node-cell-intro", "status-node-cell-intro");
+        registerServiceMenu("#status-node-table-body td.status-node-cell", "status-node-cell");
     };
 
     this.fetchOperationResult = function() {
@@ -1026,6 +1119,10 @@ eskimo.SystemStatus = function(constructorObject) {
                     }
 
                 } else if (data.clear == "nodes"){
+
+                    if (data.systemStatus) {
+                        that.handleSystemStatus(null, data.systemStatus, blocking);
+                    }
 
                     that.renderNodesStatusEmpty();
                 }

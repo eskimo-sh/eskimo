@@ -99,18 +99,31 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRegisterMenu() throws Exception {
+    public void testRegisterServiceMenu() throws Exception {
 
         testRenderNodesStatusTable();
 
         Exception error = null;
         try {
-            page.executeJavaScript("eskimoSystemStatus.registerMenu('#status-node-table-body td.status-node-cell', 'status-node-cell');");
+            page.executeJavaScript("eskimoSystemStatus.registerServiceMenu('#status-node-table-body td.status-node-cell', 'status-node-cell');");
         } catch (Exception e) {
             error = e;
         }
         assertNull(error);
+    }
 
+    @Test
+    public void testRegisterNodeMenu() throws Exception {
+
+        testRenderNodesStatusTable();
+
+        Exception error = null;
+        try {
+            page.executeJavaScript("eskimoSystemStatus.registerNodeMenu('#status-node-table-body td.status-node-cell-intro', 'status-node-cell-intro');");
+        } catch (Exception e) {
+            error = e;
+        }
+        assertNull(error);
     }
 
     @Test
@@ -133,7 +146,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testMenuTemplate() {
+    public void testServiceMenuTemplate() {
         assertJavascriptEquals("" +
                 "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
                 "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
@@ -145,7 +158,15 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testClickMenu() throws Exception {
+    public void testNodeMenuTemplate() {
+        assertJavascriptEquals("" +
+                        "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
+                        "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
+                "$('#nodeContextMenuTemplate').html()");
+    }
+
+    @Test
+    public void testClickServiceMenu() throws Exception {
 
         testRenderNodesStatusTable();
 
@@ -164,6 +185,23 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                 "$('#serviceContextMenu').html()");
 
         assertCssValue("#serviceContextMenu", "position", "absolute");
+    }
+
+    @Test
+    public void testClickNodeMenu() throws Exception {
+
+        testRenderNodesStatusTable();
+
+        assertNotNull (page.querySelector("#status-node-table-body td.status-node-cell-intro"));
+
+        ((HtmlTableDataCell)page.querySelector("#status-node-table-body td.status-node-cell-intro")).click();
+
+        assertJavascriptEquals("" +
+                        "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
+                        "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
+                "$('#nodeContextMenu').html()");
+
+        assertCssValue("#nodeContextMenu", "position", "absolute");
     }
 
     @Test

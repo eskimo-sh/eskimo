@@ -91,6 +91,9 @@ sudo sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var
 echo " - Create runtime env variables configuration file"
 sudo mkdir -p /usr/local/lib/marathon/etc/
 sudo touch /usr/local/lib/marathon/etc/runtime_vars.conf
+sudo bash -c "echo '# The timeout in second to wait for a task to be launched successfuly before considering it failed' >> /usr/local/lib/marathon/etc/runtime_vars.conf"
+sudo bash -c "echo 'task_launch_timeout=420000' >> /usr/local/lib/marathon/etc/runtime_vars.conf"
+
 sudo chown -R marathon /usr/local/lib/marathon/etc/
 
 

@@ -81,9 +81,17 @@ for i in 1 2 3 ; do
         rm -Rf /var/lib/gluster/volume_bricks/$VOL_NAME
 
         if [[ "$NBR_REPLICAS" == "1" ]]; then
+
             echo " - Creating single replica since likely single node in cluster"
+
+            # Hack for whenever one installs on single node on 127.0.0.1
+            HOST_TO_USE=$MASTER_IP_ADDRESS
+            if [[ "$HOST_TO_USE" == "127.0.0.1" ]]; then
+                HOST_TO_USE=$HOSTNAME
+            fi
+
             gluster volume create $VOL_NAME transport tcp \
-                    $MASTER_IP_ADDRESS:/var/lib/gluster/volume_bricks/$VOL_NAME
+                    $HOST_TO_USE:/var/lib/gluster/volume_bricks/$VOL_NAME
             if [[ $? != 0 ]]; then
                 sleep 2
                 continue

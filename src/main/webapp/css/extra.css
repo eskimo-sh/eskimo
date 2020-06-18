@@ -300,9 +300,13 @@ li.disabled a .menu-text {
 }
 
 .table > thead > tr > td.status-node-cell,
+.table > thead > tr > td.status-node-cell-intro,
 .table > tbody > tr > td.status-node-cell,
+.table > thead > tr > td.status-node-cell-intro,
 .table > tfoot > tr > td.status-node-cell,
-.status-node-cell {
+.table > thead > tr > td.status-node-cell-intro,
+.status-node-cell,
+.status-node-cell-intro {
     cursor: pointer;
 }
 
