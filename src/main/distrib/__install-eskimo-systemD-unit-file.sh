@@ -71,16 +71,34 @@ escaped_path=$(echo "$SCRIPT_DIR/../.." | sed 's/\//\\\//g')
 sed -i -E "s/\{ESKIMO_PATH\}/$escaped_path/g" /tmp/eskimo.service
 
 # FIXME Sanity checks:
-# Ensure Java 11 in path
+# Ensure Java 11 in path (check java version)
 
 # Handle capsh usage or installation
 install_capsh(){
 
-    # FIXME TODO check git and gcc in path and working
+    echo " - checking whether gcc is installed"
+    if [[ `which gcc 2>/dev/null` == "" ]]; then
+        echo "!!! capsh building needs gcc installed (e.g. yum install gcc) !!! "
+        echo "Cannot move forward with capsh building. Stopping here."
+        echo "Please install gcc and restart this script"
+        exit 4
+    fi
 
-    # FIXME check -lpthread available
-    # FIXME check -lc available
-    # --> need  yum install glibc-static
+    echo " - checking whether git is installed"
+    if [[ `which git 2>/dev/null` == "" ]]; then
+        echo "!!! capsh building needs git installed (e.g. yum install git) !!! "
+        echo "Cannot move forward with capsh building. Stopping here."
+        echo "Please install git and restart this script"
+        exit 4
+    fi
+
+    echo " - checking whether libc static library is available"
+    if [[ `find / -name "libc.*a" 2>/dev/null` == "" ]]; then
+        echo "!!! capsh building needs static libc installed (e.g. yum install glib-static) !!! "
+        echo "Cannot move forward with capsh building. Stopping here."
+        echo "Please install glibc static library and restart this script"
+        exit 5
+    fi
 
     rm -Rf /tmp/build_capsh
     mkdir -p /tmp/build_capsh
@@ -102,7 +120,7 @@ install_capsh(){
 
 if [[ ! -f $SCRIPT_DIR/capsh ]]; then
     # Find out about capsh possibilities
-    if [[ `which capsh` == "" ]]; then
+    if [[ `which capsh 2>/dev/null` == "" ]]; then
         export CAPSH_NOT_FOUND=1
     else
         export CAPSH_NOT_FOUND=0
