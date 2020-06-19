@@ -45,12 +45,12 @@ PermissionsStartOnly=true
 
 WorkingDirectory=/home/eskimo
 
-ExecStart={ESKIMO_PATH}/bin/utils/capsh \
+ExecStart=/bin/bash -c "{ESKIMO_PATH}/bin/utils/capsh \
     --user=eskimo \
     --caps='cap_net_bind_service=+eip cap_setpcap,cap_setuid,cap_setgid=+ep' \
     --addamb=cap_net_bind_service \
     --keep=1 \
-    -- {ESKIMO_PATH}/bin/eskimo.sh
+    -- {ESKIMO_PATH}/bin/eskimo.sh"
 
 Type=simple
 

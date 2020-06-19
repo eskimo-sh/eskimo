@@ -34,6 +34,9 @@
 # Software.
 #
 
+# This script takes care of performing sanity checks to ensure SystemD will be able to start Eskimo and setup all
+# the environment for this, including installing the Eskimo SystemD Unit Configuration file.
+
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
    exit 1
@@ -67,9 +70,19 @@ cp $SYSTEM_D_FILE /tmp/eskimo.service
 escaped_path=$(echo "$SCRIPT_DIR/../.." | sed 's/\//\\\//g')
 sed -i -E "s/\{ESKIMO_PATH\}/$escaped_path/g" /tmp/eskimo.service
 
+# FIXME Sanity checks:
+# Ensure Java 11 in path
+
 # Handle capsh usage or installation
 install_capsh(){
 
+    # FIXME TODO check git and gcc in path and working
+
+    # FIXME check -lpthread available
+    # FIXME check -lc available
+    # --> need  yum install glibc-static
+
+    rm -Rf /tmp/build_capsh
     mkdir -p /tmp/build_capsh
     cd /tmp/build_capsh
 
@@ -91,15 +104,14 @@ if [[ ! -f $SCRIPT_DIR/capsh ]]; then
     # Find out about capsh possibilities
     if [[ `which capsh` == "" ]]; then
         export CAPSH_NOT_FOUND=1
+    else
+        export CAPSH_NOT_FOUND=0
 
         if [[ `capsh --help | grep 'addamb'` == "" ]]; then
             export CAPSH_OLD=1
         else
             export CAPSH_OLD=0
         fi
-
-    else
-        export CAPSH_NOT_FOUND=0
     fi
 
     if [[ $CAPSH_NOT_FOUND == 1 || $CAPSH_OLD == 1 ]]; then
@@ -134,11 +146,13 @@ create_eskimo_user() {
     fi
 
     echo " - Creating user system folders"
-    sudo mkdir -p /var/lib/eskimo
-    sudo chown -R eskimo /var/lib/eskimo
 
     sudo mkdir -p /home/eskimo
     sudo chown -R eskimo /home/eskimo
+
+    # FIXME : even if user already exists, I should ensure these folders exist or are created
+    sudo mkdir -p /var/lib/eskimo
+    sudo chown -R eskimo /var/lib/eskimo
 }
 
 # Find out if user eskimo exists
@@ -159,7 +173,6 @@ if [[ $eskimo_id == "" ]]; then
 fi
 set -e
 
-
 # Move it to SystemD units configuration folder
 mv /tmp/eskimo.service $systemd_units_dir
 chmod 755 $systemd_units_dir
@@ -167,11 +180,11 @@ chmod 755 $systemd_units_dir
 # Try Service startup
 try_eskimo_startup(){
 
-    # TODO
-    echo
+    echo " - Starting Eskimo"
+    systemctl start eskimo
 }
 
-if [[ `systemctl status eskimo | grep 'dead'` == "" ]]; then
+if [[ `systemctl status eskimo | grep 'dead'` != "" ]]; then
     while true; do
         read -p "Do you want to try to start Eskimo as SystemD service now ? (y/n)" yn
         case $yn in
@@ -185,16 +198,17 @@ fi
 # Enable Service eskimo
 enable_eskimo(){
 
-    # TODO
-    echo
+    echo " - Enabling Eskimo"
+    systemctl enable eskimo
 }
 
-# FIXME TODO Don't do it if it's already enabled (make script idempotent)
-while true; do
-    read -p "Do you want to try to Enable Eskimo to start as SystemD service on machine startup ? (y/n)" yn
-    case $yn in
-        [Yy]* ) enable_eskimo; break;;
-        [Nn]* ) break;;
-        * ) echo "Please answer y or n.";;
-    esac
-done
+if [[ `systemctl status eskimo | grep 'disabled;'` != "" ]]; then
+    while true; do
+        read -p "Do you want to try to Enable Eskimo to start as SystemD service on machine startup ? (y/n)" yn
+        case $yn in
+            [Yy]* ) enable_eskimo; break;;
+            [Nn]* ) break;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+fi
