@@ -695,7 +695,19 @@ eskimo.SystemStatus = function(constructorObject) {
 
     this.monitoringDashboardFrameTamper = function() {
         // remove widgets menus from iframe DOM
+
+        // grafana 5.x
         $("#status-monitoring-dashboard-frame").contents().find(".panel-menu").remove();
+
+        // grafana 6.x
+        $("#status-monitoring-dashboard-frame").contents().find(".panel-menu-toggle").remove();
+
+        $("#status-monitoring-dashboard-frame").contents().find(".panel-title").on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        })
+
         setTimeout (that.monitoringDashboardFrameTamper, 10000);
     };
 
