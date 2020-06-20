@@ -47,26 +47,26 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/marathon_build_log
 
 echo " - Building image marathon"
-build_image marathon /tmp/marathon_build_log
+build_image marathon_template /tmp/marathon_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i marathon apt-get install -y openjdk-11-jdk >> /tmp/marathon_build_log 2>&1
+docker exec -i marathon_template apt-get install -y openjdk-11-jdk >> /tmp/marathon_build_log 2>&1
 fail_if_error $? "/tmp/marathon_build_log" -3
 
 echo " - Installing Docker Registry"
-docker exec -i marathon bash /scripts/installDockerRegistry.sh | tee -a /tmp/marathon_build_log 2>&1
+docker exec -i marathon_template bash /scripts/installDockerRegistry.sh | tee -a /tmp/marathon_build_log 2>&1
 if [[ `tail -n 1 /tmp/marathon_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/marathon_build_log
-    exit -103
+    exit 102
 fi
 
 echo " - Installing marathon"
-docker exec -i marathon bash /scripts/installMarathon.sh | tee -a /tmp/marathon_build_log 2>&1
+docker exec -i marathon_template bash /scripts/installMarathon.sh | tee -a /tmp/marathon_build_log 2>&1
 if [[ `tail -n 1 /tmp/marathon_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/marathon_build_log
-    exit -102
+    exit 103
 fi
 
 
@@ -74,5 +74,9 @@ fi
 #docker exec -i marathon TODO
 
 
+echo " - Cleaning up image"
+docker exec -i marathon_template apt-get remove -y git >> /tmp/marathon_build_log 2>&1
+docker exec -i marathon_template apt-get -y auto-remove >> /tmp/marathon_build_log 2>&1
+
 echo " - Closing and saving image marathon"
-close_and_save_image marathon /tmp/marathon_build_log $MARATHON_VERSION_SHORT
+close_and_save_image marathon_template /tmp/marathon_build_log $MARATHON_VERSION_SHORT

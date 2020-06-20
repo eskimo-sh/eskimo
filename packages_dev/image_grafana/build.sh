@@ -47,23 +47,28 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/grafana_build_log
 
 echo " - Building image grafana"
-build_image grafana /tmp/grafana_build_log
+build_image grafana_template /tmp/grafana_build_log
 
 echo " - Installing Grafana dependencies"
-docker exec -i grafana apt-get install -y adduser libfontconfig1 >> /tmp/grafana_build_log 2>&1
+docker exec -i grafana_template apt-get install -y adduser libfontconfig1 >> /tmp/grafana_build_log 2>&1
 fail_if_error $? "/tmp/grafana_build_log" -5
 
 echo " - Installing grafana"
-docker exec -i grafana bash /scripts/installGrafana.sh | tee -a /tmp/grafana_build_log 2>&1
+docker exec -i grafana_template bash /scripts/installGrafana.sh | tee -a /tmp/grafana_build_log 2>&1
 if [[ `tail -n 1 /tmp/grafana_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/grafana_build_log
-    exit -102
+    exit 102
 fi
 
 #echo " - TODO"
 #docker exec -i grafana TODO
 
 
+echo " - Cleaning up image"
+docker exec -i grafana_template apt-get remove -y git >> /tmp/grafana_build_log 2>&1
+docker exec -i grafana_template apt-get -y auto-remove >> /tmp/grafana_build_log 2>&1
+
+
 echo " - Closing and saving image grafana"
-close_and_save_image grafana /tmp/grafana_build_log $GRAFANA_VERSION
+close_and_save_image grafana_template /tmp/grafana_build_log $GRAFANA_VERSION

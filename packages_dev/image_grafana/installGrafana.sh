@@ -37,6 +37,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
+sudo rm -Rf /tmp/grafana_install_log
 
 echo "-- INSTALLING GRAFANA ----------------------------------------------------"
 

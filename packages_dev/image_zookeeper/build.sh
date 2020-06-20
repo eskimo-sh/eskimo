@@ -46,14 +46,14 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/zookeeper_build_log
 
 echo " - Building image zookeeper"
-build_image zookeeper /tmp/zookeeper_build_log
+build_image zookeeper_template /tmp/zookeeper_build_log
 
 echo " - Installing Zookeeper using APT (using plain debian package)"
-docker exec -i zookeeper apt-get install -y zookeeper zookeeperd zookeeper-bin >> /tmp/zookeeper_build_log 2>&1
+docker exec -i zookeeper_template apt-get install -y zookeeper zookeeperd zookeeper-bin >> /tmp/zookeeper_build_log 2>&1
 fail_if_error $? "/tmp/zookeeper_build_log" -3
 
 #echo " - TODO"
-#docker exec -i zookeeper TODO
+#docker exec -i zookeeper_template TODO
 
 echo " - Closing and saving image zookeeper"
-close_and_save_image zookeeper /tmp/zookeeper_build_log $DEBIAN_VERSION
+close_and_save_image zookeeper_template /tmp/zookeeper_build_log $DEBIAN_VERSION

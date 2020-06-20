@@ -47,7 +47,7 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/cerebro_build_log
 
 echo " - Building image cerebro"
-build_image cerebro /tmp/cerebro_build_log
+build_image cerebro_template /tmp/cerebro_build_log
 
 # connect to container
 #docker exec -i cerebro bash
@@ -57,23 +57,27 @@ build_image cerebro /tmp/cerebro_build_log
 # See what I do in config.sh
 
 echo " - Installing OpenJDK 11"
-docker exec -i cerebro apt-get install -y openjdk-11-jdk  >> /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template apt-get install -y openjdk-11-jdk  >> /tmp/cerebro_build_log 2>&1
 fail_if_error $? "/tmp/cerebro_build_log" -3
 
 echo " - Installing scala"
-docker exec -i cerebro apt-get install -y scala >> /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template apt-get install -y scala >> /tmp/cerebro_build_log 2>&1
 fail_if_error $? "/tmp/cerebro_build_log" -4
 
 echo " - Installing cerebro"
-docker exec -i cerebro bash /scripts/installCerebro.sh  | tee -a /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template bash /scripts/installCerebro.sh  | tee -a /tmp/cerebro_build_log 2>&1
 if [[ `tail -n 1 /tmp/cerebro_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/cerebro_build_log
-    exit -102
+    exit 102
 fi
 
 #echo " - TODO"
 #docker exec -i cerebro TODO
 
+echo " - Cleaning up image"
+docker exec -i cerebro_template apt-get remove -y git >> /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template apt-get -y auto-remove >> /tmp/cerebro_build_log 2>&1
+
 echo " - Closing and saving image cerebro"
-close_and_save_image cerebro /tmp/cerebro_build_log $CEREBRO_VERSION
+close_and_save_image cerebro_template /tmp/cerebro_build_log $CEREBRO_VERSION

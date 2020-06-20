@@ -56,26 +56,26 @@ if [[ `docker images -q eskimo:gluster_template 2>/dev/null` == "" ]]; then
         if [[ $? != 0 ]]; then
             echo "Could not load base image eskimo:gluster_template"
             cat /tmp/gdash_build_log
-            exit -1
+            exit 1
         fi
     done
 fi
 
 echo " - Building image gdash"
-build_image gdash /tmp/gdash_build_log
+build_image gdash_template /tmp/gdash_build_log
 
 
 #echo " - TODO"
-#docker exec -it gdash bash
+#docker exec -it gdash_template bash
 
 echo " - Installing gdash"
-docker exec -i gdash bash /scripts/installGdash.sh | tee -a /tmp/gdash_build_log 2>&1
+docker exec -i gdash_template bash /scripts/installGdash.sh | tee -a /tmp/gdash_build_log 2>&1
 if [[ `tail -n 1 /tmp/gdash_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/gdash_build_log
-    exit -102
+    exit 102
 fi
 
 
 echo " - Closing and saving image gdash"
-close_and_save_image gdash /tmp/gdash_build_log $GDASH_VERSION
+close_and_save_image gdash_template /tmp/gdash_build_log $GDASH_VERSION

@@ -45,12 +45,8 @@ cd $SCRIPT_DIR
 # Loading topology
 loadTopology
 
-# reinitializing log
-sudo rm -f /tmp/cerebro_install_log
-
-
 echo " - Building container cerebro"
-build_container cerebro cerebro /tmp/cerebro_install_log
+build_container cerebro cerebro cerebro_install_log
 
 echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh
@@ -76,40 +72,40 @@ docker run \
         -e NODE_NAME=$HOSTNAME \
         -d --name cerebro \
         -i \
-        -t eskimo:cerebro bash >> /tmp/cerebro_install_log 2>&1
-fail_if_error $? "/tmp/cerebro_install_log" -2
+        -t eskimo:cerebro bash >> cerebro_install_log 2>&1
+fail_if_error $? "cerebro_install_log" -2
 
 # connect to container
 #docker exec -it cerebro bash
 
 echo " - Configuring cerebro container (common part)"
-docker exec cerebro bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a /tmp/cerebro_install_log 2>&1
-if [[ `tail -n 1 /tmp/cerebro_install_log` != " - In container config SUCCESS" ]]; then
+docker exec cerebro bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee cerebro_install_log 2>&1
+if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
-    cat /tmp/cerebro_install_log
+    cat cerebro_install_log
     exit -102
 fi
 
 echo " - Configuring cerebro container"
-docker exec cerebro bash /scripts/inContainerSetupCerebro.sh | tee -a /tmp/cerebro_install_log 2>&1
-if [[ `tail -n 1 /tmp/cerebro_install_log` != " - In container config SUCCESS" ]]; then
+docker exec cerebro bash /scripts/inContainerSetupCerebro.sh | tee cerebro_install_log 2>&1
+if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat /tmp/cerebro_install_log
+    cat cerebro_install_log
     exit -100
 fi
 
 echo " - Handling topology and setting injection"
-handle_topology_settings cerebro /tmp/cerebro_install_log
+handle_topology_settings cerebro cerebro_install_log
 
 
 #echo " - TODO"
 #docker exec -it cerebro TODO
 
 echo " - Committing changes to local template and exiting container cerebro"
-commit_container cerebro /tmp/cerebro_install_log
+commit_container cerebro cerebro_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon cerebro /tmp/cerebro_install_log
+deploy_marathon cerebro cerebro_install_log
 
 

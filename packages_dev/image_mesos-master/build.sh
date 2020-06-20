@@ -47,10 +47,10 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/mesos_build_log
 
 echo " - Building image mesos-master"
-build_image mesos-master /tmp/mesos_build_log
+build_image mesos-master_template /tmp/mesos_build_log
 
 echo " - Installing mesos dependencies"
-docker exec -i mesos-master apt-get install -y \
+docker exec -i mesos-master_template apt-get install -y \
             libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/mesos_build_log 2>&1
 fail_if_error $? "/tmp/mesos_build_log" -3
 
@@ -59,5 +59,9 @@ echo " - Note : mesos-master is actually not installed in this container. It wil
 #echo " - TODO"
 #docker exec -i mesos-master TODO
 
+echo " - Cleaning up image"
+docker exec -i mesos-master_template apt-get remove -y git >> /tmp/mesos_build_log 2>&1
+docker exec -i mesos-master_template apt-get -y auto-remove >> /tmp/mesos_build_log 2>&1
+
 echo " - Closing and saving image mesos-master"
-close_and_save_image mesos-master /tmp/mesos_build_log $AMESOS_VERSION
+close_and_save_image mesos-master_template /tmp/mesos_build_log $AMESOS_VERSION

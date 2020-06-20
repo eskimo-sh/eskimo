@@ -106,7 +106,7 @@ fail_if_error $? "flink_install_log" -2
 
 
 echo " - Configuring flink (Flink Common part)"
-docker exec flink-app-master bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee -a flink_install_log 2>&1
+docker exec flink-app-master bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee flink_install_log 2>&1
 if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat flink_install_log
@@ -114,7 +114,7 @@ if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
 fi
 
 echo " - Configuring flink App Master container"
-docker exec flink-app-master bash /scripts/inContainerSetupFlinkAppMaster.sh | tee -a flink_install_log 2>&1
+docker exec flink-app-master bash /scripts/inContainerSetupFlinkAppMaster.sh | tee flink_install_log 2>&1
 if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat flink_install_log

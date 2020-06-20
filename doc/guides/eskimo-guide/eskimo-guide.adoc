@@ -707,6 +707,83 @@ the nuts and bolts required in setting up a remote packages repository. +
 The remote repository URL is configured in `eskimo.properties` using the configuration property : +
 `system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
 
+[[build_packages_locally]]
+==== Building packages locally
+
+Building packages locally requires some tools to be available on the host machine running eskimo itself.
+Mostly, git, docker and wget needs to be installed on your host machine.
+
+Instructions are as follows.
+
+Following commands are executed on a debian-based node:
+
+.debian host dependencies to build packages
+----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
+# system update
+apt-get -yq update
+
+# eskimo dependencies
+apt-get -yq install wget git
+
+# docker dependencies
+apt-get -yq install apt-transport-https ca-certificates curl software-properties-common
+apt-get -yq install gnupg-agent gnupg2
+
+# docker installation
+curl -fsSL https://download.docker.com/linux/$LINUX_DISTRIBUTION/gpg | sudo apt-key add
+add-apt-repository deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION $(lsb_release -cs) stable
+apt-get -yq update
+apt-get -yq install docker-ce docker-ce-cli containerd.io
+----
+
+
+Following commands are executed on a redhat-based node:
+
+.redhat host dependencies to build packages
+----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
+# system update
+sudo yum -y update
+
+# eskimo dependencies
+yum install -y wget git
+
+# docker dependencies
+apt-get -yq install apt-transport-https ca-certificates curl software-properties-common
+apt-get -yq install gnupg-agent gnupg2
+
+# docker installation
+yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUTION/docker-ce.repo
+yum install -y docker-ce docker-ce-cli containerd.io
+----
+
+Following commands are executed on a SUSE node:
+
+.suse host dependencies to build packages
+----
+# system update
+sudo zypper --non-interactive refresh | echo 'a'
+
+# eskimo dependencies
+sudo zypper install -y git wget
+
+# install docker
+sudo zypper install -y docker
+----
+
+
+
 ==== Checking for updates
 
 At any time after initial setup - and if any only if the chosen installation method is *downloading* packages, the user

@@ -39,7 +39,6 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-
 . /etc/eskimo_topology.sh
 
 
@@ -47,7 +46,7 @@ echo "-- SETTING UP KAFKA MANAGER-----------------------------------------------
 
 echo " - Getting kafka user ID"
 set +e
-kafka_user_id=`id -u kafka 2> /tmp/cerebro_install_log`
+kafka_user_id=`id -u kafka 2> kafka_install_log`
 set -e
 echo " - Found user with ID $kafka_user_id"
 if [[ $kafka_user_id == "" ]]; then

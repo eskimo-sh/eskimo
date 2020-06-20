@@ -191,6 +191,8 @@ if [[ $eskimo_id == "" ]]; then
 fi
 set -e
 
+# FIXME Need to chown services_setup, package_dev, packages_distrib and logs to eskimo
+
 # Move it to SystemD units configuration folder
 mv /tmp/eskimo.service $systemd_units_dir
 chmod 755 $systemd_units_dir

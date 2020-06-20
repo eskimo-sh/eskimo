@@ -47,15 +47,14 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/ntp_build_log
 
 echo " - Building image ntp"
-build_image ntp /tmp/ntp_build_log
+build_image ntp_template /tmp/ntp_build_log
 
 echo " - Installing ntp and cron"
-docker exec -i ntp apt-get install -y ntp cron ntpdate >> /tmp/ntp_build_log 2>&1
+docker exec -i ntp_template apt-get install -y ntp cron ntpdate >> /tmp/ntp_build_log 2>&1
 fail_if_error $? "/tmp/ntp_build_log" -2
 
 #echo " - TODO"
-#docker exec -i ntp TODO
-
+#docker exec -i ntp_template TODO
 
 echo " - Closing and saving image ntp"
-close_and_save_image ntp /tmp/ntp_build_log $DEBIAN_VERSION
+close_and_save_image ntp_template /tmp/ntp_build_log $DEBIAN_VERSION

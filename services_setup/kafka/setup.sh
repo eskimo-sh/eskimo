@@ -101,7 +101,7 @@ fail_if_error $? "kafka_install_log" -2
 #docker exec -it kafka bash
 
 echo " - Configuring kafka container (common part)"
-docker exec kafka bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee -a kafka_install_log 2>&1
+docker exec kafka bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee kafka_install_log 2>&1
 if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat kafka_install_log
@@ -109,7 +109,7 @@ if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
 fi
 
 echo " - Configuring kafka container"
-docker exec kafka bash /scripts/inContainerSetupKafka.sh  | tee -a kafka_install_log 2>&1
+docker exec kafka bash /scripts/inContainerSetupKafka.sh  | tee kafka_install_log 2>&1
 if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat kafka_install_log

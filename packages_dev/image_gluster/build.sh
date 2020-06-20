@@ -47,23 +47,26 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/gluster_build_log
 
 echo " - Building image gluster"
-build_image gluster /tmp/gluster_build_log
+build_image gluster_template /tmp/gluster_build_log
 
 # connect to container
 #docker exec -i gluster bash
 
 echo " - Installing python"
-docker exec -i gluster apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -5
 
 echo " - Installing required python packages"
-docker exec -i gluster pip install furl >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template pip install furl >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -5
 
 echo " - Installing gluster"
-docker exec -i gluster apt-get install -y glusterfs-server glusterfs-client >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get install -y glusterfs-server glusterfs-client >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -3
 
+echo " - Cleaning image gluster"
+docker exec -i gluster_template apt-get remove -y gcc git >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get -y auto-remove >> /tmp/gluster_build_log 2>&1
 
 echo " - Closing and saving image gluster"
-close_and_save_image gluster /tmp/gluster_build_log $DEBIAN_VERSION
+close_and_save_image gluster_template /tmp/gluster_build_log $DEBIAN_VERSION

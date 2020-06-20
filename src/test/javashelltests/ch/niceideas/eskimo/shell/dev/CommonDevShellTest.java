@@ -82,6 +82,9 @@ public class CommonDevShellTest {
                 "# Set test mode\n" +
                 "export TEST_MODE=true\n" +
                 "\n" +
+                "# Set no base image load\n" +
+                "export NO_BASE_IMAGE=true\n" +
+                "\n" +
                 "# Using local commands\n" +
                 "export PATH=$SCRIPT_DIR:$PATH\n" +
                 "\n" +
@@ -134,15 +137,15 @@ public class CommonDevShellTest {
 
     @Test
     public void testCloseAndSaveImage() throws Exception {
-        createTestScript("close_and_save_image.sh", "close_and_save_image cerebro /tmp/cerebro_install.log 1.0");
+        createTestScript("close_and_save_image.sh", "close_and_save_image cerebro_template /tmp/cerebro_install.log 1.0");
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/close_and_save_image.sh"}, true);
 
         // no error reported
         assertEquals (" - Cleaning apt cache\n" +
-                        " - Comitting changes from container cerebro on image cerebro_template\n" +
-                        " - Stopping container cerebro\n" +
-                        " - removing container cerebro\n" +
+                        " - Comitting changes on container cerebro_template\n" +
+                        " - Stopping container cerebro_template\n" +
+                        " - removing container cerebro_template\n" +
                         " - Saving image cerebro_template\n" +
                         " - versioning image\n" +
                         " - removing image cerebro_template\n",
@@ -153,10 +156,10 @@ public class CommonDevShellTest {
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
-            assertEquals("exec -i cerebro apt-get clean -q\n" +
-                    "commit cerebro eskimo:cerebro_template\n" +
-                    "stop cerebro\n" +
-                    "container rm cerebro\n" +
+            assertEquals("exec -i cerebro_template apt-get clean -q\n" +
+                    "commit cerebro_template eskimo:cerebro_template\n" +
+                    "stop cerebro_template\n" +
+                    "container rm cerebro_template\n" +
                     "save eskimo:cerebro_template\n" +
                     "image rm eskimo:cerebro_template\n", dockerLogs);
 
@@ -167,26 +170,23 @@ public class CommonDevShellTest {
 
     @Test
     public void testBuildImage() throws Exception {
-        createTestScript("build_image.sh", "build_image cerebro /tmp/cerebro_install.log");
+        createTestScript("build_image.sh", "build_image cerebro_template /tmp/cerebro_install.log");
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/build_image.sh"}, true);
 
         // no error reported
-        assertEquals (" - Checking if base eskimo image is available\n" +
-                        " - Trying to load base eskimo image\n" +
-                        " - Deleting any previous containers\n" +
-                        " - building docker image cerebro\n" +
-                        " - Starting container cerebro_template\n",
+        assertEquals (" - Deleting any previous containers\n" +
+                        " - building docker image cerebro_template\n" +
+                        " - Starting container cerebro_template\n" +
+                        " - Ensuring image was well started\n",
                 result.replaceAll("ls[^\\n]+\\n", "") // remove error
         );
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        System.err.println (dockerLogs);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
-            int indexOfImages = dockerLogs.indexOf("images -q eskimo:base-eskimo_template");
-            assertTrue(indexOfImages > -1);
-
-            int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=cerebro", indexOfImages);
+            int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=cerebro");
             assertTrue(indexOfPs > -1);
 
             int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:cerebro_template", indexOfPs);

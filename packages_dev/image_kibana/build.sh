@@ -47,9 +47,9 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/kibana_build_log
 
 echo " - Building image kibana"
-build_image kibana /tmp/kibana_build_log
+build_image kibana_template /tmp/kibana_build_log
 
-docker exec -i kibana bash /scripts/installKibana.sh | tee -a /tmp/kibana_build_log 2>&1
+docker exec -i kibana_template bash /scripts/installKibana.sh | tee -a /tmp/kibana_build_log 2>&1
 if [[ `tail -n 1 /tmp/kibana_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/kibana_build_log
@@ -60,5 +60,9 @@ fi
 #echo " - TODO"
 #docker exec -it kibana bash
 
+echo " - Cleaning up image"
+docker exec -i kibana_template apt-get remove -y git >> /tmp/kibana_build_log 2>&1
+docker exec -i kibana_template apt-get -y auto-remove  >> /tmp/kibana_build_log 2>&1
+
 echo " - Closing and saving image kibana"
-close_and_save_image kibana /tmp/kibana_build_log $ES_VERSION
+close_and_save_image kibana_template /tmp/kibana_build_log $ES_VERSION

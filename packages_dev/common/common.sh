@@ -56,7 +56,7 @@ export DOCKER_REGISTRY_VERSION=2.6.2~ds1-2+b21_amd64
 export ES_VERSION=7.6.2
 export ES_VERSION_MAJOR=7
 
-export CEREBRO_VERSION=0.8.5
+export CEREBRO_VERSION=0.9.2
 
 export KAFKA_VERSION=2.2.2
 export KAFKA_MANAGER_VERSION=3.0.0.4
@@ -138,8 +138,8 @@ function close_and_save_image() {
     # Exit the container and commit the changes
     # Now that we've modified the container we have to commit the changes. First exit the container with the command exit.
     # To commit the changes and create a new image based on said changes, issue the command:
-    echo " - Comitting changes from container $IMAGE on image ""$IMAGE""_template"
-    docker commit $IMAGE eskimo:"$IMAGE"_template >> $LOG_FILE 2>&1
+    echo " - Comitting changes on container $IMAGE"
+    docker commit $IMAGE eskimo:"$IMAGE" >> $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -3
 
     # Stop container and delete image
@@ -152,22 +152,22 @@ function close_and_save_image() {
     fail_if_error $? $LOG_FILE -5
 
     # save base image
-    echo " - Saving image ""$IMAGE""_template"
+    echo " - Saving image ""$IMAGE"
 	if [[ -z $TEST_MODE ]]; then set -e; fi
-    docker save eskimo:"$IMAGE"_template | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
+    docker save eskimo:"$IMAGE" | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
     set +e
 
     echo " - versioning image"
     for i in `seq 1 100`; do
-        if [[ ! -f "../../packages_distrib/docker_template_""$IMAGE""_""$VERSION""_$i.tar.gz" ]]; then
-            mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_"$IMAGE"_"$VERSION"_$i.tar.gz
+        if [[ ! -f "../../packages_distrib/docker_template_"`echo $IMAGE | cut -d '_' -f 1`"_""$VERSION""_$i.tar.gz" ]]; then
+            mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_`echo $IMAGE | cut -d '_' -f 1`_"$VERSION"_$i.tar.gz
             break;
         fi
     done
 
     #docker image rm `cat id_file`
-    echo " - removing image "$IMAGE"_template"
-    docker image rm eskimo:"$IMAGE"_template >> $LOG_FILE 2>&1
+    echo " - removing image "$IMAGE
+    docker image rm eskimo:$IMAGE >> $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -6
 
 }
@@ -210,7 +210,7 @@ function build_image() {
 
     # build
     echo " - building docker image $IMAGE"
-    docker build --iidfile id_file --tag eskimo:"$IMAGE"_template .  >> $LOG_FILE 2>&1
+    docker build --iidfile id_file --tag eskimo:"$IMAGE" .  >> $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -11
 
     export TMP_FOLDER=/tmp
@@ -222,7 +222,7 @@ function build_image() {
         fail_if_error $? $LOG_FILE -11
     fi
 
-    echo " - Starting container ""$IMAGE""_template"
+    echo " - Starting container ""$IMAGE"
     # create and start container
     docker run \
             --privileged \
@@ -231,8 +231,22 @@ function build_image() {
             -v $TMP_FOLDER:/tmp \
             -d --name $IMAGE \
             -i \
-            -t eskimo:"$IMAGE"_template bash  >> $LOG_FILE 2>&1
+            -t eskimo:"$IMAGE" bash  >> $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -12
+
+    echo " - Ensuring image was well started"
+    if [[ -z $TEST_MODE ]]; then
+        for i in `seq 1 5`; do
+            sleep 1
+            if [[ `docker ps -q -f name=$IMAGE` != "" ]]; then
+                break
+            fi
+            if [[ $i == 5 ]]; then
+                echo "- Failed to start docker container $IMAGE in 4 seconds"
+                exit 4
+            fi
+        done
+    fi
 
 }
 

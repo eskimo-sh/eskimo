@@ -92,6 +92,5 @@ sudo ln -s /usr/local/lib/kafka_$SCALA_VERSION-$KAFKA_VERSION /usr/local/lib/kaf
 
 
 
-
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container install SUCCESS"

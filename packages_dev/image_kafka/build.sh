@@ -47,31 +47,35 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/kafka_build_log
 
 echo " - Building image kafka"
-build_image kafka /tmp/kafka_build_log
+build_image kafka_template /tmp/kafka_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i kafka apt-get install -y openjdk-11-jdk >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka_template apt-get install -y openjdk-11-jdk >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -3
 
 echo " - Installing scala"
-docker exec -i kafka apt-get install -y scala >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka_template apt-get install -y scala >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -4
 
 echo " - Installing python"
-docker exec -i kafka apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -5
 
 echo " - Installing kafka"
-docker exec -i kafka bash /scripts/installKafka.sh | tee -a /tmp/kafka_build_log 2>&1
+docker exec -i kafka_template bash /scripts/installKafka.sh | tee -a /tmp/kafka_build_log 2>&1
 if [[ `tail -n 1 /tmp/kafka_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/kafka_build_log
-    exit -102
+    exit 102
 fi
 
 #echo " - TODO"
 #docker exec -i kafka TODO
 
 
+echo " - Cleaning up image"
+docker exec -i kafka_template apt-get remove -y git gcc >> /tmp/kafka_build_log 2>&1
+docker exec -i kafka_template apt-get -y auto-remove >> /tmp/kafka_build_log 2>&1
+
 echo " - Closing and saving image kafka"
-close_and_save_image kafka /tmp/kafka_build_log $KAFKA_VERSION
+close_and_save_image kafka_template /tmp/kafka_build_log $KAFKA_VERSION
