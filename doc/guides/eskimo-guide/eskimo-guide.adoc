@@ -710,12 +710,23 @@ The remote repository URL is configured in `eskimo.properties` using the configu
 [[build_packages_locally]]
 ==== Building packages locally
 
-Building packages locally requires some tools to be available on the host machine running eskimo itself.
-Mostly, git, docker and wget needs to be installed on your host machine.
+Building eskimo packages locally means building the services docker images on your local host machine running eskimo.
+This means that instead of downloading docker images from the eskimo repository, the user wants to build them on his own
+and only download the source package archives from their respective software editor web site (e.g. Apache, Elastic, etc.)
 
-Instructions are as follows.
+===== Requirements
 
-Following commands are executed on a debian-based node:
+*There are some important requirements when desiring to build the software packages on one's own:*
+
+* The host machine running eskimo needs at least 30 GB free hard drive space
+* The host machine running eskimo needs at least 20 GB free RAM space
+
+In addition, building packages locally requires some tools to be available on the host machine running eskimo itself.
+Mostly, `git`, `docker` and `wget` need to be installed on your host machine.
+
+===== Instructions to install these tools
+
+Following commands are required on a debian-based host:
 
 .debian host dependencies to build packages
 ----
@@ -740,10 +751,19 @@ curl -fsSL https://download.docker.com/linux/$LINUX_DISTRIBUTION/gpg | sudo apt-
 add-apt-repository deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION $(lsb_release -cs) stable
 apt-get -yq update
 apt-get -yq install docker-ce docker-ce-cli containerd.io
+
+# Enable and start docker
+systemctl enable docker
+systemctl start docker
+
+# Add current user to docker group
+usermod -a -G docker $USER
+
+# (system or at least shell / process restart required after this)
 ----
 
 
-Following commands are executed on a redhat-based node:
+Following commands are required on a redhat-based host:
 
 .redhat host dependencies to build packages
 ----
@@ -754,32 +774,49 @@ export LINUX_DISTRIBUTION=`\
     | tr '[:upper:]' '[:lower:]'`
 
 # system update
-sudo yum -y update
+yum -y update
 
 # eskimo dependencies
 yum install -y wget git
 
 # docker dependencies
-apt-get -yq install apt-transport-https ca-certificates curl software-properties-common
-apt-get -yq install gnupg-agent gnupg2
+yum install -y yum-utils device-mapper-persistent-data lvm2
 
 # docker installation
 yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUTION/docker-ce.repo
 yum install -y docker-ce docker-ce-cli containerd.io
+
+# Enable and start docker
+systemctl enable docker
+systemctl start docker
+
+# Add current user to docker group
+usermod -a -G docker $USER
+
+# (system or at least shell / process restart required after this)
 ----
 
-Following commands are executed on a SUSE node:
+Following commands are required on a SUSE host:
 
 .suse host dependencies to build packages
 ----
 # system update
-sudo zypper --non-interactive refresh | echo 'a'
+zypper --non-interactive refresh | echo 'a'
 
 # eskimo dependencies
-sudo zypper install -y git wget
+zypper install -y git wget
 
 # install docker
-sudo zypper install -y docker
+zypper install -y docker
+
+# Enable and start docker
+systemctl enable docker
+systemctl start docker
+
+# Add current user to docker group
+usermod -a -G docker $USER
+
+# (system or at least shell / process restart required after this)
 ----
 
 

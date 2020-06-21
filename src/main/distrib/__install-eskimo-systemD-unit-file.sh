@@ -70,8 +70,32 @@ cp $SYSTEM_D_FILE /tmp/eskimo.service
 escaped_path=$(echo "$SCRIPT_DIR/../.." | sed 's/\//\\\//g')
 sed -i -E "s/\{ESKIMO_PATH\}/$escaped_path/g" /tmp/eskimo.service
 
-# FIXME Sanity checks:
+# Sanity checks:
+
 # Ensure Java 11 in path (check java version)
+set +e
+export PATH=$JAVA_HOME/bin:$PATH
+java_version=`java -version`
+if [[ $? != 0 ]]; then
+    echo "Could not find any java executable in PATH."
+    echo "Eskimo needs to have the JDK 11 java executable in path or the JAVA_HOME env var properly defined"
+    echo "Please re-launch this script after defining JAVA_HOME in the system profile or bashrc or adding the java executable in PATH"
+    exit 5
+fi
+if [[ `echo $java_version | grep version | grep "11"` == "" ]]; then
+    echo "The java version in path of JAVA_HOME is $(echo \"$java_version\" | grep version)"
+    echo "Eskimo needs JDK 11 or greater to run"
+    while true; do
+        read -p "Please confirm your JAVA version is 11 or greater ? (y/n)" yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) exit;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+fi
+
+set -e
 
 # Handle capsh usage or installation
 install_capsh(){
@@ -167,10 +191,6 @@ create_eskimo_user() {
 
     sudo mkdir -p /home/eskimo
     sudo chown -R eskimo /home/eskimo
-
-    # FIXME : even if user already exists, I should ensure these folders exist or are created
-    sudo mkdir -p /var/lib/eskimo
-    sudo chown -R eskimo /var/lib/eskimo
 }
 
 # Find out if user eskimo exists
@@ -191,7 +211,15 @@ if [[ $eskimo_id == "" ]]; then
 fi
 set -e
 
-# FIXME Need to chown services_setup, package_dev, packages_distrib and logs to eskimo
+# even if user already exists, I should ensure these folders exist or are created
+sudo mkdir -p /var/lib/eskimo
+sudo chown -R eskimo /var/lib/eskimo
+
+# Need to chown services_setup, packages_dev and packages_distrib to eskimo
+sudo chown -R eskimo $SCRIPT_DIR/../../services_setup
+sudo chown -R eskimo $SCRIPT_DIR/../../packages_dev
+sudo chown -R eskimo $SCRIPT_DIR/../../packages_distrib
+
 
 # Move it to SystemD units configuration folder
 mv /tmp/eskimo.service $systemd_units_dir

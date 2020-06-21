@@ -299,15 +299,16 @@ eskimo.Consoles = function(constructorObject) {
 
     function getTerminalWidth() {
         return Math.round(
-            ($("#consoles-management").outerWidth()
-                - 80) // decoration
+            ($("#inner-content-consoles").outerWidth()
+                - 130) // decoration
             / 8.1  // width of column
         );
     }
 
     function getTerminalHeight() {
         return Math.round(
-            ($("#consoles-management").outerHeight()
+            ($("#inner-content-consoles").outerHeight()
+                - 60 // title and tabs
                 - 220 // decoration
                 //- 28 // toolbar
             )

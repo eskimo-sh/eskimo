@@ -32,6 +32,9 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
+.ajaxterm {
+	overflow-x: auto;
+}
 
 .ajaxterm:focus {
 	outline: none;
