@@ -65,7 +65,8 @@ nodes = [
   { :hostname => 'test-node2', :box => 'centos/7',  :ip => '192.168.10.22', :ram => 6000},
   { :hostname => 'test-node3', :box => 'centos/7',  :ip => '192.168.10.23', :ram => 6000},
   { :hostname => 'test-node3-bis', :box => 'fedora/31-cloud-base', :ip => '192.168.10.23', :ram => 6000 },
-  { :hostname => 'test-large', :box => 'centos/7',  :ip => '192.168.10.31', :ram => 10000}
+  { :hostname => 'test-large', :box => 'centos/7',  :ip => '192.168.10.31', :ram => 10000},
+  { :hostname => 'integration-test', :box => 'centos/7',  :ip => '192.168.10.41', :ram => 14000}
 ]
 
 # All Vagrant configuration is done here. The most common configuration

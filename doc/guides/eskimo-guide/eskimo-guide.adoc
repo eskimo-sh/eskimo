@@ -319,9 +319,9 @@ Eskimo can also be installed on the local computer of the user. +
 This is for instance useful when eskimo is intended to be used as a local _Data Science_ laboratory and not targeted
 towards large scale Big Data Analytics.
 
-Installing Eskimo on the local user machine is hoever tricky. +
+Installing Eskimo on the local user machine is hoewver tricky. +
 Eskimo does required indeed a target IP address for the installation. +
-A first idea one migth have in this case is to use `127.0.0.1` as single node target IP to procees with the installation.
+A first idea one might have in this case is to use `127.0.0.1` as single node target IP to procees with the installation.
 Unfortunately, this doesn't work qs 127.0.0.1 resolved to different loopback interfaces in the various docker containers
 running eskimo services and as a consequence eskimo services are not able to reach each others when `127.0.0.1` is used
 as installation target.
@@ -336,10 +336,10 @@ usually installed docker on its own. +
 Unfortunately, there is a chicken and egg problem wince the docker host IP address needs to be passed as target IP
 address for the Eskimo node in "Node configuration" before Eskimo can proceed with docker installation.
 
-So one's left with installing docker on his own before proceeded with Eskimo Node setup on his local machine.
+So one's left with installing docker on his own before proceeded with Eskimo Node setup on his local machine. +
+For this, follow the same steps as described here:
+<<build_packages_locally>>
 
-One might want to look at the script `services_setup/base-eskimo/install-eskimo-base-system.sh` and sepcifically the
-functions `install_docker_*_based` to find out how Eskimo installs docker on target nodes.
 
 === Prerequisites
 
@@ -718,8 +718,8 @@ and only download the source package archives from their respective software edi
 
 *There are some important requirements when desiring to build the software packages on one's own:*
 
-* The host machine running eskimo needs at least 30 GB free hard drive space
-* The host machine running eskimo needs at least 20 GB free RAM space
+* The host machine running eskimo needs at least 25 GB of free hard drive space
+* The host machine running eskimo needs at least 16 GB of free RAM space available
 
 In addition, building packages locally requires some tools to be available on the host machine running eskimo itself.
 Mostly, `git`, `docker` and `wget` need to be installed on your host machine.

@@ -66,9 +66,9 @@ fail_if_error $? "/tmp/flink_build_log" -5
 #fail_if_error $? "/tmp/flink_build_log" -6
 
 echo " - Switching python default version to 3.x"
-docker exec -it flink_template update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python2.7 1 >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
-docker exec -it flink_template update-alternatives --install /usr/bin/python python /usr/bin/python3.7 2 >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.7 2 >> /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing other python packages"

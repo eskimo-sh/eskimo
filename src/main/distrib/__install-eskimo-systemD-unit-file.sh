@@ -37,6 +37,33 @@
 # This script takes care of performing sanity checks to ensure SystemD will be able to start Eskimo and setup all
 # the environment for this, including installing the Eskimo SystemD Unit Configuration file.
 
+function usage() {
+    echo "Usage:"
+    echo "    -h  Display this help message."
+    echo "    -f  assume 'y' answer to all questions'"
+}
+
+# Parse options to the install script
+while getopts ":hf" opt; do
+    case ${opt} in
+        h )
+            usage
+            exit 0
+        ;;
+        f )
+            export FORCE=force
+            break
+        ;;
+        : )
+            break
+        ;;
+        \? )
+           echo "Invalid Option: -$OPTARG" 1>&2
+           exit 1
+         ;;
+    esac
+done
+
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
    exit 1
@@ -85,14 +112,16 @@ fi
 if [[ `echo $java_version | grep version | grep "11"` == "" ]]; then
     echo "The java version in path of JAVA_HOME is $(echo \"$java_version\" | grep version)"
     echo "Eskimo needs JDK 11 or greater to run"
-    while true; do
-        read -p "Please confirm your JAVA version is 11 or greater ? (y/n)" yn
-        case $yn in
-            [Yy]* ) break;;
-            [Nn]* ) exit;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done
+    if [[ $FORCE != "force" ]]; then
+        while true; do
+            read -p "Please confirm your JAVA version is 11 or greater ? (y/n)" yn
+            case $yn in
+                [Yy]* ) break;;
+                [Nn]* ) exit;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
+    fi
 fi
 
 set -e
@@ -162,14 +191,18 @@ if [[ ! -f $SCRIPT_DIR/capsh ]]; then
         echo "Eskimo can attempt to download and build its own version of capsh"
         echo "(git, make and gcc are required on your system for this to succeed))"
 
-        while true; do
-            read -p "Do you want to attempt this ? (y/n)" yn
-            case $yn in
-                [Yy]* ) install_capsh; break;;
-                [Nn]* ) exit;;
-                * ) echo "Please answer y or n.";;
-            esac
-        done
+        if [[ $FORCE == "force" ]]; then
+            install_capsh
+        else
+            while true; do
+                read -p "Do you want to attempt this ? (y/n)" yn
+                case $yn in
+                    [Yy]* ) install_capsh; break;;
+                    [Nn]* ) exit;;
+                    * ) echo "Please answer y or n.";;
+                esac
+            done
+        fi
     else
         # link system capsh to local capsh
         ln -s `which capsh` $SCRIPT_DIR/capsh
@@ -180,7 +213,7 @@ fi
 create_eskimo_user() {
 
     echo " - Creating user eskimo (if not exist)"
-    sudo useradd eskimo
+    useradd eskimo
     new_user_id=`id -u eskimo`
     if [[ $new_user_id == "" ]]; then
         echo "Failed to add user eskimo"
@@ -189,8 +222,14 @@ create_eskimo_user() {
 
     echo " - Creating user system folders"
 
-    sudo mkdir -p /home/eskimo
-    sudo chown -R eskimo /home/eskimo
+    mkdir -p /home/eskimo
+    chown -R eskimo /home/eskimo
+
+    if [ $(getent group docker) ]; then
+
+        echo " - Adding eskimo to docker group"
+        usermod -a -G docker eskimo
+    fi
 }
 
 # Find out if user eskimo exists
@@ -200,25 +239,29 @@ if [[ $eskimo_id == "" ]]; then
     echo "Eskimo runs under user 'eskimo'"
     echo "User 'eskimo' has not been found on this system"
 
-    while true; do
-        read -p "Do you want to create user eskimo now ? (y/n)" yn
-        case $yn in
-            [Yy]* ) create_eskimo_user; break;;
-            [Nn]* ) exit;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done
+    if [[ $FORCE == "force" ]]; then
+        create_eskimo_user
+    else
+        while true; do
+            read -p "Do you want to create user eskimo now ? (y/n)" yn
+            case $yn in
+                [Yy]* ) create_eskimo_user; break;;
+                [Nn]* ) exit;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
+    fi
 fi
 set -e
 
 # even if user already exists, I should ensure these folders exist or are created
-sudo mkdir -p /var/lib/eskimo
-sudo chown -R eskimo /var/lib/eskimo
+mkdir -p /var/lib/eskimo
+chown -R eskimo /var/lib/eskimo
 
 # Need to chown services_setup, packages_dev and packages_distrib to eskimo
-sudo chown -R eskimo $SCRIPT_DIR/../../services_setup
-sudo chown -R eskimo $SCRIPT_DIR/../../packages_dev
-sudo chown -R eskimo $SCRIPT_DIR/../../packages_distrib
+chown -R eskimo $SCRIPT_DIR/../../services_setup
+chown -R eskimo $SCRIPT_DIR/../../packages_dev
+chown -R eskimo $SCRIPT_DIR/../../packages_distrib
 
 
 # Move it to SystemD units configuration folder
@@ -233,14 +276,19 @@ try_eskimo_startup(){
 }
 
 if [[ `systemctl status eskimo | grep 'dead'` != "" ]]; then
-    while true; do
-        read -p "Do you want to try to start Eskimo as SystemD service now ? (y/n)" yn
-        case $yn in
-            [Yy]* ) try_eskimo_startup; break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done
+
+    if [[ $FORCE == "force" ]]; then
+        try_eskimo_startup
+    else
+        while true; do
+            read -p "Do you want to try to start Eskimo as SystemD service now ? (y/n)" yn
+            case $yn in
+                [Yy]* ) try_eskimo_startup; break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
+    fi
 fi
 
 # Enable Service eskimo
@@ -251,12 +299,17 @@ enable_eskimo(){
 }
 
 if [[ `systemctl status eskimo | grep 'disabled;'` != "" ]]; then
-    while true; do
-        read -p "Do you want to try to Enable Eskimo to start as SystemD service on machine startup ? (y/n)" yn
-        case $yn in
-            [Yy]* ) enable_eskimo; break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done
+
+    if [[ $FORCE == "force" ]]; then
+        enable_eskimo
+    else
+        while true; do
+            read -p "Do you want to try to Enable Eskimo to start as SystemD service on machine startup ? (y/n)" yn
+            case $yn in
+                [Yy]* ) enable_eskimo; break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
+    fi
 fi

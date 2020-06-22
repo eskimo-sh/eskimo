@@ -123,8 +123,8 @@ fi
 
 
 echo " - Cleaning up image"
-docker exec -i spark_template apt-get remove -y git gcc
-docker exec -i spark_template apt-get -y auto-remove
+docker exec -i spark_template apt-get remove -y git gcc >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get -y auto-remove >> /tmp/spark_build_log 2>&1
 
 echo " - Closing and saving image spark"
 close_and_save_image spark_template /tmp/spark_build_log $SPARK_VERSION

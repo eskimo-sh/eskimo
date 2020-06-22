@@ -56,7 +56,6 @@ fi
 ESKIMO_WAR=`cd lib; ls -1 eskimo*war`
 
 java \
-    -Xms1024m \
     -Xmx1024m \
     -jar lib/$ESKIMO_WAR \
     --spring.config.location=conf/eskimo.properties

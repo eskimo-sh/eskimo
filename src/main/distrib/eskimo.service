@@ -38,7 +38,7 @@ Wants=network-online.target
 
 [Service]
 TimeoutStartSec=60sec
-RemainAfterExit=true
+RemainAfterExit=false
 
 # Run ExecStartPre with root-permissions
 PermissionsStartOnly=true
