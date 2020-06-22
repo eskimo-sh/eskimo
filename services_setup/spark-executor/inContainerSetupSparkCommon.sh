@@ -65,7 +65,13 @@ echo "spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.s
 
 echo " - Enabling spark user to create /var/lib/spark/tmp and chown it"
 echo "spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/mkdir -p /var/lib/spark/tmp" >> /etc/sudoers.d/spark
 echo "spark  ALL = NOPASSWD: /bin/chown spark /var/lib/spark/tmp" >> /etc/sudoers.d/spark
+
+echo " - Enabling spark user to create /var/lib/spark/metastore_db and chown it"
+echo "spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/metastore_db" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/mkdir -p /var/lib/spark/metastore_db" >> /etc/sudoers.d/spark
+echo "spark  ALL = NOPASSWD: /bin/chown spark /var/lib/spark/metastore_db" >> /etc/sudoers.d/spark
 
 echo " - Enabling spark user to use host_spark"
 echo "spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/spark" >> /etc/sudoers.d/spark

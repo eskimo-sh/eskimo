@@ -43,7 +43,7 @@ set -e
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 3
 fi
 
 
@@ -64,3 +64,10 @@ echo " - Updating spark environment file"
 bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
 bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+
+echo " - Creating required directories (this is the only place I can do it)"
+sudo /bin/mkdir -p /var/lib/spark/tmp
+sudo /bin/chown spark /var/lib/spark/tmp
+
+sudo /bin/mkdir -p /var/lib/spark/metastore_db
+sudo /bin/chown spark /var/lib/spark/metastore_db

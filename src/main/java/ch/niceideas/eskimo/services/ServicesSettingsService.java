@@ -99,13 +99,15 @@ public class ServicesSettingsService {
             if (dirtyServices != null && !dirtyServices.isEmpty()) {
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
-                OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
-                        servicesDefinition,
-                        nodeRangeResolver,
-                        dirtyServices.toArray(new String[0]),
-                        nodesConfig);
+                if (nodesConfig != null) { // maybe this happens before any nodes config has been set
+                    OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
+                            servicesDefinition,
+                            nodeRangeResolver,
+                            dirtyServices.toArray(new String[0]),
+                            nodesConfig);
 
-                nodesConfigurationService.applyNodesConfig(restartCommand);
+                    nodesConfigurationService.applyNodesConfig(restartCommand);
+                }
             }
 
         } catch (SystemException | NodesConfigurationException | ServiceDefinitionException e) {

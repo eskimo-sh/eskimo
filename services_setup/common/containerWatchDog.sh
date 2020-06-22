@@ -56,17 +56,17 @@
 
 if [[ "$1" == "" ]]; then
     echo "Expected background process PID to be monitored as first argument"
-    exit -1
+    exit 1
 fi
 
 if [[ "$2" == "" ]]; then
     echo "Expected main container process PID (the one to be killed) as second argument"
-    exit -2
+    exit 2
 fi
 
 if [[ "$3" == "" ]]; then
     echo "Expected logfile path to log actions as third argument"
-    exit -3
+    exit 3
 fi
 
 
@@ -83,7 +83,7 @@ case $MAIN_PID in
             ''|*[!0-9]*)
                 echo `date +"%Y-%m-%d %H:%M:%S"`" - Could not resolve MAIN_PID to a process ID ($MAIN_PID). Killing $BACKGROUND_PID and crashing..." >> $LOG_FILE
                 kill -15 $BACKGROUND_PID >> $LOG_FILE 2>&1
-                exit -11
+                exit 4
             ;;
             *)
                 echo `date +"%Y-%m-%d %H:%M:%S"`" - Found MAIN_PID=$MAIN_PID" >> $LOG_FILE

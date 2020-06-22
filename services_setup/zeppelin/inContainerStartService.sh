@@ -46,8 +46,11 @@ echo " - Injecting topology (Zeppelin)"
 . /usr/local/sbin/inContainerInjectTopologyZeppelin.sh
 
 echo " - Creating required directory /var/lib/spark/tmp (as spark)"
-sudo /bin/mkdir /var/lib/spark/tmp
+sudo /bin/mkdir -p /var/lib/spark/tmp
 sudo /bin/chown spark /var/lib/spark/tmp
+
+sudo /bin/mkdir -p /var/lib/spark/metastore_db
+sudo /bin/chown spark /var/lib/spark/metastore_db
 
 echo " - Creating required directory /var/run/spark/zeppelin (as spark)"
 sudo /bin/mkdir -p /var/run/spark/zeppelin
