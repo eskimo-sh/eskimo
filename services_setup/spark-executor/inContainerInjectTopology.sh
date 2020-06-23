@@ -67,7 +67,4 @@ bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/s
 
 echo " - Creating required directories (this is the only place I can do it)"
 sudo /bin/mkdir -p /var/lib/spark/tmp
-sudo /bin/chown spark /var/lib/spark/tmp
-
-sudo /bin/mkdir -p /var/lib/spark/metastore_db
-sudo /bin/chown spark /var/lib/spark/metastore_db
+sudo /bin/chown -R spark /var/lib/spark

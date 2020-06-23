@@ -48,6 +48,9 @@ echo_date() {
     echo $(date +"%Y-%m-%d %H:%M:%S")" $@"
 }
 
+# UTILITY FUNCTIONS
+# ======================================================================================================================
+
 check_for_virtualbox() {
     if [ -x "$(command -v VBoxManage)" ]; then
         echo_date "Found virtualbox : "$(VBoxManage -v)
@@ -65,6 +68,15 @@ check_for_virtualbox() {
                 exit 13
             fi
         fi
+    fi
+}
+
+check_for_vagrant() {
+    if [ -x "$(command -v vagrant)" ]; then
+        echo_date "Found vagrant : "`vagrant -v`
+    else
+        echo "Vagrant is not available on system"
+        echo_date 100
     fi
 }
 
@@ -104,6 +116,124 @@ call_eskimo() {
     fi
 
     rm -Rf eskimo-call-result
+}
+
+wait_for_taskmanager_registered(){
+
+    echo_date " - Now waiting for mesos to report flink taskmanager"
+    for attempt in $(seq 1 30); do
+        sleep 10
+        spark_exec_status=$(curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XPOST http://$BOX_IP/mesos-master/tasks \
+            2> /dev/null |
+            jq -r ' .tasks | .[] | select (.name|contains("taskmanager")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        if [[ $spark_exec_status != "" ]]; then
+            echo_date "   + Found zeppelin flink taskmanager running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
+            break
+        fi
+        if [[ $attempt == 30 ]]; then
+            echo_date "Could not get flink taskmanager up and running within 300 seconds. Crashing"
+
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+wait_for_taskmanager_unregistered() {
+
+    echo_date " - Waiting for mesos to unregister taskmanager (not to compromise other tests)"
+    for attempt in $(seq 1 30); do
+        sleep 10
+        spark_exec_status=$(curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XPOST http://$BOX_IP/mesos-master/tasks \
+            2> /dev/null |
+            jq -r ' .tasks | .[] | select (.name|contains("taskmanager")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        if [[ $spark_exec_status == "" ]]; then
+            echo_date "   + No Zeppelin Flink taskmanager found anymore, can continue ..."
+            break
+        fi
+        if [[ $attempt == 30 ]]; then
+            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
+            #exit 41
+        fi
+    done
+}
+
+wait_for_executor_registered() {
+
+    echo_date " - Now waiting for mesos to report spark executor"
+    for attempt in $(seq 1 30); do
+        sleep 10
+        spark_exec_status=$(curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XPOST http://$BOX_IP/mesos-master/tasks \
+            2> /dev/null |
+            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        if [[ $spark_exec_status != "" ]]; then
+            echo_date "   + Found zeppelin spark executor running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
+            break
+        fi
+        if [[ $attempt == 30 ]]; then
+            echo_date "Could not get spark executor up and running within 300 seconds. Crashing"
+
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+wait_for_executor_unregistered(){
+
+    echo_date " - Waiting for mesos to unregister executor (not to compromise other tests)"
+    for attempt in $(seq 1 30); do
+        sleep 10
+        spark_exec_status=$(curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XPOST http://$BOX_IP/mesos-master/tasks \
+            2> /dev/null |
+            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        if [[ $spark_exec_status == "" ]]; then
+            echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
+            break
+        fi
+        if [[ $attempt == 30 ]]; then
+            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
+            exit 41
+        fi
+    done
+}
+
+__tmp_saved_dir=`pwd`
+
+__returned_to_saved_dir() {
+     cd $__tmp_saved_dir
+}
+
+
+# BUSINESS FUNCTIONS
+# ======================================================================================================================
+
+rebuild_eskimo() {
+
+    echo_date " - Rebuilding eskimo"
+
+    trap __returned_to_saved_dir 15
+    trap __returned_to_saved_dir EXIT
+
+    cd $SCRIPT_DIR/../..
+
+    mvn clean install >> /tmp/integration-test.log 2>&1
+
+    __returned_to_saved_dir
 }
 
 build_box() {
@@ -360,8 +490,8 @@ run_zeppelin_data_load() {
             exit 21
         fi
     done
-    # Giving it a little more time
-    sleep 20
+    # Giving it a little more time to really start
+    sleep 40
 
     # Paragraph 1
     echo_date " - ZEPPELIN logstash demo - paragraph 1"
@@ -421,6 +551,7 @@ run_zeppelin_data_load() {
         >> /tmp/integration-test.log 2>&1
 }
 
+
 run_zeppelin_spark_kafka() {
 
     # Now running Spark Kafka demo zeppelin paragraphs
@@ -431,33 +562,18 @@ run_zeppelin_spark_kafka() {
     call_eskimo \
         "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103"
 
-    echo_date " - Now waiting for mesos to report spark executor"
-    for attempt in $(seq 1 30); do
-        sleep 10
-        spark_exec_status=$(curl \
+    wait_for_executor_registered
+    if [[ $? != 0 ]]; then
+        set +e
+
+        curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
-        if [[ $spark_exec_status != "" ]]; then
-            echo_date "   + Found zeppelin spark executor running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
-            break
-        fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Could not get spark executor up and running within 300 seconds. Crashing"
+            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103 \
+            >> /tmp/integration-test.log 2>&1
 
-            set +e
-
-            curl \
-                -b $SCRIPT_DIR/cookies \
-                -H 'Content-Type: application/json' \
-                -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103 \
-                >> /tmp/integration-test.log 2>&1
-
-            exit 31
-        fi
-    done
+        exit 31
+    fi
 
     # Giving it a little more time to be all set up
     sleep 20
@@ -491,8 +607,12 @@ run_zeppelin_spark_kafka() {
             -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103 \
             >> /tmp/integration-test.log 2>&1
 
+        rm -f kafka-berka-payments-aggregate-results
+
         exit 30
     fi
+
+    rm -f kafka-berka-payments-aggregate-results
 
     echo_date " - ZEPPELIN spark Kafka demo - stop paragraph python feeder (async)"
     call_eskimo \
@@ -506,24 +626,7 @@ run_zeppelin_spark_kafka() {
         "" \
         "DELETE"
 
-    echo_date " - Waiting for mesos to unregister executor (not to compromise other tests)"
-    for attempt in $(seq 1 30); do
-        sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
-        if [[ $spark_exec_status == "" ]]; then
-            echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
-            break
-        fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
-            exit 41
-        fi
-    done
+    wait_for_executor_unregistered
 
     echo_date " - ZEPPELIN spark Kafka demo - Clearing paragraph results"
     call_eskimo \
@@ -552,33 +655,19 @@ run_zeppelin_flink_kafka() {
     call_eskimo \
         "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155"
 
-    echo_date " - Now waiting for mesos to report flink taskmanager"
-    for attempt in $(seq 1 30); do
-        sleep 10
-        spark_exec_status=$(curl \
+    wait_for_taskmanager_registered
+    if [[ $? != 0 ]]; then
+
+        set +e
+
+        curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("taskmanager")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
-        if [[ $spark_exec_status != "" ]]; then
-            echo_date "   + Found zeppelin flink taskmanager running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
-            break
-        fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Could not get flink taskmanager up and running within 300 seconds. Crashing"
+            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155 \
+            >> /tmp/integration-test.log 2>&1
 
-            set +e
-
-            curl \
-                -b $SCRIPT_DIR/cookies \
-                -H 'Content-Type: application/json' \
-                -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155 \
-                >> /tmp/integration-test.log 2>&1
-
-            exit 31
-        fi
-    done
+        exit 31
+    fi
 
     # Giving it a little more time to be all set up
     sleep 15
@@ -612,8 +701,12 @@ run_zeppelin_flink_kafka() {
             -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155 \
             >> /tmp/integration-test.log 2>&1
 
+        rm -f kafka-berka-payments-aggregate-results
+
         exit 30
     fi
+
+    rm -f kafka-berka-payments-aggregate-results
 
     echo_date " - ZEPPELIN flink Kafka demo - stop paragraph python feeder (async)"
     call_eskimo \
@@ -627,24 +720,7 @@ run_zeppelin_flink_kafka() {
         "" \
         "DELETE"
 
-    echo_date " - Waiting for mesos to unregister taskmanager (not to compromise other tests)"
-    for attempt in $(seq 1 30); do
-        sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("taskmanager")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
-        if [[ $spark_exec_status == "" ]]; then
-            echo_date "   + No Zeppelin Flink taskmanager found anymore, can continue ..."
-            break
-        fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
-            #exit 41
-        fi
-    done
+    wait_for_taskmanager_unregistered
 
     echo_date " - ZEPPELIN flink Kafka demo - Clearing paragraph results"
     call_eskimo \
@@ -670,7 +746,8 @@ run_zeppelin_flink_kafka() {
 
 run_zeppelin_other_notes() {
 
-    /usr/local/lib/kibana-7.6.2/src/plugins/home/server/services/sample_data/data_sets/flights
+    # TODO
+    #/usr/local/lib/kibana-7.6.2/src/plugins/home/server/services/sample_data/data_sets/flights
 
     # Run all paragraphs from all other notebooks
     # ----------------------------------------------------------------------------------------------------------------------
@@ -683,6 +760,27 @@ run_zeppelin_other_notes() {
     echo_date " - ZEPPELIN running Spark ML Demo (Regression)"
     call_eskimo \
         "zeppelin/api/notebook/job/2EUQABDKD"
+
+    wait_for_executor_unregistered
+
+    echo_date " - ZEPPELIN running Flink Batch Demo"
+    call_eskimo \
+        "zeppelin/api/notebook/job/2ESAF6TWT"
+
+    wait_for_taskmanager_unregistered
+
+    echo_date " - ZEPPELIN running Spark SQL Demo"
+    call_eskimo \
+        "zeppelin/api/notebook/job/2ERSB4Z6P"
+
+    wait_for_executor_unregistered
+
+    echo_date " - ZEPPELIN running Spark RDD Demo"
+    call_eskimo \
+        "zeppelin/api/notebook/job/2ET3K8RBK"
+
+    wait_for_executor_unregistered
+
 
 }
 
@@ -697,10 +795,9 @@ run_zeppelin_other_notes() {
 # Cleanup (for demo preparation)
 # ----------------------------------------------------------------------------------------------------------------------
 
-# TODO Clear output from all paragrraphs and all notebooks
-# Only delete outputs on flink/spark - kafka paragraphs
-
 # TODO delete spark and flink checkpoint locations
+
+# TODO Delete all berka indices except berka-payments and berka-transactions
 
 # [Optionally] Prepare demo
 # ----------------------------------------------------------------------------------------------------------------------
@@ -713,6 +810,10 @@ run_zeppelin_other_notes() {
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
 
 check_for_virtualbox
+
+check_for_vagrant
+
+rebuild_eskimo
 
 build_box
 

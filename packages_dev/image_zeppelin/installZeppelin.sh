@@ -97,6 +97,8 @@ if [[ $FROM_COMPLETE == "1" ]]; then
     rm -Rf /usr/local/lib/zeppelin/interpreter/scalding
     rm -Rf /usr/local/lib/zeppelin/interpreter/scio
     rm -Rf /usr/local/lib/zeppelin/interpreter/submarine
+    rm -Rf /usr/local/lib/zeppelin/interpreter/sparql
+    rm -Rf /usr/local/lib/zeppelin/interpreter/mongodb
 
 else
     echo " - Installing required interpreters"

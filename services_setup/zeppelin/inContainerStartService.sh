@@ -47,10 +47,7 @@ echo " - Injecting topology (Zeppelin)"
 
 echo " - Creating required directory /var/lib/spark/tmp (as spark)"
 sudo /bin/mkdir -p /var/lib/spark/tmp
-sudo /bin/chown spark /var/lib/spark/tmp
-
-sudo /bin/mkdir -p /var/lib/spark/metastore_db
-sudo /bin/chown spark /var/lib/spark/metastore_db
+sudo /bin/chown -R spark /var/lib/spark
 
 echo " - Creating required directory /var/run/spark/zeppelin (as spark)"
 sudo /bin/mkdir -p /var/run/spark/zeppelin
@@ -102,7 +99,7 @@ if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:18999/?command=volume&subcommand=li
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
 fi
 
-echo " - ceating zeppelin notebokk service if it does not exist"
+echo " - cerating zeppelin notebokk service if it does not exist"
 mkdir -p /var/lib/spark/data/zeppelin/notebooks
 
 echo " - Checking if samples neeed to be installed"
@@ -138,6 +135,30 @@ if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
     done
 
     touch /var/lib/spark/data/zeppelin/samples_installed_flag.marker
+fi
+
+echo " - Injecting isolation configuration from settings"
+
+# sourcing custom config
+. /usr/local/lib/zeppelin/conf/eskimo_settings.conf
+
+if [[ $zeppelin_note_isolation == "per_note" ]]; then
+    sed -i -n '1h;1!H;${;g;s/'\
+'        \"isExistingProcess\": false,\n'\
+'/'\
+'        \"isExistingProcess\": false,\n'\
+'        \"perNote\": \"isolated\",\n'\
+'        \"perUser\": \"\",\n'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+else
+    sed -i -n '1h;1!H;${;g;s/'\
+'        \"isExistingProcess\": false,\n'\
+'/'\
+'        \"isExistingProcess\": false,\n'\
+'        \"perNote\": \"shared\",\n'\
+'        \"perUser\": \"shared\",\n'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 fi
 
 echo " - Start glusterMountCheckerPeriodic.sh script"
