@@ -1220,7 +1220,7 @@
         "properties": [
           {
             "name": "zeppelin_note_isolation",
-            "comment": "The setting 'zeppelin_note_isolation' is used to control whether interpreter processes are created and managed globally for the whole zeppelin process or per note.\nPossible values are:\n 'shared' : one single instance of every interpreter is created and shared among users and notes (better for laboratory).\n 'per_note' : one instance of interpreter is created for every note (better for production - but requires a lot of RAM).\n Default is 'shared'.",
+            "comment": "The setting 'zeppelin_note_isolation' is used to control whether interpreter processes are created and managed globally for the whole zeppelin process or per note.\nPossible values are:\n 'shared' : one single instance of every interpreter is created and shared among users and notes (better for laboratory).\n 'per_note' : one instance of interpreter is created for every note (better for production - but requires a lot of RAM).\n",
             "defaultValue": "shared"
           }
         ]

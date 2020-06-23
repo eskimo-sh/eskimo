@@ -51,6 +51,12 @@ echo_date() {
 # UTILITY FUNCTIONS
 # ======================================================================================================================
 
+usage() {
+    echo "Usage:"
+    echo "    -h  Display this help message."
+    echo "    -d  prepare VM for Demo"
+}
+
 check_for_virtualbox() {
     if [ -x "$(command -v VBoxManage)" ]; then
         echo_date "Found virtualbox : "$(VBoxManage -v)
@@ -73,7 +79,7 @@ check_for_virtualbox() {
 
 check_for_vagrant() {
     if [ -x "$(command -v vagrant)" ]; then
-        echo_date "Found vagrant : "`vagrant -v`
+        echo_date "Found vagrant : "$(vagrant -v)
     else
         echo "Vagrant is not available on system"
         echo_date 100
@@ -118,7 +124,7 @@ call_eskimo() {
     rm -Rf eskimo-call-result
 }
 
-wait_for_taskmanager_registered(){
+wait_for_taskmanager_registered() {
 
     echo_date " - Now waiting for mesos to report flink taskmanager"
     for attempt in $(seq 1 30); do
@@ -190,7 +196,7 @@ wait_for_executor_registered() {
     return 0
 }
 
-wait_for_executor_unregistered(){
+wait_for_executor_unregistered() {
 
     echo_date " - Waiting for mesos to unregister executor (not to compromise other tests)"
     for attempt in $(seq 1 30); do
@@ -212,12 +218,11 @@ wait_for_executor_unregistered(){
     done
 }
 
-__tmp_saved_dir=`pwd`
+__tmp_saved_dir=$(pwd)
 
 __returned_to_saved_dir() {
-     cd $__tmp_saved_dir
+    cd $__tmp_saved_dir
 }
-
 
 # BUSINESS FUNCTIONS
 # ======================================================================================================================
@@ -328,6 +333,9 @@ install_eskimo() {
         filename=$(basename $i)
         vagrant upload $i /usr/local/lib/$eskimo_folder/packages_distrib/$filename integration-test >> /tmp/integration-test.log 2>&1
     done
+
+    echo_date " - Removing eskimo archive from home folder"
+    vagrant ssh -c "rm -Rf /home/vagrant/eskimo.tar.gz" integration-test >> /tmp/integration-test.log 2>&1
 }
 
 setup_eskimo() {
@@ -551,7 +559,6 @@ run_zeppelin_data_load() {
         >> /tmp/integration-test.log 2>&1
 }
 
-
 run_zeppelin_spark_kafka() {
 
     # Now running Spark Kafka demo zeppelin paragraphs
@@ -739,11 +746,6 @@ run_zeppelin_flink_kafka() {
         "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994270617_-321954293"
 }
 
-# Flink streaming test
-# ----------------------------------------------------------------------------------------------------------------------
-
-# TODO
-
 run_zeppelin_other_notes() {
 
     # TODO
@@ -781,7 +783,6 @@ run_zeppelin_other_notes() {
 
     wait_for_executor_unregistered
 
-
 }
 
 # Additional tests
@@ -792,39 +793,129 @@ run_zeppelin_other_notes() {
 
 # TODO make sure documentation is well deployed and available
 
-# Cleanup (for demo preparation)
-# ----------------------------------------------------------------------------------------------------------------------
 
-# TODO delete spark and flink checkpoint locations
+do_cleanup() {
 
-# TODO Delete all berka indices except berka-payments and berka-transactions
+    # Cleanup (for demo preparation)
+    # ----------------------------------------------------------------------------------------------------------------------
 
-# [Optionally] Prepare demo
-# ----------------------------------------------------------------------------------------------------------------------
+    echo_date " - Delete spark and flink checkpoint locations"
+    vagrant ssh -c "sudo rm -Rf /var/lib/spark/data/checkpoints/*" integration-test >> /tmp/integration-test.log 2>&1
 
-# TODO Switch demo flag in config and restart eskimo
+    echo_date " - Delete all berka indices except berka-payments and berka-transactions"
 
-# TODO Replace packages_distrib content with empty files
+    echo_date "   + Delete berka-account"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-account" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-card"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-card" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-disp"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-disp" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-district"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-district" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-client"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-client" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-loan"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-loan" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-order"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-order" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + Delete berka-trans"
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-trans" integration-test >> /tmp/integration-test.log 2>&1
+
+}
+
+prepare_demo() {
+
+    # [Optionally] Prepare demo
+    # ----------------------------------------------------------------------------------------------------------------------
+
+    # TODO Switch demo flag in config and restart eskimo
+
+    echo_date " - Find eskimo folder name (again)"
+    eskimo_folder=$(vagrant ssh -c "ls /usr/local/lib | grep eskimo" integration-test 2> /dev/null | sed -e 's/\r//g')
+    if [[ $eskimo_folder == "" ]]; then
+        echo_date "Couldn't get eskimo folder name"
+        exit 2
+    fi
+
+    echo_date " - Replace packages_distrib content with empty files"
+
+    echo_date "  + creating folder packages_dummy"
+    vagrant ssh -c "sudo mkdir -p /usr/local/lib/$eskimo_folder/packages_dummy/" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "  + creating marker files"
+    vagrant ssh -c "for i in \`find /usr/local/lib/$eskimo_folder/packages_distrib -name '*.gz'\`; do sudo touch /usr/local/lib/$eskimo_folder/packages_dummy/\`basename \$i\`; done" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "  + removing folder packages_distrib"
+    vagrant ssh -c "sudo rm -Rf /usr/local/lib/$eskimo_folder/packages_distrib" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "  + replacing folder packages_distrib"
+    vagrant ssh -c "sudo mv /usr/local/lib/$eskimo_folder/packages_dummy /usr/local/lib/$eskimo_folder/packages_distrib" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "  + changing owner of folder packages_distrib"
+    vagrant ssh -c "sudo chown -R eskimo. /usr/local/lib/$eskimo_folder/packages_distrib" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date " - Cleaning Yum Cache"
+    vagrant ssh -c "sudo yum clean all" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date " - Stopping VM"
+    vagrant halt integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "!!! You can now export the DemoVM using Virtual Box "
+}
 
 # get logs
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
+
+# Parse options to the integration-test script
+while getopts ":hd" opt; do
+    case ${opt} in
+        h )
+            usage
+            exit 0
+        ;;
+        d )
+            export DEMO=demo
+            break
+        ;;
+        : )
+            break
+        ;;
+        \? )
+           echo "Invalid Option: -$OPTARG" 1>&2
+           exit 1
+         ;;
+    esac
+done
 
 check_for_virtualbox
 
 check_for_vagrant
 
-rebuild_eskimo
+#rebuild_eskimo
 
-build_box
+#build_box
 
-install_eskimo
+#install_eskimo
 
-setup_eskimo
+#setup_eskimo
 
-run_zeppelin_data_load
+#run_zeppelin_data_load
 
-run_zeppelin_spark_kafka
+#run_zeppelin_spark_kafka
 
-run_zeppelin_flink_kafka
+#run_zeppelin_flink_kafka
 
-run_zeppelin_other_notes
+#run_zeppelin_other_notes
+
+#do_cleanup
+
+if [[ $DEMO == "demo" ]]; then
+    prepare_demo
+fi
