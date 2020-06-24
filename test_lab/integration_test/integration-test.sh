@@ -898,23 +898,23 @@ check_for_virtualbox
 
 check_for_vagrant
 
-#rebuild_eskimo
+rebuild_eskimo
 
-#build_box
+build_box
 
-#install_eskimo
+install_eskimo
 
-#setup_eskimo
+setup_eskimo
 
-#run_zeppelin_data_load
+run_zeppelin_data_load
 
-#run_zeppelin_spark_kafka
+run_zeppelin_spark_kafka
 
-#run_zeppelin_flink_kafka
+run_zeppelin_flink_kafka
 
-#run_zeppelin_other_notes
+run_zeppelin_other_notes
 
-#do_cleanup
+do_cleanup
 
 if [[ $DEMO == "demo" ]]; then
     prepare_demo
