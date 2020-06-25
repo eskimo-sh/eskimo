@@ -66,11 +66,11 @@ if [[ `tail -n 1 /tmp/kafkamanager_build_log | grep " - In container install SUC
 fi
 
 #echo " - TODO"
-#docker exec -i kafka TODO
+#docker exec -it kafka-manager_template bash
 
 
 echo " - Cleaning up image"
-docker exec -i kafka-manager_template apt-get remove -y git >> /tmp/kafkamanager_build_log 2>&1
+docker exec -i kafka-manager_template apt-get remove -y git adwaita-icon-theme >> /tmp/kafkamanager_build_log 2>&1
 docker exec -i kafka-manager_template apt-get -y auto-remove >> /tmp/kafkamanager_build_log 2>&1
 
 echo " - Closing and saving image kafka-manager"

@@ -106,6 +106,10 @@ cd /usr/local/lib/kafka-manager/bin/
 sudo ln -s cmak kafka-manager
 cd /tmp/kafka_manager_setup
 
+echo " - Build cleanup"
+sudo rm -Rf /root/.ivy2 >> /tmp/kafka_manager_install_log 2>&1
+sudo rm -Rf /root/.sbt >> /tmp/kafka_manager_install_log 2>&1
+
 # installation tests
 
 echo " - Registering test cleaning traps"

@@ -99,6 +99,8 @@ if [[ $FROM_COMPLETE == "1" ]]; then
     rm -Rf /usr/local/lib/zeppelin/interpreter/submarine
     rm -Rf /usr/local/lib/zeppelin/interpreter/sparql
     rm -Rf /usr/local/lib/zeppelin/interpreter/mongodb
+    rm -Rf /usr/local/lib/zeppelin/interpreter/kotlin
+    rm -Rf /usr/local/lib/zeppelin/interpreter/jupyter
 
 else
     echo " - Installing required interpreters"

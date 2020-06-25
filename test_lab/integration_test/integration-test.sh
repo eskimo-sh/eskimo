@@ -864,6 +864,9 @@ prepare_demo() {
     echo_date " - Cleaning Yum Cache"
     vagrant ssh -c "sudo yum clean all" integration-test >> /tmp/integration-test.log 2>&1
 
+    echo_date " - Zeroing disk before shutdown"
+    vagrant ssh -c "dd if=/dev/zero of=/tmp/empty.dd bs=1048576; rm /tmp/empty.dd " integration-test >> /tmp/integration-test.log 2>&1
+
     echo_date " - Stopping VM"
     vagrant halt integration-test >> /tmp/integration-test.log 2>&1
 

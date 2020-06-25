@@ -101,10 +101,11 @@ if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS
     exit 103
 fi
 
-#echo " - TODO"
-#docker exec -i zeppelin TODO
+#docker exec -it zeppelin_template bash
 
-#docker exec -it zeppelin bash
+echo " - Cleaning up image"
+docker exec -i spark_template apt-get remove -y adwaita-icon-theme >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get -y auto-remove >> /tmp/spark_build_log 2>&1
 
 echo " - Closing and saving image zeppelin"
 close_and_save_image zeppelin_template /tmp/zeppelin_build_log $ZEPPELIN_VERSION

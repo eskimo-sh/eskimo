@@ -90,6 +90,9 @@ sudo pip install kafka-python > /tmp/kafka_install_log 2>&1
 echo " - symlinking /usr/local/lib/kafka/ to /usr/local/lib/kafka_$SCALA_VERSION-$KAFKA_VERSION/"
 sudo ln -s /usr/local/lib/kafka_$SCALA_VERSION-$KAFKA_VERSION /usr/local/lib/kafka
 
+echo " - Cleanup unused files"
+sudo rm -Rf /usr/local/lib/kafka/site-docs/*
+
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

@@ -84,11 +84,11 @@ fi
 
 
 #echo " - TODO"
-#docker exec -i flink TODO
+#docker exec -it flink_template bash
 
 
 echo " - Cleaning up image"
-docker exec -i flink_template apt-get remove -y git gcc >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/flink_build_log 2>&1
 docker exec -i flink_template apt-get -y auto-remove >> /tmp/flink_build_log 2>&1
 
 echo " - Closing and saving image flink"

@@ -119,11 +119,11 @@ fi
 
 
 #echo " - TODO"
-#docker exec -i spark TODO
+docker exec -it spark_template bash
 
 
 echo " - Cleaning up image"
-docker exec -i spark_template apt-get remove -y git gcc >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/spark_build_log 2>&1
 docker exec -i spark_template apt-get -y auto-remove >> /tmp/spark_build_log 2>&1
 
 echo " - Closing and saving image spark"

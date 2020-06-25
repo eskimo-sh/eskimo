@@ -74,10 +74,10 @@ if [[ `tail -n 1 /tmp/logstash_build_log | grep " - In container install SUCCESS
 fi
 
 #echo " - TODO"
-#docker exec -i logstash TODO
+#docker exec -it logstash_template bash
 
 echo " - Cleaning up image"
-docker exec -i logstash_template apt-get remove -y git gcc >> /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/logstash_build_log 2>&1
 docker exec -i logstash_template apt-get -y auto-remove >> /tmp/logstash_build_log 2>&1
 
 echo " - Closing and saving image logstash"
