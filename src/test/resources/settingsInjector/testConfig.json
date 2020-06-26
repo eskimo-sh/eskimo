@@ -62,7 +62,28 @@
       "name": "elasticsearch"
     },
     {
-      "settings": [],
+      "settings": [{
+        "filename": "defaults.ini",
+        "propertyFormat": "{name} = {value}",
+        "commentPrefix": "#",
+        "service": "grafana",
+        "filesystemService": "grafana",
+        "propertyType": "VARIABLE",
+        "properties": [
+          {
+            "defaultValue": "eskimo",
+            "name": "admin_user",
+            "comment": "Grafana admin user within eskimo",
+            "value": "test_eskimo"
+          },
+          {
+            "defaultValue": "eskimo",
+            "name": "admin_password",
+            "comment": "Grafana admin user password within eskimo",
+            "value": "test_password"
+          }
+        ]
+      }],
       "name": "grafana"
     },
     {

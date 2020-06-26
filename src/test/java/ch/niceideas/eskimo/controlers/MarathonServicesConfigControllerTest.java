@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MarathonServicesConfigControllerTest {
 
@@ -157,6 +158,46 @@ public class MarathonServicesConfigControllerTest {
         assertEquals ("{\"status\": \"OK\" }", mscc.applyMarathonServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
+    }
+
+    @Test
+    public void testApplyNodesConfig_demoMode() throws Exception {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+
+        mscc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+
+        mscc.setDemoMode(true);
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", mscc.applyMarathonServicesConfig(session));
+    }
+
+    @Test
+    public void testApplyNodesConfig_processingPending() throws Exception {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+
+        mscc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return true;
+            }
+        });
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", mscc.applyMarathonServicesConfig(session));
     }
 
     @Test

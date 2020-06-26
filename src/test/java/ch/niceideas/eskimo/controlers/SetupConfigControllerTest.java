@@ -17,6 +17,7 @@ import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SetupConfigControllerTest {
 
@@ -110,6 +111,48 @@ public class SetupConfigControllerTest {
                 "    \"processingPending\": true,\n" +
                 "    \"config\": \"dummy\"\n" +
                 "}", scc.loadSetupConfig());
+    }
+
+    @Test
+    public void testSaveSetup_demoMode() {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+
+        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+
+        scc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+
+        scc.setDemoMode (true);
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Unfortunately, changing setup configuration is not possible in DEMO mode.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", scc.applySetup(session));
+    }
+
+    @Test
+    public void testSaveSetup_processingPending() {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+
+        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+
+        scc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return true;
+            }
+        });
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", scc.applySetup(session));
     }
 
     @Test

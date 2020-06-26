@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,6 +95,9 @@ public class NodesConfigController {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
+    @Value("${eskimo.demoMode}")
+    private boolean demoMode = false;
+
     /* For tests */
     void setSystemService(SystemService systemService) {
         this.systemService = systemService;
@@ -115,6 +119,9 @@ public class NodesConfigController {
     }
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
+    }
+    void setDemoMode (boolean demoMode) {
+        this.demoMode = demoMode;
     }
 
     @GetMapping("/load-nodes-config")
@@ -237,6 +244,13 @@ public class NodesConfigController {
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
                     put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                }}).toString(2);
+            }
+
+            if (demoMode) {
+                return new JSONObject(new HashMap<String, Object>() {{
+                    put("status", "OK");
+                    put("messages", "Unfortunately, re-applying nodes configuration or changing nodes configuration is not possible in DEMO mode.");
                 }}).toString(2);
             }
 

@@ -398,7 +398,7 @@ eskimo.Main = function() {
         setupDone = true;
 
         $(".config-menu-items").each(function() {
-            if (!$(this).hasClass("menu-hidden")) {
+            if (!$(this).hasClass("menu-hidden") && !($(this).hasClass("menu-static"))) {
                 $(this).attr("class", "config-menu-items");
             }
         });
@@ -411,7 +411,7 @@ eskimo.Main = function() {
         serviceMenuClear();
 
         $(".config-menu-items").each(function() {
-            if (!$(this).hasClass("menu-hidden")) {
+            if (!$(this).hasClass("menu-hidden") && !($(this).hasClass("menu-static"))) {
                 $(this).attr("class", "config-menu-items disabled");
             }
         });

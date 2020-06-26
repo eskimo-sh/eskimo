@@ -132,6 +132,40 @@ public class SystemAdminControllerTest {
     }
 
     @Test
+    public void testReinstallService_demoMode() throws Exception {
+
+        sac.setSystemService(new SystemService(true) {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+
+        sac.setDemoMode(true);
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Unfortunately, re-installing a service is not possible in DEMO mode.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.reinstallService("zookeeper", "192.168.10.13"));
+    }
+
+    @Test
+    public void testReinstallService_processingPending() throws Exception {
+
+        sac.setSystemService(new SystemService(true) {
+            @Override
+            public boolean isProcessingPending() {
+                return true;
+            }
+        });
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.reinstallService("zookeeper", "192.168.10.13"));
+    }
+
+    @Test
     public void testReinstallService() throws Exception {
 
         AtomicBoolean called = new AtomicBoolean(false);

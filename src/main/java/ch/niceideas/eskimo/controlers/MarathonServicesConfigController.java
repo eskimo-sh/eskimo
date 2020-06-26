@@ -92,6 +92,9 @@ public class MarathonServicesConfigController {
     @Value("${eskimo.enableMarathonSubsystem}")
     private String enableMarathon = "true";
 
+    @Value("${eskimo.demoMode}")
+    private boolean demoMode = false;
+
     /* For tests */
     void setMarathonService(MarathonService marathonService) {
         this.marathonService = marathonService;
@@ -110,6 +113,9 @@ public class MarathonServicesConfigController {
     }
     void setMarathonServicesConfigChecker (MarathonServicesConfigChecker marathonServicesConfigChecker) {
         this.marathonServicesConfigChecker = marathonServicesConfigChecker;
+    }
+    void setDemoMode (boolean demoMode) {
+        this.demoMode = demoMode;
     }
 
     @GetMapping("/load-marathon-services-config")
@@ -239,6 +245,13 @@ public class MarathonServicesConfigController {
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
                     put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                }}).toString(2);
+            }
+
+            if (demoMode) {
+                return new JSONObject(new HashMap<String, Object>() {{
+                    put("status", "OK");
+                    put("messages", "Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.");
                 }}).toString(2);
             }
 

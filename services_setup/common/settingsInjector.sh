@@ -48,7 +48,7 @@ fi
 
 if [[ $1 == "" ]]; then
     echo "Expecting service to be handled to be passed as first argument"
-    exit -1
+    exit 1
 fi
 export SERVICE=$1
 
@@ -56,7 +56,7 @@ export SETTINGS_FILE=/etc/eskimo_services-settings.json
 if [[ ! -f $SETTINGS_FILE ]]; then
     if [[ $2 == "" ]]; then
         echo "file $SETTINGS_FILE doesn't exist and no other settings file given as second argument"
-        exit -2
+        exit 2
     fi
     export SETTINGS_FILE=$2
 fi
@@ -111,9 +111,17 @@ function injectVariableProperty () {
                 export searchedResult="$name=$value"
                 ;;
 
+            "{name} = {value}")
+
+                # replace variable using propertyFormat
+                echoDebug "sed -i s/\"$name = .*$\"/\"$name = $sedValue\"/g $i"
+                sed -i s/"$name = .*$"/"$name = $sedValue"/g $i
+                export searchedResult="$name = $value"
+                ;;
+
             *)
                 echo "Unknown property format $propertyFormat";
-                exit -3
+                exit 3
                 ;;
         esac
 
@@ -145,7 +153,7 @@ function injectVariableProperty () {
         # Assess it's found as expected (using propertyFormat)
         if [[ `grep "^$freeValue" $i` == "" ]]; then
             echo "Unable to perform replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
-            exit -5
+            exit 5
         fi
 
     done
@@ -184,7 +192,7 @@ for settingsFile in `jq -c  ".settings | .[] | .settings | .[] | select (.servic
                     ;;
                 *)
                     echo "Unknown property type $propertyType";
-                    exit -3
+                    exit 4
                     ;;
             esac
         fi

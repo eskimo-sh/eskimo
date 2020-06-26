@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.fail;
 
 public class NodesConfigControllerTest {
 
@@ -184,6 +185,48 @@ public class NodesConfigControllerTest {
         assertEquals ("{\"status\": \"OK\" }", ncc.applyNodesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
+    }
+
+    @Test
+    public void testSaveNodesConfig_demoMode() throws Exception {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+
+        HttpSession session = createHttpSession(sessionContent);
+
+        ncc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+
+        ncc.setDemoMode(true);
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Unfortunately, re-applying nodes configuration or changing nodes configuration is not possible in DEMO mode.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", ncc.applyNodesConfig(session));
+    }
+
+    @Test
+    public void testSaveNodesConfig_processingPending() throws Exception {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+
+        HttpSession session = createHttpSession(sessionContent);
+
+        ncc.setSystemService(new SystemService(false) {
+            @Override
+            public boolean isProcessingPending() {
+                return true;
+            }
+        });
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", ncc.applyNodesConfig(session));
     }
 
     @Test

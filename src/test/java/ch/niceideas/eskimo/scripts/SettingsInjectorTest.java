@@ -59,6 +59,7 @@ public class SettingsInjectorTest {
 
     private File sparkFile;
     private File esFile;
+    private File grafanaFile;
 
     /** Run Test on Linux only */
     @Before
@@ -79,6 +80,7 @@ public class SettingsInjectorTest {
         // Copy configuration files to tempFolder
         sparkFile = copyFile(tempFile, "spark/conf/spark-defaults.conf");
         esFile = copyFile (tempFile, "elasticsearch/config/elasticsearch.yml");
+        grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
         settingsInjectorScriptFile = new File ("services_setup/common/settingsInjector.sh");
         System.out.println(System.getProperty("user.dir"));
@@ -143,6 +145,36 @@ public class SettingsInjectorTest {
         assertTrue (sparkFileContent.contains("spark.executor.memory=1872m"));
     }
 
+    @Test
+    public void testNominalGrafanaConfig() throws Exception {
+
+        String result = ProcessHelper.exec(new String[]{
+                "bash",
+                "-c",
+                "export SETTING_INJECTOR_DEBUG=1 && " +
+                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
+                        "bash " +
+                        settingsInjectorScriptFile.getCanonicalPath() +
+                        " grafana " +
+                        settingsFile.getCanonicalPath() +
+                        " ; " +
+                        "exit $?"}, true);
+        //logger.info(result);
+
+        // ensure properties were found
+        assertTrue(result.contains("= Found property admin_user : test_eskimo"));
+        assertTrue(result.contains("= Found property admin_password : test_password"));
+
+        String grafanaFileContent = FileUtils.readFile(grafanaFile);
+
+        //System.err.println (esFileContent);
+
+        assertTrue (grafanaFileContent.contains("admin_user = test_eskimo"));
+        assertFalse (grafanaFileContent.contains("admin_user = eskimo"));
+
+        assertTrue (grafanaFileContent.contains("admin_password = test_password"));
+        assertFalse (grafanaFileContent.contains("admin_password = eskimo"));
+    }
 
     @Test
     public void testNominalESConfig() throws Exception {
@@ -173,7 +205,6 @@ public class SettingsInjectorTest {
 
         assertTrue (esFileContent.contains("action.destructive_requires_name: false"));
         assertFalse (esFileContent.contains("#action.destructive_requires_name: false"));
-
     }
 
     @Test

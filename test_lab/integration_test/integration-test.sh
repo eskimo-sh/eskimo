@@ -86,6 +86,46 @@ check_for_vagrant() {
     fi
 }
 
+query_eskimo() {
+    URL=$1
+    data=$2
+    method=$3
+    if [[ "$method" == "" ]]; then
+        method="GET"
+    fi
+
+    rm -Rf eskimo-call-success
+    rm -Rf eskimo-call-error
+
+    if [[ "$data" != "" ]]; then
+        curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -m 3600 \
+            -X$method http://$BOX_IP/$URL \
+            -d "$data" \
+            > eskimo-call-success \
+            2> eskimo-call-error
+    else
+        curl \
+            -b $SCRIPT_DIR/cookies \
+            -m 3600 \
+            -X$method http://$BOX_IP/$URL \
+            > eskimo-call-success \
+            2> eskimo-call-error
+    fi
+
+    # send result
+    if [[ $(cat eskimo-call-success) != "" ]]; then
+        cat eskimo-call-success
+    else
+        cat eskimo-call-error
+    fi
+
+    rm -Rf eskimo-call-success
+    rm -Rf eskimo-call-error
+}
+
 call_eskimo() {
     URL=$1
     data=$2
@@ -115,7 +155,7 @@ call_eskimo() {
 
     # test result
     if [[ $(cat eskimo-call-result | jq -r '.status') != "OK" ]]; then
-        echo_date "Couldn't successfully call eskimo URK $URL !"
+        echo_date "Couldn't successfully call eskimo URL : $URL"
         echo_date "Got result"
         cat eskimo-call-result
         exit 9
@@ -368,7 +408,7 @@ setup_eskimo() {
     fi
 
     # upload setup config
-    echo_date " - CALL Saving setuo"
+    echo_date " - CALL Saving setup"
     call_eskimo \
         "save-setup" \
         '{
@@ -472,6 +512,62 @@ setup_eskimo() {
     echo_date " - CALL applying marathon config"
     call_eskimo \
         "apply-marathon-services-config"
+}
+
+check_all_services_up() {
+    eskimo_status=$(query_eskimo "get-status")
+    #echo $eskimo_status | jq -r " .nodeServicesStatus"
+
+    all_found=true
+    for i in "service_marathon_172-17-0-1" \
+        "service_mesos-agent_172-17-0-1" \
+        "service_prometheus_172-17-0-1" \
+        "service_flink-worker_172-17-0-1" \
+        "service_gdash_172-17-0-1" \
+        "service_kibana_172-17-0-1" \
+        "service_zookeeper_172-17-0-1" \
+        "service_spark-executor_172-17-0-1" \
+        "service_mesos-master_172-17-0-1" \
+        "service_zeppelin_172-17-0-1" \
+        "service_spark-history-server_172-17-0-1" \
+        "service_elasticsearch_172-17-0-1" \
+        "service_logstash_172-17-0-1" \
+        "service_cerebro_172-17-0-1" \
+        "service_kafka_172-17-0-1" \
+        "service_ntp_172-17-0-1" \
+        "service_kafka-manager_172-17-0-1" \
+        "service_gluster_172-17-0-1" \
+        "node_alive_172-17-0-1" \
+        "service_flink-app-master_172-17-0-1" \
+        "service_grafana_172-17-0-1"; do
+        if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
+            echo "not found $i"
+            return
+        fi
+    done
+
+    echo "OK"
+}
+
+wait_all_services_up() {
+
+    echo_date " - CALL ensuring services are up and OK"
+
+    for i in seq 1 30; do
+
+        all_service_status=`check_all_services_up`
+        if [[ $all_service_status == "OK" ]]; then
+            return
+        fi
+
+        if [[ $i == 30 ]]; then
+            echo_date "No all services managed to come up in 300 seconds - $all_service_status no found."
+            exit 50
+        fi
+
+        sleep 10
+
+    done
 }
 
 run_zeppelin_data_load() {
@@ -784,16 +880,6 @@ run_zeppelin_other_notes() {
     wait_for_executor_unregistered
 
 }
-
-# Additional tests
-# ----------------------------------------------------------------------------------------------------------------------
-
-# TODO Ensure Kibana dashboard exist and has data
-# (TODO find out how to do this ? API ?)
-
-# TODO make sure documentation is well deployed and available
-
-
 do_cleanup() {
 
     # Cleanup (for demo preparation)
@@ -835,6 +921,11 @@ prepare_demo() {
     # [Optionally] Prepare demo
     # ----------------------------------------------------------------------------------------------------------------------
 
+    # FIXME make it work
+    #echo_date " - Loading Kibana flights sample data"
+    #call_eskimo "kibana/api/sample_data/flights"
+
+
     # TODO Switch demo flag in config and restart eskimo
 
     echo_date " - Find eskimo folder name (again)"
@@ -873,52 +964,122 @@ prepare_demo() {
     echo_date "!!! You can now export the DemoVM using Virtual Box "
 }
 
+
+test_web_apps() {
+
+    # Testing web apps
+    # ----------------------------------------------------------------------------------------------------------------------
+
+    echo_date " - Testing web applications"
+
+    echo_date "   + testing Kibana answering (on berka dashboard)"
+    if [[ `query_eskimo "kibana/api/saved_objects/dashboard/df24fd20-a7f9-11ea-956a-630da1c33bca" | grep migrationVersion` == "" ]]; then
+        echo_date "Couldn't reach Kibana dashboard"
+        exit 101
+    fi
+
+    echo_date "   + testing cerebro"
+    if [[ `query_eskimo "cerebro/" | grep 'ng-app="cerebro"'` == "" ]]; then
+        echo_date "Couldn't reach Cerebro"
+        exit 102
+    fi
+
+    echo_date "   + testing grafana (on system dashboard)"
+    if [[ `query_eskimo "grafana/api/dashboards/db/eskimo-system-wide-monitoring" | grep meta` == "" ]]; then
+        echo_date "Couldn't reach Grafana system dashboard"
+        exit 103
+    fi
+
+    echo_date "   + testing marathon application count"
+    marathon_apps=`query_eskimo "marathon/v2/apps" | jq -r ' .apps | .[] | .id' 2>/dev/null`
+    if [[ `echo "$marathon_apps" | wc -l` != 7 ]]; then
+        echo_date "Didn't find 7 apps in marathon"
+        echo_date "Found apps:"
+        echo "$marathon_apps"
+        exit 104
+    fi
+
+    echo_date "   + testing spark history server"
+    if [[ `query_eskimo "spark-history-server/" | grep "Show incomplete applications"` == "" ]]; then
+        echo_date "Couldn't reach Spark History Server"
+        exit 105
+    fi
+
+    echo_date "   + testing gdash"
+    if [[ `query_eskimo "gdash/" | grep "a simple dashboard for GlusterFS"` == "" ]]; then
+        echo_date "Couldn't reach Gdash"
+        exit 106
+    fi
+
+    echo_date "   + testing kafka-manager"
+    if [[ `query_eskimo "kafka-manager/" | grep "clusters/Eskimo"` == "" ]]; then
+        echo_date "Couldn't reach Kafka-Manager"
+        exit 106
+    fi
+
+}
+
+# Additional tests
+# ----------------------------------------------------------------------------------------------------------------------
+
+# TODO Ensure Kibana dashboard exist and has data
+# (TODO find out how to do this ? API ?)
+
+# TODO make sure documentation is well deployed and available
+
+
 # get logs
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
 
 # Parse options to the integration-test script
 while getopts ":hd" opt; do
     case ${opt} in
-        h )
+        h)
             usage
             exit 0
-        ;;
-        d )
+            ;;
+        d)
             export DEMO=demo
             break
-        ;;
-        : )
+            ;;
+        :)
             break
-        ;;
-        \? )
-           echo "Invalid Option: -$OPTARG" 1>&2
-           exit 1
-         ;;
+            ;;
+        \?)
+            echo "Invalid Option: -$OPTARG" 1>&2
+            exit 1
+            ;;
     esac
 done
 
-check_for_virtualbox
+#check_for_virtualbox
 
-check_for_vagrant
+#check_for_vagrant
 
-rebuild_eskimo
+#rebuild_eskimo
 
-build_box
+#build_box
 
-install_eskimo
+#install_eskimo
 
-setup_eskimo
+#setup_eskimo
 
-run_zeppelin_data_load
+#wait_all_services_up
 
-run_zeppelin_spark_kafka
+#run_zeppelin_data_load
 
-run_zeppelin_flink_kafka
+#run_zeppelin_spark_kafka
 
-run_zeppelin_other_notes
+#run_zeppelin_flink_kafka
 
-do_cleanup
+#run_zeppelin_other_notes
+
+test_web_apps
+
+#do_cleanup
 
 if [[ $DEMO == "demo" ]]; then
     prepare_demo
 fi
+
+#vagrant ssh -c "sudo journalctl -u eskimo" integration-test

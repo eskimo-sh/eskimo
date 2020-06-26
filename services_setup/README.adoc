@@ -335,8 +335,11 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       "propertyType": "variable",
 
       ## The format of the property definition in the configuration file
-      ## e.g. "{name}: {value}" or "{name}={value}"
-      "propertyFormat": "property format",
+      ## Supported formats are:
+      ##  - "{name}: {value}" or
+      ##  - "{name}={value}" or
+      ##  - "{name} = s{value}"
+      "propertyFormat": "property format", ## e.g. "{name}={value}"
 
       ## The prefix to use in the configuration file for comments
       "commentPrefix": "#",

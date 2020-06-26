@@ -2018,6 +2018,11 @@ to view ElasticSearch data, Spark results, etc.
 
 https://grafana.com/
 
+==== Grafana specificities within Eskimo
+
+The _username_ / _password_ to administer grafana within eskimo is `eskimo` / `eskimo.` +
+It can be changed in the Eskimo grafana configuration on "Eskimo Services Configuration" page.
+
 ==== Pre-packaged Grafana Dashboards
 
 Eskimo CE provides two pre-packaged Grafana dashboards :
