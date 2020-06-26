@@ -7,6 +7,7 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpSession;
@@ -21,6 +22,12 @@ import static org.junit.Assert.fail;
 public class NodesConfigControllerTest {
 
     private NodesConfigController ncc = new NodesConfigController();
+
+    @Before
+    public void testSetup() {
+        ncc.setMessagingService(new MessagingService());
+        ncc.setNotificationService(new NotificationService());
+    }
 
     @Test
     public void testLoadNodesConfig() throws Exception {
@@ -224,7 +231,7 @@ public class NodesConfigControllerTest {
         });
 
         assertEquals ("{\n" +
-                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", ncc.applyNodesConfig(session));
     }

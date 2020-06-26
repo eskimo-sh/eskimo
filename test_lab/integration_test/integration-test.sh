@@ -34,27 +34,17 @@
 # Software.
 #
 
-BOX_IP=192.168.10.41
-
 echoerr() { echo "$@" 1>&2; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 set -e
 
-sudo rm -Rf /tmp/integration-test.log
-
-echo_date() {
-    echo $(date +"%Y-%m-%d %H:%M:%S")" $@"
-}
-
 # UTILITY FUNCTIONS
 # ======================================================================================================================
 
-usage() {
-    echo "Usage:"
-    echo "    -h  Display this help message."
-    echo "    -d  prepare VM for Demo"
+echo_date() {
+    echo $(date +"%Y-%m-%d %H:%M:%S")" $@"
 }
 
 check_for_virtualbox() {
@@ -276,54 +266,75 @@ rebuild_eskimo() {
 
     cd $SCRIPT_DIR/../..
 
-    mvn clean install >> /tmp/integration-test.log 2>&1
+    if [[ -z $FAST_REPACKAGE ]]; then
+        mvn clean install >> /tmp/integration-test.log 2>&1
+    else
+        mvn clean install -DskipTests >> /tmp/integration-test.log 2>&1
+    fi
 
     __returned_to_saved_dir
 }
 
-build_box() {
+__dp_build_box() {
 
     # bring VM test-integration
-    echo_date " - Destroying any previously existing VM"
+    echo_date " - Destroying any previously existing VM $1"
     set +e
-    vagrant destroy --force integration-test >> /tmp/integration-test.log 2>&1
+    vagrant destroy --force $1 >> /tmp/integration-test.log 2>&1
     set -e
 
-    echo_date " - Bringing Build VM up"
-    vagrant up integration-test >> /tmp/integration-test.log 2>&1
+    echo_date " - Building Build VM $1"
 
-    echo_date " - Updating the appliance"
-    vagrant ssh -c "sudo yum update -y" integration-test >> /tmp/integration-test.log 2>&1
+    echo_date "   + Bringing Build VM up"
+    vagrant up $1 >> /tmp/integration-test.log 2>&1
 
-    # Docker part
-    # ----------------------------------------------------------------------------------------------------------------------
+    echo_date "   + Updating the appliance"
+    vagrant ssh -c "sudo yum update -y" $1 >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Install required packages for docker "
-    vagrant ssh -c "sudo yum install -y yum-utils device-mapper-persistent-data lvm2" integration-test >> /tmp/integration-test.log 2>&1
 
-    echo_date " - set up the stable docker repository."
-    vagrant ssh -c "sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo" integration-test >> /tmp/integration-test.log 2>&1
+    if [[ $2 == "MASTER" ]]; then
 
-    echo_date " - Install the latest version of Docker CE and containerd"
-    vagrant ssh -c "sudo yum install -y docker-ce docker-ce-cli containerd.io" integration-test >> /tmp/integration-test.log 2>&1
+        # Docker part
+        # ----------------------------------------------------------------------------------------------------------------------
 
-    echo_date " - Enabling docker service"
-    vagrant ssh -c "sudo systemctl enable docker" integration-test >> /tmp/integration-test.log 2>&1
+        echo_date "   + Install required packages for docker "
+        vagrant ssh -c "sudo yum install -y yum-utils device-mapper-persistent-data lvm2" $1 >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Starting docker service"
-    vagrant ssh -c "sudo systemctl start docker" integration-test >> /tmp/integration-test.log 2>&1
+        echo_date "   + set up the stable docker repository."
+        vagrant ssh -c "sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo" $1 >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Adding current user to docker group"
-    vagrant ssh -c "sudo usermod -a -G docker vagrant" integration-test >> /tmp/integration-test.log 2>&1
+        echo_date "   + Install the latest version of Docker CE and containerd"
+        vagrant ssh -c "sudo yum install -y docker-ce docker-ce-cli containerd.io" $1 >> /tmp/integration-test.log 2>&1
 
-    # Eskimo dependencies part
-    # ----------------------------------------------------------------------------------------------------------------------
+        echo_date "   + Enabling docker service"
+        vagrant ssh -c "sudo systemctl enable docker" $1 >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Installing utilities"
-    vagrant ssh -c "sudo yum install -y wget git gcc glibc-static" integration-test >> /tmp/integration-test.log 2>&1
+        echo_date "   + Starting docker service"
+        vagrant ssh -c "sudo systemctl start docker" $1 >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Installing Java"
-    vagrant ssh -c "sudo yum install -y java-11-openjdk" integration-test >> /tmp/integration-test.log 2>&1
+        echo_date "   + Adding current user to docker group"
+        vagrant ssh -c "sudo usermod -a -G docker vagrant" $1 >> /tmp/integration-test.log 2>&1
+
+        # Eskimo dependencies part
+        # ----------------------------------------------------------------------------------------------------------------------
+
+        echo_date "   + Installing utilities"
+        vagrant ssh -c "sudo yum install -y wget git gcc glibc-static" $1 >> /tmp/integration-test.log 2>&1
+
+        echo_date "   + Installing Java"
+        vagrant ssh -c "sudo yum install -y java-11-openjdk" $1 >> /tmp/integration-test.log 2>&1
+    fi
+}
+
+build_box() {
+    if [[ -z $MULTIPLE_NODE ]]; then
+        __dp_build_box integration-test MASTER
+    else
+        __dp_build_box integration-test1 MASTER
+        __dp_build_box integration-test2
+        __dp_build_box integration-test3
+        __dp_build_box integration-test4
+    fi
 }
 
 install_eskimo() {
@@ -332,9 +343,18 @@ install_eskimo() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - Cleanup before installation"
-    vagrant ssh -c "rm -Rf eskimo.tar.gz" integration-test >> /tmp/integration-test.log 2>&1
-    vagrant ssh -c "sudo rm -Rf /usr/local/lib/eskimo*" integration-test >> /tmp/integration-test.log 2>&1
-    vagrant ssh -c "sudo rm -Rf /lib/systemd/system/eskimo.service" integration-test >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + removing any previous upload of eskimo on VM"
+    vagrant ssh -c "rm -Rf eskimo.tar.gz" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + removing eskimo installation folder"
+    vagrant ssh -c "sudo rm -Rf /usr/local/lib/eskimo*" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + removing eskimo SystemD unit file"
+    vagrant ssh -c "sudo rm -Rf /lib/systemd/system/eskimo.service" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+
+    echo_date "   + reload systemD daemon"
+    vagrant ssh -c "sudo systemctl daemon-reload" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Finding Eskimo package"
     eskimo_package=$(find $SCRIPT_DIR/../../target -name 'eskimo*bin*.tar.gz' 2> /dev/null)
@@ -344,41 +364,43 @@ install_eskimo() {
     fi
 
     echo_date " - Uploading eskimo"
-    vagrant upload $eskimo_package /home/vagrant/eskimo.tar.gz integration-test >> /tmp/integration-test.log 2>&1
+    vagrant upload $eskimo_package /home/vagrant/eskimo.tar.gz $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Extracting eskimo"
-    vagrant ssh -c "tar xvfz eskimo.tar.gz" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "tar xvfz eskimo.tar.gz" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Find eskimo folder name"
-    eskimo_folder=$(vagrant ssh -c "ls /home/vagrant | grep eskimo | grep -v gz" integration-test 2> /dev/null | sed -e 's/\r//g')
+    eskimo_folder=$(vagrant ssh -c "ls /home/vagrant | grep eskimo | grep -v gz" $TARGET_MASTER_VM 2> /dev/null | sed -e 's/\r//g')
     if [[ $eskimo_folder == "" ]]; then
         echo_date "Couldn't get eskimo folder name"
         exit 2
     fi
 
     echo_date " - Installing Eskimo"
-    vagrant ssh -c "sudo mv /home/vagrant/$eskimo_folder /usr/local/lib" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo mv /home/vagrant/$eskimo_folder /usr/local/lib" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Giving back eskimo installation folder to root"
-    vagrant ssh -c "sudo chown root. /usr/local/lib/$eskimo_folder" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo chown root. /usr/local/lib/$eskimo_folder" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Chaning eskimo port to 80"
-    vagrant ssh -c "sudo sed -i s/\"server.port=9191\"/\"server.port=80\"/g /usr/local/lib/$eskimo_folder/conf/eskimo.properties" integration-test >> /tmp/integration-test.log 2>&1
+    echo_date " - Changing eskimo port to 80"
+    vagrant ssh -c "sudo sed -i s/\"server.port=9191\"/\"server.port=80\"/g /usr/local/lib/$eskimo_folder/conf/eskimo.properties" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Installing Systemd file"
-    vagrant ssh -c "sudo bash /usr/local/lib/$eskimo_folder/bin/utils/__install-eskimo-systemD-unit-file.sh -f" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo bash /usr/local/lib/$eskimo_folder/bin/utils/__install-eskimo-systemD-unit-file.sh -f" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Uploading packages distrib packages"
     for i in $(find "$SCRIPT_DIR"/../../packages_distrib -name '*.tar.gz'); do
         filename=$(basename $i)
-        vagrant upload $i /usr/local/lib/$eskimo_folder/packages_distrib/$filename integration-test >> /tmp/integration-test.log 2>&1
+        vagrant upload $i /usr/local/lib/$eskimo_folder/packages_distrib/$filename $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
     done
 
     echo_date " - Removing eskimo archive from home folder"
-    vagrant ssh -c "rm -Rf /home/vagrant/eskimo.tar.gz" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "rm -Rf /home/vagrant/eskimo.tar.gz" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+
+    echo_date " - Reload systemD daemon"
 }
 
-setup_eskimo() {
+initial_setup_eskimo() {
 
     # Eskimo setup
     # ----------------------------------------------------------------------------------------------------------------------
@@ -420,44 +442,78 @@ setup_eskimo() {
     "setup-services-origin":"build"
     }'
 
+}
+
+setup_eskimo() {
+
+    # login again
+    echo_date " - CALL performing login"
+    curl \
+        -c $SCRIPT_DIR/cookies \
+        -H 'Content-Type: application/x-www-form-urlencoded' \
+        -XPOST http://$BOX_IP/login \
+        -d 'username=admin&password=password' \
+        >> /tmp/integration-test.log 2>&1
+
+    # fetch status now and test it
+    echo_date " - CALL Fetching status"
+    status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
+    if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
+        echo "Couldn't successfuly fetch status !"
+        echo "Got status : $status"
+        exit 4
+    fi
+    # should be clear setup before setup is applied
+    if [[ $(echo $status | jq -r '.clear') != "setup" ]]; then
+        echo "Didn't get expected 'clear' status"
+        echo "Got status : $status"
+        exit 5
+    fi
+
     # Services configuration
     # ----------------------------------------------------------------------------------------------------------------------
+
+    if [[ -z $MULTIPLE_NODE ]]; then
+        export additional_RAM="5000"
+    else
+        export additional_RAM="4000"
+    fi
 
     # upload services config
     echo_date " - CALL saving services config"
     call_eskimo \
         "save-services-settings" \
-        '{
-    "elasticsearch-bootstrap-memory_lock":"",
-    "elasticsearch-action-destructive_requires_name":"",
-    "elasticsearch-index-refresh_interval":"",
-    "elasticsearch-index-number_of_replicas":"",
-    "elasticsearch-index-number_of_shards":"",
-    "flink-app-master-jobmanager-heap-size":"",
-    "flink-app-master-taskmanager-heap-size":"",
-    "flink-app-master-parallelism-default":"",
-    "flink-app-master-mesos-resourcemanager-tasks-cpus":"",
-    "flink-app-master-mesos-resourcemanager-tasks-mem":"",
-    "flink-app-master-taskmanager-numberOfTaskSlots":"",
-    "kafka-num-network-threads":"",
-    "kafka-num-io-threads":"",
-    "kafka-socket-send-buffer-bytes":"",
-    "kafka-socket-receive-buffer-bytes":"",
-    "kafka-socket-request-max-bytes":"",
-    "kafka-num-partitions":"",
-    "kafka-log-retention-hours":"",
-    "marathon-task_launch_timeout":"",
-    "mesos-agent-cpu_additional":"",
-    "mesos-agent-ram_additional":"4800",
-    "spark-executor-spark-driver-memory":"",
-    "spark-executor-spark-rpc-numRetries":"",
-    "spark-executor-spark-rpc-retry-wait":"",
-    "spark-executor-spark-scheduler-mode":"",
-    "spark-executor-spark-locality-wait":"",
-    "spark-executor-spark-dynamicAllocation-executorIdleTimeout":"",
-    "spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout":"",
-    "spark-executor-spark-executor-memory":""
-    }'
+        "{
+    \"elasticsearch-bootstrap-memory_lock\":\"\",
+    \"elasticsearch-action-destructive_requires_name\":\"\",
+    \"elasticsearch-index-refresh_interval\":\"\",
+    \"elasticsearch-index-number_of_replicas\":\"\",
+    \"elasticsearch-index-number_of_shards\":\"\",
+    \"flink-app-master-jobmanager-heap-size\":\"\",
+    \"flink-app-master-taskmanager-heap-size\":\"\",
+    \"flink-app-master-parallelism-default\":\"\",
+    \"flink-app-master-mesos-resourcemanager-tasks-cpus\":\"\",
+    \"flink-app-master-mesos-resourcemanager-tasks-mem\":\"\",
+    \"flink-app-master-taskmanager-numberOfTaskSlots\":\"\",
+    \"kafka-num-network-threads\":\"\",
+    \"kafka-num-io-threads\":\"\",
+    \"kafka-socket-send-buffer-bytes\":\"\",
+    \"kafka-socket-receive-buffer-bytes\":\"\",
+    \"kafka-socket-request-max-bytes\":\"\",
+    \"kafka-num-partitions\":\"\",
+    \"kafka-log-retention-hours\":\"\",
+    \"marathon-task_launch_timeout\":\"\",
+    \"mesos-agent-cpu_additional\":\"\",
+    \"mesos-agent-ram_additional\":\"$additional_RAM\",
+    \"spark-executor-spark-driver-memory\":\"\",
+    \"spark-executor-spark-rpc-numRetries\":\"\",
+    \"spark-executor-spark-rpc-retry-wait\":\"\",
+    \"spark-executor-spark-scheduler-mode\":\"\",
+    \"spark-executor-spark-locality-wait\":\"\",
+    \"spark-executor-spark-dynamicAllocation-executorIdleTimeout\":\"\",
+    \"spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout\":\"\",
+    \"spark-executor-spark-executor-memory\":\"\"
+    }"
 
     # Now need to apply command
     echo_date " - CALL applying services config"
@@ -468,24 +524,76 @@ setup_eskimo() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - CALL saving nodes config"
-    call_eskimo \
-        "save-nodes-config" \
-        '{
-    "node_id1":"172.17.0.1",
-    "flink-app-master":"1",
-    "marathon":"1",
-    "mesos-master":"1",
-    "zookeeper":"1",
-    "elasticsearch1":"on",
-    "flink-worker1":"on",
-    "gluster1":"on",
-    "kafka1":"on",
-    "logstash1":"on",
-    "mesos-agent1":"on",
-    "ntp1":"on",
-    "prometheus1":"on",
-    "spark-executor1":"on"
-    }'
+
+    if [[ -z $MULTIPLE_NODE ]]; then
+        call_eskimo \
+            "save-nodes-config" \
+            '{
+        "node_id1":"172.17.0.1",
+        "flink-app-master":"1",
+        "marathon":"1",
+        "mesos-master":"1",
+        "zookeeper":"1",
+        "elasticsearch1":"on",
+        "flink-worker1":"on",
+        "gluster1":"on",
+        "kafka1":"on",
+        "logstash1":"on",
+        "mesos-agent1":"on",
+        "ntp1":"on",
+        "prometheus1":"on",
+        "spark-executor1":"on"
+        }'
+    else
+        call_eskimo \
+            "save-nodes-config" \
+            '{
+        "node_id1":"192.168.10.51",
+        "node_id2":"192.168.10.52",
+        "node_id3":"192.168.10.53",
+        "node_id4":"192.168.10.54",
+        "flink-app-master":"2",
+        "marathon":"2",
+        "mesos-master":"1",
+        "zookeeper":"1",
+        "elasticsearch1":"on",
+        "elasticsearch2":"on",
+        "elasticsearch3":"on",
+        "elasticsearch4":"on",
+        "flink-worker1":"on",
+        "flink-worker2":"on",
+        "flink-worker3":"on",
+        "flink-worker4":"on",
+        "gluster1":"on",
+        "gluster2":"on",
+        "gluster3":"on",
+        "gluster4":"on",
+        "kafka1":"on",
+        "kafka2":"on",
+        "kafka3":"on",
+        "kafka4":"on",
+        "logstash1":"on",
+        "logstash2":"on",
+        "logstash3":"on",
+        "logstash4":"on",
+        "mesos-agent1":"on",
+        "mesos-agent2":"on",
+        "mesos-agent3":"on",
+        "mesos-agent4":"on",
+        "ntp1":"on",
+        "ntp2":"on",
+        "ntp3":"on",
+        "ntp4":"on",
+        "prometheus1":"on",
+        "prometheus2":"on",
+        "prometheus3":"on",
+        "prometheus4":"on",
+        "spark-executor1":"on",
+        "spark-executor2":"on",
+        "spark-executor3":"on",
+        "spark-executor4":"on"
+        }'
+    fi
 
     # Now need to apply command
     echo_date " - CALL applying nodes config"
@@ -519,32 +627,92 @@ check_all_services_up() {
     #echo $eskimo_status | jq -r " .nodeServicesStatus"
 
     all_found=true
-    for i in "service_marathon_172-17-0-1" \
-        "service_mesos-agent_172-17-0-1" \
-        "service_prometheus_172-17-0-1" \
-        "service_flink-worker_172-17-0-1" \
-        "service_gdash_172-17-0-1" \
-        "service_kibana_172-17-0-1" \
-        "service_zookeeper_172-17-0-1" \
-        "service_spark-executor_172-17-0-1" \
-        "service_mesos-master_172-17-0-1" \
-        "service_zeppelin_172-17-0-1" \
-        "service_spark-history-server_172-17-0-1" \
-        "service_elasticsearch_172-17-0-1" \
-        "service_logstash_172-17-0-1" \
-        "service_cerebro_172-17-0-1" \
-        "service_kafka_172-17-0-1" \
-        "service_ntp_172-17-0-1" \
-        "service_kafka-manager_172-17-0-1" \
-        "service_gluster_172-17-0-1" \
-        "node_alive_172-17-0-1" \
-        "service_flink-app-master_172-17-0-1" \
-        "service_grafana_172-17-0-1"; do
-        if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
-            echo "not found $i"
-            return
-        fi
-    done
+
+    if [[ -z $MULTIPLE_NODE ]]; then
+        for i in "service_marathon_172-17-0-1" \
+            "service_mesos-agent_172-17-0-1" \
+            "service_prometheus_172-17-0-1" \
+            "service_flink-worker_172-17-0-1" \
+            "service_gdash_172-17-0-1" \
+            "service_kibana_172-17-0-1" \
+            "service_zookeeper_172-17-0-1" \
+            "service_spark-executor_172-17-0-1" \
+            "service_mesos-master_172-17-0-1" \
+            "service_zeppelin_172-17-0-1" \
+            "service_spark-history-server_172-17-0-1" \
+            "service_elasticsearch_172-17-0-1" \
+            "service_logstash_172-17-0-1" \
+            "service_cerebro_172-17-0-1" \
+            "service_kafka_172-17-0-1" \
+            "service_ntp_172-17-0-1" \
+            "service_kafka-manager_172-17-0-1" \
+            "service_gluster_172-17-0-1" \
+            "node_alive_172-17-0-1" \
+            "service_flink-app-master_172-17-0-1" \
+            "service_grafana_172-17-0-1"; do
+            if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
+                echo "not found $i"
+                return
+            fi
+        done
+    else
+        for i in "service_marathon_192-168-10-52" \
+            "service_mesos-agent_192-168-10-51" \
+            "service_mesos-agent_192-168-10-52" \
+            "service_mesos-agent_192-168-10-53" \
+            "service_mesos-agent_192-168-10-54" \
+            "service_prometheus_192-168-10-51" \
+            "service_prometheus_192-168-10-52" \
+            "service_prometheus_192-168-10-53" \
+            "service_prometheus_192-168-10-54" \
+            "service_flink-worker_192-168-10-51" \
+            "service_flink-worker_192-168-10-52" \
+            "service_flink-worker_192-168-10-53" \
+            "service_flink-worker_192-168-10-54" \
+            "service_gdash_" \
+            "service_kibana_" \
+            "service_zookeeper_192-168-10-51" \
+            "service_spark-executor_192-168-10-51" \
+            "service_spark-executor_192-168-10-52" \
+            "service_spark-executor_192-168-10-53" \
+            "service_spark-executor_192-168-10-54" \
+            "service_mesos-master_192-168-10-51" \
+            "service_zeppelin_" \
+            "service_spark-history-server_" \
+            "service_elasticsearch_192-168-10-51" \
+            "service_elasticsearch_192-168-10-52" \
+            "service_elasticsearch_192-168-10-53" \
+            "service_elasticsearch_192-168-10-54" \
+            "service_logstash_192-168-10-51" \
+            "service_logstash_192-168-10-52" \
+            "service_logstash_192-168-10-53" \
+            "service_logstash_192-168-10-54" \
+            "service_cerebro_" \
+            "service_kafka_192-168-10-51" \
+            "service_kafka_192-168-10-52" \
+            "service_kafka_192-168-10-53" \
+            "service_kafka_192-168-10-54" \
+            "service_ntp_192-168-10-51" \
+            "service_ntp_192-168-10-52" \
+            "service_ntp_192-168-10-53" \
+            "service_ntp_192-168-10-54" \
+            "service_kafka-manager_" \
+            "service_gluster_192-168-10-51" \
+            "service_gluster_192-168-10-52" \
+            "service_gluster_192-168-10-53" \
+            "service_gluster_192-168-10-54" \
+            "node_alive_192-168-10-51" \
+            "node_alive_192-168-10-52" \
+            "node_alive_192-168-10-53" \
+            "node_alive_192-168-10-54" \
+            "service_flink-app-master_192-168-10-52" \
+            "service_grafana_"; do
+            if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
+                echo "not found $i"
+                return
+            fi
+        done
+    fi
 
     echo "OK"
 }
@@ -555,7 +723,7 @@ wait_all_services_up() {
 
     for i in seq 1 30; do
 
-        all_service_status=`check_all_services_up`
+        all_service_status=$(check_all_services_up)
         if [[ $all_service_status == "OK" ]]; then
             return
         fi
@@ -645,13 +813,13 @@ run_zeppelin_data_load() {
     echo_date " - Creating topic berka-payments"
     vagrant ssh -c \
         "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions 4 --zookeeper localhost:2181 --topic berka-payments" \
-        integration-test \
+        $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 
     echo_date " - Creating topic berka-payments-aggregate"
     vagrant ssh -c \
         "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions 4 --zookeeper localhost:2181 --topic berka-payments-aggregate" \
-        integration-test \
+        $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 }
 
@@ -689,7 +857,7 @@ run_zeppelin_spark_kafka() {
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
         "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server 172.17.0.1:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
-        integration-test \
+        $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
     if [[ $(wc -l kafka-berka-payments-aggregate-results | cut -d ' ' -f 1) -lt 100 ]]; then
@@ -783,7 +951,7 @@ run_zeppelin_flink_kafka() {
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
         "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server 172.17.0.1:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
-        integration-test \
+        $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
     if [[ $(wc -l kafka-berka-payments-aggregate-results | cut -d ' ' -f 1) -lt 100 ]]; then
@@ -886,35 +1054,98 @@ do_cleanup() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - Delete spark and flink checkpoint locations"
-    vagrant ssh -c "sudo rm -Rf /var/lib/spark/data/checkpoints/*" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo rm -Rf /var/lib/spark/data/checkpoints/*" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Delete all berka indices except berka-payments and berka-transactions"
 
     echo_date "   + Delete berka-account"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-account" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-account" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-card"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-card" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-card" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-disp"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-disp" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-disp" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-district"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-district" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-district" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-client"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-client" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-client" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-loan"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-loan" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-loan" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-order"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-order" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-order" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Delete berka-trans"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-trans" integration-test >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
 }
+
+test_web_apps() {
+
+    # Testing web apps
+    # ----------------------------------------------------------------------------------------------------------------------
+
+    echo_date " - Testing web applications"
+
+    echo_date "   + testing Kibana answering (on berka dashboard)"
+    if [[ $(query_eskimo "kibana/api/saved_objects/dashboard/df24fd20-a7f9-11ea-956a-630da1c33bca" | grep migrationVersion) == "" ]]; then
+        echo_date "Couldn't reach Kibana dashboard"
+        exit 101
+    fi
+
+    echo_date "   + testing cerebro"
+    if [[ $(query_eskimo "cerebro/" | grep 'ng-app="cerebro"') == "" ]]; then
+        echo_date "Couldn't reach Cerebro"
+        exit 102
+    fi
+
+    echo_date "   + testing grafana (on system dashboard)"
+    if [[ $(query_eskimo "grafana/api/dashboards/db/eskimo-system-wide-monitoring" | grep meta) == "" ]]; then
+        echo_date "Couldn't reach Grafana system dashboard"
+        exit 103
+    fi
+
+    echo_date "   + testing marathon application count"
+    marathon_apps=$(query_eskimo "marathon/v2/apps" | jq -r ' .apps | .[] | .id' 2> /dev/null)
+    if [[ $(echo "$marathon_apps" | wc -l) != 7 ]]; then
+        echo_date "Didn't find 7 apps in marathon"
+        echo_date "Found apps:"
+        echo "$marathon_apps"
+        exit 104
+    fi
+
+    echo_date "   + testing spark history server"
+    if [[ $(query_eskimo "spark-history-server/" | grep "Show incomplete applications") == "" ]]; then
+        echo_date "Couldn't reach Spark History Server"
+        exit 105
+    fi
+
+    echo_date "   + testing gdash"
+    if [[ $(query_eskimo "gdash/" | grep "a simple dashboard for GlusterFS") == "" ]]; then
+        echo_date "Couldn't reach Gdash"
+        exit 106
+    fi
+
+    echo_date "   + testing kafka-manager"
+    if [[ $(query_eskimo "kafka-manager/" | grep "clusters/Eskimo") == "" ]]; then
+        echo_date "Couldn't reach Kafka-Manager"
+        exit 106
+    fi
+
+}
+
+# Additional tests
+# ----------------------------------------------------------------------------------------------------------------------
+
+# TODO Ensure Kibana dashboard exist and has data
+# (TODO find out how to do this ? API ?)
+
+# TODO make sure documentation is well deployed and available
+
 
 prepare_demo() {
 
@@ -924,7 +1155,6 @@ prepare_demo() {
     # FIXME make it work
     #echo_date " - Loading Kibana flights sample data"
     #call_eskimo "kibana/api/sample_data/flights"
-
 
     # TODO Switch demo flag in config and restart eskimo
 
@@ -965,74 +1195,29 @@ prepare_demo() {
 }
 
 
-test_web_apps() {
-
-    # Testing web apps
-    # ----------------------------------------------------------------------------------------------------------------------
-
-    echo_date " - Testing web applications"
-
-    echo_date "   + testing Kibana answering (on berka dashboard)"
-    if [[ `query_eskimo "kibana/api/saved_objects/dashboard/df24fd20-a7f9-11ea-956a-630da1c33bca" | grep migrationVersion` == "" ]]; then
-        echo_date "Couldn't reach Kibana dashboard"
-        exit 101
-    fi
-
-    echo_date "   + testing cerebro"
-    if [[ `query_eskimo "cerebro/" | grep 'ng-app="cerebro"'` == "" ]]; then
-        echo_date "Couldn't reach Cerebro"
-        exit 102
-    fi
-
-    echo_date "   + testing grafana (on system dashboard)"
-    if [[ `query_eskimo "grafana/api/dashboards/db/eskimo-system-wide-monitoring" | grep meta` == "" ]]; then
-        echo_date "Couldn't reach Grafana system dashboard"
-        exit 103
-    fi
-
-    echo_date "   + testing marathon application count"
-    marathon_apps=`query_eskimo "marathon/v2/apps" | jq -r ' .apps | .[] | .id' 2>/dev/null`
-    if [[ `echo "$marathon_apps" | wc -l` != 7 ]]; then
-        echo_date "Didn't find 7 apps in marathon"
-        echo_date "Found apps:"
-        echo "$marathon_apps"
-        exit 104
-    fi
-
-    echo_date "   + testing spark history server"
-    if [[ `query_eskimo "spark-history-server/" | grep "Show incomplete applications"` == "" ]]; then
-        echo_date "Couldn't reach Spark History Server"
-        exit 105
-    fi
-
-    echo_date "   + testing gdash"
-    if [[ `query_eskimo "gdash/" | grep "a simple dashboard for GlusterFS"` == "" ]]; then
-        echo_date "Couldn't reach Gdash"
-        exit 106
-    fi
-
-    echo_date "   + testing kafka-manager"
-    if [[ `query_eskimo "kafka-manager/" | grep "clusters/Eskimo"` == "" ]]; then
-        echo_date "Couldn't reach Kafka-Manager"
-        exit 106
-    fi
-
-}
-
-# Additional tests
-# ----------------------------------------------------------------------------------------------------------------------
-
-# TODO Ensure Kibana dashboard exist and has data
-# (TODO find out how to do this ? API ?)
-
-# TODO make sure documentation is well deployed and available
-
-
 # get logs
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
 
+usage() {
+    echo "Usage:"
+    echo "    -h  Display this help message."
+    echo "    -d  After the build, prepare the VM for DemoVM"
+    echo "    -r  Re-install eskimo on existing VM"
+    echo "    -f  Fast repackage"
+    echo "    -m  Test on multiple nodes"
+}
+
+export BOX_IP=192.168.10.41
+export DEMO=""
+export FAST_REPACKAGE=""
+export REBUILD_ONLY=""
+export MULTIPLE_NODE=""
+export TARGET_MASTER_VM="integration-test"
+
+sudo rm -Rf /tmp/integration-test.log
+
 # Parse options to the integration-test script
-while getopts ":hd" opt; do
+while getopts ":hdrfm" opt; do
     case ${opt} in
         h)
             usage
@@ -1040,6 +1225,20 @@ while getopts ":hd" opt; do
             ;;
         d)
             export DEMO=demo
+            break
+            ;;
+        r)
+            export REBUILD_ONLY=rebuild
+            break
+            ;;
+        f)
+            export FAST_REPACKAGE=fast
+            break
+            ;;
+        m)
+            export MULTIPLE_NODE=multiple
+            export TARGET_MASTER_VM="integration-test1"
+            export BOX_IP=192.168.10.51
             break
             ;;
         :)
@@ -1052,31 +1251,43 @@ while getopts ":hd" opt; do
     esac
 done
 
-#check_for_virtualbox
+if [[ ! -z $DEMO && ! -z $MULTIPLE_NODE ]]; then
+    echo "Demo and Multiple nodes are exckusive "
+    exit 70
+fi
 
-#check_for_vagrant
+check_for_virtualbox
 
-#rebuild_eskimo
+check_for_vagrant
 
-#build_box
+rebuild_eskimo
 
-#install_eskimo
+if [[ -z $REBUILD_ONLY ]]; then
+    build_box
+fi
 
-#setup_eskimo
+install_eskimo
 
-#wait_all_services_up
+initial_setup_eskimo
 
-#run_zeppelin_data_load
+if [[ -z $REBUILD_ONLY ]]; then
 
-#run_zeppelin_spark_kafka
+    setup_eskimo
 
-#run_zeppelin_flink_kafka
+    wait_all_services_up
 
-#run_zeppelin_other_notes
+    run_zeppelin_data_load
 
-test_web_apps
+    run_zeppelin_spark_kafka
 
-#do_cleanup
+    run_zeppelin_flink_kafka
+
+    run_zeppelin_other_notes
+
+    test_web_apps
+
+    do_cleanup
+fi
 
 if [[ $DEMO == "demo" ]]; then
     prepare_demo

@@ -8,6 +8,7 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpSession;
@@ -21,6 +22,12 @@ import static org.junit.Assert.fail;
 public class MarathonServicesConfigControllerTest {
 
     private MarathonServicesConfigController mscc = new MarathonServicesConfigController();
+
+    @Before
+    public void testSetup() {
+        mscc.setMessagingService(new MessagingService());
+        mscc.setNotificationService(new NotificationService());
+    }
 
     @Test
     public void testLoadMarathonServicesConfig() throws Exception {
@@ -195,7 +202,7 @@ public class MarathonServicesConfigControllerTest {
         });
 
         assertEquals ("{\n" +
-                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", mscc.applyMarathonServicesConfig(session));
     }

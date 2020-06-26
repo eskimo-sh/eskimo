@@ -138,6 +138,12 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
             }
         });
 
+        feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedServices);
+
+        return retCommand;
+    }
+
+    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, OperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<String> restartedServices) {
         for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
 
             if (!servicesDefinition.getService(restartedService).isMarathon()) {
@@ -154,34 +160,25 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
                     retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
                 }
             }
-
-            //Need to restart marathon services as well !
         }
-
-        return retCommand;
     }
 
     public static OperationsCommand createForRestartsOnly (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             String[] servicesToRestart,
+            ServicesInstallStatusWrapper servicesInstallStatus,
             NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
         OperationsCommand retCommand = new OperationsCommand(rawNodesConfig);
 
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
 
-        for (String restartedService : Arrays.stream(servicesToRestart).sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
-            for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
+        Set<String> restartedServices = new HashSet (Arrays.asList(servicesToRestart));
 
-                String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
-
-                retCommand.addRestartIfNotInstalled(restartedService, ipAddress);
-            }
-        }
+        feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedServices);
 
         return retCommand;
-
     }
 
     OperationsCommand(NodesConfigWrapper rawNodesConfig) {

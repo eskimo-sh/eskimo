@@ -1,0 +1,813 @@
+
+[[chap-installation]]
+== Eskimo Installation
+
+WARNING: Eskimo cluster nodes support only the Linux operating system and have to be running a Linux distribution. +
+The eskimo application itself can very well run on windows though. However, running the Eskimo application on Windows
+prevents the user from building his own containers, he may only download pre-built containers for use with Eskimo.
+
+
+=== Installation target
+
+The eskimo backend itself can either be installed:
+
+* on one of the nodes from the eskimo cluster (for instance one of the node where master services will be installed). +
+Doing so is however not recommended since that node would need to have the HTTP port on which Eskimo is listening opened
+to external accesses and in addition Eskimo would eat some of the RAM and disk that is better left to the business
+services.
+* or one a dedicated node where only the eskimo backend runs (i.e. separated from the Esimo cluster nodes). This is the
+recommended approach.
+
+==== Local Eskimo installation
+
+Eskimo can also be installed on the local computer of the user. +
+This is for instance useful when eskimo is intended to be used as a local _Data Science_ laboratory and not targeted
+towards large scale Big Data Analytics.
+
+Installing Eskimo on the local user machine is hoewver tricky. +
+Eskimo does required indeed a target IP address for the installation. +
+A first idea one might have in this case is to use `127.0.0.1` as single node target IP to procees with the installation.
+Unfortunately, this doesn't work qs 127.0.0.1 resolved to different loopback interfaces in the various docker containers
+running eskimo services and as a consequence eskimo services are not able to reach each others when `127.0.0.1` is used
+as installation target.
+
+So something else needs to be found as target IP address.
+
+The easiest way out here is to use the docker host address (most of the time `172.17.0.1` but may be configured
+differently on one's specific local docker environment).
+
+In case one doesn't have docker installed locally on his machine when proceesing with Docker installation, Eskimo
+usually installed docker on its own. +
+Unfortunately, there is a chicken and egg problem wince the docker host IP address needs to be passed as target IP
+address for the Eskimo node in "Node configuration" before Eskimo can proceed with docker installation.
+
+So one's left with installing docker on his own before proceeded with Eskimo Node setup on his local machine. +
+For this, follow the same steps as described here:
+<<build_packages_locally>>
+
+
+=== Prerequisites
+
+Some noteworthy elements need to be beared in mind regarding eskimo prerequisites.
+
+==== Java 11 or greater
+
+Eskimo needs Java 11 or greater to run.
+
+In addition, one needs to have either `java` in the path or the `JAVA_HOME` environment variable properly set in prior
+to starting eskimo.
+
+Use for instance the following commands on Linux:
+
+.Put java in PATH on Linux
+----
+export JAVA_HOME=/usr/local/lib/jdk-11
+export PATH=$JAVA_HOME/bin:$PATH
+----
+
+(You might want to put the commands above in your `/etc/profile` or `/etc/bash.bashrc`)
+
+Use for instance the following commands on Windows:
+
+.Put java in PATH on Windows
+----
+set JAVA_HOME=C:\programs\jdk-11
+set PATH=%JAVA_HOME%\bin;%PATH%
+----
+
+(On Windows, you might want to define these as _System Variables_: Right-click on "My Computer", choose "Properties",
+then "Advanced System Settings", then "Environment Variables" and finally add or update the variables above as "System
+Variables")
+
+==== System requirements
+
+In order to run eskimo, one needs to have
+
+* At least 15Gb of disk storage space on the machine running Eskimo
+* *At least one linux machine* available on the network (can be the same machine than the one running Eskimo) that will
+be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
+the eskimo cluster.
+
+Eskimo is reached using a web browser (see startup logs). Supported web browsers are:
+
+* Microsoft Edge 12 or greater
+* Mozilla FireFox 36 or greater
+* Google Chrome 41 or greater
+
+Note: there may be other browsers / versions supported (Safari, Opera but they are not certified to work with Eskimo)
+
+[[eskimo_nodes_prerequisites]]
+==== Prerequisites on eskimo cluster nodes
+
+Linux distributions successfully tested with Eskimo and officially supported are the following:
+
+* Debian Stretch and greater
+* Ubuntu Xenial and greater
+* CentOS 7.x and 8.x
+* Fedora 29 and greater
+* OpenSUSE 15.1 and greater
+
+Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far and may require the
+administrator to adapt the setup scripts.
+
+===== Minimum hardware
+
+The minimum hardware capacity requirements to run eskimo are as follows:
+
+*Multiple Nodes in the Eskimo cluster, minimum requirement for one node*
+
+In cases where the eskimo cluster runs on multiples nodes (two or more nodes), the minimum hardware capacity for one of these
+nodes is as follows:
+
+* 20 GB HDD storage space for the system, additional storage space depending on the data to be manipulated and the
+replication factor.
+* 4 CPUs (8 CPUs recommended)
+* 16 GB RAM (31 GB RAM recommended)
+
+*Single Machine Eskimo deployment, minimum requirement for the single node*
+
+In cases where Eskimo is deployed on a single node (such as the host node running Eskimo itself), the minimum hardware
+capacity for this node is as follows:
+
+* 30 GB HDD storage space for the system, additional storage space depending on the data to be manipulated.
+* 8 CPUs (16 CPUs recommended)
+* 32 GB RAM (64 GB RAM recommended)
+
+
+===== Fedora nodes specificities
+
+Fedora has switched to cgroups v2 by default now, but Mesos (and some Docker versions) are not working well with cgroups v2 and
+may fail to start. With Eskimo and current version of mesos, one needs to revert cgroups to v1 on Fedora
+nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
+b
+.Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
+----
+sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+----
+
+Then rebuild your GRUB config.
+
+.If you’re using BIOS boot
+----
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+----
+
+.If you’re running EFI
+----
+sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
+----
+
+With this, Mesos should be able to start successfully on your fedora nodes after a reboot.
+
+[[eskimo_nodes_required_packages]]
+==== Required packages installation and Internet access on cluster nodes
+
+Eskimo performs some initial setup operations on every node of the cluster it needs to operate. Some of these
+operations require Internet access to download dependencies (either RPM or DEB packages).
+
+In case it is not possible to give access to internet to the nodes in the cluster you wish to operate using eskimo, you
+will find below the `yum` and `apt` commands used during nodes setup. +
+*You can reproduce these commands on your environment to find out about the packages that need to be installed in prior
+to have eskimo operating your cluster nodes:*
+
+Following commands are executed on a debian-based node:
+
+.debian based node setup
+----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
+# system update
+apt-get -yq update
+
+# docker dependencies
+apt-get -yq install apt-transport-https ca-certificates curl software-properties-common
+apt-get -yq install gnupg-agent gnupg2
+
+# docker installation
+curl -fsSL https://download.docker.com/linux/$LINUX_DISTRIBUTION/gpg | sudo apt-key add
+add-apt-repository deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION $(lsb_release -cs) stable
+apt-get -yq update
+apt-get -yq install docker-ce docker-ce-cli containerd.io
+
+# mesos dependencies
+apt-get -y install libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev
+
+# other dependencies
+apt-get -yq install net-tools attr
+
+# glusterfs client
+apt-get -y install glusterfs-client
+----
+
+
+Following commands are executed on a redhat-based node:
+
+.redhat based node setup
+----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
+# system update
+sudo yum -y update
+
+# docker dependencies
+yum install -y yum-utils device-mapper-persistent-data lvm2
+
+# docker installation
+yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUTION/docker-ce.repo
+yum install -y docker-ce docker-ce-cli containerd.io
+
+# mesos dependencies
+yum install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel
+
+# other dependencies
+yum install -y net-tools anacron
+
+# glusterfs client
+yum -y install glusterfs glusterfs-fuse
+----
+
+Following commands are executed on a SUSE node:
+
+.suse node setup
+----
+# system update
+sudo zypper --non-interactive refresh | echo 'a'
+
+# install docker
+sudo zypper install -y docker
+
+# mesos dependencies
+sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel
+
+# other dependencies
+sudo zypper install -y net-tools cron
+
+# glusterfs client
+sudo zypper install -y glusterfs
+----
+
+*Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding
+packages* (this listed above and their transitive dependencies) *before you can use these machines as
+eskimo cluster nodes.*
+
+===== Eskimo system user
+
+Eskimo requires to have a system user properly defined and with SSH access to reach and operate the cluster nodes.
+That user can be any user but it has to be configured in Eskimo - see <<user_configuration>> - and has to have SSH
+access to every single node to be operated by eskimo using SSH Public Key Authentication -
+see <<ssh_key_authentication>>.
+
+*In addition, that user needs to have sudo access without requiring to enter a password!*
+
+
+===== Protecting eskimo nodes with a firewall
+
+The different sevices operated by Eskimo require different set of ports to communicate with each others.
+
+In case a firewall (firewalld or simple iptables configuration) is installed on eskimo cluster nodes, then
+the following port numbers need to be explicitly open (for both UDP and TCP) on every single node in the cluster for
+eskimo access:
+
+*IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE MESOS MASTER. MESOS AGENTS,
+MARATHON, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE FLY
+AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
+
+*For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
+firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
+Every eskimo node should have wide access to every other eskimo node. Period.*
+
+However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
+only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
+Eskimo console to the nodes from the Eskimo cluster happens through SSH tunnels.
+
+For the sake of information, the list of static ports used by the different services are listed here:
+
+* [cerebro] : 9000, 31900
+* [elasticsearch] : 9200, 9300
+* [gdash] : 28180, 31180
+* [gluster] : 24007, 24008, 24009, 24010, 49152, 38465, 38466, 38467
+* [grafana] : 3000, 31300
+* [kafka] : 9092, 9093, 9999
+* [kafka-manager] : 22080, 31220
+* [kibana] : 5601, 31561
+* [mesos] : 53, 61003, 61003, 61091, 61420, 62080, 62501, 64000, 5050, 7070, 8101, 8123, 8200, 8201, 8443, 8888, 9090,
+9443, 9990, 15055, 15201, 61053, 61430, 61053
+* [ntp] 123
+* [prometheus] : 9090, 9091, 9093, 9094, 9100
+* [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
+* [flink] : 6121, 6122, 6123, 6130, 8081
+* [spark-history-server] : 18080, 31810
+* [zeppelin] : 38080, 38081, 31008, 31009
+* [zookeeper] : 2181, 2888, 3888
+* [marathon] : 5000, 28080
+
+Again, this list is incomplete since it doesn't reveal the dynamic port ranges mentioned above.
+
+
+=== Extract archive.
+
+After downloading either the zip ot the tarball archive of eskimo, it needs to be extracted on the local filesystem.
+That's only that needs to be done to _install_ eskimo. It doesn't need anything else that extracting the archive on the
+filesystem. +
+Then in the folder `bin` under the newly extracted eskimo binary distribution folder, one can find two scripts:
+
+* a script `eskimo.bat` to execute eskimo on Windows
+* a script `eskimo.sh` to execute eskimo on Linux.
+
+==== Extracted Archive layout and purpose
+
+One extracted on the filesystem the Eskimo folder contains the following elements:
+
+* `bin` : contains executables required to start Eskimo as well as utility commands
+* `conf` : contains Eskimo configuration files
+* `lib` : contains eskimo runtime binaries
+* `packages-dev` : contains the Eskimo _docker images (packages) development framework_ which is used to build eskimo
+services docker packages locally (this is not required if the administrators decides to download packages
+from www.eskimo.sh)
+* `packages_distrib`: contains eventually the eskimo services docker image packages (either build locally or downloaded
+from internet)
+* `services_setup`: contains the services installation framework. *Each and every customization an administrator wishes
+to apply on eskimo services is done by modifying / extending / customizing the shell scripts in this folder*.
+* `static_images`: is intended to be used to add additional icons or logos for new custom services added by an
+administrator to Eskimo.
+
+==== Utility commands
+
+Some command line utilities to ease eskimo's administration are provided in `bin/utils`:
+
+* `encode-password.bat|.sh` : this script is used to generate the encoded password to be stored in the user definition
+file. See <<user_file>>
+
+[[user_file]]
+=== Access eskimo
+
+With eskimo properly started using the scripts in `bin` discussed above , one can reach eskimo using http://machine_ip:9191. +
+The default port number is 9191. This can be changed in configuration file `eskimo.properties`.
+
+*The default login / password credentials are _admin_ / _password_.*
+
+This login is configured in the file pointed to by the configuration property `security.userJsonFile`. +
+A sample file is created automatically if the target file doesn't exist with the `admin` login above.
+
+The structure of this file is as follows;
+
+.Sample user definition file
+----
+{
+  "users" : [
+    {
+      "username" : "admin",
+      "password" : "$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO"
+    }
+  ]
+}
+----
+
+The password is a `BCrypt` hash (11 rounds) of the actual password.
+
+
+[[user_configuration]]
+=== First run and initial setup
+
+Upon first run, eskimo needs to be setup before it can be used.
+
+Right after its first start, one single screen is available : *the setup page*. +
+It is the only accessible page as long as initial setup is not properly completed and service
+docker images (plus mesos packages) have not been either downloaded or built.
+
+
+The setup page is as follows:
+
+image::pngs/eskimo-setup.png[800, 800, align="center"]
+
+On the setup page, the user needs to input following information:
+
+* *Configuration Storage Path* : a folder on the filesystem where the system user running eskimo needs to have write
+access to. The dynamic configuration and state persistence of eskimo will be stored in this location.
+* *SSH Username* : the name of the SSH user eskimo has to use to access the cluster nodes. Every node that need to be
+managed by eskimo needs to have granted access using SSH Public Key authentication to this user.
+* *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
+in regards to how to generate this key : <<ssh_key_authentication>>
+* *Mesos Origin* : the user needs to choose whether Mesos packages need to be *built locally* (on eskimo host node) or
+whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
+* *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
+they need to be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
+
+Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
+and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
+connection and/or the eskimo host machine processing abilities.
+
+Regarding the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
+to enable eskimo to reach the cluster nodes.
+
+The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
+the nuts and bolts required in setting up a remote packages repository. +
+The remote repository URL is configured in `eskimo.properties` using the configuration property : +
+`system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
+
+[[build_packages_locally]]
+==== Building packages locally
+
+Building eskimo packages locally means building the services docker images on your local host machine running eskimo.
+This means that instead of downloading docker images from the eskimo repository, the user wants to build them on his own
+and only download the source package archives from their respective software editor web site (e.g. Apache, Elastic, etc.)
+
+===== Requirements
+
+*There are some important requirements when desiring to build the software packages on one's own:*
+
+* The host machine running eskimo needs at least 25 GB of free hard drive space
+* The host machine running eskimo needs at least 16 GB of free RAM space available
+
+In addition, building packages locally requires some tools to be available on the host machine running eskimo itself.
+Mostly, `git`, `docker` and `wget` need to be installed on your host machine.
+
+===== Instructions to install these tools
+
+Following commands are required on a debian-based host:
+
+.debian host dependencies to build packages
+----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
+# system update
+apt-get -yq update
+
+# eskimo dependencies
+apt-get -yq install wget git
+
+# docker dependencies
+apt-get -yq install apt-transport-https ca-certificates curl software-properties-common
+apt-get -yq install gnupg-agent gnupg2
+
+# docker installation
+curl -fsSL https://download.docker.com/linux/$LINUX_DISTRIBUTION/gpg | sudo apt-key add
+add-apt-repository deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION $(lsb_release -cs) stable
+apt-get -yq update
+apt-get -yq install docker-ce docker-ce-cli containerd.io
+
+# Enable and start docker
+systemctl enable docker
+systemctl start docker
+
+# Add current user to docker group
+usermod -a -G docker $USER
+
+# (system or at least shell / process restart required after this)
+----
+
+
+Following commands are required on a redhat-based host:
+
+.redhat host dependencies to build packages
+----
+export LINUX_DISTRIBUTION=`\
+    awk -F= '/^NAME/{print $2}' /etc/os-release \
+    | cut -d ' ' -f 1 \
+    | tr -d \" \
+    | tr '[:upper:]' '[:lower:]'`
+
+# system update
+yum -y update
+
+# eskimo dependencies
+yum install -y wget git
+
+# docker dependencies
+yum install -y yum-utils device-mapper-persistent-data lvm2
+
+# docker installation
+yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUTION/docker-ce.repo
+yum install -y docker-ce docker-ce-cli containerd.io
+
+# Enable and start docker
+systemctl enable docker
+systemctl start docker
+
+# Add current user to docker group
+usermod -a -G docker $USER
+
+# (system or at least shell / process restart required after this)
+----
+
+Following commands are required on a SUSE host:
+
+.suse host dependencies to build packages
+----
+# system update
+zypper --non-interactive refresh | echo 'a'
+
+# eskimo dependencies
+zypper install -y git wget
+
+# install docker
+zypper install -y docker
+
+# Enable and start docker
+systemctl enable docker
+systemctl start docker
+
+# Add current user to docker group
+usermod -a -G docker $USER
+
+# (system or at least shell / process restart required after this)
+----
+
+
+
+==== Checking for updates
+
+At any time after initial setup - and if any only if the chosen installation method is *downloading* packages, the user
+can _apply setup_ again to check on the packages server (by default https://www.eskimo.sh) if updates are available
+for service docker images or mesos packages.
+
+=== Typical startup issues
+
+Several issues can happen upon first eskimo startup. +
+This section describes common issues and ways to resolve them.
+
+////
+
+==== Failing to download package from remote docker images repository
+
+If you encounter an error message on the Setup Page - during initial setup or after - saying `Could not download latest
+package definition file from [Configured Remote Repository]`, this means likely that you are suffering from the empty
+`cacert` file problem affecting OpenJDK and Oracle JDK 9 and perhaps further versions as well.
+
+These Java Development Kits do indeed suffer fom a quite annoying issue: the `lib/security/cacert` file referencing the
+SSL certifications authorities is empty. +
+This prevents most of the time to download any file from a remote web server using HTTPS, as is the case during initial
+setup of Eskimo.
+
+A first step is to confirm that this is indeed the problem you are suffering from by looking at the eskimo logs, either
+the files in the `logs` sub-folder of the eskimo root folder or simply on the eskimo console.
+
+Search for the following error message:
+
+.Impossible to download
+----
+2019-12-24T11:08:55,431 ERROR [http-nio-9191-exec-5] c.n.e.s.SetupService: javax.net.ssl.SSLException: java.lang.RuntimeException:
+ Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+javax.net.ssl.SSLException: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the tr
+ustAnchors parameter must be non-empty
+        at java.base/sun.security.ssl.Alerts.getSSLException(Alerts.java:214)
+        at java.base/sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1969)
+        at java.base/sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1921)
+        at java.base/sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1904)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1436)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1413)
+        at java.base/sun.net.www.protocol.https.HttpsClient.afterConnect(HttpsClient.java:567)
+        at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java
+:185)
+        at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1563)
+        at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1491)
+        at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:236)
+        at java.base/java.net.URL.openStream(URL.java:1117)
+        at ch.niceideas.eskimo.services.SetupService.dowloadFile(SetupService.java:614)
+        at ch.niceideas.eskimo.services.SetupService.loadRemotePackagesVersionFile(SetupService.java:443)
+        at ch.niceideas.eskimo.services.SetupService.prepareSetup(SetupService.java:358)
+        at ch.niceideas.eskimo.model.SetupCommand.create(SetupCommand.java:70)
+        at ch.niceideas.eskimo.services.SetupService.saveAndPrepareSetup(SetupService.java:277)
+        at ch.niceideas.eskimo.controlers.SetupConfigController.saveSetup(SetupConfigController.java:126)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+        ...
+Caused by: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parame
+ter must be non-empty
+        at java.base/sun.security.validator.PKIXValidator.<init>(PKIXValidator.java:89)
+        at java.base/sun.security.validator.Validator.getInstance(Validator.java:181)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.getValidator(X509TrustManagerImpl.java:330)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrustedInit(X509TrustManagerImpl.java:180)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:192)
+        at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:133)
+        at java.base/sun.security.ssl.ClientHandshaker.checkServerCerts(ClientHandshaker.java:1825)
+        at java.base/sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1655)
+        at java.base/sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:260)
+        at java.base/sun.security.ssl.Handshaker.processLoop(Handshaker.java:1086)
+        at java.base/sun.security.ssl.Handshaker.processRecord(Handshaker.java:1020)
+        at java.base/sun.security.ssl.SSLSocketImpl.processInputRecord(SSLSocketImpl.java:1137)
+        at java.base/sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1074)
+        at java.base/sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:973)
+        at java.base/sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1402)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1429)
+        ... 99 more
+Caused by: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+        at java.base/java.security.cert.PKIXParameters.setTrustAnchors(PKIXParameters.java:200)
+        at java.base/java.security.cert.PKIXParameters.<init>(PKIXParameters.java:120)
+        at java.base/java.security.cert.PKIXBuilderParameters.<init>(PKIXBuilderParameters.java:104)
+        at java.base/sun.security.validator.PKIXValidator.<init>(PKIXValidator.java:86)
+        ... 114 more
+----
+
+If the eskimo logs report the error above, it means that you do indeed suffer from the empty cacert file of the JDK.
+
+*In this case, you need to locate your JDK installation.adoc and overwrite the file `lib/security/cacert` with a valid file
+(non-empty)*.
+
+The generation of a valid `cacert` file exceeds the scope of this documentation. Please refer to your Operating System
+manual.
+
+Eskimo provides however  a default `cacert` file in the sub-folder `utils` of its root installation.adoc. This `cacert` file
+is a default Debian `cacert` file as of July 2019 and is guaranteed safe as of July 2019. No guarantee whatsoever are
+ensured by eskimo.sh and one can use it at his own risk.
+
+////
+
+==== eskimo-users.json cannot be written
+
+If you meet an error as the following one upon startup:
+
+.Impossible to write eskimo-users.json
+----
+Caused by: ch.niceideas.common.utils.FileException: ./eskimo-users.json (Unauthorized access)
+        at ch.niceideas.common.utils.FileUtils.writeFile(FileUtils.java:154)
+        at ch.niceideas.eskimo.security.JSONBackedUserDetailsManager.<init>(JSONBackedUserDetailsManager.java:81)
+        at ch.niceideas.eskimo.configurations.WebSecurityConfiguration.userDetailsService(WebSecurityConfiguration.java:127)
+        ... 50 more
+Caused by: java.io.FileNotFoundException: ./eskimo-users.json (Unauthorized access)
+        at java.base/java.io.FileOutputStream.open0(Native Method)
+        at java.base/java.io.FileOutputStream.open(FileOutputStream.java:276)
+        at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:220)
+        at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:170)
+        at java.base/java.io.FileWriter.<init>(FileWriter.java:90)
+        at ch.niceideas.common.utils.FileUtils.writeFile(FileUtils.java:149)
+        ... 52 more
+----
+
+Eskimo uses a local file to define users and access credentials. Upon first startup, if that file doesn't exist already,
+it is created by eskimo (with the default credentials above) at the path pointed to by the property
+`security.userJsonFile` in `eskimo.properties`.
+
+If you experience the error above or something alike, change that property to point to a location where the first
+version of the file can successfully be created.
+
+
+[[ssh_key_authentication]]
+=== Setting up SSH Public Key Authentication
+
+==== Introduction
+
+Public key authentication is a way of logging into an SSH/SFTP account using a cryptographic key rather than a
+password. This is a strong requirement in the current version of eskimo.
+
+==== How Public Key Authentication Works
+
+Keys come in pairs of a public key and a private key. Each key pair is unique, and the two keys work together.
+
+These two keys have a very special and beautiful mathematical property: if you have the private key, you can prove your
+identify and authenticate without showing it, by using it to sign some information in a way that only your private key
+can do.
+
+Public key authentication works like this:
+
+. Generate a key pair.
+. Give someone (or a server) the public key.
+. Later, anytime you want to authenticate, the person (or the server) asks you to prove you have the private key that
+corresponds to the public key.
+. You prove you have the private key.
+. You don't have to do the math or implement the key exchange yourself. The SSH server and client programs take care of
+this for you.
+
+==== Generate an SSH Key Pair
+
+You should generate your key pair on your laptop, not on your server. All Mac and Linux systems include a command called
+ssh-keygen that will generate a new key pair.
+
+If you're using Windows, you can generate the keys on your server. Just remember to copy your keys to your laptop and
+delete your private key from the server after you've generated it.
+
+To generate an SSH key pair, run the command `ssh-keygen`.
+
+.Calling `ssh-keygen`
+----
+badtrash@badbooknew:/tmp$ ssh-keygen
+Generating public/private rsa key pair.
+----
+
+You'll be prompted to choose the location to store the keys. The default location is good unless you already have a key.
+Press Enter to choose the default location *unless you already have a key pair there in which case you might want to
+take great care not to overwrite it*.
+
+----
+Enter file in which to save the key (/home/badtrash/.ssh/id_rsa): /tmp/badtrash/id_rsa
+----
+
+Next, you'll be asked to choose a password. Using a password means a password will be required to use the private key.
+*Eskimo requires at all cost that you leave the password empty otherwise the key won't be usable with eskimo - at least
+in this current version*. +
+Press two times "Enter" there :
+
+----
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+----
+
+After that, your public and private keys will be generated. There will be two different files. The one named `id_rsa` is
+your private key. The one named `id_rsa.pub` is your public key.
+
+----
+Your identification has been saved in /tmp/badtrash/id_rsa.
+Your public key has been saved in /tmp/badtrash/id_rsa.pub.
+----
+
+You'll also be shown a fingerprint and "visual fingerprint" of your key. You do not need to save these.
+
+----
+The key fingerprint is:
+SHA256:/HPC91ROJtCQ6Q5FBdsqyPyppzU8xScfUThLj+3OKuw badtrash@badbooknew
+The key's randomart image is:
++---[RSA 2048]----+
+|           .+=...|
+|            +=+. |
+|           oo.+* |
+|       + ....oo.o|
+|        S .o= +.+|
+|         = +.+ B.|
+|          %.o oo.|
+|         o.Boo  o|
+|        oo .E.o. |
++----[SHA256]-----+
+----
+
+==== Configure an SSH/SFTP User for Your Key
+
+===== Method 1: Using ssh-copy-id
+
+Now that you have an SSH key pair, you're ready to configure your app's system user so you can SSH or SFTP in using your
+private key.
+
+To copy your public key to your server, run the following command. Be sure to replace "`x.x.x.x`" with your server's IP
+address and `SYSUSER` with the name of the the system user your app belongs to.
+
+----
+ssh-copy-id SYSUSER@x.x.x.x
+----
+
+===== Method 2: Manual Configuration
+
+If you don't have the `ssh-copy-id` command (for instance, if you are using Windows), you can instead SSH in to your
+server and manually create the `~/.ssh/authorized_keys` file so it contains your public key.
+
+First, run the following commands to make create the file with the correct permissions.
+
+----
+(umask 077 && test -d ~/.ssh || mkdir ~/.ssh)
+(umask 077 && touch ~/.ssh/authorized_keys)
+----
+
+Next, edit the file `.ssh/authorized_keys` using your preferred editor. Copy and paste your id_rsa.pub file into the
+file.
+
+==== Log In Using Your Private Key
+
+You can now SSH or SFTP into your server using your private key. From the command line, you can use:
+
+----
+ssh SYSUSER@x.x.x.x
+----
+
+If you didn't create your key in the default location, you'll need to specify the location:
+
+----
+ssh -i ~/.ssh/custom_key_name SYSUSER@x.x.x.x
+----
+
+If you're using a Windows SSH client, such as PuTTy, look in the configuration settings to specify the path to your
+private key.
+
+==== Granting Access to Multiple Keys
+
+The `~/.ssh/authorized_keys` file you created above uses a very simple format: it can contain many keys as long as you
+put one key on each line in the file.
+
+If you have multiple keys (for example, one on each of your laptops) or multiple developers you need to grant access
+to, just follow the same instructions above using ssh-copy-id or manually editing the file to paste in additional
+keys, one on each line.
+
+When you're done, the .ssh/authorized_keys file will look something like this (don't copy this, use your own public
+keys):
+
+----
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSkT3A1j89RT/540ghIMHXIVwNlAEM3WtmqVG7YN/wYwtsJ8iCszg4/lXQsfLFxYmEVe8L9atgtMGCi5QdYPl4X/c+5YxFfm88Yjfx+2xEgUdOr864eaI22yaNMQ0AlyilmK+PcSyxKP4dzkf6B5Nsw8lhfB5n9F5md6GHLLjOGuBbHYlesKJKnt2cMzzS90BdRk73qW6wJ+MCUWo+cyBFZVGOzrjJGEcHewOCbVs+IJWBFSi6w1enbKGc+RY9KrnzeDKWWqzYnNofiHGVFAuMxrmZOasqlTIKiC2UK3RmLxZicWiQmPnpnjJRo7pL0oYM9r/sIWzD6i2S9szDy6aZ badtrash@badbook
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzlL9Wo8ywEFXSvMJ8FYmxP6HHHMDTyYAWwM3AOtsc96DcYVQIJ5VsydZf5/4NWuq55MqnzdnGB2IfjQvOrW4JEn0cI5UFTvAG4PkfYZb00Hbvwho8JsSAwChvWU6IuhgiiUBofKSMMifKg+pEJ0dLjks2GUcfxeBwbNnAgxsBvY6BCXRfezIddPlqyfWfnftqnafIFvuiRFB1DeeBr24kik/550MaieQpJ848+MgIeVCjko4NPPLssJ/1jhGEHOTlGJpWKGDqQK+QBaOQZh7JB7ehTK+pwIFHbUaeAkr66iVYJuC05iA7ot9FZX8XGkxgmhlnaFHNf0l8ynosanqt badtrash@desktop
+----
+
+==== Use the private key in eskimo
+
+Once the above procedure properly followed and the public keys added to the authorized key for your the user to be used
+by eskimo, you can use the corresponding private key in the eskimo setup page to grand access to eskimo to the cluster
+nodes.

@@ -1,0 +1,583 @@
+
+== Eskimo pre-Packaged services
+
+In the current version, eskimo provides pre-packaged docker images as well as services setup configurations for the
+pre-packaged software components.
+
+Eskimo takes care of everything regarding the building of the docker images for these software components as well
+their setup, installation and operation on the eskimo cluster nodes. +
+Supported packaged services are defined at three different leveks in order to be operable by Eskimo:
+
+1. They must be defined and configured in the configuration file `services.json`
+2. They must have a `setup.sh` script in their `services_setup` folder.
+3. They must have a docker image available containing the _ready-to-run_ vanilla software.
+
+This is detailed in the
+https://www.eskimo.sh/doc/service-dev-guide.html#services_installation_framework[Service Installation Framework Guide].
+
+
+
+This chapter gives some additional information related to these software components as well as present some design
+decisions regarding their operation.
+
+=== Operation principles
+
+We won't go into all details of each and every of the list of software components packaged within eskimo.
+
+We are just describing hereunder, in a raw fashion, some important specificities for some of them.
+
+==== Systemd system configuration files
+
+Eskimo used systemd to manage and operate services. Services themselves are docker container.
+
+This is how docker operations are mapped to systemctl commands :
+
+* `systemctl stop service`: kills and removed the service docker container
+* `systemctl start service`: creates and starts a new docker container from the reference image
+
+Since every restart of a service creates actually a new docker container, containers are inheritently not stateful and
+freshly restarted every time. +
+This is why the persistent data is stored under sub-folders if `/var/lib` which is mounted to the docker container.
+
+==== Commands wrappers for kafka, logstash, spark and flink
+
+Commands such as kafka `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
+executor docker containers.
+
+For this reason, eskimo provides host-level wrappers in `/usr/local/bin` and `/usr/local/sbin` for most important
+commands. +
+These wrappers take care of calling the corresponding command in the required container.
+
+The remaining of this chapter presents each and every pre-packaged service:
+
+==== reloading a Service UI IFrame
+
+Master services that have a wen console and other UI applications are wrapped and shown from within the Eskimo UI, in a
+consistent and coherent fashion, without the user needing to reach anything else that the Eskimo UI to access all
+services and features of an Eskimo cluster.
+
+These wrapped UI applications are displayed as iframes in the Eskimo main UI window.
+
+Whenever a service UI is being displayed by selecting the service from the menu, *clicking the service menu entry a
+second time will force refresh the service iframe*.
+
+
+=== NTP
+
+NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
+
+Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
+considered slaves and synchronize to this NTP master.
+
+=== Zookeeper
+
+image::pngs/zookeeper-logo.png[50, 50, align="center"]
+
+Zookeeper is a distributed configuration and election tool used to synchronize kafka and mesos nodes and processes.
+
+It is an effort to develop and maintain an open-source server which enables highly reliable distributed coordination.
+
+ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed
+synchronization, and providing group services. All of these kinds of services are used in some form or another by
+distributed applications
+
+https://zookeeper.apache.org/
+
+Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
+
+==== Zookeeper specificities within Eskimo
+
+The script `zkCli.sh` enabling an administrator to browse, query and manipulate zookeeper is available on the host
+running the zookeeper container as `/usr/local/bin/zookeeperCli.sh`
+
+=== glusterFS
+
+image::pngs/gluster-logo.png[50, 50, align="center"]
+
+Gluster is a free and open source software scalable network filesystem.
+
+GlusterFS is a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming. GlusterFS is free and open source software and can utilize common off-the-shelf hardware.
+
+GlusterFS is the common distributed filesystem used within eskimo. It is used to store business data and to
+synchronize eskimo cluster nodes.
+
+https://www.gluster.org/
+
+==== Gluster Infrastructure
+
+Eskimo approaches gluster shares management in a specific way. +
+Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
+scripts and tools to manipulated gluster shares.
+
+The architecture can be depicted as follows:
+
+image::pngs/gluster_infrastructure.png[800, 800, align="center"]
+
+Where:
+
+* The command server and client are internal tools. Eskimo end users and administrators do not need to be aware of them
+* The script `gluster_mount.sh` takes care of everything and is intended for usage by end users.
+
+==== Gluster shares management
+
+Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
+
+However eskimo provides _Toolbox script_ that takes care of all the burden of managing shared folders with gluster.
+
+This _Toolbox script_ is the available at : `/usr/local/sbin/gluster_mount.sh`. +
+This script is called as follows:
+
+.calling /usr/local/sbin/gluster_mount.sh
+----
+/usr/local/sbin/gluster_mount.sh VOLUME_NAME MOUNT_POINT
+----
+
+where:
+
+* `VOLUME_NAME` is the name of the volume to be created in the gluster cluster
+* `MOUNT_POINT` is the folder where to mount that volume on the local filesystem.
+
+The beauty of this script is that it takes care of everything:
+
+* Registering the local node with the gluster cluster if not already done
+* Creating the volume in gluster if not already done
+* Registering the mount point in `/etc/fstab` and systemd for automatic remount
+
+
+==== Gluster specificities within Eskimo
+
+Some notes regarding gluster usage within Eskimo:
+
+* Eskimo's pre-packaged services leverage on gluster for their data share need between marathon services and services
+running natively on node hosts and controlled by systemd. Gluster provides the abstraction of location of the filesystem
+for services deployed on the cluster by marathon.
+* Gluster mounts with fuse are pretty weak and not very tolerant to network issues. For this reason a watchdog runs
+periodically that fixes gluster mounts that might have been disconnected following a network cut or another network
+problem
+
+=== GDASH
+
+image::pngs/gluster-logo.png[50, 50, align="center"]
+
+GDASH is the Gluster DASHboard used to monitor gluster shares.
+
+https://github.com/aravindavk/gdash
+
+=== Elastic Logstash
+
+image::pngs/logstash-logo.png[50, 50, align="center"]
+
+Logstash is an open source, server-side data processing pipeline that ingests data from a multitude of sources
+simultaneously, transforms it, and then sends it to your favorite "stash."
+
+Logstash dynamically ingests, transforms, and ships your data regardless of format or complexity. Derive structure from
+unstructured data with grok, decipher geo coordinates from IP addresses, anonymize or exclude sensitive fields, and
+ease overall processing.
+
+https://www.elastic.co/products/logstash
+
+==== Logstash specificities within Eskimo
+
+With Eskimo, logstash runs in a docker container ans as such it is pretty isolated from the host Operating System but
+also from other containers. +
+This can be a problem whenever one wants to call logstash form the host machine or even worst, from another container.
+
+Eskimo provides two key features to circumvent this problem:
+
+1. First, the folder `/var/lib/logstash/data` is shared between the host, the zeppelin container and the logstash
+containers. As such, `/var/lib/logstash/data` can be used to pass data to logstash. +
+In a cluster environment, `/var/lib/logstash/data` is shared among cluster nodes using Gluster.
+
+2. Eskimo provides a command `/usr/local/bin/logstash-cli` that acts as a command line client to the logstash server
+container. +
+Whenever one calls `logstash-cli`, this client command invokes logstash in the logstash container (potentially remotely
+on another node) and passes the arguments is has been given to the logstash instance.
+
+`logstash-cli` supports all logstash arguments which are passed through to the invoked logstash instance within the
+logstash container. +
+In addition, it supports two non standard arguments that are specific to eskimo:
+
+* `-target_host XXX.XXX.XXX.XXX` which is used to identify the cluster node on which to invoke logstash. Within the
+Zeppelin container, this can safely be set to `localhost` since there is mandatorily a logstash container available on
+the node(s) running Zeppelin.
+* `-std_in /path/to/file` which is used to pass the given file as STDIN to the invoked logstash instance. This is
+unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
+supported yet.
+
+=== ElasticSearch
+
+image::pngs/elasticsearch-logo.png[50, 50, align="center"]
+
+ElasticSearch is a document oriented real-time and distributed NoSQL database management system.
+
+It is a distributed, RESTful search and analytics engine capable of addressing a growing number of use cases. As the
+heart of the Elastic Stack, it centrally stores your data so you can discover the expected and uncover the unexpected.
+
+Elasticsearch lets you perform and combine many types of searches — structured, unstructured, geo, metric — any way
+you want. Start simple with one question and see where it takes you.
+
+https://www.elastic.co/products/elasticsearch
+
+=== Cerebro
+
+image::pngs/cerebro-logo.png[50, 50, align="center"]
+
+Cerebro is used to administer monitor elasticsearch nodes and activities. It is an open source elasticsearch web admin
+tool.
+
+Monitoring the nodes here includes all indexes, all the data nodes, index size, total index size, etc
+
+https://github.com/lmenezes/cerebro
+
+=== Elastic Kibana
+
+image::pngs/kibana-logo.png[50, 50, align="center"]
+
+Kibana lets you visualize your Elasticsearch data and navigate the Elastic Stack so you can do anything from tracking
+query load to understanding the way requests flow through your apps.
+
+Kibana gives you the freedom to select the way you give shape to your data. And you don’t always have to know what
+you’re looking for. With its interactive visualizations, start with one question and see where it leads you.
+
+https://www.elastic.co/products/kibana
+
+=== Apache Kafka
+
+image::pngs/kafka-logo.png[50, 50, align="center"]
+
+Kafka is a distributed and low-latency data distribution and processing framework. It is a  distributed Streaming platform.
+
+Kafka is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant,
+wicked fast, and runs in production in thousands of companies.
+
+https://kafka.apache.org/
+
+=== Kafka Manager
+
+image::pngs/kafka-logo.png[50, 50, align="center"]
+
+Kafka Manager is a tool for managing Apache Kafka.
+
+KafkaManager enables to manage multiples clusters, nodes, create and delete topics, run preferred replica election,
+generate partition assignments, monitor statistics, etc.
+
+https://github.com/lmenezes/cerebro
+
+=== Apache Mesos
+
+image::pngs/mesos-master-logo.png[50, 50, align="center"]
+
+Apache Mesos abstracts CPU, memory, storage, and other compute resources away from machines (physical or virtual),
+enabling fault-tolerant and elastic distributed systems to easily be built and run effectively.
+
+Mesos is a distributed system kernel. Mesos is built using the same principles as the Linux kernel, only at a
+different level of abstraction. +
+The Mesos kernel runs on every machine and provides applications (e.g., Hadoop, Spark, Kafka, Flink) with
+API’s for resource management and scheduling across entire datacenter and cloud environments.
+
+http://mesos.apache.org/
+
+==== mesos-cli
+
+Eskimo provides a specific command line tool for manipulating mesos frameworks: `/usr/local/bin/mesos-cli.sh` installed
+on all nodes of the eskimo cluster. +
+This tool can be used to list running frameworks, force kill them in a reliable way, etc.
+
+=== Mesosphere Marathon
+
+image::pngs/marathon-logo.png[80, 80, align="center"]
+
+Marathon is a production-grade container orchestration platform for Apache Mesos.
+
+Eskimo leverages on Marathon to distribute services, consoles and Web Applications accross Eskimo cluster nodes. Eskimo
+provides virtual routing to the runtime node running services and wraps the HTTP traffic through SSH tunnels.
+
+https://mesosphere.github.io/marathon/
+
+=== Apache Spark
+
+image::pngs/spark-executor-logo.png[50, 50, align="center"]
+
+Apache Spark is an open-source distributed general-purpose cluster-computing framework. Spark provides an interface
+for programming entire clusters with implicit data parallelism and fault tolerance.
+
+Spark provides high-level APIs and an optimized engine that supports general execution graphs. It also supports a rich
+set of higher-level tools including Spark SQL for SQL and structured data processing, MLlib for machine learning,
+GraphX for graph processing, and Spark Streaming.
+
+https://spark.apache.org/
+
+==== Gluster shares for Spark
+
+Nodes where spark is installed (either spark executor or spark history server or zeppelin) automatically have following
+gluster shares created and mounted:
+
+* `/var/lib/spark/data` where spark stores its own data but the user can store his own data to be used accross spark
+executors as well
+* `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
+history server to monitor spark jobs.
+
+==== Other spark specificities within Eskimo
+
+When running on Apache Mesos, Spark needs a special process to be up and running to orchestrate the shuffle stage in
+between executor processes on the various nodes. With Dynamic allocation, Spark needs to understand the executor
+topology operated by Mesos. +
+A special process needs to be up and running on every node where spark executors can be run for this very need, the
+_Mesos Shuffle Service_.
+
+Within Eskimo, this _Mesos Shuffle Service_ is identified as the `spark-executor` service which serves two intents:
+operating the _Mesos Shuffle Service_ and setting up host-level requirements to optimize spark executors execution from
+Mesis on every node of the Eskimo cluster.
+
+=== Apache Flink
+
+image::pngs/flink-app-master-logo.png[50, 50, align="center"]
+
+Apache Flink is an open-source stream-processing framework.
+
+Apache Flink is a framework and distributed processing engine for stateful computations over unbounded and bounded data
+streams. Flink has been designed to run in all common cluster environments, perform computations at in-memory speed and
+at any scale.
+
+Apache Flink's dataflow programming model provides event-at-a-time processing on both finite and infinite datasets. At
+a basic level, Flink programs consist of streams and transformations. Conceptually, a stream is a (potentially
+never-ending) flow of data records, and a transformation is an operation that takes one or more streams as input, and
+produces one or more output streams as a result.
+
+https://flink.apache.org
+
+==== Gluster shares for Flink
+
+Nodes where Flink is installed (either Flink App Master, Flink worker or Zeppelin) automatically have the following
+gluster shares created and mounted:
+
+* `/var/lib/flink/data flink` used to store data to be shared amoung flink workers.
+* `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
+
+
+=== Apache zeppelin
+
+image::pngs/zeppelin-logo.png[50, 50, align="center"]
+
+Apache Zeppelin is a web-based notebook that enables data-driven, interactive data analytics and collaborative
+documents with SQL, Scala and more.
+
+Zeppelin is a multiple purpose notebook, the place for all your needs, from Data Discovery to High-end Data Analytics
+supporting a Multiple Language Backend.
+
+Within Eskimo, zeppelin can be used to run flink and spark jobs, discover data in ElasticSearch, manipulate files in
+Gluster, etc.
+
+https://zeppelin.apache.org/
+
+==== Zeppelin specificities within Eskimo
+
+Within Eskimo, Zeppelin runs from within a docker container. +
+Command wrappers and custom command clients are available to enable it to use other services, running themselves as
+docker containers under eskimo.
+
+* Elasticsearch, flink and spark are called by using their dedicated intepreter
+* Logstash is called by using the `logstash-cli` script from the shell interpreter
+
+In addition, zeppelin has access to shared folders used by the different services in order to be able to share data
+with them. +
+Following shares are mounted within the Zeppelin container:
+
+* Logstash shared folder:
+** `/var/lib/logstash/data`
+* Spark shares:
+** `/var/lib/spark/data`
+** `/var/lib/spark/eventlog`
+* Flink shares:
+** `/var/lib/flink/data flink`
+** `/var/lib/flink/completed_jobs`
+
+These shared folders are automatically shared among the different nodes of the cluster using GlusterFS.
+
+An additional share exist in order to be able to share data to the zeppelin docker container:
+
+** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
+gluster when deploying in cluster mode).
+
+==== A note on memory.
+
+In the zeppelin _services installation framework_ root folder the zeppelin marathon configuration file
+`zeppelin.marathon.json` defines the memory available for zeppelin as 4.5 GB (`"mem": 4500`). +
+While this is fine for a single user usage, it's far from sufficient for a multi-user production environment.
+This should be increased to a minimal additional 2Gb for every user intending to use Zeppelin concurrently.
+
+==== _Shared_ or _Per Note_ interpreters
+
+Zeppelin's interpreters - such as the Spark interpreter warpping the spark submit process or the ElasticSearch
+interpreter - can be instantiated globally for the whole zeppelin container of isolated per note. +
+Eskimo's settings page enables an administrator to change this configuration globally for all zeppelin interpreters.
+
+The default settings is `shared` which means that interpreters are shared by all notes within zeppelin.
+
+WARNING: It's absolutely key to understand what implication this default setting has in terms of user experience.
+Stopping a `shared` interpreter means killing all jobs running on that interpreter for all users working concurrenty
+with Zeppelin. +
+For this reason, *in a production multi-user environment, it's important to make sure to change this setting to
+`per_note`* thus enabling a much better isolation between users. +
+In this case, it's also very important to significantly increase the amount of memory available to the zeppelin
+container* to something with minimum 2Gb per user using Zeppelin concurrently with a 2Gb base (e.g. 2 users would
+mean 2 Gb Base + 2 x 2 Gb for each user, hence 6Gb RAM in total to give to Zeppelin). The available memory for Zeppelin
+is defined in the _zeppelin service marathon configuration file_ named `zeppelin.marathon.json` located in the zeppelin
+sub -folder of the `services_setup` folder.
+
+*Eskimo Enterprise Edition* is required if one wishes to separate Zeppelin's interpreters *per user*.
+
+==== Sample Zeppelin notebooks
+
+Upon Zeppelin installation, Eskimo sets up a set of Sample notebooks in Zeppelin to illustrate the behaviour of the
+Eskimo cluster using different frameworks and the different packaged technologies such as Flink, Spark, Logstash, etc.
+
+These sample zeppelin notebooks are intended to demonstrate the possibilities with Eskimo and to show how Zeppelin can
+be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
+
+The different sample notebooks packages with Eskimo and available from within Zeppelin are described hereafter.
+
+===== ElasticSearch Demo (Queries)
+
+This is a very simple demo notebook showing how to submit queries to ElasticSearch from a Zeppelin notebook.
+
+It uses the elasticsearch interpreter from Zeppelin. +
+One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
+
+===== Logstash Demo
+
+The logstash demo notebook shows how to integrate with logstash on Eskimo from a Zeppelin notebook.
+
+It uses the shell interpreter from Zeppelin and the command line client wrapper to logstash. +
+It uses the "sample berka transaction" datset downloaded from niceideas.ch and inserts it in ElasticSearch using
+logstash.
+
+===== Spark RDD Demo
+
+This is a plain old Spark Demo notebook showing various RDD operations and how to run them from within Zeppelin.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Spark ML Demo (Regression)
+
+This is a simple notebook showing some basic ML feature sich as how to run a regression.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Spark SQL Demo
+
+This is a simple notebook showing some Spark SQL functions from within Zeppelin and the way to integrate with
+Zeppelin's visualizations abilities.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Spark Integration ES
+
+This notebook demonstrates how to integrate Spark and ElasticSearch on Eskimo from within Zeppelin.
+
+It uses the Spark Interpreter from Zeppelin and requires to run the "Logstash Demo" notebook first to have the
+"Berka Transaction" dataset available in ElasticSearch in prior to using it.
+
+===== Spark Integration Kafka
+
+This notebook shows how to integrate Spark Streaming (Structured Streaming / SQL actually) and kafka on Eskimo from
+within Zeppelin.
+
+Two sample notebooks must have been executed in prior to executing this one : the "Logstash Demo" and
+"Spark Integration ES", in this order.
+
+It uses the Spark interpreter from Zeppelin.
+
+===== Flink Batch Demo
+
+This is a simple notebook showing some simple Flink Batch Computing examples.
+
+It uses the Flink interpreter from Zeppelin.
+
+===== Flink Streaming Demo
+
+This notebook demonstrates a more advanced example of a flink streaming job. It registers a custom data source and
+serves as an illustration purpose of Flink's job monitoring abilities.
+
+It uses the Flink interpreter from Zeppelin.
+
+===== Flink Integration Kafka
+
+This notebook shows how to integrate Flink Streaming with Kafka on Eskimo from within Zeppelin.
+
+Two sample notebooks must have been executed in prior to executing this one : the "Logstash Demov and
+"Spark Integration ES", in this order.
+
+It uses the Flink interpreter from Zeppelin.
+
+==== Zeppelin 0.9-SNAPSHOT bugs and workarounds
+
+In the version 0.2 of Eskimo, we're using a SNAPSHOT version of Zeppelin-0.9 since the 0.9 version is not released yet
+and the former 0.8 version is incompatible with most software versions packages within Eskimo.
+
+Unfortunately this SNAPSHOT version is a development version and suffers from some bugs.
+
+These bugs and workarounds are reported hereunder:
+
+===== REST API for notebook export is broken.
+
+* *Problem* : after importing a notebook using the REST API, the notebook is not properly saved, it only exists in
+memory. +
+Restarting zeppelin would loose it.
+* *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
+it is saved for real.
+
+===== Importing a note from the UI is broken
+
+* *Problem* : Importing a note from the UI is broken. The UI always reports that the file is exceeding maximum size
+regardless of actual size.
+* *Workaround* : Use the REST API to importe note. +
+For instance if your have a note `test.json` that you want to import, go in its folder and type following command: +
+`curl -XPOST -H "Content-Type: application/json" http://localhost:38080/api/notebook/import -d @test.json` +
+(replace localhost by the IP address of the node running zeppelin) +
+(See above note about REST API import workaround)
+
+=== Prometheus
+
+image::pngs/prometheus-logo.png[50, 50, align="center"]
+
+Prometheus is an open-source systems monitoring and alerting toolkit.
+
+Prometheus's main features are: a multi-dimensional data model with time series data identified by metric name and
+key/value pairs, PromQL - a flexible query language to leverage this dimensionality, automatic discovery of nodes and
+targets, etc.
+
+https://prometheus.io/
+
+=== Grafana
+
+image::pngs/grafana-logo.png[50, 50, align="center"]
+
+Grafana is the open source analytics & monitoring solution for every database.
+
+Within Eskimo, Grafana is meant as the data visualization tool for monitoring purposes on top of pometheus.
+
+One can use Grafana though for a whole range of other data visualization use cases.
+
+Within Eskimo, Grafana is mostly used as a Data visualization tool on Prometheus raw data, but it can very well be used
+to view ElasticSearch data, Spark results, etc.
+
+https://grafana.com/
+
+==== Grafana specificities within Eskimo
+
+The default _username_ / _password_ to administer grafana within eskimo is `eskimo` / `eskimo.` +
+These credentials can be changed in the Eskimo grafana configuration part on "Eskimo Services Configuration" page.
+
+WARNING: The default _username_ / _password_ can onyl be changed *before* Grafana's first start.
+
+==== Pre-packaged Grafana Dashboards
+
+Eskimo CE provides two pre-packaged Grafana dashboards :
+
+* *Eskimo System Wide Monitoring* : This is the global cluster sttaus monitoring dashboard. This dashboard is the one
+used on the Eskimo Status Page.
+* *Eskimo Nodes System Monitoring* : This s a complete monitoring dashboard showing all individual eskimo cluster nodes
+metrics. It is intended for fine-grained monitoring and debugging purpose.
+
+

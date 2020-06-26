@@ -114,6 +114,8 @@ public class MarathonServicesConfigController {
     void setMarathonServicesConfigChecker (MarathonServicesConfigChecker marathonServicesConfigChecker) {
         this.marathonServicesConfigChecker = marathonServicesConfigChecker;
     }
+    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
+    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
     void setDemoMode (boolean demoMode) {
         this.demoMode = demoMode;
     }
@@ -242,16 +244,28 @@ public class MarathonServicesConfigController {
         try {
 
             if (systemService.isProcessingPending()) {
+
+                String message = "Some backend operations are currently running. Please retry after they are completed.";
+
+                messagingService.addLines (message);
+                notificationService.addError("Operation In Progress");
+
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
-                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                    put("messages", message);
                 }}).toString(2);
             }
 
             if (demoMode) {
+
+                String message = "Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.";
+
+                messagingService.addLines (message);
+                notificationService.addError("Demo Mode");
+
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
-                    put("messages", "Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.");
+                    put("messages", message);
                 }}).toString(2);
             }
 

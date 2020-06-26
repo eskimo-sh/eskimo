@@ -22,6 +22,9 @@ public class SystemAdminControllerTest {
     public void setUp() throws Exception {
         sd.afterPropertiesSet();
         sac.setServicesDefinition(sd);
+
+        sac.setMessagingService(new MessagingService());
+        sac.setNotificationService(new NotificationService());
     }
 
     @Test
@@ -160,7 +163,7 @@ public class SystemAdminControllerTest {
         });
 
         assertEquals ("{\n" +
-                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
+                "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.reinstallService("zookeeper", "192.168.10.13"));
     }

@@ -439,6 +439,7 @@ Software.
                 </plugins>
             </build>
         </profile>
+
         <profile>
             <id>doc</id>
             <activation>

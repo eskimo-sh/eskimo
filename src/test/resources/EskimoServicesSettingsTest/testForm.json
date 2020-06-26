@@ -15,5 +15,7 @@
   "spark-executor-spark-locality-wait":"",
   "spark-executor-spark-dynamicAllocation-executorIdleTimeout":"200s",
   "spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout":"400s",
-  "spark-executor-spark-executor-memory":"[ESKIMO_DEFAULT]"
+  "spark-executor-spark-executor-memory":"[ESKIMO_DEFAULT]",
+  "grafana-admin_user":"test",
+  "grafana-admin_password":"testpassword"
 }

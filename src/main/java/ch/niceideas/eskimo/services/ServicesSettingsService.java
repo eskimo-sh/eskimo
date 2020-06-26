@@ -36,10 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
-import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
-import ch.niceideas.eskimo.model.SettingsOperationsCommand;
+import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -100,10 +97,14 @@ public class ServicesSettingsService {
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
                 if (nodesConfig != null) { // maybe this happens before any nodes config has been set
+
+                    ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
+
                     OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
                             servicesDefinition,
                             nodeRangeResolver,
                             dirtyServices.toArray(new String[0]),
+                            serviceInstallStatus,
                             nodesConfig);
 
                     nodesConfigurationService.applyNodesConfig(restartCommand);

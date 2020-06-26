@@ -37,10 +37,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.services.ConfigurationService;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SetupService;
-import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ErrorStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -55,6 +52,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
@@ -65,6 +63,12 @@ public class SetupConfigController {
     private static final Logger logger = Logger.getLogger(SetupConfigController.class);
 
     public static final String PENDING_SETUP_COMMAND = "PENDING_SETUP_COMMAND";
+
+    @Resource
+    private MessagingService messagingService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private SetupService setupService;
@@ -88,6 +92,8 @@ public class SetupConfigController {
     void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
+    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
     void setDemoMode (boolean demoMode) {
         this.demoMode = demoMode;
     }
@@ -167,16 +173,28 @@ public class SetupConfigController {
     public String applySetup(HttpSession session) {
 
         if (systemService.isProcessingPending()) {
+
+            String message = "Some backend operations are currently running. Please retry after they are completed.";
+
+            messagingService.addLines (message);
+            notificationService.addError("Operation In Progress");
+
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
-                put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                put("messages", message);
             }}).toString(2);
         }
 
         if (demoMode) {
+
+            String message = "Unfortunately, changing setup configuration is not possible in DEMO mode.";
+
+            messagingService.addLines (message);
+            notificationService.addError("Demo Mode");
+
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
-                put("messages", "Unfortunately, changing setup configuration is not possible in DEMO mode.");
+                put("messages", message);
             }}).toString(2);
         }
 

@@ -1,0 +1,96 @@
+
+== Eskimo Architecture and Design Elements
+
+This section presents various architecture and design elements of Eskimo.
+
+[[ssh-tunneling]]
+=== SSH Tunelling
+
+One of the most important feature of the Eskimo Web Console is its ability to provide in a single and consistent
+Graphical User Interface al the underlying components administration Consoles such as the _Mesos Console_ or the _Kafka
+Manager_, just as the essential Data Science Applications such as _Kibana_ and _Zeppelin_.
+
+The Eskimo Frontend wraps these other web applications in it's own _User Interface_ and the Eskimo backend proxies their
+HTTP data flows to their respective backend through SSH, in a transparent and secured way. +
+The actual location of these software components (the runtime cluster node on which they are actually executed) is only
+known by the eskimo backend and is handled automatically. +
+Whenever such a console or service is moved from a node to another node, either manually or automatically by Marathon,
+that is completely transparent to the end user.
+
+image::pngs/ssh-tunneling.png[800, 800, align="center"]
+
+
+=== Security
+
+This section presents different important aspects of the security principle within Eskimo.
+
+=== Confidentiality and cluster protection
+
+The key principle on which Eskimo leverages consists in *protecting the cluster nodes from external accesses.
+
+Eskimo makes it so that each and every access to the eskimo cluster services are made by itself. Eskimo acts as a proxy
+between the external world and the eskimo cluster nodes (See <<ssh-tunneling>> above).
+
+When building eskimo cluster nodes, administrators should ensure to leverage on `iptables` or `firewalld` to ensure
+
+* Only IP addresses within the Eskimo cluster nodes range or sub-network can have open and wide access to the Eskimo
+nodes.
+* All external IP addresses (external to the eskimo cluster) would have access only to
+** Port 22 for eskimo to be able to reach them - if the eskimo application itself is installed outside of the eskimo
+cluster
+** Port 80 of the node running eskimo - if the eskimo application itself is installed on one of the eskimo cluster node
+(or the port on which Eskimo is answering
+
+This principle is illustrated by the schema at <<sample_system_archi>>.
+
+When setting up Eskimo, administrators have to provide the SSH private key certificate that Eskimo will use to access
+all services running on internal eskimo cluster nodes.
+It is of utmost importance to treat this key with great confidentiality and ensure it is only usable by the Eskimo
+system user.
+
+==== Data Encryption
+
+Eskimo recommends to encrypt filesystem partitions use for data storage, either at hardware level if that is supported
+or at Operating System level.
+
+Especially following folders or mount points have to be encrypted:
+
+* `/var/lib/spark` used for spark data and temporary data storage
+* `/var/lib/elasticsearch` used as Elasticsearch storage folder
+* `/var/lib/gluster` used for gluster bricks storage
+
+It's also possible within Eskimo to customize the ElasticSearch instances setup script to leverage on ElasticSearch's
+native data at rest encryption abilities.
+
+
+==== User rights segregation and user imprersonation
+
+Note on user impersonation and user rights segregation: Eskimo Community Edition doesn't support user rights segregation.
+All users within Eskimo Community Edition are considered administrators and have full access to all Eskimo user and
+administration features.
+
+If user rights segregation, authorizations enforcement and user impersonation are key concerns for one's enterprise
+environment, one should consider upgrading to *Eskimo Enterprise Edition which provides state of the art implementations
+of each and every Enterprise Grade requirement*.
+
+
+=== High availability
+
+Eskimo Community Edition provides only partial HA - High Availability - support.
+
+Basically:
+
+* Flink and Spark applications leveraging on mesos are natively Highly Available and resilient to slave nodes vanishing.
+* ElasticSearch as well is natively highly-available as long as the applications reaching it support using multiple
+bootstrap nodes.
+* All web consoles and administration applications leveraging on marathon (such as Kibana, Zeppelin, Cerebro,
+the kafka-manager, etc. are natively available as well.
+
+However in Eskimo Community Edition, some services are not highly-available and form single point of failure forcing
+administrators to take manual actions when problems occur (service crash or node vanishing). +
+These Single Point of Failure services - not highly available - are: Zookeeper, Mesos-Master, Flink App Master and
+Marathon itself.
+
+If full high-availability is an important requirement for one's applications, then one should consider upgrading to
+*Eskimo Enterprise Edition which implements 100% high availability for every components*.
+

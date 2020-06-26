@@ -120,6 +120,8 @@ public class NodesConfigController {
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
     }
+    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
+    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
     void setDemoMode (boolean demoMode) {
         this.demoMode = demoMode;
     }
@@ -241,16 +243,28 @@ public class NodesConfigController {
         try {
 
             if (systemService.isProcessingPending()) {
+
+                String message = "Some backend operations are currently running. Please retry after they are completed.";
+
+                messagingService.addLines (message);
+                notificationService.addError("Operation In Progress");
+
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
-                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
+                    put("messages", message);
                 }}).toString(2);
             }
 
             if (demoMode) {
+
+                String message = "Unfortunately, re-applying nodes configuration or changing nodes configuration is not possible in DEMO mode.";
+
+                messagingService.addLines (message);
+                notificationService.addError("Demo Mode");
+
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
-                    put("messages", "Unfortunately, re-applying nodes configuration or changing nodes configuration is not possible in DEMO mode.");
+                    put("messages", message);
                 }}).toString(2);
             }
 

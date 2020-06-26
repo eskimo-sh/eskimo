@@ -1,0 +1,173 @@
+
+[[chap-usage]]
+== Eskimo User Guide
+
+
+This chapter is the eskimo user guide and related to feature available to both administrators and standard users.
+
+=== The menu
+
+The menu on the left is separated in two parts :
+
+. *Eskimo Services* : Eskimo services declaring a web console are automatically available from within this menu. The
+web console is available in an iframe from within eskimo. Clicking again on the menu entry while the web console is
+already displayed forced a refresh of the iframe.
+
+. *Platform Administration* : This is where eskimo is configured, the layout of the services on cluster nodes defined
+and the cluster monitored.
+
+=== Eskimo System Status Screen
+
+One of the most essential screen of the Eskimo Web Console, the one which is reach just after login, is the
+_System status screen_.
+
+This is an example of the status screen showing a three nodes cluster and the services installed on this cluster.
+
+image::pngs/eskimo-status.png[800, 800, align="center"]
+
+On the example above, all services are in _white_, which indicates that they are working fine.
+
+Services can be in:
+
+* [green]#OK (Check)# - green : the service is working alright
+* [red]#OK (Check)# - red) : the service is working alright although it needs to be restarted following some dependencies
+updates or re-installation.
+* [purple]#OK (Check)# - purple : the service is running but pending removal from the node.
+* [red]#KO (Cross)#  - red: the service is reporting errors (down)
+* [red]#NA (Question Mark)# - red : the service is installed (and should be available) but cannot be found on node
+
+The user can choose between the node view (default) as above or the table view which is more suited to monitor large
+clusters with hundreds of nodes.
+
+==== Action Menu
+
+When _mouse-over_'ing a service on a node in the table view, the user has access to the
+service action menu which he can use to stop / start / restart a service or even force its full re-installation.
+
+In addition to these default commands, Eskimo Services can provide additional custom commands made available to
+administrators and/or users in this action menu.
+
+This is for instance the action menu when clicking on Zeppelin in the table view:
+
+image::pngs/context-menu.png[300, 300, align="center"]
+
+
+=== Acting on services reporting errors
+
+Most of the time when a service is reporting an error, a first step is to try to reapply the configuration. +
+See <<apply_configuration>>
+
+
+=== SSH and SFTP Client
+
+The last and last but one menu entries in the "_Eskimo Services_" part are special consoles implemented within eskimo to
+administer the cluster nodes.
+
+==== SSH Terminal
+
+The menu "*SSH Terminals*" gives access to SSH terminals to each and every node configured in the eskimo cluster, just
+as a plain old SSH console, but from within your web browser.
+
+image::pngs/eskimo_ssh_demo.png[800, 800, align="center"]
+
+As a design choice, the SSH Terminal doesn't provide any toolbar but leverages on keyboard shortcuts to perform most
+useful actions.
+
+*SSH Terminal shortcuts*:
+
+* `Ctrl + Shift + Left` : show terminal tab on the left
+* `Ctrl + Shift + Right` : show terminal tab on the right
+* `Ctrl + Shift + C` : Copy the currently selected text - Using `Ctrl + Shift + C` instead of `Ctrl + C` since
+`Ctrl + C` is reserved for cancelling current / pending command
+* `Ctrl + V` : Paste the clipboard content to the console - Here since Eskimo runs as a web app, it is unfortunately
+obligatory to use `Ctrl + V` for pasting the clipboard due to browser limitations (Only an event answering to `Ctrl + V`
+can access the clipboard)
+
+*Various notes related to Eskimo terminal console usage:*
+
+* The initial terminal size is computed automatically from the available window size. Unfortunately in the current
+version, resizing the terminal is not suppported. Whenever the user resizes its Web Browser window, the only way to
+resize the terminal is by closing it and reopening it.
+* `Shift + PgUp` and `Shift + PgDown` to scroll the terminal is not supported. A sound usage of `| less` is recommended
+when pagination is required.
+
+==== SFTP File Manager
+
+The Menu "*SFTP File Manager*" gives access to a web file manager which one can use to
+
+* Browse the nodes filesystem
+* Visualize text files stored on nodes
+* Download binary file stored on nodes
+* Upload files on nodes
+* etc.
+
+image::pngs/eskimo_file_manager_demo.png[800, 800, align="center"]
+
+=== Services Web Consoles
+
+Some services managed by eskimo are actually application with a _Web Graphical User Interface_ or *Web Console* in the
+Eskimo terminology. +
+If properly configured for it - See _Eskimo Services Developer Guide_ - these web consoles are detected as is and
+available from within Eskimo.
+
+They are disposed in the menu under "_Eskimo Services_".
+
+The pre-packaged web consoles with Eskimo are Zeppelin, Gdash, Kibana, Grafana, Cerebro, Spark History Server,
+Flink App Manager, Kafka Manager, the Mesos Console and the Marathon Console.
+
+
+==== Demo Mode
+
+Eskimo supports a _Demo Mode_ which is in use for instance, on the DemoVM downloadable from the eskimo web site. +
+The purpose of the Demo Mode is to be able to showcase all possibilities of Eskimo - including administration features -
+while minimizing the runtime size and preventing users from breaking eskimo.
+
+In Demo Mode, following actions are blocked:
+
+* Reinstalling a service
+* Changing or re-applying nodes configuration
+* Changing or re-applying marathon configuration
+* Changing or re-applying setup configuration
+
+Demo Mode is activated by changing the property `eskimo.demoMode` to `true` in the confguration file `eskimo.properties`:
+
+.Configuration Property related to _Demo Mode_
+----
+# Whether to put eskimo in Demo Mode (true, false)
+# The eskimo demo mode is used for the DemoVM. In demo mode, following restrictions apply:
+# - Cannot change nodes config
+# - Cannot change marathon config
+# - Cannot re-install a service
+eskimo.demoMode=false
+----
+
+==== The DemoVM
+
+The Eskimo DemoVM downloadable from the eskimo web site. It is intended as a demonstration of the features of the eskimo
+platform and enables users to test eskimo's possibilities.
+
+The Eskimo DemoVM is provided with _Demo Mode_ enabled by default, with the limits explained above (some actions are
+blocked).
+
+In case a user wants to use the features that are disabled in _Demo Mode_, he needs to disable _Demo Mode_.
+
+==== Deactivating Demo Mode on the demo VM
+
+In order to deactivate _Demo Mode_, change the property `eskimo.demoMode` back to to `false` in the confguration file
+`eskimo.properties`.
+
+Unfortunately, this is not sufficient. The Eskimo DemoVM, for the sake of shortening it's size, doesn't package the
+_Eskimo Service Package Images_, it just packages placeholders instead. +
+So these placeholders need to be removed and the actual _Eskimo Service Package Images_ need to be re-created or
+downloaded.
+
+In order to do this, one should delete the content of the folder `packages_distrib` from the Eskimo installation folder:
+
+.Delete `packages_distrib` content
+----
+# connect to your VM, then:
+sudo rm -RF /usr/local/lib/eskimo-V0.3/packages_distrib/*
+----
+
+When this is done the Eskimo Web UI will automaticalyl bring the user back to the setup page and enable him to either
+build or download the _Eskimo Service Package Images_. Internet access from the VM is required.

@@ -65,13 +65,24 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
 
         scs = new ServicesSettingsService();
 
-        scs.setServicesDefinition(servicesDefinition);
-
         scs.setNodeRangeResolver(nodeRangeResolver);
 
         scs.setConfigurationService(configurationService);
 
         scs.setNodesConfigurationService(createNodesConfiguratioNService());
+
+        servicesDefinition = new ServicesDefinition() {
+            @Override
+            public String getAllServicesString() {
+                return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster gdash spark-history-server prometheus grafana";
+            }
+            @Override
+            public String[] listAllServices() {
+                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-executor", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server", "elasticsearch", "prometheus", "grafana"};
+            }
+        };
+        servicesDefinition.afterPropertiesSet();
+        scs.setServicesDefinition(servicesDefinition);
 
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }
@@ -94,6 +105,13 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         configurationService.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
 
         SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, scs);
+
+        assertEquals (4, command.getRestartedServices().size());
+
+        assertEquals ("elasticsearch", command.getRestartedServices().get(0));
+        assertEquals ("grafana", command.getRestartedServices().get(1));
+        assertEquals ("kafka", command.getRestartedServices().get(2));
+        assertEquals ("spark-executor", command.getRestartedServices().get(3));
 
         scs.applyServicesSettings(command);
 

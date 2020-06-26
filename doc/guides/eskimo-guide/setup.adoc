@@ -1,0 +1,152 @@
+
+[[chap-cluster-setup]]
+== Setting up the eskimo cluster
+
+Right after the initial setup presented in the previous chapter. The administrator can start setting up and installing
+the Eskimo Big Data Analytics cluster.
+
+The process is the following:
+
+1. *Service settings configuration*. Fine tune the settings for the services one is about to install on the Eskimo cluster
+2. *Nodes and native services layout configuration* : Declare the IP addresses of the nodes to me installed and operated
+by eskimo and select the native services that should run on these nodes
+3. *Marathon services selection* : Declare which of the marathon services you want to deploy on the cluster
+
+=== Services settings configuration
+
+The most essential settings for all eskimo pre-packaged services are set automatically in such a way that the nominal
+use cases of an eskimo cluster work out of the box.
+
+But for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
+For this reason, Eskimo CE embeds a settings editor enabling administrators to find tune runtime settings for eskimo
+embedded services.
+
+The settings editor is available from the menu under "Configured Services":
+
+image::pngs/eskimo-setttings.png[800, 800, align="center"]
+
+For every service, administrators have access to supported configuration files and supported settings. +
+The default values enforced by eskimo right after installation are indicated.
+
+
+=== Nodes and native services layout configuration
+
+The fourth menu entry under "*Platform Administration*" is the most important part of the Eskimo Administration console:
+it provides the system administrators / Eskimo Users with the way to deploy the eskimo managed services on the cluster
+of nodes to be managed by eskimo.
+
+Eskimo services are docker containers managed (started / stopped / monitored / etc.) by systemd.
+
+Setting up a cluster with eskimo usually boils down to these 2 phases :
+
+* Adding nodes to the eskimo cluster - using the _Add Node_ button or ranges of nodes using the _Add Range_ button.
+* Selecting the services that should be deployed and operated and the configured nodes
+
+Below is an example of a tiny cluster with two nodes setup:
+
+image::pngs/eskimo-nodes-config.png[800, 800, align="center"]
+
+On the above example, we can see:
+
+* One master node being configured as a standalone node configuration (which is always the case for nodes running
+master or unique services) declaring master services as well as slave services.
+* Two slave nodes being configured as a range of nodes with a single configuration declaring slave services.
+
+==== Adding nodes to the eskimo cluster
+
+Whenever one wants to operate a cluster of a hundred of nodes with Eskimo, one doesn't want to have to define the
+hundred nodes one after the other. Not to mention that wouldn't make any sense since most nodes of that cluster would
+actually have the very same configuration (in terms of services topology).
+
+This is the rationality behind the notion of "_Range of nodes_"- The idea here is to be able to add a single and
+consistent configuration to all the nodes sharing the same configuration.
+
+Single node configurations and range of nodes can be combined at will. Eskimo will however refuse to apply configuration
+if the resolution of the various ranges and single nodes leads to an IP address being defined several times.
+
+Also, all nodes in a range are expected to be up and running and Eskimo will consider them so and report errors if one
+node in a range is not answering. +
+*Should you have holes in your range of IP addresses, you are expected to define multiple ranges, getting rid of the
+holes in your range of IPs.* This is fairly important if you want Eskimo to be able to
+successfully manage your cluster.
+
+WARNING: In its current version (0.2 at the time of writing this document), eskimo *requires at all cost* nodes to be
+defined using IP addresses and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
+addresses are supported, period. +
+Unfortunately with big data technologies and especially spark and mesos, supporting DNS or hostnames is significantly
+more complicated than direct IP addresses resolutions. +
+We are working on this and the next version of eskimo will support working with hostnames instead of IP addresses. But
+for the time being, administrators need to configure eskimo using IP addresses and only IP addresses.
+
+==== Deploying services
+
+With all nodes from the cluster to be managed by eskimo properly identified either as single node or as part of a range
+of nodes, services can be configured and deployed.
+
+image::pngs/multiple-services.png[600, 600, align="center"]
+
+==== Master services
+
+Some service are considered *master services* and are identified on the _services selection_ window as unique services
+(understand services that can be deployed only once, e.g. Kibana, Zeppelin, Mesos-Master, etc.) and configured using
+a radio button
+
+These "_Master services_" - considered unique - can only be configured in single node configuration and only once for
+the whole cluster:
+
+==== Slave services
+
+Some other services are considered *slave services* and can be deployed at will, on one single or all nodes of the
+cluster (understand services that can be deployed multiple times, e.g. elasticsearch, kafka, mesos-agent, etc.) and
+configured using a checkbox on the _services selection_ window.
+
+These "_Slave Services_" - considered multiple - can be configured at will:
+
+[[apply_configuration]]
+==== Applying nodes configuration
+
+Once al nodes are properly configured with their desired set of services, clicking on "_Apply Configuration_" will
+initiate the *Nodes Configuration process*.
+
+That setup process can be quite long on large clusters with plenty of nodes even though a lot of tasks are performed in
+parallel.
+
+*One should note that this configuration can be changed at will! Master services can be moved back and forth between
+nodes, slave services can be removed from nodes or added at will after the initial configuration has been applied,
+Eskimo takes care of everything !*
+
+As a sidenote, _Eskimo Community Edition_ doesn't support high availability for master services, one needs to acquire
+_Eskimo Enterprise Edition_ for high availability.
+
+*Applying configuration* is also useful when a service is reporting an error for instance such as needed restart or
+being reported as vanished. +
+In such cases a first step to resolve the problem is getting to the _"Configure Eskimo Nodes"_ screen and re-applying
+configuration.
+
+Finally, whenever an installation or another operation fails, after fixing the problem (most of the time correcting the
+service installation scripts in the service installation framework), the installation or other operation process can be
+recovered from where it failed by simply re-applying the configuration from here.
+
+Applying node configuration is re-entrant / idempotent.
+
+==== Forcing re-installation of a service.
+
+The button "Force reinstall" enables the user to select services that will be reinstalled on every node from the
+latest service docker image available. +
+Dependent services will be properly restarted.
+
+
+=== Marathon Services Selection
+
+The last step in the Eskimo cluster installation consists in deploying marathon services.
+
+This is performed by the fifth menu entry under "*Platform Administration*" called "*Config. Marathon Services*".
+
+The process is actually very simple and one just needs to select the services to be installed and operated automatically
+by marathon.
+
+image::pngs/eskimo-marathon-setup.png[800, 800, align="center"]
+
+Just as for native node host services, Eskimo provides a possibility to force the reinstallation of marathon services. +
+Just click on the "Force Reinstall" button and choose which services should be re-installed on marathon.
+
