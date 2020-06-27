@@ -44,11 +44,7 @@ RemainAfterExit=false
 ExecStartPre=-/usr/bin/docker kill mesos-master
 ExecStartPre=-/usr/bin/docker rm -f mesos-master
 
-# Find out about version of mesos available
-ExecStartPre=/bin/bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/system_mesos_environment"
-#EnvironmentFile=/run/system_mesos_environment
-
-ExecStart=/bin/bash -c ". /run/system_mesos_environment && /usr/bin/docker run \
+ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment&& /usr/bin/docker run \
         -i\
         --name mesos-master \
         --network host \

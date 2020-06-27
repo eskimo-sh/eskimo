@@ -75,7 +75,7 @@ echo " - Inject settings (flink-app-master)"
 # Ensure gluster is available
 if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
     echo "ERROR : No Gluster master defined"
-    exit -20
+    exit 20
 fi
 
 # Zeppelin connects on gluster on same node

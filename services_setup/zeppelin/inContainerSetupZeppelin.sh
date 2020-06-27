@@ -72,6 +72,7 @@ chown spark /var/lib/spark
 
 echo " - Finding mesos"
 bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
+sleep 1
 . /run/zeppelin_mesos_environment
 ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION
 ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos

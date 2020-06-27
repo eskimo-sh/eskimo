@@ -79,7 +79,6 @@ Jun 18 16:03:16 deb-node2 bash[23328]: Using config: /etc/zookeeper/conf/zoo.cfg
 ● mesos-master.service - Mesos Master
    Loaded: loaded (/lib/systemd/system/mesos-master.service; enabled; vendor preset: enabled)
    Active: active (running) since Tue 2019-06-18 16:05:26 UTC; 10min ago
-  Process: 25608 ExecStartPre=/bin/bash -c echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2` > /run/system_mesos_environment (code=exited, status=0/SUCCESS)
   Process: 25594 ExecStartPre=/usr/bin/docker rm -f mesos-master (code=exited, status=0/SUCCESS)
   Process: 25584 ExecStartPre=/usr/bin/docker kill mesos-master (code=exited, status=1/FAILURE)
  Main PID: 25617 (bash)
@@ -87,7 +86,7 @@ Jun 18 16:03:16 deb-node2 bash[23328]: Using config: /etc/zookeeper/conf/zoo.cfg
    Memory: 19.8M
       CPU: 166ms
    CGroup: /system.slice/mesos-master.service
-           ├─25617 /bin/bash -c . /run/system_mesos_environment && /usr/bin/docker run          -i         --name mesos-master          --network host          -v /var/lib/mesos:/var/lib/mesos          -v /var/log/mesos:/var/log/mesos          -v /var/run/mesos:/var/run/mesos          -v /usr/local/bin:/usr/local/bin          -v /usr/local/sbin:/usr/local/sbin          -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          -v /usr/local/etc/mesos:/usr/local/etc/mesos          --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh          -e NODE_NAME=$HOSTNAME          eskimo:mesos-master          /usr/local/sbin/inContainerStartService.sh
+           ├─25617 /bin/bash -c . /run/eskimo_mesos_environment && /usr/bin/docker run          -i         --name mesos-master          --network host          -v /var/lib/mesos:/var/lib/mesos          -v /var/log/mesos:/var/log/mesos          -v /var/run/mesos:/var/run/mesos          -v /usr/local/bin:/usr/local/bin          -v /usr/local/sbin:/usr/local/sbin          -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          -v /usr/local/etc/mesos:/usr/local/etc/mesos          --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh          -e NODE_NAME=$HOSTNAME          eskimo:mesos-master          /usr/local/sbin/inContainerStartService.sh
            └─25619 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo:mesos-master /usr/local/sbin/inContainerStartService.sh
 
 Jun 18 16:05:26 deb-node2 systemd[1]: Starting Mesos Master...

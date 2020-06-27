@@ -241,6 +241,20 @@ you’re looking for. With its interactive visualizations, start with one questi
 
 https://www.elastic.co/products/kibana
 
+==== Kibana specificities within Eskimo
+
+Eskimo is able to provision Kibana dashboards and referenced objects automatically at installation time.
+
+* dashboards and all references objects exports need to be put under `services_setup/kibana/samples/` such as
+e.g. `samples/berka-transactions.ndjson`
+* These Kibana export archives need to be self contained : every direct or indirect object referenced by a dashboard
+such as obviously visualizations, saved searches, index patterns, etc. need to be selected when creating the extract.
+
+==== Pre-packaged Kibana Dashboards
+
+In addition to the Kibana native samples distributed along Kibana, Eskimo provisions a sample Dashboard for Berka
+transactions used in Zeppelin sample notes.
+
 === Apache Kafka
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
@@ -427,26 +441,26 @@ sub -folder of the `services_setup` folder.
 
 *Eskimo Enterprise Edition* is required if one wishes to separate Zeppelin's interpreters *per user*.
 
-==== Sample Zeppelin notebooks
+==== Eskimo packaged Zeppelin Sample notes
 
-Upon Zeppelin installation, Eskimo sets up a set of Sample notebooks in Zeppelin to illustrate the behaviour of the
+Upon Zeppelin installation, Eskimo sets up a set of Sample notes in Zeppelin to illustrate the behaviour of the
 Eskimo cluster using different frameworks and the different packaged technologies such as Flink, Spark, Logstash, etc.
 
-These sample zeppelin notebooks are intended to demonstrate the possibilities with Eskimo and to show how Zeppelin can
+These sample zeppelin notes are intended to demonstrate the possibilities with Eskimo and to show how Zeppelin can
 be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
 
-The different sample notebooks packages with Eskimo and available from within Zeppelin are described hereafter.
+The different sample note packages with Eskimo and available from within Zeppelin are described hereafter.
 
 ===== ElasticSearch Demo (Queries)
 
-This is a very simple demo notebook showing how to submit queries to ElasticSearch from a Zeppelin notebook.
+This is a very simple demo note showing how to submit queries to ElasticSearch from a Zeppelin note.
 
 It uses the elasticsearch interpreter from Zeppelin. +
 One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
 
 ===== Logstash Demo
 
-The logstash demo notebook shows how to integrate with logstash on Eskimo from a Zeppelin notebook.
+The logstash demo note shows how to integrate with logstash on Eskimo from a Zeppelin note.
 
 It uses the shell interpreter from Zeppelin and the command line client wrapper to logstash. +
 It uses the "sample berka transaction" datset downloaded from niceideas.ch and inserts it in ElasticSearch using
@@ -454,58 +468,58 @@ logstash.
 
 ===== Spark RDD Demo
 
-This is a plain old Spark Demo notebook showing various RDD operations and how to run them from within Zeppelin.
+This is a plain old Spark Demo note showing various RDD operations and how to run them from within Zeppelin.
 
 It uses the Spark interpreter from Zeppelin.
 
 ===== Spark ML Demo (Regression)
 
-This is a simple notebook showing some basic ML feature sich as how to run a regression.
+This is a simple note showing some basic ML feature sich as how to run a regression.
 
 It uses the Spark interpreter from Zeppelin.
 
 ===== Spark SQL Demo
 
-This is a simple notebook showing some Spark SQL functions from within Zeppelin and the way to integrate with
+This is a simple note showing some Spark SQL functions from within Zeppelin and the way to integrate with
 Zeppelin's visualizations abilities.
 
 It uses the Spark interpreter from Zeppelin.
 
 ===== Spark Integration ES
 
-This notebook demonstrates how to integrate Spark and ElasticSearch on Eskimo from within Zeppelin.
+This note demonstrates how to integrate Spark and ElasticSearch on Eskimo from within Zeppelin.
 
-It uses the Spark Interpreter from Zeppelin and requires to run the "Logstash Demo" notebook first to have the
+It uses the Spark Interpreter from Zeppelin and requires to run the "Logstash Demo" note first to have the
 "Berka Transaction" dataset available in ElasticSearch in prior to using it.
 
 ===== Spark Integration Kafka
 
-This notebook shows how to integrate Spark Streaming (Structured Streaming / SQL actually) and kafka on Eskimo from
+This note shows how to integrate Spark Streaming (Structured Streaming / SQL actually) and kafka on Eskimo from
 within Zeppelin.
 
-Two sample notebooks must have been executed in prior to executing this one : the "Logstash Demo" and
+Two sample notes must have been executed in prior to executing this one : the "Logstash Demo" and
 "Spark Integration ES", in this order.
 
 It uses the Spark interpreter from Zeppelin.
 
 ===== Flink Batch Demo
 
-This is a simple notebook showing some simple Flink Batch Computing examples.
+This is a simple note showing some simple Flink Batch Computing examples.
 
 It uses the Flink interpreter from Zeppelin.
 
 ===== Flink Streaming Demo
 
-This notebook demonstrates a more advanced example of a flink streaming job. It registers a custom data source and
+This note demonstrates a more advanced example of a flink streaming job. It registers a custom data source and
 serves as an illustration purpose of Flink's job monitoring abilities.
 
 It uses the Flink interpreter from Zeppelin.
 
 ===== Flink Integration Kafka
 
-This notebook shows how to integrate Flink Streaming with Kafka on Eskimo from within Zeppelin.
+This note shows how to integrate Flink Streaming with Kafka on Eskimo from within Zeppelin.
 
-Two sample notebooks must have been executed in prior to executing this one : the "Logstash Demov and
+Two sample notes must have been executed in prior to executing this one : the "Logstash Demov and
 "Spark Integration ES", in this order.
 
 It uses the Flink interpreter from Zeppelin.
@@ -519,13 +533,18 @@ Unfortunately this SNAPSHOT version is a development version and suffers from so
 
 These bugs and workarounds are reported hereunder:
 
-===== REST API for notebook export is broken.
+===== REST API for note export is broken.
 
-* *Problem* : after importing a notebook using the REST API, the notebook is not properly saved, it only exists in
+* *Problem* : after importing a note using the REST API, the note is not properly saved, it only exists in
 memory. +
 Restarting zeppelin would loose it.
 * *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
 it is saved for real.
+
+WARNING: to avoid the need to do it after provisisioninf of the Eskimo sample notes, as of the current version of
+Eskimo, sample notes provisioning is done py packaging directly the Zeppelin underlying note storage. +
+One might want to have a look at the zeppelin `inContainerStartService.sh` startup script to find out how
+this is done.
 
 ===== Importing a note from the UI is broken
 
@@ -549,6 +568,18 @@ targets, etc.
 
 https://prometheus.io/
 
+==== Prometheus specificities within Eskimo
+
+Within Eskimo, the packaging of prometheus and it's exporter is a little peculiar. Both prometheus and its all exporters
+for it are packaged together and installed on every node. +
+Having prometheus on every node is not required since only one instance is active (collecting metrics) at a time.
+Packaging it all together is however simpler from a deployment perspective to avoid having yet another additional
+service (prometheus exporters) on Eskimo.
+
+This also enables to collect metrics from different instances and makes the HA implementation of Prometheus easier in
+Eskimo Enterprise Edition.
+
+
 === Grafana
 
 image::pngs/grafana-logo.png[50, 50, align="center"]
@@ -566,10 +597,21 @@ https://grafana.com/
 
 ==== Grafana specificities within Eskimo
 
+===== Admin user / password
+
 The default _username_ / _password_ to administer grafana within eskimo is `eskimo` / `eskimo.` +
 These credentials can be changed in the Eskimo grafana configuration part on "Eskimo Services Configuration" page.
 
 WARNING: The default _username_ / _password_ can onyl be changed *before* Grafana's first start.
+
+===== Grafana dashboards provisionning
+
+Eskimo is able to provision Grafana dashboards automatically at installation time.
+
+* dashboards and all references objects exports need to be put under `services_setup/grafana/provisioning/dashboards`
+such as e.g. `services_setup/grafana/provisioning/dashboards/mesos-monitoring.json` along with a `yml` file describing the
+dashboard (look at examples)
+
 
 ==== Pre-packaged Grafana Dashboards
 

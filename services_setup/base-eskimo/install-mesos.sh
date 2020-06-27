@@ -103,7 +103,7 @@ elif [[ -f "/etc/SUSE-brand" ]]; then
 else
     echo " - !! ERROR : Could not find any brand marker file "
     echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
-    exit -101
+    exit 101
 fi
 
 cd /tmp/mesos_setup
@@ -166,8 +166,6 @@ EOF
 done
 set +e
 
-# installation tests
-
 echo " - Basic environment setup (mesos cannot run without these variables)"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/:/usr/local/lib/mesos-$AMESOS_VERSION/lib
 # etc profile
@@ -190,6 +188,23 @@ sudo bash -c "echo \"export MESOS_log_dir=/var/log/mesos\" >> /usr/local/etc/mes
 sudo bash -c "echo -e \"\n#Specify a human readable name for the cluster \" >> /usr/local/etc/mesos/mesos-env.sh"
 sudo bash -c "echo \"export MESOS_cluster=eskimo\" >> /usr/local/etc/mesos/mesos-env.sh"
 
+echo " - Create / update eskimo MESOS version file"
+sudo bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /etc/eskimo_mesos_environment"
+
+echo " - Checking eskimo MESOS version file"
+if [[ -z $TEST_MODE && ! -f /etc/eskimo_mesos_environment ]]; then
+    echo "Could not create /etc/eskimo_mesos_environment"
+    exit 21
+fi
+. /etc/eskimo_mesos_environment
+
+if [[ -z $TEST_MODE && ! -d /usr/local/lib/mesos-$AMESOS_VERSION ]]; then
+    echo "/etc/eskimo_mesos_environment doesn't point to valid mesos version"
+    exit 21
+fi
+
+
+# installation tests
 
 echo " - Registering test cleaning traps"
 export MESOS_MASTER_PROC_ID=-1

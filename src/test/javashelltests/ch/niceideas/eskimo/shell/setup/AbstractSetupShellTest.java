@@ -160,6 +160,8 @@ public abstract class AbstractSetupShellTest {
 
             scriptContent = scriptContent.replace(". /host_etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
 
+            scriptContent = scriptContent.replace("/etc/eskimo_mesos_environment", jailPath + "/eskimo_mesos_environment");
+
             copyResource(scriptToExecute, jailPath, scriptContent);
         }
     }

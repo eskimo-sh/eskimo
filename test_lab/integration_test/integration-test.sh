@@ -464,7 +464,7 @@ setup_eskimo() {
         exit 4
     fi
     # should be clear setup before setup is applied
-    if [[ $(echo $status | jq -r '.clear') != "setup" ]]; then
+    if [[ $(echo $status | jq -r '.clear') != "nodes" ]]; then
         echo "Didn't get expected 'clear' status"
         echo "Got status : $status"
         exit 5

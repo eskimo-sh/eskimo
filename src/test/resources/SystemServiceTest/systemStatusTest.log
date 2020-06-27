@@ -12,7 +12,6 @@
 ● spark-executor.service - Mesos Shuffle Service for Spark executors
    Loaded: loaded (/lib/systemd/system/spark-executor.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-09 10:16:33 UTC; 9h ago
-  Process: 16153 ExecStartPre=/bin/bash -c echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/spark_mesos_environment (code=exited, status=0/SUCCESS)
   Process: 16152 ExecStartPre=/bin/chown spark /var/lib/spark/eventlog (code=exited, status=0/SUCCESS)
 ● kibana.service - Kibana UI
    Loaded: loaded (/lib/systemd/system/kibana.service; enabled; vendor preset: enabled)

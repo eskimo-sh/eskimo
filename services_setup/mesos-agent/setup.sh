@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 
@@ -135,7 +135,7 @@ elif [[ -d /usr/lib/systemd/system/ ]]; then
     export systemd_units_dir=/usr/lib/systemd/system/
 else
     echo "Couldn't find systemd unit files directory"
-    exit -10
+    exit 10
 fi
 sudo cp $SCRIPT_DIR/mesos-agent.service $systemd_units_dir
 sudo chmod 644 $systemd_units_dir/mesos-agent.service
@@ -187,6 +187,21 @@ sudo bash -c "echo -e \"# and domains but not to remove or to modify existing on
 sudo bash -c "echo -e \"export MESOS_reconfiguration_policy=additive\"  >> /usr/local/etc/mesos/mesos-slave-env.sh"
 
 
+echo " - Create / update eskimo MESOS version file"
+sudo bash -c "echo AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /etc/eskimo_mesos_environment"
+
+echo " - Checking eskimo MESOS version file"
+if [[ -z $TEST_MODE && ! -f /etc/eskimo_mesos_environment ]]; then
+    echo "Could not create /etc/eskimo_mesos_environment"
+    exit 21
+fi
+. /etc/eskimo_mesos_environment
+
+if [[ -z $TEST_MODE && ! -d /usr/local/lib/mesos-$AMESOS_VERSION ]]; then
+    echo "/etc/eskimo_mesos_environment doesn't point to valid mesos version"
+    exit 21
+fi
+
 echo " - Reloading systemd config"
 sudo systemctl daemon-reload >> mesos_install_log 2>&1
 fail_if_error $? "mesos_install_log" -6
@@ -194,12 +209,12 @@ fail_if_error $? "mesos_install_log" -6
 echo " - Checking mesos agent Systemd file"
 if [[ `systemctl status mesos-agent | grep 'could not be found'` != "" ]]; then
     echo "mesos-agent systemd file installation failed"
-    exit -12
+    exit 12
 fi
 sudo systemctl status mesos-agent > mesos_install_log 2>&1
 if [[ $? != 0 && $? != 3 ]]; then
     echo "mesos-agent systemd file doesn't work as expected"
-    exit -12
+    exit 13
 fi  
 
 echo " - Testing systemd startup - starting mesos-agent"
@@ -214,7 +229,7 @@ fail_if_error $? "mesos_install_log" -7
 echo " - Testing systemd startup - Make sure service is really running"
 if [[ `systemctl show -p SubState mesos-agent | grep exited` != "" ]]; then
     echo "mesos-agent service is actually not really running"
-    exit -13
+    exit 14
 fi
 
 echo " - Testing systemd startup - stopping mesos-agent"

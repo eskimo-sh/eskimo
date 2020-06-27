@@ -50,7 +50,7 @@ import java.io.IOException;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
-public class MesosAgentSearchSetupTest extends AbstractSetupShellTest {
+public class MesosAgentSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
