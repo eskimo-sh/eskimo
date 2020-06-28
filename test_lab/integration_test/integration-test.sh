@@ -291,7 +291,6 @@ __dp_build_box() {
     echo_date "   + Updating the appliance"
     vagrant ssh -c "sudo yum update -y" $1 >> /tmp/integration-test.log 2>&1
 
-
     if [[ $2 == "MASTER" ]]; then
 
         # Docker part
@@ -445,6 +444,8 @@ initial_setup_eskimo() {
 }
 
 setup_eskimo() {
+
+    sleep 10
 
     # login again
     echo_date " - CALL performing login"
@@ -1012,16 +1013,8 @@ run_zeppelin_flink_kafka() {
 
 run_zeppelin_other_notes() {
 
-    # TODO
-    #/usr/local/lib/kibana-7.6.2/src/plugins/home/server/services/sample_data/data_sets/flights
-
     # Run all paragraphs from all other notebooks
     # ----------------------------------------------------------------------------------------------------------------------
-
-    # TODO Find a way to have the kibana "flights" data loaded for this one
-    #echo_date " - ZEPPELIN running ElasticSearch Demo (Queries)"
-    #call_eskimo \
-    #    "zeppelin/api/notebook/job/2F844Y1ZM"
 
     echo_date " - ZEPPELIN running Spark ML Demo (Regression)"
     call_eskimo \
@@ -1048,6 +1041,7 @@ run_zeppelin_other_notes() {
     wait_for_executor_unregistered
 
 }
+
 do_cleanup() {
 
     # Cleanup (for demo preparation)
@@ -1144,19 +1138,96 @@ test_web_apps() {
 # TODO Ensure Kibana dashboard exist and has data
 # (TODO find out how to do this ? API ?)
 
-# TODO make sure documentation is well deployed and available
+test_doc(){
 
+    # Test documentation is packaged and available
+    # ----------------------------------------------------------------------------------------------------------------------
+
+    echo_date " - Testing Eskimo user guide"
+    if [[ `query_eskimo "docs/eskimo-guide.html" | grep "<p>Eskimo is available under a dual licensing model"` == "" ]]; then
+        echo "!! Couldnt get eskimo user guide"
+        exit 111
+    fi
+
+    echo_date " - Testing Eskimo service dev guide"
+    if [[ `query_eskimo "docs/service-dev-guide.html" | grep "<p>Eskimo is available under a dual licensing model"` == "" ]]; then
+        echo "!! Couldnt get eskimo service dev guide"
+        exit 112
+    fi
+
+    return
+}
 
 prepare_demo() {
 
     # [Optionally] Prepare demo
     # ----------------------------------------------------------------------------------------------------------------------
 
-    # FIXME make it work
-    #echo_date " - Loading Kibana flights sample data"
-    #call_eskimo "kibana/api/sample_data/flights"
+    echo_date " - Loading Kibana flights sample data"
+    curl  \
+            -b $SCRIPT_DIR/cookies \
+            -m 3600 \
+            -H "kbn-version: 7.6.2" \
+            -H "Content-Length: 0" \
+            -H "Content-Type: application/json" \
+            -H "Host: $BOX_IP" \
+            -H "Origin: $BOX_IP" \
+            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
+            -XPOST http://$BOX_IP/kibana/api/sample_data/flights \
+            > kibana-flight-import \
+            2> kibana-flight-import-error
 
-    # TODO Switch demo flag in config and restart eskimo
+    if [[ `cat kibana-flight-import | grep "elasticsearchIndicesCreated"` == "" ]]; then
+        echo "!! Couldn't import kibana flights object"
+        exit 113
+    fi
+
+    rm -f kibana-flight-import
+    rm -f kibana-flight-import-error
+
+    echo_date " - Loading Kibana Logs sample data"
+    curl  \
+            -b $SCRIPT_DIR/cookies \
+            -m 3600 \
+            -H "kbn-version: 7.6.2" \
+            -H "Content-Length: 0" \
+            -H "Content-Type: application/json" \
+            -H "Host: $BOX_IP" \
+            -H "Origin: $BOX_IP" \
+            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
+            -XPOST http://$BOX_IP/kibana/api/sample_data/logs \
+            > kibana-logs-import \
+            2> kibana-logs-import-error
+
+    if [[ `cat kibana-logs-import | grep "elasticsearchIndicesCreated"` == "" ]]; then
+        echo "!! Couldn't import kibana logs object"
+        exit 113
+    fi
+
+    rm -f kibana-logs-import
+    rm -f kibana-logs-import-error
+
+    echo_date " - Loading Kibana ecommerce sample data"
+    curl  \
+            -b $SCRIPT_DIR/cookies \
+            -m 3600 \
+            -H "kbn-version: 7.6.2" \
+            -H "Content-Length: 0" \
+            -H "Content-Type: application/json" \
+            -H "Host: $BOX_IP" \
+            -H "Origin: $BOX_IP" \
+            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
+            -XPOST http://$BOX_IP/kibana/api/sample_data/ecommerce \
+            > kibana-ecommerce-import \
+            2> kibana-ecommerce-import-error
+
+    if [[ `cat kibana-ecommerce-import | grep "elasticsearchIndicesCreated"` == "" ]]; then
+        echo "!! Couldn't import kibana ecommerce object"
+        exit 113
+    fi
+
+    rm -f kibana-ecommerce-import
+    rm -f kibana-ecommerce-import-error
 
     echo_date " - Find eskimo folder name (again)"
     eskimo_folder=$(vagrant ssh -c "ls /usr/local/lib | grep eskimo" integration-test 2> /dev/null | sed -e 's/\r//g')
@@ -1185,6 +1256,9 @@ prepare_demo() {
     echo_date " - Cleaning Yum Cache"
     vagrant ssh -c "sudo yum clean all" integration-test >> /tmp/integration-test.log 2>&1
 
+    echo_date " - Switching to Demo Mode"
+    vagrant ssh -c "sudo sed -i s/\"eskimo.demoMode=false\"/\"eskimo.demoMode=true\"/g /usr/local/lib/$eskimo_folder/conf/eskimo.properties" integration-test >> /tmp/integration-test.log 2>&1
+
     echo_date " - Zeroing disk before shutdown"
     vagrant ssh -c "dd if=/dev/zero of=/tmp/empty.dd bs=1048576; rm /tmp/empty.dd " integration-test >> /tmp/integration-test.log 2>&1
 
@@ -1193,7 +1267,6 @@ prepare_demo() {
 
     echo_date "!!! You can now export the DemoVM using Virtual Box "
 }
-
 
 # get logs
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
@@ -1205,19 +1278,21 @@ usage() {
     echo "    -r  Re-install eskimo on existing VM"
     echo "    -f  Fast repackage"
     echo "    -m  Test on multiple nodes"
+    echo "    -n  Don't rebuild the software (use last build)"
 }
 
 export BOX_IP=192.168.10.41
 export DEMO=""
 export FAST_REPACKAGE=""
 export REBUILD_ONLY=""
+export DONT_REBUILD=""
 export MULTIPLE_NODE=""
 export TARGET_MASTER_VM="integration-test"
 
 sudo rm -Rf /tmp/integration-test.log
 
 # Parse options to the integration-test script
-while getopts ":hdrfm" opt; do
+while getopts ":hdrfmn" opt; do
     case ${opt} in
         h)
             usage
@@ -1233,6 +1308,10 @@ while getopts ":hdrfm" opt; do
             ;;
         f)
             export FAST_REPACKAGE=fast
+            break
+            ;;
+        n)
+            export DONT_REBUILD=dont
             break
             ;;
         m)
@@ -1260,7 +1339,9 @@ check_for_virtualbox
 
 check_for_vagrant
 
-rebuild_eskimo
+if [[ -z $DONT_REBUILD ]]; then
+    rebuild_eskimo
+fi
 
 if [[ -z $REBUILD_ONLY ]]; then
     build_box
@@ -1285,6 +1366,8 @@ if [[ -z $REBUILD_ONLY ]]; then
     run_zeppelin_other_notes
 
     test_web_apps
+
+    test_doc
 
     do_cleanup
 fi

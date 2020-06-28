@@ -154,6 +154,9 @@ Software.
                             </div>
                         </div>
                     </div>
+                    <div id="login-demo-footer" class="eskimo-panel-footer panel-footer" style="display: none;">
+                        (Use <b>admin</b> / <b>password</b> on Demo VM)
+                    </div>
                 </div>
             </div>
         </div>
@@ -174,6 +177,10 @@ Software.
             $("#login-error-panel").css("display", "none");
             $("#panel-login-body").css("padding-bottom", "20px");
         }, 5000);
+    }
+
+    if (window.location.href.indexOf("demo") > -1) {
+        $("#login-demo-footer").css("display", "block");
     }
 
 </script>

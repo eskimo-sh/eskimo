@@ -64,6 +64,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
 
+    @Value("${eskimo.demoMode}")
+    private boolean demoMode = false;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -87,7 +90,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     if (isAjax(httpServletRequest)) {
                         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                     } else {
-                        httpServletResponse.sendRedirect(contextPath + LOGIN_PAGE_URL);
+                        httpServletResponse.sendRedirect(contextPath + LOGIN_PAGE_URL
+                                + (demoMode ? "?demo=true" : ""));
                     }
                 }).and()
             // own login stuff
