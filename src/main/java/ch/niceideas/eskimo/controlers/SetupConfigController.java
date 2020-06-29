@@ -38,12 +38,11 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,52 +51,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 
 @Controller
-public class SetupConfigController {
+public class SetupConfigController extends AbstractOperationController {
 
     private static final Logger logger = Logger.getLogger(SetupConfigController.class);
 
     public static final String PENDING_SETUP_COMMAND = "PENDING_SETUP_COMMAND";
 
-    @Resource
-    private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
-
     @Autowired
     private SetupService setupService;
 
     @Autowired
-    private SystemService systemService;
-
-    @Autowired
     private ConfigurationService configurationService;
 
-    @Value("${eskimo.demoMode}")
-    private boolean demoMode = false;
-
     /* For tests */
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
     }
     void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
-    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
-    void setDemoMode (boolean demoMode) {
-        this.demoMode = demoMode;
-    }
-
 
     @GetMapping("/load-setup")
     @ResponseBody
@@ -123,12 +100,12 @@ public class SetupConfigController {
 
         } catch (FileException | JSONException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
 
         } catch (SetupException e) {
             // this is OK. means application is not initialized
             logger.debug(e, e);
-            return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
         }
     }
 
@@ -152,19 +129,12 @@ public class SetupConfigController {
 
         } catch (SetupException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
     private String returnCommand(SetupCommand command) {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("command", command.toJSON());
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
+        return ReturnStatusHelper.createOKStatus(map -> map.put("command", command.toJSON()));
     }
 
     @PostMapping("/apply-setup")
@@ -172,37 +142,15 @@ public class SetupConfigController {
     @ResponseBody
     public String applySetup(HttpSession session) {
 
-        if (systemService.isProcessingPending()) {
-
-            String message = "Some backend operations are currently running. Please retry after they are completed.";
-
-            messagingService.addLines (message);
-            notificationService.addError("Operation In Progress");
-
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", message);
-            }}).toString(2);
-        }
-
-        if (demoMode) {
-
-            String message = "Unfortunately, changing setup configuration is not possible in DEMO mode.";
-
-            messagingService.addLines (message);
-            notificationService.addError("Demo Mode");
-
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", message);
-            }}).toString(2);
+        JSONObject checkObject = checkOperations("Unfortunately, changing setup configuration is not possible in DEMO mode.");
+        if (checkObject != null) {
+            return checkObject.toString(2);
         }
 
         SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
         session.removeAttribute(PENDING_SETUP_COMMAND);
 
         return setupService.applySetup(command.getRawSetup());
-
     }
 
 }

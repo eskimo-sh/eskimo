@@ -75,10 +75,10 @@ eskimo.OperationsCommand = function(constructorObject) {
 
         //console.log (command);
 
-        var commandDescription = "<b>Following Operations are about to be applied</b><br><br>";
+        var commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
 
         // installations
-        commandDescription += "<b>Services Installation</b><br><br>";
+        commandDescription += "<strong>Services Installation</strong><br><br>";
 
         for (var i = 0; i < command.installations.length; i++) {
             commandDescription = renderOperation(command.installations[i], commandDescription);
@@ -87,7 +87,7 @@ eskimo.OperationsCommand = function(constructorObject) {
         commandDescription += "<br>";
 
         // uninstallations
-        commandDescription += "<b>Services Uninstallation</b><br><br>";
+        commandDescription += "<strong>Services Uninstallation</strong><br><br>";
 
         for (var i = 0; i < command.uninstallations.length; i++) {
             commandDescription = renderOperation(command.uninstallations[i], commandDescription);
@@ -96,7 +96,7 @@ eskimo.OperationsCommand = function(constructorObject) {
         commandDescription += "<br>";
 
         // reinstallations
-        commandDescription += "<b>Services Restart</b><br><br>";
+        commandDescription += "<strong>Services Restart</strong><br><br>";
 
         for (var i = 0; i < command.restarts.length; i++) {
             commandDescription = renderOperation(command.restarts[i], commandDescription);

@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.services.TerminalService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,13 +69,12 @@ public class TerminalController {
 
         try {
             terminalService.removeTerminal(sessionId);
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-            }}).toString(2);
 
-        } catch (IOException | JSONException e) {
+            return ReturnStatusHelper.createOKStatus();
+
+        } catch (IOException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 

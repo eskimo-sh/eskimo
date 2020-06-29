@@ -33,7 +33,7 @@ public class TerminalControllerTest {
         tc.setTerminalService(new TerminalService() {
             @Override
             public void removeTerminal (String sessionId) throws IOException {
-                throw new JSONException("Error Test");
+                throw new IOException("Error Test");
             }
         });
 

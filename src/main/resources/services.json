@@ -153,12 +153,12 @@
         "properties": [
           {
             "name": "admin_user",
-            "comment": "Login Name of the Grafana admin user within eskimo\n<b>CAN ONLY BE CHANGED BEFORE FIRST START OF GRAFANA</b>",
+            "comment": "Login Name of the Grafana admin user within eskimo\n<strong>CAN ONLY BE CHANGED BEFORE FIRST START OF GRAFANA</strong>",
             "defaultValue": "eskimo"
           },
           {
             "name": "admin_password",
-            "comment": "Login Password of the Grafana admin user within eskimo\n<b>CAN ONLY BE CHANGED BEFORE FIRST START OF GRAFANA</b>",
+            "comment": "Login Password of the Grafana admin user within eskimo\n<strong>CAN ONLY BE CHANGED BEFORE FIRST START OF GRAFANA</strong>",
             "defaultValue": "eskimo"
           }
         ]

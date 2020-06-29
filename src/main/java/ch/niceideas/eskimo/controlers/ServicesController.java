@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,112 +65,78 @@ public class ServicesController {
     @GetMapping("/list-services")
     @ResponseBody
     public String listServices() {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("services", new JSONArray(servicesDefinition.listServicesInOrder()));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+        return ReturnStatusHelper.createOKStatus(map ->
+                map.put("services", new JSONArray(servicesDefinition.listServicesInOrder())));
     }
 
     @GetMapping("/list-ui-services")
     @ResponseBody
     public String listUIServices() {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("uiServices", new JSONArray(servicesDefinition.listUIServices()));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+        return ReturnStatusHelper.createOKStatus(map ->
+                map.put("uiServices", new JSONArray(servicesDefinition.listUIServices())));
     }
 
     @GetMapping("/get-ui-services-config")
     @ResponseBody
     public String getUIServicesConfig() {
-        try {
+        return ReturnStatusHelper.createOKStatus(map -> {
             Map<String, Object> uiServicesConfig = new HashMap<>();
             Map<String, UIConfig> uiConfigs = servicesDefinition.getUIServicesConfig();
 
             uiConfigs.keySet()
                     .forEach(name -> uiServicesConfig.put (name, uiConfigs.get(name).toJSON()));
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("uiServicesConfig", new JSONObject(uiServicesConfig));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+            map.put("uiServicesConfig", new JSONObject(uiServicesConfig));
+        });
     }
 
     @GetMapping("/get-ui-services-status-config")
     @ResponseBody
     public String getUIServicesStatusConfig() {
+        return ReturnStatusHelper.createOKStatus(map -> {
+            Map<String, Object> uiServicesStatusConfig = new HashMap<>();
+            Arrays.stream(servicesDefinition.listAllServices())
+                    .map(name -> servicesDefinition.getService(name))
+                    .forEach(service -> uiServicesStatusConfig.put (service.getName(), service.toUiStatusConfigJSON()));
 
-        Map<String, Object> uiServicesStatusConfig = new HashMap<>();
-        Arrays.stream(servicesDefinition.listAllServices())
-                .map(name -> servicesDefinition.getService(name))
-                .forEach(service -> uiServicesStatusConfig.put (service.getName(), service.toUiStatusConfigJSON()));
 
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("uiServicesStatusConfig", new JSONObject(uiServicesStatusConfig));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+            map.put("uiServicesStatusConfig", new JSONObject(uiServicesStatusConfig));
+        });
     }
 
     @GetMapping("/get-services-dependencies")
     @ResponseBody
     public String getServicesDependencies() {
+        return ReturnStatusHelper.createOKStatus(map -> {
+            Map<String, Object> servicesDependencies = new HashMap<>();
 
-        Map<String, Object> servicesDependencies = new HashMap<>();
-
-        try {
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesDependencies.put (service.getName(), service.toDependenciesJSON()));
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("servicesDependencies", new JSONObject(servicesDependencies));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+            map.put("servicesDependencies", new JSONObject(servicesDependencies));
+        });
     }
 
     @GetMapping("/get-services-config")
     @ResponseBody
     public String getServicesConfigurations() {
+        return ReturnStatusHelper.createOKStatus(map -> {
+            Map<String, Object> servicesConfigurations = new HashMap<>();
 
-        Map<String, Object> servicesConfigurations = new HashMap<>();
-
-        try {
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .filter(service -> !service.isMarathon())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("servicesConfigurations", new JSONObject(servicesConfigurations));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+            map.put("servicesConfigurations", new JSONObject(servicesConfigurations));
+        });
     }
 
     @GetMapping("/list-config-services")
     @ResponseBody
     public String listConfigServices() {
-        try {
+        return ReturnStatusHelper.createOKStatus(map -> {
 
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
@@ -178,22 +144,17 @@ public class ServicesController {
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("uniqueServices", new JSONArray(servicesDefinition.listUniqueServices()));
-                put("multipleServices", new JSONArray(servicesDefinition.listMultipleServices()));
-                put("mandatoryServices", new JSONArray(servicesDefinition.listMandatoryServices()));
-                put("servicesConfigurations", new JSONObject(servicesConfigurations));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+            map.put("uniqueServices", new JSONArray(servicesDefinition.listUniqueServices()));
+            map.put("multipleServices", new JSONArray(servicesDefinition.listMultipleServices()));
+            map.put("mandatoryServices", new JSONArray(servicesDefinition.listMandatoryServices()));
+            map.put("servicesConfigurations", new JSONObject(servicesConfigurations));
+        });
     }
 
     @GetMapping("/get-marathon-services")
     @ResponseBody
     public String getMarathonServices() {
-        try {
+        return ReturnStatusHelper.createOKStatus(map -> {
 
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
@@ -202,14 +163,9 @@ public class ServicesController {
                     .filter(Service::isMarathon)
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("marathonServices", new JSONArray(servicesDefinition.listMarathonServices()));
-                put("marathonServicesConfigurations", new JSONObject(servicesConfigurations));
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
-        }
+            map.put("marathonServices", new JSONArray(servicesDefinition.listMarathonServices()));
+            map.put("marathonServicesConfigurations", new JSONObject(servicesConfigurations));
+        });
     }
 
 }

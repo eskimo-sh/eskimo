@@ -35,17 +35,16 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.JSONOpCommand;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,26 +55,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.io.Serializable;
 import java.util.HashMap;
 
 
 @Controller
-public class NodesConfigController {
+public class NodesConfigController extends AbstractOperationController {
 
     private static final Logger logger = Logger.getLogger(NodesConfigController.class);
 
     public static final String PENDING_OPERATIONS_STATUS_OVERRIDE = "PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE";
     public static final String PENDING_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
-
-    @Resource
-    private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private SystemService systemService;
 
     @Autowired
     private SetupService setupService;
@@ -95,13 +84,7 @@ public class NodesConfigController {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
-    @Value("${eskimo.demoMode}")
-    private boolean demoMode = false;
-
     /* For tests */
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
     }
@@ -120,11 +103,6 @@ public class NodesConfigController {
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
     }
-    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
-    void setDemoMode (boolean demoMode) {
-        this.demoMode = demoMode;
-    }
 
     @GetMapping("/load-nodes-config")
     @ResponseBody
@@ -133,18 +111,18 @@ public class NodesConfigController {
             setupService.ensureSetupCompleted();
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
             return nodesConfig.getFormattedValue();
 
         } catch (SystemException | JSONException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e.getMessage());
+            return ReturnStatusHelper.createErrorStatus(e.getMessage());
 
         } catch (SetupException e) {
             // this is OK. means application is not yet initialized
             logger.debug (e, e);
-            return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
         }
     }
 
@@ -173,7 +151,7 @@ public class NodesConfigController {
 
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
 
             // Create OperationsCommand
@@ -188,18 +166,7 @@ public class NodesConfigController {
         } catch (JSONException | FileException | NodesConfigurationException | SetupException | SystemException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
-        }
-    }
-
-    static String returnCommand(JSONOpCommand<? extends Serializable> command) {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("command", command.toJSON());
-            }}).toString(2);
-        } catch (JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
@@ -231,7 +198,7 @@ public class NodesConfigController {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
@@ -242,30 +209,9 @@ public class NodesConfigController {
 
         try {
 
-            if (systemService.isProcessingPending()) {
-
-                String message = "Some backend operations are currently running. Please retry after they are completed.";
-
-                messagingService.addLines (message);
-                notificationService.addError("Operation In Progress");
-
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", message);
-                }}).toString(2);
-            }
-
-            if (demoMode) {
-
-                String message = "Unfortunately, re-applying nodes configuration or changing nodes configuration is not possible in DEMO mode.";
-
-                messagingService.addLines (message);
-                notificationService.addError("Demo Mode");
-
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", message);
-                }}).toString(2);
+            JSONObject checkObject = checkOperations("Unfortunately, re-applying nodes configuration or changing nodes configuration is not possible in DEMO mode.");
+            if (checkObject != null) {
+                return checkObject.toString(2);
             }
 
             OperationsCommand command = (OperationsCommand) session.getAttribute(PENDING_OPERATIONS_COMMAND);
@@ -283,17 +229,17 @@ public class NodesConfigController {
 
             nodesConfigurationService.applyNodesConfig(command);
 
-            return "{\"status\": \"OK\" }";
+            return ReturnStatusHelper.createOKStatus();
 
         } catch (SystemException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
 
         } catch (JSONException | SetupException | FileException | NodesConfigurationException | ServiceDefinitionException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 }

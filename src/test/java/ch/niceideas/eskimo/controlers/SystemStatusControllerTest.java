@@ -33,14 +33,14 @@ public class SystemStatusControllerTest {
 
         ssc.setSystemService(new SystemService(false) {
             public boolean getLastOperationSuccess() {
-                throw new JSONException("Test Error");
+                throw new IllegalStateException("Test Error");
             }
         });
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> ssc.getLastOperationResult());
 
-        assertEquals ("org.json.JSONException: Test Error", exception.getMessage());
+        assertEquals ("Test Error", exception.getMessage());
     }
 
     @Test

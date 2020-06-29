@@ -71,10 +71,10 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
 
         console.log (command);
 
-        var commandDescription = "<b>Following Operations are about to be applied</b><br><br>";
+        var commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
 
         // installations
-        commandDescription += "<b>Marathon Services Installation</b><br><br>";
+        commandDescription += "<strong>Marathon Services Installation</strong><br><br>";
 
         for (var i = 0; i < command.installations.length; i++) {
             commandDescription = renderOperation(command.installations[i], commandDescription);
@@ -83,7 +83,7 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
         commandDescription += "<br>";
 
         // uninstallations
-        commandDescription += "<b>Marathon Services Uninstallation</b><br><br>";
+        commandDescription += "<strong>Marathon Services Uninstallation</strong><br><br>";
 
         for (var i = 0; i < command.uninstallations.length; i++) {
             commandDescription = renderOperation(command.uninstallations[i], commandDescription);

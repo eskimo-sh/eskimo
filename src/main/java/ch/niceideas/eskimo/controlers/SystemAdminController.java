@@ -37,12 +37,11 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,21 +54,12 @@ import java.util.HashMap;
 
 
 @Controller
-public class SystemAdminController {
+public class SystemAdminController extends AbstractOperationController {
 
     private static final Logger logger = Logger.getLogger(SystemAdminController.class);
 
     @Autowired
-    private SystemService systemService;
-
-    @Autowired
     private MarathonService marathonService;
-
-    @Resource
-    private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -80,13 +70,7 @@ public class SystemAdminController {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
-    @Value("${eskimo.demoMode}")
-    private boolean demoMode = false;
-
     /* for tests */
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
@@ -96,12 +80,6 @@ public class SystemAdminController {
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
-    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
-    void setDemoMode (boolean demoMode) {
-        this.demoMode = demoMode;
-    }
-
 
     @GetMapping("/interupt-processing")
     @Transactional(isolation= Isolation.REPEATABLE_READ)
@@ -111,13 +89,11 @@ public class SystemAdminController {
         try {
             systemService.interruptProcessing();
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus();
 
         } catch (JSONException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
 
         }
     }
@@ -127,15 +103,11 @@ public class SystemAdminController {
         try {
             operation.performOperation(marathonService);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", message);
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
 
-        } catch (JSONException | SSHCommandException | MarathonException e) {
+        } catch (SSHCommandException | MarathonException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
-
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 
@@ -144,15 +116,11 @@ public class SystemAdminController {
         try {
             operation.performOperation(systemService);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("messages", message);
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
 
-        } catch (JSONException | SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException | MarathonException e) {
+        } catch (SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException | MarathonException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
-
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 
@@ -245,30 +213,9 @@ public class SystemAdminController {
 
         try {
 
-            if (systemService.isProcessingPending()) {
-
-                String message = "Some backend operations are currently running. Please retry after they are completed.";
-
-                messagingService.addLines (message);
-                notificationService.addError("Operation In Progress");
-
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", message);
-                }}).toString(2);
-            }
-
-            if (demoMode) {
-
-                String message = "Unfortunately, re-installing a service is not possible in DEMO mode.";
-
-                messagingService.addLines (message);
-                notificationService.addError("Demo Mode");
-
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", message);
-                }}).toString(2);
+            JSONObject checkObject = checkOperations("Unfortunately, re-installing a service is not possible in DEMO mode.");
+            if (checkObject != null) {
+                return checkObject.toString(2);
             }
 
             Service service = servicesDefinition.getService(serviceName);
@@ -294,7 +241,7 @@ public class SystemAdminController {
 
                 MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
                 if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
-                    return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                    return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
                 }
 
                 MarathonOperationsCommand operationsCommand = MarathonOperationsCommand.create(
@@ -308,7 +255,7 @@ public class SystemAdminController {
 
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
                 if (nodesConfig == null || nodesConfig.isEmpty()) {
-                    return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                    return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
                 }
 
                 OperationsCommand operationsCommand = OperationsCommand.create(
@@ -322,7 +269,7 @@ public class SystemAdminController {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 

@@ -92,7 +92,7 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
                 String marathonNodeName = lastStatus.getFirstNodeName("marathon");
                 if (StringUtils.isBlank(marathonNodeName)) {
                     retCommand.setWarnings("Marathon is not available. The changes in marathon services configuration and " +
-                            "deployments will be saved but they will <b>need to be applied again</b> another time when " +
+                            "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
                             "marathon is available");
 
                 } else {
@@ -100,7 +100,7 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
                     if (!lastStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
 
                         retCommand.setWarnings("Marathon is not properly running. The changes in marathon services configuration and " +
-                                "deployments will be saved but they will <b>need to be applied again</b> another time when " +
+                                "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
                                 "marathon is available");
                     }
                 }

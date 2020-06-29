@@ -189,7 +189,7 @@ public class NodesConfigControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ncc.reinstallNodesConfig("{\"gluster\":\"on\",\"spark-executor\":\"on\",\"logstash\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\" }", ncc.applyNodesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }
@@ -348,7 +348,7 @@ public class NodesConfigControllerTest {
                 "\"prometheus2\":\"on\"," +
                 "\"spark-executor2\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\" }", ncc.applyNodesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }

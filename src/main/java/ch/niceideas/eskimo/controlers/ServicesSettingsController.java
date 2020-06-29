@@ -38,8 +38,9 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,13 +98,12 @@ public class ServicesSettingsController {
         try {
 
             ServicesSettingsWrapper wrapper = configurationService.loadServicesSettings();
-
             wrapper.setValueForPath("status", "OK");
 
             return wrapper.getFormattedValue();
         } catch (JSONException | FileException | SetupException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e.getMessage());
+            return ReturnStatusHelper.createErrorStatus(e.getMessage());
         }
     }
 
@@ -124,16 +124,13 @@ public class ServicesSettingsController {
             // store command and config in HTTP Session
             session.setAttribute(PENDING_SETTINGS_OPERATIONS_COMMAND, command);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("command", command.toJSON());
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus(map -> map.put("command", command.toJSON()));
 
-        } catch (JSONException | SetupException | FileException e) {
+        } catch (SetupException | FileException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Service Settings Application preparation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
@@ -145,10 +142,8 @@ public class ServicesSettingsController {
         try {
 
             if (systemService.isProcessingPending()) {
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", "Some backend operations are currently running. Please retry after they are completed..");
-                }}).toString(2);
+                return ReturnStatusHelper.createOKStatus(map ->
+                        map.put("messages", "Some backend operations are currently running. Please retry after they are completed.."));
             }
 
             SettingsOperationsCommand command = (SettingsOperationsCommand) session.getAttribute(PENDING_SETTINGS_OPERATIONS_COMMAND);
@@ -156,17 +151,17 @@ public class ServicesSettingsController {
 
             servicesSettingsService.applyServicesSettings(command);
 
-            return "{\"status\": \"OK\" }";
+            return ReturnStatusHelper.createOKStatus();
 
         } catch (SystemException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
 
-        } catch (JSONException | SetupException | FileException e) {
+        } catch (SetupException | FileException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Setting application failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 }

@@ -272,7 +272,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
 
-        assertJavascriptEquals("<b>Grafana doesn't know dashboard with ID abcd</b>", "$('#status-monitoring-no-dashboard').html()");
+        assertJavascriptEquals("<strong>Grafana doesn't know dashboard with ID abcd</strong>", "$('#status-monitoring-no-dashboard').html()");
 
         page.executeJavaScript("$.ajax = function (options) {" +
                 "    options.success()" +

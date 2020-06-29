@@ -204,7 +204,7 @@ eskimo.ServicesSettings = function (constructorObject) {
                     servicesSettingsContent = servicesSettingsContent +
 
                         '<div class="col-md-12 col-sd-12">' +
-                        '<h5><b>Configuration file</b> : ' + serviceEditableSettingsFile.filename + '</h5>' +
+                        '<h5><strong>Configuration file</strong> : ' + serviceEditableSettingsFile.filename + '</h5>' +
                         '</div>';
 
                     for (var k = 0; k < serviceEditableSettingsFile.properties.length; k++) {
@@ -216,9 +216,9 @@ eskimo.ServicesSettings = function (constructorObject) {
                         servicesSettingsContent = servicesSettingsContent +
                             '<div class="col-md-12 col-sd-12">\n' +
                             '     <label class="col-md-12 control-label">'+
-                            '         <b>'+
+                            '         <strong>'+
                             property.name+
-                            '         </b> : '+
+                            '         </strong> : '+
                             '     </label>\n' +
                             '     <div class="col-md-12">\n' +
                             property.comment.replace("\n", "<br>") +

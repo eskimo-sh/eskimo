@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.FileManagerService;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,12 +73,10 @@ public class FileManagerController {
         try {
             fileManagerService.removeFileManager(hostAddress);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus();
         } catch (JSONException e) {
             logger.error (e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 
@@ -100,14 +98,12 @@ public class FileManagerController {
         try {
             Pair<String, JSONObject> result = fileManagerService.navigateFileManager(hostAddress, folder, subFolder);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("folder", result.getKey());
-                put("content", result.getValue());
-            }}).toString(2);
-
-        } catch (IOException | JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createOKStatus (map -> {
+                map.put("folder", result.getKey());
+                map.put("content", result.getValue());
+            });
+        } catch (IOException e) {
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 
@@ -121,14 +117,13 @@ public class FileManagerController {
         try {
             Pair<String, JSONObject> result = fileManagerService.createFile(hostAddress, folder, fileName);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("folder", result.getKey());
-                put("content", result.getValue());
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus (map -> {
+                map.put("folder", result.getKey());
+                map.put("content", result.getValue());
+            });
 
-        } catch (IOException | JSONException e) {
-            return ErrorStatusHelper.createErrorStatus(e);
+        } catch (IOException e) {
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 
@@ -144,7 +139,7 @@ public class FileManagerController {
 
         } catch (JSONException e) {
             logger.error (e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
 
         }
     }
@@ -186,14 +181,11 @@ public class FileManagerController {
         try {
             String deletedPath =  fileManagerService.deletePath(hostAddress, folder, file);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("path", deletedPath);
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus (map -> map.put("path", deletedPath));
 
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             logger.error (e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
+            return ReturnStatusHelper.createErrorStatus(e);
 
         }
     }
@@ -209,15 +201,11 @@ public class FileManagerController {
         try {
             fileManagerService.uploadFile (hostAddress, folder, filename, file.getInputStream());
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("file", file.getName());
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus (map -> map.put("file", file.getName()));
 
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             logger.error (e, e);
-            return ErrorStatusHelper.createErrorStatus(e);
-
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 }

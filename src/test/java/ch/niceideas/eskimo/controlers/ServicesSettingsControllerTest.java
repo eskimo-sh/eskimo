@@ -97,7 +97,7 @@ public class ServicesSettingsControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", scc.prepareSaveServicesSettings("{\"dummyJson\" : \"dummyJson\"}", session));
 
-        assertEquals ("{\"status\": \"OK\" }", scc.saveServicesSettings(session));
+        assertEquals ("{\"status\": \"OK\"}", scc.saveServicesSettings(session));
 
         scc.setServicesSettingsService(new ServicesSettingsService() {
             @Override

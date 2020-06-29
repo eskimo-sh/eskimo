@@ -35,12 +35,14 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.services.AbstractInformationService;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
@@ -53,26 +55,11 @@ public class AbstractInformationController<T, R>  {
     }
 
     String lastLine(Integer lastLine) {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("lastLine", lastLine);
-            }}).toString(2);
-        } catch (JSONException e) {
-            logger.error(e, e);
-            throw new IllegalStateException(e);
-        }
+        return ReturnStatusHelper.createOKStatus(map -> map.put("lastLine", lastLine));
     }
 
     public String clear(AbstractInformationService<T, R>  is) {
-        try {
-            is.clear();
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-            }}).toString(2);
-        } catch (JSONException e) {
-            logger.error (e, e);
-            throw new IllegalStateException(e);
-        }
+        is.clear();
+        return ReturnStatusHelper.createOKStatus();
     }
 }

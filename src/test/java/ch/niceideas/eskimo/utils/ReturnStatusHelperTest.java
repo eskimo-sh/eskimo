@@ -38,14 +38,14 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class ErrorStatusHelperTest {
+public class ReturnStatusHelperTest {
 
     @Test
     public void testCreateErrorStatus() {
         assertEquals("{\n" +
                 "  \"error\": \"test\",\n" +
                 "  \"status\": \"KO\"\n" +
-                "}", ErrorStatusHelper.createErrorStatus("test"));
+                "}", ReturnStatusHelper.createErrorStatus("test"));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ErrorStatusHelperTest {
         assertEquals("{\n" +
                 "  \"error\": \"dGVzdA==\",\n" +
                 "  \"status\": \"KO\"\n" +
-                "}", ErrorStatusHelper.createEncodedErrorStatus(new RuntimeException("test")));
+                "}", ReturnStatusHelper.createEncodedErrorStatus(new RuntimeException("test")));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class ErrorStatusHelperTest {
                 "  \"clear\": \"test\",\n" +
                 "  \"processingPending\": true,\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ErrorStatusHelper.createClearStatus("test", true));
+                "}", ReturnStatusHelper.createClearStatus("test", true));
     }
 
     @Test
@@ -72,6 +72,6 @@ public class ErrorStatusHelperTest {
                 "  \"message\": \"test-message\",\n" +
                 "  \"processingPending\": true,\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ErrorStatusHelper.createClearStatusWithMessage("test", true, "test-message"));
+                "}", ReturnStatusHelper.createClearStatusWithMessage("test", true, "test-message"));
     }
 }

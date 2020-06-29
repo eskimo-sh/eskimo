@@ -38,7 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -555,7 +555,7 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".distribution");
 
-                        downloadPackage("eskimo_" + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                        downloadPackage(MESOS_PREFIX + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
 
                 } else {
@@ -601,7 +601,7 @@ public class SetupService {
             logger.error(e, e);
             messagingService.addLines("\nerror : "
                     + e.getMessage());
-            return ErrorStatusHelper.createErrorStatus (e);
+            return ReturnStatusHelper.createErrorStatus (e);
 
         } finally {
             systemService.setLastOperationSuccess (success);

@@ -157,12 +157,12 @@ public class MarathonServicesConfigControllerTest {
                 "      \"cerebro\",\n" +
                 "      \"zeppelin\"\n" +
                 "    ],\n" +
-                "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <b>need to be applied again<\\/b> another time when marathon is available\"\n" +
+                "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when marathon is available\"\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", mscc.reinstallMarathonServiceConfig("{\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\" }", mscc.applyMarathonServicesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", mscc.applyMarathonServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }
@@ -264,7 +264,7 @@ public class MarathonServicesConfigControllerTest {
                         "      \"spark-history-server\"\n" +
                         "    ],\n" +
                         "    \"installations\": [\"grafana\"],\n" +
-                        "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <b>need to be applied again<\\/b> another time when marathon is available\"\n" +
+                        "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when marathon is available\"\n" +
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
                         "}",
@@ -275,7 +275,7 @@ public class MarathonServicesConfigControllerTest {
                 "\"spark-history-server\":\"on\"," +
                 "\"kibana\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\" }", mscc.applyMarathonServicesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", mscc.applyMarathonServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }

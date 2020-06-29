@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,15 +77,7 @@ public class SystemStatusController {
     @GetMapping("/get-last-operation-result")
     @ResponseBody
     public String getLastOperationResult() {
-        try {
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("success", systemService.getLastOperationSuccess());
-            }}).toString(2);
-        } catch (JSONException e) {
-            logger.error (e, e);
-            throw new IllegalStateException(e);
-        }
+        return ReturnStatusHelper.createOKStatus(map -> map.put("success", systemService.getLastOperationSuccess()));
     }
 
     @GetMapping("/get-status")
@@ -99,35 +91,32 @@ public class SystemStatusController {
 
             JsonWrapper systemStatus = statusService.getStatus();
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
+            return ReturnStatusHelper.createOKStatus(map -> {
                 if (nodeServicesStatus == null || nodeServicesStatus.isEmpty()) {
-                    put("clear", "nodes");
+                    map.put("clear", "nodes");
                 } else {
-                    put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
+                    map.put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
                 }
-                put("systemStatus", systemStatus.getJSONObject());
-                put("processingPending", systemService.isProcessingPending());
-            }}).toString(2);
+                map.put("systemStatus", systemStatus.getJSONObject());
+                map.put("processingPending", systemService.isProcessingPending());
+            });
 
         } catch (SetupException e) {
 
             // this is OK. means application is not yet initialized
             logger.debug (e.getCause(), e.getCause());
-            return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
 
         } catch (SystemService.StatusExceptionWrapperException e) {
 
             if (e.getCause() instanceof SetupException) {
                 // this is OK. means application is not yet initialized
                 logger.debug (e.getCause(), e.getCause());
-                return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
             } else {
                 logger.debug(e.getCause(), e.getCause());
-                return ErrorStatusHelper.createErrorStatus ((Exception)e.getCause());
+                return ReturnStatusHelper.createErrorStatus ((Exception)e.getCause());
             }
         }
     }
-
-
 }

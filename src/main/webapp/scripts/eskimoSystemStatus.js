@@ -507,7 +507,7 @@ eskimo.SystemStatus = function(constructorObject) {
                 console.debug("error : could not fetch dashboard " + monitoringDashboardId);
 
                 // mention the fact that dashboard does not exist
-                $('#status-monitoring-no-dashboard').html("<b>Grafana doesn't know dashboard with ID " + monitoringDashboardId + "</b>");
+                $('#status-monitoring-no-dashboard').html("<strong>Grafana doesn't know dashboard with ID " + monitoringDashboardId + "</strong>");
             }
         });
 

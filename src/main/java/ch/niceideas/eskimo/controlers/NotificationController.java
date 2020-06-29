@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.NotificationService;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,11 +72,11 @@ public class NotificationController extends AbstractInformationController<JSONOb
         try {
             Pair<Integer, List<JSONObject>> newLines = notificationService.fetchElements (lastLine);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("lastLine", ""+newLines.getKey());
-                put("notifications", new JSONArray(newLines.getValue().toArray()));
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus(map -> {
+                map.put("lastLine", ""+newLines.getKey());
+                map.put("notifications", new JSONArray(newLines.getValue().toArray()));
+            });
+
         } catch (JSONException e) {
             logger.error (e, e);
             throw new IllegalStateException(e);

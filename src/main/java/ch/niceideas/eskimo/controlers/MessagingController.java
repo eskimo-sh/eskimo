@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.MessagingService;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,11 +71,10 @@ public class MessagingController extends AbstractInformationController<String, S
 
             Pair<Integer, String> newLines = messagingService.fetchElements (lastLine);
 
-            return new JSONObject(new HashMap<String, Object>() {{
-                put("status", "OK");
-                put("lastLine", newLines.getKey() );
-                put("lines", Base64.getEncoder().encodeToString(newLines.getValue().getBytes()));
-            }}).toString(2);
+            return ReturnStatusHelper.createOKStatus(map -> {
+                map.put("lastLine", newLines.getKey());
+                map.put("lines", Base64.getEncoder().encodeToString(newLines.getValue().getBytes()));
+            });
 
         } catch (JSONException e) {
             logger.error(e, e);

@@ -65,77 +65,77 @@ eskimo.SetupCommand = function(constructorObject) {
 
         console.log (command);
 
-        var commandDescription = "<b>Following Operations are about to be applied</b>";
+        var commandDescription = "<strong>Following Operations are about to be applied</strong>";
 
         // Build of packages
         if (command.buildPackage != null && command.buildPackage.length > 0) {
 
-            commandDescription += '<br><br><b>Packages are about to be built.</b>' +
+            commandDescription += '<br><br><strong>Packages are about to be built.</strong>' +
                 '<br>'+
                 'Building packages happens in the folder "packages_dev" under the root folder of your eskimo installation<br>'+
                 'Packages are built using shell script and docker.<br>'+
                 'Building packages can take several dozen of minutes<br>'+
-                '<b>List of packages to be built</b><br>';
+                '<strong>List of packages to be built</strong><br>';
 
 
             for (var i = 0; i < command.buildPackage.length; i++) {
-                commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildPackage[i] + '</b><br>';
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildPackage[i] + '</strong><br>';
             }
         }
 
         // Download of packages
         if (command.downloadPackages != null && command.downloadPackages.length > 0) {
 
-            commandDescription += '<br><br><b>Packages are about to be downloaded from '+command.packageDownloadUrl+'.</b>' +
+            commandDescription += '<br><br><strong>Packages are about to be downloaded from '+command.packageDownloadUrl+'.</strong>' +
                 '<br>'+
                 'Downloading of packages can take several dozen of minutes depending on your internet connection<br>'+
-                '<b>List of packages to be downloaded</b><br>';
+                '<strong>List of packages to be downloaded</strong><br>';
 
 
             for (var i = 0; i < command.downloadPackages.length; i++) {
-                commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadPackages[i] + '</b><br>';
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadPackages[i] + '</strong><br>';
             }
         }
 
         // Build of mesos
         if (command.buildMesos != null && command.buildMesos.length > 0) {
 
-            commandDescription += '<br><br><b>Mesos Packages are about to be built.</b>' +
+            commandDescription += '<br><br><strong>Mesos Packages are about to be built.</strong>' +
                 '<br>'+
                 'Building mesos happens in the folder "packages_dev" under the root folder of your eskimo installation<br>'+
                 'Mesos Packages are built using shell script and either vagrant or libvirt.<br>'+
-                '<b>Building packages can take several hours.</b><br>'+
-                '<b>List of Mesos packages to be built</b><br>';
+                '<strong>Building packages can take several hours.</strong><br>'+
+                '<strong>List of Mesos packages to be built</strong><br>';
 
 
             for (var i = 0; i < command.buildMesos.length; i++) {
-                commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildMesos[i] + '</b><br>';
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildMesos[i] + '</strong><br>';
             }
         }
 
         // Download of mesos
         if (command.downloadMesos != null && command.downloadMesos.length > 0) {
 
-            commandDescription += '<br><br><b>Mesos Packages are about to be downloaded from '+command.packageDownloadUrl+'.</b>' +
+            commandDescription += '<br><br><strong>Mesos Packages are about to be downloaded from '+command.packageDownloadUrl+'.</strong>' +
                 '<br>'+
                 'Downloading of mesos packages can take several dozen of minutes depending on your internet connection<br>'+
-                '<b>List of Mesos packages to be downloaded</b><br>';
+                '<strong>List of Mesos packages to be downloaded</strong><br>';
 
 
             for (var i = 0; i < command.downloadMesos.length; i++) {
-                commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadMesos[i] + '</b><br>';
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadMesos[i] + '</strong><br>';
             }
         }
 
         // Package Updates
         if (command.packageUpdates != null && command.packageUpdates.length > 0) {
 
-            commandDescription += '<br><br><b>Following packages updates are available:</b>' +
+            commandDescription += '<br><br><strong>Following packages updates are available:</strong>' +
                 '<br>';
 
 
             for (var i = 0; i < command.packageUpdates.length; i++) {
-                commandDescription += '<b><i class="fa fa-arrow-right"></i>&nbsp;' + command.packageUpdates[i] + '</b><br>';
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.packageUpdates[i] + '</strong><br>';
             }
         }
 

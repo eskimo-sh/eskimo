@@ -94,7 +94,7 @@ eskimo.Messaging = function(constructorObject) {
             });
 
             $("#interupt-messaging-btn").click(function(e) {
-                $("#pending-message-title").html("<h3>Processing pending on Eskimo backend. <b>(Interrupting ...)</b></h3>");
+                $("#pending-message-title").html("<h3>Processing pending on Eskimo backend. <strong>(Interrupting ...)</strong></h3>");
                 $.ajax({
                     type: "GET",
                     dataType: "json",

@@ -36,9 +36,11 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.MarathonOperationsCommand;
+import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.utils.ErrorStatusHelper;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +59,7 @@ import java.util.HashMap;
 
 
 @Controller
-public class MarathonServicesConfigController {
+public class MarathonServicesConfigController extends AbstractOperationController {
 
     private static final Logger logger = Logger.getLogger(MarathonServicesConfigController.class);
 
@@ -75,25 +77,14 @@ public class MarathonServicesConfigController {
     private SetupService setupService;
 
     @Autowired
-    private SystemService systemService;
-
-    @Autowired
     private ServicesDefinition servicesDefinition;
 
     @Autowired
     private MarathonServicesConfigChecker marathonServicesConfigChecker;
 
-    @Autowired
-    private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
-
     @Value("${eskimo.enableMarathonSubsystem}")
     private String enableMarathon = "true";
 
-    @Value("${eskimo.demoMode}")
-    private boolean demoMode = false;
 
     /* For tests */
     void setMarathonService(MarathonService marathonService) {
@@ -101,9 +92,6 @@ public class MarathonServicesConfigController {
     }
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
-    }
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
     }
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
@@ -114,36 +102,31 @@ public class MarathonServicesConfigController {
     void setMarathonServicesConfigChecker (MarathonServicesConfigChecker marathonServicesConfigChecker) {
         this.marathonServicesConfigChecker = marathonServicesConfigChecker;
     }
-    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
-    void setDemoMode (boolean demoMode) {
-        this.demoMode = demoMode;
-    }
 
     @GetMapping("/load-marathon-services-config")
     @ResponseBody
     public String loadMarathonServicesConfig() {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
             setupService.ensureSetupCompleted();
             MarathonServicesConfigWrapper msConfig = configurationService.loadMarathonServicesConfig();
             if (msConfig == null || msConfig.isEmpty()) {
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
             return msConfig.getFormattedValue();
 
         } catch (SystemException | JSONException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createErrorStatus(e.getMessage());
+            return ReturnStatusHelper.createErrorStatus(e.getMessage());
 
         } catch (SetupException e) {
             // this is OK. means application is not yet initialized
             logger.debug (e, e);
-            return ErrorStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
         }
     }
 
@@ -155,7 +138,7 @@ public class MarathonServicesConfigController {
         logger.info ("Got config : " + configAsString);
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
@@ -173,13 +156,13 @@ public class MarathonServicesConfigController {
             // store command and config in HTTP Session
             session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
 
-            return NodesConfigController.returnCommand (command);
+            return returnCommand (command);
 
         } catch (JSONException | SetupException | FileException | MarathonServicesConfigException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Marathon Services installation preparation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
@@ -191,7 +174,7 @@ public class MarathonServicesConfigController {
         logger.info ("Got model : " + reinstallModel);
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
@@ -212,7 +195,7 @@ public class MarathonServicesConfigController {
 
             MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
             if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
-                return ErrorStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
             }
 
             // Create OperationsCommand
@@ -223,12 +206,12 @@ public class MarathonServicesConfigController {
             session.setAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
             session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
 
-            return NodesConfigController.returnCommand (command);
+            return returnCommand (command);
 
         } catch (JSONException | FileException | SetupException | SystemException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
@@ -238,35 +221,14 @@ public class MarathonServicesConfigController {
     public String applyMarathonServicesConfig(HttpSession session) {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ErrorStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
         }
 
         try {
 
-            if (systemService.isProcessingPending()) {
-
-                String message = "Some backend operations are currently running. Please retry after they are completed.";
-
-                messagingService.addLines (message);
-                notificationService.addError("Operation In Progress");
-
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", message);
-                }}).toString(2);
-            }
-
-            if (demoMode) {
-
-                String message = "Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.";
-
-                messagingService.addLines (message);
-                notificationService.addError("Demo Mode");
-
-                return new JSONObject(new HashMap<String, Object>() {{
-                    put("status", "OK");
-                    put("messages", message);
-                }}).toString(2);
+            JSONObject checkObject = checkOperations("Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.");
+            if (checkObject != null) {
+                return checkObject.toString(2);
             }
 
             MarathonOperationsCommand command = (MarathonOperationsCommand) session.getAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
@@ -284,17 +246,17 @@ public class MarathonServicesConfigController {
 
             marathonService.applyMarathonServicesConfig(command);
 
-            return "{\"status\": \"OK\" }";
+            return ReturnStatusHelper.createOKStatus();
 
         } catch (MarathonException e) {
             logger.error(e, e);
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
 
         } catch (JSONException | SetupException | FileException e) {
             logger.error(e, e);
             messagingService.addLines (e.getMessage());
             notificationService.addError("Marathon Services installation failed !");
-            return ErrorStatusHelper.createEncodedErrorStatus(e);
+            return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 

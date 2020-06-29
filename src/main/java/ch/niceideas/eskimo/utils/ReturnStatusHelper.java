@@ -34,15 +34,19 @@
 
 package ch.niceideas.eskimo.utils;
 
+import ch.niceideas.eskimo.model.JSONOpCommand;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
-public class ErrorStatusHelper {
+public class ReturnStatusHelper {
 
-    private ErrorStatusHelper() {}
+    private ReturnStatusHelper() {}
 
     public static String createErrorStatus (Exception e) {
         return createErrorStatus(e.getMessage());
@@ -69,6 +73,27 @@ public class ErrorStatusHelper {
         } catch (JSONException e1) {
             // cannot happen
             throw new ErrorStatusException(e1);
+        }
+    }
+
+    public static String createOKStatus() {
+        return createOKStatus(map -> {});
+    }
+
+    public interface MapFeeder {
+
+        void feedMap (Map<String, Object> map) throws JSONException;
+
+    }
+
+    public static String createOKStatus(MapFeeder additionalAttributesFeeder) {
+        try {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                additionalAttributesFeeder.feedMap (this);
+            }}).toString(2);
+        } catch (JSONException e) {
+            return ReturnStatusHelper.createErrorStatus(e);
         }
     }
 
