@@ -50,12 +50,12 @@ cd $SCRIPT_DIR
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 export MASTER_IP_ADDRESS=`get_gluster_master`
@@ -65,6 +65,7 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
 
         echo " - Checking if local node needs to be removed from gluster cluster"
         poolListResult=`docker exec -i gluster bash -c "/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS pool list"`
+        hostnames=$(echo "$poolListResult" | cut -d$'\t' -f 2 | sed  '/^$/d')
         poolListIps=`hostnames_to_ips "$poolListResult"`
         if [[ `echo $poolListIps | grep $SELF_IP_ADDRESS` != "" ]]; then
 
@@ -81,16 +82,15 @@ if [[ $MASTER_IP_ADDRESS != "" ]]; then
                 echo "y" | sudo /usr/local/sbin/gluster volume remove-brick $share_name replica 1 $i force
                 if [[ $? != 0 ]]; then
                     echo " -> Failed to remove brick $i!"
-                    exit -3
+                    exit 3
                 fi
             done
-
 
             echo " - Removing local gluster node from master pool list"
             docker exec -i gluster bash -c "/usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer detach $SELF_IP_ADDRESS"
             if [[ $? != 0 ]]; then
                 echo " -> Failed !"
-                exit -3
+                exit 4
             fi
         fi
 

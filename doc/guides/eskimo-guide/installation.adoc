@@ -96,6 +96,19 @@ Eskimo is reached using a web browser (see startup logs). Supported web browsers
 
 Note: there may be other browsers / versions supported (Safari, Opera but they are not certified to work with Eskimo)
 
+==== Network requirements
+
+Network requirements with Eskimo are as follows:
+
+* 100MB ethernet between client machines (accessing eskimo cluster services through web browser) and the machine
+running the Eskimo backend.
+
+In case of cluster deployment:
+
+* gigabit ethernet between the machine running the Eskimo backend and Eskimo cluster nodes
+* gigabit ethernet required in between cluster nodes
+
+
 [[eskimo_nodes_prerequisites]]
 ==== Prerequisites on eskimo cluster nodes
 

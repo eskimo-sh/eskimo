@@ -69,7 +69,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         SystemService ss = new SystemService(false) {
             @Override
             protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
-                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
+                File retFile = new File (System.getProperty("java.io.tmpdir") + "/" + serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
                 retFile.createNewFile();
                 return retFile;
             }

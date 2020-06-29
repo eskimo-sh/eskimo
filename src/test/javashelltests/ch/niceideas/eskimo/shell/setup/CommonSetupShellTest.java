@@ -38,6 +38,7 @@ package ch.niceideas.eskimo.shell.setup;
 import ch.niceideas.common.utils.*;
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +49,12 @@ import static junit.framework.TestCase.*;
 public class CommonSetupShellTest {
 
     protected String jailPath = null;
+
+    /** Run Test on Linux only */
+    @Before
+    public void beforeMethod() {
+        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+    }
 
     @Before
     public void setUp() throws Exception {

@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
 import ch.niceideas.eskimo.shell.setup.CerebroSetupTest;
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +51,12 @@ import static junit.framework.TestCase.*;
 public class CommonDevShellTest {
 
     protected String jailPath = null;
+
+    /** Run Test on Linux only */
+    @Before
+    public void beforeMethod() {
+        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+    }
 
     @Before
     public void setUp() throws Exception {

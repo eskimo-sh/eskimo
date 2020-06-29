@@ -1,5 +1,6 @@
 package ch.niceideas.common.utils;
 
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -38,13 +39,17 @@ public class ResourceUtilsTest {
         assertNotNull(ResourceUtils.getFile("classpath:application.properties"));
         assertTrue(ResourceUtils.getFile("classpath:application.properties").exists());
 
-        assertNotNull(ResourceUtils.getFile("file:///etc/passwd"));
-        assertTrue(ResourceUtils.getFile("file:///etc/passwd").exists());
+        if (OSDetector.isUnix()) {
 
-        assertNotNull(ResourceUtils.getFile("/etc/passwd"));
-        assertTrue(ResourceUtils.getFile("/etc/passwd").exists());
+            assertNotNull(ResourceUtils.getFile("file:///etc/passwd"));
+            assertTrue(ResourceUtils.getFile("file:///etc/passwd").exists());
 
-        assertNotNull(ResourceUtils.getFile("/etc/nonexistent"));
-        assertFalse(ResourceUtils.getFile("/etc/nonexistent").exists());
+            assertNotNull(ResourceUtils.getFile("/etc/passwd"));
+            assertTrue(ResourceUtils.getFile("/etc/passwd").exists());
+
+            assertNotNull(ResourceUtils.getFile("/etc/nonexistent"));
+            assertFalse(ResourceUtils.getFile("/etc/nonexistent").exists());
+
+        }
     }
 }

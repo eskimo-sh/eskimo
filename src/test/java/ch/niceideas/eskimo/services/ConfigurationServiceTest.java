@@ -5,6 +5,7 @@ import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,11 +96,15 @@ public class ConfigurationServiceTest {
 
         assertEquals("config Storage path cannot be empty.", exception.getMessage());
 
-        JsonWrapper sc2 = configurationService.createSetupConfigAndSaveStoragePath("{\"test\": \"OK\", \"setup_storage\": \""+tmpFile.getAbsolutePath()+"\"}");
-        configurationService.saveSetupConfig(sc2.getFormattedValue());
+        if (OSDetector.isUnix()) {
 
-        JsonWrapper sc3 = new JsonWrapper(configurationService.loadSetupConfig());
-        assertTrue(sc2.getJSONObject().similar(sc3.getJSONObject()));
+            JsonWrapper sc2 = configurationService.createSetupConfigAndSaveStoragePath("{\"test\": \"OK\", \"setup_storage\": \"" + tmpFile.getAbsolutePath() + "\"}");
+            configurationService.saveSetupConfig(sc2.getFormattedValue());
+
+            JsonWrapper sc3 = new JsonWrapper(configurationService.loadSetupConfig());
+            assertTrue(sc2.getJSONObject().similar(sc3.getJSONObject()));
+
+        }
     }
 
     @Test

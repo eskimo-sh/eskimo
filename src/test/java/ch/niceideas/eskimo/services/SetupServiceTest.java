@@ -40,7 +40,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
-import org.apache.log4j.Logger;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 public class SetupServiceTest extends AbstractSystemTest {
 
@@ -183,6 +184,8 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     @Test
     public void testBuildPackage() throws Exception {
+
+        assumeTrue(OSDetector.isUnix());
 
         File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
         packageDevPathTest.delete();
