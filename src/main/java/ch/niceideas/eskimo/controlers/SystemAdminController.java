@@ -49,9 +49,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import java.util.HashMap;
-
 
 @Controller
 public class SystemAdminController extends AbstractOperationController {
@@ -220,7 +217,7 @@ public class SystemAdminController extends AbstractOperationController {
 
             Service service = servicesDefinition.getService(serviceName);
 
-            String nodeName = null;
+            String nodeName;
             if (service.isMarathon()) {
                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
             } else {

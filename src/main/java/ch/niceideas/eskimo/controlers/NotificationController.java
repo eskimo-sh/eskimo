@@ -47,8 +47,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 
 

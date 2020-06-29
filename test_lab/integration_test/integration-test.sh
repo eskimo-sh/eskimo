@@ -1135,9 +1135,6 @@ test_web_apps() {
 # Additional tests
 # ----------------------------------------------------------------------------------------------------------------------
 
-# TODO Ensure Kibana dashboard exist and has data
-# (TODO find out how to do this ? API ?)
-
 test_doc(){
 
     # Test documentation is packaged and available
@@ -1228,6 +1225,51 @@ prepare_demo() {
 
     rm -f kibana-ecommerce-import
     rm -f kibana-ecommerce-import-error
+
+    echo_date " - Ensure all dashboards are available"
+
+    echo_date "   + Fetching dashboards from Kibana"
+    curl  \
+            -b $SCRIPT_DIR/cookies \
+            -m 3600 \
+            -H "kbn-version: 7.6.2" \
+            -H "Content-Length: 0" \
+            -H "Content-Type: application/json" \
+            -H "Host: $BOX_IP" \
+            -H "Origin: $BOX_IP" \
+            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
+            -XGET http://$BOX_IP/kibana/api/saved_objects/_find?default_search_operator=AND\&page=1\&per_page=1000\&search_fields=title%5E3\&search_fields=description\&type=dashboard \
+            > kibana-dashboard-check \
+            2> kibana-dashboard-check-error
+
+    echo_date "   + Extracting dashboard names"
+    cat kibana-dashboard-check | jq -r '.saved_objects | .[] | select(.type=="dashboard") | .attributes | .title' > kibana-dashboards
+
+    echo_date "   + Ensure all dashboards are found"
+
+    if [[ `cat kibana-dashboards | grep '\[eCommerce\] Revenue Dashboard'` == "" ]]; then
+        echo "!! Cannot find [eCommerce] Revenue Dashboard"
+        exit 121
+    fi
+
+    if [[ `cat kibana-dashboards | grep 'berka-transactions'` == "" ]]; then
+        echo "!! Cannot find berka-transactions"
+        exit 122
+    fi
+
+    if [[ `cat kibana-dashboards | grep '\[Flights\] Global Flight Dashboard'` == "" ]]; then
+        echo "!! Cannot find [eCommerce] Revenue Dashboard"
+        exit 123
+    fi
+
+    if [[ `cat kibana-dashboards | grep '\[Logs\] Web Traffic'` == "" ]]; then
+        echo "!! Cannot find [eCommerce] Revenue Dashboard"
+        exit 124
+    fi
+
+    rm -f kibana-dashboard-check
+    rm -f kibana-dashboard-check-error
+    rm -f kibana-dashboards
 
     echo_date " - Find eskimo folder name (again)"
     eskimo_folder=$(vagrant ssh -c "ls /usr/local/lib | grep eskimo" integration-test 2> /dev/null | sed -e 's/\r//g')

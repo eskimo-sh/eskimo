@@ -5,7 +5,6 @@ import ch.niceideas.eskimo.services.MessagingService;
 import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

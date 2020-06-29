@@ -34,13 +34,10 @@
 
 package ch.niceideas.eskimo.utils;
 
-import ch.niceideas.eskimo.model.JSONOpCommand;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,9 +78,7 @@ public class ReturnStatusHelper {
     }
 
     public interface MapFeeder {
-
         void feedMap (Map<String, Object> map) throws JSONException;
-
     }
 
     public static String createOKStatus(MapFeeder additionalAttributesFeeder) {

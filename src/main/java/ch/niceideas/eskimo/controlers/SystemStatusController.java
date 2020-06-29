@@ -36,17 +36,16 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ApplicationStatusService;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.HashMap;
 
 
 @Controller

@@ -37,12 +37,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.services.AbstractInformationService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 @Controller

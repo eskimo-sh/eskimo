@@ -37,7 +37,9 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ConfigurationService;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -52,7 +54,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 
 
 @Controller

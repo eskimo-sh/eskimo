@@ -51,7 +51,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 
 
 @Controller
@@ -186,7 +185,6 @@ public class FileManagerController {
         } catch (IOException e) {
             logger.error (e, e);
             return ReturnStatusHelper.createErrorStatus(e);
-
         }
     }
 
