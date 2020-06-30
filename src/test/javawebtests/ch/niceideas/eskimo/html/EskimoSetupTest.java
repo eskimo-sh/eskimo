@@ -47,16 +47,16 @@ public class EskimoSetupTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoSetup.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        js("function errorHandler() {};");
 
         String currentDir = System.getProperty("user.dir");
         System.out.println("Current dir using System:" +currentDir);
 
         // instantiate test object
-        page.executeJavaScript("eskimoSetup = new eskimo.Setup()");
-        page.executeJavaScript("eskimoSetup.eskimoMain = eskimoMain;");
-        page.executeJavaScript("eskimoSetup.eskimoSystemStatus = eskimoSystemStatus;");
-        page.executeJavaScript("eskimoSetup.initialize()");
+        js("eskimoSetup = new eskimo.Setup()");
+        js("eskimoSetup.eskimoMain = eskimoMain;");
+        js("eskimoSetup.eskimoSystemStatus = eskimoSystemStatus;");
+        js("eskimoSetup.initialize()");
 
         waitForElementIdInDOM("setup-warning");
     }
@@ -65,7 +65,7 @@ public class EskimoSetupTest extends AbstractWebTest {
     public void testSaveSetupMessages() throws Exception {
 
         // add services menu
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        js("eskimoSetup.saveSetup()");
 
         //System.out.println (page.asXml());
 
@@ -73,16 +73,16 @@ public class EskimoSetupTest extends AbstractWebTest {
         assertCssValue ("#setup-warning", "display", "inherit");
         assertJavascriptEquals ("Configuration Storage path should be set", "$('#setup-warning-message').html()");
 
-        page.executeJavaScript("$('#setup_storage').val('/tmp/test')");
+        js("$('#setup_storage').val('/tmp/test')");
 
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        js("eskimoSetup.saveSetup()");
 
         assertJavascriptEquals ("SSH Username to use to reach cluster nodes should be set",
                 "$('#setup-warning-message').html()");
 
-        page.executeJavaScript("$('#ssh_username').val('eskimo')");
+        js("$('#ssh_username').val('eskimo')");
 
-        page.executeJavaScript("eskimoSetup.saveSetup()");
+        js("eskimoSetup.saveSetup()");
 
         assertJavascriptEquals ("SSH Identity Private Key to use to reach cluster nodes should be set",
                 "$('#setup-warning-message').html()");
@@ -91,7 +91,7 @@ public class EskimoSetupTest extends AbstractWebTest {
     @Test
     public void testShowSetupMessage() throws Exception {
 
-        page.executeJavaScript("eskimoSetup.showSetupMessage ('test');");
+        js("eskimoSetup.showSetupMessage ('test');");
 
         assertCssValue("#setup-warning", "display", "inherit");
         assertCssValue("#setup-warning", "visibility", "inherit");
@@ -100,7 +100,7 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         assertJavascriptEquals("test", "$('#setup-warning-message').html()");
 
-        page.executeJavaScript("eskimoSetup.showSetupMessage ('test', true);");
+        js("eskimoSetup.showSetupMessage ('test', true);");
 
         assertAttrValue("#setup-warning-message", "class", "alert alert-info");
     }
@@ -110,7 +110,7 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         String setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
 
-        page.executeJavaScript("eskimoSetup.handleSetup("+setupConfig+")");
+        js("eskimoSetup.handleSetup("+setupConfig+")");
 
         assertJavascriptEquals("/tmp/setupConfigTest", "$('#setup_storage').val()");
         assertJavascriptEquals("eskimo", "$('#ssh_username').val()");

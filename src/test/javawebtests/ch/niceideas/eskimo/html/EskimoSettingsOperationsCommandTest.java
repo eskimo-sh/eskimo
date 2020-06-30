@@ -49,8 +49,8 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
         loadScript(page, "eskimoSettingsOperationsCommand.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();");
-        page.executeJavaScript("eskimoSettingsOperationsCommand.initialize();");
+        js("eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();");
+        js("eskimoSettingsOperationsCommand.initialize();");
 
         waitForElementIdInDOM("settings-operations-command-body");
     }
@@ -61,7 +61,7 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
 
         String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/command.json"));
 
-        page.executeJavaScript("eskimoSettingsOperationsCommand.showCommand("+command+".command)");
+        js("eskimoSettingsOperationsCommand.showCommand("+command+".command)");
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/expectedResult.html"));
 

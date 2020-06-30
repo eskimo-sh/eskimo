@@ -65,34 +65,34 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoSystemStatus.js");
 
-        page.executeJavaScript("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"gdash\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-history-server\",\"spark-executor\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
+        js("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"gdash\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-history-server\",\"spark-executor\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
 
-        page.executeJavaScript("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
+        js("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
 
         // instantiate test object
-        page.executeJavaScript("eskimoSystemStatus = new eskimo.SystemStatus()");
-        page.executeJavaScript("eskimoSystemStatus.eskimoNotifications = eskimoNotifications");
-        page.executeJavaScript("eskimoSystemStatus.eskimoMessaging = eskimoMessaging");
-        page.executeJavaScript("eskimoSystemStatus.eskimoNodesConfig = eskimoNodesConfig");
-        page.executeJavaScript("eskimoSystemStatus.eskimoSetup = eskimoSetup");
-        page.executeJavaScript("eskimoSystemStatus.eskimoServices = eskimoServices");
-        page.executeJavaScript("eskimoSystemStatus.eskimoMain = eskimoMain");
-        page.executeJavaScript("eskimoSystemStatus.initialize()");
+        js("eskimoSystemStatus = new eskimo.SystemStatus()");
+        js("eskimoSystemStatus.eskimoNotifications = eskimoNotifications");
+        js("eskimoSystemStatus.eskimoMessaging = eskimoMessaging");
+        js("eskimoSystemStatus.eskimoNodesConfig = eskimoNodesConfig");
+        js("eskimoSystemStatus.eskimoSetup = eskimoSetup");
+        js("eskimoSystemStatus.eskimoServices = eskimoServices");
+        js("eskimoSystemStatus.eskimoMain = eskimoMain");
+        js("eskimoSystemStatus.initialize()");
 
         waitForElementIdInDOM("service-status-warning");
 
         // set services for tests
-        page.executeJavaScript("eskimoSystemStatus.setStatusServices (STATUS_SERVICES);");
-        page.executeJavaScript("eskimoSystemStatus.setServicesStatusConfig (SERVICES_STATUS_CONFIG);");
+        js("eskimoSystemStatus.setStatusServices (STATUS_SERVICES);");
+        js("eskimoSystemStatus.setServicesStatusConfig (SERVICES_STATUS_CONFIG);");
 
-        page.executeJavaScript("$('#inner-content-status').css('display', 'inherit')");
-        page.executeJavaScript("$('#inner-content-status').css('visibility', 'visible')");
+        js("$('#inner-content-status').css('display', 'inherit')");
+        js("$('#inner-content-status').css('visibility', 'visible')");
     }
 
     @Test
     public void testRenderNodesStatusEmpty() throws Exception {
 
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatusEmpty()");
+        js("eskimoSystemStatus.renderNodesStatusEmpty()");
 
         assertCssValue("#status-node-container-empty", "visibility", "inherit");
         assertCssValue("#status-node-container-empty", "display", "inherit");
@@ -105,7 +105,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         Exception error = null;
         try {
-            page.executeJavaScript("eskimoSystemStatus.registerServiceMenu('#status-node-table-body td.status-node-cell', 'status-node-cell');");
+            js("eskimoSystemStatus.registerServiceMenu('#status-node-table-body td.status-node-cell', 'status-node-cell');");
         } catch (Exception e) {
             error = e;
         }
@@ -119,7 +119,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         Exception error = null;
         try {
-            page.executeJavaScript("eskimoSystemStatus.registerNodeMenu('#status-node-table-body td.status-node-cell-intro', 'status-node-cell-intro');");
+            js("eskimoSystemStatus.registerNodeMenu('#status-node-table-body td.status-node-cell-intro', 'status-node-cell-intro');");
         } catch (Exception e) {
             error = e;
         }
@@ -129,17 +129,17 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testHideShowGrafanaDashboard() {
 
-        page.executeJavaScript("eskimoSystemStatus.hideGrafanaDashboard()");
+        js("eskimoSystemStatus.hideGrafanaDashboard()");
 
         assertCssValue("#status-monitoring-grafana", "display", "none");
         assertJavascriptEquals("col-xs-12 col-sm-12 col-md-12", "$('#status-monitoring-info-container').attr('class')");
 
-        page.executeJavaScript("eskimoSystemStatus.showGrafanaDashboard()");
+        js("eskimoSystemStatus.showGrafanaDashboard()");
 
         assertCssValue("#status-monitoring-grafana", "display", "inherit");
         assertJavascriptEquals("col-xs-12 col-sm-12 col-md-4", "$('#status-monitoring-info-container').attr('class')");
 
-        page.executeJavaScript("eskimoSystemStatus.hideGrafanaDashboard()");
+        js("eskimoSystemStatus.hideGrafanaDashboard()");
 
         assertCssValue("#status-monitoring-grafana", "display", "none");
         assertJavascriptEquals("col-xs-12 col-sm-12 col-md-12", "$('#status-monitoring-info-container').attr('class')");
@@ -207,9 +207,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testRenderNodesStatusTable() throws Exception {
 
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", false)");
+        js("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", false)");
 
-        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        String tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
         assertNotNull (tableString);
 
@@ -220,21 +220,21 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testShowStatus() throws Exception {
 
-        page.executeJavaScript("$.ajax = function (options) {" +
+        js("$.ajax = function (options) {" +
                 "    options.success(" + jsonFullStatus + ")" +
                 "}");
 
-        page.executeJavaScript("eskimoSystemStatus.showStatus()");
+        js("eskimoSystemStatus.showStatus()");
 
         System.err.println (page.asXml());
 
-        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        String tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
         assertNotNull (tableString);
 
         assertTrue (tableString.contains("192.168.10.11"));
 
-        String infoActionsString = page.executeJavaScript("$('#status-monitoring-info-actions').html()").getJavaScriptResult().toString();
+        String infoActionsString = js("$('#status-monitoring-info-actions').html()").getJavaScriptResult().toString();
 
         assertNotNull (infoActionsString);
 
@@ -248,7 +248,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         page.getElementById("show-issues-btn").click();
 
-        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        String tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
         assertNotNull (tableString);
 
@@ -256,7 +256,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         page.getElementById("show-master-services-btn").click();
 
-        tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
         assertNotNull (tableString);
 
@@ -266,24 +266,24 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testDisplayMonitoringDashboard() throws Exception {
 
-        page.executeJavaScript("$.ajax = function (options) {" +
+        js("$.ajax = function (options) {" +
                 "    options.error()" +
                 "}");
 
-        page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
+        js("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
 
         assertJavascriptEquals("<strong>Grafana doesn't know dashboard with ID abcd</strong>", "$('#status-monitoring-no-dashboard').html()");
 
-        page.executeJavaScript("$.ajax = function (options) {" +
+        js("$.ajax = function (options) {" +
                 "    options.success()" +
                 "}");
 
         // HTMLUnit cannot load grafana
         ScriptException exception = assertThrows(ScriptException.class,
-                () -> page.executeJavaScript("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');"));
+                () -> js("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');"));
         assertTrue(exception.getMessage().endsWith("grafana/d/abcd/monitoring?orgId=1&&kiosk&refresh=50"));
 
-        await().atMost(15, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#status-monitoring-no-dashboard').css('display')").getJavaScriptResult().toString().equals("none"));
+        await().atMost(15, TimeUnit.SECONDS).until(() -> js("$('#status-monitoring-no-dashboard').css('display')").getJavaScriptResult().toString().equals("none"));
 
         assertCssValue("#status-monitoring-dashboard-frame", "display", "inherit");
         assertCssValue("#status-monitoring-no-dashboard", "display", "none");
@@ -296,29 +296,29 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         statusWrapper.setValueForPath("service_kafka_192-168-10-13", "NA");
         statusWrapper.setValueForPath("service_logstash_192-168-10-13", "KO");
 
-        page.executeJavaScript("eskimoSystemStatus.setNodeFilter(\"\")");
+        js("eskimoSystemStatus.setNodeFilter(\"\")");
 
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
+        js("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
 
-        String tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        String tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
         assertNotNull (tableString);
         assertTrue (tableString.contains("192.168.10.11"));
         assertTrue (tableString.contains("192.168.10.13"));
 
-        page.executeJavaScript("eskimoSystemStatus.setNodeFilter(\"issues\")");
+        js("eskimoSystemStatus.setNodeFilter(\"issues\")");
 
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
+        js("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
 
-        tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
         assertNotNull (tableString);
         assertFalse (tableString.contains("192.168.10.11"));
         assertTrue (tableString.contains("192.168.10.13"));
 
-        page.executeJavaScript("eskimoSystemStatus.setNodeFilter(\"master\")");
+        js("eskimoSystemStatus.setNodeFilter(\"master\")");
 
-        page.executeJavaScript("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
+        js("eskimoSystemStatus.renderNodesStatus(" + statusWrapper.getFormattedValue() + ", false)");
 
-        tableString = page.executeJavaScript("$('#status-node-table-body').html()").getJavaScriptResult().toString();
+        tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
         assertNotNull (tableString);
         assertTrue (tableString.contains("192.168.10.11"));
         assertFalse (tableString.contains("192.168.10.13"));
@@ -329,12 +329,12 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         String jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));
 
-        page.executeJavaScript("var jsonFullStatus = " + jsonFullStatus);
+        js("var jsonFullStatus = " + jsonFullStatus);
 
         // grafana not available
-        page.executeJavaScript("eskimoServices.isServiceAvailable = function () { return false; }");
+        js("eskimoServices.isServiceAvailable = function () { return false; }");
 
-        page.executeJavaScript("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
+        js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
         assertCssValue("#status-monitoring-no-dashboard", "display", "inherit");
         assertCssValue("#status-monitoring-dashboard-frame", "display", "none");
@@ -342,12 +342,12 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertAttrValue("#status-monitoring-dashboard-frame", "src", "html/emptyPage.html");
 
         // grafana available
-        page.executeJavaScript("eskimoServices.isServiceAvailable = function () { return true; }");
+        js("eskimoServices.isServiceAvailable = function () { return true; }");
 
-        page.executeJavaScript("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
+        js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
         /* FIXME Find out why this fails
-        await().atMost(15, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#status-monitoring-no-dashboard').css('display')").getJavaScriptResult().toString().equals("none"));
+        await().atMost(15, TimeUnit.SECONDS).until(() -> js("$('#status-monitoring-no-dashboard').css('display')").getJavaScriptResult().toString().equals("none"));
 
         assertCssValue("#status-monitoring-no-dashboard", "display", "none");
         assertCssValue("#status-monitoring-dashboard-frame", "display", "inherit");
@@ -362,11 +362,11 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         ssw.setValueForPath("nodeServicesStatus.service_mesos-agent_192-168-10-11", "KO");
         ssw.setValueForPath("nodeServicesStatus.node_alive_192-168-10-13", "KO");
         ssw.setValueForPath("nodeServicesStatus.node_address_192-168-10-13", "192.168.10.13");
-        page.executeJavaScript("jsonFullStatus = " + ssw.getFormattedValue());
+        js("jsonFullStatus = " + ssw.getFormattedValue());
 
-        page.executeJavaScript("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
+        js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
-        await().atMost(15, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#system-information-nodes-status').html()").getJavaScriptResult().toString()
+        await().atMost(15, TimeUnit.SECONDS).until(() -> js("$('#system-information-nodes-status').html()").getJavaScriptResult().toString()
                 .equals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>"));
 
         assertJavascriptEquals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>",
@@ -382,7 +382,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testShowStatusMessage() throws Exception {
 
-        page.executeJavaScript("eskimoSystemStatus.showStatusMessage ('test');");
+        js("eskimoSystemStatus.showStatusMessage ('test');");
 
         assertCssValue("#service-status-warning", "display", "block");
         assertCssValue("#service-status-warning", "visibility", "visible");
@@ -391,7 +391,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         assertJavascriptEquals("test", "$('#service-status-warning-message').html()");
 
-        page.executeJavaScript("eskimoSystemStatus.showStatusMessage ('test', true);");
+        js("eskimoSystemStatus.showStatusMessage ('test', true);");
 
         assertAttrValue("#service-status-warning-message", "class", "alert alert-danger");
     }

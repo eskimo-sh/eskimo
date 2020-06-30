@@ -152,12 +152,15 @@ sleep 10
 if [[ `ps -e | grep $GRAFANA_PROC_ID` == "" ]]; then
     echo " !! Failed to start Grafana !!"
     cat /tmp/grafana_run_log
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Grafana"
 kill -15 $GRAFANA_PROC_ID
 export GRAFANA_PROC_ID=-1
+
+echo " - Moving grafana plugins to grafana directory"
+sudo mv /var/lib/grafana/plugins /usr/local/lib/grafana/
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

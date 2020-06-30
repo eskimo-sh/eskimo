@@ -72,16 +72,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         String servicesDependencies = sc.getServicesDependencies();
 
-        page.executeJavaScript("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
+        js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        page.executeJavaScript("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"marathon\" ];");
-        page.executeJavaScript("var MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
-        page.executeJavaScript("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        page.executeJavaScript("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        js("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"marathon\" ];");
+        js("var MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
+        js("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        js("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        page.executeJavaScript("var SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("var SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        page.executeJavaScript("function callCheckNodeSetup(config) {\n" +
+        js("function callCheckNodeSetup(config) {\n" +
                 "   return checkNodesSetup(config, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
                 "}");
 
@@ -97,7 +97,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        page.executeJavaScript ("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js ("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -110,7 +110,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("prometheus1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -142,7 +142,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -173,7 +173,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -203,7 +203,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -223,7 +223,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -254,7 +254,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -285,7 +285,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -300,7 +300,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id1", "");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -315,7 +315,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id2", "192.168.10.11");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -335,7 +335,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("ntp2", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -359,7 +359,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -379,7 +379,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -401,7 +401,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -422,7 +422,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("gluster1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -443,7 +443,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("gluster1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -466,7 +466,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("gluster1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -483,7 +483,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
     @Test
@@ -499,7 +499,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("spark-executor1", "on");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -529,7 +529,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("flink-app-master", "2");
         }});
 
-        page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
     }
 
 
@@ -553,7 +553,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("cerebro", "2");
             }});
 
-            page.executeJavaScript("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());

@@ -53,47 +53,47 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         loadScript (page, "eskimoFileManagers.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        js("function errorHandler() {};");
 
-        page.executeJavaScript("var dirContent = " + dirContent + "");
+        js("var dirContent = " + dirContent + "");
 
         // instantiate test object
-        page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers()");
-        page.executeJavaScript("eskimoFileManagers.eskimoMain = {" +
+        js("eskimoFileManagers = new eskimo.FileManagers()");
+        js("eskimoFileManagers.eskimoMain = {" +
                 "        isSetupDone: function() { return true; }," +
                 "        showOnlyContent: function() {}," +
                 "        hideProgressbar: function() {}" +
                 "    };");
-        page.executeJavaScript("eskimoFileManagers.initialize()");
+        js("eskimoFileManagers.initialize()");
 
         waitForElementIdInDOM("file-upload-progress-modal");
 
         // mock functions
-        page.executeJavaScript("eskimo.FileManagers.submitFormFileUpload = function (e) {}");
+        js("eskimo.FileManagers.submitFormFileUpload = function (e) {}");
 
         // set services for tests
-        page.executeJavaScript("eskimoFileManagers.setAvailableNodes (" +
+        js("eskimoFileManagers.setAvailableNodes (" +
                 "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"}, " +
                 " {\"nbr\": 2, \"nodeName\": \"192-168-10-13\", \"nodeAddress\": \"192.168.10.13\"} ] );");
 
-        page.executeJavaScript("eskimoFileManagers.openFolder = function (nodeAddress, nodeName, currentFolder, subFolder) {" +
+        js("eskimoFileManagers.openFolder = function (nodeAddress, nodeName, currentFolder, subFolder) {" +
                 "    eskimoFileManagers.listFolder (nodeAddress, nodeName, currentFolder+'/'+subFolder, dirContent);\n" +
                 "}");
 
-        page.executeJavaScript("eskimoFileManagers.connectFileManager = function (nodeAddress, nodeName) {" +
+        js("eskimoFileManagers.connectFileManager = function (nodeAddress, nodeName) {" +
                 "    alert (\"calledFor : \" + nodeAddress);\n" +
                 "    eskimoFileManagers.getOpenedFileManagers().push({\"nodeName\" : nodeName, \"nodeAddress\": nodeAddress, \"current\": \"/\"});" +
                 "    eskimoFileManagers.listFolder (nodeAddress, nodeName, '/', dirContent);\n" +
                 "}");
 
-        page.executeJavaScript("$('#inner-content-file-managers').css('display', 'inherit')");
-        page.executeJavaScript("$('#inner-content-file-managers').css('visibility', 'visible')");
+        js("$('#inner-content-file-managers').css('display', 'inherit')");
+        js("$('#inner-content-file-managers').css('visibility', 'visible')");
     }
 
     @Test
     public void testNominal() {
 
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
         assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
         assertJavascriptEquals("192-168-10-11", "eskimoFileManagers.getOpenedFileManagers()[0].nodeName");
@@ -108,7 +108,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         testClickOpenFileManagers();
 
         // node 192-168-10-13 vanishes !
-        page.executeJavaScript("eskimoFileManagers.setAvailableNodes (" +
+        js("eskimoFileManagers.setAvailableNodes (" +
                 "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"} ] );");
 
         // ensure console was disabled
@@ -124,8 +124,8 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @Test
     public void testFindFileManager() {
 
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
 
         // if this is set then we want as far as listFolder function
         assertJavascriptEquals("/", "eskimoFileManagers.getOpenedFileManagers()[0].current");
@@ -138,11 +138,11 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @Test
     public void testUpdateCurrentFolder() {
 
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
 
-        page.executeJavaScript("eskimoFileManagers.updateCurrentFolder('192-168-10-11', 'test1');");
-        page.executeJavaScript("eskimoFileManagers.updateCurrentFolder('192-168-10-13', 'test2');");
+        js("eskimoFileManagers.updateCurrentFolder('192-168-10-11', 'test1');");
+        js("eskimoFileManagers.updateCurrentFolder('192-168-10-13', 'test2');");
 
         assertJavascriptEquals("test1", "eskimoFileManagers.getOpenedFileManagers()[0].current");
         assertJavascriptEquals("test2", "eskimoFileManagers.getOpenedFileManagers()[1].current");
@@ -151,9 +151,9 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @Test
     public void testListFolder() throws Exception {
 
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
-        page.executeJavaScript("eskimoFileManagers.listFolder('192.168.10.11', '192-168-10-11', '/', "+dirContent+");");
+        js("eskimoFileManagers.listFolder('192.168.10.11', '192-168-10-11', '/', "+dirContent+");");
 
         String htmlContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/expectedContent.rawhtml"));
 
@@ -163,11 +163,11 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @Test
     public void testShowParent() throws Exception {
 
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
-        page.executeJavaScript("eskimoFileManagers.getOpenedFileManagers()[0].current = '/home/eskimo'");
+        js("eskimoFileManagers.getOpenedFileManagers()[0].current = '/home/eskimo'");
 
-        page.executeJavaScript("eskimoFileManagers.showParent('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.showParent('192.168.10.11', '192-168-10-11');");
 
         assertJavascriptEquals("/home/.", "eskimoFileManagers.getOpenedFileManagers()[0].current");
     }
@@ -177,7 +177,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         testShowParent();
 
-        page.executeJavaScript("eskimoFileManagers.showPrevious('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.showPrevious('192.168.10.11', '192-168-10-11');");
 
         assertJavascriptEquals("/home/eskimo/.", "eskimoFileManagers.getOpenedFileManagers()[0].current");
     }
@@ -185,12 +185,12 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @Test
     public void testCloseFileManager() throws Exception {
 
-        page.executeJavaScript("eskimoFileManagers.showFileManagers()");
+        js("eskimoFileManagers.showFileManagers()");
 
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
-        page.executeJavaScript("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.openFileManager('192.168.10.13', '192-168-10-13');");
 
-        page.executeJavaScript("eskimoFileManagers.selectFileManager('192.168.10.11', '192-168-10-11');");
+        js("eskimoFileManagers.selectFileManager('192.168.10.11', '192-168-10-11');");
 
         //System.err.println (page.asXml());
 
@@ -204,7 +204,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
     @Test
     public void testShowFileManagers() {
-        page.executeJavaScript("eskimoFileManagers.showFileManagers()");
+        js("eskimoFileManagers.showFileManagers()");
 
         assertNotNull (page.getElementById("file_manager_open_192-168-10-11"));
         assertEquals ("192.168.10.11", page.getElementById("file_manager_open_192-168-10-11").getTextContent().trim());

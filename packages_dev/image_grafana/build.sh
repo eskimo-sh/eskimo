@@ -62,7 +62,7 @@ if [[ `tail -n 1 /tmp/grafana_build_log | grep " - In container install SUCCESS"
 fi
 
 #echo " - TODO"
-#docker exec -i grafana TODO
+#docker exec -it grafana_template bash
 
 
 echo " - Cleaning up image"

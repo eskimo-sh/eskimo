@@ -53,22 +53,22 @@ public class EskimoServicesTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoServices.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        js("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServices = new eskimo.Services()");
-        page.executeJavaScript("eskimoServices.eskimoMain = eskimoMain");
-        page.executeJavaScript("eskimoServices.eskimoSystemStatus = eskimoSystemStatus");
-        page.executeJavaScript("eskimoServices.eskimoNodesConfig = eskimoNodesConfig");
-        page.executeJavaScript("eskimoServices.initialize()");
+        js("eskimoServices = new eskimo.Services()");
+        js("eskimoServices.eskimoMain = eskimoMain");
+        js("eskimoServices.eskimoSystemStatus = eskimoSystemStatus");
+        js("eskimoServices.eskimoNodesConfig = eskimoNodesConfig");
+        js("eskimoServices.initialize()");
 
         URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
 
-        page.executeJavaScript("eskimoServices.setEmptyFrameTarget (\""+testPage.getPath()+"/\");");
+        js("eskimoServices.setEmptyFrameTarget (\""+testPage.getPath()+"/\");");
 
-        page.executeJavaScript("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"] );");
+        js("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\"] );");
 
-        page.executeJavaScript("var UI_SERVICES_CONFIG = {" +
+        js("var UI_SERVICES_CONFIG = {" +
                 "\"cerebro\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
                 "\"kibana\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana', 'waitTime': 15 }, " +
                 "\"gdash\": {'urlTemplate': 'http://{NODE_ADDRESS}:9999/gdash', 'title' : 'gdash', 'waitTime': 20 }, " +
@@ -76,45 +76,45 @@ public class EskimoServicesTest extends AbstractWebTest {
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
                 "};");
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig(UI_SERVICES_CONFIG);");
+        js("eskimoServices.setUiServicesConfig(UI_SERVICES_CONFIG);");
     }
 
     @Test
     public void testShowServiceIFrame() throws Exception {
 
         // 1. setup not done
-        page.executeJavaScript("eskimoMain.showSetupNotDone = function(message) { window.setupNotDoneMessage = message; }");
-        page.executeJavaScript("eskimoMain.isSetupDone = function() { return false; }");
+        js("eskimoMain.showSetupNotDone = function(message) { window.setupNotDoneMessage = message; }");
+        js("eskimoMain.isSetupDone = function() { return false; }");
 
-        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+        js("eskimoServices.showServiceIFrame('cerebro')");
 
         assertJavascriptEquals("Service cerebro is not available at this stage.", "window.setupNotDoneMessage");
 
         // 2. disconnected
-        page.executeJavaScript("eskimoMain.isSetupDone = function() { return true; }");
-        page.executeJavaScript("eskimoSystemStatus.isDisconnected = function() { return true; }");
-        page.executeJavaScript("eskimoSystemStatus.showStatus = function() { window.showStatusCalled = true; }");
+        js("eskimoMain.isSetupDone = function() { return true; }");
+        js("eskimoSystemStatus.isDisconnected = function() { return true; }");
+        js("eskimoSystemStatus.showStatus = function() { window.showStatusCalled = true; }");
 
-        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+        js("eskimoServices.showServiceIFrame('cerebro')");
 
         assertJavascriptEquals("true", "window.showStatusCalled");
 
         // 3. Service not yet initialized
-        page.executeJavaScript("eskimoSystemStatus.isDisconnected = function() { return false; }");
-        page.executeJavaScript("eskimoSystemStatus.showStatusWhenServiceUnavailable = function (service) { window.statusUnavailableService = service;}");
+        js("eskimoSystemStatus.isDisconnected = function() { return false; }");
+        js("eskimoSystemStatus.showStatusWhenServiceUnavailable = function (service) { window.statusUnavailableService = service;}");
 
-        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+        js("eskimoServices.showServiceIFrame('cerebro')");
 
         assertJavascriptEquals("cerebro", "window.statusUnavailableService");
 
         // 4. service initialized
-        page.executeJavaScript("eskimoMain.hideProgressbar = function() { window.hideProgressbarCalled = true; }");
-        page.executeJavaScript("eskimoMain.setNavigationCompact = function() { window.setNavigationCompactCalled = true; }");
-        page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { window.onlyContentShown = content; }");
+        js("eskimoMain.hideProgressbar = function() { window.hideProgressbarCalled = true; }");
+        js("eskimoMain.setNavigationCompact = function() { window.setNavigationCompactCalled = true; }");
+        js("eskimoMain.showOnlyContent = function (content) { window.onlyContentShown = content; }");
 
-        page.executeJavaScript("eskimoServices.setServiceInitializedForTests ('cerebro');");
+        js("eskimoServices.setServiceInitializedForTests ('cerebro');");
 
-        page.executeJavaScript("eskimoServices.showServiceIFrame('cerebro')");
+        js("eskimoServices.showServiceIFrame('cerebro')");
 
         assertJavascriptEquals("true", "window.hideProgressbarCalled");
         assertJavascriptEquals("true", "window.setNavigationCompactCalled");
@@ -126,17 +126,17 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('non-existent');");
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+        js("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin', 'refreshWaiting': true }});");
 
         assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('zeppelin');");
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+        js("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'}});");
 
         assertJavascriptEquals("true", "!(eskimoServices.isServiceAvailable('zeppelin'))"); // undefined
 
-        page.executeJavaScript("eskimoServices.setServiceInitializedForTests ('zeppelin');");
+        js("eskimoServices.setServiceInitializedForTests ('zeppelin');");
 
         assertJavascriptEquals("true", "eskimoServices.isServiceAvailable('zeppelin');");
     }
@@ -144,21 +144,21 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testPeriodicRetryServices() throws Exception {
 
-        page.executeJavaScript("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
-        page.executeJavaScript("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
-        page.executeJavaScript("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
+        js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
+        js("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
+        js("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
 
-        page.executeJavaScript("alert (JSON.stringify (eskimoServices.getUIConfigsToRetryForTests()));");
+        js("alert (JSON.stringify (eskimoServices.getUIConfigsToRetryForTests()));");
 
         assertJavascriptEquals("2.0", "eskimoServices.getUIConfigsToRetryForTests().length");
         assertJavascriptEquals("cerebro", "eskimoServices.getUIConfigsToRetryForTests()[0].title");
         assertJavascriptEquals("kibana", "eskimoServices.getUIConfigsToRetryForTests()[1].title");
 
-        page.executeJavaScript("$.ajax = function(object) { object.success(); }");
+        js("$.ajax = function(object) { object.success(); }");
 
-        page.executeJavaScript("eskimoServices.periodicRetryServices();");
+        js("eskimoServices.periodicRetryServices();");
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Double)page.executeJavaScript("eskimoServices.getUIConfigsToRetryForTests().length").getJavaScriptResult()) == 0.0);
+        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Double)js("eskimoServices.getUIConfigsToRetryForTests().length").getJavaScriptResult()) == 0.0);
         assertJavascriptEquals("0.0", "eskimoServices.getUIConfigsToRetryForTests().length");
     }
 
@@ -166,7 +166,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     public void testCreateMenu() throws Exception {
 
         // add services menu
-        page.executeJavaScript("eskimoServices.createServicesMenu()");
+        js("eskimoServices.createServicesMenu()");
 
         // make sure they're created
         assertJavascriptEquals ("1.0", "$('#folderMenuCerebro').length");
@@ -183,18 +183,18 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testShouldReinitialize() throws Exception {
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+        js("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin' }});");
 
         assertJavascriptEquals("true", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+        js("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
                 "'actualUrl' : 'http://other-ip-address:9999/zeppelin' }});");
 
         assertJavascriptEquals("true", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
 
-        page.executeJavaScript("eskimoServices.setUiServicesConfig( {" +
+        js("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
                 "'actualUrl' : 'http://192.168.10.11:9999/zeppelin' }});");
 
@@ -205,7 +205,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     public void testCreateIFrames() throws Exception {
 
         // add iframe nodes
-        page.executeJavaScript("eskimoServices.createServicesIFrames()");
+        js("eskimoServices.createServicesIFrames()");
 
         // make sure they are created
 
@@ -220,13 +220,13 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testBuildUrl() throws Exception {
 
-        page.executeJavaScript("uiConfig = {'urlTemplate': 'http://{NODE_ADDRESS}:9999/test'}"); // proxyContext
+        js("uiConfig = {'urlTemplate': 'http://{NODE_ADDRESS}:9999/test'}"); // proxyContext
         assertJavascriptEquals("http://192.168.10.11:9999/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
-        page.executeJavaScript("uiConfig = {'proxyContext': '/test', 'unique': true}"); //
+        js("uiConfig = {'proxyContext': '/test', 'unique': true}"); //
         assertJavascriptEquals("/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
-        page.executeJavaScript("uiConfig = {'proxyContext': '/test'}"); //
+        js("uiConfig = {'proxyContext': '/test'}"); //
         assertJavascriptEquals("/test/192-168-10-11", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
     }
 
@@ -238,11 +238,11 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
 
-        page.executeJavaScript("eskimoServices.setServiceNotInitializedForTests ('cerebro');");
+        js("eskimoServices.setServiceNotInitializedForTests ('cerebro');");
 
         assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('cerebro')");
 
-        page.executeJavaScript("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
+        js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
 
         assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].targetUrl");
         assertJavascriptEquals("cerebro", "UI_SERVICES_CONFIG['cerebro'].service");
@@ -250,14 +250,14 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals("true", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
 
 
-        page.executeJavaScript("UI_SERVICES_CONFIG['cerebro'].refreshWaiting = false;");
-        page.executeJavaScript("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', true);");
+        js("UI_SERVICES_CONFIG['cerebro'].refreshWaiting = false;");
+        js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', true);");
 
         assertJavascriptEquals("0.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
 
-        page.executeJavaScript("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
+        js("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
 
-        await().atMost(5, TimeUnit.SECONDS).until(() -> page.executeJavaScript("UI_SERVICES_CONFIG['cerebro'].refreshWaiting").getJavaScriptResult().toString().equals ("false"));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> js("UI_SERVICES_CONFIG['cerebro'].refreshWaiting").getJavaScriptResult().toString().equals ("false"));
 
         assertJavascriptEquals("false", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
         assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");
@@ -268,7 +268,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         testHandleServiceDisplay();
 
-        page.executeJavaScript("eskimoServices.handleServiceHiding('cerebro', UI_SERVICES_CONFIG['cerebro'])");
+        js("eskimoServices.handleServiceHiding('cerebro', UI_SERVICES_CONFIG['cerebro'])");
 
         assertJavascriptNull("UI_SERVICES_CONFIG['cerebro'].actualUrl");
     }
@@ -276,13 +276,13 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testRetryPolicyNominal() throws Exception {
 
-        page.executeJavaScript("eskimoServices.periodicRetryServices = function () { " +
+        js("eskimoServices.periodicRetryServices = function () { " +
                 "    window.uiConfigsToRetry = eskimoServices.getUIConfigsToRetryForTests();" +
                 "}");
 
-        page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook('192-168-10-11', '192.168.10.11', 'kibana', true, false)");
+        js("eskimoServices.serviceMenuServiceFoundHook('192-168-10-11', '192.168.10.11', 'kibana', true, false)");
 
-        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+        js("eskimoServices.periodicRetryServices()");
 
         assertTrue (
                 new JSONArray("[{" +
@@ -294,7 +294,7 @@ public class EskimoServicesTest extends AbstractWebTest {
                         "\"targetWaitTime\":15," +
                         "\"refreshWaiting\":true}]")
                 .similar(
-                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
     }
 
     @Test
@@ -302,16 +302,16 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         testRetryPolicyNominal();
 
-        page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook('192-168-10-11', '192.168.10.11', 'kibana', false, false)");
+        js("eskimoServices.serviceMenuServiceFoundHook('192-168-10-11', '192.168.10.11', 'kibana', false, false)");
 
-        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+        js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+        System.err.println(js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
 
         assertTrue (
                 new JSONArray("[]")
                         .similar(
-                                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
     }
 
     @Test
@@ -319,16 +319,16 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         testRetryPolicyNominal();
 
-        page.executeJavaScript("eskimoServices.handleServiceIsUp(window.uiConfigsToRetry[0])");
+        js("eskimoServices.handleServiceIsUp(window.uiConfigsToRetry[0])");
 
-        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+        js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+        System.err.println(js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
 
         assertTrue (
                 new JSONArray("[]")
                         .similar(
-                                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
 
     }
 
@@ -338,11 +338,11 @@ public class EskimoServicesTest extends AbstractWebTest {
         testRetryPolicyNominal();
 
         // this is what eskimoMain.serviceMenuClear calls
-        page.executeJavaScript("eskimoServices.handleServiceHiding('kibana')");
+        js("eskimoServices.handleServiceHiding('kibana')");
 
-        page.executeJavaScript("eskimoServices.periodicRetryServices()");
+        js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+        System.err.println(js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
 
         assertTrue (
                 new JSONArray("[{" +
@@ -355,6 +355,6 @@ public class EskimoServicesTest extends AbstractWebTest {
                         "\"refreshWaiting\":true," +
                         "\"actualUrl\":null}]")
                         .similar(
-                                new JSONArray((String)page.executeJavaScript("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
     }
 }

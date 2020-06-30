@@ -97,7 +97,6 @@ public class GdashSetupTest extends AbstractSetupShellTest {
     @Test
     public void testSystemDockerManipulations() throws Exception {
         assertMarathonServiceDockerCommands();
-
     }
 
     @Test

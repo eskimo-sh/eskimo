@@ -67,9 +67,9 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         String servicesDependencies = sc.getServicesDependencies();
 
-        page.executeJavaScript("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
+        js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        page.executeJavaScript("function callCheckMarathonSetup(nodesConfig, marathonConfig) {\n" +
+        js("function callCheckMarathonSetup(nodesConfig, marathonConfig) {\n" +
                 "   return doCheckMarathonSetup(nodesConfig, marathonConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
                 "}");
     }
@@ -94,7 +94,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         Exception error = null;
         try {
-            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         } catch (Exception e) {
             error = e;
         }
@@ -117,7 +117,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
                 put("cerebro_installed", "on");
             }});
 
-            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -141,7 +141,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
                 put("gdash_installed", "on");
             }});
 
-            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -164,7 +164,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
                 put("zeppelin_installed", "on");
             }});
 
-            page.executeJavaScript("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());

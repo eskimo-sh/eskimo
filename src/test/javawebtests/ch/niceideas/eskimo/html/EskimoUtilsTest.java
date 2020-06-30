@@ -68,9 +68,9 @@ public class EskimoUtilsTest extends AbstractWebTest {
     public void testSerializeObject() throws Exception {
 
         String testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoUtilsTest/testForm.html"));
-        page.executeJavaScript("$('#main-content').html('"+testForm.replace("\n", "")+"')");
+        js("$('#main-content').html('"+testForm.replace("\n", "")+"')");
 
-        String serializedForm = page.executeJavaScript("JSON.stringify($('form#testForm').serializeObject())").getJavaScriptResult().toString();
+        String serializedForm = js("JSON.stringify($('form#testForm').serializeObject())").getJavaScriptResult().toString();
         assertEquals("{\"text1\":\"test1\",\"text2\":\"test2\",\"hidden1\":\"testHidden1\"}", serializedForm);
     }
 

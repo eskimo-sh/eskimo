@@ -47,23 +47,23 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
         loadScript(page, "eskimoNotifications.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        js("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoNotifications = new eskimo.Notifications();");
-        page.executeJavaScript("eskimoNotifications.initialize()");
+        js("eskimoNotifications = new eskimo.Notifications();");
+        js("eskimoNotifications.initialize()");
     }
 
     @Test
     public void testAddNotifications() throws Exception {
-        page.executeJavaScript("eskimoNotifications.addNotification({\n" +
+        js("eskimoNotifications.addNotification({\n" +
                 "      \"type\": \"Info\",\n" +
                 "      \"message\": \"Installation of Topology and settings on 192.168.10.11 succeeded\"\n" +
                 "    });");
 
         assertJavascriptEquals("1", "$('#new-notifications-count').html()");
 
-        String notificationsHTML = page.executeJavaScript("$('#notifications-container').html()").getJavaScriptResult().toString();
+        String notificationsHTML = js("$('#notifications-container').html()").getJavaScriptResult().toString();
         //System.err.println (notificationsHTML);
         assertTrue (notificationsHTML.startsWith ("" +
                 "<li class=\"hoe-submenu-label\">\n" +
@@ -84,13 +84,13 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
         testAddNotifications();
 
-        page.executeJavaScript("$.ajax = function(object) {" +
+        js("$.ajax = function(object) {" +
                 "    object.success();" +
                 "}");
 
         page.getElementById("notifications-clear").click();
 
-        String notificationsHTML = page.executeJavaScript("$('#notifications-container').html()").getJavaScriptResult().toString();
+        String notificationsHTML = js("$('#notifications-container').html()").getJavaScriptResult().toString();
 
         assertEquals("<li class=\"hoe-submenu-label\">\n" +
                 "    <h3><span id=\"notifications-count\" class=\"bold\">0    </span> Notification(s)     <a id=\"notifications-clear\" href=\"#\">        <span class=\"notifications-clear-link\">Clear</span>    </a></h3>\n" +

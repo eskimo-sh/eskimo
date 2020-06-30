@@ -58,30 +58,30 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoNodesConfigurationChecker.js");
         loadScript(page, "eskimoNodesConfig.js");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\" ];");
-        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
-        page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\" ];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
+        js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
         // instantiate test object
-        page.executeJavaScript("eskimoNodesConfig = new eskimo.NodesConfig()");
-        page.executeJavaScript("eskimoNodesConfig.eskimoMain = eskimoMain");
-        page.executeJavaScript("eskimoNodesConfig.eskimoServicesSelection =  eskimoServicesSelection");
-        page.executeJavaScript("eskimoNodesConfig.eskimoServices = eskimoServices");
-        page.executeJavaScript("eskimoNodesConfig.eskimoOperationsCommand = eskimoOperationsCommand");
-        page.executeJavaScript("eskimoNodesConfig.initialize()");
+        js("eskimoNodesConfig = new eskimo.NodesConfig()");
+        js("eskimoNodesConfig.eskimoMain = eskimoMain");
+        js("eskimoNodesConfig.eskimoServicesSelection =  eskimoServicesSelection");
+        js("eskimoNodesConfig.eskimoServices = eskimoServices");
+        js("eskimoNodesConfig.eskimoOperationsCommand = eskimoOperationsCommand");
+        js("eskimoNodesConfig.initialize()");
 
         waitForElementIdInDOM("reset-nodes-config");
 
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
+        js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
         // set services for tests
-        page.executeJavaScript("eskimoNodesConfig.setServicesSettingsForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
+        js("eskimoNodesConfig.setServicesSettingsForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
 
-        page.executeJavaScript("$('#inner-content-nodes').css('display', 'inherit')");
-        page.executeJavaScript("$('#inner-content-nodes').css('visibility', 'visible')");
+        js("$('#inner-content-nodes').css('display', 'inherit')");
+        js("$('#inner-content-nodes').css('visibility', 'visible')");
     }
 
     @Test
@@ -101,7 +101,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        page.executeJavaScript("eskimoNodesConfig.renderNodesConfig("+nodesConfig.getFormattedValue()+");");
+        js("eskimoNodesConfig.renderNodesConfig("+nodesConfig.getFormattedValue()+");");
 
         // test a few nodes
         assertJavascriptEquals("1.0", "$('#ntp1:checked').length");
@@ -123,13 +123,13 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     public void testSaveNodesButton() throws Exception {
         testRenderNodesConfig();
 
-        page.executeJavaScript("function checkNodesSetup(nodeSetup) {" +
+        js("function checkNodesSetup(nodeSetup) {" +
                 "    window.nodeSetup = nodeSetup" +
                 "}");
 
         page.getElementById("save-nodes-btn").click();
 
-        //System.err.println(page.executeJavaScript("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
+        //System.err.println(js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
 
         JSONObject expectedResult = new JSONObject("{" +
                 "\"node_id1\":\"192.168.10.11\"," +
@@ -152,7 +152,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"gluster2\":\"on\"," +
                 "\"logstash2\":\"on\"}");
 
-        JSONObject actualResult = new JSONObject((String)page.executeJavaScript("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
+        JSONObject actualResult = new JSONObject((String)js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
 
         assertTrue(expectedResult.similar(actualResult));
     }
@@ -160,10 +160,10 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @Test
     public void testShowNodesConfigWithResetButton() throws Exception {
 
-        page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
+        js("eskimoMain.isSetupDone = function () { return true; }");
 
         // test clear = missing
-        page.executeJavaScript("$.ajax = function (object) {" +
+        js("$.ajax = function (object) {" +
                 "    object.success ({clear: \"missing\"});" +
                 "}");
 
@@ -172,22 +172,22 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertTrue(page.getElementById("nodes-placeholder").getTextContent().contains("(No nodes / services configured yet)"));
 
         // test clear = setup
-        page.executeJavaScript("$.ajax = function (object) {" +
+        js("$.ajax = function (object) {" +
                 "    object.success ({clear: \"setup\"});" +
                 "}");
 
-        page.executeJavaScript("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
+        js("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
 
         page.getElementById("reset-nodes-config").click();
 
-        assertTrue((boolean)page.executeJavaScript("window.handleSetupNotCompletedCalled").getJavaScriptResult());
+        assertTrue((boolean)js("window.handleSetupNotCompletedCalled").getJavaScriptResult());
 
         // test OK
-        page.executeJavaScript("$.ajax = function (object) {" +
+        js("$.ajax = function (object) {" +
                 "    object.success ({result: \"OK\"});" +
                 "}");
 
-        page.executeJavaScript("eskimoNodesConfig.renderNodesConfig = function (config) { window.nodesConfig = config; }");
+        js("eskimoNodesConfig.renderNodesConfig = function (config) { window.nodesConfig = config; }");
 
         page.getElementById("reset-nodes-config").click();
 
@@ -199,9 +199,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        page.executeJavaScript("eskimoNodesConfig.renderNodesConfig(" + nodesConfig.getFormattedValue() + ");");
+        js("eskimoNodesConfig.renderNodesConfig(" + nodesConfig.getFormattedValue() + ");");
 
-        page.executeJavaScript("eskimoNodesConfig.onServicesSelectedForNode({\n" +
+        js("eskimoNodesConfig.onServicesSelectedForNode({\n" +
                 "\"elasticsearch2\": \"on\",\n" +
                 "\"flink-worker2\": \"on\",\n" +
                 "\"flink-app-master\": \"2\",\n" +
@@ -224,16 +224,16 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     public void testRemoveNode() throws Exception {
 
         // add two nodes
-        page.executeJavaScript("eskimoNodesConfig.addNode()");
-        page.executeJavaScript("eskimoNodesConfig.addNode()");
+        js("eskimoNodesConfig.addNode()");
+        js("eskimoNodesConfig.addNode()");
 
         // manipulate node 2
-        page.executeJavaScript("$('#node_id2').attr('value', '192.168.10.11')");
-        page.executeJavaScript("$('#flink-app-master2').get(0).checked = true");
-        page.executeJavaScript("$('#elasticsearch2').get(0).checked = true");
+        js("$('#node_id2').attr('value', '192.168.10.11')");
+        js("$('#flink-app-master2').get(0).checked = true");
+        js("$('#elasticsearch2').get(0).checked = true");
 
         // remove node 1
-        page.executeJavaScript("eskimoNodesConfig.removeNode ('remove1')");
+        js("eskimoNodesConfig.removeNode ('remove1')");
 
         // ensure values are found in node 1
         assertAttrValue("#node_id1", "value", "192.168.10.11");
@@ -245,7 +245,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @Test
     public void testAddNode() throws Exception {
 
-        page.executeJavaScript("eskimoNodesConfig.addNode()");
+        js("eskimoNodesConfig.addNode()");
 
         assertTrue(page.getElementById("label1").getTextContent().contains("Node no  1"));
 

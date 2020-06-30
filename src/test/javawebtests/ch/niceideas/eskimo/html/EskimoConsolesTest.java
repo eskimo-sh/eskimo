@@ -49,41 +49,41 @@ public class EskimoConsolesTest extends AbstractWebTest {
         loadScript (page, "eskimoConsoles.js");
 
         // mock ajax term
-        page.executeJavaScript("ajaxterm = {};");
-        page.executeJavaScript("ajaxterm.Terminal = function(id, options) {\n" +
+        js("ajaxterm = {};");
+        js("ajaxterm.Terminal = function(id, options) {\n" +
                 "this.setShowNextTab = function() {};\n" +
                 "this.setShowPrevTab = function() {};\n" +
                 "this.close = function () {if (!window.terminalCloseCalled) { window.terminalCloseCalled = []; }; window.terminalCloseCalled.push(id); };\n" +
                 "}\n");
 
         // instantiate test object
-        page.executeJavaScript("eskimoConsoles = new eskimo.Consoles()");
-        page.executeJavaScript("eskimoConsoles.eskimoMain = {" +
+        js("eskimoConsoles = new eskimo.Consoles()");
+        js("eskimoConsoles.eskimoMain = {" +
                 "       isSetupDone: function() {return true; }," +
                 "       showOnlyContent: function() {}," +
                 "       hideProgressbar: function() {}" +
                 "   }");
-        page.executeJavaScript("eskimoConsoles.initialize()");
+        js("eskimoConsoles.initialize()");
 
         waitForElementIdInDOM("consoles-console-content");
 
-        page.executeJavaScript("var openedConsoles = [];");
-        page.executeJavaScript("eskimoConsoles.setOpenedConsoles(openedConsoles);");
+        js("var openedConsoles = [];");
+        js("eskimoConsoles.setOpenedConsoles(openedConsoles);");
 
         // set services for tests
-        page.executeJavaScript("eskimoConsoles.setAvailableNodes (" +
+        js("eskimoConsoles.setAvailableNodes (" +
                 "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"}, " +
                 " {\"nbr\": 2, \"nodeName\": \"192-168-10-13\", \"nodeAddress\": \"192.168.10.13\"} ] );");
 
-        page.executeJavaScript("$('#inner-content-consoles').css('display', 'inherit')");
-        page.executeJavaScript("$('#inner-content-consoles').css('visibility', 'visible')");
+        js("$('#inner-content-consoles').css('display', 'inherit')");
+        js("$('#inner-content-consoles').css('visibility', 'visible')");
     }
 
     @Test
     public void testNominal() {
 
         try {
-            page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
+            js("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
 
             // Honestly if this ends up without an error, we're good
         } catch (Throwable e) {
@@ -97,7 +97,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
         testClickOpenConsle();
 
         // node 192-168-10-13 vanishes !
-        page.executeJavaScript("eskimoConsoles.setAvailableNodes (" +
+        js("eskimoConsoles.setAvailableNodes (" +
                 "[{\"nbr\": 1, \"nodeName\": \"192-168-10-11\", \"nodeAddress\": \"192.168.10.11\"} ] );");
 
         // ensure console was disabled
@@ -116,7 +116,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
 
     @Test
     public void testShowConsoles() {
-        page.executeJavaScript("eskimoConsoles.showConsoles()");
+        js("eskimoConsoles.showConsoles()");
 
         assertNotNull (page.getElementById("console_open_192-168-10-11"));
         assertEquals ("192.168.10.11", page.getElementById("console_open_192-168-10-11").getTextContent());
@@ -147,8 +147,8 @@ public class EskimoConsolesTest extends AbstractWebTest {
 
     @Test
     public void testShowPrevTab() throws Exception {
-        page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
-        page.executeJavaScript("eskimoConsoles.openConsole('192.168.10.13', '192-168-10-13')");
+        js("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
+        js("eskimoConsoles.openConsole('192.168.10.13', '192-168-10-13')");
 
         assertCssValue ("#consoles-console-192-168-10-11", "visibility", "hidden");
         assertCssValue ("#consoles-console-192-168-10-11", "display", "none");
@@ -156,7 +156,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
         assertCssValue ("#consoles-console-192-168-10-13", "visibility", "inherit");
         assertCssValue ("#consoles-console-192-168-10-13", "display", "inherit");
 
-        page.executeJavaScript("eskimoConsoles.showPrevTab()");
+        js("eskimoConsoles.showPrevTab()");
 
         assertCssValue ("#consoles-console-192-168-10-11", "visibility", "inherit");
         assertCssValue ("#consoles-console-192-168-10-11", "display", "inherit");
@@ -171,7 +171,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
         // reinitiate the situation as testShowPrevTab
         testShowPrevTab();
 
-        page.executeJavaScript("eskimoConsoles.showNextTab()");
+        js("eskimoConsoles.showNextTab()");
 
         // situation is now inverse
         assertCssValue ("#consoles-console-192-168-10-11", "visibility", "hidden");

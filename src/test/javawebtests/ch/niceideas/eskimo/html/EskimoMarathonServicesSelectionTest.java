@@ -54,23 +54,23 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoMarathonServicesSelection.js");
 
-        page.executeJavaScript("eskimoMarathonServicesConfig = {};");
+        js("eskimoMarathonServicesConfig = {};");
 
         // leaving gdash out intentionally
-        page.executeJavaScript("eskimoMarathonServicesConfig.getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana', 'zeppelin']};");
+        js("eskimoMarathonServicesConfig.getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana', 'zeppelin']};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();");
-        page.executeJavaScript("eskimoMarathonServicesSelection.eskimoMarathonServicesConfig = eskimoMarathonServicesConfig;");
-        page.executeJavaScript("eskimoMarathonServicesSelection.initialize();");
+        js("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();");
+        js("eskimoMarathonServicesSelection.eskimoMarathonServicesConfig = eskimoMarathonServicesConfig;");
+        js("eskimoMarathonServicesSelection.initialize();");
 
         waitForElementIdInDOM("marathon-services-selection-body");
 
         String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesSelectionTest/form.html"));
 
-        page.executeJavaScript("INNER_FORM = '" + htmlForm.replace("\n", " ") + "';");
+        js("INNER_FORM = '" + htmlForm.replace("\n", " ") + "';");
 
-        page.executeJavaScript("$('#marathon-services-selection-body').html(INNER_FORM);");
+        js("$('#marathon-services-selection-body').html(INNER_FORM);");
     }
 
     @Test
@@ -79,9 +79,9 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
         // this is just to ensure everything has been properly loaded by setup
         assertNotNull (page.getElementById("select-all-marathon-services-button"));
 
-        page.executeJavaScript("eskimoMarathonServicesSelection.showMarathonServiceSelection()");
+        js("eskimoMarathonServicesSelection.showMarathonServiceSelection()");
 
-        await().atMost(1, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#marathon-services-selection-modal').css('display')").getJavaScriptResult().toString().equals ("block"));
+        await().atMost(1, TimeUnit.SECONDS).until(() -> js("$('#marathon-services-selection-modal').css('display')").getJavaScriptResult().toString().equals ("block"));
 
         assertCssValue("#marathon-services-selection-modal", "display", "block");
         assertCssValue("#marathon-services-selection-modal", "visibility", "visible");
@@ -92,7 +92,7 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
         testNominal();
 
-        page.executeJavaScript("eskimoMarathonServicesConfig.proceedWithReinstall = function (reinstallConfig) {" +
+        js("eskimoMarathonServicesConfig.proceedWithReinstall = function (reinstallConfig) {" +
                 "    window.reinstallConfig = JSON.stringify (reinstallConfig);" +
                 "}");
 
@@ -108,22 +108,22 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
                 "\"spark-history-server_reinstall\":\"on\"," +
                 "\"zeppelin_reinstall\":\"on\"}");
 
-        JSONObject actualResult = new JSONObject((String)page.executeJavaScript("window.reinstallConfig").getJavaScriptResult());
+        JSONObject actualResult = new JSONObject((String)js("window.reinstallConfig").getJavaScriptResult());
         assertTrue(expectedResult.similar(actualResult));
     }
 
     @Test
     public void testSelectAll() throws Exception {
 
-        page.executeJavaScript("eskimoMarathonServicesSelection.marathonServicesSelectionSelectAll();");
+        js("eskimoMarathonServicesSelection.marathonServicesSelectionSelectAll();");
 
-        assertTrue ((Boolean)page.executeJavaScript("$('#cerebro_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)page.executeJavaScript("$('#kibana_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)page.executeJavaScript("$('#kafka-manager_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)page.executeJavaScript("$('#spark-history-server_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)page.executeJavaScript("$('#grafana_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)page.executeJavaScript("$('#zeppelin_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#cerebro_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#kibana_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#kafka-manager_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#spark-history-server_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#grafana_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#zeppelin_reinstall').get(0).checked").getJavaScriptResult());
 
-        assertFalse ((Boolean)page.executeJavaScript("$('#gdash_reinstall').get(0).checked").getJavaScriptResult());
+        assertFalse ((Boolean)js("$('#gdash_reinstall').get(0).checked").getJavaScriptResult());
     }
 }

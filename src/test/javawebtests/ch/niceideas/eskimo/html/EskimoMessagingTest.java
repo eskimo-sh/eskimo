@@ -45,11 +45,11 @@ public class EskimoMessagingTest extends AbstractWebTest {
 
         loadScript(page, "eskimoMessaging.js");
 
-        page.executeJavaScript("function errorHandler() {};");
+        js("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoMessaging = new eskimo.Messaging()");
-        page.executeJavaScript("eskimoMessaging.fetchLastMessages = function(callback) {" +
+        js("eskimoMessaging = new eskimo.Messaging()");
+        js("eskimoMessaging.fetchLastMessages = function(callback) {" +
                 "    if (callback != null) {callback(); }" +
                 "};");
 
@@ -59,14 +59,14 @@ public class EskimoMessagingTest extends AbstractWebTest {
     @Test
     public void testStartStopOperationInprogress() throws Exception {
 
-        page.executeJavaScript("eskimoMessaging.startOperationInProgress();");
+        js("eskimoMessaging.startOperationInProgress();");
 
         assertCssValue("#progress-bar-pending-wrapper", "visibility", "inherit");
         assertCssValue("#progress-bar-pending-wrapper", "display", "block");
 
         assertJavascriptEquals("<h3>Processing pending on Eskimo backend ....</h3>", "$('#pending-message-title').html()");
 
-        page.executeJavaScript("eskimoMessaging.stopOperationInProgress(false);");
+        js("eskimoMessaging.stopOperationInProgress(false);");
 
         assertCssValue("#progress-bar-pending-wrapper", "visibility", "hidden");
         assertCssValue("#progress-bar-pending-wrapper", "display", "none");
@@ -75,14 +75,14 @@ public class EskimoMessagingTest extends AbstractWebTest {
                 "$('#pending-message-title').html()");
 
 
-        page.executeJavaScript("eskimoMessaging.startOperationInProgress();");
+        js("eskimoMessaging.startOperationInProgress();");
 
         assertCssValue("#progress-bar-pending-wrapper", "visibility", "inherit");
         assertCssValue("#progress-bar-pending-wrapper", "display", "block");
 
         assertJavascriptEquals("<h3>Processing pending on Eskimo backend ....</h3>", "$('#pending-message-title').html()");
 
-        page.executeJavaScript("eskimoMessaging.stopOperationInProgress(true);");
+        js("eskimoMessaging.stopOperationInProgress(true);");
 
         assertCssValue("#progress-bar-pending-wrapper", "visibility", "hidden");
         assertCssValue("#progress-bar-pending-wrapper", "display", "none");

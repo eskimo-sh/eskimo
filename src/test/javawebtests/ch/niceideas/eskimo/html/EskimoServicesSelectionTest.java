@@ -58,32 +58,32 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         loadScript(page, "eskimoServicesSelection.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection();");
-        page.executeJavaScript("eskimoServicesSelection.eskimoMain = eskimoMain");
-        page.executeJavaScript("eskimoServicesSelection.eskimoNodesConfig = eskimoNodesConfig");
-        page.executeJavaScript("eskimoServicesSelection.initialize()");
+        js("eskimoServicesSelection = new eskimo.ServicesSelection();");
+        js("eskimoServicesSelection.eskimoMain = eskimoMain");
+        js("eskimoServicesSelection.eskimoNodesConfig = eskimoNodesConfig");
+        js("eskimoServicesSelection.initialize()");
 
         waitForElementIdInDOM("services-selection-button-select-all");
 
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        page.executeJavaScript("eskimoServicesSelection.setServicesSettingsForTest(SERVICES_CONFIGURATION);");
+        js("eskimoServicesSelection.setServicesSettingsForTest(SERVICES_CONFIGURATION);");
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
 
-        page.executeJavaScript("SERVICES_CONFIGURATION = " + jsonServices + ";");
-        //page.executeJavaScript("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
+        js("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
-        page.executeJavaScript("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\"];");
-        page.executeJavaScript("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
-        page.executeJavaScript("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        page.executeJavaScript("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\"];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
+        js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        page.executeJavaScript("eskimoNodesConfig.getConfiguredServices = function() {\n"+
+        js("eskimoNodesConfig.getConfiguredServices = function() {\n"+
                 "    return CONFIGURED_SERVICES;\n"+
                 "};\n");
 
-        page.executeJavaScript("eskimoServicesSelection.initModalServicesConfig();");
+        js("eskimoServicesSelection.initModalServicesConfig();");
     }
 
     @Test
@@ -110,7 +110,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         page.getElementById("flink-app-master-choice").click();
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> page.executeJavaScript("$('#flink-app-master-choice').get(0).checked").getJavaScriptResult().toString().equals ("false"));
+        await().atMost(10, TimeUnit.SECONDS).until(() -> js("$('#flink-app-master-choice').get(0).checked").getJavaScriptResult().toString().equals ("false"));
 
         assertJavascriptEquals("false", "$('#flink-app-master-choice').get(0).checked");
     }
@@ -118,9 +118,9 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testNominal() throws Exception {
 
-        page.executeJavaScript("var result = null;");
+        js("var result = null;");
 
-        page.executeJavaScript("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
+        js("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
                 "return {\n" +
                 "  \"node_id1\": \"192.168.10.11\",\n" +
                 "  \"elasticsearch1\": \"on\",\n" +
@@ -137,11 +137,11 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "};" +
                 "}");
 
-        page.executeJavaScript("eskimoNodesConfig.getNodesCount = function() { return 2; }");
+        js("eskimoNodesConfig.getNodesCount = function() { return 2; }");
 
-        page.executeJavaScript("eskimoServicesSelection.showServiceSelection(1, function(model) {result = model;})");
+        js("eskimoServicesSelection.showServiceSelection(1, function(model) {result = model;})");
 
-        page.executeJavaScript("eskimoServicesSelection.validateServicesSelection();");
+        js("eskimoServicesSelection.validateServicesSelection();");
 
         assertJavascriptEquals("{\"ntp1\":\"on\"," +
                 "\"zookeeper\":\"1\"," +
@@ -160,15 +160,15 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testSelectAll() throws Exception {
 
-        page.executeJavaScript("var result = null;");
+        js("var result = null;");
 
-        page.executeJavaScript("eskimoNodesConfig.getNodesCount = function() { return 2; }");
+        js("eskimoNodesConfig.getNodesCount = function() { return 2; }");
 
-        page.executeJavaScript("eskimoServicesSelection.showServiceSelection(\"empty\", function(model) {result = model;})");
+        js("eskimoServicesSelection.showServiceSelection(\"empty\", function(model) {result = model;})");
 
-        page.executeJavaScript("eskimoServicesSelection.servicesSelectionSelectAll();");
+        js("eskimoServicesSelection.servicesSelectionSelectAll();");
 
-        page.executeJavaScript("eskimoServicesSelection.validateServicesSelection();");
+        js("eskimoServicesSelection.validateServicesSelection();");
 
         assertJavascriptEquals("{\"ntp\":\"on\"," +
                 "\"zookeeper\":\"on\"," +

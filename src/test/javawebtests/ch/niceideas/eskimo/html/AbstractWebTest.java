@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.eskimo.utils.GenerateLCOV;
 import com.gargoylesoftware.htmlunit.AjaxController;
+import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import jscover.Main;
@@ -90,6 +91,10 @@ public abstract class AbstractWebTest {
     protected WebClient webClient;
     protected HtmlPage page;
 
+    ScriptResult js (String jsCode) {
+        return page.executeJavaScript (jsCode);
+    }
+
     @BeforeClass
     public static void setUpOnce() {
         if (isCoverageRun()) {
@@ -119,24 +124,24 @@ public abstract class AbstractWebTest {
     @After
     public void tearDown() throws Exception {
         if (isCoverageRun()) {
-            page.executeJavaScript("window.jscoverFinished = false;");
-            page.executeJavaScript("jscoverage_report('', function(){window.jscoverFinished=true;});");
+            js("window.jscoverFinished = false;");
+            js("jscoverage_report('', function(){window.jscoverFinished=true;});");
 
             // FIXME I have failing tests with Awaitility !?!
             /*
             await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1)  , TimeUnit.SECONDS).until(
-                    () -> (Boolean) page.executeJavaScript("window.jscoverFinished").getJavaScriptResult());
+                    () -> (Boolean) js("window.jscoverFinished").getJavaScriptResult());
 
             */
 
             int attempt = 0;
-            while ((!((Boolean) (page.executeJavaScript("window.jscoverFinished").getJavaScriptResult())).booleanValue()) && attempt < 10) {
+            while ((!((Boolean) (js("window.jscoverFinished").getJavaScriptResult())).booleanValue()) && attempt < 10) {
                 logger.debug("Waiting for coverage report to be written ...");
                 Thread.sleep(500);
                 attempt++;
             }
 
-            String json = (String) (page.executeJavaScript("jscoverage_serializeCoverageToJSON();")).getJavaScriptResult();
+            String json = (String) (js("jscoverage_serializeCoverageToJSON();")).getJavaScriptResult();
             coverages.add(json);
         }
     }
@@ -156,9 +161,9 @@ public abstract class AbstractWebTest {
 
     protected final void loadScript (HtmlPage page, String script) {
         if (isCoverageRun()) {
-            page.executeJavaScript("loadScript('http://localhost:9001/scripts/"+script+"')");
+            js("loadScript('http://localhost:9001/scripts/"+script+"')");
         } else {
-            page.executeJavaScript("loadScript('../../src/main/webapp/scripts/"+script+"')");
+            js("loadScript('../../src/main/webapp/scripts/"+script+"')");
         }
     }
 
@@ -178,40 +183,40 @@ public abstract class AbstractWebTest {
 
         // create common mocks
         // create mock functions
-        page.executeJavaScript("var eskimoServices = {};");
-        page.executeJavaScript("eskimoServices.serviceMenuServiceFoundHook = function (){};");
-        page.executeJavaScript("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
-        page.executeJavaScript("eskimoServices.isServiceAvailable = function (){ return true; };");
+        js("var eskimoServices = {};");
+        js("eskimoServices.serviceMenuServiceFoundHook = function (){};");
+        js("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
+        js("eskimoServices.isServiceAvailable = function (){ return true; };");
 
-        page.executeJavaScript("var eskimoConsoles = {}");
-        page.executeJavaScript("eskimoConsoles.setAvailableNodes = function () {};");
+        js("var eskimoConsoles = {}");
+        js("eskimoConsoles.setAvailableNodes = function () {};");
 
-        page.executeJavaScript("var eskimoServicesSelection = {" +
+        js("var eskimoServicesSelection = {" +
                 "}");
 
-        page.executeJavaScript("var eskimoOperationsCommand = {" +
+        js("var eskimoOperationsCommand = {" +
                 "showCommand : function() {}" +
                 "}");
 
-        page.executeJavaScript("var eskimoMessaging = {}");
-        page.executeJavaScript("eskimoMessaging.isOperationInProgress = function() { return false; };");
-        page.executeJavaScript("eskimoMessaging.setOperationInProgress = function() {};");
-        page.executeJavaScript("eskimoMessaging.showMessages = function() {};");
+        js("var eskimoMessaging = {}");
+        js("eskimoMessaging.isOperationInProgress = function() { return false; };");
+        js("eskimoMessaging.setOperationInProgress = function() {};");
+        js("eskimoMessaging.showMessages = function() {};");
 
-        page.executeJavaScript("var eskimoNotifications = {}");
-        page.executeJavaScript("eskimoNotifications.fetchNotifications = function() {};");
+        js("var eskimoNotifications = {}");
+        js("eskimoNotifications.fetchNotifications = function() {};");
 
-        page.executeJavaScript("var eskimoSetup = {}");
-        page.executeJavaScript("eskimoSetup.setSnapshot = function () {};");
+        js("var eskimoSetup = {}");
+        js("eskimoSetup.setSnapshot = function () {};");
 
-        page.executeJavaScript("var eskimoFileManagers = {};");
-        page.executeJavaScript("eskimoFileManagers.setAvailableNodes = function() {};");
+        js("var eskimoFileManagers = {};");
+        js("eskimoFileManagers.setAvailableNodes = function() {};");
 
-        page.executeJavaScript("var eskimoNodesConfig = {};");
-        page.executeJavaScript("eskimoNodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
-        page.executeJavaScript("eskimoNodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
-        page.executeJavaScript("eskimoNodesConfig.getServicesDependencies = function () { return {}; };");
-        page.executeJavaScript("eskimoNodesConfig.isServiceUnique = function (serviceName){ " +
+        js("var eskimoNodesConfig = {};");
+        js("eskimoNodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
+        js("eskimoNodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
+        js("eskimoNodesConfig.getServicesDependencies = function () { return {}; };");
+        js("eskimoNodesConfig.isServiceUnique = function (serviceName){ " +
                 "return (serviceName == 'mesos-master' " +
                 "    || serviceName == 'zookeeper' " +
                 "    || serviceName == 'grafana' " +
@@ -224,43 +229,43 @@ public abstract class AbstractWebTest {
                 "    || serviceName == 'zeppelin' ); " +
                 "};");
 
-        page.executeJavaScript("var eskimoSystemStatus = {};");
-        page.executeJavaScript("eskimoSystemStatus.showStatus = function () {};");
+        js("var eskimoSystemStatus = {};");
+        js("eskimoSystemStatus.showStatus = function () {};");
 
-        page.executeJavaScript("var eskimoMarathonServicesSelection = {" +
+        js("var eskimoMarathonServicesSelection = {" +
                 "showMarathonServiceSelection: function () {}" +
                 "};");
 
-        page.executeJavaScript("var eskimoMarathonOperationsCommand = {" +
+        js("var eskimoMarathonOperationsCommand = {" +
                 "showCommand : function() {}" +
                 "};");
 
-        page.executeJavaScript("var eskimoSettingsOperationsCommand = {}");
+        js("var eskimoSettingsOperationsCommand = {}");
 
-        page.executeJavaScript("var eskimoMain = {};");
-        page.executeJavaScript("eskimoMain.handleSetupCompleted = function (){};");
-        page.executeJavaScript("eskimoMain.getServices = function (){ return eskimoServices; };");
-        page.executeJavaScript("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
-        page.executeJavaScript("eskimoMain.getFileManagers = function (){ return eskimoFileManagers; };");
-        page.executeJavaScript("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
-        page.executeJavaScript("eskimoMain.getNodesConfig = function () { return eskimoNodesConfig; };");
-        page.executeJavaScript("eskimoMain.isOperationInProgress = function() { return false; };");
-        page.executeJavaScript("eskimoMain.setAvailableNodes = function () {};");
-        page.executeJavaScript("eskimoMain.menuResize = function () {};");
-        page.executeJavaScript("eskimoMain.isSetupDone = function () { return true; }");
-        page.executeJavaScript("eskimoMain.hideProgressbar = function () { }");
-        page.executeJavaScript("eskimoMain.isCurrentDisplayedService = function () { return false; }");
-        page.executeJavaScript("eskimoMain.setSetupLoaded = function () {}");
-        page.executeJavaScript("eskimoMain.startOperationInProgress = function() {}");
-        page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress = function() {}");
-        page.executeJavaScript("eskimoMain.handleMarathonSubsystem = function() {}");
-        page.executeJavaScript("eskimoMain.showProgressbar = function() {}");
-        page.executeJavaScript("eskimoMain.isSetupLoaded = function() { return true; }");
-        page.executeJavaScript("eskimoMain.serviceMenuClear = function() { return true; }");
+        js("var eskimoMain = {};");
+        js("eskimoMain.handleSetupCompleted = function (){};");
+        js("eskimoMain.getServices = function (){ return eskimoServices; };");
+        js("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
+        js("eskimoMain.getFileManagers = function (){ return eskimoFileManagers; };");
+        js("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
+        js("eskimoMain.getNodesConfig = function () { return eskimoNodesConfig; };");
+        js("eskimoMain.isOperationInProgress = function() { return false; };");
+        js("eskimoMain.setAvailableNodes = function () {};");
+        js("eskimoMain.menuResize = function () {};");
+        js("eskimoMain.isSetupDone = function () { return true; }");
+        js("eskimoMain.hideProgressbar = function () { }");
+        js("eskimoMain.isCurrentDisplayedService = function () { return false; }");
+        js("eskimoMain.setSetupLoaded = function () {}");
+        js("eskimoMain.startOperationInProgress = function() {}");
+        js("eskimoMain.scheduleStopOperationInProgress = function() {}");
+        js("eskimoMain.handleMarathonSubsystem = function() {}");
+        js("eskimoMain.showProgressbar = function() {}");
+        js("eskimoMain.isSetupLoaded = function() { return true; }");
+        js("eskimoMain.serviceMenuClear = function() { return true; }");
 
-        page.executeJavaScript("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
+        js("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 
-        page.executeJavaScript("eskimoMain.showOnlyContent = function (content) { " +
+        js("eskimoMain.showOnlyContent = function (content) { " +
                 "    $(\".inner-content\").css(\"visibility\", \"hidden\");\n" +
                 "    $(\"#inner-content-\" + content).css(\"visibility\", \"visible\");" +
                 "    $(\"#inner-content-\" + content).css(\"display\", \"block\");" +
@@ -274,7 +279,7 @@ public abstract class AbstractWebTest {
 
             waitForDefinition("window.$");
 
-            if (!page.executeJavaScript("typeof window.$").getJavaScriptResult().toString().equals ("undefined")) {
+            if (!js("typeof window.$").getJavaScriptResult().toString().equals ("undefined")) {
                 break;
             }
         }
@@ -282,8 +287,8 @@ public abstract class AbstractWebTest {
         waitForDefinition("$.fn");
 
         // override jquery load
-        page.executeJavaScript("$.fn._internalLoad = $.fn.load;");
-        page.executeJavaScript("$.fn.load = function (resource, callback) { return this._internalLoad ('../../src/main/webapp/'+resource, callback); };");
+        js("$.fn._internalLoad = $.fn.load;");
+        js("$.fn.load = function (resource, callback) { return this._internalLoad ('../../src/main/webapp/'+resource, callback); };");
 
     }
 
@@ -293,19 +298,19 @@ public abstract class AbstractWebTest {
     }
 
     protected void assertAttrValue(String selector, String attribute, String value) {
-        assertEquals (value, page.executeJavaScript("$('"+selector+"').attr('"+attribute+"')").getJavaScriptResult());
+        assertEquals (value, js("$('"+selector+"').attr('"+attribute+"')").getJavaScriptResult());
     }
 
     protected void assertCssValue(String selector, String attribute, String value) {
-        assertEquals (value, page.executeJavaScript("$('"+selector+"').css('"+attribute+"')").getJavaScriptResult());
+        assertEquals (value, js("$('"+selector+"').css('"+attribute+"')").getJavaScriptResult());
     }
 
     protected void assertJavascriptEquals(String value, String javascript) {
-        assertEquals (value, page.executeJavaScript(javascript).getJavaScriptResult().toString());
+        assertEquals (value, js(javascript).getJavaScriptResult().toString());
     }
 
     protected void assertJavascriptNull(String javascript) {
-        assertNull (page.executeJavaScript(javascript).getJavaScriptResult());
+        assertNull (js(javascript).getJavaScriptResult());
     }
 
     protected void assertTagName(String elementId, String tagName) {
@@ -332,11 +337,11 @@ public abstract class AbstractWebTest {
         // FIXME I have failing tests with Awaitility !?!
         /*
         await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1) , TimeUnit.SECONDS).until(
-                () -> !page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined"));
+                () -> !js("typeof " + varName).getJavaScriptResult().toString().equals ("undefined"));
         */
 
         int attempt = 0;
-        while (page.executeJavaScript("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
+        while (js("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
             Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }

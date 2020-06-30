@@ -43,7 +43,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 GRAFANA_USER_ID=$1
 if [[ $GRAFANA_USER_ID == "" ]]; then
     echo " - Didn't get Grafana User ID as argument"
-    exit -2
+    exit 2
 fi
 
 ESKIMO_CONTEXT_PATH=$2
@@ -60,7 +60,7 @@ if [[ $grafana_user_id == "" ]]; then
     useradd -u $GRAFANA_USER_ID grafana
 elif [[ $grafana_user_id != $GRAFANA_USER_ID ]]; then
     echo "Docker grafana USER ID is $grafana_user_id while requested USER ID is $GRAFANA_USER_ID"
-    exit -2
+    exit 3
 fi
 
 
@@ -78,6 +78,7 @@ sudo sed -i s/"admin_user = admin"/"admin_user = eskimo"/g /usr/local/lib/grafan
 sudo sed -i s/"admin_password = admin"/"admin_password = eskimo"/g /usr/local/lib/grafana/conf/defaults.ini
 sudo sed -i s/"reporting_enabled = true"/"reporting_enabled = false"/g /usr/local/lib/grafana/conf/defaults.ini
 sudo sed -i s/"default_theme = dark"/"default_theme = light"/g /usr/local/lib/grafana/conf/defaults.ini
+sudo sed -i s/"plugins = data\/plugins"/"plugins = plugins"/g /usr/local/lib/grafana/conf/defaults.ini
 
 echo " - Enabling anonymous access"
 sudo sed -i -n '1h;1!H;${;g;s/'\
@@ -120,7 +121,6 @@ else
 fi
 
 sed -i s/"serve_from_sub_path = false"/"serve_from_sub_path = true"/g /usr/local/lib/grafana/conf/defaults.ini
-
 
 
 

@@ -46,8 +46,8 @@ public class EskimoAboutTest extends AbstractWebTest {
 
         loadScript(page, "eskimoAbout.js");
 
-        page.executeJavaScript("eskimoAbout = new eskimo.About();");
-        page.executeJavaScript("eskimoAbout.initialize()");
+        js("eskimoAbout = new eskimo.About();");
+        js("eskimoAbout.initialize()");
 
         waitForElementIdInDOM("about-modal-body");
     }
@@ -55,19 +55,19 @@ public class EskimoAboutTest extends AbstractWebTest {
     @Test
     public void testNominal() throws Exception {
 
-        page.executeJavaScript("eskimoAbout.showAbout()");
+        js("eskimoAbout.showAbout()");
 
         assertCssValue("#about-modal", "display", "block");
         assertCssValue("#about-modal", "visibility", "visible");
 
-        page.executeJavaScript("eskimoAbout.cancelAbout()");
+        js("eskimoAbout.cancelAbout()");
 
         /* FIXME WTF ?!?
         await().atMost(20, TimeUnit.SECONDS).until(() ->
-                   page.executeJavaScript("$('#about-modal').css('display')") != null
-                && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult() != null
-                && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString() != null
-                && page.executeJavaScript("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
+                   js("$('#about-modal').css('display')") != null
+                && js("$('#about-modal').css('display')").getJavaScriptResult() != null
+                && js("$('#about-modal').css('display')").getJavaScriptResult().toString() != null
+                && js("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
         */
         Thread.sleep(3000);
 

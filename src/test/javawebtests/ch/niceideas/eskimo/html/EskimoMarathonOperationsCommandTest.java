@@ -49,19 +49,18 @@ public class EskimoMarathonOperationsCommandTest extends AbstractWebTest {
         loadScript(page, "eskimoMarathonOperationsCommand.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();");
-        page.executeJavaScript("eskimoMarathonOperationsCommand.initialize()");
+        js("eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();");
+        js("eskimoMarathonOperationsCommand.initialize()");
 
         waitForElementIdInDOM("marathon-operations-command-body");
     }
-
 
     @Test
     public void testShowCommand() throws Exception {
 
         String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonOperationsCommandTest/command.json"));
 
-        page.executeJavaScript("eskimoMarathonOperationsCommand.showCommand("+command+".command)");
+        js("eskimoMarathonOperationsCommand.showCommand("+command+".command)");
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonOperationsCommandTest/expectedResult.html"));
 

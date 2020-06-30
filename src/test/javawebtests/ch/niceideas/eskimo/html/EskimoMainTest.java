@@ -49,10 +49,10 @@ public class EskimoMainTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
 
         // redefine constructor
-        page.executeJavaScript("eskimo.Setup = function(){ this.initialize = function(){};  };");
-        page.executeJavaScript("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
-        page.executeJavaScript("eskimo.Notifications = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.Messaging = function(){" +
+        js("eskimo.Setup = function(){ this.initialize = function(){};  };");
+        js("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
+        js("eskimo.Notifications = function(){ this.initialize = function(){}; };");
+        js("eskimo.Messaging = function(){" +
                 "    this.setOperationInProgress = function() {" +
                 "    };" +
                 "    this.startOperationInProgress = function() {" +
@@ -64,36 +64,36 @@ public class EskimoMainTest extends AbstractWebTest {
                 "        }" +
                 "    };" +
                 "};");
-        page.executeJavaScript("eskimo.SystemStatus = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.Consoles = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.Services = function(){" +
+        js("eskimo.SystemStatus = function(){ this.initialize = function(){}; };");
+        js("eskimo.Consoles = function(){ this.initialize = function(){}; };");
+        js("eskimo.Services = function(){" +
                 "   this.handleServiceHiding = function() {};" +
                 "   this.initialize =  function() {}; " +
                 "};");
-        page.executeJavaScript("eskimo.ServicesSelection = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.ServicesSettings = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.MarathonServicesConfig = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.MarathonServicesSelection = function(){ this.initialize = function(){}; };");
-        page.executeJavaScript("eskimo.OperationsCommand = function(){ this.initialize = function(){} ; };");
-        page.executeJavaScript("eskimo.MarathonOperationsCommand = function(){ this.initialize = function(){} ;};");
-        page.executeJavaScript("eskimo.SettingsOperationsCommand = function(){ this.initialize = function(){} ;};");
-        page.executeJavaScript("eskimo.SetupCommand = function(){ this.initialize = function(){} ;};");
-        page.executeJavaScript("eskimo.FileManagers = function(){ this.initialize = function(){} ;};");
-        page.executeJavaScript("eskimo.Setup = function(){ this.initialize = function(){} ;};");
-        page.executeJavaScript("eskimo.About = function(){ this.initialize = function(){}; };");
+        js("eskimo.ServicesSelection = function(){ this.initialize = function(){}; };");
+        js("eskimo.ServicesSettings = function(){ this.initialize = function(){}; };");
+        js("eskimo.MarathonServicesConfig = function(){ this.initialize = function(){}; };");
+        js("eskimo.MarathonServicesSelection = function(){ this.initialize = function(){}; };");
+        js("eskimo.OperationsCommand = function(){ this.initialize = function(){} ; };");
+        js("eskimo.MarathonOperationsCommand = function(){ this.initialize = function(){} ;};");
+        js("eskimo.SettingsOperationsCommand = function(){ this.initialize = function(){} ;};");
+        js("eskimo.SetupCommand = function(){ this.initialize = function(){} ;};");
+        js("eskimo.FileManagers = function(){ this.initialize = function(){} ;};");
+        js("eskimo.Setup = function(){ this.initialize = function(){} ;};");
+        js("eskimo.About = function(){ this.initialize = function(){}; };");
 
         // Don0t let jquery load real eskimoMain
-        page.executeJavaScript("$.fn.ready = function () {};");
+        js("$.fn.ready = function () {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoMain = new eskimo.Main();");
-        page.executeJavaScript("eskimoMain.doInitializeInternal();");
+        js("eskimoMain = new eskimo.Main();");
+        js("eskimoMain.doInitializeInternal();");
     }
 
     @Test
     public void testShowOnlyContent() throws Exception {
 
-        page.executeJavaScript("eskimoMain.showOnlyContent('pending')");
+        js("eskimoMain.showOnlyContent('pending')");
 
         assertCssValue("#inner-content-status", "visibility", "hidden");
 
@@ -111,49 +111,49 @@ public class EskimoMainTest extends AbstractWebTest {
     @Test
     public void testShowHideProgressBar() throws Exception {
 
-        page.executeJavaScript("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
+        js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
         waitForElementIdInDOM("inner-content-progress");
 
-        page.executeJavaScript("$('#main-content').css('visibility', 'visible');");
-        page.executeJavaScript("$('#hoeapp-container').css('visibility', 'visible');");
+        js("$('#main-content').css('visibility', 'visible');");
+        js("$('#hoeapp-container').css('visibility', 'visible');");
 
-        page.executeJavaScript("eskimoMain.showProgressbar()");
+        js("eskimoMain.showProgressbar()");
 
-        assertEquals ("visible", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals ("visible", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
 
-        page.executeJavaScript("eskimoMain.hideProgressbar()");
+        js("eskimoMain.hideProgressbar()");
 
-        assertEquals ("hidden", page.executeJavaScript("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals ("hidden", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
     }
 
     @Test
     public void testStartStopOperationInprogress() throws Exception {
 
-        assertEquals(false, page.executeJavaScript("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+        assertEquals(false, js("eskimoMain.isOperationInProgress()").getJavaScriptResult());
 
-        page.executeJavaScript("eskimoMain.startOperationInProgress();");
+        js("eskimoMain.startOperationInProgress();");
 
-        assertEquals(true, page.executeJavaScript("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+        assertEquals(true, js("eskimoMain.isOperationInProgress()").getJavaScriptResult());
 
-        page.executeJavaScript("eskimoMain.scheduleStopOperationInProgress();");
+        js("eskimoMain.scheduleStopOperationInProgress();");
 
-        assertEquals(false, page.executeJavaScript("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+        assertEquals(false, js("eskimoMain.isOperationInProgress()").getJavaScriptResult());
     }
 
     @Test
     public void testHandleSetupCompletedAndNotCompleted() throws Exception {
 
-        page.executeJavaScript("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
+        js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
         waitForElementIdInDOM("menu-container");
 
-        page.executeJavaScript("eskimoMain.handleSetupCompleted()");
+        js("eskimoMain.handleSetupCompleted()");
 
-        page.executeJavaScript("var allDisabled = true;");
-        page.executeJavaScript("var allEnabled = true;");
+        js("var allDisabled = true;");
+        js("var allEnabled = true;");
 
-        page.executeJavaScript("" +
+        js("" +
                 " $('.config-menu-items').each(function() {\n" +
                 "     if ($(this).attr('class') == 'config-menu-items') {\n" +
                 "         allDisabled=false;\n"+
@@ -166,11 +166,11 @@ public class EskimoMainTest extends AbstractWebTest {
         assertJavascriptEquals("false", "allDisabled");
         assertJavascriptEquals("true", "allEnabled");
 
-        page.executeJavaScript("eskimoMain.handleSetupNotCompleted()");
+        js("eskimoMain.handleSetupNotCompleted()");
 
-        page.executeJavaScript("allEnabled = true;");
+        js("allEnabled = true;");
 
-        page.executeJavaScript("" +
+        js("" +
                 " $('.config-menu-items').each(function() {\n" +
                 "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
                 "         allEnabled=false;\n"+
