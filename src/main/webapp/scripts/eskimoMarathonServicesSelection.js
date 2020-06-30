@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.MarathonServicesSelection = function(constructorObject) {
+eskimo.MarathonServicesSelection = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMarathonServicesConfig = null;
@@ -102,12 +102,4 @@ eskimo.MarathonServicesSelection = function(constructorObject) {
     }
     this.validateMarathonServicesSelection = validateMarathonServicesSelection;
 
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

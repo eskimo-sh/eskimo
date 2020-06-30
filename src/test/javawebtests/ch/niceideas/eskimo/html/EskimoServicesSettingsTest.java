@@ -50,10 +50,12 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
         loadScript(page, "eskimoServicesSettings.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesSettings = new eskimo.ServicesSettings({" +
-                "    eskimoMain: eskimoMain," +
-                "    eskimoMessaging: eskimoMessaging" +
-                "});");
+        page.executeJavaScript("eskimoServicesSettings = new eskimo.ServicesSettings()");
+        page.executeJavaScript("eskimoServicesSettings.eskimoMain = eskimoMain");
+        page.executeJavaScript("eskimoServicesSettings.eskimoMessaging = eskimoMessaging");
+        page.executeJavaScript("eskimoServicesSettings.eskimoSettingsOperationsCommand = eskimoSettingsOperationsCommand");
+        page.executeJavaScript("eskimoServicesSettings.eskimoNodesConfig = eskimoNodesConfig");
+        page.executeJavaScript("eskimoServicesSettings.initialize()");
 
         waitForElementIdInDOM("reset-services-settings-btn");
 
@@ -76,9 +78,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
                 "    object.success({status: \"OK\", command: true})" +
                 "}");
 
-        page.executeJavaScript("eskimoMain.getSettingsOperationsCommand = function () {" +
-                "    return { showCommand : function () {window.showCommandCalled = true;  } }; " +
-                "};");
+        page.executeJavaScript("eskimoSettingsOperationsCommand.showCommand = function () {window.showCommandCalled = true;  }");
 
         page.getElementById("save-services-settings-btn").click();
 

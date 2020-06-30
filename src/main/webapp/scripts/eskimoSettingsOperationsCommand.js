@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.SettingsOperationsCommand = function(constructorObject) {
+eskimo.SettingsOperationsCommand = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -177,12 +177,4 @@ eskimo.SettingsOperationsCommand = function(constructorObject) {
         $('#settings-operations-command-modal').modal("hide");
     }
     this.cancelSettingsOperationsCommand = cancelSettingsOperationsCommand;
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constriuctor
-    this.initialize();
 };

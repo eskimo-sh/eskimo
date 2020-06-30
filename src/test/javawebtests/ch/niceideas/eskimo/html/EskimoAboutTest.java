@@ -47,6 +47,7 @@ public class EskimoAboutTest extends AbstractWebTest {
         loadScript(page, "eskimoAbout.js");
 
         page.executeJavaScript("eskimoAbout = new eskimo.About();");
+        page.executeJavaScript("eskimoAbout.initialize()");
 
         waitForElementIdInDOM("about-modal-body");
     }

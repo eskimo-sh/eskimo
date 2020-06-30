@@ -49,36 +49,38 @@ public class EskimoMainTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
 
         // redefine constructor
-        page.executeJavaScript("eskimo.Setup = function(){};");
-        page.executeJavaScript("eskimo.NodesConfig = function(){};");
-        page.executeJavaScript("eskimo.Notifications = function(){};");
+        page.executeJavaScript("eskimo.Setup = function(){ this.initialize = function(){};  };");
+        page.executeJavaScript("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
+        page.executeJavaScript("eskimo.Notifications = function(){ this.initialize = function(){}; };");
         page.executeJavaScript("eskimo.Messaging = function(){" +
                 "    this.setOperationInProgress = function() {" +
                 "    };" +
                 "    this.startOperationInProgress = function() {" +
                 "    };" +
+                "    this.initialize = function(){}; " +
                 "    this.stopOperationInProgress = function(success, callback) {" +
                 "        if (callback != null) {" +
                 "            callback();" +
                 "        }" +
                 "    };" +
                 "};");
-        page.executeJavaScript("eskimo.SystemStatus = function(){};");
-        page.executeJavaScript("eskimo.Consoles = function(){};");
+        page.executeJavaScript("eskimo.SystemStatus = function(){ this.initialize = function(){}; };");
+        page.executeJavaScript("eskimo.Consoles = function(){ this.initialize = function(){}; };");
         page.executeJavaScript("eskimo.Services = function(){" +
-                "   this.handleServiceHiding = function() {}" +
+                "   this.handleServiceHiding = function() {};" +
+                "   this.initialize =  function() {}; " +
                 "};");
-        page.executeJavaScript("eskimo.ServicesSelection = function(){};");
-        page.executeJavaScript("eskimo.ServicesSettings = function(){};");
-        page.executeJavaScript("eskimo.MarathonServicesConfig = function(){};");
-        page.executeJavaScript("eskimo.MarathonServicesSelection = function(){};");
-        page.executeJavaScript("eskimo.OperationsCommand = function(){};");
-        page.executeJavaScript("eskimo.MarathonOperationsCommand = function(){};");
-        page.executeJavaScript("eskimo.SettingsOperationsCommand = function(){};");
-        page.executeJavaScript("eskimo.SetupCommand = function(){};");
-        page.executeJavaScript("eskimo.FileManagers = function(){};");
-        page.executeJavaScript("eskimo.Setup = function(){};");
-        page.executeJavaScript("eskimo.About = function(){};");
+        page.executeJavaScript("eskimo.ServicesSelection = function(){ this.initialize = function(){}; };");
+        page.executeJavaScript("eskimo.ServicesSettings = function(){ this.initialize = function(){}; };");
+        page.executeJavaScript("eskimo.MarathonServicesConfig = function(){ this.initialize = function(){}; };");
+        page.executeJavaScript("eskimo.MarathonServicesSelection = function(){ this.initialize = function(){}; };");
+        page.executeJavaScript("eskimo.OperationsCommand = function(){ this.initialize = function(){} ; };");
+        page.executeJavaScript("eskimo.MarathonOperationsCommand = function(){ this.initialize = function(){} ;};");
+        page.executeJavaScript("eskimo.SettingsOperationsCommand = function(){ this.initialize = function(){} ;};");
+        page.executeJavaScript("eskimo.SetupCommand = function(){ this.initialize = function(){} ;};");
+        page.executeJavaScript("eskimo.FileManagers = function(){ this.initialize = function(){} ;};");
+        page.executeJavaScript("eskimo.Setup = function(){ this.initialize = function(){} ;};");
+        page.executeJavaScript("eskimo.About = function(){ this.initialize = function(){}; };");
 
         // Don0t let jquery load real eskimoMain
         page.executeJavaScript("$.fn.ready = function () {};");

@@ -48,11 +48,10 @@ public class EskimoMessagingTest extends AbstractWebTest {
         page.executeJavaScript("function errorHandler() {};");
 
         // instantiate test object
-        page.executeJavaScript("eskimoMessaging = new eskimo.Messaging({" +
-                "fetchLastMessages: function(callback) {" +
+        page.executeJavaScript("eskimoMessaging = new eskimo.Messaging()");
+        page.executeJavaScript("eskimoMessaging.fetchLastMessages = function(callback) {" +
                 "    if (callback != null) {callback(); }" +
-                "}" +
-                "});");
+                "};");
 
         waitForElementIdInDOM("progress-bar-pending-wrapper");
     }

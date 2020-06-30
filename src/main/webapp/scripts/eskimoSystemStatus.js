@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.SystemStatus = function(constructorObject) {
+eskimo.SystemStatus = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoNotifications = null;
@@ -44,6 +44,8 @@ eskimo.SystemStatus = function(constructorObject) {
     this.eskimoSetup = null;
     this.eskimoServices = null;
     this.eskimoMain = null;
+    this.eskimoConsoles = null;
+    this.eskimoFileManagers = null;
 
     const that = this;
 
@@ -543,7 +545,7 @@ eskimo.SystemStatus = function(constructorObject) {
 
         var statusMonitoringGrafana = $('#status-monitoring-grafana');
         statusMonitoringGrafana.css("display", "inherit");
-        statusMonitoringGrafana.css("visibility", "visible");
+        statusMonitoringGrafana.css("visibility", "inherit");
     }
     this.showGrafanaDashboard = showGrafanaDashboard;
 
@@ -790,13 +792,13 @@ eskimo.SystemStatus = function(constructorObject) {
     };
 
     function showTerminal(nodeAddress, nodeName) {
-        that.eskimoMain.getConsoles().showConsoles();
-        that.eskimoMain.getConsoles().openConsole(nodeAddress, nodeName)
+        that.eskimoConsoles.showConsoles();
+        that.eskimoConsoles.openConsole(nodeAddress, nodeName)
     }
 
     function showFileManager(nodeAddress, nodeName) {
-        that.eskimoMain.getFileManagers().showFileManagers();
-        that.eskimoMain.getFileManagers().openFileManager(nodeAddress, nodeName)
+        that.eskimoFileManagers.showFileManagers();
+        that.eskimoFileManagers.openFileManager(nodeAddress, nodeName)
     }
 
     function registerNodeMenu(selector, dataSelector) {
@@ -1195,12 +1197,4 @@ eskimo.SystemStatus = function(constructorObject) {
     }
     this.updateStatus = updateStatus;
 
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

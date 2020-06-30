@@ -35,10 +35,13 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.MarathonServicesConfig = function(constructorObject) {
+eskimo.MarathonServicesConfig = function() {
 
-    // will be injected eventually from constructorObject
+    // will be injected from glue
     this.eskimoMain = null;
+    this.eskimoMarathonServicesSelection = null;
+    this.eskimoMarathonOperationsCommand = null;
+    this.eskimoNodesConfig = null;
 
     const that = this;
 
@@ -58,7 +61,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
                     console.log(setupConfig);
 
                     try {
-                        checkMarathonSetup(setupConfig, that.eskimoMain.getNodesConfig().getServicesDependencies(),
+                        checkMarathonSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(),
                             function () {
                                 // callback if setup is OK
                                 proceedWithMarathonInstallation(setupConfig);
@@ -157,7 +160,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
 
             marathonServiceRow += ''+
                 '<td>' +
-                '<img class="nodes-config-logo" src="' + that.eskimoMain.getNodesConfig().getServiceLogoPath(MARATHON_SERVICES[i]) + '" />' +
+                '<img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(MARATHON_SERVICES[i]) + '" />' +
                 '</td>'+
                 '<td>'+
                 MARATHON_SERVICES[i]+
@@ -193,7 +196,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
 
     function showReinstallSelection() {
 
-        that.eskimoMain.getMarathonServicesSelection().showMarathonServiceSelection();
+        that.eskimoMarathonServicesSelection.showMarathonServiceSelection();
 
         var marathonServicesSelectionHTML = $('#marathon-services-container-table').html();
         marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/marathon\-services/g, "marathon-services-selection");
@@ -295,7 +298,7 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
                     if (!data.command) {
                         alert ("Expected pending operations command but got none !");
                     } else {
-                        that.eskimoMain.getMarathonOperationsCommand().showCommand (data.command);
+                        that.eskimoMarathonOperationsCommand.showCommand (data.command);
                     }
                 }
             },
@@ -307,12 +310,4 @@ eskimo.MarathonServicesConfig = function(constructorObject) {
         });
     }
     this.proceedWithMarathonInstallation = proceedWithMarathonInstallation;
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

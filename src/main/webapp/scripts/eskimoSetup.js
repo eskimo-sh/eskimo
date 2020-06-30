@@ -36,17 +36,17 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Setup = function(constructorObject) {
+eskimo.Setup = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
+    this.eskimoSystemStatus = null;
 
     const MESSAGE_SHOW_DURATION = 10000;
 
     const that = this;
 
     this.isSnapshot = true;
-
 
     // Initialize HTML Div from Template
     this.initialize = function() {
@@ -158,7 +158,7 @@ eskimo.Setup = function(constructorObject) {
             that.eskimoMain.handleSetupCompleted();
 
             if (initializationTime) {
-                that.eskimoMain.getSystemStatus().showStatus(true);
+                that.eskimoSystemStatus.showStatus(true);
             }
 
         } else {
@@ -167,7 +167,7 @@ eskimo.Setup = function(constructorObject) {
 
             if (initializationTime) { // only at initialization time
                 that.eskimoMain.showOnlyContent("setup");
-                that.eskimoMain.getSystemStatus().updateStatus(false);
+                that.eskimoSystemStatus.updateStatus(false);
             }
 
             if (data.message) {
@@ -272,7 +272,7 @@ eskimo.Setup = function(constructorObject) {
                     } else {
 
                         if (!data.command.none) {
-                            that.eskimoMain.getSetupCommand().showCommand(data.command);
+                            that.eskimoSetupCommand.showCommand(data.command);
 
                         } else {
                             showSetupMessage("Configuration applied successfully", true);
@@ -291,11 +291,4 @@ eskimo.Setup = function(constructorObject) {
     }
     this.saveSetup = saveSetup;
 
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

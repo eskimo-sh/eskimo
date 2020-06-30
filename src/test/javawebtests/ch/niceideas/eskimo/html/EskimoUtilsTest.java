@@ -45,7 +45,6 @@ public class EskimoUtilsTest extends AbstractWebTest {
 
     @Before
     public void setUp() throws Exception {
-
         loadScript(page, "eskimoUtils.js");
     }
 

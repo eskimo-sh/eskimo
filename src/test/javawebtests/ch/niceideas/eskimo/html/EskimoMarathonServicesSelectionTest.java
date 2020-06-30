@@ -59,12 +59,10 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
         // leaving gdash out intentionally
         page.executeJavaScript("eskimoMarathonServicesConfig.getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana', 'zeppelin']};");
 
-
         // instantiate test object
-        page.executeJavaScript("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection({" +
-                "    eskimoMarathonServicesConfig: eskimoMarathonServicesConfig" +
-                "});");
-
+        page.executeJavaScript("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();");
+        page.executeJavaScript("eskimoMarathonServicesSelection.eskimoMarathonServicesConfig = eskimoMarathonServicesConfig;");
+        page.executeJavaScript("eskimoMarathonServicesSelection.initialize();");
 
         waitForElementIdInDOM("marathon-services-selection-body");
 

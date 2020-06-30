@@ -59,10 +59,7 @@ eskimo.About = function() {
         });
     };
 
-
     function showAbout () {
-
-        console.log ();
 
         $("#about-eskimo-version").html($("#system-information-version").html());
         
@@ -74,8 +71,4 @@ eskimo.About = function() {
         $('#about-modal').modal("hide");
     }
     this.cancelAbout = cancelAbout;
-
-
-    // call constructor
-    this.initialize();
 };

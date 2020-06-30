@@ -62,6 +62,6 @@ REM encoding UTF-8 is required to parse SSH command results properly.
 %JAVA_HOME%\bin\java ^
     -Xmx256m ^
     -Dfile.encoding=UTF-8 ^
-    -classpath %scriptpath%..\lib\%JAR_FILE% ^
+    -classpath %scriptpath%..\..\lib\%JAR_FILE% ^
     ch.niceideas.eskimo.utils.EncodedPasswordGenerator %1
 

@@ -57,13 +57,13 @@ public class EskimoConsolesTest extends AbstractWebTest {
                 "}\n");
 
         // instantiate test object
-        page.executeJavaScript("eskimoConsoles = new eskimo.Consoles({" +
-                "   eskimoMain: {" +
+        page.executeJavaScript("eskimoConsoles = new eskimo.Consoles()");
+        page.executeJavaScript("eskimoConsoles.eskimoMain = {" +
                 "       isSetupDone: function() {return true; }," +
                 "       showOnlyContent: function() {}," +
                 "       hideProgressbar: function() {}" +
-                "   }" +
-                "});");
+                "   }");
+        page.executeJavaScript("eskimoConsoles.initialize()");
 
         waitForElementIdInDOM("consoles-console-content");
 

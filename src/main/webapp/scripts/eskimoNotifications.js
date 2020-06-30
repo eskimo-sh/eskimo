@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Notifications = function(constructorObject) {
+eskimo.Notifications = function() {
 
     const that = this;
 
@@ -242,11 +242,4 @@ eskimo.Notifications = function(constructorObject) {
     }
     this.notificationsShown = notificationsShown;
 
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

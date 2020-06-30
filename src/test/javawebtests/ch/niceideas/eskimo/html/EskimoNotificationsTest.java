@@ -51,6 +51,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
         // instantiate test object
         page.executeJavaScript("eskimoNotifications = new eskimo.Notifications();");
+        page.executeJavaScript("eskimoNotifications.initialize()");
     }
 
     @Test

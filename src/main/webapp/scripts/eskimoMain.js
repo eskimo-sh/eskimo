@@ -71,89 +71,111 @@ eskimo.Main = function() {
     this.doInitializeInternal = function() {
         $("#eskimoTitle").html("Eskimo CE");
 
-        eskimoSetup = new eskimo.Setup({eskimoMain: that});
+        // A. Create services
+
+        eskimoSetup = new eskimo.Setup();
+        eskimoNotifications = new eskimo.Notifications();
+        eskimoMessaging = new eskimo.Messaging();
+        eskimoOperationsCommand = new eskimo.OperationsCommand();
+        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();
+        eskimoSetupCommand = new eskimo.SetupCommand();
+        eskimoConsoles = new eskimo.Consoles();
+        eskimoFileManagers = new eskimo.FileManagers();
+        eskimoServices = new eskimo.Services();
+        eskimoServicesSelection = new eskimo.ServicesSelection({eskimoMain: that});
+        eskimoServicesSettings = new eskimo.ServicesSettings();
+        eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();
+        eskimoNodesConfig = new eskimo.NodesConfig();
+        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();
+        eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();
+        eskimoSystemStatus = new eskimo.SystemStatus();
+        eskimoAbout = new eskimo.About();
+
+        // B. Inject dependencies
+        let initObject = {
+            eskimoSetup: eskimoSetup,
+            eskimoNodesConfig: eskimoNodesConfig,
+            eskimoSystemStatus: eskimoSystemStatus,
+            eskimoMessaging: eskimoMessaging,
+            eskimoConsoles: eskimoConsoles,
+            eskimoNotifications: eskimoNotifications,
+            eskimoServices: eskimoServices,
+            eskimoServicesSelection: eskimoServicesSelection,
+            eskimoMarathonServicesSelection: eskimoMarathonServicesSelection,
+            eskimoMarathonServicesConfig: eskimoMarathonServicesConfig,
+            eskimoServicesSettings: eskimoServicesSettings,
+            eskimoFileManagers: eskimoFileManagers,
+            eskimoOperationsCommand: eskimoOperationsCommand,
+            eskimoSetupCommand: eskimoSetupCommand,
+            eskimoMarathonOperationsCommand: eskimoMarathonOperationsCommand,
+            eskimoSettingsOperationsCommand: eskimoSettingsOperationsCommand,
+            eskimoAbout: eskimoAbout,
+            eskimoMain: this
+        };
+
+        for (let dependency in initObject) {
+            for (let service in initObject) {
+                if (initObject[service][dependency] !== undefined) {
+                    initObject[service][dependency] = initObject[dependency];
+                }
+            }
+        }
+
+        // C. Initialize services
+
+        eskimoSetup.initialize();
         //  -> No specific backend loading
 
-        eskimoNotifications = new eskimo.Notifications({});
+        eskimoNotifications.initialize();
         // loadLastLine -> get-lastline-notification
 
-        eskimoMessaging = new eskimo.Messaging({eskimoMain: that});
+        eskimoMessaging.initialize();
         // loadLastLine -> get-lastline-messaging
 
-        eskimoOperationsCommand = new eskimo.OperationsCommand({
-            eskimoMain: that,
-            eskimoMessaging : eskimoMessaging
-        });
+        eskimoOperationsCommand.initialize();
         // (nothing)
 
-        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand({
-            eskimoMain: that,
-            eskimoMessaging : eskimoMessaging
-        });
+        eskimoMarathonOperationsCommand.initialize();
         // (nothing)
 
-        eskimoSetupCommand = new eskimo.SetupCommand({
-            eskimoMain: that,
-            eskimoMessaging: eskimoMessaging,
-            eskimoSetup: eskimoSetup
-        });
+        eskimoSetupCommand.initialize();
         // (nothing)
 
-        eskimoConsoles = new eskimo.Consoles({eskimoMain: that});
+        eskimoConsoles.initialize();
         // (nothing)
 
-        eskimoFileManagers = new eskimo.FileManagers({eskimoMain: that});
+        eskimoFileManagers.initialize();
         // (nothing)
 
-        eskimoServices = new eskimo.Services({eskimoMain: that});
+        // CALLED ELSWEHERE
+        //eskimoServices.initialize();
         // loadUIServicesConfig -> get-ui-services-config
         // - loadUIServices -> list-ui-services
         //   - createServicesIFrames()
         //   - createServicesMenu()
 
-        eskimoServicesSelection = new eskimo.ServicesSelection({eskimoMain: that});
+        eskimoServicesSelection.initialize();
         // loadServicesConfig -> get-services-config
         // - initModalServicesConfig()
 
-        eskimoServicesSettings = new eskimo.ServicesSettings({
-            eskimoMain: that,
-            eskimoMessaging: eskimoMessaging
-        });
+        eskimoServicesSettings.initialize();
         // loadServicesConfig -> load-services-config
 
-        eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand({
-            eskimoMain: that,
-            eskimoMessaging : eskimoMessaging,
-            eskimoServicesSettings: eskimoServicesSettings
-        });
+        eskimoSettingsOperationsCommand.initialize();
         // (nothing)
 
-        eskimoNodesConfig = new eskimo.NodesConfig({
-            eskimoMain: that,
-            eskimoServicesSelection: eskimoServicesSelection,
-            eskimoServices: eskimoServices,
-            eskimoOperationsCommand: eskimoOperationsCommand
-        });
+        eskimoNodesConfig.initialize();
         // loadConfigServices -> get-services-dependencies
         // - calls eskimoServices.initialize()
         // loadServiceDependencies -> list-config-services
 
-        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: that});
+        eskimoMarathonServicesConfig.initialize();
         // loadMarathonServices -> get-marathon-services
 
-        eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection({
-            eskimoMarathonServicesConfig: eskimoMarathonServicesConfig
-        });
+        eskimoMarathonServicesSelection.initialize();
         // (nothing)
 
-        eskimoSystemStatus = new eskimo.SystemStatus({
-            eskimoNotifications: eskimoNotifications,
-            eskimoMessaging: eskimoMessaging,
-            eskimoNodesConfig: eskimoNodesConfig,
-            eskimoSetup: eskimoSetup,
-            eskimoServices: eskimoServices,
-            eskimoMain: that
-        });
+        eskimoSystemStatus.initialize();
         // loadUIStatusServicesConfig -> get-ui-services-status-config
         // - loadListServices -> list-services
         //   - setup.loadSetup -> load-setup
@@ -166,10 +188,10 @@ eskimo.Main = function() {
         //         + status.updateStatus(false); -- to start the polling
         //     +  success OR OR clear=services
         //       - if initializationTime
-        //         + eskimoMain.getSystemStatus().showStatus(true);
+        //         + eskimoSystemStatus.showStatus(true);
         //     + PROCESSING PENDING DETECTION LOGIC
 
-        eskimoAbout = new eskimo.About();
+        eskimoAbout.initialize();
 
         $(window).resize (this.menuResize);
 

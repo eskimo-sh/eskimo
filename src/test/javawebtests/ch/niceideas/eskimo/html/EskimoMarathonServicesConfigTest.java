@@ -67,7 +67,12 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         */
 
         // instantiate test object
-        page.executeJavaScript("eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig({eskimoMain: eskimoMain});");
+        page.executeJavaScript("eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();");
+        page.executeJavaScript("eskimoMarathonServicesConfig.eskimoMain = eskimoMain;");
+        page.executeJavaScript("eskimoMarathonServicesConfig.eskimoMarathonServicesSelection = eskimoMarathonServicesSelection");
+        page.executeJavaScript("eskimoMarathonServicesConfig.eskimoMarathonOperationsCommand = eskimoMarathonOperationsCommand");
+        page.executeJavaScript("eskimoMarathonServicesConfig.eskimoNodesConfig = eskimoNodesConfig");
+        page.executeJavaScript("eskimoMarathonServicesConfig.initialize();");
 
         waitForElementIdInDOM("reset-marathon-servicesconfig");
 
@@ -164,9 +169,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         testRenderMarathonConfig();
 
-        // mocking stuff
-        page.executeJavaScript("eskimoMain.getMarathonServicesSelection = function() { return { 'showMarathonServiceSelection' : function() {} } }");
-
         page.executeJavaScript("$('#main-content').append($('<div id=\"marathon-services-selection-body\"></div>'))");
 
         page.executeJavaScript("eskimoMarathonServicesConfig.showReinstallSelection()");
@@ -253,13 +255,9 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         assertJavascriptEquals("testError", "window.consoleError");
 
         // 2. pass command
-        page.executeJavaScript("eskimoMain.getMarathonOperationsCommand = function () { " +
-                "    return {" +
-                "        showCommand: function (command) {" +
+        page.executeJavaScript("eskimoMarathonOperationsCommand.showCommand = function (command) {" +
                 "            window.command = command;" +
-                "        }" +
-                "    }" +
-                "};");
+                "        };");
 
         page.executeJavaScript("$.ajax = function (object) { object.success ( { command: 'testCommand' } );}");
 

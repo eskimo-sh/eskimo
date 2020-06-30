@@ -35,10 +35,11 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.ServicesSelection = function(constructorObject) {
+eskimo.ServicesSelection = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
+    this.eskimoNodesConfig = null;
 
     const that = this;
 
@@ -104,8 +105,8 @@ eskimo.ServicesSelection = function(constructorObject) {
 
         servicesSelectedcallback = callback;
 
-        var configuredServices = that.eskimoMain.getNodesConfig().getConfiguredServices();
-        var nbrOfNodes = that.eskimoMain.getNodesConfig().getNodesCount();
+        var configuredServices = that.eskimoNodesConfig.getConfiguredServices();
+        var nbrOfNodes = that.eskimoNodesConfig.getNodesCount();
 
         // clear all boxes
         for (var i = 0; i < configuredServices.length; i++) {
@@ -211,7 +212,7 @@ eskimo.ServicesSelection = function(constructorObject) {
 
         var allSelected = true;
 
-        var configuredServices = that.eskimoMain.getNodesConfig().getConfiguredServices();
+        var configuredServices = that.eskimoNodesConfig.getConfiguredServices();
 
         // are they all selected already
         for (var i = 0; i < configuredServices.length; i++) {
@@ -361,12 +362,4 @@ eskimo.ServicesSelection = function(constructorObject) {
         $(".service-selection-radio-choice").mousedown(servicesSelectionRadioMouseDown);
     }
     this.initModalServicesConfig = initModalServicesConfig;
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

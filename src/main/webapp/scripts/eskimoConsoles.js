@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Consoles = function(constructorObject) {
+eskimo.Consoles = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -370,11 +370,4 @@ eskimo.Consoles = function(constructorObject) {
     }
     this.openConsole = openConsole;
 
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

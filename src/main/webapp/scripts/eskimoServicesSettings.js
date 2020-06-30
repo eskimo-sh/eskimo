@@ -35,11 +35,13 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.ServicesSettings = function (constructorObject) {
+eskimo.ServicesSettings = function () {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
     this.eskimoMessaging = null;
+    this.eskimoSettingsOperationsCommand = null;
+    this.eskimoNodesConfig = null;
 
     const that = this;
 
@@ -125,7 +127,7 @@ eskimo.ServicesSettings = function (constructorObject) {
                     if (!data.command) {
                         alert ("Expected pending operations command but got none !");
                     } else {
-                        that.eskimoMain.getSettingsOperationsCommand().showCommand (data.command);
+                        that.eskimoSettingsOperationsCommand.showCommand (data.command);
                     }
                 }
             },
@@ -187,7 +189,7 @@ eskimo.ServicesSettings = function (constructorObject) {
                 servicesSettingsContent = servicesSettingsContent +
                     '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
                     '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
-                    '<td><img class="nodes-config-logo" src="' + that.eskimoMain.getNodesConfig().getServiceLogoPath(serviceName) + '" /></td>'+
+                    '<td><img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) + '" /></td>'+
                     '<td><h5>' +
                     serviceName +
                     '</h5></td>' +
@@ -246,11 +248,4 @@ eskimo.ServicesSettings = function (constructorObject) {
     }
     this.layoutServicesSettings = layoutServicesSettings;
 
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

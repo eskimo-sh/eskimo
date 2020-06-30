@@ -58,9 +58,10 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         loadScript(page, "eskimoServicesSelection.js");
 
         // instantiate test object
-        page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection({" +
-                "    eskimoMain: eskimoMain" +
-                "});");
+        page.executeJavaScript("eskimoServicesSelection = new eskimo.ServicesSelection();");
+        page.executeJavaScript("eskimoServicesSelection.eskimoMain = eskimoMain");
+        page.executeJavaScript("eskimoServicesSelection.eskimoNodesConfig = eskimoNodesConfig");
+        page.executeJavaScript("eskimoServicesSelection.initialize()");
 
         waitForElementIdInDOM("services-selection-button-select-all");
 

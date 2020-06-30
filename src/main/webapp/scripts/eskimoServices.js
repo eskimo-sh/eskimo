@@ -35,10 +35,12 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.Services = function (constructorObject) {
+eskimo.Services = function () {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
+    this.eskimoSystemStatus = null;
+    this.eskimoNodesConfig = null;
 
     const PERIODIC_RETRY_SERVICE_MS = 5000;
 
@@ -129,9 +131,9 @@ eskimo.Services = function (constructorObject) {
 
             that.eskimoMain.showSetupNotDone("Service " + service + " is not available at this stage.");
 
-        } else if (that.eskimoMain.getSystemStatus().isDisconnected()) {
+        } else if (that.eskimoSystemStatus.isDisconnected()) {
 
-            that.eskimoMain.getSystemStatus().showStatus();
+            that.eskimoSystemStatus.showStatus();
 
         } else {
 
@@ -146,7 +148,7 @@ eskimo.Services = function (constructorObject) {
 
             } else {
 
-                that.eskimoMain.getSystemStatus().showStatusWhenServiceUnavailable(service);
+                that.eskimoSystemStatus.showStatusWhenServiceUnavailable(service);
             }
         }
     }
@@ -402,7 +404,7 @@ eskimo.Services = function (constructorObject) {
 
         // if service was displayed, show Status
         if (that.eskimoMain.isCurrentDisplayedService(service)) {
-            that.eskimoMain.getSystemStatus().showStatus();
+            that.eskimoSystemStatus.showStatus();
         }
     };
 
@@ -437,7 +439,7 @@ eskimo.Services = function (constructorObject) {
             var menuEntry = '' +
                 '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                 '    <a id="services-menu_' + service + '" href="#">\n' +
-                '        <img src="' + that.eskimoMain.getNodesConfig().getServiceIconPath(service) + '"></img>\n' +
+                '        <img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img>\n' +
                 '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
                 '    </a>\n' +
                 '</li>';
@@ -480,9 +482,5 @@ eskimo.Services = function (constructorObject) {
     /** for tests */
     this.createServicesIFrames = createServicesIFrames;
 
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
 };
 

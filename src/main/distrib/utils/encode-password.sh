@@ -53,7 +53,7 @@ if [[ $? != 0 ]]; then
         export PATH=$JAVA_HOME/bin:$PATH
     else
         echo "No java binary in path nor JAVA_HOME set. Unable to start eskimo"
-        exit -1
+        exit 1
     fi
 fi
 

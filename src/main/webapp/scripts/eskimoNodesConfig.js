@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.NodesConfig = function(constructorObject) {
+eskimo.NodesConfig = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -645,13 +645,4 @@ eskimo.NodesConfig = function(constructorObject) {
             }
         });
     }
-
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constructor
-    this.initialize();
 };

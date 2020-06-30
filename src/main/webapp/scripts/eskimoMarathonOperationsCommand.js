@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-eskimo.MarathonOperationsCommand = function(constructorObject) {
+eskimo.MarathonOperationsCommand = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -159,12 +159,4 @@ eskimo.MarathonOperationsCommand = function(constructorObject) {
         $('#marathon-operations-command-modal').modal("hide");
     }
     this.cancelMarathonOperationsCommand = cancelMarathonOperationsCommand;
-
-    // inject constructor object in the end
-    if (constructorObject != null) {
-        $.extend(this, constructorObject);
-    }
-
-    // call constriuctor
-    this.initialize();
 };

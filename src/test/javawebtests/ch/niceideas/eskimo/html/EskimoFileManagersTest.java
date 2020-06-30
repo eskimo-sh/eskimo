@@ -58,13 +58,13 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         page.executeJavaScript("var dirContent = " + dirContent + "");
 
         // instantiate test object
-        page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers({" +
-                "    eskimoMain: {" +
+        page.executeJavaScript("eskimoFileManagers = new eskimo.FileManagers()");
+        page.executeJavaScript("eskimoFileManagers.eskimoMain = {" +
                 "        isSetupDone: function() { return true; }," +
                 "        showOnlyContent: function() {}," +
                 "        hideProgressbar: function() {}" +
-                "    }" +
-                "});");
+                "    };");
+        page.executeJavaScript("eskimoFileManagers.initialize()");
 
         waitForElementIdInDOM("file-upload-progress-modal");
 

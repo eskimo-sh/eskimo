@@ -50,6 +50,7 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
 
         // instantiate test object
         page.executeJavaScript("eskimoOperationsCommand = new eskimo.OperationsCommand();");
+        page.executeJavaScript("eskimoOperationsCommand.initialize();");
 
         waitForElementIdInDOM("operations-command-body");
     }
