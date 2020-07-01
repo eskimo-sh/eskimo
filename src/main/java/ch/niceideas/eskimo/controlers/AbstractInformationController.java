@@ -36,14 +36,11 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.services.AbstractInformationService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 
 
 @Controller
 public class AbstractInformationController<T, R>  {
-
-    private static final Logger logger = Logger.getLogger(AbstractInformationController.class);
 
     String getLastlineElement(AbstractInformationService<T, R>  is) {
         return lastLine(is.getLastElement());

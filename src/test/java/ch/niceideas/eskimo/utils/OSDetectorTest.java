@@ -34,39 +34,42 @@
 
 package ch.niceideas.eskimo.utils;
 
-public class OSDetector {
+import ch.niceideas.common.utils.StringUtils;
+import org.junit.Test;
 
-    private OSDetector() {}
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-    private static final String OS = System.getProperty("os.name").toLowerCase();
+public class OSDetectorTest {
 
-    public static boolean isWindows() {
-        return OS.contains("win");
+    @Test
+    public void testAtLeastOne() {
+        assertTrue(OSDetector.isUnix() || OSDetector.isMac() || OSDetector.isSolaris() || OSDetector.isWindows());
     }
 
-    public static boolean isMac() {
-        return OS.contains("mac");
-    }
+    @Test
+    public void testExclusive() {
 
-    public static boolean isUnix() {
-        return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix"));
-    }
+        if (OSDetector.isUnix()) {
+            assertFalse (OSDetector.isMac() || OSDetector.isSolaris() || OSDetector.isWindows());
+        }
 
-    public static boolean isSolaris() {
-        return OS.contains("sunos");
-    }
+        if (OSDetector.isMac()) {
+            assertFalse (OSDetector.isUnix() || OSDetector.isSolaris() || OSDetector.isWindows());
+        }
 
-    public static String getOS(){
-        if (isWindows()) {
-            return "win";
-        } else if (isMac()) {
-            return "osx";
-        } else if (isUnix()) {
-            return "uni";
-        } else if (isSolaris()) {
-            return "sol";
-        } else {
-            return "err";
+        if (OSDetector.isSolaris()) {
+            assertFalse (OSDetector.isMac() || OSDetector.isUnix() || OSDetector.isWindows());
+        }
+
+        if (OSDetector.isWindows()) {
+            assertFalse (OSDetector.isMac() || OSDetector.isSolaris() || OSDetector.isUnix());
         }
     }
+
+    @Test
+    public void testGetOS() {
+        assertTrue(StringUtils.isNotBlank(OSDetector.getOS()));
+    }
+
 }
