@@ -116,40 +116,52 @@ eskimo.MarathonOperationsCommand = function() {
         $("#marathon-operations-command-body").html(commandDescription);
 
         $('#marathon-operations-command-modal').modal("show");
+
+        // re-enable button
+        $('#marathon-operations-command-button-validate').prop('disabled', false);
     }
     this.showCommand = showCommand;
 
     function validateMarathonOperationsCommand() {
 
-        that.eskimoMessaging.showMessages();
+        if (that.eskimoMain.isOperationInProgress()) {
+            alert ("There is already some operations in progress on backend. Skipping.");
 
-        that.eskimoMain.startOperationInProgress();
+        } else {
 
-        // 1 hour timeout
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            timeout: 1000 * 3600,
-            contentType: "application/json; charset=utf-8",
-            url:"apply-marathon-services-config",
-            success: function (data, status, jqXHR) {
+            // first thing : disable button to prevent double submit
+            $('#marathon-operations-command-button-validate').prop('disabled', true);
 
-                // OK
-                console.log(data);
+            that.eskimoMessaging.showMessages();
 
-                if (!data || data.error) {
-                    console.error(atob(data.error));
-                    that.eskimoMain.scheduleStopOperationInProgress (false);
-                } else {
-                    that.eskimoMain.scheduleStopOperationInProgress (true);
+            that.eskimoMain.startOperationInProgress();
+
+            // 1 hour timeout
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                timeout: 1000 * 3600,
+                contentType: "application/json; charset=utf-8",
+                url: "apply-marathon-services-config",
+                success: function (data, status, jqXHR) {
+
+                    // OK
+                    console.log(data);
+
+                    if (!data || data.error) {
+                        console.error(atob(data.error));
+                        that.eskimoMain.scheduleStopOperationInProgress(false);
+                    } else {
+                        that.eskimoMain.scheduleStopOperationInProgress(true);
+                    }
+                },
+
+                error: function (jqXHR, status) {
+                    errorHandler(jqXHR, status);
+                    that.eskimoMain.scheduleStopOperationInProgress(false);
                 }
-            },
-
-            error: function (jqXHR, status) {
-                errorHandler (jqXHR, status);
-                that.eskimoMain.scheduleStopOperationInProgress (false);
-            }
-        });
+            });
+        }
 
         $('#marathon-operations-command-modal').modal("hide");
     }

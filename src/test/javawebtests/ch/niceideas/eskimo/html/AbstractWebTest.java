@@ -212,6 +212,8 @@ public abstract class AbstractWebTest {
         js("var eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
 
+        js("var eskimoServicesSettings = {};");
+
         js("var eskimoNodesConfig = {};");
         js("eskimoNodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
         js("eskimoNodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");

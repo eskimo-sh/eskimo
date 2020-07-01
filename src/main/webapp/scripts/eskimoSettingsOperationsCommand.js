@@ -124,50 +124,62 @@ eskimo.SettingsOperationsCommand = function() {
         $("#settings-operations-command-body").html(commandDescription);
 
         $('#settings-operations-command-modal').modal("show");
+
+        // re-enable button
+        $('#settings-operations-command-button-validate').prop('disabled', false);
     }
     this.showCommand = showCommand;
 
     function validateSettingsOperationsCommand() {
 
-        that.eskimoMessaging.showMessages();
+        if (that.eskimoMain.isOperationInProgress()) {
+            alert ("There is already some operations in progress on backend. Skipping.");
 
-        that.eskimoMain.startOperationInProgress();
+        } else {
 
-        // 1 hour timeout
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            timeout: 1000 * 3600,
-            contentType: "application/json; charset=utf-8",
-            url:"apply-services-settings",
-            success: function (data, status, jqXHR) {
+            // first thing : disable button to prevent double submit
+            $('#settings-operations-command-button-validate').prop('disabled', true);
 
-                // OK
-                console.log(data);
+            that.eskimoMessaging.showMessages();
 
-                if (data && data.status) {
-                    if (data.status == "KO") {
-                        that.eskimoServicesSettings.showServicesSettingsMessage(data.error, false);
+            that.eskimoMain.startOperationInProgress();
+
+            // 1 hour timeout
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                timeout: 1000 * 3600,
+                contentType: "application/json; charset=utf-8",
+                url: "apply-services-settings",
+                success: function (data, status, jqXHR) {
+
+                    // OK
+                    console.log(data);
+
+                    if (data && data.status) {
+                        if (data.status == "KO") {
+                            that.eskimoServicesSettings.showServicesSettingsMessage(data.error, false);
+                        } else {
+                            that.eskimoServicesSettings.showServicesSettingsMessage("Settings applied successfully", true);
+                        }
                     } else {
-                        that.eskimoServicesSettings.showServicesSettingsMessage("Settings applied successfully", true);
+                        that.eskimoServicesSettings.showServicesSettingsMessage("No status received back from backend.", false);
                     }
-                } else {
-                    that.eskimoServicesSettings.showServicesSettingsMessage("No status received back from backend.", false);
-                }
 
-                if (!data || data.error) {
-                    console.error(atob(data.error));
-                    that.eskimoMain.scheduleStopOperationInProgress (false);
-                } else {
-                    that.eskimoMain.scheduleStopOperationInProgress (true);
-                }
-            },
+                    if (!data || data.error) {
+                        console.error(atob(data.error));
+                        that.eskimoMain.scheduleStopOperationInProgress(false);
+                    } else {
+                        that.eskimoMain.scheduleStopOperationInProgress(true);
+                    }
+                },
 
-            error: function (jqXHR, status) {
-                errorHandler (jqXHR, status);
-                that.eskimoMain.scheduleStopOperationInProgress (false);
-            }
-        });
+                error: function (jqXHR, status) {
+                    errorHandler(jqXHR, status);
+                    that.eskimoMain.scheduleStopOperationInProgress(false);
+                }
+            });
+        }
 
         $('#settings-operations-command-modal').modal("hide");
     }

@@ -142,49 +142,61 @@ eskimo.SetupCommand = function() {
         $("#setup-command-body").html(commandDescription);
 
         $('#setup-command-modal').modal("show");
+
+        // re-enable button
+        $('#setup-command-button-validate').prop('disabled', false);
     }
     this.showCommand = showCommand;
 
     function validateSetupCommand() {
 
-        that.eskimoMessaging.showMessages();
+        if (that.eskimoMain.isOperationInProgress()) {
+            alert ("There is already some operations in progress on backend. Skipping.");
 
-        that.eskimoMain.startOperationInProgress();
+        } else {
 
-        // 5 hours timeout
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            timeout: 1000 * 3600 * 5,
-            contentType: "application/json; charset=utf-8",
-            url:"apply-setup",
-            success: function (data, status, jqXHR) {
+            // first thing : disable button to prevent double submit
+            $('#setup-command-button-validate').prop('disabled', true);
 
-                console.log(data);
-                if (data && data.status) {
-                    if (data.status == "KO") {
-                        that.eskimoSetup.showSetupMessage(data.error, false);
+            that.eskimoMessaging.showMessages();
+
+            that.eskimoMain.startOperationInProgress();
+
+            // 5 hours timeout
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                timeout: 1000 * 3600 * 5,
+                contentType: "application/json; charset=utf-8",
+                url: "apply-setup",
+                success: function (data, status, jqXHR) {
+
+                    console.log(data);
+                    if (data && data.status) {
+                        if (data.status == "KO") {
+                            that.eskimoSetup.showSetupMessage(data.error, false);
+                        } else {
+                            that.eskimoSetup.showSetupMessage("Configuration applied successfully", true);
+                            that.eskimoMain.handleSetupCompleted();
+                        }
                     } else {
-                        that.eskimoSetup.showSetupMessage("Configuration applied successfully", true);
-                        that.eskimoMain.handleSetupCompleted();
+                        that.eskimoSetup.showSetupMessage("No status received back from backend.", false);
                     }
-                } else {
-                    that.eskimoSetup.showSetupMessage("No status received back from backend.", false);
+
+                    if (data.error) {
+                        that.eskimoMain.scheduleStopOperationInProgress(false);
+                    } else {
+                        that.eskimoMain.scheduleStopOperationInProgress(true);
+                    }
+
+                },
+
+                error: function (jqXHR, status) {
+                    errorHandler(jqXHR, status);
+                    that.eskimoMain.scheduleStopOperationInProgress(false);
                 }
-
-                if (data.error) {
-                    that.eskimoMain.scheduleStopOperationInProgress (false);
-                } else {
-                    that.eskimoMain.scheduleStopOperationInProgress (true);
-                }
-
-            },
-
-            error: function (jqXHR, status) {
-                errorHandler (jqXHR, status);
-                that.eskimoMain.scheduleStopOperationInProgress (false);
-            }
-        });
+            });
+        }
 
         $('#setup-command-modal').modal("hide");
     }

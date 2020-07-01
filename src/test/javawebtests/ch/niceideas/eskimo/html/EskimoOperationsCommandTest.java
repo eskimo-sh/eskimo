@@ -50,6 +50,8 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
 
         // instantiate test object
         js("eskimoOperationsCommand = new eskimo.OperationsCommand();");
+        js("eskimoOperationsCommand.eskimoMain = eskimoMain;");
+        js("eskimoOperationsCommand.eskimoMessaging = eskimoMessaging;");
         js("eskimoOperationsCommand.initialize();");
 
         waitForElementIdInDOM("operations-command-body");
@@ -65,6 +67,32 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsCommandTest/expectedResult.html"));
 
         assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#operations-command-body').html()");
+    }
+
+    @Test
+    public void testSubmit() throws Exception {
+
+        js("$.ajax = function(callback) { callback.success ({}); }");
+
+        js("eskimoMain.scheduleStopOperationInProgress = function (result) { window.stopOperationInProgressResult = result; }");
+
+        testShowCommand();
+
+        page.getElementById("operations-command-button-validate").click();
+
+        assertJavascriptEquals("true", "window.stopOperationInProgressResult");
+    }
+
+    @Test
+    public void testButtonDisabling() throws Exception {
+
+        testSubmit();
+
+        assertJavascriptEquals("true", "$('#operations-command-button-validate').prop('disabled')");
+
+        testShowCommand();
+
+        assertJavascriptEquals("false", "$('#operations-command-button-validate').prop('disabled')");
     }
 }
 
