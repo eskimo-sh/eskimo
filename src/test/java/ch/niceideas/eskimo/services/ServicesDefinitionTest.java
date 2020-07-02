@@ -87,9 +87,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 new MarathonServicesConfigWrapper(jsonMarathonConfig),
                 "192.168.10.11");
 
-        assertEquals ("export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
-                "export MASTER_ELASTICSEARCH_1921681012=192.168.10.13\n" +
-                "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
+        assertEquals ("export MASTER_ELASTICSEARCH_1=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
@@ -116,9 +114,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_ELASTICSEARCH_1921681011=192.168.10.12\n" +
-                "export MASTER_ELASTICSEARCH_1921681012=192.168.10.13\n" +
-                "export MASTER_ELASTICSEARCH_1921681013=192.168.10.11\n" +
+                "export MASTER_ELASTICSEARCH_1=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
@@ -134,6 +130,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
+                "export ALL_NODES_LIST_elasticsearch=192.168.10.11,192.168.10.12,192.168.10.13\n" +
                 "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.12\n" +
                 "export NODE_NBR_KAFKA_1921681011=0\n" +
                 "export NODE_NBR_KAFKA_1921681012=1\n" +
@@ -175,6 +172,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
+                "export MASTER_ELASTICSEARCH_1=192.168.10.11\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
@@ -186,6 +184,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
                 "\n" +
                 "#Additional Environment\n" +
+                "export ALL_NODES_LIST_elasticsearch=192.168.10.11\n" +
                 "export NODE_NBR_KAFKA_1921681011=0\n" +
                 "export ALL_NODES_LIST_mesos_agent=192.168.10.11\n" +
                 "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +

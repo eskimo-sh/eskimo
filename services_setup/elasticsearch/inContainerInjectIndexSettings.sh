@@ -37,7 +37,12 @@
 set -e
 
 #echo " - Handling default indices settings (before framworked settings injection) "
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
+#export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
+if [[ `echo $ALL_NODES_LIST_elasticsearch | grep ','` == "" ]]; then
+    export HAS_MASTER=0
+else
+    export HAS_MASTER=1
+fi
 
 
 # 1. Handling properties from Configuration file
@@ -69,7 +74,7 @@ if [[ $NUMBER_OF_SHARDS == "" ]]; then
 fi
 
 if [[ $NUMBER_OF_REPLICAS == "" ]]; then
-    if [[ $MASTER_IP_ADDRESS == "" ]]; then
+    if [[ $HAS_MASTER == 0 ]]; then
         # Single node deployment : no replica (only master)
         export NUMBER_OF_REPLICAS=0
     else

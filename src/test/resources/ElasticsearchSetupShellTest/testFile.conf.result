@@ -8,11 +8,11 @@ bootstrap.memory_lock: false
 
 network.host: 0.0.0.0
 
-discovery.zen.ping.unicast.hosts: ["192.168.10.13"]
+discovery.zen.ping.unicast.hosts: ["192.168.10.11", "192.168.10.13"]
 
-discovery.seed_hosts: ["192.168.10.13"]
+discovery.seed_hosts: ["192.168.10.11", "192.168.10.13"]
 
-cluster.initial_master_nodes: ["192.168.10.13", "192.168.10.11"]
+cluster.initial_master_nodes: ["192.168.10.11", "192.168.10.13"]
 
 discovery.zen.minimum_master_nodes: 1
 

@@ -39,47 +39,87 @@ set -e
 echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
+# OLD IMPLEMENTATION
 # ElasticSearch's own ES master is actually the next master to use in the chain
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $MASTER_IP_ADDRESS == "" ]]; then
-    echo " - No master passed in argument. Zen discovery will not be configured"
-fi
+#export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
+#if [[ $MASTER_IP_ADDRESS == "" ]]; then
+#    echo " - No master passed in argument. Zen discovery will not be configured"
+#fi
 
 echo " - Adapting configuration in file elasticsearch.yml"
 
-# FIXME
 # I was using node name previously, but now the problem is that a node has to be known by the same name it has
 # in node.name and the same that is declared in cluster.initial_master_nodes ...
-# And the problem is that I only know the master as itis IP address
+# And the problem is that I only know the master as it is IP address
 #sed -i s/"#node.name: node-1"/"node.name: $NODE_NAME"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 sed -i s/"#node.name: node-1"/"node.name: $SELF_IP_ADDRESS"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
-if [[ $MASTER_IP_ADDRESS != "" ]]; then
-    echo " - Adapting configuration in file elasticsearch.yml - enabling discovery of master"
+# Former Implementation with single master
+#if [[ $MASTER_IP_ADDRESS != "" ]]; then
+#    echo " - Adapting configuration in file elasticsearch.yml - enabling discovery of master"
+#
+#    # EX 6.x
+#    sed -i s/"#discovery.zen.ping.unicast.hosts: \[\"host1\", \"host2\"\]"/"discovery.zen.ping.unicast.hosts: \[\"$MASTER_IP_ADDRESS\"\]"/g \
+#        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+#
+#    # ES 7.x
+#    sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\"$MASTER_IP_ADDRESS\"\]"/g \
+#        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+#    sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$MASTER_IP_ADDRESS\", \"$SELF_IP_ADDRESS\"\]"/g \
+#        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+#
+#else
+#
+#    # ES 7.x
+#    sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\]"/g \
+#        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+#    # Likely single node
+#    sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$SELF_IP_ADDRESS\"\]"/g \
+#        /usr/local/lib/elasticsearch/config/elasticsearch.yml
+#
+#fi
 
-    # EX 6.x
-    sed -i s/"#discovery.zen.ping.unicast.hosts: \[\"host1\", \"host2\"\]"/"discovery.zen.ping.unicast.hosts: \[\"$MASTER_IP_ADDRESS\"\]"/g \
-        /usr/local/lib/elasticsearch/config/elasticsearch.yml
-
-    # ES 7.x
-    sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\"$MASTER_IP_ADDRESS\"\]"/g \
-        /usr/local/lib/elasticsearch/config/elasticsearch.yml
-    sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$MASTER_IP_ADDRESS\", \"$SELF_IP_ADDRESS\"\]"/g \
-        /usr/local/lib/elasticsearch/config/elasticsearch.yml
-
+echo " - Building reference list of masters"
+export ES_MASTERS=""
+export number_of_es_nodes=0
+echo "   + Checking situation"
+if [[ `echo $ALL_NODES_LIST_elasticsearch | grep ','` == "" ]]; then
+    echo "   + Single master: $ALL_NODES_LIST_elasticsearch"
+    export ES_MASTERS="\"$ALL_NODES_LIST_elasticsearch\""
+    export number_of_es_nodes=1
 else
+    echo "   + Multiple masters: $ALL_NODES_LIST_elasticsearch"
+    export cnt=0
+    for i in $(echo $ALL_NODES_LIST_elasticsearch | /bin/sed "s/,/ /g"); do
+        # taking 10 first only
+        if [[ $cnt -lt 10 ]]; then
+            if [[ "$ES_MASTERS" == "" ]]; then
+                export ES_MASTERS="\"$i\""
+            else
+                export ES_MASTERS="$ES_MASTERS, \"$i\""
+            fi
+        fi
 
-    # ES 7.x
-    sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[\]"/g \
-        /usr/local/lib/elasticsearch/config/elasticsearch.yml
-    # Likely single node
-    sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[\"$SELF_IP_ADDRESS\"\]"/g \
-        /usr/local/lib/elasticsearch/config/elasticsearch.yml
-
+        export cnt=`expr $cnt + 1`
+        export number_of_es_nodes=`expr $number_of_es_nodes + 1`
+    done
 fi
 
+echo " - Adapting configuration in file elasticsearch.yml - enabling discovery of master"
+
+# EX 6.x
+sed -i s/"#discovery.zen.ping.unicast.hosts: \[\"host1\", \"host2\"\]"/"discovery.zen.ping.unicast.hosts: \[$ES_MASTERS\]"/g \
+    /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+# ES 7.x
+sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[$ES_MASTERS\]"/g \
+    /usr/local/lib/elasticsearch/config/elasticsearch.yml
+sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[$ES_MASTERS\]"/g \
+    /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
+
 # Compute number of elasticsearch nodes and set minimum master nodes for discovery
-number_of_es_nodes=`cat /etc/eskimo_topology.sh | grep "export MASTER_ELASTICSEARCH_" | cut -d '_' -f 3 | cut -d '=' -f 1 | uniq | wc -l`
+#number_of_es_nodes=`cat /etc/eskimo_topology.sh | grep "export MASTER_ELASTICSEARCH_" | cut -d '_' -f 3 | cut -d '=' -f 1 | uniq | wc -l`
 
 if [ $number_of_es_nodes -gt 2 ]; then
     number_of_master_nodes=$((number_of_es_nodes / 2 + 1))

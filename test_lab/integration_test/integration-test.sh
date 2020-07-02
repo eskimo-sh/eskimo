@@ -722,7 +722,7 @@ wait_all_services_up() {
 
     echo_date " - CALL ensuring services are up and OK"
 
-    for i in seq 1 30; do
+    for i in seq 1 60; do
 
         all_service_status=$(check_all_services_up)
         if [[ $all_service_status == "OK" ]]; then
@@ -730,7 +730,7 @@ wait_all_services_up() {
         fi
 
         if [[ $i == 30 ]]; then
-            echo_date "No all services managed to come up in 300 seconds - $all_service_status no found."
+            echo_date "No all services managed to come up in 600 seconds - $all_service_status no found."
             exit 50
         fi
 

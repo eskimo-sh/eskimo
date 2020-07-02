@@ -1003,7 +1003,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "RANDOM_NODE_AFTER",
+        "masterElectionStrategy": "FIRST_NODE",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": false
@@ -1053,6 +1053,9 @@
           }
         ]
       }
+    ],
+    "additionalEnvironment": [
+      "ALL_NODES_LIST_elasticsearch"
     ],
     "commands" : [
       {

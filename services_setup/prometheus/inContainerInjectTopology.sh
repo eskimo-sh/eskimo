@@ -65,9 +65,9 @@ bash -c "echo -e \"\n  - job_name: mesos-slave\n    static_configs:\" >> /usr/lo
 if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
 
     echo " - fetching from all mesos-agent nodes"
-    bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - ALL_NODES_LIST_mesos_agent\" >> /usr/local/lib/prometheus/prometheus.yml"
+    bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - ALL_NODES_LIST_prometheus\" >> /usr/local/lib/prometheus/prometheus.yml"
     bash -c "echo -e \"    - targets:\" >> /usr/local/lib/prometheus/prometheus.yml"
-    for i in `echo "$ALL_NODES_LIST_mesos_agent"  | tr "," "\n"`; do
+    for i in `echo "$ALL_NODES_LIST_prometheus"  | tr "," "\n"`; do
         bash -c "echo -e \"      - $i:9106\" >> /usr/local/lib/prometheus/prometheus.yml"
     done
 
