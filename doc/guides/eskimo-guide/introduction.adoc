@@ -13,7 +13,7 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
 * A _plug and play_, working _out of the Box_, *Big Data Analytics platform* fulfilling _enterprise environment
 requirements_.
 * A *state of the art Big Data 2.0 platform*
-** based on _Docker_, _Marathon_, _Mesos_ and _Systemd_
+** based on _Docker_, _Marathon_, _Mesos_ and _SystemD_
 ** packaging _Gluster_, _Spark_, _Kafka_, _Flink_, _Nifi_ and _ElasticSearch_
 ** with all the administration and management consoles such as _Cerebro_, _Kibana_, _Zeppelin_, _Kafka-Manager_,
 _Grafana_ and _Prometheus_.
@@ -26,8 +26,9 @@ your Big Data Cluster
 Eskimo is as well:
 
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
-all the _nuts and bolds_ required to make them work well together.
-* a framework for building and deploying Big Data and NoSQL services based on docker and systemd
+all the _nuts and bolts_ required to make them work perfectly together.
+* a framework for developing, building and deploying Big Data and NoSQL services based on _Docker_, _SystemD_ and
+_Marathon_.
 
 image::pngs/eskimo_platform.png[800, 800, align="center"]
 
@@ -67,22 +68,25 @@ Eskimo also enables the user to develop his own services very easily.
 === Why is Eskimo cool ?
 
 * *Taking care of it !* +
-Making Zookeeper, Mesos, Kafka, ElasticSearch, Flink, Spark, etc. work perfectly together is difficult and tedious. +
+Making Zookeeper, Mesos, Marathon, Kafka, ElasticSearch, Flink, Spark, etc. work perfectly together is difficult and
+tedious. +
 Eskimo takes care of everything.
 
 * *Big Data 2.0* +
 Most if not all private-cloud Big Data Platform such as Hortonworks, Cloudera, MapR, etc. are based on Hadoop, HDFS,
 YARN, etc. which are quite old components and technology. +
-Eskimo is based on Mesos, ElasticSearch, Kafka and Spark,
+Eskimo is based on Mesos, Marathon, ElasticSearch, Kafka and Spark,
 cutting edge components from a newer generation.
 
 * *Leveraging on docker* +
 Most if not all private-cloud Big Data Platform such as those mentioned above would install components natively,
 thus having strong requirements and impacts on underlying nodes. +
-Eskimo uses docker to isolates Eskimo components from the underlying host OS and vice versa.
+Eskimo uses docker to isolate Eskimo components from the underlying host OS and vice versa, enabling transparent
+upgrades, relocations of services, etc.
 
 * *Eskimo is an open platform.* +
-Eskimo works out of the box but users can customize and extend it the way they like, the way they decide
+Eskimo works out of the box but users and administrators can customize and extend it the way they like, the way they
+decide.
 
 
 === Eskimo's DNA
@@ -99,6 +103,8 @@ With Flink ML and Spark ML natively available on Flink and Spark and usable from
 bring their mission to the next level: the big data way.
 
 SciKit Learn and TensorFlow are also available from within Zeppelin of course.
+
+Develop your business analytics processes and deploy them in production operations in a few clicks.
 
 a|image::pngs/big_data.jpg[80, 80] a| *Big Data 2.0*
 
@@ -167,14 +173,15 @@ All the other components - from kafka to zeppelin through spark - run on docker
 
 Eskimo is successfully tested on Ubuntu, Debian, CentOS, Fedora and OpenSUSE nodes so far ... more are coming.
 
-a|image::pngs/simplicity.jpg[80, 80] a| *Simplicity as a core value*
+a|image::pngs/enterprise_grade.png[80, 80] a| *Enterprise-grade requirements*
 
-Eskimo leverages on simple approaches and technologies.
+Eskimo is designed for Enterprise deployments, fulfilling enterprise-grade requirements:
 
-No fancy scripting language, just plain old shell scripts. +
-No fancy container management middleware, just plain old docker and systemd.
-
-Eskimo doesn’t require you to learn anything else than Linux standard tools.
+* Security from the grounds-up: data and communication encryption, firewall, authentication and authorization on every action, etc.
+* DRP compliance / Backup and restore tooling
+* High-Availability out of the box
+* State of the art Integration abilities
+* Very broad range of use-cases and possibilities
 
 a|image::pngs/cloud.jpg[80, 80] a| *Cloud Friendly*
 
@@ -196,7 +203,7 @@ Eskimo's technical architecture can be illustrated as follows:
 
 image::pngs/technical_architecture.png[800, 800, align="center"]
 
-Three components are available in the storage layer
+Three components are available in the storage layer:
 
 * *ElasticSearch*: a real-time, scalable, document-oriented and REST operated NoSQL Database
 * *Gluster FS*: the distributed filesystem in use with Eskimo
@@ -217,7 +224,7 @@ The user layer is intended for data / result visualizations and platform adminis
 
 * *Elastic Kibana*, *Grafana* and *Apache Zeppelin* for data and result visualizations
 ** Grafana is also used natively for platform monitoring concerns
-* *Cerebro*, The Spark Console, The Flink Dashboard, the *Kafka Manager*, the *Mesos Console* and the *Marathon
+* *Cerebro*, The Spark History Server, The Flink Dashboard, the *Kafka Manager*, the *Mesos Console* and the *Marathon
 Console* for platform administration.
 
 Each and every software components is executed with Docker and packaged as a docker container.

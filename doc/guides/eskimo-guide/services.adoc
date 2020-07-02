@@ -26,18 +26,18 @@ We won't go into all details of each and every of the list of software component
 
 We are just describing hereunder, in a raw fashion, some important specificities for some of them.
 
-==== Systemd system configuration files
+==== Systemd unit configuration files
 
-Eskimo used systemd to manage and operate services. Services themselves are docker container.
+Eskimo uses SystemD to manage and operate services. Services themselves are implemented as docker containers.
 
 This is how docker operations are mapped to systemctl commands :
 
-* `systemctl stop service`: kills and removed the service docker container
+* `systemctl stop service`: kills and removes the service docker container
 * `systemctl start service`: creates and starts a new docker container from the reference image
 
 Since every restart of a service creates actually a new docker container, containers are inheritently not stateful and
 freshly restarted every time. +
-This is why the persistent data is stored under sub-folders if `/var/lib` which is mounted to the docker container.
+This is why the persistent data is stored under sub-folders of `/var/lib` which is mounted to the docker container.
 
 ==== Commands wrappers for kafka, logstash, spark and flink
 
@@ -50,7 +50,7 @@ These wrappers take care of calling the corresponding command in the required co
 
 The remaining of this chapter presents each and every pre-packaged service:
 
-==== reloading a Service UI IFrame
+==== Reloading a Service UI IFrame
 
 Master services that have a wen console and other UI applications are wrapped and shown from within the Eskimo UI, in a
 consistent and coherent fashion, without the user needing to reach anything else that the Eskimo UI to access all
@@ -422,7 +422,7 @@ This should be increased to a minimal additional 2Gb for every user intending to
 
 ==== _Shared_ or _Per Note_ interpreters
 
-Zeppelin's interpreters - such as the Spark interpreter warpping the spark submit process or the ElasticSearch
+Zeppelin's interpreters - such as the Spark interpreter wrapping the spark submit process or the ElasticSearch
 interpreter - can be instantiated globally for the whole zeppelin container of isolated per note. +
 Eskimo's settings page enables an administrator to change this configuration globally for all zeppelin interpreters.
 
@@ -434,7 +434,7 @@ with Zeppelin. +
 For this reason, *in a production multi-user environment, it's important to make sure to change this setting to
 `per_note`* thus enabling a much better isolation between users. +
 In this case, it's also very important to significantly increase the amount of memory available to the zeppelin
-container* to something with minimum 2Gb per user using Zeppelin concurrently with a 2Gb base (e.g. 2 users would
+container to something with minimum 2Gb per user using Zeppelin concurrently with a 2Gb base (e.g. 2 users would
 mean 2 Gb Base + 2 x 2 Gb for each user, hence 6Gb RAM in total to give to Zeppelin). The available memory for Zeppelin
 is defined in the _zeppelin service marathon configuration file_ named `zeppelin.marathon.json` located in the zeppelin
 sub -folder of the `services_setup` folder.

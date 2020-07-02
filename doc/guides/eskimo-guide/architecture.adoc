@@ -6,11 +6,11 @@ This section presents various architecture and design elements of Eskimo.
 [[ssh-tunneling]]
 === SSH Tunelling
 
-One of the most important feature of the Eskimo Web Console is its ability to provide in a single and consistent
-Graphical User Interface al the underlying components administration Consoles such as the _Mesos Console_ or the _Kafka
+One of the most important features of the Eskimo Web Console is its ability to provide in a single and consistent
+Graphical User Interface all the underlying component administration Consoles such as the _Mesos Console_ or the _Kafka
 Manager_, just as the essential Data Science Applications such as _Kibana_ and _Zeppelin_.
 
-The Eskimo Frontend wraps these other web applications in it's own _User Interface_ and the Eskimo backend proxies their
+The Eskimo Frontend wraps these other web applications in its own _User Interface_ and the Eskimo backend proxies their
 HTTP data flows to their respective backend through SSH, in a transparent and secured way. +
 The actual location of these software components (the runtime cluster node on which they are actually executed) is only
 known by the eskimo backend and is handled automatically. +

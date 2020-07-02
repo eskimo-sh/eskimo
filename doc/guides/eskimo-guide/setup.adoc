@@ -15,10 +15,10 @@ by eskimo and select the native services that should run on these nodes
 === Services settings configuration
 
 The most essential settings for all eskimo pre-packaged services are set automatically in such a way that the nominal
-use cases of an eskimo cluster work out of the box.
+analytics use cases of an eskimo cluster work out of the box.
 
 But for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
-For this reason, Eskimo CE embeds a settings editor enabling administrators to find tune runtime settings for eskimo
+For this reason, Eskimo CE embeds a settings editor enabling administrators to fine tune runtime settings for eskimo
 embedded services.
 
 The settings editor is available from the menu under "Configured Services":
@@ -32,25 +32,24 @@ The default values enforced by eskimo right after installation are indicated.
 === Nodes and native services layout configuration
 
 The fourth menu entry under "*Platform Administration*" is the most important part of the Eskimo Administration console:
-it provides the system administrators / Eskimo Users with the way to deploy the eskimo managed services on the cluster
-of nodes to be managed by eskimo.
+it provides the system administrators / Eskimo Users with the way to deploy the eskimo managed native services on the
+eskimo cluster nodes.
 
-Eskimo services are docker containers managed (started / stopped / monitored / etc.) by systemd.
+Eskimo native services are docker containers managed (started / stopped / monitored / etc.) by systemd.
+Native services are operated by SystemD directly on the nodes, while marathon services are operated through Mesos /
+Marathon.
 
-Setting up a cluster with eskimo usually boils down to these 2 phases :
+Setting up a native services on the eskimo cluster usually boils down to these 2 phases :
 
 * Adding nodes to the eskimo cluster - using the _Add Node_ button or ranges of nodes using the _Add Range_ button.
 * Selecting the services that should be deployed and operated and the configured nodes
 
-Below is an example of a tiny cluster with two nodes setup:
+Below is an example of a tiny cluster with three nodes setup:
 
 image::pngs/eskimo-nodes-config.png[800, 800, align="center"]
 
-On the above example, we can see:
-
-* One master node being configured as a standalone node configuration (which is always the case for nodes running
-master or unique services) declaring master services as well as slave services.
-* Two slave nodes being configured as a range of nodes with a single configuration declaring slave services.
+As a sidenote, whenever nodes share the same configuration, they can be defined as a _range of IP addresses_ instead
+of defining each and every one of them, thus simplifying the configuration as explained in the next section.
 
 ==== Adding nodes to the eskimo cluster
 
@@ -70,7 +69,7 @@ node in a range is not answering. +
 holes in your range of IPs.* This is fairly important if you want Eskimo to be able to
 successfully manage your cluster.
 
-WARNING: In its current version (0.2 at the time of writing this document), eskimo *requires at all cost* nodes to be
+WARNING: In its current version (0.3 at the time of writing this document), eskimo *requires at all cost* nodes to be
 defined using IP addresses and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
 addresses are supported, period. +
 Unfortunately with big data technologies and especially spark and mesos, supporting DNS or hostnames is significantly
@@ -87,7 +86,7 @@ image::pngs/multiple-services.png[600, 600, align="center"]
 
 ==== Master services
 
-Some service are considered *master services* and are identified on the _services selection_ window as unique services
+Some services are considered *master services* and are identified on the _services selection_ window as unique services
 (understand services that can be deployed only once, e.g. Kibana, Zeppelin, Mesos-Master, etc.) and configured using
 a radio button
 
@@ -100,7 +99,7 @@ Some other services are considered *slave services* and can be deployed at will,
 cluster (understand services that can be deployed multiple times, e.g. elasticsearch, kafka, mesos-agent, etc.) and
 configured using a checkbox on the _services selection_ window.
 
-These "_Slave Services_" - considered multiple - can be configured at will:
+These "_Slave Services_" - considered multiple - can be configured at will.
 
 [[apply_configuration]]
 ==== Applying nodes configuration
@@ -124,8 +123,8 @@ In such cases a first step to resolve the problem is getting to the _"Configure 
 configuration.
 
 Finally, whenever an installation or another operation fails, after fixing the problem (most of the time correcting the
-service installation scripts in the service installation framework), the installation or other operation process can be
-recovered from where it failed by simply re-applying the configuration from here.
+service installation scripts in the service installation framework), the installation or other operations can be
+recovered from where it failed by simply re-applying the configuration here.
 
 Applying node configuration is re-entrant / idempotent.
 

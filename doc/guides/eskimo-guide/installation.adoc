@@ -2,9 +2,11 @@
 [[chap-installation]]
 == Eskimo Installation
 
-WARNING: Eskimo cluster nodes support only the Linux operating system and have to be running a Linux distribution. +
+WARNING: Eskimo cluster nodes support only the Linux operating system and have to be running a supported Linux
+distribution (See <<eskimo_nodes_prerequisites>>). +
 The eskimo application itself can very well run on windows though. However, running the Eskimo application on Windows
-prevents the user from building his own containers, he may only download pre-built containers for use with Eskimo.
+prevents the user from building his own containers. When running the eskimo backend on Windows, it's only possible to
+download pre-built service container images from www.eskimo.sh.
 
 
 === Installation target
@@ -13,37 +15,50 @@ The eskimo backend itself can either be installed:
 
 * on one of the nodes from the eskimo cluster (for instance one of the node where master services will be installed). +
 Doing so is however not recommended since that node would need to have the HTTP port on which Eskimo is listening opened
-to external accesses and in addition Eskimo would eat some of the RAM and disk that is better left to the business
-services.
-* or one a dedicated node where only the eskimo backend runs (i.e. separated from the Esimo cluster nodes). This is the
+to external accesses and in addition Eskimo would eat some of the resources (RAM and disk) that would be better left to
+the business services.
+* or on a dedicated node where only the eskimo backend runs (i.e. separated from the Eskimo cluster nodes). This is the
 recommended approach.
 
 ==== Local Eskimo installation
 
-Eskimo can also be installed on the local computer of the user. +
+Eskimo can also be installed on the local computer of the user where that local machine is the single node. +
 This is for instance useful when eskimo is intended to be used as a local _Data Science_ laboratory and not targeted
 towards large scale Big Data Analytics.
 
-Installing Eskimo on the local user machine is hoewver tricky. +
-Eskimo does required indeed a target IP address for the installation. +
-A first idea one might have in this case is to use `127.0.0.1` as single node target IP to procees with the installation.
-Unfortunately, this doesn't work qs 127.0.0.1 resolved to different loopback interfaces in the various docker containers
-running eskimo services and as a consequence eskimo services are not able to reach each others when `127.0.0.1` is used
-as installation target.
+Installing Eskimo on the local user machine is however tricky. +
+Eskimo does require indeed a target IP address for the installation. +
+A first idea one might have in this case is to use `127.0.0.1` (localhost) as single node target IP to proceed with
+the installation. Unfortunately, this doesn't work qs 127.0.0.1 resolved to different loopback interfaces in the
+various docker containers running eskimo services and as a consequence eskimo services are not able to reach each
+others when `127.0.0.1` is used as installation target.
 
-So something else needs to be found as target IP address.
+*So something else needs to be found as target IP address.*
 
 The easiest way out here is to use the docker host address (most of the time `172.17.0.1` but may be configured
 differently on one's specific local docker environment).
 
-In case one doesn't have docker installed locally on his machine when proceesing with Docker installation, Eskimo
-usually installed docker on its own. +
-Unfortunately, there is a chicken and egg problem wince the docker host IP address needs to be passed as target IP
+In case one doesn't have docker installed locally on his machine when processing with Docker installation, Eskimo
+usually installs docker on its own. +
+Unfortunately, there is a _chicken and egg_ problem here since the docker host IP address needs to be passed as target IP
 address for the Eskimo node in "Node configuration" before Eskimo can proceed with docker installation.
 
-So one's left with installing docker on his own before proceeded with Eskimo Node setup on his local machine. +
-For this, follow the same steps as described here:
-<<build_packages_locally>>
+So one's left with installing docker on his own before proceeding with Eskimo Node setup on his local machine. +
+For this, follow the same steps as those described here: <<build_packages_locally>>.
+
+==== Installing eskimo on Windows.
+
+As stated in introduction, the eskimo backend can run on Microsoft Windows but in this case it's only possible to
+download service container images from www.eskimo.sh. Building one's own container images locally is not possible.
+
+In addition, a property in the configuration file `eskimo.properties` needs to be adapted to a Windows environment,
+the properly that configures the path of the user definition file:
+
+`security.userJsonFile=/var/lib/eskimo/eskimo-users.json`
+
+needs to be changed to a folder existing on windows and where the user running Eskimop has _write rights_, such as e.g.
+
+`security.userJsonFile=c:/Windows/Temp/eskimo-users.json`
 
 
 === Prerequisites
@@ -121,7 +136,7 @@ Linux distributions successfully tested with Eskimo and officially supported are
 * OpenSUSE 15.1 and greater
 
 Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far and may require the
-administrator to adapt the setup scripts.
+administrator to adapt the setup scripts located in `services_setup`.
 
 ===== Minimum hardware
 
@@ -129,8 +144,8 @@ The minimum hardware capacity requirements to run eskimo are as follows:
 
 *Multiple Nodes in the Eskimo cluster, minimum requirement for one node*
 
-In cases where the eskimo cluster runs on multiples nodes (two or more nodes), the minimum hardware capacity for one of these
-nodes is as follows:
+In cases where the eskimo cluster runs on multiples nodes (two or more nodes), the minimum hardware capacity for
+each these nodes is as follows:
 
 * 20 GB HDD storage space for the system, additional storage space depending on the data to be manipulated and the
 replication factor.
@@ -152,7 +167,7 @@ capacity for this node is as follows:
 Fedora has switched to cgroups v2 by default now, but Mesos (and some Docker versions) are not working well with cgroups v2 and
 may fail to start. With Eskimo and current version of mesos, one needs to revert cgroups to v1 on Fedora
 nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
-b
+
 .Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
 ----
 sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
@@ -170,7 +185,7 @@ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
 ----
 
-With this, Mesos should be able to start successfully on your fedora nodes after a reboot.
+With this, the _Mesos Agent_ should be able to start successfully on your fedora nodes after a reboot.
 
 [[eskimo_nodes_required_packages]]
 ==== Required packages installation and Internet access on cluster nodes
@@ -295,7 +310,7 @@ AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
 
 *For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
 firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
-Every eskimo node should have wide access to every other eskimo node. Period.*
+Every eskimo node should have wide access to every other node in the eskimo cluster. Period.*
 
 However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
 only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
@@ -325,21 +340,29 @@ For the sake of information, the list of static ports used by the different serv
 Again, this list is incomplete since it doesn't reveal the dynamic port ranges mentioned above.
 
 
-=== Extract archive.
+=== Extract archive and install Eskimo
 
 After downloading either the zip ot the tarball archive of eskimo, it needs to be extracted on the local filesystem.
-That's only that needs to be done to _install_ eskimo. It doesn't need anything else that extracting the archive on the
-filesystem. +
+This simple extraction is the only step required to _install_ eskimo.
+
 Then in the folder `bin` under the newly extracted eskimo binary distribution folder, one can find two scripts:
 
 * a script `eskimo.bat` to execute eskimo on Windows
 * a script `eskimo.sh` to execute eskimo on Linux.
 
+That's it.
+
+==== SystemD Installation
+
+In case one wants to have Eskimo's backend operated (automatically started, etc.) using SystemD, the script
+`bin/utils/__install-eskimo-systemD-unit-file.sh` can be used to perform all the required setup steps for a successful
+SystemD launch as well as installing the Eskimo SystemD unit configuration file.
+
 ==== Extracted Archive layout and purpose
 
-One extracted on the filesystem the Eskimo folder contains the following elements:
+Once extracted on the filesystem, the Eskimo folder contains the following elements:
 
-* `bin` : contains executables required to start Eskimo as well as utility commands
+* `bin` : contains executables required to start Eskimo as well as utility commands (in `utils` sub-folder)
 * `conf` : contains Eskimo configuration files
 * `lib` : contains eskimo runtime binaries
 * `packages-dev` : contains the Eskimo _docker images (packages) development framework_ which is used to build eskimo
@@ -418,8 +441,8 @@ Once the settings have been chosen by the user, clicking "Save and Apply Setup" 
 and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
 connection and/or the eskimo host machine processing abilities.
 
-Regarding the SSH private key, the next session gives indication in regards to how to build  a public / private key pair
-to enable eskimo to reach the cluster nodes.
+Regarding the SSH private key, the next section gives indication with regards to how to build a _public / private key
+pair_ to enable eskimo to reach and manage the cluster nodes.
 
 The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
 the nuts and bolts required in setting up a remote packages repository. +
@@ -542,7 +565,7 @@ usermod -a -G docker $USER
 
 ==== Checking for updates
 
-At any time after initial setup - and if any only if the chosen installation method is *downloading* packages, the user
+At any time after initial setup - and if and only if the chosen installation method is *downloading* packages, the user
 can _apply setup_ again to check on the packages server (by default https://www.eskimo.sh) if updates are available
 for service docker images or mesos packages.
 
@@ -550,95 +573,6 @@ for service docker images or mesos packages.
 
 Several issues can happen upon first eskimo startup. +
 This section describes common issues and ways to resolve them.
-
-////
-
-==== Failing to download package from remote docker images repository
-
-If you encounter an error message on the Setup Page - during initial setup or after - saying `Could not download latest
-package definition file from [Configured Remote Repository]`, this means likely that you are suffering from the empty
-`cacert` file problem affecting OpenJDK and Oracle JDK 9 and perhaps further versions as well.
-
-These Java Development Kits do indeed suffer fom a quite annoying issue: the `lib/security/cacert` file referencing the
-SSL certifications authorities is empty. +
-This prevents most of the time to download any file from a remote web server using HTTPS, as is the case during initial
-setup of Eskimo.
-
-A first step is to confirm that this is indeed the problem you are suffering from by looking at the eskimo logs, either
-the files in the `logs` sub-folder of the eskimo root folder or simply on the eskimo console.
-
-Search for the following error message:
-
-.Impossible to download
-----
-2019-12-24T11:08:55,431 ERROR [http-nio-9191-exec-5] c.n.e.s.SetupService: javax.net.ssl.SSLException: java.lang.RuntimeException:
- Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
-javax.net.ssl.SSLException: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the tr
-ustAnchors parameter must be non-empty
-        at java.base/sun.security.ssl.Alerts.getSSLException(Alerts.java:214)
-        at java.base/sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1969)
-        at java.base/sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1921)
-        at java.base/sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1904)
-        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1436)
-        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1413)
-        at java.base/sun.net.www.protocol.https.HttpsClient.afterConnect(HttpsClient.java:567)
-        at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java
-:185)
-        at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1563)
-        at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1491)
-        at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:236)
-        at java.base/java.net.URL.openStream(URL.java:1117)
-        at ch.niceideas.eskimo.services.SetupService.dowloadFile(SetupService.java:614)
-        at ch.niceideas.eskimo.services.SetupService.loadRemotePackagesVersionFile(SetupService.java:443)
-        at ch.niceideas.eskimo.services.SetupService.prepareSetup(SetupService.java:358)
-        at ch.niceideas.eskimo.model.SetupCommand.create(SetupCommand.java:70)
-        at ch.niceideas.eskimo.services.SetupService.saveAndPrepareSetup(SetupService.java:277)
-        at ch.niceideas.eskimo.controlers.SetupConfigController.saveSetup(SetupConfigController.java:126)
-        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-        at java.base/java.lang.reflect.Method.invoke(Method.java:564)
-        ...
-Caused by: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parame
-ter must be non-empty
-        at java.base/sun.security.validator.PKIXValidator.<init>(PKIXValidator.java:89)
-        at java.base/sun.security.validator.Validator.getInstance(Validator.java:181)
-        at java.base/sun.security.ssl.X509TrustManagerImpl.getValidator(X509TrustManagerImpl.java:330)
-        at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrustedInit(X509TrustManagerImpl.java:180)
-        at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:192)
-        at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:133)
-        at java.base/sun.security.ssl.ClientHandshaker.checkServerCerts(ClientHandshaker.java:1825)
-        at java.base/sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1655)
-        at java.base/sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:260)
-        at java.base/sun.security.ssl.Handshaker.processLoop(Handshaker.java:1086)
-        at java.base/sun.security.ssl.Handshaker.processRecord(Handshaker.java:1020)
-        at java.base/sun.security.ssl.SSLSocketImpl.processInputRecord(SSLSocketImpl.java:1137)
-        at java.base/sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1074)
-        at java.base/sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:973)
-        at java.base/sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1402)
-        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:1429)
-        ... 99 more
-Caused by: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
-        at java.base/java.security.cert.PKIXParameters.setTrustAnchors(PKIXParameters.java:200)
-        at java.base/java.security.cert.PKIXParameters.<init>(PKIXParameters.java:120)
-        at java.base/java.security.cert.PKIXBuilderParameters.<init>(PKIXBuilderParameters.java:104)
-        at java.base/sun.security.validator.PKIXValidator.<init>(PKIXValidator.java:86)
-        ... 114 more
-----
-
-If the eskimo logs report the error above, it means that you do indeed suffer from the empty cacert file of the JDK.
-
-*In this case, you need to locate your JDK installation.adoc and overwrite the file `lib/security/cacert` with a valid file
-(non-empty)*.
-
-The generation of a valid `cacert` file exceeds the scope of this documentation. Please refer to your Operating System
-manual.
-
-Eskimo provides however  a default `cacert` file in the sub-folder `utils` of its root installation.adoc. This `cacert` file
-is a default Debian `cacert` file as of July 2019 and is guaranteed safe as of July 2019. No guarantee whatsoever are
-ensured by eskimo.sh and one can use it at his own risk.
-
-////
 
 ==== eskimo-users.json cannot be written
 

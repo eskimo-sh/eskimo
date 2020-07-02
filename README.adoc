@@ -66,7 +66,8 @@ Eskimo is as well:
 
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
   all the _nuts and bolds_ required to make them work well together.
-* a framework for building and deploying Big Data and NoSQL services based on docker and systemd
+* a framework for developing, building and deploying Big Data and NoSQL services based on _Docker_, _SystemD_ and
+_Marathon_.
 
 Eskimo Packages all the components above and takes care of all the nuts and bolts required to make them work together
 smoothly and without the user or administrator needing to take care of anything.
@@ -164,112 +165,6 @@ cd libs
 bash install_libs.sh
 ----
 
-////
-==== OpenJDK 9 empty cacerts
-
-The Open JDK 9 comes with a quite annoying issue. The `lib/security/cacert` file referencing the SSL certifications
-authorities is empty. +
-This prevents most of the time both maven from successfully accessing maven repositories as well as JRuby from
-working flawlessly.
-
-Symptoms of this problem are as follows +
-Either the maven build fails at the time of fetching dependencies:
-
-.Maven fails to fetch dependencies
-----
-Z:\data\\eskimo>mvn clean install
-[INFO] Scanning for projects...
-[INFO]
-[INFO] --------------< org.springframework.boot:eskimo-console >---------------
-[INFO] Building Eskimo Console 0.1-SNAPSHOT
-[INFO] --------------------------------[ war ]---------------------------------
-Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/3.1.0/maven-assembly-plugin-3.1.0.pom
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  3.335 s
-[INFO] Finished at: 2019-07-14T16:19:54+02:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] Plugin org.apache.maven.plugins:maven-assembly-plugin:3.1.0 or one of its dependencies could not be resolved: Failed to read artifact descriptor for org.apache.maven.plugins:maven-assembly-plugin:jar:3.1.0: Could not transfer artifact org.apache.maven.plugins:maven-assembly-plugin:pom:3.1.0 from/to central (https://repo.maven.apache.org/maven2): java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty -> [Help 1]
-[ERROR]
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR]
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginResolutionException
-----
-
-Or asciidoctor fails within JRuby at the time of generating the documentation:
-
-.asciidoctor fails on Jruby
-----
-badtrash@badbooknew:/data//eskimo$ mvn clean install
-[INFO] Scanning for projects...
-[INFO]
-[INFO] --------------< org.springframework.boot:eskimo-console >---------------
-[INFO] Building Eskimo Console 0.1-SNAPSHOT
-[INFO] --------------------------------[ war ]---------------------------------
-[INFO]
-[INFO] --- maven-clean-plugin:3.1.0:clean (default-clean) @ eskimo-console ---
-[INFO] Deleting /data/eskimo/target
-[INFO]
-[INFO] --- asciidoctor-maven-plugin:1.6.0:process-asciidoc (service-dev-guide-pdf) @ eskimo-console ---
-[INFO] Using 'UTF-8' encoding to copy filtered resources.
-[INFO] Copying 4 resources
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 40.533 s
-[INFO] Finished at: 2019-07-14T17:20:57+02:00
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.asciidoctor:asciidoctor-maven-plugin:1.6.0:process-asciidoc (service-dev-guide-pdf) on project eskimo-console: Execution service-dev-guide-pdf of goal org.asciidoctor:asciidoctor-maven-plugin:1.6.0:process-asciidoc failed: (NameError) cannot load (ext) (org.jruby.ext.openssl.OpenSSL): InvocationTargetException: (OpenSSL::X509::StoreError) setting default path failed: the trustAnchors parameter must be non-empty -> [Help 1]
-[ERROR]
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR]
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginExecutionException
-----
-
-Happily the fix is quite straightforward, just copy a valid `cacert` file to your `jdk-9/lib/security` folder.
-
-For instance on debian or ubuntu, you can generate a valid `cacert` file for the system bundled java and then copy this
-valid cacert file to your jdk-9.
-
-.generate cacert and copy it to jdk-9
-----
-badtrash@badbooknew:/data//eskimo$ sudo update-ca-certificates -f
-...
-badtrash@badbooknew:/data//eskimo$ cd /usr/local/lib/jdk-9/lib/security/
-badtrash@badbooknew:/usr/local/lib/jdk-9/lib/security$ sudo rm cacerts
-badtrash@badbooknew:/usr/local/lib/jdk-9/lib/security$ sudo ln -s /etc/ssl/certs/java/cacerts
-----
-
-And the problem shall be solved.
-
-On windows, you need to find a valid `cacert` file and copy it over to your `jdk-9/lib/security` folder. +
-A sample (generated on debian) cacert file is provided with eskimo sources in the folder `test_lab`
-
-
-===== Using custom cacert file fix for maven
-
-If for any reason you cannot change the `cacert` file of your JDK, you can still manage to find a way to have maven
-working by following the following procedure, for instance for Windows:
-
-. Use a browser (I used IE) to go to https://repo.maven.apache.org/
-** Click on lock icon and choose "View Certificate"
-** Go to the "Details" tab and choose "Save to File"
-** Choose type "Base 64 X.509 (.CER)" and save it somewhere, e.g in `C:\data\maven_cert.cer`
-. Create a trusted keystore
-** `keytool -import -file C:\data\maven_cert.cer -keystore c:\data\mavenKeystore`
-** (give "changeit" as password)
-. One can now fetch dependencies from maven successfully by using:
-** `mvn clean install -Djavax.net.ssl.trustStore=C:\data\mavenKeystore -Djavax.net.ssl.trustStorePassword=changeit`
-
-Unfortunately that wouldn't work for adressing JRuby's issue when generating the eskimo documentation and you would
-need to comment the asciidoctor part out of the maven build.
-
-////
 
 === Eskimo Build result
 

@@ -25,7 +25,7 @@ This is an example of the status screen showing a three nodes cluster and the se
 
 image::pngs/eskimo-status.png[800, 800, align="center"]
 
-On the example above, all services are in _white_, which indicates that they are working fine.
+On the example above, all services are in _green_, which indicates that they are working fine.
 
 Services can be in:
 
