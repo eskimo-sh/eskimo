@@ -68,7 +68,7 @@ public class ProxyManagerServiceTest {
         });
         pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
             @Override
-            public void removeForwarders(String serviceId) {
+            public void removeForwardersForService(String serviceId) {
                 removeForwardersCalled.set(true);
             }
         });

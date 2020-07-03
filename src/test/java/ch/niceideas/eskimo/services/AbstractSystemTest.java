@@ -133,7 +133,7 @@ public abstract class AbstractSystemTest {
         });
         proxyManagerService.setWebSocketProxyServer(new WebSocketProxyServer(proxyManagerService, servicesDefinition) {
             @Override
-            public void removeForwarders(String serviceId) {
+            public void removeForwardersForService(String serviceId) {
             }
         });
 

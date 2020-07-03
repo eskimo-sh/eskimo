@@ -160,7 +160,7 @@ public class ProxyManagerService {
                 }
 
                 connectionManagerService.recreateTunnels (ipAddress);
-                webSocketProxyServer.removeForwarders (serviceId); // just remove them, they will be recreated automagically
+                webSocketProxyServer.removeForwardersForService(serviceId); // just remove them, they will be recreated automagically
             }
         }
     }
@@ -176,7 +176,7 @@ public class ProxyManagerService {
 
             proxyTunnelConfigs.remove(serviceId);
             connectionManagerService.dropTunnels (prevConfig.getRemoteAddress());
-            webSocketProxyServer.removeForwarders (serviceId);
+            webSocketProxyServer.removeForwardersForService(serviceId);
         }
 
     }

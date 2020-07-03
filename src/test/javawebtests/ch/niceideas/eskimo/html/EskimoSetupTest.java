@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class EskimoSetupTest extends AbstractWebTest {
 
     @Before
@@ -86,6 +88,16 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         assertJavascriptEquals ("SSH Identity Private Key to use to reach cluster nodes should be set",
                 "$('#setup-warning-message').html()");
+    }
+
+    @Test
+    public void testSaveSetupShowsCommand() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testDisableDownloadInSnapshot_EnableInRelease() {
+        fail ("To Be Implemented");
     }
 
     @Test

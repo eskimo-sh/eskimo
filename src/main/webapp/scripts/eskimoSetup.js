@@ -41,6 +41,7 @@ eskimo.Setup = function() {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
     this.eskimoSystemStatus = null;
+    this.eskimoSetupCommand = null;
 
     const MESSAGE_SHOW_DURATION = 10000;
 
@@ -112,7 +113,7 @@ eskimo.Setup = function() {
       that.isSnapshot = isSnapshot;
     };
 
-    function swtchDownloadBuild(target) {
+    function switchDownloadBuild(target, data) {
         if (that.isSnapshot) {
             $('#setup-'+target+'-origin-build').get(0).checked = true;
             $('#setup-'+target+'-origin-download-label').addClass("disabled");
@@ -149,9 +150,9 @@ eskimo.Setup = function() {
             $("#content-ssh-key").val(data['content-ssh-key']);
         }
 
-        swtchDownloadBuild ("mesos");
+        switchDownloadBuild ("mesos", data);
 
-        swtchDownloadBuild ("services");
+        switchDownloadBuild ("services", data);
 
         if (!data.clear || data.clear == "services") {
 
@@ -222,6 +223,51 @@ eskimo.Setup = function() {
     }
     this.showSetupMessage = showSetupMessage;
 
+    function doSaveSetup (setupConfig) {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            timeout: 1000 * 120,
+            url: "save-setup",
+            data: JSON.stringify(setupConfig),
+            success: function (data, status, jqXHR) {
+
+                that.eskimoMain.hideProgressbar();
+
+                // OK
+                console.log(data);
+
+                if (!data || data.error) {
+                    console.error(atob(data.error));
+                    //alert(atob(data.error));
+                    showSetupMessage(atob(data.error), false);
+                } else {
+
+                    if (!data.command) {
+                        alert("Expected pending operations command but got none !");
+                    } else {
+
+                        if (!data.command.none) {
+                            that.eskimoSetupCommand.showCommand(data.command);
+
+                        } else {
+                            showSetupMessage("Configuration applied successfully", true);
+                            that.eskimoMain.handleSetupCompleted();
+                        }
+                    }
+                }
+
+            },
+
+            error: function (jqXHR, status) {
+                that.eskimoMain.hideProgressbar();
+                errorHandler(jqXHR, status);
+            }
+        });
+    }
+    this.doSaveSetup = doSaveSetup;
+
     function saveSetup () {
 
         // coherence checks
@@ -247,47 +293,7 @@ eskimo.Setup = function() {
 
         var setupConfig = $("form#setup-config").serializeObject();
 
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            timeout: 1000 * 120,
-            url: "save-setup",
-            data: JSON.stringify(setupConfig),
-            success: function (data, status, jqXHR) {
-
-                that.eskimoMain.hideProgressbar();
-
-                // OK
-                console.log(data);
-
-                if (!data || data.error) {
-                    console.error(atob(data.error));
-                    //alert(atob(data.error));
-                    showSetupMessage(atob(data.error), false);
-                } else {
-
-                    if (!data.command) {
-                        alert ("Expected pending operations command but got none !");
-                    } else {
-
-                        if (!data.command.none) {
-                            that.eskimoSetupCommand.showCommand(data.command);
-
-                        } else {
-                            showSetupMessage("Configuration applied successfully", true);
-                            that.eskimoMain.handleSetupCompleted();
-                        }
-                    }
-                }
-
-            },
-
-            error: function (jqXHR, status) {
-                that.eskimoMain.hideProgressbar();
-                errorHandler (jqXHR, status);
-            }
-        });
+        doSaveSetup(setupConfig);
     }
     this.saveSetup = saveSetup;
 

@@ -50,6 +50,8 @@ Software.
     </parent>
 
     <properties>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <argLine>-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8</argLine>
         <!--
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>

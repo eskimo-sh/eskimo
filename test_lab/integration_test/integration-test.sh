@@ -1050,30 +1050,32 @@ do_cleanup() {
     echo_date " - Delete spark and flink checkpoint locations"
     vagrant ssh -c "sudo rm -Rf /var/lib/spark/data/checkpoints/*" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date " - Delete all berka indices except berka-payments and berka-transactions"
+    # EDIT : no keeping these in the end
+    #echo_date " - Delete all berka indices except berka-payments and berka-transactions"
 
-    echo_date "   + Delete berka-account"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-account" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-account"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-account" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-card"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-card" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-card"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-card" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-disp"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-disp" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-disp"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-disp" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-district"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-district" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-district"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-district" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-client"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-client" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-client"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-client" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-loan"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-loan" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-loan"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-loan" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-order"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-order" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    #echo_date "   + Delete berka-order"
+    #vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-order" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
-    echo_date "   + Delete berka-trans"
+    #echo_date "   + Delete berka-trans"
+    echo_date " - Delete berka index berka-trans"
     vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
 }
@@ -1324,11 +1326,6 @@ usage() {
 }
 
 export BOX_IP=192.168.10.41
-export DEMO=""
-export FAST_REPACKAGE=""
-export REBUILD_ONLY=""
-export DONT_REBUILD=""
-export MULTIPLE_NODE=""
 export TARGET_MASTER_VM="integration-test"
 
 sudo rm -Rf /tmp/integration-test.log
@@ -1342,25 +1339,20 @@ while getopts ":hdrfmn" opt; do
             ;;
         d)
             export DEMO=demo
-            break
             ;;
         r)
             export REBUILD_ONLY=rebuild
-            break
             ;;
         f)
             export FAST_REPACKAGE=fast
-            break
             ;;
         n)
             export DONT_REBUILD=dont
-            break
             ;;
         m)
             export MULTIPLE_NODE=multiple
             export TARGET_MASTER_VM="integration-test1"
             export BOX_IP=192.168.10.51
-            break
             ;;
         :)
             break

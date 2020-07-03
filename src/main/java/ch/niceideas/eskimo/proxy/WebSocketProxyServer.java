@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -57,7 +58,6 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
         }
 
         getForwarder(serviceId, webSocketServerSession, targetPath).forwardMessage(webSocketMessage);
-
     }
 
     private WebSocketProxyForwarder getForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
@@ -72,8 +72,39 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
         });
     }
 
-    public void removeForwarders(String serviceId) {
-        logger.info ("Dropping all forwarders for  service ID " + serviceId + " (will be recreated lazily)");
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+
+        logger.info ("Dropping all forwarders for session ID " + session.getId() + "");
+        forwarders.values()
+                .forEach(forwardersForService ->
+                    forwardersForService.keySet().stream()
+                            .filter(sessionId -> sessionId.equals(session.getId()))
+                            .map(forwardersForService::get)
+                            .forEach(forwardersForSession -> {
+                                forwardersForSession.values()
+                                        .forEach(WebSocketProxyForwarder::close);
+                                forwardersForSession.clear();
+                            })
+                );
+
+    }
+
+    public void removeForwardersForService(String serviceId) {
+        logger.info ("Dropping all forwarders for service ID " + serviceId + " (will be recreated lazily)");
+        forwarders.keySet().stream()
+                .filter(service -> service.equals(serviceId))
+                .map(service -> forwarders.get(serviceId))
+                .forEach(forwardersForService -> {
+                    forwardersForService.values()
+                            .forEach(forwardersForSession ->
+                                forwardersForSession.values()
+                                        .forEach(WebSocketProxyForwarder::close)
+                            );
+                    forwardersForService.clear();
+                });
+
+        /*
         Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.get(serviceId);
         if (forwardersForService != null) {
             for (Map<String, WebSocketProxyForwarder> forwardersForSession : forwardersForService.values()) {
@@ -83,5 +114,6 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
             }
             forwardersForService.clear();
         }
+        */
     }
 }

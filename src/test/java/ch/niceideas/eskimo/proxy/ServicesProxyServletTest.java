@@ -83,7 +83,7 @@ public class ServicesProxyServletTest {
         });
         pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
             @Override
-            public void removeForwarders(String serviceId) {
+            public void removeForwardersForService(String serviceId) {
                 // No Op
             }
         });
