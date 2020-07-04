@@ -597,7 +597,7 @@ eskimo.SystemStatus = function() {
 
         // B. Inject information
 
-        //$("#eskimo-flavour").html()
+        $("#eskimo-flavour").html(eskimoFlavour);
 
         $("#system-information-version").html(systemStatus.buildVersion);
 
