@@ -40,7 +40,6 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -87,6 +86,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("$('#inner-content-status').css('display', 'inherit')");
         js("$('#inner-content-status').css('visibility', 'visible')");
+
+        js("var eskimoFlavour = \"CE\"");
     }
 
     @Test
