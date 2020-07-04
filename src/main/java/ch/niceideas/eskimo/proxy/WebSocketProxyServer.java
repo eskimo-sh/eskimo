@@ -11,6 +11,7 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +32,11 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
     private final ServicesDefinition servicesDefinition;
 
     private final Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> forwarders = new ConcurrentHashMap<>();
+
+    /* For tests */
+    Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> getForwarders() {
+        return Collections.unmodifiableMap(forwarders);
+    }
 
     public WebSocketProxyServer(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition) {
         this.proxyManagerService = proxyManagerService;
@@ -60,7 +66,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
         getForwarder(serviceId, webSocketServerSession, targetPath).forwardMessage(webSocketMessage);
     }
 
-    private WebSocketProxyForwarder getForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
+    protected WebSocketProxyForwarder getForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
 
         Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.computeIfAbsent(serviceId, k -> new HashMap<>());
 
@@ -68,8 +74,12 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
 
         return forwardersForSession.computeIfAbsent(targetPath, k  -> {
             logger.info ("Creating new forwarder for session : " + webSocketServerSession.getId() + " - service ID : " + serviceId + " - target path : " + targetPath);
-            return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession);
+            return createForwarder(serviceId, webSocketServerSession, targetPath);
         });
+    }
+
+    protected WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
+        return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession);
     }
 
     @Override
@@ -77,17 +87,18 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
 
         logger.info ("Dropping all forwarders for session ID " + session.getId() + "");
         forwarders.values()
-                .forEach(forwardersForService ->
-                    forwardersForService.keySet().stream()
-                            .filter(sessionId -> sessionId.equals(session.getId()))
-                            .map(forwardersForService::get)
-                            .forEach(forwardersForSession -> {
-                                forwardersForSession.values()
-                                        .forEach(WebSocketProxyForwarder::close);
-                                forwardersForSession.clear();
-                            })
+                .forEach(forwardersForService -> {
+                            forwardersForService.keySet().stream()
+                                    .filter(sessionId -> sessionId.equals(session.getId()))
+                                    .map(forwardersForService::get)
+                                    .forEach(forwardersForSession -> {
+                                        forwardersForSession.values()
+                                                .forEach(WebSocketProxyForwarder::close);
+                                        forwardersForSession.clear();
+                                    });
+                            forwardersForService.remove(session.getId());
+                        }
                 );
-
     }
 
     public void removeForwardersForService(String serviceId) {
@@ -103,6 +114,8 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
                             );
                     forwardersForService.clear();
                 });
+
+        forwarders.remove(serviceId);
 
         /*
         Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.get(serviceId);

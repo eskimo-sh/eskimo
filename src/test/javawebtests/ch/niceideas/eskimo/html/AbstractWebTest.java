@@ -209,6 +209,8 @@ public abstract class AbstractWebTest {
         js("var eskimoSetup = {}");
         js("eskimoSetup.setSnapshot = function () {};");
 
+        js("var eskimoSetupCommand = {}");
+
         js("var eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
 

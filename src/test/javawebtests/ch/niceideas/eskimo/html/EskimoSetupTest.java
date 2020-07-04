@@ -58,6 +58,7 @@ public class EskimoSetupTest extends AbstractWebTest {
         js("eskimoSetup = new eskimo.Setup()");
         js("eskimoSetup.eskimoMain = eskimoMain;");
         js("eskimoSetup.eskimoSystemStatus = eskimoSystemStatus;");
+        js("eskimoSetup.eskimoSetupCommand = eskimoSetupCommand;");
         js("eskimoSetup.initialize()");
 
         waitForElementIdInDOM("setup-warning");
@@ -91,13 +92,36 @@ public class EskimoSetupTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveSetupShowsCommand() {
-        fail ("To Be Implemented");
+    public void testSaveSetupShowsCommand() throws Exception {
+
+        String setup = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupTest/setup.json"));
+
+        js("$.ajax = function (callback) { callback.success ( { command: { test: \"test\" }} ); }");
+
+        js("eskimoSetupCommand.showCommand = function (command) { window.setupCommand = command; }");
+
+        js("eskimoSetup.doSaveSetup(" + setup + ")");
+
+        assertJavascriptEquals("{\"test\":\"test\"}", "JSON.stringify (window.setupCommand)");
     }
 
     @Test
-    public void testDisableDownloadInSnapshot_EnableInRelease() {
-        fail ("To Be Implemented");
+    public void testDisableDownloadInSnapshot_EnableInRelease() throws Exception {
+
+        // build
+        String setupBuild =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
+
+        js("eskimoSetup.handleSetup("+setupBuild+")");
+
+        assertJavascriptEquals("radio-inline disabled", "$('#setup-mesos-origin-download-label').attr('class')");
+        assertJavascriptEquals("radio-inline disabled", "$('#setup-services-origin-download-label').attr('class')");
+
+        js("eskimoSetup.setSnapshot(false)");
+
+        js("eskimoSetup.handleSetup("+setupBuild+")");
+
+        assertJavascriptEquals("radio-inline", "$('#setup-mesos-origin-download-label').attr('class')");
+        assertJavascriptEquals("radio-inline", "$('#setup-services-origin-download-label').attr('class')");
     }
 
     @Test
