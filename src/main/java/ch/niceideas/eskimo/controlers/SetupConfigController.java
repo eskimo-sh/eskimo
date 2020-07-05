@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
+import ch.niceideas.eskimo.services.ApplicationStatusService;
 import ch.niceideas.eskimo.services.ConfigurationService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
@@ -45,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +64,9 @@ public class SetupConfigController extends AbstractOperationController {
     private static final Logger logger = Logger.getLogger(SetupConfigController.class);
 
     public static final String PENDING_SETUP_COMMAND = "PENDING_SETUP_COMMAND";
+
+    @Value("${build.version}")
+    private String buildVersion = "DEV-SNAPSHOT";
 
     @Autowired
     private SetupService setupService;
@@ -94,6 +99,9 @@ public class SetupConfigController extends AbstractOperationController {
                 configWrapper.setValueForPath("clear", "setup");
                 configWrapper.setValueForPath("message", e.getMessage());
             }
+
+            configWrapper.setValueForPath("version", buildVersion);
+            configWrapper.setValueForPath("isSnapshot", ApplicationStatusService.isSnapshot(buildVersion));
 
             configWrapper.setValueForPath("processingPending", systemService.isProcessingPending());
 

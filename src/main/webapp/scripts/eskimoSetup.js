@@ -47,8 +47,6 @@ eskimo.Setup = function() {
 
     const that = this;
 
-    this.isSnapshot = true;
-
     // Initialize HTML Div from Template
     this.initialize = function() {
         $("#inner-content-setup").load("html/eskimoSetup.html", function (responseTxt, statusTxt, jqXHR) {
@@ -109,12 +107,8 @@ eskimo.Setup = function() {
         });
     };
 
-    this.setSnapshot = function (isSnapshot) {
-      that.isSnapshot = isSnapshot;
-    };
-
     function switchDownloadBuild(target, data) {
-        if (that.isSnapshot) {
+        if (data.isSnapshot) {
             $('#setup-'+target+'-origin-build').get(0).checked = true;
             $('#setup-'+target+'-origin-download-label').addClass("disabled");
             $('#download-'+target+'-explain-disabled').css('display', 'block');
@@ -148,6 +142,10 @@ eskimo.Setup = function() {
 
         if (data['content-ssh-key'] != null) {
             $("#content-ssh-key").val(data['content-ssh-key']);
+        }
+
+        if (data.version == null) {
+            alert ("Couldn't get Eskimo version");
         }
 
         switchDownloadBuild ("mesos", data);

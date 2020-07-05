@@ -115,9 +115,18 @@ public class SetupService {
     @Value("${setup.temporaryBuildFolder}")
     private String temporaryBuildFolder = "/tmp";
 
+    @Value("${build.version}")
+    private String buildVersion = "DEV-SNAPSHOT";
+
     private String configStoragePathInternal = null;
 
     /** For tests */
+    void setMessagingService (MessagingService messagingService) {
+        this.messagingService = messagingService;
+    }
+    void setBuildVersion (String buildVersion) {
+        this.buildVersion = buildVersion;
+    }
     public void setConfigStoragePathInternal(String configStoragePathInternal) {
         this.configStoragePathInternal = configStoragePathInternal;
     }
@@ -376,7 +385,7 @@ public class SetupService {
 
         } else {
 
-            if (applicationStatusService.isSnapshot()) {
+            if (applicationStatusService.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
@@ -395,7 +404,7 @@ public class SetupService {
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
         if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
-            if (applicationStatusService.isSnapshot()) {
+            if (applicationStatusService.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
@@ -414,7 +423,7 @@ public class SetupService {
         }
 
         // 3. Find out about upgrades
-        if (!applicationStatusService.isSnapshot()
+        if (!applicationStatusService.isSnapshot(buildVersion)
                 && StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG) // for services default is build
                 && packagesVersion != null) {
             Set<String> updates = new HashSet<>();
@@ -516,7 +525,7 @@ public class SetupService {
 
                 } else {
 
-                    if (applicationStatusService.isSnapshot()) {
+                    if (applicationStatusService.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
@@ -542,7 +551,7 @@ public class SetupService {
             if (!missingMesosPackages.isEmpty()) {
                 if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
-                    if (applicationStatusService.isSnapshot()) {
+                    if (applicationStatusService.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
@@ -568,7 +577,7 @@ public class SetupService {
             }
 
             // 3. Handle updates
-            if (!applicationStatusService.isSnapshot()
+            if (!applicationStatusService.isSnapshot(buildVersion)
                     && StringUtils.isNotEmpty(servicesOrigin)
                     && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for services default is build
 

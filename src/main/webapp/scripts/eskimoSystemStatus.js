@@ -691,8 +691,6 @@ eskimo.SystemStatus = function() {
         // D. General configuration
 
         that.eskimoMain.handleMarathonSubsystem (systemStatus.enableMarathon);
-
-        that.eskimoSetup.setSnapshot(systemStatus.isSnapshot);
     };
 
     this.monitoringDashboardFrameTamper = function() {

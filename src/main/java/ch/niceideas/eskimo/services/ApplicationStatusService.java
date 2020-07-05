@@ -116,7 +116,7 @@ public class ApplicationStatusService {
         timer.cancel();
     }
 
-    public boolean isSnapshot() {
+    public static boolean isSnapshot(String buildVersion) {
         return StringUtils.isBlank(buildVersion) || buildVersion.endsWith("SNAPSHOT");
     }
 
@@ -148,7 +148,7 @@ public class ApplicationStatusService {
 
             systemStatus.setValueForPath("enableMarathon", StringUtils.isNotBlank(enableMarathon) && enableMarathon.equals("true"));
 
-            systemStatus.setValueForPath("isSnapshot", isSnapshot());
+            systemStatus.setValueForPath("isSnapshot", isSnapshot(buildVersion));
 
             try {
                 JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());

@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.junit.Before;
@@ -116,9 +117,10 @@ public class EskimoSetupTest extends AbstractWebTest {
         assertJavascriptEquals("radio-inline disabled", "$('#setup-mesos-origin-download-label').attr('class')");
         assertJavascriptEquals("radio-inline disabled", "$('#setup-services-origin-download-label').attr('class')");
 
-        js("eskimoSetup.setSnapshot(false)");
+        JsonWrapper setupWrapper = new JsonWrapper(setupBuild);
+        setupWrapper.setValueForPath("isSnapshot", false);
 
-        js("eskimoSetup.handleSetup("+setupBuild+")");
+        js("eskimoSetup.handleSetup("+setupWrapper.getFormattedValue()+")");
 
         assertJavascriptEquals("radio-inline", "$('#setup-mesos-origin-download-label').attr('class')");
         assertJavascriptEquals("radio-inline", "$('#setup-services-origin-download-label').attr('class')");

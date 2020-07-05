@@ -80,6 +80,31 @@ public class SetupServiceTest extends AbstractSystemTest {
         tempPackagesDistribPath.delete();
     }
 
+    SetupService createSetupService(SetupService setupService) throws IOException {
+
+        File storagePathConfDir = File.createTempFile("eskimo_storage", "");
+        storagePathConfDir.delete();
+        storagePathConfDir.mkdirs();
+        setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
+
+        setupService.setConfigStoragePathInternal(tempConfigStoragePath.getCanonicalPath());
+        setupService.setPackageDistributionPath(tempPackagesDistribPath.getCanonicalPath());
+
+        setupService.setSystemService(systemService);
+
+        setupService.setPackagesToBuild(packagesToBuild);
+        setupService.setMesosPackages(mesosPackages);
+
+        setupService.setConfigurationService(configurationService);
+        configurationService.setSetupService(setupService);
+
+        setupService.setBuildVersion("1.0");
+
+        setupService.setMessagingService(messagingService);
+
+        return setupService;
+    }
+
     @Test
     public void testParseVersion() throws Exception {
 
@@ -125,27 +150,6 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(0, command.getDownloadMesos().size());
         assertEquals(0, command.getDownloadPackages().size());
 
-    }
-
-    SetupService createSetupService(SetupService setupService) throws IOException {
-
-        File storagePathConfDir = File.createTempFile("eskimo_storage", "");
-        storagePathConfDir.delete();
-        storagePathConfDir.mkdirs();
-        setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
-
-        setupService.setConfigStoragePathInternal(tempConfigStoragePath.getCanonicalPath());
-        setupService.setPackageDistributionPath(tempPackagesDistribPath.getCanonicalPath());
-
-        setupService.setSystemService(systemService);
-
-        setupService.setPackagesToBuild(packagesToBuild);
-        setupService.setMesosPackages(mesosPackages);
-
-        setupService.setConfigurationService(configurationService);
-        configurationService.setSetupService(setupService);
-
-        return setupService;
     }
 
     @Test
@@ -314,11 +318,16 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
-        SetupException exception = assertThrows(SetupException.class,
-                () -> setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate));
+        downloadPackages = new HashSet<>();
+        buildPackage = new HashSet<>();
+        downloadMesos = new HashSet<>();
+        buildMesos = new HashSet<>();
+        packageUpdate = new HashSet<>();
 
-        assertNotNull(exception);
-        assertEquals("Downloading packages is not supported on development version (SNAPSHOT)", exception.getMessage());
+        setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
+
+        assertEquals(17, downloadPackages.size());
+        assertEquals(3, downloadMesos.size());
     }
 
     @Test
@@ -484,6 +493,49 @@ public class SetupServiceTest extends AbstractSystemTest {
             String.join(", ", downloadPackageList));
     }
 
+
+    @Test
+    public void testApplySetupDownload_unsupportedSnapshot() throws Exception {
+
+        final List<String> builtPackageList = new ArrayList<>();
+        final List<String> downloadPackageList = new ArrayList<>();
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected void buildPackage(String image) {
+                builtPackageList.add (image);
+            }
+            @Override
+            protected void downloadPackage(String fileName) {
+                downloadPackageList.add (fileName);
+            }
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() {
+                return new JsonWrapper(packagesVersionFile);
+            }
+        });
+
+        setupService.setBuildVersion("1.0-SNAPSHOT");
+
+        JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
+        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        setupService.saveAndPrepareSetup(setupConfig);
+
+        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        servicesDefinition.afterPropertiesSet();
+
+        setupService.setServicesDefinition(servicesDefinition);
+
+        String errorResult = setupService.applySetup(setupConfigWrapper);
+
+        assertEquals("{\n" +
+                "  \"error\": \"Downloading packages is not supported on development version (SNAPSHOT)\",\n" +
+                "  \"status\": \"KO\"\n" +
+                "}", errorResult);
+    }
+
     @Test
     public void testApplySetupDownload() throws Exception {
 
@@ -492,22 +544,16 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         SetupService setupService = createSetupService(new SetupService() {
             @Override
-            protected void buildPackage(String image) throws SetupException {
+            protected void buildPackage(String image) {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) throws SetupException {
+            protected void downloadPackage(String fileName) {
                 downloadPackageList.add (fileName);
             }
             @Override
-            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+            protected JsonWrapper loadRemotePackagesVersionFile() {
                 return new JsonWrapper(packagesVersionFile);
-            }
-        });
-
-        setupService.setApplicationStatusService(new ApplicationStatusService() {
-            public boolean isSnapshot() {
-                return false;
             }
         });
 

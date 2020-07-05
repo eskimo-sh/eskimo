@@ -53,7 +53,9 @@ public class SetupConfigControllerTest {
 
         assertEquals ("{\n" +
                 "    \"processingPending\": false,\n" +
-                "    \"config\": \"dummy\"\n" +
+                "    \"isSnapshot\": true,\n" +
+                "    \"config\": \"dummy\",\n" +
+                "    \"version\": \"DEV-SNAPSHOT\"\n" +
                 "}", scc.loadSetupConfig());
 
         scc.setSetupService(new SetupService() {
@@ -74,7 +76,9 @@ public class SetupConfigControllerTest {
                 "    \"processingPending\": false,\n" +
                 "    \"clear\": \"setup\",\n" +
                 "    \"message\": \"No loaded\",\n" +
-                "    \"config\": \"dummy\"\n" +
+                "    \"isSnapshot\": true,\n" +
+                "    \"config\": \"dummy\",\n" +
+                "    \"version\": \"DEV-SNAPSHOT\"\n" +
                 "}", scc.loadSetupConfig());
 
         scc.setConfigurationService(new ConfigurationService() {
@@ -113,7 +117,9 @@ public class SetupConfigControllerTest {
 
         assertEquals ("{\n" +
                 "    \"processingPending\": true,\n" +
-                "    \"config\": \"dummy\"\n" +
+                "    \"isSnapshot\": true,\n" +
+                "    \"config\": \"dummy\",\n" +
+                "    \"version\": \"DEV-SNAPSHOT\"\n" +
                 "}", scc.loadSetupConfig());
     }
 
