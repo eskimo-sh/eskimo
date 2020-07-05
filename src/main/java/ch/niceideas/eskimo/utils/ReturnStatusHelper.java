@@ -92,6 +92,21 @@ public class ReturnStatusHelper {
         }
     }
 
+    public static String createClearStatus (String flag, boolean processingPending, MapFeeder additionalAttributesFeeder) {
+
+        try {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("status", "OK");
+                put("processingPending", processingPending);
+                put("clear", flag);
+                additionalAttributesFeeder.feedMap (this);
+            }}).toString(2);
+        } catch (JSONException e1) {
+            // cannot happen
+            throw new ErrorStatusException(e1);
+        }
+    }
+
     public static String createEncodedErrorStatus (Exception e) {
 
         String errorMessageBuilder = buildFullMessage(e);

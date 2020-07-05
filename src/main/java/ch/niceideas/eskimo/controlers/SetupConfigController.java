@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 
 @Controller
@@ -114,7 +115,10 @@ public class SetupConfigController extends AbstractOperationController {
         } catch (SetupException e) {
             // this is OK. means application is not initialized
             logger.debug(e, e);
-            return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending(), map -> {
+                map.put("version", buildVersion);
+                map.put("isSnapshot", ApplicationStatusService.isSnapshot(buildVersion));
+            });
         }
     }
 

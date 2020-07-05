@@ -37,17 +37,32 @@ public class SetupConfigControllerTest {
             }
         });
 
-        scc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-        });
-
         scc.setSystemService(new SystemService(false) {
             @Override
             public boolean isProcessingPending() {
                 return false;
+            }
+        });
+
+        scc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public String loadSetupConfig() throws FileException, SetupException {
+                throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
+            }
+        });
+
+        assertEquals ("{\n" +
+                "  \"clear\": \"missing\",\n" +
+                "  \"isSnapshot\": true,\n" +
+                "  \"version\": \"DEV-SNAPSHOT\",\n" +
+                "  \"processingPending\": false,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", scc.loadSetupConfig());
+
+        scc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public String loadSetupConfig() throws FileException, SetupException {
+                return "{\"config\": \"dummy\"}";
             }
         });
 
@@ -90,6 +105,8 @@ public class SetupConfigControllerTest {
 
         assertEquals ("{\n" +
                 "  \"clear\": \"missing\",\n" +
+                "  \"isSnapshot\": true,\n" +
+                "  \"version\": \"DEV-SNAPSHOT\",\n" +
                 "  \"processingPending\": false,\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", scc.loadSetupConfig());
