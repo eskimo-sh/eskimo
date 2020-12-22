@@ -3,8 +3,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.services.TerminalService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Terminal;
-import org.json.JSONException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TerminalControllerTest {
 

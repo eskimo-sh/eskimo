@@ -7,7 +7,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ServicesSettingsControllerTest {
 

@@ -43,8 +43,8 @@ import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -57,7 +57,7 @@ public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
     }
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }

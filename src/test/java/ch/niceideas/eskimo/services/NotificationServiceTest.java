@@ -36,18 +36,18 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NotificationServiceTest {
 
     private NotificationService ns = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ns = new NotificationService();
         ns.addError("Test");

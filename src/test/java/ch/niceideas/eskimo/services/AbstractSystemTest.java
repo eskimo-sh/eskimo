@@ -43,7 +43,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import org.apache.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,7 +96,7 @@ public abstract class AbstractSystemTest {
     protected String expectedPrevStatusAllServicesStay = null;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), "UTF-8");

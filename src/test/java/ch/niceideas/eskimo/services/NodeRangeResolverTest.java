@@ -37,25 +37,21 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.comparator.Comparators;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NodeRangeResolverTest {
 
     private NodeRangeResolver nrr = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         nrr = new NodeRangeResolver();
     }

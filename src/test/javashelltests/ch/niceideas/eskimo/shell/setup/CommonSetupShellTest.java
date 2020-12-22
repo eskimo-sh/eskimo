@@ -36,27 +36,26 @@
 package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.*;
-import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static junit.framework.TestCase.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CommonSetupShellTest {
 
     protected String jailPath = null;
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         jailPath = AbstractSetupShellTest.createJail();
 
@@ -66,7 +65,7 @@ public class CommonSetupShellTest {
 
     }
 
-    @After
+    @AfterAll
     public void tearDownClass() throws Exception {
         if (StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));

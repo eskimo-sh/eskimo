@@ -38,16 +38,16 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.ResourceUtils;
 import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SettingsInjectorTest {
 
@@ -62,12 +62,12 @@ public class SettingsInjectorTest {
     private File grafanaFile;
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         // Create temp folder
@@ -104,7 +104,7 @@ public class SettingsInjectorTest {
         return targetEsFile;
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         new File (tempFolder).delete();
     }

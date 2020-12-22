@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.UnboundList;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +44,6 @@ public abstract class AbstractInformationService<T, R> {
 
     protected final List<T> elements = Collections.synchronizedList(new UnboundList<>(getMaxHistorySize()));
 
-    @Transactional
     public Pair<Integer, R> fetchElements(int lastLine) {
         if (lastLine > elements.size()) { // this means that a call to clear has been performed
             // need to refetch everything from scratch !

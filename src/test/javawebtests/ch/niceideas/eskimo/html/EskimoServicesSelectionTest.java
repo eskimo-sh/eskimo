@@ -36,8 +36,8 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +47,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
     private String jsonServices = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));

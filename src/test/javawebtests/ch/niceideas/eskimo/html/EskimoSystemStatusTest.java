@@ -40,13 +40,13 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoSystemStatusTest extends AbstractWebTest {
 
@@ -54,7 +54,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     private String jsonNodesStatus = null;
     private String jsonStatusConfig = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));

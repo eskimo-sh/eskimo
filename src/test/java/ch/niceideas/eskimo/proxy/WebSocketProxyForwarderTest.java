@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -9,9 +9,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WebSocketProxyForwarderTest {
 
@@ -22,7 +20,7 @@ public class WebSocketProxyForwarderTest {
     private List<Object> clientMessages = null;
     private List<Object> serverMessages = null;
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         clientMessages = new ArrayList<>();

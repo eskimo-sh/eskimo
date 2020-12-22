@@ -38,10 +38,9 @@ package ch.niceideas.eskimo.shell.setup;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
-import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +51,7 @@ public class GrafanaSetupTest extends AbstractSetupShellTest {
 
     private static boolean initialized = false;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!initialized) {
             jailPath = setupJail(getServiceName());
@@ -60,7 +59,7 @@ public class GrafanaSetupTest extends AbstractSetupShellTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         if (initialized && StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));

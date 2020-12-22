@@ -35,18 +35,19 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NodesConfigurationCheckerTest {
 
     private NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         ServicesDefinition def = new ServicesDefinition();

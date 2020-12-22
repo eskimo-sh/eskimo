@@ -39,17 +39,17 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoNodesConfigTest extends AbstractWebTest {
 
     private String jsonServices = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));

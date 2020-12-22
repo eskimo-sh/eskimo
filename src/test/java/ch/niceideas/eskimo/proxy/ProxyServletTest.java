@@ -15,9 +15,9 @@ import org.apache.http.protocol.*;
 import org.apache.http.util.Asserts;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import javax.net.ssl.SSLContext;
@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProxyServletTest {
 
@@ -63,7 +63,7 @@ public class ProxyServletTest {
     };
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         localTestServer = new LocalTestServer(null, null);
         localTestServer.start();
@@ -89,7 +89,7 @@ public class ProxyServletTest {
         sourceBaseUri = "http://localhost/proxyMe";//localhost:0 is hard-coded in ServletUnitHttpRequest
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         servletRunner.shutDown();
         localTestServer.stop();

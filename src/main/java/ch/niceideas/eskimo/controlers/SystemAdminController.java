@@ -43,8 +43,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -79,7 +77,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("/interupt-processing")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String interruptProcessing() {
 
@@ -122,7 +119,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("/show-journal")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
         Service service = servicesDefinition.getService(serviceName);
@@ -140,7 +136,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("/start-service")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
         Service service = servicesDefinition.getService(serviceName);
@@ -157,7 +152,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("/stop-service")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
         Service service = servicesDefinition.getService(serviceName);
@@ -174,7 +168,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("/restart-service")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
 
@@ -192,7 +185,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("service-custom-action")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String serviceActionCustom(
             @RequestParam(name="action") String commandId,
@@ -204,7 +196,6 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     @GetMapping("/reinstall-service")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
 

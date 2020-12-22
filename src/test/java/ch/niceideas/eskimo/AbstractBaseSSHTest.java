@@ -43,24 +43,21 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuthFactory;
-import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.apache.sshd.server.subsystem.SubsystemFactory;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.*;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -90,14 +87,14 @@ public abstract class AbstractBaseSSHTest {
         return sshPort;
     }
 
-    @After
+    @AfterEach
     public void afterTestTeardown() {
         sshd.close(true);
     }
 
     protected abstract CommandFactory getSShSubsystemToUse();
 
-    @Before
+    @BeforeEach
     public void beforeTestSetup() throws Exception {
 
         sshPort = ProxyManagerService.generateLocalPort();

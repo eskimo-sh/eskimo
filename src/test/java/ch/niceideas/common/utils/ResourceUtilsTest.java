@@ -1,12 +1,11 @@
 package ch.niceideas.common.utils;
 
 import ch.niceideas.eskimo.utils.OSDetector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ResourceUtilsTest {
 

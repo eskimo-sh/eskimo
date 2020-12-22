@@ -41,20 +41,20 @@ import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
 import ch.niceideas.eskimo.services.NodeRangeResolver;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OperationsCommandTest extends AbstractServicesDefinitionTest {
 
     private NodeRangeResolver nrr;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

@@ -43,8 +43,6 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -105,7 +103,6 @@ public class ServicesSettingsController {
     }
 
     @PostMapping("/save-services-settings")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String prepareSaveServicesSettings(@RequestBody String settingsFormAsString, HttpSession session) {
 
@@ -132,7 +129,6 @@ public class ServicesSettingsController {
     }
 
     @PostMapping("/apply-services-settings")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String saveServicesSettings(HttpSession session) {
 

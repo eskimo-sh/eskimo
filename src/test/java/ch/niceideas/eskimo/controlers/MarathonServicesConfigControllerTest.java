@@ -8,22 +8,21 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MarathonServicesConfigControllerTest {
 
     private MarathonServicesConfigController mscc = new MarathonServicesConfigController();
 
-    @Before
+    @BeforeEach
     public void testSetup() {
         mscc.setMessagingService(new MessagingService());
         mscc.setNotificationService(new NotificationService());

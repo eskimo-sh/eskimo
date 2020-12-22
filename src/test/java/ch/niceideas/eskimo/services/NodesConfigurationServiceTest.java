@@ -41,8 +41,8 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,14 +50,14 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
     private String testRunUUID = UUID.randomUUID().toString();
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -259,11 +259,11 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         String commandString = testSSHCommandScript.toString();
 
         for (String commandStart : expectedCommandStart.split("\n")) {
-            assertTrue (commandStart + "\nis contained in \n" + commandString, commandString.contains(commandStart));
+            assertTrue (commandString.contains(commandStart), commandStart + "\nis contained in \n" + commandString);
         }
 
         for (String commandEnd : expectedCommandEnd.split("\n")) {
-            assertTrue (commandEnd + "\nis contained in \n" + commandString, commandString.contains(commandEnd));
+            assertTrue (commandString.contains(commandEnd), commandEnd + "\nis contained in \n" + commandString);
         }
     }
 

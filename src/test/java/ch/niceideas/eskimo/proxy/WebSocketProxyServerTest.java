@@ -1,12 +1,10 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
-import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.lang.Nullable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -14,16 +12,12 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 
 import java.io.IOException;
-import java.lang.reflect.Proxy;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class WebSocketProxyServerTest {
 
@@ -38,7 +32,7 @@ public class WebSocketProxyServerTest {
     private AtomicInteger closedCalls;
 
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         pms = new ProxyManagerService() {

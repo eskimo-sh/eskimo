@@ -37,14 +37,12 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProxyManagerServiceTest {
 
@@ -54,7 +52,7 @@ public class ProxyManagerServiceTest {
     private AtomicBoolean recreateTunnelsCalled = new AtomicBoolean(false);
     private AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         pms = new ProxyManagerService();
         sd = new ServicesDefinition();

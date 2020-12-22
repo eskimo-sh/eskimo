@@ -40,15 +40,15 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SystemServiceTest extends AbstractSystemTest {
 
@@ -56,7 +56,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     private String testRunUUID = UUID.randomUUID().toString();
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -212,7 +212,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         //System.out.println(expectedStatusWrapper.getFormattedValue());
 
-        assertTrue(systemStatus.getFormattedValue(), expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()));
+        assertTrue(expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()), systemStatus.getFormattedValue());
     }
 
     @Test
@@ -305,7 +305,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
 
         JSONObject actual = systemStatus.getJSONObject();
-        assertTrue(actual.toString(2), new JSONObject(expectedFullStatus).similar(actual));
+        assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
     }
 
     @Test

@@ -1,20 +1,17 @@
 package ch.niceideas.common.utils;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UnboundListTest {
 
     private UnboundList<String> testList = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testList = new UnboundList<>(10);
     }

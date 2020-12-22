@@ -1,12 +1,11 @@
 package ch.niceideas.common.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class StreamUtilsTest {
 

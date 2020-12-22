@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.utils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +45,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SystemStatusParserTest {
 

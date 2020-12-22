@@ -2,19 +2,20 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PackageVersionGeneratorTest {
 
     private File tmpFolder = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         tmpFolder = File.createTempFile("packagetest", "distrib");
         assertTrue(tmpFolder.delete());
@@ -40,7 +41,7 @@ public class PackageVersionGeneratorTest {
         assertTrue (new File (tmpFolder, "eskimo_mesos-suse_1.8.1_1.tar.gz").createNewFile());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         FileUtils.delete(tmpFolder);
     }

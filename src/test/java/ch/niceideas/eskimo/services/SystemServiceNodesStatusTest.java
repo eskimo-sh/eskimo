@@ -42,20 +42,20 @@ import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
     private String testRunUUID = UUID.randomUUID().toString();
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

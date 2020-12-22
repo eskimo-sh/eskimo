@@ -3,19 +3,17 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.TestCase.*;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ConfigurationServiceTest {
 
@@ -25,7 +23,7 @@ public class ConfigurationServiceTest {
 
     private ConfigurationService configurationService = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         try {
             tmpFile = File.createTempFile("test_", "_configurationService");

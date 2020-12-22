@@ -45,8 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -124,7 +122,6 @@ public class NodesConfigController extends AbstractOperationController {
     }
 
     @PostMapping("/reinstall-nodes-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String reinstallNodesConfig(@RequestBody String reinstallModel, HttpSession session) {
 
@@ -168,7 +165,6 @@ public class NodesConfigController extends AbstractOperationController {
     }
 
     @PostMapping("/save-nodes-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String saveNodesConfig(@RequestBody String configAsString, HttpSession session) {
 
@@ -200,7 +196,6 @@ public class NodesConfigController extends AbstractOperationController {
     }
 
     @PostMapping("/apply-nodes-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String applyNodesConfig(HttpSession session) {
 

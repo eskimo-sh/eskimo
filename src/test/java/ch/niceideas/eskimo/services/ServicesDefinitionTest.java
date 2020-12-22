@@ -37,15 +37,15 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
@@ -54,7 +54,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     private MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
@@ -216,7 +216,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesInOrder();
 
-        assertEquals(String.join(",", orderedServices), 20, orderedServices.length);
+        assertEquals(20, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "ntp",
@@ -279,7 +279,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUIServices();
 
-        assertEquals(String.join(",", orderedServices), 10, orderedServices.length);
+        assertEquals(10, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "grafana",
@@ -329,7 +329,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         }, elasticsearchDep);
 
         String[] zookeeperDep = def.getDependentServices("zookeeper").toArray(new String[0]);
-        assertEquals(String.join(",", zookeeperDep), 11, zookeeperDep.length);
+        assertEquals(11, zookeeperDep.length, String.join(",", zookeeperDep));
         assertArrayEquals(new String[] {
                 "zookeeper",
                 "flink-app-master",

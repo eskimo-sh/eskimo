@@ -6,19 +6,19 @@ import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static junit.framework.TestCase.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SystemAdminControllerTest {
 
     private SystemAdminController sac = new SystemAdminController();
     private ServicesDefinition sd = new ServicesDefinition();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         sd.afterPropertiesSet();
         sac.setServicesDefinition(sd);

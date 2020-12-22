@@ -39,14 +39,13 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
-import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ServicesSettingsServiceTest extends AbstractSystemTest {
 
@@ -57,7 +56,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
 
     private AtomicReference<OperationsCommand> processedCommand = new AtomicReference<>();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));

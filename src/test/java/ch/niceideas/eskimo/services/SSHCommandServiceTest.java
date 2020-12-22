@@ -40,14 +40,12 @@ import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
@@ -57,7 +55,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     }
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
@@ -72,7 +70,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     private ConfigurationService cs = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setupService = new SetupService();
         String tempPath = SystemServiceTest.createTempStoragePath();
@@ -117,8 +115,12 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
             fail ("Exception expected");
         } catch (SSHCommandException e) {
             assertNotNull(e);
-            assertEquals ("Command exited with return code 127\n" +
-                    "/bin/bash: /bin/tada: No such file or directory\n", e.getMessage());
+            assertTrue (
+                        ("Command exited with return code 127\n" +
+                         "/bin/bash: /bin/tada: No such file or directory\n").equals (e.getMessage())
+                    ||
+                        ("Command exited with return code 127\n" +
+                         "/bin/bash: line 1: /bin/tada: No such file or directory\n").equals (e.getMessage()));
         }
     }
 

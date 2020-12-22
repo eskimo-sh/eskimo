@@ -42,15 +42,15 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SetupServiceTest extends AbstractSystemTest {
 
@@ -66,7 +66,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private String mesosPackages = "mesos-debian,mesos-redhat,mesos-suse";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));

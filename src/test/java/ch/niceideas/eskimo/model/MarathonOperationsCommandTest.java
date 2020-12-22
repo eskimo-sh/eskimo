@@ -35,15 +35,14 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
-import ch.niceideas.eskimo.services.NodeRangeResolver;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTest {
 
@@ -51,7 +50,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
     };
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

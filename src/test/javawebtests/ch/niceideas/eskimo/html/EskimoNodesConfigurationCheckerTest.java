@@ -41,14 +41,13 @@ import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
@@ -56,7 +55,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
     private String jsonServices = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));

@@ -36,19 +36,13 @@
 package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
-import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
 
 public class SparkWorkerSetupTest extends AbstractSetupShellTest {
 
@@ -56,7 +50,7 @@ public class SparkWorkerSetupTest extends AbstractSetupShellTest {
 
     private static boolean initialized = false;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         if (!initialized) {
             jailPath = setupJail(getServiceName());
@@ -64,7 +58,7 @@ public class SparkWorkerSetupTest extends AbstractSetupShellTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         if (initialized && StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));

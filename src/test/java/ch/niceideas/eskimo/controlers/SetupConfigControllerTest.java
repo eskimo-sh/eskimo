@@ -5,23 +5,22 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SetupConfigControllerTest {
 
     private SetupConfigController scc = new SetupConfigController();
 
-    @Before
+    @BeforeEach
     public void testSetup() {
         scc.setMessagingService(new MessagingService());
         scc.setNotificationService(new NotificationService());

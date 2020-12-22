@@ -43,8 +43,8 @@ import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.json.JSONObject;
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletOutputStream;
@@ -56,8 +56,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
@@ -67,7 +66,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
@@ -84,7 +83,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     private ConfigurationService cs = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setupService = new SetupService();
         String tempPath = SystemServiceTest.createTempStoragePath();

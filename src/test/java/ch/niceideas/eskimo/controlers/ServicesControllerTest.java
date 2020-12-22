@@ -5,19 +5,19 @@ import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServicesControllerTest {
 
     private ServicesController sc = new ServicesController();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ServicesDefinition sd = new ServicesDefinition();
         sd.afterPropertiesSet();

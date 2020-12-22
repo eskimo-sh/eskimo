@@ -45,7 +45,11 @@ import jscover.Main;
 import jscover.report.FileData;
 import jscover.report.JSONDataMerger;
 import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.net.URL;
@@ -54,8 +58,8 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public abstract class AbstractWebTest {
 
@@ -115,13 +119,13 @@ public abstract class AbstractWebTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUpClassName() {
         Class<?> clazz = this.getClass(); //if you want to get Class object
         className = clazz.getCanonicalName(); //you want to get only class name
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         if (isCoverageRun()) {
             js("window.jscoverFinished = false;");
@@ -167,7 +171,7 @@ public abstract class AbstractWebTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         webClient = new WebClient();
 
@@ -296,7 +300,7 @@ public abstract class AbstractWebTest {
 
     }
 
-    @After
+    @AfterEach
     public void close() {
         webClient.close();
     }

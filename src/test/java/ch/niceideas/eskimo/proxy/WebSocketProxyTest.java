@@ -8,9 +8,9 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.websocket.server.WsContextListener;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
@@ -35,9 +35,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static junit.framework.TestCase.*;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WebSocketProxyTest {
 
@@ -57,7 +56,7 @@ public class WebSocketProxyTest {
 
     private static int tomcatServerLocalPort = -1;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception{
 
         client = new StandardWebSocketClient();
@@ -79,7 +78,7 @@ public class WebSocketProxyTest {
         serverBlockingQueue = new LinkedBlockingDeque<>();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         try {
             this.server.destroy();

@@ -39,20 +39,18 @@ import ch.niceideas.eskimo.services.ServicesDefinition;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(EskimoMarathonServicesConfigCheckerTest.class);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoNodesConfigurationChecker.js");

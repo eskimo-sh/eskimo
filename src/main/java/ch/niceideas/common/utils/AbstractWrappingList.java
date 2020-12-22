@@ -1,6 +1,5 @@
 package ch.niceideas.common.utils;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 abstract class AbstractWrappingList <T> implements List<T> {
@@ -22,7 +21,7 @@ abstract class AbstractWrappingList <T> implements List<T> {
     }
 
     @Override
-    public final <T1> T1[] toArray(@NotNull T1[] a) {
+    public final <T1> T1[] toArray(T1[] a) {
         return underlying.<T1>toArray(a);
     }
 

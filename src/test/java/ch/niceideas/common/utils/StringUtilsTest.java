@@ -35,13 +35,13 @@
 
 package ch.niceideas.common.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StringUtilsTest  {
 

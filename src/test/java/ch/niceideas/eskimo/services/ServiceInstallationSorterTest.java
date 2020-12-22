@@ -38,14 +38,14 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTest  {
 
@@ -53,7 +53,7 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
     NodesConfigWrapper nodesConfig = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         sio = new ServicesInstallationSorter();

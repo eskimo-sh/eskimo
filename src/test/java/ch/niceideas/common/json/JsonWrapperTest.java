@@ -36,15 +36,12 @@ package ch.niceideas.common.json;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class JsonWrapperTest {
@@ -55,7 +52,7 @@ public class JsonWrapperTest {
     private String sourceJSONOutput;
     private String sourceJSONSearchYahoo;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         InputStream sourceJSONStream = ResourceUtils.getResourceAsStream("JsonWrapperTest/in.json");
         sourceJSONInput = StreamUtils.getAsString(sourceJSONStream);

@@ -1,20 +1,19 @@
 package ch.niceideas.common.utils;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertThrows;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProcessHelperTest {
 
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
-        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
     @Test

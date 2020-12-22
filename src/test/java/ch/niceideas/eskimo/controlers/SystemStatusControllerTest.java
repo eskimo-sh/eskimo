@@ -6,12 +6,11 @@ import ch.niceideas.eskimo.services.ApplicationStatusService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.SystemService;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SystemStatusControllerTest {
 

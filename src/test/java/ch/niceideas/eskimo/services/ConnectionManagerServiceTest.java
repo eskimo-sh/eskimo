@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
@@ -43,15 +42,14 @@ import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
@@ -68,7 +66,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
     private ConfigurationService cs = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setupService = new SetupService();
         String tempPath = SystemServiceTest.createTempStoragePath();

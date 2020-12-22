@@ -3,10 +3,10 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.MessagingService;
 import org.json.JSONException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MessagingControllerTest {
 

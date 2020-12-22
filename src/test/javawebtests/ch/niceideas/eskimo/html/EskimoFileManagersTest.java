@@ -36,17 +36,17 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EskimoFileManagersTest extends AbstractWebTest {
 
     private String dirContent = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"));

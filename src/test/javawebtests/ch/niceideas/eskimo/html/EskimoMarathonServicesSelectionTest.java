@@ -37,17 +37,17 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.TestCase.*;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "bootstrap.js");

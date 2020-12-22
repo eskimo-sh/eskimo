@@ -36,18 +36,18 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import org.json.JSONArray;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoServicesTest extends AbstractWebTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoUtils.js");

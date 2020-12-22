@@ -36,14 +36,14 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class EskimoServicesSettingsTest extends AbstractWebTest {
 
     private String jsonConfig = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoUtils.js");

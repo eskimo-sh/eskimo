@@ -46,20 +46,20 @@ import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import org.apache.log4j.Logger;
 import org.junit.Assume;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import static junit.framework.TestCase.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractSetupShellTest {
 
     private static final Logger logger = Logger.getLogger(AbstractSetupShellTest.class);
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }

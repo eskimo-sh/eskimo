@@ -34,12 +34,12 @@
 
 package ch.niceideas.eskimo.html;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class EskimoAboutTest extends AbstractWebTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "bootstrap.js");

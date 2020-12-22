@@ -37,14 +37,14 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MemoryComputerTest {
 
@@ -54,7 +54,7 @@ public class MemoryComputerTest {
 
     private String jsonConfig = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         jsonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
 

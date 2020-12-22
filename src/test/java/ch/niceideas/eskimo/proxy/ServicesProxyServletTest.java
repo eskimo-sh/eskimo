@@ -44,8 +44,8 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServicesProxyServletTest {
 
@@ -63,7 +63,7 @@ public class ServicesProxyServletTest {
 
     private ServicesProxyServlet servlet;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         pms = new ProxyManagerService();
         sd = new ServicesDefinition();

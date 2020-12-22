@@ -35,7 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.*;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractServicesDefinitionTest {
 
@@ -45,7 +45,7 @@ public abstract class AbstractServicesDefinitionTest {
 
     protected NodeRangeResolver nrr = new NodeRangeResolver();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         def = new ServicesDefinition();
         def.setSetupService (setupService);

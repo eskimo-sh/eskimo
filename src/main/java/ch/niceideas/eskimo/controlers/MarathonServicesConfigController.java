@@ -47,8 +47,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -130,7 +128,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     }
 
     @PostMapping("/save-marathon-services-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String saveMarathonServicesConfig(@RequestBody String configAsString, HttpSession session) {
 
@@ -166,7 +163,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     }
 
     @PostMapping("/reinstall-marathon-services-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String reinstallMarathonServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
 
@@ -215,7 +211,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     }
 
     @PostMapping("/apply-marathon-services-config")
-    @Transactional(isolation= Isolation.REPEATABLE_READ)
     @ResponseBody
     public String applyMarathonServicesConfig(HttpSession session) {
 

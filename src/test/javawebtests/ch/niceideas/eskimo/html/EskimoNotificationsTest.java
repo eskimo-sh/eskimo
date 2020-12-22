@@ -34,15 +34,15 @@
 
 package ch.niceideas.eskimo.html;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoNotificationsTest extends AbstractWebTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoNotifications.js");

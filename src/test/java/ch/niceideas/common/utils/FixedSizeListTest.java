@@ -1,19 +1,20 @@
 package ch.niceideas.common.utils;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+
 
 public class FixedSizeListTest {
 
     private FixedSizeList<String> testList = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testList = new FixedSizeList<>(10);
     }

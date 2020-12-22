@@ -37,18 +37,18 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
     private String expectedMarathonConfigTableContent = null;
     private String expectedMarathonSelectionTableContent = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         expectedMarathonConfigTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesConfigTest/expectedMarathonConfigTableContent.html"));

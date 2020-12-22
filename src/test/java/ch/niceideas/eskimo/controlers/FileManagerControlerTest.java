@@ -4,7 +4,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.FileManagerService;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +15,7 @@ import java.lang.reflect.Proxy;
 import java.util.Base64;
 import java.util.HashMap;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileManagerControlerTest {
 

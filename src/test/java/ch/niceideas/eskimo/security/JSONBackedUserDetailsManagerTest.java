@@ -34,8 +34,8 @@
 
 package ch.niceideas.eskimo.security;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,7 +47,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.io.File;
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONBackedUserDetailsManagerTest {
 
@@ -57,7 +57,7 @@ public class JSONBackedUserDetailsManagerTest {
 
     private File tmpUsersFile = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         passwordEncoder = new BCryptPasswordEncoder(11);

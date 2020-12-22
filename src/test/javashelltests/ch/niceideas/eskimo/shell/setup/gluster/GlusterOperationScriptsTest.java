@@ -37,20 +37,20 @@ package ch.niceideas.eskimo.shell.setup.gluster;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.TestCase.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         jailPath = setupJail(getServiceName());
         File glusterScriptsFile = new File(jailPath+"/gluster_container_helpers");
@@ -92,7 +92,7 @@ public class GlusterOperationScriptsTest extends AbstractSetupShellTest {
         enhanceScript(jailPath, dest);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         if (StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));

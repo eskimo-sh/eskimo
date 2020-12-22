@@ -38,17 +38,16 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
-import org.apache.log4j.Logger;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TerminalServiceTest extends AbstractBaseSSHTest {
 
@@ -58,7 +57,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
     }
 
     /** Run Test on Linux only */
-    @Before
+    @BeforeEach
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
@@ -73,7 +72,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
 
     private ConfigurationService cs = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setupService = new SetupService();
         String tempPath = SystemServiceTest.createTempStoragePath();
