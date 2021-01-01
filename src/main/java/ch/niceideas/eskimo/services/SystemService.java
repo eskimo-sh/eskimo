@@ -328,15 +328,15 @@ public class SystemService {
 
     public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
 
-            // special case at application startup : if the UI request comes before the first status update
-            if (lastStatusException.get() == null && lastStatus.get() == null) {
-                return new SystemStatusWrapper("{ \"clear\" : \"initializing\"}");
-            }
+        // special case at application startup : if the UI request comes before the first status update
+        if (lastStatusException.get() == null && lastStatus.get() == null) {
+            return new SystemStatusWrapper("{ \"clear\" : \"initializing\"}");
+        }
 
-            if (lastStatusException.get() != null) {
-                throw new StatusExceptionWrapperException (lastStatusException.get());
-            }
-            return lastStatus.get();
+        if (lastStatusException.get() != null) {
+            throw new StatusExceptionWrapperException (lastStatusException.get());
+        }
+        return lastStatus.get();
     }
 
     void setLastStatusForTest(SystemStatusWrapper lastStatusForTest) {
@@ -852,9 +852,13 @@ public class SystemService {
                     } else {
                         liveIps.add(ipAddress);
                     }
+
+                    // Ensure sudo is possible
+                    checkSudoPossible (deadIps, ipAddress);
+
                 } catch (SSHCommandException e) {
                     logger.debug(e, e);
-                    handleNodeDead(deadIps, ipAddress);
+                    handleSSHFails(deadIps, ipAddress);
                 }
             }
         }
@@ -865,9 +869,27 @@ public class SystemService {
         return nodesSetup;
     }
 
+    private void checkSudoPossible(Set<String> deadIps, String ipAddress) throws SSHCommandException {
+
+        String result = sshCommandService.runSSHScript(ipAddress, "sudo ls", false);
+        if (   result.contains("a terminal is required to read the password")
+            || result.contains("a password is required")) {
+            messagingService.addLines("\nNode " + ipAddress + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
+            notificationService.addError("Node " + ipAddress + " sudo problem");
+            deadIps.add(ipAddress);
+        }
+
+    }
+
     void handleNodeDead(Set<String> deadIps, String ipAddress) {
         messagingService.addLines("\nNode seems dead " + ipAddress);
         notificationService.addError("Node " + ipAddress + " is dead.");
+        deadIps.add(ipAddress);
+    }
+
+    void handleSSHFails(Set<String> deadIps, String ipAddress) {
+        messagingService.addLines("\nNode \" + ipAddress + \" couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
+        notificationService.addError("Node " + ipAddress + " not reachable.");
         deadIps.add(ipAddress);
     }
 

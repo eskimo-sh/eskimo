@@ -92,7 +92,7 @@ class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         # execute command
         try:
             # stdout = subprocess.PIPE lets you redirect the output
-            res = subprocess.Popen(command_line.strip().split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            res = subprocess.Popen(command_line.strip().split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             res.wait() # wait for process to finish; this also sets the returncode variable inside 'res'
             if res.returncode != 0:
@@ -105,8 +105,8 @@ class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_header('Content-type','text/plain')
             self.end_headers()
 
-            # access the output from stdout
-            result = res.stdout.read()
+            # access the output from stdout and stderr
+            result = "{0}\n{1}".format (res.stdout.read(), res.stderr.read())
             LOG.info ("result is \n : %s", result)
             #print ("after read: {}".format(result))
 
@@ -138,5 +138,5 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)
 
-print "serving at port", PORT
+print ("serving at port", PORT)
 httpd.serve_forever()

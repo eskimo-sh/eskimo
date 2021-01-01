@@ -142,7 +142,7 @@ public class MemoryComputer {
 
                 threadPool.execute(() -> {
                     try {
-                        String nodeMemory = sshCommandService.runSSHScript(ipAddress, "sudo cat /proc/meminfo | grep MemTotal", false);
+                        String nodeMemory = sshCommandService.runSSHScript(ipAddress, "cat /proc/meminfo | grep MemTotal", false);
                         nodeMemory = nodeMemory.trim();
                         if (!nodeMemory.startsWith("MemTotal")) {
                             throw new SSHCommandException("Impossible to understand the format of the meminof result. Missing 'MemTotal' in " + nodeMemory);

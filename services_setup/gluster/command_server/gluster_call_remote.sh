@@ -36,17 +36,17 @@
 
 if [[ $1 == "" ]]; then
     echo "Expected remote server as first argument"
-    exit -1;
+    exit 1
 fi
 
 if [[ $2 == "" ]]; then
     echo "Expected command as second argument"
-    exit -2;
+    exit 2
 fi
 
 if [[ $3 == "" ]]; then
     echo "Expected subcommand as third argument"
-    exit -3;
+    exit 3
 fi
 
 options=`echo ${@:4:$(($#-3))} | tr " " +`
@@ -60,5 +60,5 @@ if [[ $HTTP_CODE != "200" ]]; then
     echo "failed"
     cat /tmp/call_result.log
     cat /tmp/call_error.log
-    exit -1
+    exit 4
 fi

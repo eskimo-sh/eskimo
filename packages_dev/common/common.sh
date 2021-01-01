@@ -35,7 +35,7 @@
 #
 
 # Version of software to install
-export ESKIMO_VERSION=0.2
+export ESKIMO_VERSION=0.5
 export DEBIAN_VERSION=debian_10_buster
 
 export FLINK_VERSION=1.10.1

@@ -214,8 +214,9 @@ function install_docker_debian_based() {
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to apt package index"
-        cat /tmp/install_docker 1>&2
-        exit 64
+        # This error is accepted for now, we'll see if we can move further ...
+        #cat /tmp/install_docker 1>&2
+        #exit 64
     fi
 
     echo "  - Install the latest version of Docker CE and containerd"
@@ -328,11 +329,12 @@ echo "  - Linux distribution is $LINUX_DISTRIBUTION"
 if [[ -f "/etc/debian_version" ]]; then
 
     echo "  - updating apt package index"
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/setup_log 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to update apt package index"
-        cat /tmp/install_docker 1>&2
-        exit -1
+        # attempting to continue further
+        #cat /tmp/setup_log 1>&2
+        #exit -1
     fi
 
     echo "  - installing some required dependencies"

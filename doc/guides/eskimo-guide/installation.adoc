@@ -295,6 +295,15 @@ see <<ssh_key_authentication>>.
 
 *In addition, that user needs to have sudo access without requiring to enter a password!*
 
+The ability for the configured user is absolutely key.
+
+On most systems, this means:
+
+* Add the user configured with eskimo to the `sudoers` groups
+* Add a file in `/etc/sudoers.d/eskimo` containing `eskimo ALL=(ALL) NOPASSWD:ALL +
+(if `eskimo` is the configured user)
+`
+
 
 ===== Protecting eskimo nodes with a firewall
 
