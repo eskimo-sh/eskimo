@@ -84,6 +84,8 @@ class RequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         if command == "force-remove-peer":
             command_line = "/usr/local/sbin/__force-remove-peer.sh {0}".format(options)
+        elif command == "force-remove-brick":
+            command_line = "/usr/local/sbin/__force-remove-brick.sh {0} {1}".format(subcommand, options)
         else:
             command_line = "/usr/sbin/gluster {0} {1} {2}".format(command, subcommand, options)
 

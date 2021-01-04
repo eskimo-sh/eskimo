@@ -70,7 +70,11 @@ nodes = [
   { :hostname => 'integration-test1', :box => 'centos/7',  :ip => '192.168.10.51', :ram => 5500},
   { :hostname => 'integration-test2', :box => 'centos/7',  :ip => '192.168.10.52', :ram => 5500},
   { :hostname => 'integration-test3', :box => 'centos/7',  :ip => '192.168.10.53', :ram => 5500},
-  { :hostname => 'integration-test4', :box => 'centos/7',  :ip => '192.168.10.54', :ram => 5500}
+  { :hostname => 'integration-test4', :box => 'centos/7',  :ip => '192.168.10.54', :ram => 5500},
+  { :hostname => 'small-node1', :box => 'centos/7',  :ip => '192.168.10.71', :ram => 5000},
+  { :hostname => 'small-node2', :box => 'centos/7',  :ip => '192.168.10.72', :ram => 5000},
+  { :hostname => 'small-node3', :box => 'centos/7',  :ip => '192.168.10.73', :ram => 5000},
+  { :hostname => 'small-node4', :box => 'centos/7',  :ip => '192.168.10.74', :ram => 5000},
 ]
 
 # All Vagrant configuration is done here. The most common configuration
