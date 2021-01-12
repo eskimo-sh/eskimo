@@ -2,7 +2,7 @@
 This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 well to this individual file than to the Eskimo Project as a whole.
 
-Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Copyright 2019 - 2021 eskimo.sh / https://www.eskimo.sh - All rights reserved.
 Author : eskimo.sh / https://www.eskimo.sh
 
 Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -93,8 +93,12 @@ function errorHandler (jqXHR, status) {
 
     if (jqXHR && jqXHR.responseJSON  && jqXHR.responseJSON.message) {
         alert('fail : ' + jqXHR.responseJSON.message);
+
+    } else if (jqXHR && jqXHR.responseJSON  && jqXHR.responseJSON.error) {
+        alert('fail : ' + jqXHR.responseJSON.error);
+
     } else {
-        alert('fail : ' + status);
+        console.error('fail : ' + status);
     }
 }
 

@@ -4,7 +4,7 @@
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
 #
-# Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+# Copyright 2019 - 2021 eskimo.sh / https://www.eskimo.sh - All rights reserved.
 # Author : eskimo.sh / https://www.eskimo.sh
 #
 # Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -42,13 +42,13 @@ echo " - Loading Topology"
 export MASTER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $MASTER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 2
 fi
 
 export ZOOKEEPER_ID=`eval echo "\$"$(echo NODE_NBR_ZOOKEEPER_$SELF_IP_ADDRESS | tr -d .)`
 if [[ ZOOKEEPER_ID == "" ]]; then
     echo " - No Zookeeper ID found in topology for ip address $SELF_IP_ADDRESS"
-    exit -3
+    exit 3
 fi
 
 echo " - Generating myid"
@@ -61,6 +61,9 @@ sed -i s/"#server.1=zookeeper1:2888:3888"/"server.$ZOOKEEPER_ID=$MASTER_IP_ADDRE
 
 #sed -i s/"#server.2=zookeeper2:2888:3888"/"#server.2=192.168.10.11:2888:3888"/g /etc/zookeeper/conf/zoo.cfg
 #sed -i s/"#server.3=zookeeper3:2888:3888"/"#server.3=192.168.10.12:2888:3888"/g /etc/zookeeper/conf/zoo.cfg
+
+# EDIT : DOn't need this
+# echo "clientPortAddress=$SELF_IP_ADDRESS" >> /etc/zookeeper/conf/zoo.cfg
 
 
 

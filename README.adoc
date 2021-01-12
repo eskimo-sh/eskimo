@@ -349,7 +349,7 @@ Look at the following files for more information
 == Copyright and License
 
 
-Eskimo is Copyright 2019 eskimo.sh - All rights reserved. +
+Eskimo is Copyright 2019 - 2021 eskimo.sh - All rights reserved. +
 Author : http://www.eskimo.sh
 
 Eskimo is available under a dual licensing model : commercial and GNU AGPL. +

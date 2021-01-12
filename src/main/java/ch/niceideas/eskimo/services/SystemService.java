@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2021 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -888,7 +888,7 @@ public class SystemService {
     }
 
     void handleSSHFails(Set<String> deadIps, String ipAddress) {
-        messagingService.addLines("\nNode \" + ipAddress + \" couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
+        messagingService.addLines("\nNode " + ipAddress + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
         notificationService.addError("Node " + ipAddress + " not reachable.");
         deadIps.add(ipAddress);
     }
