@@ -62,7 +62,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private File tempPackagesDistribPath = null;
 
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
 
     private String mesosPackages = "mesos-debian,mesos-redhat,mesos-suse";
 
@@ -145,7 +145,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertNotNull(command);
 
         assertEquals(3, command.getBuildMesos().size());
-        assertEquals(17, command.getBuildPackage().size());
+        assertEquals(16, command.getBuildPackage().size());
 
         assertEquals(0, command.getDownloadMesos().size());
         assertEquals(0, command.getDownloadPackages().size());
@@ -163,7 +163,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         SetupException exception = assertThrows(SetupException.class, setupService::ensureSetupCompleted);
         assertEquals(
                 "Following services are missing and need to be downloaded or built base-eskimo, cerebro, elasticsearch, " +
-                        "flink, gdash, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
+                        "flink, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
                         "mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
                 exception.getMessage());
 
@@ -311,7 +311,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
 
-        assertEquals(17, buildPackage.size());
+        assertEquals(16, buildPackage.size());
         assertEquals(3, buildMesos.size());
 
         // 2. test download strategy
@@ -326,7 +326,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
 
-        assertEquals(17, downloadPackages.size());
+        assertEquals(16, downloadPackages.size());
         assertEquals(3, downloadMesos.size());
     }
 
@@ -570,7 +570,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.applySetup(setupConfigWrapper);
 
-        assertEquals(20, downloadPackageList.size());
+        assertEquals(19, downloadPackageList.size());
         assertEquals(0, builtPackageList.size());
 
         Collections.sort(downloadPackageList);
@@ -579,7 +579,6 @@ public class SetupServiceTest extends AbstractSystemTest {
                     "docker_template_cerebro_0.8.4_1.tar.gz, " +
                     "docker_template_elasticsearch_6.8.3_1.tar.gz, " +
                     "docker_template_flink_1.9.1_1.tar.gz, " +
-                    "docker_template_gdash_0.0.1_1.tar.gz, " +
                     "docker_template_gluster_debian_09_stretch_1.tar.gz, " +
                     "docker_template_grafana_6.3.3_1.tar.gz, " +
                     "docker_template_kafka-manager_2.0.0.2_1.tar.gz, " +
@@ -630,12 +629,12 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.applySetup(new JsonWrapper(setupConfig));
 
-        assertEquals(20, builtPackageList.size());
+        assertEquals(19, builtPackageList.size());
         assertEquals(0, downloadPackageList.size());
 
         Collections.sort(builtPackageList);
         assertEquals(
-                    "base-eskimo, cerebro, elasticsearch, flink, gdash, gluster, grafana, kafka, kafka-manager, kibana, " +
+                    "base-eskimo, cerebro, elasticsearch, flink, gluster, grafana, kafka, kafka-manager, kibana, " +
                     "logstash, mesos-debian, mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
                 String.join(", ", builtPackageList));
 

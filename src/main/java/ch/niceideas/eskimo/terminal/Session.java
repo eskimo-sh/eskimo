@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.terminal;
 
 import com.trilead.ssh2.Connection;
+import lombok.Getter;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,13 +61,16 @@ public final class Session extends Thread {
 
     private final ProcessWithPty childProcess;
 
+    @Getter
     private final Terminal terminal;
 
+    @Getter
     private final long time = System.currentTimeMillis();
 
     /**
      * When was this session accessed the last time?
      */
+    @Getter
     private long lastAccess;
 
     private final Reader in;
@@ -93,24 +97,6 @@ public final class Session extends Thread {
 
         setName("Terminal pump thread for "+ childProcessWithTty);
         start(); // start pumping
-    }
-
-    public Terminal getTerminal() {
-        return terminal;
-    }
-
-    /**
-     * When was this session accessed by the client the last time?
-     */
-    public long getLastAccess() {
-        return lastAccess;
-    }
-
-    /**
-     * When was this session allocated?
-     */
-    public long getTime() {
-        return time;
     }
 
     @Override

@@ -118,30 +118,6 @@ public class MarathonServicesConfigCheckerTest {
     }
 
     @Test
-    public void testGdashButNoGluster() throws Exception {
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("elasticsearch1", "on");
-                put("ntp1", "on");
-                put("prometheus1", "on");
-                put("logstash1", "on");
-        }});
-        configurationService.saveNodesConfig(nodesConfig);
-
-        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
-
-            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
-                put("gdash_installed", "on");
-            }});
-
-            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
-        });
-
-        assertEquals("Inconsistency found : Service gdash expects 1 gluster instance(s). But only 0 has been found !", exception.getMessage());
-    }
-
-    @Test
     public void testZeppelinButNoZookeeper() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{

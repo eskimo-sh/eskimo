@@ -34,17 +34,16 @@
 
 package ch.niceideas.eskimo.model;
 
+import lombok.Getter;
+
 public enum MemoryConsumptionSize {
 
     MESOS(0), NEGLECTABLE(0), SMALL(1), MEDIUM(2), LARGE(3), VERYLARGE (5);
 
+    @Getter
     private final int nbrParts;
 
     MemoryConsumptionSize (int nbrParts) {
         this.nbrParts = nbrParts;
-    }
-
-    public int getNbrParts() {
-        return nbrParts;
     }
 }

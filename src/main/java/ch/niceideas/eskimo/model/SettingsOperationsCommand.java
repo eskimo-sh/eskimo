@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.SetupException;
+import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Data
 public class SettingsOperationsCommand implements Serializable {
 
     private Map<String, Map<String, List<ChangedSettings>>> changedSettings = null;
@@ -70,30 +72,6 @@ public class SettingsOperationsCommand implements Serializable {
         retCommand.setNewSettings(newSettings);
 
         return retCommand;
-    }
-
-    public ServicesSettingsWrapper getNewSettings() {
-        return newSettings;
-    }
-
-    void setNewSettings(ServicesSettingsWrapper newSettings) {
-        this.newSettings = newSettings;
-    }
-
-    public Map<String, Map<String, List<ChangedSettings>>> getChangedSettings() {
-        return changedSettings;
-    }
-
-    public void setChangedSettings(Map<String, Map<String, List<ChangedSettings>>> changedSettings) {
-        this.changedSettings = changedSettings;
-    }
-
-    public List<String> getRestartedServices() {
-        return restartedServices;
-    }
-
-    void setRestartedServices(List<String> restartedServices) {
-        this.restartedServices = restartedServices;
     }
 
     public JSONObject toJSON() {
@@ -132,6 +110,7 @@ public class SettingsOperationsCommand implements Serializable {
         return new JSONObject(retAsMap);
     }
 
+    @Data
     public static class ChangedSettings implements Serializable {
 
         private final String service;
@@ -146,26 +125,6 @@ public class SettingsOperationsCommand implements Serializable {
             this.key = key;
             this.value = value;
             this.oldValue = oldValue;
-        }
-
-        public String getService() {
-            return service;
-        }
-
-        public String getConfigFile() {
-            return configFile;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public String getOldValue() {
-            return oldValue;
         }
 
         public JSONObject toJSON() {

@@ -11,7 +11,6 @@
     "downloadPackages": [
       "zookeeper_debian_09_stretch_1",
       "elasticsearch_6.8.3_1",
-      "gdash_0.0.1_1",
       "flink_1.9.1_2",
       "cerebro_0.8.4_1",
       "mesos-master_1.8.1_1",

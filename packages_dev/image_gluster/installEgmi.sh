@@ -34,37 +34,16 @@
 # Software.
 #
 
-set -e
-
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "-- SETTING UP GDASH ------------------------------------------------------------"
+echo "-- INSTALLING EGMI -----------------------------------------------------------"
 
-#echo " - Getting container IP "
-#CONTAINER_IP_ADDRESS=`hostname -i`
+if [ -z "$EGMI_VERSION" ]; then
+    echo "Need to set EGMI_VERSION environment variable before calling this script !"
+    exit 1
+fi
 
-sudo mkdir -p /var/run/gdash
-sudo chown -R 777 /var/run/gdash
-sudo mkdir -p /var/log/gdash
-sudo chown -R 777 /var/log/gdash
-
-echo " - Creating in startup script"
-
-sudo cat > /usr/local/bin/launch-gdash.sh <<- "EOF"
-#!/usr/bin/env bash
-
-set -e
-
-/usr/local/bin/gdash --port 28180 --host MASTER_IP_ADDRESS
-
-EOF
-
-sudo chmod 755 /usr/local/bin/launch-gdash.sh
-
-
-
-# Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+# Test if EGFMI distributable are available in colocated folder and take it if any

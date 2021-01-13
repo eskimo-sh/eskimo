@@ -174,7 +174,7 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
 
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
 
-        Set<String> restartedServices = new HashSet (Arrays.asList(servicesToRestart));
+        Set<String> restartedServices = new HashSet<>(Arrays.asList(servicesToRestart));
 
         feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedServices);
 

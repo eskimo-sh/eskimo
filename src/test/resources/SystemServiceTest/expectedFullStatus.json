@@ -13,7 +13,6 @@
   "node_address_192-168-10-11": "192.168.10.11",
   "service_gluster_192-168-10-13": "OK",
   "service_mesos-agent_192-168-10-13": "NA",
-  "service_gdash_192-168-10-11": "OK",
   "service_mesos-master_192-168-10-13": "NA",
   "service_zeppelin_192-168-10-11": "OK",
   "service_gluster_192-168-10-11": "OK",

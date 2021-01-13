@@ -123,30 +123,6 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testGdashButNoGluster() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("marathon", "1");
-                put("elasticsearch1", "on");
-                put("ntp1", "on");
-                put("prometheus1", "on");
-                put("logstash1", "on");
-            }});
-
-            JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("gdash_installed", "on");
-            }});
-
-            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service gdash expects 1 gluster instance(s). But only 0 has been found !"));
-    }
-
-    @Test
     public void testZeppelinButNoZookeeper() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {

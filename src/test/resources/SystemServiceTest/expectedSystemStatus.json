@@ -14,7 +14,6 @@
     "service_gluster_192-168-10-13": "OK",
     "service_mesos-agent_192-168-10-13": "NA",
     "service_mesos-master_192-168-10-13": "NA",
-    "service_gdash_192-168-10-11": "KO",
     "service_gluster_192-168-10-11": "OK",
     "service_logstash_192-168-10-11": "NA",
     "service_logstash_192-168-10-13": "NA",

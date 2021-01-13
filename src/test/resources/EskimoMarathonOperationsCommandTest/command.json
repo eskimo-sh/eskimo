@@ -1,7 +1,7 @@
 {
   "command": {
     "uninstallations": ["kafka-manager"],
-    "installations": ["cerebro", "gdash", "kibana", "zeppelin"]
+    "installations": ["cerebro", "kibana", "zeppelin"]
   },
   "status": "OK"
 }

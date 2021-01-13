@@ -110,11 +110,11 @@ public abstract class AbstractSystemTest {
         servicesDefinition = new ServicesDefinition() {
             @Override
             public String getAllServicesString() {
-                return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster gdash spark-history-server";
+                return "kafka zookeeper ntp mesos-master spark-executor kibana cerebro zeppelin kafka-manager gluster spark-history-server";
             }
             @Override
             public String[] listAllServices() {
-                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-executor", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "gdash", "spark-history-server", "elasticsearch"};
+                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-executor", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "spark-history-server", "elasticsearch"};
             }
         };
         servicesDefinition.afterPropertiesSet();
@@ -155,7 +155,7 @@ public abstract class AbstractSystemTest {
         sshCommandService = new SSHCommandService() {
             @Override
             public String runSSHScript(String hostAddress, String script, boolean throwsException) {
-                if (script.equals("sudo cat /proc/meminfo | grep MemTotal")) {
+                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
                     switch (hostAddress) {
                         case "192.168.10.11":
                             return "MemTotal:        5969796 kB";

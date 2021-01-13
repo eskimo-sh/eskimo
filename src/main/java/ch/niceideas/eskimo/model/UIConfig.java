@@ -34,12 +34,14 @@
 
 package ch.niceideas.eskimo.model;
 
+import lombok.Data;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Data
 public class UIConfig {
 
     private final Service service;
@@ -57,46 +59,6 @@ public class UIConfig {
         this.service = service;
     }
 
-    public String getStatusPageLinkTitle() {
-        return statusPageLinkTitle;
-    }
-
-    public void setStatusPageLinkTitle(String statusPageLinkTitle) {
-        this.statusPageLinkTitle = statusPageLinkTitle;
-    }
-
-    public boolean isApplyStandardProxyReplacements() {
-        return applyStandardProxyReplacements;
-    }
-
-    public void setApplyStandardProxyReplacements(boolean applyStandardProxyReplacements) {
-        this.applyStandardProxyReplacements = applyStandardProxyReplacements;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public int getWaitTime() {
-        return waitTime;
-    }
-
-    public void setWaitTime(int waitTime) {
-        this.waitTime = waitTime;
-    }
-
-    public String getUrlTemplate() {
-        return urlTemplate;
-    }
-
-    public void setUrlTemplate(String urlTemplate) {
-        this.urlTemplate = urlTemplate;
-    }
-
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
@@ -111,18 +73,8 @@ public class UIConfig {
         return service.getName();
     }
 
-    public Integer getProxyTargetPort() {
-        return proxyTargetPort;
-    }
-    public void setProxyTargetPort(Integer proxyTargetPort) {
-        this.proxyTargetPort = proxyTargetPort;
-    }
-
     public void addProxyReplacement(ProxyReplacement pr) {
         proxyReplacements.add (pr);
     }
 
-    public List<ProxyReplacement> getProxyReplacements() {
-        return proxyReplacements;
-    }
 }

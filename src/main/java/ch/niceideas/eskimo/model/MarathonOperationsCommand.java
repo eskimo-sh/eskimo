@@ -38,6 +38,8 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemService;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,6 +50,7 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
 
+    @Getter @Setter
     private String warnings = null;
 
     // Note : marathon dependent services not supported for now
@@ -122,14 +125,6 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
 
     public MarathonServicesConfigWrapper getRawConfig() {
         return rawMarathonServicesConfig;
-    }
-
-    public String getWarnings() {
-        return warnings;
-    }
-
-    public void setWarnings(String warnings) {
-        this.warnings = warnings;
     }
 
     public JSONObject toJSON () {

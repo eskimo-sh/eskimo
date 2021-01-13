@@ -82,12 +82,12 @@ sudo ln -s /usr/local/lib/kibana-$ES_VERSION /usr/local/lib/kibana
 #echo " - Installing nodejs and npm (required to build plugins)"
 #
 #echo " - Configuring nodejs repo"
-#curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -  > /tmp/gdash_install_log 2>&1
-#fail_if_error $? "/tmp/gdash_install_log" -2
+#curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -  > /tmp/kb_install_log 2>&1
+#fail_if_error $? "/tmp/kb_install_log" -2
 #
 #echo " - Installing nodejs"
-#apt-get -y install nodejs  > /tmp/gdash_install_log 2>&1
-#fail_if_error $? "/tmp/gdash_install_log" -2
+#apt-get -y install nodejs  > /tmp/kb_install_log 2>&1
+#fail_if_error $? "/tmp/kb_install_log" -2
 #
 #echo " - Downloading sankey plugin"
 #sudo rm -Rf /tmp/installsankey

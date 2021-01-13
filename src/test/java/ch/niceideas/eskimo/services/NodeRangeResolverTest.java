@@ -75,7 +75,6 @@ public class NodeRangeResolverTest {
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kibana", "1");
-                put("gdash", "1");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -112,7 +111,6 @@ public class NodeRangeResolverTest {
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kibana", "1");
-                put("gdash", "1");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -149,7 +147,6 @@ public class NodeRangeResolverTest {
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kibana", "1");
-                put("gdash", "1");
                 put("logstash1", "on");
                 put("logstash2", "on");
                 put("mesos-agent1", "on");
@@ -211,7 +208,6 @@ public class NodeRangeResolverTest {
             put("gluster1", "on");
             put("gluster2", "on");
             put("kibana", "1");
-            put("gdash", "1");
             put("logstash1", "on");
             put("logstash2", "on");
             put("mesos-agent1", "on");
@@ -238,7 +234,6 @@ public class NodeRangeResolverTest {
             put("elasticsearch2", "on");
             put("elasticsearch3", "on");
             put("elasticsearch4", "on");
-            put("gdash", "1");
             put("gluster1", "on");
             put("gluster2", "on");
             put("gluster3", "on");

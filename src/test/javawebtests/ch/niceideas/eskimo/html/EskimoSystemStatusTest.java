@@ -64,7 +64,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoSystemStatus.js");
 
-        js("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"gdash\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-history-server\",\"spark-executor\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
+        js("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-history-server\",\"spark-executor\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
 
         js("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
 

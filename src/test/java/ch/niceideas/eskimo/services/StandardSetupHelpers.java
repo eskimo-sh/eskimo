@@ -57,7 +57,6 @@ public class StandardSetupHelpers {
             put("ntp1", "on");
             put("spark-executor1", "on");
             put("node_id2", "192.168.10.13");
-            //put("gdash", "2");
             put("mesos-master", "2");
             put("marathon", "1");
             //put("spark-history-server", "2");
@@ -78,7 +77,6 @@ public class StandardSetupHelpers {
             put("cerebro_installed_on_IP_MARATHON_NODE", "OK");
             put("elasticsearch_installed_on_IP_192-168-10-11", "OK");
             put("elasticsearch_installed_on_IP_192-168-10-13", "OK");
-            put("gdash_installed_on_IP_MARATHON_NODE", "OK");
             put("gluster_installed_on_IP_192-168-10-11", "OK");
             put("gluster_installed_on_IP_192-168-10-13", "OK");
             put("kafka-manager_installed_on_IP_MARATHON_NODE", "OK");
@@ -112,7 +110,6 @@ public class StandardSetupHelpers {
             put("service_cerebro_192-168-10-11", "OK");
             put("service_elasticsearch_192-168-10-11", "OK");
             put("service_elasticsearch_192-168-10-13", "OK");
-            put("service_gdash_192-168-10-13", "OK");
             put("service_gluster_192-168-10-11", "OK");
             put("service_gluster_192-168-10-13", "OK");
             put("service_marathon_192-168-10-11", "OK");
@@ -140,7 +137,6 @@ public class StandardSetupHelpers {
             put("cerebro_install", "on");
             put("kibana_install", "on");
             put("spark-history-server_install", "on");
-            put("gdash_install", "on");
             put("kafka-manager_install", "on");
             put("zeppelin_install", "on");
         }});

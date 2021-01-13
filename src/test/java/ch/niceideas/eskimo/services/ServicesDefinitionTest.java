@@ -63,7 +63,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     @Test
     public void testAfterPropertiesSet() throws Exception {
-        assertEquals (20, def.listAllServices().length);
+        assertEquals (19, def.listAllServices().length);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesOrderedByDependencies();
 
-        assertEquals(20, orderedServices.length);
+        assertEquals(19, orderedServices.length);
 
         assertTrue (orderedServices[0].equals("zookeeper")
                 || orderedServices[0].equals("ntp")
@@ -216,7 +216,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesInOrder();
 
-        assertEquals(20, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(19, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "ntp",
@@ -224,7 +224,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "prometheus",
                 "grafana",
                 "gluster",
-                "gdash",
                 "mesos-master",
                 "mesos-agent",
                 "marathon",
@@ -261,11 +260,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     public void testListMarathonServices() throws Exception {
         String[] marathonServices = def.listMarathonServices();
 
-        assertEquals(7, marathonServices.length);
+        assertEquals(6, marathonServices.length);
 
         assertArrayEquals(new String[] {
                 "cerebro",
-                "gdash",
                 "grafana",
                 "kafka-manager",
                 "kibana",
@@ -279,11 +277,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUIServices();
 
-        assertEquals(10, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(9, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "grafana",
-                "gdash",
                 "mesos-master",
                 "marathon",
                 "kafka-manager",

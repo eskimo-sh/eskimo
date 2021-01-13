@@ -609,7 +609,6 @@ setup_eskimo() {
         "save-marathon-services-config" \
         '{
     "cerebro_install":"on",
-    "gdash_install":"on",
     "grafana_install":"on",
     "kafka-manager_install":"on",
     "kibana_install":"on",
@@ -634,7 +633,6 @@ check_all_services_up() {
             "service_mesos-agent_172-17-0-1" \
             "service_prometheus_172-17-0-1" \
             "service_flink-worker_172-17-0-1" \
-            "service_gdash_172-17-0-1" \
             "service_kibana_172-17-0-1" \
             "service_zookeeper_172-17-0-1" \
             "service_spark-executor_172-17-0-1" \
@@ -670,7 +668,6 @@ check_all_services_up() {
             "service_flink-worker_192-168-10-52" \
             "service_flink-worker_192-168-10-53" \
             "service_flink-worker_192-168-10-54" \
-            "service_gdash_" \
             "service_kibana_" \
             "service_zookeeper_192-168-10-51" \
             "service_spark-executor_192-168-10-51" \
@@ -1120,11 +1117,12 @@ test_web_apps() {
         exit 105
     fi
 
-    echo_date "   + testing gdash"
-    if [[ $(query_eskimo "gdash/" | grep "a simple dashboard for GlusterFS") == "" ]]; then
-        echo_date "Couldn't reach Gdash"
-        exit 106
-    fi
+    echo_date "   + testing EGMI"
+    echo_date "     - TODO"
+    #if [[ $(query_eskimo "gluster/" | grep "a simple dashboard for GlusterFS") == "" ]]; then
+    #    echo_date "Couldn't reach EGMI"
+    #    exit 106
+    #fi
 
     echo_date "   + testing kafka-manager"
     if [[ $(query_eskimo "kafka-manager/" | grep "clusters/Eskimo") == "" ]]; then

@@ -228,7 +228,6 @@ public abstract class AbstractWebTest {
                 "return (serviceName == 'mesos-master' " +
                 "    || serviceName == 'zookeeper' " +
                 "    || serviceName == 'grafana' " +
-                "    || serviceName == 'gdash' " +
                 "    || serviceName == 'kafka-manager' " +
                 "    || serviceName == 'spark-history-server' " +
                 "    || serviceName == 'flink-app-master' " +

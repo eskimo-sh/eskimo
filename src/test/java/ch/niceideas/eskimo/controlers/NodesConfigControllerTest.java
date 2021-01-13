@@ -171,7 +171,6 @@ public class NodesConfigControllerTest {
                 "      {\"marathon\": \"192.168.10.11\"},\n" +
                 "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
                 "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
-                "      {\"gdash\": \"(marathon)\"},\n" +
                 "      {\"spark-history-server\": \"(marathon)\"},\n" +
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
                 "    ],\n" +
@@ -298,7 +297,6 @@ public class NodesConfigControllerTest {
                         "      {\"spark-executor\": \"192.168.10.13\"},\n" +
                         "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
                         "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
-                        "      {\"gdash\": \"(marathon)\"},\n" +
                         "      {\"cerebro\": \"(marathon)\"},\n" +
                         "      {\"kibana\": \"(marathon)\"},\n" +
                         "      {\"kafka-manager\": \"(marathon)\"},\n" +

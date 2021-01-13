@@ -329,7 +329,6 @@ For the sake of information, the list of static ports used by the different serv
 
 * [cerebro] : 9000, 31900
 * [elasticsearch] : 9200, 9300
-* [gdash] : 28180, 31180
 * [gluster] : 24007, 24008, 24009, 24010, 49152, 38465, 38466, 38467
 * [grafana] : 3000, 31300
 * [kafka] : 9092, 9093, 9999

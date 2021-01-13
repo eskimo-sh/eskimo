@@ -130,7 +130,7 @@ elif [[ $package == "all_images" ]]; then
     echo "BUILDING ALL PACKAGES"
     set -e
 
-    all_services='base-eskimo ntp zookeeper gluster gdash mesos-master prometheus grafana elasticsearch logstash cerebro marathon kibana kafka flink kafka-manager spark zeppelin'
+    all_services='base-eskimo ntp zookeeper gluster mesos-master prometheus grafana elasticsearch logstash cerebro marathon kibana kafka flink kafka-manager spark zeppelin'
 
     IFS=$' '
     for service in $all_services; do

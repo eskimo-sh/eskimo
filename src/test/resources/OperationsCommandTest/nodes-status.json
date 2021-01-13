@@ -2,7 +2,6 @@
   "cerebro_installed_on_IP_192-168-10-11": "OK",
   "elasticsearch_installed_on_IP_192-168-10-13": "OK",
   "elasticsearch_installed_on_IP_192-168-10-14": "OK",
-  "gdash_installed_on_IP_192-168-10-11": "OK",
   "gluster_installed_on_IP_192-168-10-11": "OK",
   "gluster_installed_on_IP_192-168-10-13": "OK",
   "gluster_installed_on_IP_192-168-10-14": "OK",

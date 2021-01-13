@@ -613,7 +613,7 @@ The "topology definition file" can be fond on nodes in `/etc/eskimo_topology.sh`
 Many services managed by eskimo have web consoles used to administer them, such as mesos-agents, mesos-master,
 kafka-manager, etc.
 Some are even only web consoles used to administer other services or perform Data Science tasks, such as Kibana,
-Zeppelin or GDash, etc.
+Zeppelin or EGMI, etc.
 
 Eskimo supports two modes for providing these web consoles in its own UI as presented in configuration above:
 

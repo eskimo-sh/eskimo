@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import lombok.Getter;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -42,7 +43,10 @@ import java.util.List;
 
 public abstract class JSONOpCommand<T extends Serializable> implements Serializable {
 
+    @Getter
     private final ArrayList<T> installations = new ArrayList<>();
+
+    @Getter
     private final ArrayList<T> uninstallations = new ArrayList<>();
 
     void addInstallation(T service) {
@@ -51,14 +55,6 @@ public abstract class JSONOpCommand<T extends Serializable> implements Serializa
 
     void addUninstallation(T service) {
         uninstallations.add(service);
-    }
-
-    public List<T> getInstallations() {
-        return installations;
-    }
-
-    public List<T> getUninstallations() {
-        return uninstallations;
     }
 
     public abstract JSONObject toJSON ();

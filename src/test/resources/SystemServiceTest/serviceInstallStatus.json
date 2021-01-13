@@ -7,7 +7,6 @@
   "flink-worker_installed_on_IP_192-168-10-15": "OK",
   "cerebro_installed_on_IP_192-168-10-15": "OK",
   "ntp_installed_on_IP_192-168-10-13": "OK",
-  "gdash_installed_on_IP_192-168-10-13": "OK",
   "kafka_installed_on_IP_192-168-10-13": "OK",
   "kafka_installed_on_IP_192-168-10-15": "OK",
   "zookeeper_installed_on_IP_192-168-10-15": "OK",

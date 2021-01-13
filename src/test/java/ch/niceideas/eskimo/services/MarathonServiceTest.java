@@ -179,7 +179,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         serviceInstallStatus.removeInstallationFlag("cerebro", "MARATHON_NODE");
-        serviceInstallStatus.removeInstallationFlag("gdash", "MARATHON_NODE");
         serviceInstallStatus.removeInstallationFlag("kafka-manager", "MARATHON_NODE");
         serviceInstallStatus.removeInstallationFlag("kibana", "MARATHON_NODE");
         serviceInstallStatus.removeInstallationFlag("spark-history-server", "MARATHON_NODE");
@@ -233,9 +232,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         marathonService.applyMarathonServicesConfig(command);
 
-        assertEquals(6, installList.size());
+        assertEquals(5, installList.size());
         assertEquals("cerebro-192.168.10.11," +
-                "gdash-192.168.10.11," +
                 "kafka-manager-192.168.10.11," +
                 "kibana-192.168.10.11," +
                 "spark-history-server-192.168.10.11," +
@@ -513,11 +511,10 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
 
-        assertEquals(7, statusMap.size());
+        assertEquals(6, statusMap.size());
         assertEquals("OK", statusMap.get("service_cerebro_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_kibana_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_spark-history-server_192-168-10-13"));
-        assertEquals("OK", statusMap.get("service_gdash_192-168-10-13"));
         assertEquals("TD", statusMap.get("service_grafana_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_zeppelin_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_kafka-manager_192-168-10-13"));
@@ -529,7 +526,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
         MarathonService marathonService = resetupMarathonService(new MarathonService() {
             @Override
             protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws MarathonException  {
-                if (service.equals("cerebro") || service.equals("gdash")) {
+                if (service.equals("cerebro")) {
                     return new Pair<>("192.168.10.13", "notOK");
                 } else {
                     return new Pair<>("192.168.10.13", "running");
@@ -555,11 +552,10 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
 
-        assertEquals(7, statusMap.size());
+        assertEquals(6, statusMap.size());
         assertEquals("KO", statusMap.get("service_cerebro_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_kibana_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_spark-history-server_192-168-10-13"));
-        assertEquals("KO", statusMap.get("service_gdash_192-168-10-13"));
         assertEquals("TD", statusMap.get("service_grafana_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_zeppelin_192-168-10-13"));
         assertEquals("OK", statusMap.get("service_kafka-manager_192-168-10-13"));
@@ -595,12 +591,11 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         // grafana is away !
         //assertEquals(7, statusMap.size());
-        assertEquals(6, statusMap.size());
+        assertEquals(5, statusMap.size());
 
         assertEquals("KO", statusMap.get("service_cerebro_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_spark-history-server_192-168-10-11"));
-        assertEquals("KO", statusMap.get("service_gdash_192-168-10-11"));
         // This one is not referenced anymore in this case
         //assertEquals("KO", statusMap.get("service_grafana_192-168-10-13"));
         assertEquals("KO", statusMap.get("service_zeppelin_192-168-10-11"));
@@ -654,12 +649,11 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         // grafana is away !
         //assertEquals(7, statusMap.size());
-        assertEquals(6, statusMap.size());
+        assertEquals(5, statusMap.size());
 
         assertEquals("KO", statusMap.get("service_cerebro_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_spark-history-server_192-168-10-11"));
-        assertEquals("KO", statusMap.get("service_gdash_192-168-10-11"));
         // This one is not referenced anymore in this case
         //assertEquals("KO", statusMap.get("service_grafana_192-168-10-13"));
         assertEquals("KO", statusMap.get("service_zeppelin_192-168-10-11"));
@@ -674,7 +668,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "cerebro"));
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "kibana"));
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "spark-history-server"));
-        assertTrue (marathonService.shouldInstall(marathonServicesConfig, "gdash"));
         assertFalse (marathonService.shouldInstall(marathonServicesConfig, "grafana"));
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "zeppelin"));
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "kafka-manager"));

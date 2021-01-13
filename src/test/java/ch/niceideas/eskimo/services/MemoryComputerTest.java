@@ -192,7 +192,6 @@ public class MemoryComputerTest {
         assertNull(memmModel1.get("kafka-manager"));
         assertNull(memmModel1.get("zeppelin"));
         assertNull(memmModel1.get("kibana"));
-        assertNull(memmModel1.get("gdash"));
         assertEquals(Long.valueOf(3960), memmModel1.get("elasticsearch"));
         assertEquals(Long.valueOf(1320), memmModel1.get("logstash"));
         assertEquals(Long.valueOf(2640), memmModel1.get("kafka"));

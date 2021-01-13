@@ -174,8 +174,7 @@
       "imageName" : "gluster",
       "order": 4,
       "mandatory": true,
-      "group" : "Gluster",
-      "name" : "FS",
+      "name" : "Gluster FS",
       "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/gluster-logo.png",
@@ -210,47 +209,10 @@
 
 
 
-  "gdash" : {
-    "config": {
-      "imageName" : "gdash",
-      "order": 5,
-      "marathon": true,
-      "unique": true,
-      "group" : "Gluster",
-      "name" : "Dashboard",
-      "memory": "mesos",
-      "logo" : "images/gdash-logo.png",
-      "icon" : "images/gdash-icon.png"
-    },
-    "ui": {
-      "proxyTargetPort" : 31180,
-      "waitTime": 5000,
-      "title" : "Gluster Dashboard",
-
-      "proxyReplacements" : [
-        {
-          "type" : "PLAIN",
-          "source" : "apiUrl%22%3A%22/data",
-          "target" : "apiUrl%22%3A%22/{PREFIX_PATH}/data"
-        }
-      ]
-    },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": true
-      }
-    ]
-  },
-
-
-
   "mesos-master": {
     "config": {
       "imageName" : "mesos-master",
-      "order": 6,
+      "order": 5,
       "unique": true,
       "group" : "Mesos",
       "name" : "Master",
@@ -339,7 +301,7 @@
 
   "mesos-agent": {
     "config": {
-      "order": 7,
+      "order": 6,
       "group" : "Mesos",
       "name" : "Agent",
       "selectionLayout" : { "row" : 3, "col" : 1},
@@ -435,7 +397,7 @@
   "marathon" : {
     "config": {
       "imageName" : "marathon",
-      "order": 8,
+      "order": 7,
       "unique": true,
       "group": "Mesos",
       "name": "Marathon",
@@ -515,7 +477,7 @@
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 9,
+      "order": 8,
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -605,7 +567,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 10,
+      "order": 9,
       "marathon": true,
       "unique": true,
       "group" : "Kafka",
@@ -649,7 +611,7 @@
   "spark-history-server" : {
     "config": {
       "imageName" : "spark",
-      "order": 11,
+      "order": 10,
       "marathon": true,
       "unique": true,
       "group" : "Spark",
@@ -700,7 +662,7 @@
   "spark-executor" : {
     "config": {
       "imageName" : "spark",
-      "order": 12,
+      "order": 11,
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 3, "col" : 3},
@@ -793,7 +755,7 @@
   "flink-app-master" : {
     "config": {
       "imageName" : "flink",
-      "order": 13,
+      "order": 12,
       "unique": true,
       "group": "Flink",
       "name": "App Master",
@@ -890,7 +852,7 @@
   "flink-worker" : {
     "config": {
       "imageName" : "flink",
-      "order": 14,
+      "order": 13,
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "row": 4, "col": 3  },
@@ -925,7 +887,7 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 15,
+      "order": 14,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 2, "col" : 3},
@@ -962,7 +924,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 16,
+      "order": 15,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -993,7 +955,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 17,
+      "order": 16,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 1, "col" : 3},
@@ -1090,7 +1052,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 18,
+      "order": 17,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1152,7 +1114,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 19,
+      "order": 18,
       "marathon": true,
       "unique": true,
       "name" : "Zeppelin",

@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
+import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
 public class SetupCommand implements Serializable {
 
     private final JsonWrapper rawSetup;
@@ -98,30 +100,5 @@ public class SetupCommand implements Serializable {
             put("packageUpdates", new JSONArray(packageUpdates));
             put("none", buildMesos.size() + downloadMesos.size() + buildPackage.size() + downloadPackages.size() + packageUpdates.size() <= 0);
         }});
-    }
-
-    public JsonWrapper getRawSetup() {
-        return rawSetup;
-    }
-
-    public Set<String> getDownloadPackages() {
-        return downloadPackages;
-    }
-
-    public Set<String> getBuildPackage() {
-        return buildPackage;
-    }
-
-    public Set<String> getDownloadMesos() {
-        return downloadMesos;
-    }
-
-    public Set<String> getBuildMesos() {
-        return buildMesos;
-    }
-
-    // TODO find out what I wanted to use this
-    public Set<String> getPackageUpdates() {
-        return packageUpdates;
     }
 }

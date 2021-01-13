@@ -83,7 +83,7 @@ public class SettingsInjectorTest {
         grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
         settingsInjectorScriptFile = new File ("services_setup/common/settingsInjector.sh");
-        System.out.println(System.getProperty("user.dir"));
+        //System.out.println(System.getProperty("user.dir"));
         assertTrue (settingsInjectorScriptFile.exists());
 
         settingsFile = ResourceUtils.getFile("classpath:settingsInjector/testConfig.json");
@@ -123,7 +123,7 @@ public class SettingsInjectorTest {
                     settingsFile.getCanonicalPath() +
                     " ; " +
                     "exit $?"}, true);
-        //logger.info(result);
+        logger.info(result);
 
         // ensure properties were found
         assertTrue(result.contains("= Found property spark.locality.wait : 40s"));

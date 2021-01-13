@@ -54,7 +54,6 @@ public class MarathonServicesConfigControllerTest {
 
         assertTrue (new JSONObject("{\n" +
                 "    \"kibana_install\": \"on\",\n" +
-                "    \"gdash_install\": \"on\",\n" +
                 "    \"cerebro_install\": \"on\",\n" +
                 "    \"spark-history-server_install\": \"on\",\n" +
                 "    \"zeppelin_install\": \"on\",\n" +
@@ -257,7 +256,6 @@ public class MarathonServicesConfigControllerTest {
         assertEquals ("{\n" +
                         "  \"command\": {\n" +
                         "    \"uninstallations\": [\n" +
-                        "      \"gdash\",\n" +
                         "      \"kafka-manager\",\n" +
                         "      \"kibana\",\n" +
                         "      \"spark-history-server\"\n" +

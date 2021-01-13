@@ -2,10 +2,6 @@
   "settings": [
     {
       "settings": [],
-      "name": "gdash"
-    },
-    {
-      "settings": [],
       "name": "mesos-master"
     },
     {

@@ -35,16 +35,28 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 public class Dependency {
 
+    @Getter @Setter
     private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
+
+    @Getter @Setter
     private String masterService = null;
+
+    @Getter @Setter
     private int numberOfMasters = 0;
+
+    @Getter @Setter
     private boolean mandatory = true; // default is true
+
     private String conditional = null;
 
     public boolean isMandatory(ConfigurationOwner wrapper) {
@@ -57,41 +69,9 @@ public class Dependency {
         return false;
     }
 
-    public String getConditional() {
-        return conditional;
-    }
-
     public void setConditional(String conditional) {
         this.mandatory = false;
         this.conditional = conditional;
-    }
-
-    public void setMandatory(boolean mandatory) {
-        this.mandatory = mandatory;
-    }
-
-    public MasterElectionStrategy getMes() {
-        return mes;
-    }
-
-    public void setMes(MasterElectionStrategy mes) {
-        this.mes = mes;
-    }
-
-    public String getMasterService() {
-        return masterService;
-    }
-
-    public void setMasterService(String masterService) {
-        this.masterService = masterService;
-    }
-
-    public int getNumberOfMasters() {
-        return numberOfMasters;
-    }
-
-    public void setNumberOfMasters(int numberOfMasters) {
-        this.numberOfMasters = numberOfMasters;
     }
 
     public JSONObject toJSON () {

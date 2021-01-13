@@ -338,6 +338,27 @@ public class MarathonService {
                 notificationService.addError(message);
                 messagingService.addLines(message);
                 messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
+
+                // special case : if some marathon services are getting uninstalled, and marathon is nowhere installed or anything, let's force flag them as uninstalled
+                try {
+                    SystemStatusWrapper lastStatus = systemService.getStatus();
+                    String marathonNodeName = lastStatus.getFirstNodeName(MARATHON);
+                    if (StringUtils.isBlank(marathonNodeName)) {
+
+                        if (command.getUninstallations().size() > 0) {
+                            messagingService.addLines("Uninstalled marathon services will be flagged as uninstalled even though no operation can be performed in marathon.");
+                            configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
+                                for (String uninstalledMarathonService : command.getUninstallations()) {
+                                    servicesInstallationStatus.removeInstallationFlag(uninstalledMarathonService, ServicesInstallStatusWrapper.MARATHON_NODE);
+                                }
+                            });
+                        }
+                    }
+
+                } catch (SystemService.StatusExceptionWrapperException e1) {
+                    logger.debug (e1, e1);
+                }
+
                 throw new SystemException(message);
             }
 

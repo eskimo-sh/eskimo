@@ -59,7 +59,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoMarathonServicesConfig.js");
 
         /*
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"gdash\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
         js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -78,7 +78,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         js("eskimoMarathonServicesConfig.setMarathonServicesForTest([\n" +
                 "    \"cerebro\",\n" +
-                "    \"gdash\",\n" +
                 "    \"grafana\",\n" +
                 "    \"kafka-manager\",\n" +
                 "    \"kibana\",\n" +
@@ -104,7 +103,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         JSONObject expectedConfig = new JSONObject("" +
                 "{\"cerebro_install\":\"on\"," +
-                "\"gdash_install\":\"on\"," +
                 "\"grafana_install\":\"on\"," +
                 "\"kafka-manager_install\":\"on\"," +
                 "\"kibana_install\":\"on\"," +
@@ -123,7 +121,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("eskimoMarathonServicesConfig.selectAll()");
 
         assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#gdash_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
@@ -131,7 +128,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("eskimoMarathonServicesConfig.selectAll()");
 
         assertEquals (true, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#gdash_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
@@ -139,7 +135,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("eskimoMarathonServicesConfig.selectAll()");
 
         assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#gdash_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
@@ -153,7 +148,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                 "    \"zeppelin_install\": \"on\",\n" +
                 "    \"kafka-manager_install\": \"on\",\n" +
                 "    \"kibana_install\": \"on\",\n" +
-                "    \"gdash_install\": \"on\",\n" +
                 "    \"spark-history-server_install\": \"on\",\n" +
                 "    \"grafana_install\": \"on\"\n" +
                 "})");
@@ -216,7 +210,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
 
         assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#gdash_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
@@ -227,7 +220,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                         "    \"zeppelin_install\": \"on\",\n" +
                         "    \"kafka-manager_install\": \"on\",\n" +
                         "    \"kibana_install\": \"on\",\n" +
-                        "    \"gdash_install\": \"on\",\n" +
                         "    \"spark-history-server_install\": \"on\",\n" +
                         "    \"grafana_install\": \"on\"\n" +
                         "} ); }");
@@ -235,7 +227,6 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
 
         assertEquals (true, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#gdash_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());

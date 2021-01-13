@@ -155,13 +155,9 @@ for services deployed on the cluster by marathon.
 periodically that fixes gluster mounts that might have been disconnected following a network cut or another network
 problem
 
-=== GDASH
+=== EGMI
 
-image::pngs/gluster-logo.png[50, 50, align="center"]
-
-GDASH is the Gluster DASHboard used to monitor gluster shares.
-
-https://github.com/aravindavk/gdash
+TODO Document EGMI
 
 === Elastic Logstash
 

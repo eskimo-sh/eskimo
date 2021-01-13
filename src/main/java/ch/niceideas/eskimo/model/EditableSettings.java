@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.services.EditablePropertyType;
+import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -44,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
 public class EditableSettings {
 
     private final Service service;
@@ -60,30 +62,6 @@ public class EditableSettings {
         this.filename = filename;
         this.propertyType = propertyType;
         this.propertyFormat = propertyFormat;
-    }
-
-    public String getFilesystemService() {
-        return filesystemService;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public String getPropertyFormat() {
-        return propertyFormat;
-    }
-
-    public String getCommentPrefix() {
-        return commentPrefix;
-    }
-
-    public void setCommentPrefix(String commentPrefix) {
-        this.commentPrefix = commentPrefix;
-    }
-
-    public EditablePropertyType getPropertyType() {
-        return propertyType;
     }
 
     public List<EditableProperty> getProperties() {

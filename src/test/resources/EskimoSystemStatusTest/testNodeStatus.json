@@ -8,7 +8,6 @@
     "service_cerebro_192-168-10-11": "OK",
     "service_elasticsearch_192-168-10-11": "OK",
     "service_elasticsearch_192-168-10-13": "OK",
-    "service_gdash_192-168-10-11": "OK",
     "service_gluster_192-168-10-11": "OK",
     "service_gluster_192-168-10-13": "OK",
     "service_kafka-manager_192-168-10-11": "OK",

@@ -3,6 +3,5 @@
   "zeppelin_install": "on",
   "spark-history-server_install": "on",
   "cerebro_install": "on",
-  "gdash_install": "on",
   "kafka-manager_install": "on"
 }

@@ -104,7 +104,7 @@ public class SetupService {
     private String packagesDevPath = "./packages_dev";
 
     @Value("${setup.packagesToBuild}")
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,gdash,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,flink,zeppelin,marathon";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,flink,zeppelin,marathon";
 
     @Value("${setup.mesosPackages}")
     private String mesosPackages = "mesos-debian,mesos-redhat";

@@ -1,9 +1,4 @@
 {
-  "gdash": {
-    "name": "Dashboard",
-    "commands": [],
-    "group": "Gluster"
-  },
   "marathon": {
     "name": "Marathon",
     "commands": [

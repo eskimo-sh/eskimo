@@ -73,24 +73,23 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     public void testInstallation() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("gdash_installed_on_IP_MARATHON_NODE");
         savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_MARATHON_NODE");
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
         SystemService ss = new SystemService() {
             @Override
-            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+            public SystemStatusWrapper getStatus() {
                 return StandardSetupHelpers.getStandard2NodesSystemStatus();
             }
         };
 
         MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
 
-        assertEquals(2, moc.getInstallations().size());
+        assertEquals(1, moc.getInstallations().size());
         assertEquals(0, moc.getUninstallations().size());
 
-        assertEquals ("[gdash, kafka-manager]", Arrays.toString(moc.getInstallations().toArray()));
+        assertEquals ("[kafka-manager]", Arrays.toString(moc.getInstallations().toArray()));
     }
 
     @Test
@@ -99,7 +98,6 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        marathonConfig.getJSONObject().remove("gdash_install");
         marathonConfig.getJSONObject().remove("kafka-manager_install");
 
         SystemService ss = new SystemService() {
@@ -113,8 +111,8 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
 
         assertEquals(0, moc.getInstallations().size());
-        assertEquals(2, moc.getUninstallations().size());
+        assertEquals(1, moc.getUninstallations().size());
 
-        assertEquals ("[gdash, kafka-manager]", Arrays.toString(moc.getUninstallations().toArray()));
+        assertEquals ("[kafka-manager]", Arrays.toString(moc.getUninstallations().toArray()));
     }
 }

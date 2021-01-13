@@ -178,23 +178,23 @@ public class WebSocketProxyTest {
 
             // A dummy target application that just returns a text message with a "pong" prefix
             registry.addHandler(new AbstractWebSocketHandler() {
-                            @Override
-                            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-                                serverSessionReference.set (session);
+                        @Override
+                        public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+                            serverSessionReference.set (session);
+                        }
+                        @Override
+                        protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+                            String msg = message.getPayload();
+                            if (!msg.equals("CONNECT")) {
+                                // store it
+                                serverBlockingQueue.offer(msg);
+                                // and send it back
+                                session.sendMessage(new TextMessage("PONG : " + message.getPayload()));
                             }
-                            @Override
-                            protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-                                String msg = message.getPayload();
-                                if (!msg.equals("CONNECT")) {
-                                    // store it
-                                    serverBlockingQueue.offer(msg);
-                                    // and send it back
-                                    session.sendMessage(new TextMessage("PONG : " + message.getPayload()));
-                                }
-                            }
-                        },
-                        "/application")
-                    .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy));
+                        }
+                    },
+                    "/application")
+                .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy));
 
             // The Eskimo websocket proxy infrastructure
             registry.addHandler(new WebSocketProxyServer(new ProxyManagerService() {

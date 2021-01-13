@@ -64,6 +64,15 @@ echo " - Installing gluster"
 docker exec -i gluster_template apt-get install -y glusterfs-server glusterfs-client >> /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -3
 
+echo " - Installing EGMI"
+docker exec -i gluster_template bash /scripts/installEgmi.sh | tee -a /tmp/gluster_build_log 2>&1
+if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/gluster_build_log
+    exit 102
+fi
+
+
 echo " - Cleaning image gluster"
 docker exec -i gluster_template apt-get remove -y gcc git >> /tmp/gluster_build_log 2>&1
 docker exec -i gluster_template apt-get -y auto-remove >> /tmp/gluster_build_log 2>&1

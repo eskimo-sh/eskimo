@@ -113,6 +113,12 @@ Software.
             <version>0.3.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Web with Tomcat + Embed -->
         <dependency>

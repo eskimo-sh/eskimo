@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -43,6 +44,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Data
 public class Service {
 
     private String name;
@@ -53,11 +55,10 @@ public class Service {
 
     // configuration
     private String imageName;
-
     private int configOrder = -1;
+
     private boolean unique = false;
     private boolean marathon = false;
-
     private boolean mandatory = false;
 
     private ConditionalInstallation conditional = null;
@@ -75,14 +76,9 @@ public class Service {
     private final List<String> additionalmemoryServices = new ArrayList<>();
 
     private String logo;
-
     private String icon;
 
     private final List<Command> commands = new ArrayList<>();
-
-    public List<Command> getCommands() {
-        return commands;
-    }
 
     public void addCommand (Command command) {
         commands.add (command);
@@ -95,39 +91,6 @@ public class Service {
                 .orElse(null);
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
-    public String getImageName() {
-        return imageName;
-    }
-
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-
-    public List<String> getAdditionalmemoryServices() {
-        return additionalmemoryServices;
-    }
-
-    public MemoryConsumptionSize getMemoryConsumptionSize() {
-        return memoryConsumptionSize;
-    }
-
-
     public int getMemoryConsumptionParts (ServicesDefinition servicesDefinition) {
         AtomicInteger parts = new AtomicInteger (getMemoryConsumptionSize().getNbrParts());
         getAdditionalmemoryServices().stream()
@@ -136,113 +99,14 @@ public class Service {
         return parts.get();
     }
 
-    public void setMemoryConsumptionSize(MemoryConsumptionSize memoryConsumptionSize) {
-        this.memoryConsumptionSize = memoryConsumptionSize;
-    }
 
-    public int getSelectionLayoutCol() {
-        return selectionLayoutCol;
-    }
-
-    public void setSelectionLayoutCol(int selectionLayoutCol) {
-        this.selectionLayoutCol = selectionLayoutCol;
-    }
-
-    public int getSelectionLayoutRow() {
-        return selectionLayoutRow;
-    }
-
-    public void setSelectionLayoutRow(int selectionLayoutRow) {
-        this.selectionLayoutRow = selectionLayoutRow;
-    }
-
-    public String getStatusGroup() {
-        return statusGroup;
-    }
-
-    public void setStatusGroup(String statusGroup) {
-        this.statusGroup = statusGroup;
-    }
-
-    public String getStatusName() {
-        return statusName;
-    }
-
-    public void setStatusName(String statusName) {
-        this.statusName = statusName;
-    }
-
-
-    public ConditionalInstallation getConditional() {
-        return conditional;
-    }
-
-    public void setConditional(ConditionalInstallation conditional) {
-        this.conditional = conditional;
-    }
-
-    public boolean isMandatory() {
-        return mandatory;
-    }
-
-    public void setMandatory(boolean mandatory) {
-        this.mandatory = mandatory;
-    }
-
-    public UIConfig getUiConfig() {
-        return uiConfig;
-    }
-
-    public void setUiConfig(UIConfig uiConfig) {
-        this.uiConfig = uiConfig;
-    }
-
-    public boolean isUnique() {
-        return unique;
-    }
-
-    public void setUnique(boolean unique) {
-        this.unique = unique;
-    }
-
-    public boolean isMarathon() {
-        return marathon;
-    }
     public boolean isNotMarathon() {
         return !marathon;
-    }
-
-    public void setMarathon(boolean marathon) {
-        this.marathon = marathon;
-    }
-
-    public int getConfigOrder() {
-        return configOrder;
-    }
-
-    public void setConfigOrder(int configOrder) {
-        this.configOrder = configOrder;
-    }
-
-    public List<Dependency> getDependencies() {
-        return dependencies;
     }
 
     public boolean dependsOn (String service) {
         return dependencies.stream()
                 .anyMatch(o -> o.getMasterService().equals(service));
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<String> getAdditionalEnvironment() {
-        return additionalEnvironment;
     }
 
     public void addAdditionalEnvironment(String additionalEnvironment) {

@@ -15,10 +15,6 @@
     "software" : "1.9.1",
     "distribution": "1"
   },
-  "gdash": {
-    "software" : "0.0.1",
-    "distribution": "1"
-  },
   "gluster": {
     "software" : "debian_09_stretch",
     "distribution": "1"

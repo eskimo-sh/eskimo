@@ -1,7 +1,9 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.StringUtils;
+import lombok.Data;
 
+@Data
 public class ProxyReplacement {
 
     public enum ProxyReplacementType {
@@ -12,38 +14,6 @@ public class ProxyReplacement {
     private String source;
     private String target;
     private String urlPattern;
-
-    public ProxyReplacementType getType() {
-        return type;
-    }
-
-    public void setType(ProxyReplacementType type) {
-        this.type = type;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public String getUrlPattern() {
-        return urlPattern;
-    }
-
-    public void setUrlPattern(String urlPattern) {
-        this.urlPattern = urlPattern;
-    }
 
     public String performReplacement(String input, String contextPath, String prefixPath, String requestURI) {
 
