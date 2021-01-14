@@ -214,7 +214,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
                     return "debian";
                 }
-                if (script.equals("sudo cat /proc/meminfo | grep MemTotal")) {
+                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
                     return "MemTotal:        9982656 kB";
                 }
 

@@ -1,7 +1,7 @@
 echo OK
 echo OK
-sudo cat /proc/meminfo | grep MemTotal
-sudo cat /proc/meminfo | grep MemTotal
+cat /proc/meminfo | grep MemTotal
+cat /proc/meminfo | grep MemTotal
 cat /etc/eskimo_flag_base_system_installed
 cat /etc/eskimo_flag_base_system_installed
 sudo mv eskimo_topology-{UUID}-192.168.10.15.sh /etc/eskimo_topology.sh 

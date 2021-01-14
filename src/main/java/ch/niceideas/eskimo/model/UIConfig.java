@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.util.List;
 @Data
 public class UIConfig {
 
+    @EqualsAndHashCode.Exclude
     private final Service service;
 
     private String urlTemplate;

@@ -117,75 +117,75 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         ServicesSettingsWrapper newConfig = configurationService.loadServicesSettings();
 
         // test elasticsearch config
-        assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("settings.9.settings.0.properties.0.name"));
-        assertEquals ("false", newConfig.getValueForPath("settings.9.settings.0.properties.0.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.9.settings.0.properties.0.value"));
+        assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("settings.8.settings.0.properties.0.name"));
+        assertEquals ("false", newConfig.getValueForPath("settings.8.settings.0.properties.0.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.8.settings.0.properties.0.value"));
 
-        assertEquals ("action.destructive_requires_name", newConfig.getValueForPath("settings.9.settings.0.properties.1.name"));
-        assertEquals ("true", newConfig.getValueForPath("settings.9.settings.0.properties.1.defaultValue"));
-        assertEquals ("false", newConfig.getValueForPath("settings.9.settings.0.properties.1.value"));
+        assertEquals ("action.destructive_requires_name", newConfig.getValueForPath("settings.8.settings.0.properties.1.name"));
+        assertEquals ("true", newConfig.getValueForPath("settings.8.settings.0.properties.1.defaultValue"));
+        assertEquals ("false", newConfig.getValueForPath("settings.8.settings.0.properties.1.value"));
 
         // test kafka config
-        assertEquals ("num.network.threads", newConfig.getValueForPath("settings.12.settings.0.properties.0.name"));
-        assertEquals ("3", newConfig.getValueForPath("settings.12.settings.0.properties.0.defaultValue"));
-        assertEquals ("5", newConfig.getValueForPath("settings.12.settings.0.properties.0.value"));
+        assertEquals ("num.network.threads", newConfig.getValueForPath("settings.11.settings.0.properties.0.name"));
+        assertEquals ("3", newConfig.getValueForPath("settings.11.settings.0.properties.0.defaultValue"));
+        assertEquals ("5", newConfig.getValueForPath("settings.11.settings.0.properties.0.value"));
 
-        assertEquals ("num.io.threads", newConfig.getValueForPath("settings.12.settings.0.properties.1.name"));
-        assertEquals ("8", newConfig.getValueForPath("settings.12.settings.0.properties.1.defaultValue"));
-        assertEquals ("10", newConfig.getValueForPath("settings.12.settings.0.properties.1.value"));
+        assertEquals ("num.io.threads", newConfig.getValueForPath("settings.11.settings.0.properties.1.name"));
+        assertEquals ("8", newConfig.getValueForPath("settings.11.settings.0.properties.1.defaultValue"));
+        assertEquals ("10", newConfig.getValueForPath("settings.11.settings.0.properties.1.value"));
 
-        assertEquals ("socket.send.buffer.bytes", newConfig.getValueForPath("settings.12.settings.0.properties.2.name"));
-        assertEquals ("102400", newConfig.getValueForPath("settings.12.settings.0.properties.2.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.2.value"));
+        assertEquals ("socket.send.buffer.bytes", newConfig.getValueForPath("settings.11.settings.0.properties.2.name"));
+        assertEquals ("102400", newConfig.getValueForPath("settings.11.settings.0.properties.2.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.2.value"));
 
-        assertEquals ("socket.receive.buffer.bytes", newConfig.getValueForPath("settings.12.settings.0.properties.3.name"));
-        assertEquals ("102400", newConfig.getValueForPath("settings.12.settings.0.properties.3.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.3.value"));
+        assertEquals ("socket.receive.buffer.bytes", newConfig.getValueForPath("settings.11.settings.0.properties.3.name"));
+        assertEquals ("102400", newConfig.getValueForPath("settings.11.settings.0.properties.3.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.3.value"));
 
-        assertEquals ("socket.request.max.bytes", newConfig.getValueForPath("settings.12.settings.0.properties.4.name"));
-        assertEquals ("104857600", newConfig.getValueForPath("settings.12.settings.0.properties.4.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.4.value"));
+        assertEquals ("socket.request.max.bytes", newConfig.getValueForPath("settings.11.settings.0.properties.4.name"));
+        assertEquals ("104857600", newConfig.getValueForPath("settings.11.settings.0.properties.4.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.4.value"));
 
-        assertEquals ("num.partitions", newConfig.getValueForPath("settings.12.settings.0.properties.5.name"));
-        assertEquals ("1", newConfig.getValueForPath("settings.12.settings.0.properties.5.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.5.value"));
+        assertEquals ("num.partitions", newConfig.getValueForPath("settings.11.settings.0.properties.5.name"));
+        assertEquals ("1", newConfig.getValueForPath("settings.11.settings.0.properties.5.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.5.value"));
 
-        assertEquals ("log.retention.hours", newConfig.getValueForPath("settings.12.settings.0.properties.6.name"));
-        assertEquals ("168", newConfig.getValueForPath("settings.12.settings.0.properties.6.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.6.value"));
+        assertEquals ("log.retention.hours", newConfig.getValueForPath("settings.11.settings.0.properties.6.name"));
+        assertEquals ("168", newConfig.getValueForPath("settings.11.settings.0.properties.6.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.6.value"));
 
         // test spark config
-        assertEquals ("spark.driver.memory", newConfig.getValueForPath("settings.13.settings.0.properties.0.name"));
-        assertEquals ("800m", newConfig.getValueForPath("settings.13.settings.0.properties.0.defaultValue"));
-        assertEquals ("500m", newConfig.getValueForPath("settings.13.settings.0.properties.0.value"));
+        assertEquals ("spark.driver.memory", newConfig.getValueForPath("settings.12.settings.0.properties.0.name"));
+        assertEquals ("800m", newConfig.getValueForPath("settings.12.settings.0.properties.0.defaultValue"));
+        assertEquals ("500m", newConfig.getValueForPath("settings.12.settings.0.properties.0.value"));
 
-        assertEquals ("spark.rpc.numRetries", newConfig.getValueForPath("settings.13.settings.0.properties.1.name"));
-        assertEquals ("5", newConfig.getValueForPath("settings.13.settings.0.properties.1.defaultValue"));
-        assertEquals ("10", newConfig.getValueForPath("settings.13.settings.0.properties.1.value"));
+        assertEquals ("spark.rpc.numRetries", newConfig.getValueForPath("settings.12.settings.0.properties.1.name"));
+        assertEquals ("5", newConfig.getValueForPath("settings.12.settings.0.properties.1.defaultValue"));
+        assertEquals ("10", newConfig.getValueForPath("settings.12.settings.0.properties.1.value"));
 
-        assertEquals ("spark.rpc.retry.wait", newConfig.getValueForPath("settings.13.settings.0.properties.2.name"));
-        assertEquals ("5s", newConfig.getValueForPath("settings.13.settings.0.properties.2.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.13.settings.0.properties.2.value"));
+        assertEquals ("spark.rpc.retry.wait", newConfig.getValueForPath("settings.12.settings.0.properties.2.name"));
+        assertEquals ("5s", newConfig.getValueForPath("settings.12.settings.0.properties.2.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.2.value"));
 
-        assertEquals ("spark.scheduler.mode", newConfig.getValueForPath("settings.13.settings.0.properties.3.name"));
-        assertEquals ("FAIR", newConfig.getValueForPath("settings.13.settings.0.properties.3.defaultValue"));
-        assertEquals ("FIFO", newConfig.getValueForPath("settings.13.settings.0.properties.3.value"));
+        assertEquals ("spark.scheduler.mode", newConfig.getValueForPath("settings.12.settings.0.properties.3.name"));
+        assertEquals ("FAIR", newConfig.getValueForPath("settings.12.settings.0.properties.3.defaultValue"));
+        assertEquals ("FIFO", newConfig.getValueForPath("settings.12.settings.0.properties.3.value"));
 
-        assertEquals ("spark.locality.wait", newConfig.getValueForPath("settings.13.settings.0.properties.4.name"));
-        assertEquals ("20s", newConfig.getValueForPath("settings.13.settings.0.properties.4.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.13.settings.0.properties.4.value"));
+        assertEquals ("spark.locality.wait", newConfig.getValueForPath("settings.12.settings.0.properties.4.name"));
+        assertEquals ("20s", newConfig.getValueForPath("settings.12.settings.0.properties.4.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.4.value"));
 
-        assertEquals ("spark.dynamicAllocation.executorIdleTimeout", newConfig.getValueForPath("settings.13.settings.0.properties.5.name"));
-        assertEquals ("200s", newConfig.getValueForPath("settings.13.settings.0.properties.5.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.13.settings.0.properties.5.value"));
+        assertEquals ("spark.dynamicAllocation.executorIdleTimeout", newConfig.getValueForPath("settings.12.settings.0.properties.5.name"));
+        assertEquals ("200s", newConfig.getValueForPath("settings.12.settings.0.properties.5.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.5.value"));
 
-        assertEquals ("spark.dynamicAllocation.cachedExecutorIdleTimeout", newConfig.getValueForPath("settings.13.settings.0.properties.6.name"));
-        assertEquals ("300s", newConfig.getValueForPath("settings.13.settings.0.properties.6.defaultValue"));
-        assertEquals ("400s", newConfig.getValueForPath("settings.13.settings.0.properties.6.value"));
+        assertEquals ("spark.dynamicAllocation.cachedExecutorIdleTimeout", newConfig.getValueForPath("settings.12.settings.0.properties.6.name"));
+        assertEquals ("300s", newConfig.getValueForPath("settings.12.settings.0.properties.6.defaultValue"));
+        assertEquals ("400s", newConfig.getValueForPath("settings.12.settings.0.properties.6.value"));
 
-        assertEquals ("spark.executor.memory", newConfig.getValueForPath("settings.13.settings.0.properties.7.name"));
-        assertEquals ("[ESKIMO_DEFAULT]", newConfig.getValueForPath("settings.13.settings.0.properties.7.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.13.settings.0.properties.7.value"));
+        assertEquals ("spark.executor.memory", newConfig.getValueForPath("settings.12.settings.0.properties.7.name"));
+        assertEquals ("[ESKIMO_DEFAULT]", newConfig.getValueForPath("settings.12.settings.0.properties.7.defaultValue"));
+        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.7.value"));
 
     }
 
