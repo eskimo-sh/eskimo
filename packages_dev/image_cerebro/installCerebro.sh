@@ -65,7 +65,7 @@ echo " - Downloading cerebro-$CEREBRO_VERSION"
 wget https://github.com/lmenezes/cerebro/releases/download/v$CEREBRO_VERSION/cerebro-$CEREBRO_VERSION.tgz > /tmp/cerebro_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad cerebro-$CEREBRO_VERSION from https://github.com/lmenezes/cerebro. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cerebro-$CEREBRO_VERSION.tgz >> /tmp/cerebro_install_log 2>&1
+    wget http://niceideas.ch/mes/cerebro-$CEREBRO_VERSION.tgz > /tmp/cerebro_install_log 2>&1
     fail_if_error $? "/tmp/cerebro_install_log" -1
 fi
 

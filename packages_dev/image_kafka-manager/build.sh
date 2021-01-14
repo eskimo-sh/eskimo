@@ -50,15 +50,15 @@ echo " - Building image kafka"
 build_image kafka-manager_template /tmp/kafkamanager_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i kafka-manager_template apt-get install -y openjdk-11-jdk >> /tmp/kafkamanager_build_log 2>&1
+docker exec -i kafka-manager_template apt-get install -y openjdk-11-jdk > /tmp/kafkamanager_build_log 2>&1
 fail_if_error $? "/tmp/kafkamanager_build_log" -3
 
 echo " - Installing scala"
-docker exec -i kafka-manager_template apt-get install -y scala >> /tmp/kafkamanager_build_log 2>&1
+docker exec -i kafka-manager_template apt-get install -y scala > /tmp/kafkamanager_build_log 2>&1
 fail_if_error $? "/tmp/kafkamanager_build_log" -4
 
 echo " - Installing kafka manager"
-docker exec -i kafka-manager_template bash /scripts/installKafkaManagerFromSources.sh | tee -a /tmp/kafkamanager_build_log 2>&1
+docker exec -i kafka-manager_template bash /scripts/installKafkaManagerFromSources.sh | tee /tmp/kafkamanager_build_log 2>&1
 if [[ `tail -n 1 /tmp/kafkamanager_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/kafkamanager_build_log

@@ -61,7 +61,7 @@ mkdir -p /tmp/kafka_manager_setup
 cd /tmp/kafka_manager_source_setup
 
 echo " - Downloading kafka-manager-$KAFKA_MANAGER_VERSION"
-wget https://github.com/yahoo/CMAK/archive/$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+wget https://github.com/yahoo/CMAK/archive/$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad kafka-manager-$KAFKA_MANAGER_VERSION from github. Trying to download from niceideas.ch"
     wget http://niceideas.ch/mes/CMAK-$KAFKA_MANAGER_VERSION.zip  >> /tmp/kafka_manager_install_log 2>&1
@@ -71,17 +71,17 @@ fi
 mv $KAFKA_MANAGER_VERSION.zip CMAK-$KAFKA_MANAGER_VERSION.zip
 
 echo " - Extracting CMAK-$KAFKA_MANAGER_VERSION"
-unzip CMAK-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+unzip CMAK-$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 cd ./CMAK-$KAFKA_MANAGER_VERSION/
 
 echo " - !! HACK : PATCHING build.sbt for zookeeper 3.4.x"
-patch < /scripts/patch-for-zookeeper-3.4.diff >> /tmp/kafka_manager_install_log 2>&1
+patch < /scripts/patch-for-zookeeper-3.4.diff > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -1
 
 echo " - Building source tree (./sbt clean dist) (this can take a few minutes)"
-./sbt clean dist   >> /tmp/kafka_manager_install_log 2>&1
+./sbt clean dist > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -1
 
 
@@ -91,7 +91,7 @@ cd /tmp/kafka_manager_setup
 
 
 echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
-unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip >> /tmp/kafka_manager_install_log 2>&1
+unzip kafka-manager-$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
 echo " - Installing kafka_managser"
@@ -130,7 +130,7 @@ export ZK_HOSTS=localhost:2181
     -Dapplication.home=/usr/local/lib/kafka-manager-$KAFKA_MANAGER_VERSION/ \
     -Dpidfile.path=/tmp/kafka-manager.pid \
     -Dhttp.port=22080 \
-    >> /tmp/kafka_manager_install_log 2>&1 &
+    > /tmp/kafka_manager_install_log 2>&1 &
 export KAFKA_MANAGER_PROC_ID=$!
 
 echo " - Checking Kafka Manager startup"
@@ -150,10 +150,10 @@ rm -Rf /tmp/kafka-manager.pid
 echo " - Cleaning build folder"
 cd $saved_dir
 
-rm -Rf /tmp/kafka_manager_setup >> /tmp/kafka_manager_install_log 2>&1
+rm -Rf /tmp/kafka_manager_setup > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -10
 
-rm -Rf /tmp/kafka_manager_source_setup >> /tmp/kafka_manager_install_log 2>&1
+rm -Rf /tmp/kafka_manager_source_setup > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -10
 
 echo " - Cleaning coursier cache"

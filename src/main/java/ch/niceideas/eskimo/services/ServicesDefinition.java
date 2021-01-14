@@ -327,8 +327,9 @@ public class ServicesDefinition implements InitializingBean {
                         String propName = prop.getString("name");
                         String comment = prop.getString("comment");
                         String defaultValue = prop.getString("defaultValue");
+                        String value = prop.has("value") ? prop.getString("value") : null;
 
-                        EditableProperty property = new EditableProperty(propName, comment, defaultValue);
+                        EditableProperty property = new EditableProperty(propName, comment, defaultValue, value);
 
                         editableSettings.addProperty(property);
                     }

@@ -73,7 +73,7 @@ wget https://www-eu.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERS
 
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad flink-$FLINK_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz >> /tmp/flink_install_log 2>&1
+    wget http://niceideas.ch/mes/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
     fail_if_error $? "/tmp/flink_install_log" -1
 fi
 
@@ -82,16 +82,16 @@ tar -xvf flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_
 fail_if_error $? "/tmp/flink_install_log" -2
 
 echo " - Downloading optional components"
-wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-avro/$FLINK_VERSION/flink-avro-$FLINK_VERSION.jar >> /tmp/flink_install_log 2>&1
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-avro/$FLINK_VERSION/flink-avro-$FLINK_VERSION.jar > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -21
 
-wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-csv/$FLINK_VERSION/flink-csv-$FLINK_VERSION.jar >> /tmp/flink_install_log 2>&1
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-csv/$FLINK_VERSION/flink-csv-$FLINK_VERSION.jar > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -22
 
-wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-json/$FLINK_VERSION/flink-json-$FLINK_VERSION.jar >> /tmp/flink_install_log 2>&1
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-json/$FLINK_VERSION/flink-json-$FLINK_VERSION.jar > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -23
 
-wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/$FLINK_HADOOP_VERSION/flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar >> /tmp/flink_install_log 2>&1
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/$FLINK_HADOOP_VERSION/flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -24
 
 echo " - Installing optional components"
@@ -135,7 +135,7 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
 </project>" > pom.xml
 
 echo " - Proceeding with download of connectors and dependencies"
-mvn dependency:copy-dependencies >> /tmp/flink_install_log 2>&1
+mvn dependency:copy-dependencies > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -25
 
 echo " - Copying connectors with dependencies to flink distribution folder"

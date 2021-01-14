@@ -172,16 +172,9 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
     fi
 
     if [[ $failedSys != 0 && $failedTrans != 0 ]]; then
-        echo " - Mount failed. Need to Prepare gluster mount $MOUNT_POINT (no further logs if success)"
-        /usr/local/sbin/__gluster-prepare-mount.sh $VOLUME $OWNER_ID >> /tmp/gluster_mount_$1_log 2>&1
-        if [[ $? != 0 ]]; then
-            echo "Failed to prepare gluster mount $MOUNT_POINT with __gluster-prepare-mount.sh"
-            echo "Reporting here output of __gluster-prepare-mount.sh:"
-            cat /tmp/gluster_mount_$1_log
-            exit -5
-        else
-            echo "  + Prepare mount success."
-        fi
+        echo "Problem encountered with gluster infrastructure on local node."
+        cat /tmp/gluster_mount_$1_log
+        exit 10
     fi
 fi
 

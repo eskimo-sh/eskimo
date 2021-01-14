@@ -180,16 +180,46 @@
       "logo" : "images/gluster-logo.png",
       "icon" : "images/gluster-icon.png"
     },
+    "ui": {
+      "urlTemplate": "./gluster/{NODE_ADDRESS}/egmi/app.html",
+      "proxyTargetPort": 28901,
+      "waitTime": 10000,
+      "title": "Gluster Dashboard",
+      "statusPageLinktitle": "Monitor Gluster volumes"
+    },
     "dependencies": [
       {
         "masterElectionStrategy": "RANDOM_NODE_AFTER_OR_SAME",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true
       }
     ],
     "additionalEnvironment": [
       "ALL_NODES_LIST_gluster"
+    ],
+    "editableSettings": [
+      {
+        "filename": "egmi.properties",
+        "filesystemService": "egmi",
+        "propertyType": "variable",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
+        "properties": [
+          {
+            "name": "target.volumes",
+            "comment": "The volumes to be automagically managed by EGMI.",
+            "defaultValue": "",
+            "value": "spark_eventlog,spark_data,flink_data,flink_completed_jobs,logstash_data,marathon_registry"
+          }
+        ]
+      }
     ],
     "commands" : [
       {

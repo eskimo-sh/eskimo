@@ -50,29 +50,29 @@ echo " - Building image flink"
 build_image flink_template /tmp/flink_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i flink_template apt-get install -y openjdk-11-jdk >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get install -y openjdk-11-jdk > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -3
 
 echo " - Installing scala"
-docker exec -i flink_template apt-get install -y scala >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get install -y scala > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -4
 
 echo " - Installing python"
-docker exec -i flink_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get -y install  python-dev python-six python-virtualenv python-pip > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 #echo " - Installing python elasticsearch and kafka clients and other utilities"
-#docker exec -i flink pip install elasticsearch kafka-python >> /tmp/flink_build_log 2>&1
+#docker exec -i flink pip install elasticsearch kafka-python > /tmp/flink_build_log 2>&1
 #fail_if_error $? "/tmp/flink_build_log" -6
 
 echo " - Switching python default version to 3.x"
-docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python2.7 1 >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python2.7 1 > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
-docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.7 2 >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.7 2 > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing other python packages"
-docker exec -i flink_template pip install requests filelock >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template pip install requests filelock > /tmp/flink_build_log 2>&1
 
 echo " - Installing flink"
 docker exec -i flink_template bash /scripts/installFlink.sh | tee -a /tmp/flink_build_log 2>&1
@@ -88,8 +88,8 @@ fi
 
 
 echo " - Cleaning up image"
-docker exec -i flink_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/flink_build_log 2>&1
-docker exec -i flink_template apt-get -y auto-remove >> /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get remove -y git gcc adwaita-icon-theme > /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get -y auto-remove > /tmp/flink_build_log 2>&1
 
 echo " - Closing and saving image flink"
 close_and_save_image flink_template /tmp/flink_build_log $FLINK_VERSION

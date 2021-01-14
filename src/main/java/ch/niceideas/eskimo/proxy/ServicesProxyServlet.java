@@ -156,7 +156,8 @@ public class ServicesProxyServlet extends ProxyServlet {
 
             // Need to remove host from pathInfo
             if (!service.isUnique()) {
-                pathInfo = pathInfo.substring(pathInfo.indexOf('/'));
+                int slashIndex = pathInfo.indexOf('/');
+                pathInfo = slashIndex > -1 ? pathInfo.substring(slashIndex) : "";
             }
 
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters

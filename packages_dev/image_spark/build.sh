@@ -53,48 +53,48 @@ build_image spark_template /tmp/spark_build_log
 # Hence the need to repeat eskimo base system installation here
 # ----------------------------------------------------------------------------------------------------------------------
 echo " - (Hack) Creating missing directory /usr/share/man/man1/"
-docker exec -i spark_template mkdir -p /usr/share/man/man1/ >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template mkdir -p /usr/share/man/man1/ > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -2
 
 echo " - Updating the packages"
-docker exec -i spark_template apt-get update >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get update > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -2
 
 echo " - Upgrading the appliance"
-docker exec -i -e DEBIAN_FRONTEND=noninteractive spark_template apt-get -yq upgrade >> /tmp/spark_build_log 2>&1
+docker exec -i -e DEBIAN_FRONTEND=noninteractive spark_template apt-get -yq upgrade > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -2
 
 echo " - Installing required utility tools for eskimo framework"
-docker exec -i spark_template apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -2
 # ----------------------------------------------------------------------------------------------------------------------
 
 echo " - Installing OpenJDK 8 (Keeping JDK 8 for spark for compatibility)"
-docker exec -i spark_template apt-get install -y openjdk-8-jdk >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3
 
 echo " - Installing scala"
-docker exec -i spark_template apt-get install -y scala >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get install -y scala > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -4
 
 echo " - Installing python"
-docker exec -i spark_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get -y install  python-dev python-six python-virtualenv python-pip > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -5
 
 echo " - Installing python elasticsearch and kafka clients and other utilities"
-docker exec -i spark_template pip install elasticsearch kafka-python >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template pip install elasticsearch kafka-python > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -6
 
 echo " - Installing other python packages"
-docker exec -i spark_template pip install requests filelock >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template pip install requests filelock > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -11
 
 echo " - Installing GlusterFS client"
-docker exec -i spark_template apt-get -y install  glusterfs-client >> /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get -y install  glusterfs-client > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -10
 
 echo " - Installing spark"
-docker exec -i spark_template bash /scripts/installSpark.sh | tee -a /tmp/spark_build_log 2>&1
+docker exec -i spark_template bash /scripts/installSpark.sh | tee /tmp/spark_build_log 2>&1
 if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/spark_build_log
@@ -102,7 +102,7 @@ if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` 
 fi
 
 echo " - Installing ESHadoop connector"
-docker exec -i spark_template bash /scripts/installESHadoop.sh | tee -a /tmp/spark_build_log 2>&1
+docker exec -i spark_template bash /scripts/installESHadoop.sh | tee  /tmp/spark_build_log 2>&1
 if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/spark_build_log
@@ -110,7 +110,7 @@ if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` 
 fi
 
 echo " - Installing Spark-Kafka connector"
-docker exec -i spark_template bash /scripts/installSparkKafkaConnector.sh  | tee -a /tmp/spark_build_log 2>&1
+docker exec -i spark_template bash /scripts/installSparkKafkaConnector.sh  | tee /tmp/spark_build_log 2>&1
 if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/spark_build_log

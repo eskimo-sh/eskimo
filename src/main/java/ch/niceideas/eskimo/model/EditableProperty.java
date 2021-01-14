@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.common.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.json.JSONObject;
@@ -47,12 +48,16 @@ public class EditableProperty {
     private final String name;
     private final String comment;
     private final String defaultValue;
+    private String value;
 
     public JSONObject toJSON() {
         return new JSONObject(new HashMap<String, Object>() {{
             put("name", getName());
             put("comment", getComment());
             put("defaultValue", getDefaultValue());
+            if (StringUtils.isNotBlank(getValue())) {
+                put("value", getValue());
+            }
         }});
     }
 }

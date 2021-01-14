@@ -49,10 +49,10 @@ echo " - Building image prometheus"
 build_image prometheus_template /tmp/prometheus_build_log
 
 echo " - Installing go language environment (for mesos exporter)"
-docker exec -i prometheus_template apt-get install -y golang >> /tmp/ntp_build_log 2>&1
+docker exec -i prometheus_template apt-get install -y golang > /tmp/ntp_build_log 2>&1
 
 echo " - Installing prometheus"
-docker exec -i prometheus_template bash /scripts/installPrometheus.sh | tee -a /tmp/prometheus_build_log 2>&1
+docker exec -i prometheus_template bash /scripts/installPrometheus.sh | tee /tmp/prometheus_build_log 2>&1
 if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/prometheus_build_log
@@ -60,7 +60,7 @@ if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCE
 fi
 
 echo " - Installing prometheus Node Exporter"
-docker exec -i prometheus_template bash /scripts/installPrometheusNodeExporter.sh | tee -a /tmp/prometheus_build_log 2>&1
+docker exec -i prometheus_template bash /scripts/installPrometheusNodeExporter.sh | tee /tmp/prometheus_build_log 2>&1
 if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/prometheus_build_log
@@ -68,7 +68,7 @@ if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCE
 fi
 
 echo " - Installing prometheus Push Gateway"
-docker exec -i prometheus_template bash /scripts/installPrometheusPushgateway.sh | tee -a /tmp/prometheus_build_log 2>&1
+docker exec -i prometheus_template bash /scripts/installPrometheusPushgateway.sh | tee /tmp/prometheus_build_log 2>&1
 if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/prometheus_build_log
@@ -76,7 +76,7 @@ if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCE
 fi
 
 echo " - Installing prometheus Mesos Exporter"
-docker exec -i prometheus_template bash /scripts/installPrometheusMesosExporter.sh | tee -a /tmp/prometheus_build_log 2>&1
+docker exec -i prometheus_template bash /scripts/installPrometheusMesosExporter.sh | tee /tmp/prometheus_build_log 2>&1
 if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/prometheus_build_log

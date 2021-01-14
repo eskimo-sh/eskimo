@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 # reinitializing log
@@ -94,26 +94,6 @@ fail_if_error $? "gluster_install_log" -2
 # connect to container
 #docker exec -it gluster bash
 
-echo " - Gluster Remote Server Scripts"
-for i in `find ./command_server`; do
-    if [[ -f $SCRIPT_DIR/$i ]]; then
-        filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        docker exec gluster chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        fail_if_error $? /tmp/gluster_install_log -30
-    fi
-done
-
-echo " - Gluster in container helpers"
-for i in `find ./gluster_container_helpers`; do
-    if [[ -f $SCRIPT_DIR/$i ]]; then
-        filename=`basename $i`
-        docker cp $SCRIPT_DIR/$i gluster:/usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        docker exec gluster chmod 755 /usr/local/sbin/$filename >> /tmp/gluster_install_log 2>&1
-        fail_if_error $? /tmp/gluster_install_log -30
-    fi
-done
-
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin gluster gluster_install_log
 
@@ -122,18 +102,24 @@ docker exec gluster bash /scripts/inContainerSetupGluster.sh | tee -a gluster_in
 if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat gluster_install_log
-    exit -100
+    exit 100
 fi
+
+# Nothing to configure statically for the time being
+#echo " - Configuring EGMI - Eskimo Gluster Management Infrastructure"
+#docker exec gluster bash /scripts/inContainerSetupEgmi.sh | tee -a gluster_install_log 2>&1
+#if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
+#    echo " - In container setup script ended up in error"
+#    cat gluster_install_log
+#    exit 101
+#fi
 
 #echo " - TODO"
 #docker exec -it gluster TODO
 
 
-echo " - Copying Service Start Script"
-docker_cp_script inContainerStartService.sh sbin gluster gluster_install_log
-
-echo " - Copying settingsInjector.sh Script"
-docker_cp_script settingsInjector.sh sbin gluster gluster_install_log
+echo " - Handling topology and setting injection"
+handle_topology_settings gluster gluster_install_log
 
 echo " - Copying commonGlusterFunctions.sh Script"
 docker_cp_script commonGlusterFunctions.sh sbin gluster gluster_install_log

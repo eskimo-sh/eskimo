@@ -199,7 +199,7 @@ eskimo.Services = function () {
             } else {
 
                 actualUrl = uiConfig.urlTemplate.substring(0, indexOfNodeAddress)
-                    + nodeAddress
+                    + nodeAddress.replace(/\./g, "-")
                     + uiConfig.urlTemplate.substring(indexOfNodeAddress + 14);
             }
         } else {
@@ -211,7 +211,9 @@ eskimo.Services = function () {
             if (uiConfig.unique) {
                 actualUrl = uiConfig.proxyContext;
             } else {
-                actualUrl = uiConfig.proxyContext + "/" + nodeAddress.replace(/\./g, "-");
+                actualUrl = uiConfig.proxyContext
+                    + (uiConfig.proxyContext.endsWith ("/") ? "" : "/")
+                    + nodeAddress.replace(/\./g, "-");
             }
         }
         return actualUrl;

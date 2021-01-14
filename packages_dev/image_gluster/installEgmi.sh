@@ -46,4 +46,68 @@ if [ -z "$EGMI_VERSION" ]; then
     exit 1
 fi
 
-# Test if EGFMI distributable are available in colocated folder and take it if any
+
+echo " - Testing if local EGMI is found "
+export EGMI_LOCAL_ARCHIVE=
+for i in `find /tmp -name 'egmi*tar.gz'`; do
+    export EGMI_LOCAL_ARCHIVE=$i
+done
+if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
+    echo "   + Found local archive : $EGMI_LOCAL_ARCHIVE"
+fi
+
+
+
+
+saved_dir=`pwd`
+function returned_to_saved_dir() {
+     cd $saved_dir
+}
+trap returned_to_saved_dir 15
+trap returned_to_saved_dir EXIT
+
+echo " - Changing to temp directory"
+mkdir -p /tmp/egmi_setup
+cd /tmp/egmi_setup
+
+if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
+    echo " - Using local archive"
+    cp $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION.tar.gz
+else
+    echo " - Downloading archive egmi-$EGMI_VERSION"
+    # wget https://www-eu.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
+    echo " - TODO TO BE IMPLEMENTED"
+    exit 1
+fi
+
+
+echo " - Extracting egmi-$EGMI_VERSION"
+tar -xvf egmi-$EGMI_VERSION.tar.gz > /tmp/egmi_install_log 2>&1
+fail_if_error $? "/tmp/egmi_install_log" -2
+
+echo " - Installing egmi"
+sudo chown root.staff -R egmi-$EGMI_VERSION
+sudo mv egmi-$EGMI_VERSION /usr/local/lib/egmi-$EGMI_VERSION
+
+echo " - symlinking /usr/local/lib/egmi/ to /usr/local/lib/egmi-$EGMI_VERSION"
+sudo ln -s /usr/local/lib/egmi-$EGMI_VERSION /usr/local/lib/egmi
+
+
+echo " - Checking EGMI Installation"
+/usr/local/lib/egmi/bin/egmi.sh > /tmp/egmi_run_log 2>&1 &
+EXAMPLE_PID=$!
+fail_if_error $? "/tmp/egmi_run_log" -3
+sleep 10
+if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
+    echo "EGMI process not started successfully !"
+    cat /tmp/egmi_run_log
+    exit 10
+fi
+
+sudo rm -Rf /tmp/egmi_setup
+returned_to_saved_dir
+
+
+
+# Caution : the in container setup script must mandatorily finish with this log"
+echo " - In container install SUCCESS"

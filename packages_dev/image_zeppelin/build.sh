@@ -50,7 +50,7 @@ if [[ `docker images -q eskimo:spark_template 2>/dev/null` == "" ]]; then
     echo " - Trying to loads spark image"
     for i in `ls -rt ../../packages_distrib/docker_template_spark*.tar.gz | tail -1`; do
         echo "   + loading image $i"
-        gunzip -c $i | docker load >> /tmp/zeppelin_build_log 2>&1
+        gunzip -c $i | docker load > /tmp/zeppelin_build_log 2>&1
         if [[ $? != 0 ]]; then
             echo "Could not load base image eskimo:spark_template"
             cat /tmp/zeppelin_build_log
@@ -63,25 +63,25 @@ echo " - Building image zeppelin"
 build_image zeppelin_template /tmp/zeppelin_build_log
 
 echo " - Installing a few utilities"
-docker exec -i zeppelin_template apt-get install -y zip netcat sshpass >> /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template apt-get install -y zip netcat sshpass > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -11
 
 echo " - Installing python"
-docker exec -i zeppelin_template apt-get -y install  python-dev python-six python-virtualenv python-pip cython >> /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template apt-get -y install  python-dev python-six python-virtualenv python-pip cython > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -5
 
 echo " - Installing python packages for datascience"
-docker exec -i zeppelin_template pip install pandas scikit-learn matplotlib nltk plotly filelock py4j >> /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template pip install pandas scikit-learn matplotlib nltk plotly filelock py4j > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
 echo " - Installing GlusterFS client"
-docker exec -i zeppelin_template apt-get -y install glusterfs-client >> /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template apt-get -y install glusterfs-client > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -10
 
 
 echo " - Installing flink"
 cp installFlink.sh __installFlinkEff.sh
-docker exec -i zeppelin_template bash /scripts/__installFlinkEff.sh | tee -a /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template bash /scripts/__installFlinkEff.sh | tee /tmp/zeppelin_build_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/zeppelin_build_log
@@ -91,9 +91,9 @@ rm -f __installFlinkEff.sh
 
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
-    docker exec -i zeppelin_template bash /scripts/installZeppelinFromSources.sh $USER $UID | tee -a /tmp/zeppelin_build_log 2>&1
+    docker exec -i zeppelin_template bash /scripts/installZeppelinFromSources.sh $USER $UID | tee /tmp/zeppelin_build_log 2>&1
 else
-    docker exec -i zeppelin_template bash /scripts/installZeppelin.sh | tee -a /tmp/zeppelin_build_log 2>&1
+    docker exec -i zeppelin_template bash /scripts/installZeppelin.sh | tee /tmp/zeppelin_build_log 2>&1
 fi
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"

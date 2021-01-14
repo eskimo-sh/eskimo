@@ -45,7 +45,7 @@ echo " - Changing to temp directory"
 cd /tmp
 
 echo " - Downloading docker-registry_$DOCKER_REGISTRY_VERSION.deb "
-wget http://ftp.debian.org/debian/pool/main/d/docker-registry/docker-registry_$DOCKER_REGISTRY_VERSION.deb >> /tmp/docker_registry_install_log 2>&1
+wget http://ftp.debian.org/debian/pool/main/d/docker-registry/docker-registry_$DOCKER_REGISTRY_VERSION.deb > /tmp/docker_registry_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad docker-registry_$DOCKER_REGISTRY_VERSION.deb from debian. Trying to download from niceideas.ch"
     wget http://niceideas.ch/mes/docker-registry_$DOCKER_REGISTRY_VERSION.deb  >> /tmp/docker_registry_install_log 2>&1
@@ -53,15 +53,15 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Installing docker registry"
-dpkg -i docker-registry_2.6.2~ds1-2+b21_amd64.deb >> /tmp/docker_registry_install_log 2>&1
+dpkg -i docker-registry_2.6.2~ds1-2+b21_amd64.deb > /tmp/docker_registry_install_log 2>&1
 fail_if_error $? "/tmp/docker_registry_install_log" -2
 
 
 echo " - Creating configuration file"
-mkdir -p /etc/docker/registry >> /tmp/docker_registry_install_log 2>&1
+mkdir -p /etc/docker/registry > /tmp/docker_registry_install_log 2>&1
 fail_if_error $? "/tmp/docker_registry_install_log" -3
 
-ln -s /etc/docker/registry /etc/docker_registry >> /tmp/docker_registry_install_log 2>&1
+ln -s /etc/docker/registry /etc/docker_registry > /tmp/docker_registry_install_log 2>&1
 fail_if_error $? "/tmp/docker_registry_install_log" -4
 
 

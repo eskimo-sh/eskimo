@@ -57,12 +57,12 @@ build_image cerebro_template /tmp/cerebro_build_log
 # See what I do in config.sh
 
 echo " - Installing OpenJDK 11"
-docker exec -i cerebro_template apt-get install -y openjdk-11-jdk  >> /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template apt-get install -y openjdk-11-jdk  > /tmp/cerebro_build_log 2>&1
 fail_if_error $? "/tmp/cerebro_build_log" -3
 
 # cerebro doesn't need scala pre-installed
 #echo " - Installing scala"
-#docker exec -i cerebro_template apt-get install -y scala >> /tmp/cerebro_build_log 2>&1
+#docker exec -i cerebro_template apt-get install -y scala > /tmp/cerebro_build_log 2>&1
 #fail_if_error $? "/tmp/cerebro_build_log" -4
 
 echo " - Installing cerebro"
@@ -77,8 +77,8 @@ fi
 docker exec -it cerebro_template bash
 
 echo " - Cleaning up image"
-docker exec -i cerebro_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/cerebro_build_log 2>&1
-docker exec -i cerebro_template apt-get -y auto-remove >> /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template apt-get remove -y git gcc adwaita-icon-theme > /tmp/cerebro_build_log 2>&1
+docker exec -i cerebro_template apt-get -y auto-remove > /tmp/cerebro_build_log 2>&1
 
 echo " - Closing and saving image cerebro"
 close_and_save_image cerebro_template /tmp/cerebro_build_log $CEREBRO_VERSION

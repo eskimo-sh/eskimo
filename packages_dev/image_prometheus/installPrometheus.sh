@@ -67,7 +67,7 @@ fi
 
 
 echo " - Extracting prometheus-$PROMETHEUS_VERSION"
-tar -xvf prometheus-$PROMETHEUS_VERSION.linux-amd64.tar.gz> /tmp/prometheus_install_log 2>&1
+tar -xvf prometheus-$PROMETHEUS_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 fail_if_error $? "/tmp/prometheus_install_log" -2
 
 echo " - Installing prometheus"

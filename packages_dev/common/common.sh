@@ -35,7 +35,7 @@
 #
 
 # Version of software to install
-export ESKIMO_VERSION=0.5
+export ESKIMO_VERSION=0.4
 export DEBIAN_VERSION=debian_10_buster
 
 export FLINK_VERSION=1.10.1
@@ -66,7 +66,7 @@ export SPARK_STREAMING_KAFKA_CON_VERSION=0-10
 export SPARK_STREAMING_KAFKA_CLIENT_VERSION=2.0.0
 export SPARK_UNUSED_VERSION=1.0.0
 
-export EGMI_VERSION=0.1
+export EGMI_VERSION=0.1-SNAPSHOT
 
 export GRAFANA_VERSION=6.7.4
 export PROMETHEUS_VERSION=2.18.1
@@ -132,23 +132,23 @@ function close_and_save_image() {
     VERSION=$3
 	
     echo " - Cleaning apt cache"
-    docker exec -i $IMAGE apt-get clean -q >> $LOG_FILE 2>&1
+    docker exec -i $IMAGE apt-get clean -q > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -2
 
     # Exit the container and commit the changes
     # Now that we've modified the container we have to commit the changes. First exit the container with the command exit.
     # To commit the changes and create a new image based on said changes, issue the command:
     echo " - Comitting changes on container $IMAGE"
-    docker commit $IMAGE eskimo:"$IMAGE" >> $LOG_FILE 2>&1
+    docker commit $IMAGE eskimo:"$IMAGE" > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -3
 
     # Stop container and delete image
     echo " - Stopping container $IMAGE"
-    docker stop $IMAGE >> $LOG_FILE 2>&1
+    docker stop $IMAGE > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -4
 
     echo " - removing container $IMAGE"
-    docker container rm $IMAGE >> $LOG_FILE 2>&1
+    docker container rm $IMAGE > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -5
 
     # save base image
@@ -167,7 +167,7 @@ function close_and_save_image() {
 
     #docker image rm `cat id_file`
     echo " - removing image "$IMAGE
-    docker image rm eskimo:$IMAGE >> $LOG_FILE 2>&1
+    docker image rm eskimo:$IMAGE > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -6
 
 }
@@ -196,7 +196,7 @@ function build_image() {
             echo " - Trying to load base eskimo image"
             for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
                 echo "   + loading image $i"
-                gunzip -c $i | docker load >> $LOG_FILE 2>&1
+                gunzip -c $i | docker load > $LOG_FILE 2>&1
                 fail_if_error $? $LOG_FILE -10
             done
         fi
@@ -210,7 +210,7 @@ function build_image() {
 
     # build
     echo " - building docker image $IMAGE"
-    docker build --iidfile id_file --tag eskimo:"$IMAGE" .  >> $LOG_FILE 2>&1
+    docker build --iidfile id_file --tag eskimo:"$IMAGE" .  > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -11
 
     export TMP_FOLDER=/tmp
@@ -218,7 +218,7 @@ function build_image() {
         export TMP_FOLDER=$BUILD_TEMP_FOLDER
 
         echo " - making sure I can write in $BUILD_TEMP_FOLDER"
-        touch $BUILD_TEMP_FOLDER/test >> $LOG_FILE 2>&1
+        touch $BUILD_TEMP_FOLDER/test > $LOG_FILE 2>&1
         fail_if_error $? $LOG_FILE -11
     fi
 
@@ -231,7 +231,7 @@ function build_image() {
             -v $TMP_FOLDER:/tmp \
             -d --name $IMAGE \
             -i \
-            -t eskimo:"$IMAGE" bash  >> $LOG_FILE 2>&1
+            -t eskimo:"$IMAGE" bash  > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -12
 
     echo " - Ensuring image was well started"

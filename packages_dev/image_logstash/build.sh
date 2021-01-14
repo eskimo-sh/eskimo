@@ -50,23 +50,23 @@ echo " - Building image logstash"
 build_image logstash_template /tmp/logstash_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i logstash_template apt-get install -y openjdk-11-jdk >> /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template apt-get install -y openjdk-11-jdk > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -2
 
 echo " - Installing ZIP"
-docker exec -i logstash_template apt-get install -y zip >> /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template apt-get install -y zip > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -11
 
 echo " - Installing python"
-docker exec -i logstash_template apt-get -y install  python-dev python-six python-virtualenv python-pip cython >> /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template apt-get -y install  python-dev python-six python-virtualenv python-pip cython > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -5
 
 echo " - Installing required python packages"
-docker exec -i logstash_template pip install filelock furl >> /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template pip install filelock furl > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -12
 
 echo " - Installing logstash"
-docker exec -i logstash_template bash /scripts/installLogstash.sh | tee -a /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template bash /scripts/installLogstash.sh | tee /tmp/logstash_build_log 2>&1
 if [[ `tail -n 1 /tmp/logstash_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/logstash_build_log

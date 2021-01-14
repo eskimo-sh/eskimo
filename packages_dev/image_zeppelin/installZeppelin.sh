@@ -104,7 +104,7 @@ if [[ $FROM_COMPLETE == "1" ]]; then
 
 else
     echo " - Installing required interpreters"
-    sudo /usr/local/lib/zeppelin/bin/install-interpreter.sh --name md,shell,jdbc,python,angular,elasticsearch,flink >> /tmp/zeppelin_install_log 2>&1
+    sudo /usr/local/lib/zeppelin/bin/install-interpreter.sh --name md,shell,jdbc,python,angular,elasticsearch,flink > /tmp/zeppelin_install_log 2>&1
     fail_if_error $? "/tmp/zeppelin_install_log" -1
 fi
 
@@ -179,7 +179,7 @@ trap check_stop_zeppelin EXIT
 
 
 echo " - Starting Zeppelin"
-/usr/local/lib/zeppelin/bin/zeppelin.sh >> /tmp/zeppelin_install_log 2>&1 &
+/usr/local/lib/zeppelin/bin/zeppelin.sh > /tmp/zeppelin_install_log 2>&1 &
 export ZEPPELIN_PROC_ID=$!
 
 echo " - Checking Zeppelin startup"

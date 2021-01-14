@@ -51,7 +51,7 @@ build_image mesos-master_template /tmp/mesos_build_log
 
 echo " - Installing mesos dependencies"
 docker exec -i mesos-master_template apt-get install -y \
-            libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/mesos_build_log 2>&1
+            libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev > /tmp/mesos_build_log 2>&1
 fail_if_error $? "/tmp/mesos_build_log" -3
 
 echo " - Note : mesos-master is actually not installed in this container. It will be linked from the docker host."

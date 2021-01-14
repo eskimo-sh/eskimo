@@ -52,20 +52,36 @@ build_image gluster_template /tmp/gluster_build_log
 # connect to container
 #docker exec -i gluster bash
 
-echo " - Installing python"
-docker exec -i gluster_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" -5
+# EDIT : I don't nee python anymore
+#echo " - Installing python"
+#docker exec -i gluster_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
+#fail_if_error $? "/tmp/gluster_build_log" -5
 
-echo " - Installing required python packages"
-docker exec -i gluster_template pip install furl >> /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" -5
+#echo " - Installing required python packages"
+#docker exec -i gluster_template pip install furl >> /tmp/gluster_build_log 2>&1
+#fail_if_error $? "/tmp/gluster_build_log" -5
+
+echo " - Installing OpenJDK 11"
+docker exec -i gluster_template apt-get install -y openjdk-11-jdk > /tmp/gluster_build_log 2>&1
+fail_if_error $? "/tmp/gluster_build_log" -3
 
 echo " - Installing gluster"
-docker exec -i gluster_template apt-get install -y glusterfs-server glusterfs-client >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get install -y glusterfs-server glusterfs-client > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -3
 
 echo " - Installing EGMI"
-docker exec -i gluster_template bash /scripts/installEgmi.sh | tee -a /tmp/gluster_build_log 2>&1
+
+# Test if EGMI distributable are available in colocated folder and copy there to docker container if any
+if [[ -d "$SCRIPT_DIR/../../../EGMI/target" ]]; then
+    echo "   + EGMI local installation found. Copying local files "
+    for i in `find $SCRIPT_DIR/../../../EGMI/target -name 'egmi*tar.gz'`; do
+        echo "   + Copying "`basename $i`
+        docker cp $i gluster_template:/tmp/`basename $i`  > /tmp/gluster_build_log 2>&1
+        fail_if_error $? "/tmp/gluster_build_log" -3
+    done
+fi
+
+docker exec -i gluster_template bash /scripts/installEgmi.sh | tee /tmp/gluster_build_log 2>&1
 if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/gluster_build_log
@@ -74,8 +90,8 @@ fi
 
 
 echo " - Cleaning image gluster"
-docker exec -i gluster_template apt-get remove -y gcc git >> /tmp/gluster_build_log 2>&1
-docker exec -i gluster_template apt-get -y auto-remove >> /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get remove -y gcc git > /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get -y auto-remove > /tmp/gluster_build_log 2>&1
 
 echo " - Closing and saving image gluster"
 close_and_save_image gluster_template /tmp/gluster_build_log $DEBIAN_VERSION
