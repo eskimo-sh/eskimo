@@ -452,7 +452,7 @@ public class SystemService {
             lastStatus.set (systemStatus);
             lastStatusException.set (null);
 
-        } catch (SystemException | NodesConfigurationException | FileException | SetupException  e) {
+        } catch (Exception e) {
 
             logger.error (e, e);
 

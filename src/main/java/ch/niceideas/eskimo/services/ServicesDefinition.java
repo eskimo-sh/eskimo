@@ -48,8 +48,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -298,6 +300,41 @@ public class ServicesDefinition implements InitializingBean {
                     String additionalEnv = addEnvConf.getString(i);
                     service.addAdditionalEnvironment(additionalEnv);
                 }
+            }
+
+            if (servicesConfig.hasPath(serviceString+".masterDetection")) {
+
+                String detStrategyString = servicesConfig.getValueForPathAsString(serviceString+".masterDetection.strategy");
+                if (StringUtils.isBlank(detStrategyString)) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a master detection without strategy");
+                }
+                MasterDetectionStrategy detectionStrategy = MasterDetectionStrategy.valueOf(detStrategyString);
+
+                String logFile = servicesConfig.getValueForPathAsString(serviceString+".masterDetection.logFile");
+                if (StringUtils.isBlank(logFile)) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a master detection without logFile");
+                }
+
+                String grep = servicesConfig.getValueForPathAsString(serviceString+".masterDetection.grep");
+                if (StringUtils.isBlank(grep)) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a master detection without grep");
+                }
+
+                String timeStampExtractRexpString = servicesConfig.getValueForPathAsString(serviceString+".masterDetection.timeStampExtractRexp");
+                if (StringUtils.isBlank(timeStampExtractRexpString)) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a master detection without timeStampExtract REXP");
+                }
+                Pattern timeStampExtractRexp = Pattern.compile(timeStampExtractRexpString);
+
+                String timeStampFormatString = servicesConfig.getValueForPathAsString(serviceString+".masterDetection.timeStampFormat");
+                if (StringUtils.isBlank(timeStampFormatString)) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a master detection without timeStamp Format");
+                }
+                SimpleDateFormat timeStampFormat = new SimpleDateFormat(timeStampFormatString);
+
+                MasterDetection masterDetection = new MasterDetection(detectionStrategy, logFile, grep, timeStampExtractRexp, timeStampFormat);
+                service.setMasterDetection (masterDetection);
+
             }
 
             if (servicesConfig.hasPath(serviceString+".editableSettings")) {

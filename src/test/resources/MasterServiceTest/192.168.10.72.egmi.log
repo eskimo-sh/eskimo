@@ -1,0 +1,946 @@
+2021-01-15 10:39:07,991 INFO o.s.b.StartupInfoLogger [main] Starting EGMIApplication v0.1-SNAPSHOT on small-node3 with PID 83 (/usr/local/lib/egmi-0.1-SNAPSHOT/lib/egmi-0.1-SNAPSHOT.war started by root in /usr/local/lib/egmi-0.1-SNAPSHOT)
+2021-01-15 10:39:08,012 INFO o.s.b.SpringApplication [main] No active profile set, falling back to default profiles: default
+2021-01-15 10:39:13,695 INFO o.s.b.w.e.t.TomcatWebServer [main] Tomcat initialized with port(s): 28901 (http)
+2021-01-15 10:39:13,751 INFO o.a.j.l.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-28901"]
+2021-01-15 10:39:13,760 INFO o.a.j.l.DirectJDKLog [main] Starting service [Tomcat]
+2021-01-15 10:39:13,763 INFO o.a.j.l.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.39]
+2021-01-15 10:39:15,874 INFO o.a.j.l.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2021-01-15 10:39:15,875 INFO o.s.b.w.s.c.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 7494 ms
+2021-01-15 10:39:16,254 INFO c.n.e.e.m.ManagementService [main] Initializing Status updater scheduler ...
+2021-01-15 10:39:17,694 INFO o.a.z.Environment [Thread-1] Client environment:zookeeper.version=3.6.2--803c7f1a12f85978cb049af5e4ef23bd8b688715, built on 09/04/2020 12:44 GMT
+2021-01-15 10:39:17,731 INFO o.a.z.Environment [Thread-1] Client environment:host.name=small-node3
+2021-01-15 10:39:17,731 INFO o.a.z.Environment [Thread-1] Client environment:java.version=11.0.9.1
+2021-01-15 10:39:17,732 INFO o.a.z.Environment [Thread-1] Client environment:java.vendor=Debian
+2021-01-15 10:39:17,732 INFO o.a.z.Environment [Thread-1] Client environment:java.home=/usr/lib/jvm/java-11-openjdk-amd64
+2021-01-15 10:39:17,733 INFO o.a.z.Environment [Thread-1] Client environment:java.class.path=lib/egmi-0.1-SNAPSHOT.war
+2021-01-15 10:39:17,733 INFO o.a.z.Environment [Thread-1] Client environment:java.library.path=/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+2021-01-15 10:39:17,733 INFO o.a.z.Environment [Thread-1] Client environment:java.io.tmpdir=/tmp
+2021-01-15 10:39:17,733 INFO o.a.z.Environment [Thread-1] Client environment:java.compiler=<NA>
+2021-01-15 10:39:17,734 INFO o.a.z.Environment [Thread-1] Client environment:os.name=Linux
+2021-01-15 10:39:17,734 INFO o.a.z.Environment [Thread-1] Client environment:os.arch=amd64
+2021-01-15 10:39:17,734 INFO o.a.z.Environment [Thread-1] Client environment:os.version=3.10.0-1127.el7.x86_64
+2021-01-15 10:39:17,735 INFO o.a.z.Environment [Thread-1] Client environment:user.name=root
+2021-01-15 10:39:17,735 INFO o.a.z.Environment [Thread-1] Client environment:user.home=/root
+2021-01-15 10:39:17,735 INFO o.a.z.Environment [Thread-1] Client environment:user.dir=/usr/local/lib/egmi-0.1-SNAPSHOT
+2021-01-15 10:39:17,735 INFO o.a.z.Environment [Thread-1] Client environment:os.memory.free=39MB
+2021-01-15 10:39:17,736 INFO o.a.z.Environment [Thread-1] Client environment:os.memory.max=300MB
+2021-01-15 10:39:17,736 INFO o.a.z.Environment [Thread-1] Client environment:os.memory.total=96MB
+2021-01-15 10:39:17,783 INFO o.a.z.ZooKeeper [Thread-1] Initiating client connection, connectString=192.168.10.71:2181 sessionTimeout=10000 watcher=ch.niceideas.eskimo.egmi.zookeeper.ElectionProcess$ProcessNodeWatcher@7c869d49
+2021-01-15 10:39:17,820 INFO o.a.z.c.X509Util [Thread-1] Setting -D jdk.tls.rejectClientInitiatedRenegotiation=true to disable client-initiated TLS renegotiation
+2021-01-15 10:39:17,920 INFO o.a.z.ClientCnxnSocket [Thread-1] jute.maxbuffer value is 1048575 Bytes
+2021-01-15 10:39:18,012 INFO o.a.z.ClientCnxn [Thread-1] zookeeper.request.timeout value is 0. feature enabled=false
+2021-01-15 10:39:18,034 INFO c.n.e.e.z.ElectionProcess [Thread-1] Process with id: small-node3 has started!
+2021-01-15 10:39:18,271 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Opening socket connection to server 192.168.10.71/192.168.10.71:2181.
+2021-01-15 10:39:18,272 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] SASL config status: Will not attempt to authenticate using SASL (unknown error)
+2021-01-15 10:39:18,366 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Socket connection established, initiating session, client: /192.168.10.73:44670, server: 192.168.10.71/192.168.10.71:2181
+2021-01-15 10:39:18,819 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session establishment complete on server 192.168.10.71/192.168.10.71:2181, session id = 0x1000015ccf40000, negotiated timeout = 10000
+2021-01-15 10:39:18,893 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:None path:null
+2021-01-15 10:39:19,082 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] Ensuring master trakcer nod exists on /egmi/master_id
+2021-01-15 10:39:19,115 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:NodeCreated path:/egmi/master_id
+2021-01-15 10:39:19,315 INFO o.s.s.w.DefaultSecurityFilterChain [main] Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@24528a25, org.springframework.security.web.context.SecurityContextPersistenceFilter@315df4bb, org.springframework.security.web.header.HeaderWriterFilter@61e3a1fd, org.springframework.security.web.authentication.logout.LogoutFilter@7a34b7b8, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@1c65121, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5cad8b7d, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2e6ee0bc, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@17ae98d7, org.springframework.security.web.session.SessionManagementFilter@eadb475, org.springframework.security.web.access.ExceptionTranslationFilter@271f18d3, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@1a1d3c1a]
+2021-01-15 10:39:19,366 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] Current master is :
+2021-01-15 10:39:19,408 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] I am the new leader!
+2021-01-15 10:39:19,457 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:NodeDataChanged path:/egmi/master_id
+2021-01-15 10:39:19,552 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Master changed: small-node3
+2021-01-15 10:39:20,259 INFO o.s.s.c.ExecutorConfigurationSupport [main] Initializing ExecutorService 'applicationTaskExecutor'
+2021-01-15 10:39:21,051 INFO o.a.j.l.DirectJDKLog [main] Starting ProtocolHandler ["http-nio-28901"]
+2021-01-15 10:39:21,166 INFO o.s.b.w.e.t.TomcatWebServer [main] Tomcat started on port(s): 28901 (http) with context path '/egmi'
+2021-01-15 10:39:21,221 INFO o.s.b.StartupInfoLogger [main] Started EGMIApplication in 14.731 seconds (JVM running for 18.904)
+2021-01-15 10:39:21,270 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:39:21,977 INFO o.a.j.l.DirectJDKLog [http-nio-28901-exec-2] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-01-15 10:39:21,977 INFO o.s.w.s.FrameworkServlet [http-nio-28901-exec-2] Initializing Servlet 'dispatcherServlet'
+2021-01-15 10:39:22,010 INFO o.s.w.s.FrameworkServlet [http-nio-28901-exec-2] Completed initialization in 32 ms
+2021-01-15 10:39:22,324 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:39:22,772 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:39:23,007 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:39:23,271 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:23,289 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:23,292 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:23,386 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed. 6 No Volume, 1 Node Partitioned
+2021-01-15 10:39:23,388 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NODE_PARTITIONED-192.168.10.73
+2021-01-15 10:39:23,399 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:39:23,735 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:39:24,057 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:39:24,450 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:24,459 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:24,463 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:24,467 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Candidates
+2021-01-15 10:39:24,468 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-spark_eventlog
+2021-01-15 10:39:24,469 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume spark_eventlog IS a managed volume. Attempting creation ...
+2021-01-15 10:39:24,475 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:39:24,698 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:39:25,128 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:39:25,549 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:25,568 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:25,573 ERROR c.n.e.e.g.GlusterRemoteManager [pool-2-thread-1] null
+2021-01-15 10:39:25,614 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Should create 3 brick but only 1 nodes are up.
+2021-01-15 10:39:25,615 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Should create 2 brick but only 1 nodes are up.
+2021-01-15 10:39:25,637 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 1 replicas = 1 bricks
+2021-01-15 10:39:25,669 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.73:/var/lib/gluster/volume_bricks/spark_eventlog
+2021-01-15 10:39:25,695 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: create - options: spark_eventlog replica 1 transport tcp 192.168.10.73:/var/lib/gluster/volume_bricks/spark_eventlog --mode=script
+2021-01-15 10:39:26,106 ERROR c.n.c.u.ProcessHelper [http-nio-28901-exec-1] ch.niceideas.common.utils.ProcessHelper$ProcessHelperException: replica count should be greater than 1
+
+Usage:
+volume create <NEW-VOLNAME> [stripe <COUNT>] [replica <COUNT> [arbiter <COUNT>]] [disperse [<COUNT>]] [disperse-data <COUNT>] [redundancy <COUNT>] [transport <tcp|rdma|tcp,rdma>] <NEW-BRICK>... [force]
+
+
+ch.niceideas.common.utils.ProcessHelper$ProcessHelperException: replica count should be greater than 1
+
+Usage:
+volume create <NEW-VOLNAME> [stripe <COUNT>] [replica <COUNT> [arbiter <COUNT>]] [disperse [<COUNT>]] [disperse-data <COUNT>] [redundancy <COUNT>] [transport <tcp|rdma|tcp,rdma>] <NEW-BRICK>... [force]
+
+
+	at ch.niceideas.common.utils.ProcessHelper.execProc(ProcessHelper.java:105) [classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.common.utils.ProcessHelper.exec(ProcessHelper.java:62) [classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.eskimo.egmi.controllers.CommandServer.execute(CommandServer.java:87) [classes!/:0.1-SNAPSHOT]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:878) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:792) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:626) [tomcat-embed-core-9.0.39.jar!/:4.0.FR]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:733) [tomcat-embed-core-9.0.39.jar!/:4.0.FR]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) [tomcat-embed-websocket-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:320) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:126) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:90) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:118) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:137) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:111) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:158) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:200) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:116) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:92) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:77) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:105) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:56) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:215) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:178) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:358) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:271) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:542) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:143) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:374) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128) [?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628) [?:?]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at java.lang.Thread.run(Thread.java:834) [?:?]
+2021-01-15 10:39:26,154 ERROR c.n.e.e.c.CommandServer [http-nio-28901-exec-1] ch.niceideas.common.utils.ProcessHelper$ProcessHelperException: replica count should be greater than 1
+
+Usage:
+volume create <NEW-VOLNAME> [stripe <COUNT>] [replica <COUNT> [arbiter <COUNT>]] [disperse [<COUNT>]] [disperse-data <COUNT>] [redundancy <COUNT>] [transport <tcp|rdma|tcp,rdma>] <NEW-BRICK>... [force]
+
+
+ch.niceideas.common.utils.ProcessHelper$ProcessHelperException: replica count should be greater than 1
+
+Usage:
+volume create <NEW-VOLNAME> [stripe <COUNT>] [replica <COUNT> [arbiter <COUNT>]] [disperse [<COUNT>]] [disperse-data <COUNT>] [redundancy <COUNT>] [transport <tcp|rdma|tcp,rdma>] <NEW-BRICK>... [force]
+
+
+	at ch.niceideas.common.utils.ProcessHelper.execProc(ProcessHelper.java:115) ~[classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.common.utils.ProcessHelper.exec(ProcessHelper.java:62) ~[classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.eskimo.egmi.controllers.CommandServer.execute(CommandServer.java:87) [classes!/:0.1-SNAPSHOT]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:878) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:792) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:626) [tomcat-embed-core-9.0.39.jar!/:4.0.FR]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883) [spring-webmvc-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:733) [tomcat-embed-core-9.0.39.jar!/:4.0.FR]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) [tomcat-embed-websocket-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:320) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:126) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:90) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:118) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:137) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:111) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:158) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:200) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:116) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:92) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:77) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:105) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:56) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:215) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:178) [spring-security-web-5.3.5.RELEASE.jar!/:5.3.5.RELEASE]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:358) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:271) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119) [spring-web-5.2.10.RELEASE.jar!/:5.2.10.RELEASE]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:542) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:143) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:374) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:868) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1590) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128) [?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628) [?:?]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) [tomcat-embed-core-9.0.39.jar!/:9.0.39]
+	at java.lang.Thread.run(Thread.java:834) [?:?]
+Caused by: ch.niceideas.common.utils.ProcessHelper$ProcessHelperException: replica count should be greater than 1
+
+Usage:
+volume create <NEW-VOLNAME> [stripe <COUNT>] [replica <COUNT> [arbiter <COUNT>]] [disperse [<COUNT>]] [disperse-data <COUNT>] [redundancy <COUNT>] [transport <tcp|rdma|tcp,rdma>] <NEW-BRICK>... [force]
+
+
+	at ch.niceideas.common.utils.ProcessHelper.execProc(ProcessHelper.java:105) ~[classes!/:0.1-SNAPSHOT]
+	... 85 more
+2021-01-15 10:39:26,184 ERROR c.n.e.e.m.ManagementService [pool-2-thread-1]       !! GlusterVolumeCreate failed. See backend logs for details
+2021-01-15 10:39:26,184 ERROR c.n.e.e.p.AbstractProblem [pool-2-thread-1] Failed to get an answer from command server
+2021-01-15 10:39:26,185 ERROR c.n.e.e.p.ProblemManager [pool-2-thread-1] ch.niceideas.eskimo.egmi.problems.ResolutionStopException
+ch.niceideas.eskimo.egmi.problems.ResolutionStopException: null
+	at ch.niceideas.eskimo.egmi.problems.AbstractProblem.executeSimpleOperation(AbstractProblem.java:34) ~[classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.eskimo.egmi.problems.NoVolume.createVolume(NoVolume.java:154) ~[classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.eskimo.egmi.problems.NoVolume.solve(NoVolume.java:124) ~[classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.eskimo.egmi.problems.ProblemManager.resolutionIteration(ProblemManager.java:108) ~[classes!/:0.1-SNAPSHOT]
+	at ch.niceideas.eskimo.egmi.management.ManagementService.updateSystemStatus(ManagementService.java:238) ~[classes!/:0.1-SNAPSHOT]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515) [?:?]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264) [?:?]
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) [?:?]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128) [?:?]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628) [?:?]
+	at java.lang.Thread.run(Thread.java:834) [?:?]
+2021-01-15 10:39:56,187 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:39:56,200 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:39:56,291 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:39:56,498 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:39:57,928 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed. 6 No Volume, 4 Node Partitioned
+2021-01-15 10:39:57,929 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NODE_PARTITIONED-192.168.10.71
+2021-01-15 10:39:57,932 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:39:58,001 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:39:58,063 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:39:58,987 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Candidates 192.168.10.73, 192.168.10.74, 192.168.10.72
+2021-01-15 10:39:58,989 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Isolated Candidates 192.168.10.73, 192.168.10.74, 192.168.10.72
+2021-01-15 10:39:58,989 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Attaching to new cluster
+2021-01-15 10:39:58,990 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Trying to attach to candidate 192.168.10.73
+2021-01-15 10:39:58,993 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: peer - subcommand: probe - options: 192.168.10.71
+2021-01-15 10:39:59,117 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NODE_PARTITIONED-192.168.10.73
+2021-01-15 10:39:59,120 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:39:59,200 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:39:59,268 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:00,282 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Candidates
+2021-01-15 10:40:00,282 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NODE_PARTITIONED-192.168.10.72
+2021-01-15 10:40:00,285 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:00,355 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:00,467 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:01,151 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Candidates 192.168.10.73, 192.168.10.71
+2021-01-15 10:40:01,152 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Isolated Candidates 192.168.10.73, 192.168.10.71
+2021-01-15 10:40:01,153 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Attaching to new cluster
+2021-01-15 10:40:01,153 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Trying to attach to candidate 192.168.10.73
+2021-01-15 10:40:01,155 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: peer - subcommand: probe - options: 192.168.10.72
+2021-01-15 10:40:01,281 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NODE_PARTITIONED-192.168.10.74
+2021-01-15 10:40:01,285 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:01,362 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:01,439 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:03,197 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Candidates 192.168.10.73, 192.168.10.71, 192.168.10.72
+2021-01-15 10:40:03,198 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Isolated Candidates 192.168.10.73, 192.168.10.71, 192.168.10.72
+2021-01-15 10:40:03,198 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Attaching to new cluster
+2021-01-15 10:40:03,198 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Trying to attach to candidate 192.168.10.73
+2021-01-15 10:40:03,201 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: peer - subcommand: probe - options: 192.168.10.74
+2021-01-15 10:40:03,328 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-spark_eventlog
+2021-01-15 10:40:03,328 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume spark_eventlog IS a managed volume. Attempting creation ...
+2021-01-15 10:40:03,332 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:03,433 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:03,508 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:04,410 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 3 replicas = 3 bricks
+2021-01-15 10:40:04,411 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.73:/var/lib/gluster/volume_bricks/spark_eventlog, 192.168.10.74:/var/lib/gluster/volume_bricks/spark_eventlog, 192.168.10.71:/var/lib/gluster/volume_bricks/spark_eventlog
+2021-01-15 10:40:04,413 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: create - options: spark_eventlog replica 3 transport tcp 192.168.10.73:/var/lib/gluster/volume_bricks/spark_eventlog 192.168.10.74:/var/lib/gluster/volume_bricks/spark_eventlog 192.168.10.71:/var/lib/gluster/volume_bricks/spark_eventlog --mode=script
+2021-01-15 10:40:04,550 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: start - options: spark_eventlog --mode=script
+2021-01-15 10:40:07,048 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-flink_data
+2021-01-15 10:40:07,049 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume flink_data IS a managed volume. Attempting creation ...
+2021-01-15 10:40:07,058 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:07,149 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:07,211 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:08,037 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 3 replicas = 3 bricks
+2021-01-15 10:40:08,038 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.72:/var/lib/gluster/volume_bricks/flink_data, 192.168.10.73:/var/lib/gluster/volume_bricks/flink_data, 192.168.10.74:/var/lib/gluster/volume_bricks/flink_data
+2021-01-15 10:40:12,709 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-flink_completed_jobs
+2021-01-15 10:40:12,710 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume flink_completed_jobs IS a managed volume. Attempting creation ...
+2021-01-15 10:40:12,729 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:12,802 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:12,873 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:13,610 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 3 replicas = 3 bricks
+2021-01-15 10:40:13,611 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.71:/var/lib/gluster/volume_bricks/flink_completed_jobs, 192.168.10.72:/var/lib/gluster/volume_bricks/flink_completed_jobs, 192.168.10.73:/var/lib/gluster/volume_bricks/flink_completed_jobs
+2021-01-15 10:40:18,068 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-spark_data
+2021-01-15 10:40:18,070 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume spark_data IS a managed volume. Attempting creation ...
+2021-01-15 10:40:18,093 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:18,180 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:18,240 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:19,004 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 3 replicas = 3 bricks
+2021-01-15 10:40:19,005 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.74:/var/lib/gluster/volume_bricks/spark_data, 192.168.10.71:/var/lib/gluster/volume_bricks/spark_data, 192.168.10.72:/var/lib/gluster/volume_bricks/spark_data
+2021-01-15 10:40:23,474 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-marathon_registry
+2021-01-15 10:40:23,493 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume marathon_registry IS a managed volume. Attempting creation ...
+2021-01-15 10:40:23,497 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:23,580 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:23,639 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:24,515 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 3 replicas = 3 bricks
+2021-01-15 10:40:24,516 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.73:/var/lib/gluster/volume_bricks/marathon_registry, 192.168.10.74:/var/lib/gluster/volume_bricks/marathon_registry, 192.168.10.71:/var/lib/gluster/volume_bricks/marathon_registry
+2021-01-15 10:40:24,521 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: create - options: marathon_registry replica 3 transport tcp 192.168.10.73:/var/lib/gluster/volume_bricks/marathon_registry 192.168.10.74:/var/lib/gluster/volume_bricks/marathon_registry 192.168.10.71:/var/lib/gluster/volume_bricks/marathon_registry --mode=script
+2021-01-15 10:40:24,659 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: start - options: marathon_registry --mode=script
+2021-01-15 10:40:29,013 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Solving NO_VOLUME-logstash_data
+2021-01-15 10:40:29,014 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]   + Volume logstash_data IS a managed volume. Attempting creation ...
+2021-01-15 10:40:29,025 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:40:29,108 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:40:29,169 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:40:30,005 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Allocating 1 shards / 3 replicas = 3 bricks
+2021-01-15 10:40:30,006 INFO c.n.e.e.m.ManagementService [pool-2-thread-1]     - Bricks are 192.168.10.72:/var/lib/gluster/volume_bricks/logstash_data, 192.168.10.73:/var/lib/gluster/volume_bricks/logstash_data, 192.168.10.74:/var/lib/gluster/volume_bricks/logstash_data
+2021-01-15 10:41:04,656 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:41:04,662 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:41:04,807 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:41:04,868 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:41:05,769 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:41:35,783 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:41:35,794 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:41:35,899 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:41:35,962 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:41:36,821 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:42:06,822 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:42:06,830 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:42:06,928 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:42:07,009 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:42:08,026 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:42:38,042 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:42:38,049 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:42:38,151 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:42:38,215 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:42:39,305 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:43:09,307 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:43:09,324 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:43:09,566 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:43:09,657 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:43:10,830 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:43:40,844 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:43:40,849 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:43:40,986 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:43:41,046 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:43:41,906 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:44:11,907 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:44:11,914 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:44:12,007 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:44:12,067 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:44:12,922 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:44:42,923 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:44:42,933 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:44:43,072 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:44:43,141 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:44:44,081 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:45:14,083 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:45:14,091 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:45:14,199 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:45:14,265 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:45:15,567 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:45:45,569 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:45:45,577 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:45:45,682 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:45:45,749 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:45:46,818 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:46:16,819 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:46:16,823 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:46:16,925 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:46:17,012 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:46:17,914 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:46:47,932 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:46:47,944 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:46:48,031 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:46:48,093 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:46:48,920 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:47:18,937 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:47:18,940 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:47:19,132 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:47:19,302 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:47:21,262 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:47:51,266 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:47:51,273 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:47:51,357 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:47:51,417 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:47:52,242 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:48:22,251 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:48:22,260 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:48:22,350 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:48:22,423 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:48:23,667 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:48:53,671 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:48:53,700 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:48:53,851 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:48:53,944 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:48:54,917 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:49:24,923 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:49:24,927 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:49:25,192 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:49:25,341 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:49:26,446 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:49:56,455 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:49:56,458 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:49:56,527 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:49:56,590 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:49:57,970 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:50:27,974 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:50:27,983 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:50:28,081 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:50:28,161 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:50:29,160 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:50:59,162 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:50:59,169 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:50:59,285 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:50:59,352 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:51:00,237 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:51:30,239 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:51:30,250 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:51:30,395 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:51:30,458 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:51:31,373 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:52:01,396 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:52:01,399 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:52:01,498 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:52:01,563 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:52:02,457 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:52:32,460 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:52:32,468 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:52:32,568 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:52:32,634 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:52:33,731 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:53:03,738 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:53:03,743 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:53:03,842 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:53:03,915 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:53:04,801 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:53:34,817 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status
+2021-01-15 10:53:34,825 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:53:34,924 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:53:34,989 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:53:35,879 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] Status fetching completed.
+2021-01-15 10:53:41,400 WARN o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Client session timed out, have not heard from server in 6670ms for session id 0x1000015ccf40000
+2021-01-15 10:53:41,401 WARN o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session 0x1000015ccf40000 for sever 192.168.10.71/192.168.10.71:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException.
+org.apache.zookeeper.ClientCnxn$SessionTimeoutException: Client session timed out, have not heard from server in 6670ms for session id 0x1000015ccf40000
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1243) [zookeeper-3.6.2.jar!/:3.6.2]
+2021-01-15 10:53:41,509 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:Disconnected type:None path:null
+2021-01-15 10:53:43,352 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Opening socket connection to server 192.168.10.71/192.168.10.71:2181.
+2021-01-15 10:53:43,354 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] SASL config status: Will not attempt to authenticate using SASL (unknown error)
+2021-01-15 10:53:43,367 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Socket connection established, initiating session, client: /192.168.10.73:45072, server: 192.168.10.71/192.168.10.71:2181
+2021-01-15 10:53:43,403 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session establishment complete on server 192.168.10.71/192.168.10.71:2181, session id = 0x1000015ccf40000, negotiated timeout = 10000
+2021-01-15 10:53:43,462 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:None path:null
+2021-01-15 10:53:43,571 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:Closed type:None path:null
+2021-01-15 10:53:43,572 INFO o.a.z.ZooKeeper [Thread-1] Session: 0x1000015ccf40000 closed
+2021-01-15 10:53:43,572 INFO o.a.z.ClientCnxn$EventThread [Thread-1-EventThread] EventThread shut down for session: 0x1000015ccf40000
+2021-01-15 10:53:43,572 INFO o.a.z.ZooKeeper [Thread-1] Initiating client connection, connectString=192.168.10.71:2181 sessionTimeout=10000 watcher=ch.niceideas.eskimo.egmi.zookeeper.ElectionProcess$ProcessNodeWatcher@19e8ab53
+2021-01-15 10:53:43,573 INFO o.a.z.ClientCnxnSocket [Thread-1] jute.maxbuffer value is 1048575 Bytes
+2021-01-15 10:53:43,573 INFO o.a.z.ClientCnxn [Thread-1] zookeeper.request.timeout value is 0. feature enabled=false
+2021-01-15 10:53:43,574 INFO c.n.e.e.z.ElectionProcess [Thread-1] Process with id: small-node3 has started!
+2021-01-15 10:53:43,581 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Opening socket connection to server 192.168.10.71/192.168.10.71:2181.
+2021-01-15 10:53:43,581 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] SASL config status: Will not attempt to authenticate using SASL (unknown error)
+2021-01-15 10:53:43,583 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Socket connection established, initiating session, client: /192.168.10.73:45074, server: 192.168.10.71/192.168.10.71:2181
+2021-01-15 10:53:43,589 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session establishment complete on server 192.168.10.71/192.168.10.71:2181, session id = 0x1000015ccf40007, negotiated timeout = 10000
+2021-01-15 10:53:43,591 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:None path:null
+2021-01-15 10:53:43,594 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] Ensuring master trakcer nod exists on /egmi/master_id
+2021-01-15 10:53:43,610 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] Current master is : small-node1
+2021-01-15 10:53:43,613 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] - Setting watch on node with path: /egmi/egmi_election/p_0000000006
+2021-01-15 10:54:06,150 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:54:06,239 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:54:06,307 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:54:37,952 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:54:38,098 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:54:38,163 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:55:09,122 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:55:09,201 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:55:09,342 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:55:41,173 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:55:41,311 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:55:41,374 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:56:12,312 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:56:12,406 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:56:12,471 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:56:44,020 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:56:44,084 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:56:44,152 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:57:15,142 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:57:15,246 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:57:15,320 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:57:46,241 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:57:46,346 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:57:46,413 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:58:17,497 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:58:17,636 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:58:17,774 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:58:49,019 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:58:49,141 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:58:49,206 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:59:20,393 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:59:20,511 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:59:20,575 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 10:59:51,653 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 10:59:51,740 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 10:59:51,810 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:00:22,795 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:00:22,895 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:00:22,963 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:00:54,058 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:00:54,123 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:00:54,193 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:01:25,078 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:01:25,153 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:01:25,229 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:01:56,305 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:01:56,486 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:01:56,554 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:02:27,989 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:02:28,120 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:02:28,187 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:02:59,070 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:02:59,166 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:02:59,256 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:03:30,314 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:03:30,465 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:03:30,534 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:04:01,629 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:04:01,785 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:04:01,849 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:04:32,699 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:04:32,803 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:04:32,870 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:04:46,147 WARN o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Client session timed out, have not heard from server in 6669ms for session id 0x1000015ccf40007
+2021-01-15 11:04:46,148 WARN o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session 0x1000015ccf40007 for sever 192.168.10.71/192.168.10.71:2181, Closing socket connection. Attempting reconnect except it is a SessionExpiredException.
+org.apache.zookeeper.ClientCnxn$SessionTimeoutException: Client session timed out, have not heard from server in 6669ms for session id 0x1000015ccf40007
+	at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1243) [zookeeper-3.6.2.jar!/:3.6.2]
+2021-01-15 11:04:46,252 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:Disconnected type:None path:null
+2021-01-15 11:04:47,270 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Opening socket connection to server 192.168.10.71/192.168.10.71:2181.
+2021-01-15 11:04:47,270 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] SASL config status: Will not attempt to authenticate using SASL (unknown error)
+2021-01-15 11:04:48,277 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Socket connection established, initiating session, client: /192.168.10.73:45348, server: 192.168.10.71/192.168.10.71:2181
+2021-01-15 11:04:48,294 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session establishment complete on server 192.168.10.71/192.168.10.71:2181, session id = 0x1000015ccf40007, negotiated timeout = 10000
+2021-01-15 11:04:48,303 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:None path:null
+2021-01-15 11:04:48,436 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:Closed type:None path:null
+2021-01-15 11:04:48,437 INFO o.a.z.ClientCnxn$EventThread [Thread-1-EventThread] EventThread shut down for session: 0x1000015ccf40007
+2021-01-15 11:04:48,436 INFO o.a.z.ZooKeeper [Thread-1] Session: 0x1000015ccf40007 closed
+2021-01-15 11:04:48,438 INFO o.a.z.ZooKeeper [Thread-1] Initiating client connection, connectString=192.168.10.71:2181 sessionTimeout=10000 watcher=ch.niceideas.eskimo.egmi.zookeeper.ElectionProcess$ProcessNodeWatcher@2ea9040a
+2021-01-15 11:04:48,440 INFO o.a.z.ClientCnxnSocket [Thread-1] jute.maxbuffer value is 1048575 Bytes
+2021-01-15 11:04:48,441 INFO o.a.z.ClientCnxn [Thread-1] zookeeper.request.timeout value is 0. feature enabled=false
+2021-01-15 11:04:48,444 INFO c.n.e.e.z.ElectionProcess [Thread-1] Process with id: small-node3 has started!
+2021-01-15 11:04:48,450 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Opening socket connection to server 192.168.10.71/192.168.10.71:2181.
+2021-01-15 11:04:48,451 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] SASL config status: Will not attempt to authenticate using SASL (unknown error)
+2021-01-15 11:04:48,454 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Socket connection established, initiating session, client: /192.168.10.73:45350, server: 192.168.10.71/192.168.10.71:2181
+2021-01-15 11:04:48,463 INFO o.a.z.ClientCnxn$SendThread [Thread-1-SendThread(192.168.10.71:2181)] Session establishment complete on server 192.168.10.71/192.168.10.71:2181, session id = 0x1000015ccf40008, negotiated timeout = 10000
+2021-01-15 11:04:48,465 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:None path:null
+2021-01-15 11:04:48,482 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] Ensuring master trakcer nod exists on /egmi/master_id
+2021-01-15 11:04:48,541 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] Current master is : small-node1
+2021-01-15 11:04:48,546 INFO c.n.e.e.z.ElectionProcess [Thread-1] [Process: small-node3] - Setting watch on node with path: /egmi/egmi_election/p_0000000006
+2021-01-15 11:05:03,821 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:05:03,930 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:05:04,025 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:05:35,430 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:05:35,533 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:05:35,599 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:06:06,446 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:06:06,548 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:06:06,612 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:06:37,495 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:06:37,631 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:06:37,699 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:07:08,599 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:07:08,683 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:07:08,765 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:07:39,913 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:07:40,021 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:07:40,084 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:08:11,556 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:08:11,723 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:08:11,791 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:08:42,739 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:08:42,882 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:08:42,953 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:09:13,888 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:09:13,979 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:09:14,050 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:09:44,940 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:09:45,041 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:09:45,106 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:10:16,160 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:10:16,280 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:10:16,348 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:10:47,264 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:10:47,413 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:10:47,484 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:11:18,802 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:11:18,960 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:11:19,028 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:11:49,963 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:11:50,079 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:11:50,150 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:12:21,075 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:12:21,170 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:12:21,235 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:12:52,282 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:12:52,474 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:12:52,608 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:13:24,420 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:13:24,569 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:13:24,666 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:13:55,811 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:13:55,963 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:13:56,041 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:14:27,653 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:14:27,990 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:14:28,087 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:14:59,175 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:14:59,314 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:14:59,379 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:15:30,265 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:15:30,387 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:15:30,463 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:16:01,615 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:16:01,691 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:16:01,756 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:16:32,780 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:16:32,866 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:16:32,994 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:17:04,361 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:17:04,617 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:17:04,709 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:17:36,019 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:17:36,122 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:17:36,189 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:18:07,101 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:18:07,278 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:18:07,424 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:18:38,438 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:18:38,514 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:18:38,578 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:19:09,471 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:19:09,607 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:19:09,673 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:19:40,620 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:19:40,766 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:19:40,853 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:20:11,845 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:20:11,999 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:20:12,067 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:20:43,049 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:20:43,188 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:20:43,261 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:21:14,351 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:21:14,466 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:21:14,535 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:21:46,014 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:21:46,167 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:21:46,241 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:22:17,503 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:22:17,706 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:22:17,776 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:22:48,999 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:22:49,102 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:22:49,166 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:23:20,269 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:23:20,401 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:23:20,466 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:23:51,451 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:23:51,580 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:23:51,645 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:24:22,571 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:24:22,658 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:24:22,740 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:24:53,816 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:24:53,927 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:24:53,993 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:25:24,981 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:25:25,069 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:25:25,137 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:25:56,061 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:25:56,207 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:25:56,286 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:26:27,529 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:26:27,678 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:26:27,744 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:26:58,699 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:26:58,963 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:26:59,106 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:27:30,005 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:27:30,103 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:27:30,166 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:28:01,117 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:28:01,216 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:28:01,285 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:28:32,392 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:28:32,527 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:28:32,592 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:29:03,537 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:29:03,623 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:29:03,687 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:29:34,589 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:29:34,814 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:29:34,999 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:30:06,407 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:30:06,591 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:30:06,981 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:30:38,878 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:30:39,021 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:30:39,091 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:31:10,875 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:31:10,970 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:31:11,036 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:31:41,946 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:31:42,041 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:31:42,218 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:32:13,382 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:32:13,541 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:32:13,604 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:32:45,049 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:32:45,269 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:32:45,358 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:33:16,619 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:33:16,723 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:33:16,789 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:33:48,737 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:33:49,053 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:33:49,216 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:34:20,758 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:34:20,898 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:34:20,978 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:34:52,090 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:34:52,157 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:34:52,226 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:35:23,320 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:35:23,703 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:35:23,830 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:35:54,905 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:35:55,339 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:35:55,463 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:36:26,548 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:36:26,656 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:36:26,727 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:36:58,962 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:36:59,047 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:36:59,117 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:37:30,989 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:37:31,057 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:37:31,123 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:38:02,219 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:38:02,297 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:38:02,392 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:38:33,867 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:38:34,031 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:38:34,109 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:39:05,188 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:39:05,279 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:39:05,363 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:39:36,273 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:39:36,380 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:39:36,446 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:40:08,245 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:40:08,325 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:40:08,405 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:40:39,944 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:40:40,126 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:40:40,339 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:41:12,997 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:41:13,095 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:41:13,285 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:41:45,008 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:41:45,115 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:41:45,204 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:42:16,351 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:42:16,470 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:42:16,589 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:42:47,977 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:42:48,042 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:42:48,106 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:43:20,127 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:43:20,304 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:43:20,378 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:43:51,383 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:43:51,446 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:43:51,515 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:44:22,444 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:44:22,541 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:44:22,610 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:44:54,638 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:44:54,800 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:44:54,863 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:45:25,737 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:45:25,820 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:45:25,892 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:45:56,825 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:45:57,035 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:45:57,236 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:46:28,141 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:46:28,261 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:46:28,324 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:46:59,222 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:46:59,326 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:46:59,389 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:47:30,255 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:47:30,321 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:47:30,383 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:48:01,250 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:48:01,384 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:48:01,474 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:48:32,452 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:48:32,575 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:48:32,643 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:49:03,985 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:49:04,098 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:49:04,161 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:49:35,119 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:49:35,398 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:49:35,726 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:50:07,248 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:50:07,358 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:50:07,436 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:50:38,386 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:50:38,475 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:50:38,575 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:51:10,061 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:51:10,141 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:51:10,234 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:51:41,921 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:51:42,040 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:51:42,108 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:52:13,599 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:52:13,727 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:52:13,791 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:52:44,668 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:52:44,897 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:52:45,008 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:53:16,218 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:53:16,350 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:53:16,422 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:53:47,410 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:53:47,487 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:53:47,553 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:54:18,658 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:54:18,721 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:54:18,788 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:54:50,150 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:54:50,249 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:54:50,312 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:55:21,196 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:55:21,366 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:55:21,431 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:55:53,212 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:55:53,290 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:55:53,375 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:55:53,931 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: small-node3] Event received: WatchedEvent state:SyncConnected type:NodeDeleted path:/egmi/egmi_election/p_0000000006
+2021-01-15 11:55:54,169 INFO c.n.e.e.z.ElectionProcess [Thread-1-EventThread] [Process: small-node3] - Setting watch on node with path: /egmi/egmi_election/p_0000000003
+2021-01-15 11:56:24,495 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:56:24,633 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:56:24,695 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:56:55,529 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:56:55,648 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:56:55,714 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:57:26,580 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:57:26,688 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:57:26,750 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:57:57,629 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:57:57,728 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:57:57,803 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:58:28,813 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:58:28,983 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:58:29,044 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:58:59,901 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:59:00,030 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:59:00,095 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 11:59:31,036 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: pool - subcommand: list - options:
+2021-01-15 11:59:31,225 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: info - options:
+2021-01-15 11:59:31,294 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 12:00:02,132 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options:
+2021-01-15 12:00:02,267 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-5] About to execute command: volume - subcommand: info - options:
+2021-01-15 12:00:02,332 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 12:00:33,183 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: pool - subcommand: list - options:
+2021-01-15 12:00:33,271 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-9] About to execute command: volume - subcommand: info - options:
+2021-01-15 12:00:33,337 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-2] About to execute command: volume - subcommand: status - options: all detail
+2021-01-15 12:01:04,727 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: pool - subcommand: list - options:
+2021-01-15 12:01:04,810 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-3] About to execute command: volume - subcommand: info - options:
+2021-01-15 12:01:04,873 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: volume - subcommand: status - options: all detail

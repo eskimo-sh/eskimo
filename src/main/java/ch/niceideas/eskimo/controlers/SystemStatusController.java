@@ -35,11 +35,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.eskimo.model.MasterStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import ch.niceideas.eskimo.services.ApplicationStatusService;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SetupService;
-import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +59,9 @@ public class SystemStatusController {
 
     @Autowired
     private ApplicationStatusService statusService;
+
+    @Autowired
+    private MasterService masterService;
 
     /* For tests */
     void setSetupService(SetupService setupService) {
@@ -90,11 +91,17 @@ public class SystemStatusController {
 
             JsonWrapper systemStatus = statusService.getStatus();
 
+            // 6. Inject identified masters
+            MasterStatusWrapper masterStatus = masterService.getMasterStatus();
+
             return ReturnStatusHelper.createOKStatus(map -> {
                 if (nodeServicesStatus == null || nodeServicesStatus.isEmpty()) {
                     map.put("clear", "nodes");
                 } else {
                     map.put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
+                }
+                if (masterStatus.hasPath("masters")) {
+                    map.put("masters", masterStatus.getJSONObject().getJSONObject("masters"));
                 }
                 map.put("systemStatus", systemStatus.getJSONObject());
                 map.put("processingPending", systemService.isProcessingPending());
@@ -106,7 +113,7 @@ public class SystemStatusController {
             logger.debug (e.getCause(), e.getCause());
             return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
 
-        } catch (SystemService.StatusExceptionWrapperException e) {
+        } catch (SystemService.StatusExceptionWrapperException | MasterService.MasterExceptionWrapperException e) {
 
             if (e.getCause() instanceof SetupException) {
                 // this is OK. means application is not yet initialized

@@ -50,11 +50,11 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "-- SETTING UP EGMI ------------------------------------------------------------"
 
 mkdir -p /var/lib/egmi
-mkdir -p /var/log/egmi
+mkdir -p /var/log/gluster/egmi
 
 echo " - Simlinking EGMI logs to /var/log/"
 sudo rm -Rf /usr/local/lib/egmi/logs
-sudo ln -s /var/log/egmi /usr/local/lib/egmi/logs
+sudo ln -s /var/log/gluster/egmi /usr/local/lib/egmi/logs
 
 echo " - Simlinking EGMI config to /usr/local/etc/egmi"
 sudo ln -s /usr/local/lib/egmi/conf /usr/local/etc/egmi

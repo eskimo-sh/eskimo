@@ -187,6 +187,13 @@
       "title": "Gluster Dashboard",
       "statusPageLinktitle": "Monitor Gluster volumes"
     },
+    "masterDetection": {
+      "strategy" : "LOG_FILE",
+      "logFile" : "/var/log/gluster/egmi/egmi.log",
+      "grep": "I am the new leader",
+      "timeStampExtractRexp" : "([0-9\\-]+ [0-9.:,]+).*",
+      "timeStampFormat" : "yyyy-MM-dd HH:mm:ss,SSS"
+    },
     "dependencies": [
       {
         "masterElectionStrategy": "RANDOM_NODE_AFTER_OR_SAME",

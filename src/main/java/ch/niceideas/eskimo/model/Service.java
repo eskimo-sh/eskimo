@@ -64,6 +64,7 @@ public class Service {
     private ConditionalInstallation conditional = null;
 
     private UIConfig uiConfig = null;
+    private MasterDetection masterDetection = null;
 
     private String statusGroup = null;
     private String statusName = null;
@@ -73,7 +74,7 @@ public class Service {
 
     private MemoryConsumptionSize memoryConsumptionSize;
 
-    private final List<String> additionalmemoryServices = new ArrayList<>();
+    private final List<String> additionalMemoryServices = new ArrayList<>();
 
     private String logo;
     private String icon;
@@ -93,7 +94,7 @@ public class Service {
 
     public int getMemoryConsumptionParts (ServicesDefinition servicesDefinition) {
         AtomicInteger parts = new AtomicInteger (getMemoryConsumptionSize().getNbrParts());
-        getAdditionalmemoryServices().stream()
+        getAdditionalMemoryServices().stream()
                 .map(servicesDefinition::getService)
                 .forEach(service -> parts.addAndGet(service.getMemoryConsumptionSize().getNbrParts()));
         return parts.get();
@@ -157,6 +158,7 @@ public class Service {
         return new JSONObject(new HashMap<String, Object>() {{
             put("group", StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() : "");
             put("name", getStatusName());
+            put("unique", isUnique());
             put("commands", getCommandsJSON());
         }});
     }
@@ -197,7 +199,7 @@ public class Service {
     }
 
     public void addAdditionalMemory(String memAdditionalService) {
-        this.additionalmemoryServices.add(memAdditionalService);
+        this.additionalMemoryServices.add(memAdditionalService);
     }
 
     public String getServiceId(String host) {

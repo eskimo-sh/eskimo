@@ -711,7 +711,15 @@ eskimo.SystemStatus = function() {
         setTimeout (that.monitoringDashboardFrameTamper, 10000);
     };
 
-    this.renderNodesStatus = function (nodeServicesStatus, blocking) {
+    this.callServiceMenuHooks  = function (serviceStatus, nodeName, nodeAddress, service, blocking) {
+        if (serviceStatus == "NA" || serviceStatus == "KO") {
+            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, false, blocking);
+        } else if (serviceStatus == "OK") {
+            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, true, blocking);
+        }
+    };
+
+    this.renderNodesStatus = function (nodeServicesStatus, masters, blocking) {
 
         let nodeNamesByNbr = [];
 
@@ -753,13 +761,15 @@ eskimo.SystemStatus = function() {
 
                     if (serviceStatus) {
 
-                        if (serviceStatus == "NA" || serviceStatus == "KO") {
+                        if (SERVICES_STATUS_CONFIG[service].unique) {
 
-                            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, false, blocking);
+                            this.callServiceMenuHooks (serviceStatus, nodeName, nodeAddress, service, blocking);
+                        } else {
 
-                        } else if (serviceStatus == "OK") {
-
-                            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, true, blocking);
+                            // check master and only do it if nodeAddress is master, otherwise don't bother'
+                            if (masters[service] == nodeName) {
+                                this.callServiceMenuHooks (serviceStatus, nodeName, nodeAddress, service, blocking);
+                            }
                         }
                     }
                 }
@@ -1119,7 +1129,7 @@ eskimo.SystemStatus = function() {
 
                     that.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
 
-                    that.renderNodesStatus (data.nodeServicesStatus, blocking);
+                    that.renderNodesStatus (data.nodeServicesStatus, data.masters, blocking);
 
                 } else if (data.clear == "setup"){
 
