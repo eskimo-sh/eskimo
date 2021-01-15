@@ -291,6 +291,8 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                         "  \"command\": {\n" +
                         "    \"restarts\": [\n" +
+                        "      {\"gluster\": \"192.168.10.11\"},\n" +
+                        "      {\"gluster\": \"192.168.10.13\"},\n" +
                         "      {\"kafka\": \"192.168.10.11\"},\n" +
                         "      {\"kafka\": \"192.168.10.13\"},\n" +
                         "      {\"spark-executor\": \"192.168.10.11\"},\n" +

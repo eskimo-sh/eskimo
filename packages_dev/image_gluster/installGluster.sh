@@ -39,24 +39,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "-- INSTALLING EGMI -----------------------------------------------------------"
-
-if [ -z "$EGMI_VERSION" ]; then
-    echo "Need to set EGMI_VERSION environment variable before calling this script !"
-    exit 1
-fi
-
-
-echo " - Testing if local EGMI is found "
-export EGMI_LOCAL_ARCHIVE=
-for i in `find /tmp -name 'egmi*tar.gz'`; do
-    export EGMI_LOCAL_ARCHIVE=$i
-done
-if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
-    echo "   + Found local archive : $EGMI_LOCAL_ARCHIVE"
-fi
-
-
+echo "-- INSTALLING GLUSTER (Mostly hacks) -------------------------------------------------"
 
 
 saved_dir=`pwd`
@@ -67,45 +50,21 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
-mkdir -p /tmp/egmi_setup
-cd /tmp/egmi_setup
+mkdir -p /tmp/gluster_setup
+cd /tmp/gluster_setup
 
-if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
-    echo " - Using local archive"
-    mv $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION.tar.gz
-else
-    echo " - Downloading archive egmi-$EGMI_VERSION"
-    # wget https://www-eu.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
-    echo " - TODO TO BE IMPLEMENTED"
-    exit 1
-fi
+echo " - downgrading xfsprogs (last version is buggy)"
 
+echo "   + downloading xfsprogs_4.9.0+nmu1_amd64.deb from debian packages repository"
 
-echo " - Extracting egmi-$EGMI_VERSION"
-tar -xvf egmi-$EGMI_VERSION.tar.gz > /tmp/egmi_install_log 2>&1
-fail_if_error $? "/tmp/egmi_install_log" -2
+wget http://ftp.us.debian.org/debian/pool/main/x/xfsprogs/xfsprogs_4.9.0+nmu1_amd64.deb> /tmp/gluster_install_log 2>&1
+fail_if_error $? "/tmp/gluster_install_log" -1
 
-echo " - Installing egmi"
-sudo chown root.staff -R egmi-$EGMI_VERSION
-sudo mv egmi-$EGMI_VERSION /usr/local/lib/egmi-$EGMI_VERSION
+echo "   + Installing xfsprogs"
+dpkg -i xfsprogs_4.9.0+nmu1_amd64.deb > /tmp/gluster_install_log 2>&1
+fail_if_error $? "/tmp/flink_install_log" -2
 
-echo " - symlinking /usr/local/lib/egmi/ to /usr/local/lib/egmi-$EGMI_VERSION"
-sudo ln -s /usr/local/lib/egmi-$EGMI_VERSION /usr/local/lib/egmi
-
-
-echo " - Checking EGMI Installation"
-/usr/local/lib/egmi/bin/egmi.sh > /tmp/egmi_run_log 2>&1 &
-EXAMPLE_PID=$!
-fail_if_error $? "/tmp/egmi_run_log" -3
-sleep 10
-if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
-    echo "EGMI process not started successfully !"
-    cat /tmp/egmi_run_log
-    exit 10
-fi
-
-
-sudo rm -Rf /tmp/egmi_setup
+sudo rm -Rf /tmp/gluster_setup
 returned_to_saved_dir
 
 

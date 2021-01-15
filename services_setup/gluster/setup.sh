@@ -105,14 +105,13 @@ if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; th
     exit 100
 fi
 
-# Nothing to configure statically for the time being
-#echo " - Configuring EGMI - Eskimo Gluster Management Infrastructure"
-#docker exec gluster bash /scripts/inContainerSetupEgmi.sh | tee -a gluster_install_log 2>&1
-#if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
-#    echo " - In container setup script ended up in error"
-#    cat gluster_install_log
-#    exit 101
-#fi
+echo " - Configuring EGMI - Eskimo Gluster Management Infrastructure"
+docker exec gluster bash /scripts/inContainerSetupEgmi.sh | tee -a gluster_install_log 2>&1
+if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
+    echo " - In container setup script ended up in error"
+    cat gluster_install_log
+    exit 101
+fi
 
 #echo " - TODO"
 #docker exec -it gluster TODO

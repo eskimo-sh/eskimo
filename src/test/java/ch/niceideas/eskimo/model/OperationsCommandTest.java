@@ -150,11 +150,13 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(14, oc.getRestarts().size());
+        assertEquals(16, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
+                "gluster=192.168.10.11, " +
+                "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
@@ -285,11 +287,13 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(14, oc.getRestarts().size());
+        assertEquals(16, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
+                "gluster=192.168.10.11, " +
+                "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
@@ -389,11 +393,13 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(14, oc.getRestarts().size());
+        assertEquals(16, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
+                "gluster=192.168.10.11, " +
+                "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
@@ -490,11 +496,13 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         assertEquals("zookeeper", oc.getUninstallations().get(2).getKey());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getValue());
 
-        assertEquals(14, oc.getRestarts().size());
+        assertEquals(16, oc.getRestarts().size());
 
         assertEquals ("[" +
                 "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
+                "gluster=192.168.10.11, " +
+                "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
@@ -531,7 +539,9 @@ public class OperationsCommandTest extends AbstractServicesDefinitionTest {
         savedServicesInstallStatus.setValueForPath("spark-executor_installed_on_IP_192-168-10-13", "restart");
         savedServicesInstallStatus.setValueForPath("zeppelin_installed_on_IP_192-168-10-13", "restart");
 
-        // some restartes done
+        // some restarts done
+        savedServicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-13", "OK");
         savedServicesInstallStatus.setValueForPath("elasticsearch_installed_on_IP_192-168-10-11", "OK");
         savedServicesInstallStatus.setValueForPath("mesos-master_installed_on_IP_192-168-10-13", "OK");
         savedServicesInstallStatus.setValueForPath("cerebro_installed_on_IP_192-168-10-11", "OK");

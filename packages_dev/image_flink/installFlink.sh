@@ -69,8 +69,6 @@ fail_if_error $? "/tmp/flink_install_log" -2
 
 echo " - Downloading flink-$FLINK_VERSION"
 wget https://www-eu.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
-
-
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad flink-$FLINK_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
     wget http://niceideas.ch/mes/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1

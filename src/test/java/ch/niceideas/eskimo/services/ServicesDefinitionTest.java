@@ -277,10 +277,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUIServices();
 
-        assertEquals(9, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(10, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "grafana",
+                "gluster",
                 "mesos-master",
                 "marathon",
                 "kafka-manager",
@@ -326,9 +327,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         }, elasticsearchDep);
 
         String[] zookeeperDep = def.getDependentServices("zookeeper").toArray(new String[0]);
-        assertEquals(11, zookeeperDep.length, String.join(",", zookeeperDep));
+        assertEquals(12, zookeeperDep.length, String.join(",", zookeeperDep));
         assertArrayEquals(new String[] {
                 "zookeeper",
+                "gluster",
                 "flink-app-master",
                 "flink-worker",
                 "kafka",

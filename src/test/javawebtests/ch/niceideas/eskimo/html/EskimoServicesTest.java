@@ -69,10 +69,10 @@ public class EskimoServicesTest extends AbstractWebTest {
         js("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"spark-history-server\", \"zeppelin\"] );");
 
         js("var UI_SERVICES_CONFIG = {" +
-                "\"cerebro\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
-                "\"kibana\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana', 'waitTime': 15 }, " +
-                "\"spark-history-server\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo', 'waitTime': 25 }, " +
-                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
+                "\"cerebro\" : {'urlTemplate': './cerebro/{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
+                "\"kibana\" : {'urlTemplate': './kibana/{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana', 'waitTime': 15 }, " +
+                "\"spark-history-server\" : {'urlTemplate': './spark-histo/{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo', 'waitTime': 25 }, " +
+                "\"zeppelin\" : {'urlTemplate': './zeppelin/{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
                 "};");
 
         js("eskimoServices.setUiServicesConfig(UI_SERVICES_CONFIG);");
@@ -143,8 +143,8 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testPeriodicRetryServices() throws Exception {
 
-        js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
-        js("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
+        js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192-168-10-11', false);");
+        js("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192-168-10.11', false);");
         js("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192.168.10.11', false);");
 
         js("alert (JSON.stringify (eskimoServices.getUIConfigsToRetryForTests()));");
@@ -187,14 +187,14 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals("true", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
 
         js("eskimoServices.setUiServicesConfig( {" +
-                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
-                "'actualUrl' : 'http://other-ip-address:9999/zeppelin' }});");
+                "\"zeppelin\" : {'urlTemplate': './zeppelin/{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
+                "'actualUrl' : './zeppelin/other-ip-address:9999/zeppelin' }});");
 
         assertJavascriptEquals("true", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
 
         js("eskimoServices.setUiServicesConfig( {" +
-                "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
-                "'actualUrl' : 'http://192.168.10.11:9999/zeppelin' }});");
+                "\"zeppelin\" : {'urlTemplate': './zeppelin/{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin'," +
+                "'actualUrl' : './zeppelin/192-168-10-11:9999/zeppelin' }});");
 
         assertJavascriptEquals("false", "eskimoServices.shouldReinitialize('zeppelin', '192.168.10.11')");
     }
@@ -217,8 +217,8 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testBuildUrl() throws Exception {
 
-        js("uiConfig = {'urlTemplate': 'http://{NODE_ADDRESS}:9999/test'}"); // proxyContext
-        assertJavascriptEquals("http://192.168.10.11:9999/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
+        js("uiConfig = {'urlTemplate': './test/{NODE_ADDRESS}:9999/test'}"); // proxyContext
+        assertJavascriptEquals("./test/192-168-10-11:9999/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
         js("uiConfig = {'proxyContext': '/test', 'unique': true}"); //
         assertJavascriptEquals("/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
@@ -241,7 +241,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', false);");
 
-        assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].targetUrl");
+        assertJavascriptEquals("./cerebro/192-168-10-11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].targetUrl");
         assertJavascriptEquals("cerebro", "UI_SERVICES_CONFIG['cerebro'].service");
         assertJavascriptEquals("10.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
         assertJavascriptEquals("true", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
@@ -257,7 +257,7 @@ public class EskimoServicesTest extends AbstractWebTest {
         await().atMost(5, TimeUnit.SECONDS).until(() -> js("UI_SERVICES_CONFIG['cerebro'].refreshWaiting").getJavaScriptResult().toString().equals ("false"));
 
         assertJavascriptEquals("false", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
-        assertJavascriptEquals("http://192.168.10.11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");
+        assertJavascriptEquals("./cerebro/192-168-10-11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");
     }
 
     @Test
@@ -283,10 +283,10 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         assertTrue (
                 new JSONArray("[{" +
-                        "\"urlTemplate\":\"http://{NODE_ADDRESS}:9999/kibana\"," +
+                        "\"urlTemplate\":\"./kibana/{NODE_ADDRESS}:9999/kibana\"," +
                         "\"title\":\"kibana\"," +
                         "\"waitTime\":15," +
-                        "\"targetUrl\":\"http://192.168.10.11:9999/kibana\"," +
+                        "\"targetUrl\":\"./kibana/192-168-10-11:9999/kibana\"," +
                         "\"service\":\"kibana\"," +
                         "\"targetWaitTime\":15," +
                         "\"refreshWaiting\":true}]")
@@ -343,10 +343,10 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         assertTrue (
                 new JSONArray("[{" +
-                        "\"urlTemplate\":\"http://{NODE_ADDRESS}:9999/kibana\"," +
+                        "\"urlTemplate\":\"./kibana/{NODE_ADDRESS}:9999/kibana\"," +
                         "\"title\":\"kibana\"," +
                         "\"waitTime\":15," +
-                        "\"targetUrl\":\"http://192.168.10.11:9999/kibana\"," +
+                        "\"targetUrl\":\"./kibana/192-168-10-11:9999/kibana\"," +
                         "\"service\":\"kibana\"," +
                         "\"targetWaitTime\":15," +
                         "\"refreshWaiting\":true," +

@@ -118,8 +118,9 @@ public class GlusterSetupTest extends AbstractSetupShellTest {
                     "bash -c echo \"    type mgmt/glusterd\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option working-directory /var/lib/gluster/working_directory\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport-type socket,rdma\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
-                    "bash -c echo \"    option transport.socket.keepalive-time 10\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
+                    "bash -c echo \"    option transport.socket.keepalive-time 20\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport.socket.keepalive-interval 2\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
+                    "bash -c echo \"    option transport.socket.keepalive-count 9\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport.socket.read-fail-log off\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option ping-timeout 0\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option event-threads 2\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +

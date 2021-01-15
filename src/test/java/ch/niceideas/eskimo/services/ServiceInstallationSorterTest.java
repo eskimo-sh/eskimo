@@ -86,11 +86,11 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         assertEquals("elasticsearch", group2.get(0).getKey());
         assertEquals("192.168.10.13", group2.get(0).getValue());
 
-        List<Pair<String, String>> group3 = orderedInstall.get(4);
-        assertEquals(2, group3.size());
-        assertEquals("gluster", group3.get(0).getKey());
-        assertEquals("192.168.10.11", group3.get(0).getValue());
-        assertEquals("gluster", group3.get(1).getKey());
+        List<Pair<String, String>> group6 = orderedInstall.get(6);
+        assertEquals(2, group6.size());
+        assertEquals("gluster", group6.get(0).getKey());
+        assertEquals("192.168.10.11", group6.get(0).getValue());
+        assertEquals("gluster", group6.get(1).getKey());
 
         List<Pair<String, String>> group8 = orderedInstall.get(9);
         assertEquals(2, group8.size());

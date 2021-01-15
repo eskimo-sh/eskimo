@@ -65,6 +65,10 @@ echo " - Installing OpenJDK 11"
 docker exec -i gluster_template apt-get install -y openjdk-11-jdk > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -3
 
+echo " - Installing GLuster dependencies"
+docker exec -i gluster_template apt-get install -y nfs-kernel-server nfs-common > /tmp/gluster_build_log 2>&1
+fail_if_error $? "/tmp/gluster_build_log" -3
+
 echo " - Installing gluster"
 docker exec -i gluster_template apt-get install -y glusterfs-server glusterfs-client > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" -3
@@ -81,6 +85,13 @@ if [[ -d "$SCRIPT_DIR/../../../EGMI/target" ]]; then
     done
 fi
 
+docker exec -i gluster_template bash /scripts/installGluster.sh | tee /tmp/gluster_build_log 2>&1
+if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/gluster_build_log
+    exit 102
+fi
+
 docker exec -i gluster_template bash /scripts/installEgmi.sh | tee /tmp/gluster_build_log 2>&1
 if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
@@ -90,7 +101,7 @@ fi
 
 
 echo " - Cleaning image gluster"
-docker exec -i gluster_template apt-get remove -y gcc git > /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get remove -y gcc git adwaita-icon-theme > /tmp/gluster_build_log 2>&1
 docker exec -i gluster_template apt-get -y auto-remove > /tmp/gluster_build_log 2>&1
 
 echo " - Closing and saving image gluster"
