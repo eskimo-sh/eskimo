@@ -55,23 +55,23 @@ build_image gluster_template /tmp/gluster_build_log
 # EDIT : I don't nee python anymore
 #echo " - Installing python"
 #docker exec -i gluster_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
-#fail_if_error $? "/tmp/gluster_build_log" -5
+#fail_if_error $? "/tmp/gluster_build_log" 1
 
 #echo " - Installing required python packages"
 #docker exec -i gluster_template pip install furl >> /tmp/gluster_build_log 2>&1
-#fail_if_error $? "/tmp/gluster_build_log" -5
+#fail_if_error $? "/tmp/gluster_build_log" 2
 
 echo " - Installing OpenJDK 11"
 docker exec -i gluster_template apt-get install -y openjdk-11-jdk > /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" -3
+fail_if_error $? "/tmp/gluster_build_log" 3
 
 echo " - Installing GLuster dependencies"
 docker exec -i gluster_template apt-get install -y nfs-kernel-server nfs-common > /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" -3
+fail_if_error $? "/tmp/gluster_build_log" 4
 
 echo " - Installing gluster"
 docker exec -i gluster_template apt-get install -y glusterfs-server glusterfs-client > /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" -3
+fail_if_error $? "/tmp/gluster_build_log" 5
 
 echo " - Installing EGMI"
 
@@ -81,7 +81,7 @@ if [[ -d "$SCRIPT_DIR/../../../EGMI/target" ]]; then
     for i in `find $SCRIPT_DIR/../../../EGMI/target -name 'egmi*tar.gz'`; do
         echo "   + Copying "`basename $i`
         docker cp $i gluster_template:/tmp/`basename $i`  > /tmp/gluster_build_log 2>&1
-        fail_if_error $? "/tmp/gluster_build_log" -3
+        fail_if_error $? "/tmp/gluster_build_log" 6
     done
 fi
 
@@ -102,6 +102,11 @@ fi
 
 echo " - Cleaning image gluster"
 docker exec -i gluster_template apt-get remove -y gcc git adwaita-icon-theme > /tmp/gluster_build_log 2>&1
+fail_if_error $? "/tmp/gluster_build_log" 7
+
+docker exec -i gluster_template apt-get remove -y fonts-dejavu-extra krb5-locales manpages-dev moreutils libipc-run-perl libio-pty-perl perl > /tmp/gluster_build_log 2>&1
+fail_if_error $? "/tmp/gluster_build_log" 8
+
 docker exec -i gluster_template apt-get -y auto-remove > /tmp/gluster_build_log 2>&1
 
 echo " - Closing and saving image gluster"

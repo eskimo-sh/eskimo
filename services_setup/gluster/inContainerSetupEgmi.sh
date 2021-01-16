@@ -59,6 +59,9 @@ sudo ln -s /var/log/gluster/egmi /usr/local/lib/egmi/logs
 echo " - Simlinking EGMI config to /usr/local/etc/egmi"
 sudo ln -s /usr/local/lib/egmi/conf /usr/local/etc/egmi
 
+echo " - Installing __force-remove-brick.sh"
+cp /usr/local/lib/egmi/gluster_container_helpers/* /usr/local/sbin/
+
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
