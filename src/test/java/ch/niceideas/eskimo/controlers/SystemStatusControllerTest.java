@@ -1,11 +1,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.eskimo.model.MasterStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import ch.niceideas.eskimo.services.ApplicationStatusService;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SetupService;
-import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.services.*;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +20,12 @@ public class SystemStatusControllerTest {
         ssc.setSystemService(new SystemService(false) {
             public boolean getLastOperationSuccess() {
                 return true;
+            }
+        });
+
+        ssc.setMasterService(new MasterService() {
+            public MasterStatusWrapper getMasterStatus() {
+                return MasterStatusWrapper.empty();
             }
         });
 
@@ -55,6 +59,12 @@ public class SystemStatusControllerTest {
         ssc.setSystemService(new SystemService(false) {
             public SystemStatusWrapper getStatus() {
                 return new SystemStatusWrapper("{\"status\":\"OK\"}");
+            }
+        });
+
+        ssc.setMasterService(new MasterService() {
+            public MasterStatusWrapper getMasterStatus() {
+                return MasterStatusWrapper.empty();
             }
         });
 

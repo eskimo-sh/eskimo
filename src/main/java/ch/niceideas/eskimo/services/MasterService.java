@@ -34,10 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.MasterDetection;
-import ch.niceideas.eskimo.model.MasterStatusWrapper;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.mdStrategy.MdStrategy;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +77,9 @@ public class MasterService {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
+    @Autowired
+    private SystemService systemService;
+
     @Value("${system.statusUpdatePeriodSeconds}")
     private int statusUpdatePeriodSeconds = 5;
 
@@ -109,6 +109,9 @@ public class MasterService {
     }
     void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
+    }
+    void setSystemService (SystemService systemService) {
+        this.systemService = systemService;
     }
 
     // constructor for spring
@@ -206,6 +209,8 @@ public class MasterService {
                         .filter(service -> service.getMasterDetection() != null)
                         .collect(Collectors.toList());
 
+                SystemStatusWrapper lastStatus = systemService.getStatus();
+
                 for (Service service : masterServices) {
 
                     MasterDetection masterDetection = service.getMasterDetection();
@@ -216,24 +221,28 @@ public class MasterService {
 
                     for (String node : nodes) {
 
-                        try {
-                            Date masterElectedDate = strategy.detectMaster(
-                                    service, node, masterDetection, this, sshCommandService, messagingService, notificationService);
+                        if (lastStatus.isServiceOKOnNode(service.getName(), node)) {
 
-                            if (masterElectedDate != null) {
-                                handleMasterDetectedDate(service, node, masterElectedDate);
+                            try {
+                                Date masterElectedDate = strategy.detectMaster(
+                                        service, node, masterDetection, this, sshCommandService, messagingService, notificationService);
+
+                                if (masterElectedDate != null) {
+                                    handleMasterDetectedDate(service, node, masterElectedDate);
+                                }
+
+                            } catch (MasterDetectionException e) {
+                                logger.warn(e.getMessage());
+                                logger.debug(e, e);
                             }
-
-                        } catch (MasterDetectionException e) {
-                            logger.warn (e.getMessage());
-                            logger.debug (e, e);
+                        } else {
+                            logger.warn ("Not checking if service " + service.getName() + " is master on " + node + " since service reports issues");
                         }
                     }
                 }
             }
 
-        } catch (SystemException | NodesConfigurationException | SetupException e) {
-
+        } catch (SystemException | NodesConfigurationException | SetupException | SystemService.StatusExceptionWrapperException e) {
             logger.error (e, e);
 
         } finally {

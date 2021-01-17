@@ -99,13 +99,12 @@ if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"
     exit 102
 fi
 
+#docker exec -i gluster_template bash
+
 
 echo " - Cleaning image gluster"
-docker exec -i gluster_template apt-get remove -y gcc git adwaita-icon-theme > /tmp/gluster_build_log 2>&1
+docker exec -i gluster_template apt-get remove -y gcc git adwaita-icon-theme fonts-dejavu-extra > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" 7
-
-docker exec -i gluster_template apt-get remove -y fonts-dejavu-extra krb5-locales manpages-dev moreutils libipc-run-perl libio-pty-perl perl > /tmp/gluster_build_log 2>&1
-fail_if_error $? "/tmp/gluster_build_log" 8
 
 docker exec -i gluster_template apt-get -y auto-remove > /tmp/gluster_build_log 2>&1
 

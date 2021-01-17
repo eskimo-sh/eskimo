@@ -73,6 +73,9 @@ public class SystemStatusController {
     void setStatusService(ApplicationStatusService statusService) {
         this.statusService = statusService;
     }
+    void setMasterService(MasterService masterService) {
+        this.masterService = masterService;
+    }
 
     @GetMapping("/get-last-operation-result")
     @ResponseBody

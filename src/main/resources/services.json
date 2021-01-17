@@ -174,7 +174,7 @@
       "imageName" : "gluster",
       "order": 4,
       "mandatory": true,
-      "name" : "Gluster FS",
+      "name" : "Gluster / EGMI",
       "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/gluster-logo.png",

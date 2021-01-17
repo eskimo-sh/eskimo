@@ -767,7 +767,7 @@ eskimo.SystemStatus = function() {
                         } else {
 
                             // check master and only do it if nodeAddress is master, otherwise don't bother'
-                            if (masters[service] == nodeName) {
+                            if (masters && masters[service] == nodeName) {
                                 this.callServiceMenuHooks (serviceStatus, nodeName, nodeAddress, service, blocking);
                             }
                         }

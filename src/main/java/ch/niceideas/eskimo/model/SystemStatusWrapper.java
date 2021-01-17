@@ -127,8 +127,8 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         }
     }
 
-    public boolean isServiceOKOnNode(String serviceName, String marathonNodeName) {
-        String marathonStatus = getValueForPathAsString(SERVICE_PREFIX + serviceName  + "_" + marathonNodeName);
+    public boolean isServiceOKOnNode(String serviceName, String node) {
+        String marathonStatus = getValueForPathAsString(SERVICE_PREFIX + serviceName  + "_" + node.replace(".", "-"));
         return StringUtils.isNotBlank(marathonStatus) && marathonStatus.equals("OK");
     }
 

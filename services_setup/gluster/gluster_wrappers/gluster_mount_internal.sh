@@ -37,13 +37,13 @@
 # Checking arguments
 if [[ $1 == "" ]]; then
    echo "expected gluster volume name as first argument"
-   exit -1
+   exit 1
 fi
 export VOLUME=$1
 
 if [[ $2 == "" ]]; then
    echo "expected mount point as second argument"
-   exit -2
+   exit 2
 fi
 export MOUNT_POINT=$2
 export MOUNT_POINT_NAME=`echo $MOUNT_POINT | tr -s '/' '-'`
@@ -51,13 +51,13 @@ export MOUNT_POINT_NAME=${MOUNT_POINT_NAME#?};
 
 if [[ $3 == "" ]]; then
    echo "expected mount point owner user as third argument"
-   exit -2
+   exit 3
 fi
 export OWNER=$3
 
 if [[ $4 == "" ]]; then
    echo "expected mount point owner user ID as fourth argument"
-   exit -2
+   exit 4
 fi
 export OWNER_ID=$4
 
@@ -72,7 +72,7 @@ echo "   + owner UID        : $OWNER_ID"
 # Loading topology
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
     echo "  - ERROR : no topology file defined !"
-    exit -123
+    exit 5
 fi
 
 rm -Rf /tmp/gluster_mount_$1_log
@@ -82,42 +82,23 @@ rm -Rf /tmp/gluster_mount_$1_log
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -4
+    exit 6
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -5
+    exit 7
 fi
 
 
 # find out if gluster is available
 if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
     echo "ERROR: No gluster master defined"
-    exit -20
+    exit 8
 fi
 
 set +e
 
-
-# This is really just addressing the need to unmount the mount point before anything else is to be attempted
-# In case the underlying gluster transport is not connected and yet the mount point is still referenced as mounted
-echo " - Checking existing mount of $MOUNT_POINT"
-rm -Rf /tmp/gluster_error_$1
-ls -la $MOUNT_POINT >/dev/null 2>/tmp/gluster_error_$1
-if [[ $? != 0 ]]; then
-    if [[ `grep "Transport endpoint is not connected" /tmp/gluster_error_$1` != "" \
-         || `grep "Too many levels of symbolic links" /tmp/gluster_error_$1` != "" \
-         || `grep "No such device" /tmp/gluster_error_$1` != "" ]]; then
-        echo " - There is an issue with $MOUNT_POINT (Transport endpoint is not connected / too many levels of symbolic links), unmounting ..."
-        /bin/umount -f $MOUNT_POINT  >> /tmp/gluster_mount_$1_log 2>&1
-        if [[ $? != 0 ]]; then
-            echo "Failed to unmount $MOUNT_POINT"
-            cat /tmp/gluster_mount_$1_log
-            exit -3
-        fi
-    fi
-fi
 
 # Creating the mount point if it does not exist
 if [[ ! -d "$MOUNT_POINT" ]]; then
@@ -140,41 +121,22 @@ trap delete_gluster_lock_file EXIT
 
 touch /var/lib/gluster/volume_management_lock_$VOLUME
 
-# We first attempt mounting on two sides using __gluster-prepare-mount.sh
-# - __gluster-prepare-mount-sh calls
-#  + in container address-gluster-inconsistency.sh which does
-#    - ensures that the master is not in the pool of the local node and the local node not in the pool of the master
-#    - or that both are in each others pool
-#    - fix the situation if it is incoherent
-#  + in container configure-general-gluster.sh which does
-#    - first try /usr/local/sbin/gluster_call_remote.sh $SELF_IP_ADDRESS peer probe $MASTER_IP_ADDRESS
-#    - then try  /usr/local/sbin/gluster_call_remote.sh $MASTER_IP_ADDRESS peer probe $
-#    - then checks if peer adding was successfull
-#  + in container gluster-prepare-mount.sh which does
-#    - gluster volume create $VOL_NAME ...
-#    - gluster volume start $VOL_NAME ...
-#    - then check volume was properly created
-if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
-
-    echo " - Just trying to remount $MOUNT_POINT first"
-    /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_$1_log 2>&1
-
-    sleep 1
-    if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
-        failedSys=1
-    fi
-
-    ls -la $MOUNT_POINT >/dev/null 2>/tmp/error
-    if [[ $? != 0 && $failedSys != 0 ]]; then
-        if [[ `grep "Transport endpoint is not connected" /tmp/error` != "" ]]; then
-            failedTrans=1
+# This is really just addressing the need to unmount the mount point before anything else is to be attempted
+# In case the underlying gluster transport is not connected and yet the mount point is still referenced as mounted
+echo " - Checking existing mount of $MOUNT_POINT"
+rm -Rf /tmp/gluster_error_$1
+ls -la $MOUNT_POINT >/dev/null 2>/tmp/gluster_error_$1
+if [[ $? != 0 ]]; then
+    if [[ `grep "Transport endpoint is not connected" /tmp/gluster_error_$1` != "" \
+         || `grep "Too many levels of symbolic links" /tmp/gluster_error_$1` != "" \
+         || `grep "No such device" /tmp/gluster_error_$1` != "" ]]; then
+        echo " - There is an issue with $MOUNT_POINT (Transport endpoint is not connected / too many levels of symbolic links), unmounting ..."
+        /bin/umount -f $MOUNT_POINT  >> /tmp/gluster_mount_$1_log 2>&1
+        if [[ $? != 0 ]]; then
+            echo "Failed to unmount $MOUNT_POINT"
+            cat /tmp/gluster_mount_$1_log
+            exit 9
         fi
-    fi
-
-    if [[ $failedSys != 0 && $failedTrans != 0 ]]; then
-        echo "Problem encountered with gluster infrastructure on local node."
-        cat /tmp/gluster_mount_$1_log
-        exit 10
     fi
 fi
 
@@ -188,6 +150,7 @@ if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
 
     echo " - reloading systemd daemon"
     /bin/systemctl daemon-reload
+
 fi
 
 
@@ -198,13 +161,13 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
     if [[ $? != 0 ]]; then
         echo "Failed to mount $MOUNT_POINT"
         cat /tmp/gluster_mount_$1_log
-        exit -7
+        exit 10
     fi
 
     if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
         echo "Unsuccessfully attempted to mount $MOUNT_POINT"
         cat /tmp/gluster_mount_$1_log
-        exit -71
+        exit 11
     fi
 fi
 
