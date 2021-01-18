@@ -57,7 +57,7 @@ nohup /usr/bin/docker run \
 #         -p 111:111 \ # RPC Bind is not supported in docke rcontainer since in use on the host in anyway
 # as a consequence if gluster has to be used through nfs, this is not supported without "network host" I guess
 
-#        -p 18999:18999 \
+#        -p 28901:28901 \
 #        -p 24007:24007 \
 #        -p 24008:24008 \
 #        -p 38465-38467:38465-38467 \

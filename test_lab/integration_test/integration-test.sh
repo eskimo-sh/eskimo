@@ -1104,8 +1104,8 @@ test_web_apps() {
 
     echo_date "   + testing marathon application count"
     marathon_apps=$(query_eskimo "marathon/v2/apps" | jq -r ' .apps | .[] | .id' 2> /dev/null)
-    if [[ $(echo "$marathon_apps" | wc -l) != 7 ]]; then
-        echo_date "Didn't find 7 apps in marathon"
+    if [[ $(echo "$marathon_apps" | wc -l) != $EXPECTED_NBR_APPS_MARATHON ]]; then
+        echo_date "Didn't find $EXPECTED_NBR_APPS_MARATHON apps in marathon"
         echo_date "Found apps:"
         echo "$marathon_apps"
         exit 104
@@ -1322,6 +1322,8 @@ usage() {
     echo "    -m  Test on multiple nodes"
     echo "    -n  Don't rebuild the software (use last build)"
 }
+
+export EXPECTED_NBR_APPS_MARATHON=6
 
 export BOX_IP=192.168.10.41
 export TARGET_MASTER_VM="integration-test"

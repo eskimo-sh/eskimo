@@ -343,12 +343,12 @@ function build_container() {
     echo " - Deleting previous docker template for $IMAGE if exist"
     if [[ `docker images -q eskimo:$IMAGE"_template" 2>/dev/null` != "" ]]; then
         docker image rm eskimo:$IMAGE"_template" >> $LOG_FILE 2>&1
-        fail_if_error $? "$LOG_FILE" -1
+        fail_if_error $? "$LOG_FILE" 5
     fi
 
     echo " - Importing latest docker template for $IMAGE"
     gunzip -c ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz | docker load >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -1
+    fail_if_error $? "$LOG_FILE" 6
 
     echo " - Killing any previous containers"
     sudo systemctl stop $CONTAINER > /dev/null 2>&1
@@ -360,7 +360,7 @@ function build_container() {
     # build
     echo " - Building docker container"
     docker build --iidfile id_file --tag eskimo:$CONTAINER . >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -1
+    fail_if_error $? "$LOG_FILE" 7
 }
 
 # This is used to create a command wrapper around a binary command in order to

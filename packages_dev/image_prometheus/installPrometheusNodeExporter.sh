@@ -62,7 +62,7 @@ mkdir -p /tmp/prometheus_ne_setup
 cd /tmp/prometheus_ne_setup
 
 echo " - Downloading node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION"
-wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
+wget https://github.com/prometheus/node_exporter/releases/download/v$PROMETHEUS_NODE_EXPORTER_VERSION/node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad ode_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION from github. Trying to download from niceideas.ch"
     exit -1

@@ -87,19 +87,21 @@ sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/sp
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
 
 
-if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:18999/?command=volume&subcommand=list" 2>/dev/null | grep "logstash"` != "" ]]; then
+echo "   + Checking if needed to mount logstash shares ?"
+if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:28901/egmi/command?command=volume&subcommand=list&options=" 2>/dev/null | grep "logstash"` != "" ]]; then
     echo "   + mounting logstash shares"
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
 fi
 
 
-if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:18999/?command=volume&subcommand=list" 2>/dev/null | grep "flink"` != "" ]]; then
+echo "   + Checking if needed to mount flink shares ?"
+if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:28901/egmi/command?command=volume&subcommand=list&options=" 2>/dev/null | grep "flink"` != "" ]]; then
     echo "   + mounting flink shares"
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
 fi
 
-echo " - cerating zeppelin notebokk service if it does not exist"
+echo " - creating zeppelin notebook service if it does not exist"
 mkdir -p /var/lib/spark/data/zeppelin/notebooks
 
 echo " - Checking if samples neeed to be installed"

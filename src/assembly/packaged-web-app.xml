@@ -97,6 +97,11 @@ Software.
             </includes>
             <fileMode>0755</fileMode>
         </fileSet>
+        <fileSet> <!-- Create empty directory -->
+            <outputDirectory>logs</outputDirectory>
+            <excludes><exclude>**/*</exclude></excludes>
+            <directoryMode>0777</directoryMode>
+        </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/distrib/utils</directory>
             <outputDirectory>bin/utils</outputDirectory>

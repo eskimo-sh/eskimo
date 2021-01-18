@@ -35,9 +35,6 @@
 # requires :
 # apt-get install python-pip
 # pip install furl
-# called with :
-# curl 'http://localhost:18999/?command=peer&subcommand=probe&options=192.168.10.13'
-# curl 'http://localhost:18999/?command=pool&subcommand=list&options='
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
@@ -148,5 +145,5 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)
 
-print "serving at port", PORT
+print ("serving at port {0}".format (PORT))
 httpd.serve_forever()

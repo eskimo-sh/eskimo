@@ -58,7 +58,7 @@ mkdir -p /tmp/grafana_setup
 cd /tmp/grafana_setup
 
 echo " - Downloading grafana-$GRAFANA_VERSION"
-wget https://dl.grafana.com/oss/release/grafana-6.7.4.linux-amd64.tar.gz  > /tmp/grafana_install_log 2>&1
+wget https://dl.grafana.com/oss/release/grafana-$GRAFANA_VERSION.linux-amd64.tar.gz  > /tmp/grafana_install_log 2>&1
 
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad grafana-$GRAFANA_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
