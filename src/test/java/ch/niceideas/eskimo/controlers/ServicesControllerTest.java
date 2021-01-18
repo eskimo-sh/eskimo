@@ -152,14 +152,17 @@ public class ServicesControllerTest {
                 "  \"uiServicesStatusConfig\": {\n" +
                 "    \"A\": {\n" +
                 "      \"commands\": [],\n" +
+                "      \"unique\": false,\n" +
                 "      \"group\": \"\"\n" +
                 "    },\n" +
                 "    \"B\": {\n" +
                 "      \"commands\": [],\n" +
+                "      \"unique\": false,\n" +
                 "      \"group\": \"\"\n" +
                 "    },\n" +
                 "    \"C\": {\n" +
                 "      \"commands\": [],\n" +
+                "      \"unique\": false,\n" +
                 "      \"group\": \"\"\n" +
                 "    }\n" +
                 "  },\n" +
