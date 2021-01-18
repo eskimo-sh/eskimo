@@ -348,7 +348,12 @@ function build_container() {
 
     echo " - Importing latest docker template for $IMAGE"
     gunzip -c ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz | docker load >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" 6
+    if [[ $? != 0 ]]; then
+        # dunno why but docker load is randomly failing from times to times
+        echo "   + Second attempt"
+        gunzip -c ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz | docker load >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 6
+    fi
 
     echo " - Killing any previous containers"
     sudo systemctl stop $CONTAINER > /dev/null 2>&1
