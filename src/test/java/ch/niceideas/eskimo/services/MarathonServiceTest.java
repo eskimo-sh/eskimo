@@ -728,14 +728,14 @@ public class MarathonServiceTest extends AbstractSystemTest {
                 return "{\"deploymentId\": \"1234\"}";
             }
             @Override
-            protected void waitForServiceShutdown(String service) throws MarathonException {
+            protected void waitForServiceShutdown(String service) {
                 // No Op
             }
         });
 
         SystemService ss = new SystemService() {
             @Override
-            public SystemStatusWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+            public SystemStatusWrapper getStatus() {
                 SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
                 retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "marathon_192-168-10-11", "OK");
                 return retStatus;

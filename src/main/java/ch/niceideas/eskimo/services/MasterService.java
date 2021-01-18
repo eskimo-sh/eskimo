@@ -113,6 +113,12 @@ public class MasterService {
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
     }
+    Map<String, String>  getServiceMasterNodes() {
+        return Collections.unmodifiableMap(serviceMasterNodes);
+    }
+    Map<String, Date> getServiceMasterTimestamps() {
+        return Collections.unmodifiableMap(serviceMasterTimestamps);
+    }
 
     // constructor for spring
     public MasterService() {

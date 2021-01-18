@@ -34,46 +34,42 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.*;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class SystemServiceNodesStatusTest extends AbstractSystemTest {
+public class MasterServiceTest extends AbstractSystemTest {
 
-    private String testRunUUID = UUID.randomUUID().toString();
+    private static final Logger logger = Logger.getLogger(MasterServiceTest.class);
+
+    private MasterService ms = new MasterService();
 
     @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
-    }
 
-    @Override
-    protected SystemService createSystemService() {
-        SystemService ss = new SystemService(false) {
-            @Override
-            protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
-                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
-                retFile.createNewFile();
-                return retFile;
-            }
-        };
-        ss.setConfigurationService(configurationService);
-        return ss;
+        ms.setConfigurationService(configurationService);
+        ms.setMessagingService(messagingService);
+        ms.setNodeRangeResolver(nodeRangeResolver);
+        ms.setNotificationService(notificationService);
+        ms.setServicesDefinition(servicesDefinition);
+        ms.setSshCommandService(sshCommandService);
+        ms.setSystemService(systemService);
     }
 
     @Override
@@ -94,39 +90,45 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
         };
     }
 
+    @Override
+    protected SystemService createSystemService() {
+        return new SystemService(false) {
+            @Override
+            public SystemStatusWrapper getStatus() {
+                return StandardSetupHelpers.getStandard2NodesSystemStatus();
+            }
+        };
+    }
 
     @Test
-    public void testGetStatus() throws Exception {
+    public void testUpdateStatus() throws Exception {
 
-        systemService.setSshCommandService(new SSHCommandService() {
-            @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.startsWith("sudo systemctl status --no-pager -al")) {
-                    return systemStatusTest;
-                }
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
-                testSSHCommandScript.append(command).append("\n");
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
-                // just do nothing
-            }
-        });
+        assertEquals(0, ms.getServiceMasterNodes().size());
+        assertEquals(0, ms.getServiceMasterTimestamps().size());
 
-        systemService.updateStatus();
-        SystemStatusWrapper systemStatus = systemService.getStatus();
+        ms.updateStatus();
 
-        String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), "UTF-8");
+        assertEquals(1, ms.getServiceMasterNodes().size());
+        assertEquals(1, ms.getServiceMasterTimestamps().size());
 
-        //assertEquals(expectedStatus, systemStatus.getFormattedValue());
-        assertTrue(new JsonWrapper(expectedStatus).getJSONObject().similar(systemStatus.getJSONObject()));
+        assertEquals("192.168.10.11", ms.getServiceMasterNodes().get("gluster"));
+        assertNotNull(ms.getServiceMasterTimestamps().get("gluster"));
     }
+
+    @Test
+    public void testGetMasterStatus() throws Exception {
+
+        assertEquals(0, ms.getServiceMasterNodes().size());
+        assertEquals(0, ms.getServiceMasterTimestamps().size());
+
+        // this sets a default master
+        ms.getMasterStatus();
+
+        assertEquals(1, ms.getServiceMasterNodes().size());
+        assertEquals(1, ms.getServiceMasterTimestamps().size());
+
+        assertEquals("192.168.10.11", ms.getServiceMasterNodes().get("gluster"));
+        assertNotNull(ms.getServiceMasterTimestamps().get("gluster"));
+    }
+
 }

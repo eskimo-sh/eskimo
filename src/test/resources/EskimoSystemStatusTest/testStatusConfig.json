@@ -1,6 +1,7 @@
 {
   "marathon": {
     "name": "Marathon",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",
@@ -17,6 +18,7 @@
   },
   "mesos-master": {
     "name": "Master",
+    "unique": true,
     "commands": [
       {
         "name": "Show INFO Logs",
@@ -38,6 +40,7 @@
   },
   "zookeeper": {
     "name": "Zookeeper",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",
@@ -49,11 +52,13 @@
   },
   "flink-worker": {
     "name": "Worker",
+    "unique": false,
     "commands": [],
     "group": "Flink"
   },
   "zeppelin": {
     "name": "Zeppelin",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",
@@ -85,6 +90,7 @@
   },
   "ntp": {
     "name": "NTP",
+    "unique": false,
     "commands": [
       {
         "name": "Show Logs",
@@ -96,6 +102,7 @@
   },
   "gluster": {
     "name": "FS",
+    "unique": false,
     "commands": [
       {
         "name": "Show GlusterFS Logs",
@@ -112,6 +119,7 @@
   },
   "flink-app-master": {
     "name": "App Master",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",
@@ -123,6 +131,7 @@
   },
   "mesos-agent": {
     "name": "Agent",
+    "unique": false,
     "commands": [
       {
         "name": "Show INFO Logs",
@@ -144,6 +153,7 @@
   },
   "logstash": {
     "name": "Logstash",
+    "unique": false,
     "commands": [
       {
         "name": "Show Remote Server Logs",
@@ -155,11 +165,13 @@
   },
   "cerebro": {
     "name": "Cerebro",
+    "unique": true,
     "commands": [],
     "group": "Elastic Stack"
   },
   "elasticsearch": {
     "name": "Elastic-Search",
+    "unique": false,
     "commands": [
       {
         "name": "Show Logs",
@@ -186,11 +198,13 @@
   },
   "grafana": {
     "name": "Grafana",
+    "unique": true,
     "commands": [],
     "group": "Monitoring"
   },
   "kafka-manager": {
     "name": "Manager",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",
@@ -202,6 +216,7 @@
   },
   "kafka": {
     "name": "Broker",
+    "unique": false,
     "commands": [
       {
         "name": "Show Server Logs",
@@ -223,6 +238,7 @@
   },
   "spark-executor": {
     "name": "Executor",
+    "unique": false,
     "commands": [
       {
         "name": "Show Mesos Shuffle Logs",
@@ -234,6 +250,7 @@
   },
   "prometheus": {
     "name": "Prometheus",
+    "unique": false,
     "commands": [
       {
         "name": "Show Logs",
@@ -245,6 +262,7 @@
   },
   "kibana": {
     "name": "Kibana",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",
@@ -256,6 +274,7 @@
   },
   "spark-history-server": {
     "name": "Console",
+    "unique": true,
     "commands": [
       {
         "name": "Show Logs",

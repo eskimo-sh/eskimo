@@ -53,6 +53,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     private String jsonFullStatus = null;
     private String jsonNodesStatus = null;
     private String jsonStatusConfig = null;
+    private String jsonMastersStatus = null;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -60,6 +61,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));
         jsonNodesStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testNodeStatus.json"));
         jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"));
+        jsonMastersStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testMastersStatus.json"));
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoSystemStatus.js");
@@ -208,7 +210,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testRenderNodesStatusTable() throws Exception {
 
-        js("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", false)");
+        js("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", null, false)");
 
         String tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
@@ -227,7 +229,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showStatus()");
 
-        System.err.println (page.asXml());
+        //System.err.println (page.asXml());
 
         String tableString = js("$('#status-node-table-body').html()").getJavaScriptResult().toString();
 
@@ -395,5 +397,27 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("eskimoSystemStatus.showStatusMessage ('test', true);");
 
         assertAttrValue("#service-status-warning-message", "class", "alert alert-danger");
+    }
+
+    @Test
+    public void testRenderNodesStatusCallsServiceMenuServiceFoundHook() throws Exception {
+
+        js("window.serviceMenuServiceFoundHookCalls = '';");
+
+        js("eskimoServices.serviceMenuServiceFoundHook = function (nodeName, nodeAddress, service, found, blocking) {" +
+                "window.serviceMenuServiceFoundHookCalls = window.serviceMenuServiceFoundHookCalls + " +
+                "    (nodeName + '-' + nodeAddress + '-' + service + '-' + found + '-' + blocking + '\\n');" +
+                "}");
+
+        js("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", " + jsonMastersStatus + ", false)");
+
+        assertJavascriptEquals("192-168-10-11-192.168.10.11-zookeeper-true-false\n" +
+                "192-168-10-11-192.168.10.11-gluster-true-false\n" +
+                "192-168-10-11-192.168.10.11-mesos-master-true-false\n" +
+                "192-168-10-11-192.168.10.11-kafka-manager-true-false\n" +
+                "192-168-10-11-192.168.10.11-spark-history-server-true-false\n" +
+                "192-168-10-11-192.168.10.11-cerebro-true-false\n" +
+                "192-168-10-11-192.168.10.11-kibana-true-false\n" +
+                "192-168-10-11-192.168.10.11-zeppelin-true-false\n", "window.serviceMenuServiceFoundHookCalls");
     }
 }
