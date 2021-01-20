@@ -125,12 +125,21 @@ sudo bash -c 'echo "</configuration>" >> /usr/local/lib/zeppelin/conf/zeppelin-s
 
 echo " - Configuring spark interpreter"
 
+# not suppoorted by zeppelin 0.9-final
+#sudo sed -i -n '1h;1!H;${;g;s/'\
+#'          \"name\": \"zeppelin.spark.useNew\",\n'\
+#'          \"value\": true,'\
+#'/'\
+#'          \"name\": \"zeppelin.spark.useNew\",\n'\
+#'          \"value\": false,'\
+#'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
 sudo sed -i -n '1h;1!H;${;g;s/'\
-'          \"name\": \"zeppelin.spark.useNew\",\n'\
-'          \"value\": true,'\
+'          \"name\": \"SPARK_HOME\",\n'\
+'          \"value\": \"\",'\
 '/'\
-'          \"name\": \"zeppelin.spark.useNew\",\n'\
-'          \"value\": false,'\
+'          \"name\": \"SPARK_HOME\",\n'\
+'          \"value\": \"\/usr\/local\/lib\/spark\/\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 

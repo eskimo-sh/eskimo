@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpCookie;
 import java.net.URI;
-import java.util.BitSet;
-import java.util.Enumeration;
-import java.util.Formatter;
+import java.util.*;
 
 public class ProxyServlet extends HttpServlet {
 
@@ -96,13 +94,17 @@ public class ProxyServlet extends HttpServlet {
     protected static final String ATTR_TARGET_HOST =
             ProxyServlet.class.getSimpleName() + ".targetHost";
 
+    private static Map<String, String> overridingClientHheaders = new HashMap<>() {{
+            put ("accept-encoding", "gzip, deflate");
+        }};
+
     /* MISC */
 
     protected boolean doLog = false;
     protected boolean doForwardIP = true;
 
     /**
-     * User agents shouldn't send the url fragment but what if it does?
+     * Don't mess with these settings !!!
      */
     protected boolean doSendUrlFragment = true;
     protected boolean doPreserveHost = false;
@@ -141,11 +143,14 @@ public class ProxyServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+
         String doLogStr = getConfigParam(P_LOG);
         if (StringUtils.isNotBlank(doLogStr)) {
             this.doLog = Boolean.parseBoolean(doLogStr);
         }
 
+        /* JKE : I am removing the possibility to change these. A lot of these settings mess up wuite a lot the services
+        proxying
         String doForwardIPString = getConfigParam(P_FORWARDEDFOR);
         if (StringUtils.isNotBlank(doForwardIPString)) {
             this.doForwardIP = Boolean.parseBoolean(doForwardIPString);
@@ -190,6 +195,7 @@ public class ProxyServlet extends HttpServlet {
         if (StringUtils.isNotBlank(useSystemPropertiesString)) {
             this.useSystemProperties = Boolean.parseBoolean(useSystemPropertiesString);
         }
+        */
 
         initTarget();//sets target*
     }
@@ -203,6 +209,7 @@ public class ProxyServlet extends HttpServlet {
                 .setCookieSpec(CookieSpecs.IGNORE_COOKIES) // we handle them in the servlet instead
                 .setConnectTimeout(connectTimeout)
                 .setSocketTimeout(readTimeout)
+                //.setCircularRedirectsAllowed(true)
                 .setConnectionRequestTimeout(connectionRequestTimeout)
                 .build();
     }
@@ -308,6 +315,9 @@ public class ProxyServlet extends HttpServlet {
         }
 
         copyRequestHeaders(servletRequest, proxyRequest);
+
+        overridingClientHheaders.keySet().forEach(
+                key -> proxyRequest.setHeader(key, overridingClientHheaders.get(key)));
 
         setXForwardedForHeader(servletRequest, proxyRequest);
 

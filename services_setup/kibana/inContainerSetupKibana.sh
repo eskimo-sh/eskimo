@@ -63,6 +63,7 @@ sudo sed -i s/"#logging.dest: stdout"/"logging.dest: \/var\/log\/elasticsearch\/
 
 # It runs behind a proxy in eskimo
 sudo sed -i s/"#server.basePath: \"\""/"server.basePath: \"\/kibana\""/g /usr/local/etc/kibana/kibana.yml
+#sudo sed -i s/"#server.rewriteBasePath: false"/"server.rewriteBasePath: true"/g /usr/local/etc/kibana/kibana.yml
 
 echo " - enabling user elasticsearch to change config"
 chown -R elasticsearch. /usr/local/lib/kibana/config

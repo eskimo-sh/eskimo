@@ -62,11 +62,20 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"'"$ESMASTER_IP_ADDRESS"'\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+# zeppelin pre-0.9-final
+#sed -i -n '1h;1!H;${;g;s/'\
+#'          \"name\": \"master\",\n'\
+#'          \"value\": \"local\[\*\]\",'\
+#'/'\
+#'          \"name\": \"master\",\n'\
+#'          \"value\": \"'"mesos:\/\/zk:\/\/$ZOOKEEPER_IP_ADDRESS:2181\/mesos"'\",'\
+#'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
 sed -i -n '1h;1!H;${;g;s/'\
-'          \"name\": \"master\",\n'\
+'          \"name\": \"spark.master\",\n'\
 '          \"value\": \"local\[\*\]\",'\
 '/'\
-'          \"name\": \"master\",\n'\
+'          \"name\": \"spark.master\",\n'\
 '          \"value\": \"'"mesos:\/\/zk:\/\/$ZOOKEEPER_IP_ADDRESS:2181\/mesos"'\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 

@@ -56,19 +56,14 @@ public abstract class StreamUtils {
     /**
      * Copies information from the input stream to the output stream using the specified buffer size
      */
-    public static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+    public static void copy(InputStream input, OutputStream output) throws IOException {
+        if (input == null) {
+            throw new NullPointerException("Input is null");
+        }
         if (output == null) {
-            throw new IOException ("Passed output stream is null");
+            throw new NullPointerException("Output is null");
         }
-        if (input != null) {
-            byte[] buf = new byte[bufferSize];
-            int bytesRead = input.read(buf);
-            while (bytesRead != -1) {
-                output.write(buf, 0, bytesRead);
-                bytesRead = input.read(buf);
-            }
-            output.flush();
-        }
+        input.transferTo(output);
     }
 
     /**
@@ -101,13 +96,6 @@ public abstract class StreamUtils {
      */
     public static long copy(InputStream is, Writer output) throws IOException {
         return copy(new InputStreamReader(is), output);
-    }
-
-    /**
-     * Copies information from the input stream to the output stream using a default buffer size of 2048 bytes.
-     */
-    public static void copy(InputStream input, OutputStream output) throws IOException {
-        copy(input, output, DEFAULT_BUFFER_SIZE);
     }
 
     /**
