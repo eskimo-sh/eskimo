@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationsCommand;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import com.trilead.ssh2.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -115,6 +116,14 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
             public void forceRecreateConnection(String ipAddress) {
                 // No-Op
             }
+            @Override
+            public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+                return null;
+            }
+            @Override
+            public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
+                return null;
+            }
         });
 
         StringBuilder sb = new StringBuilder();
@@ -139,25 +148,25 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(String hostAddress, String script) throws SSHCommandException {
+            public String runSSHScript(Connection connection, String script) throws SSHCommandException {
                 return (String) command.get();
             }
         });
 
         command.set("debian");
-        assertEquals ("debian", nodesConfigurationService.getNodeFlavour("192.168.10.11"));
+        assertEquals ("debian", nodesConfigurationService.getNodeFlavour(null));
 
         command.set("redhat");
-        assertEquals ("redhat", nodesConfigurationService.getNodeFlavour("192.168.10.11"));
+        assertEquals ("redhat", nodesConfigurationService.getNodeFlavour(null));
 
         command.set("suse");
-        assertEquals ("suse", nodesConfigurationService.getNodeFlavour("192.168.10.11"));
+        assertEquals ("suse", nodesConfigurationService.getNodeFlavour(null));
     }
 
     @Test
     public void testCopyCommand() throws Exception {
 
-        nodesConfigurationService.copyCommand("source", "target", "192.168.10.11");
+        nodesConfigurationService.copyCommand("source", "target", null);
 
         assertEquals ("192.168.10.11-./services_setup/base-eskimo/source", testSCPCommands.toString().trim());
         assertEquals ("sudo mv source target \n" +
@@ -206,6 +215,10 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         SSHCommandService sshCommandService = new SSHCommandService() {
             @Override
+            public synchronized String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
+                return runSSHScript((String)null, script, throwsException);
+            }
+            @Override
             public synchronized String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
@@ -221,6 +234,10 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
+            public synchronized String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+                return runSSHCommand((String)null, command);
+            }
+            @Override
             public synchronized String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
                 testSSHCommandScript.append(command).append("\n");
                 if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
@@ -228,6 +245,10 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 }
 
                 return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public synchronized void copySCPFile(Connection connection, String filePath) throws SSHCommandException {
+                // just do nothing
             }
             @Override
             public synchronized void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
@@ -245,6 +266,14 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
             @Override
             public void forceRecreateConnection(String ipAddress) {
                 // no Op
+            }
+            @Override
+            public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+                return null;
+            }
+            @Override
+            public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
+                return null;
             }
         });
 

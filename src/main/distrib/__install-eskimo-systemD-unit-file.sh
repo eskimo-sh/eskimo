@@ -169,6 +169,7 @@ install_capsh(){
     cp ./progs/capsh $SCRIPT_DIR/capsh
 
     rm -Rf /tmp/build_capsh
+    cd
 }
 
 if [[ ! -f $SCRIPT_DIR/capsh ]]; then
@@ -257,6 +258,29 @@ set -e
 # even if user already exists, I should ensure these folders exist or are created
 mkdir -p /var/lib/eskimo
 chown -R eskimo /var/lib/eskimo
+
+# This is only executed if eskimo is expected in /usr/local/lib/
+if [[ `find /usr/local/lib/ -name '*eskimo*'` != "" ]]; then
+
+    # Creating eskimo symlink
+    if [[ ! -L "/usr/local/lib/eskimo" || ! -d "/usr/local/lib/eskimo" ]]; then
+        saved_dir=`pwd`
+        cd /usr/local/lib
+        rm -f eskimo
+        ln -s eskimo-* eskimo
+        cd $saved_dir
+    fi
+
+    # creating logs folder
+    mkdir -p /var/log/eskimo
+    chown -R eskimo /var/log/eskimo
+
+    if [[ ! -L /usr/local/lib/eskimo/logs || ! -d /usr/local/lib/eskimo/logs ]]; then
+        rm -Rf /usr/local/lib/eskimo/logs
+        ln -s /var/log/eskimo /usr/local/lib/eskimo/logs
+        chown eskimo /usr/local/lib/eskimo/logs
+    fi
+fi
 
 # Need to chown services_setup, packages_dev and packages_distrib to eskimo
 chown -R eskimo $SCRIPT_DIR/../../services_setup

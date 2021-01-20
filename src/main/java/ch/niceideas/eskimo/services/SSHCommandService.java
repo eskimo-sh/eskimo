@@ -61,34 +61,46 @@ public class SSHCommandService {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Value("${connectionManager.sshOperationTimeout}")
-    private int sshOperationTimeout = 60000;
+    @Value("${connectionManager.scriptOperationTimeout}")
+    private int scriptOperationTimeout = 1800000;
 
     /** For tests */
     public void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
         this.connectionManagerService = connectionManagerService;
     }
 
+    public String runSSHScript(Connection connection, String script) throws SSHCommandException {
+        return runSSHScript(connection, script, true);
+    }
+
     public String runSSHScript(String hostAddress, String script) throws SSHCommandException {
         return runSSHScript(hostAddress, script, true);
     }
 
-    public String runSSHCommand(String hostAddress, String[] command) throws SSHCommandException {
+    public String runSSHCommand(Connection connection, String[] command) throws SSHCommandException {
         StringBuilder sb = new StringBuilder();
         for (String cmd : command) {
             sb.append (cmd);
             sb.append (" ");
         }
-        return runSSHCommand(hostAddress, sb.toString());
+        return runSSHCommand(connection, sb.toString());
+    }
+
+    public String runSSHScriptPath(Connection connection, String scriptName) throws SSHCommandException {
+        return runSSHScript(connection, getScriptContent(scriptName));
     }
 
     public String runSSHScriptPath(String hostAddress, String scriptName) throws SSHCommandException {
+        return runSSHScript(hostAddress, getScriptContent(scriptName));
+    }
 
+    String getScriptContent(String scriptName) throws SSHCommandException {
         InputStream scriptIs = ResourceUtils.getResourceAsStream(scriptName);
         if (scriptIs == null) {
             throw new SSHCommandException("Impossible to load script " + scriptName);
         }
 
+        String scriptContent = null;
         try (BufferedReader reader = new BufferedReader (new InputStreamReader(scriptIs))) {
             String line = null;
             StringBuilder scriptBuilder = new StringBuilder();
@@ -98,22 +110,33 @@ public class SSHCommandService {
                 scriptBuilder.append("\n");
             }
 
-            return runSSHScript(hostAddress, scriptBuilder.toString());
-
+            scriptContent = scriptBuilder.toString();
         } catch (IOException e) {
             logger.error(e, e);
             throw new SSHCommandException(e);
         }
-
+        return scriptContent;
     }
 
     public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+        try {
+            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
+
+            return runSSHScript(connection, script, throwsException);
+
+        } catch (ConnectionManagerException e) {
+            logger.error(e.getMessage());
+            logger.debug(e, e);
+            throw new SSHCommandException(e);
+
+        }
+    }
+
+    public String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
 
         Session session = null;
         try (ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
              ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
-
-            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
             session = connection.openSession();
             session.execCommand("bash --login -s");
@@ -133,11 +156,11 @@ public class SSHCommandService {
             t2.join();
 
             // wait for some time since the delivery of the exit status often gets delayed
-            session.waitForCondition(ChannelCondition.EXIT_STATUS, sshOperationTimeout);
+            session.waitForCondition(ChannelCondition.EXIT_STATUS, scriptOperationTimeout);
             Integer r = session.getExitStatus();
 
             if (r == null) {
-                throw new IOException("Could not get a return status within " + sshOperationTimeout + " milliseconds");
+                throw new IOException("Could not get a return status within " + scriptOperationTimeout + " milliseconds");
             }
 
             int retValue = r;
@@ -155,11 +178,6 @@ public class SSHCommandService {
                 throw new SSHCommandException(result);
             }
 
-        } catch (ConnectionManagerException e) {
-            logger.error(e.getMessage());
-            logger.debug(e, e);
-            throw new SSHCommandException(e);
-
         } catch (InterruptedException | IOException e) {
             logger.error(e, e);
             throw new SSHCommandException(e);
@@ -171,11 +189,18 @@ public class SSHCommandService {
         }
     }
 
-
     public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
         try {
             Connection connection = connectionManagerService.getSharedConnection(hostAddress);
+            return runSSHCommand(connection, command);
+        } catch (ConnectionManagerException e) {
+            logger.error (e, e);
+            throw new SSHCommandException(e);
+        }
+    }
 
+    public String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+        try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int retValue = connection.exec(command, baos);
 
@@ -185,19 +210,28 @@ public class SSHCommandService {
                 throw new SSHCommandException("Command exited with return code " + retValue + "\n" + baos.toString());
             }
 
-        } catch (ConnectionManagerException | InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.error (e, e);
             throw new SSHCommandException(e);
         }
     }
 
     public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+        try {
+            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
+            copySCPFile(connection, filePath);
+
+        } catch (ConnectionManagerException e) {
+            logger.error (e, e);
+            throw new SSHCommandException(e);
+        }
+    }
+
+    public void copySCPFile(Connection connection, String filePath) throws SSHCommandException {
 
         try {
 
             JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
-
-            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
 
             //SCPClient scp = new SCPClient(connection);
             SCPClient scp = connection.createSCPClient();
@@ -206,7 +240,7 @@ public class SSHCommandService {
 
             // scp is stateless and doesn't nee to be closed
 
-        } catch (ConnectionManagerException | IOException  | FileException | JSONException | SetupException e) {
+        } catch (IOException  | FileException | JSONException | SetupException e) {
             logger.error (e, e);
             throw new SSHCommandException(e);
         }

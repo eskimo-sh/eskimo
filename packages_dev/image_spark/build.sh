@@ -69,7 +69,7 @@ docker exec -i spark_template apt-get install -y tar wget git unzip curl moreuti
 fail_if_error $? "/tmp/spark_build_log" -2
 # ----------------------------------------------------------------------------------------------------------------------
 
-echo " - Installing OpenJDK 8 (Keeping JDK 8 for spark for compatibility)"
+echo " - Installing OpenJDK 8 (Keeping JDK 8 for spark 2.x for compatibility)"
 docker exec -i spark_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3
 
@@ -119,7 +119,7 @@ fi
 
 
 #echo " - TODO"
-docker exec -it spark_template bash
+#docker exec -it spark_template bash
 
 
 echo " - Cleaning up image"

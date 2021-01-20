@@ -7,6 +7,7 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import com.trilead.ssh2.Connection;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -81,6 +82,9 @@ public class MarathonService {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
+    @Autowired
+    private ConnectionManagerService connectionManagerService;
+
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
@@ -128,6 +132,9 @@ public class MarathonService {
     }
     void setNodesConfigurationService(NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
+    }
+    void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
+        this.connectionManagerService = connectionManagerService;
     }
 
     public MarathonService() {
@@ -518,56 +525,80 @@ public class MarathonService {
                 status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
     }
 
-    private void proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonIpAddress, String service)
+    private void proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonNode, String service)
             throws SSHCommandException, SystemException, MarathonException {
 
-        // 1. Calling uninstall.sh script if it exists
-        systemService.callUninstallScript(sb, marathonIpAddress, service);
+        Connection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(marathonNode);
 
-        // 2. Stop service
-        sb.append("Deleting marathon application for ").append(service).append("\n");
-        String killResultString = queryMarathon(MARATHON_CONTEXT + service, "DELETE");
-        JsonWrapper killResult = new JsonWrapper(killResultString);
+            // 1. Calling uninstall.sh script if it exists
+            systemService.callUninstallScript(sb, connection, service);
 
-        String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
-        if (StringUtils.isBlank(deploymentId)) {
-            sb.append("WARNING : Could not find any deployment ID when killing tasks for ").append(service).append("\n");
-        } else {
-            sb.append("Tasks killing deployment ID for ").append(service).append(" is ").append(deploymentId).append("\n");
+            // 2. Stop service
+            sb.append("Deleting marathon application for ").append(service).append("\n");
+            String killResultString = queryMarathon(MARATHON_CONTEXT + service, "DELETE");
+            JsonWrapper killResult = new JsonWrapper(killResultString);
+
+            String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
+            if (StringUtils.isBlank(deploymentId)) {
+                sb.append("WARNING : Could not find any deployment ID when killing tasks for ").append(service).append("\n");
+            } else {
+                sb.append("Tasks killing deployment ID for ").append(service).append(" is ").append(deploymentId).append("\n");
+            }
+
+            // 3. Wait for service to be stopped
+            waitForServiceShutdown(service);
+
+            // 4. Delete docker container
+            sb.append(" - TODO Removing docker image from registry \n");
+
+            // 5. remove blobs
+            sb.append(" - Removing service from docker repository \n");
+
+            // 5.1 remove repository for service
+            sshCommandService.runSSHCommand(connection,
+                    "docker exec -i --user root marathon bash -c \"rm -Rf /var/lib/marathon/docker_registry/docker/registry/v2/repositories/" + service + "\"");
+
+            // 5.2 run garbage collection to remove blobs
+            sb.append(" - Running garbage collection \n");
+            sshCommandService.runSSHCommand(connection,
+                    "docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
+
+        } catch (ConnectionManagerException e) {
+            throw new MarathonException (e);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
         }
-
-        // 3. Wait for service to be stopped
-        waitForServiceShutdown(service);
-
-        // 4. Delete docker container
-        sb.append(" - TODO Removing docker image from registry \n");
-
-        // 5. remove blobs
-        sb.append(" - Removing service from docker repository \n");
-
-        // 5.1 remove repository for service
-        sshCommandService.runSSHCommand(marathonIpAddress,
-                "docker exec -i --user root marathon bash -c \"rm -Rf /var/lib/marathon/docker_registry/docker/registry/v2/repositories/" + service + "\"");
-
-        // 5.2 run garbage collection to remove blobs
-        sb.append(" - Running garbage collection \n");
-        sshCommandService.runSSHCommand(marathonIpAddress,
-                "docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
     }
 
-    private void proceedWithMarathonServiceInstallation(StringBuilder sb, String marathonIpAddress, String service)
+    private void proceedWithMarathonServiceInstallation(StringBuilder sb, String marathonNode, String service)
             throws IOException, SystemException, SSHCommandException {
 
-        String imageName = servicesDefinition.getService(service).getImageName();
+        Connection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(marathonNode);
 
-        sb.append(" - Creating archive and copying it over to marathon node \n");
-        File tmpArchiveFile = systemService.createRemotePackageFolder(sb, marathonIpAddress, service, imageName);
+            String imageName = servicesDefinition.getService(service).getImageName();
 
-        // 4. call setup script
-        systemService.installationSetup(sb, marathonIpAddress, service);
+            sb.append(" - Creating archive and copying it over to marathon node \n");
+            File tmpArchiveFile = systemService.createRemotePackageFolder(sb, connection, marathonNode, service, imageName);
 
-        // 5. cleanup
-        systemService.installationCleanup(sb, marathonIpAddress, service, imageName, tmpArchiveFile);
+            // 4. call setup script
+            systemService.installationSetup(sb, connection, marathonNode, service);
+
+            // 5. cleanup
+            systemService.installationCleanup(sb, connection, service, imageName, tmpArchiveFile);
+
+        } catch (ConnectionManagerException e) {
+            throw new SSHCommandException (e);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
     public void fetchMarathonServicesStatus

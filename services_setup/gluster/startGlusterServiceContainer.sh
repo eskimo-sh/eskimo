@@ -73,7 +73,7 @@ container_process_PID=`ps -ef | grep "docker run" | grep "name gluster"  | tr -s
 
 if [[ "$container_process_PID" == "" ]]; then
     echo " - Couldn't not get docker run command PID"
-    exit -2
+    exit 61
 else
     echo " - docker run PID is $container_process_PID"
 fi
@@ -83,7 +83,7 @@ if [[ `ps -p $container_process_PID -f | grep "docker run"` != "" ]]; then
     echo "   + process has been correctly started"
 else
     echo "   + Could not find running PID $container_process_PID"
-    exit -1
+    exit 62
 fi
 
 # After a gluster restart, fix gluster mounts on host

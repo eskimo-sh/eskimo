@@ -47,7 +47,7 @@ function hostnames_to_ips () {
 
     if [[ $1 == "" ]]; then
         echo "Need to pass result of 'gluster pool list' to this function"
-        return -1
+        return 51
     fi
 
     IFS=$'\n'

@@ -74,7 +74,7 @@ if [[ `tail -n 1 /tmp/cerebro_build_log | grep " - In container install SUCCESS"
 fi
 
 #echo " - TODO"
-docker exec -it cerebro_template bash
+#docker exec -it cerebro_template bash
 
 echo " - Cleaning up image"
 docker exec -i cerebro_template apt-get remove -y git gcc adwaita-icon-theme > /tmp/cerebro_build_log 2>&1

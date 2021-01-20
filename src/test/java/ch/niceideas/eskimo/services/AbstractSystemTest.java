@@ -42,7 +42,9 @@ import ch.niceideas.eskimo.model.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
+import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -85,6 +87,8 @@ public abstract class AbstractSystemTest {
     protected NodesConfigurationService nodesConfigurationService = null;
 
     protected ApplicationStatusService applicationStatusService = null;
+
+    protected ConnectionManagerService connectionManagerService;
 
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
@@ -154,6 +158,10 @@ public abstract class AbstractSystemTest {
 
         sshCommandService = new SSHCommandService() {
             @Override
+            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+                return runSSHScript("192.168.10.11", script, throwsException);
+            }
+            @Override
             public String runSSHScript(String hostAddress, String script, boolean throwsException) {
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -187,9 +195,17 @@ public abstract class AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
+            public String runSSHCommand(Connection connection, String command) {
+                return runSSHCommand("192.168.10.11", command);
+            }
+            @Override
             public String runSSHCommand(String hostAddress, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public void copySCPFile(Connection connection, String filePath) {
+                copySCPFile("192.168.10.11", filePath);
             }
             @Override
             public void copySCPFile(String hostAddress, String filePath) {
@@ -227,6 +243,18 @@ public abstract class AbstractSystemTest {
         servicesSettingsService.setNodeRangeResolver(nodeRangeResolver);
         servicesSettingsService.setServicesDefinition(servicesDefinition);
 
+        connectionManagerService = new ConnectionManagerService() {
+            @Override
+            public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+                return null;
+            }
+
+            @Override
+            public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
+                return null;
+            }
+        };
+
         marathonService = createMarathonService();
         marathonService.setServicesDefinition(servicesDefinition);
         marathonService.setConfigurationService (configurationService);
@@ -237,6 +265,7 @@ public abstract class AbstractSystemTest {
         marathonService.setMemoryComputer(memoryComputer);
         marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
+        marathonService.setConnectionManagerService (connectionManagerService);
 
         systemService.setNodeRangeResolver(nodeRangeResolver);
         systemService.setSetupService(setupService);
@@ -262,6 +291,7 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService.setSystemService (systemService);
         nodesConfigurationService.setSshCommandService(sshCommandService);
         nodesConfigurationService.setSystemOperationService(systemOperationService);
+        nodesConfigurationService.setConnectionManagerService(connectionManagerService);
     }
 
     protected ProxyManagerService createProxyManagerService() {

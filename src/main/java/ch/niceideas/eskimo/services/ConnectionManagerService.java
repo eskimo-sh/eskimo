@@ -73,16 +73,19 @@ public class ConnectionManagerService {
     private int sshPort = 22;
 
     @Value("${connectionManager.tcpConnectionTimeout}")
-    private int tcpConnectionTimeout = 20000;
+    private int tcpConnectionTimeout = 30000;
 
     @Value("${connectionManager.sshKeyExchangeTimeout}")
     private int sshKeyExchangeTimeout = 20000;
 
     @Value("${connectionManager.maximumConnectionAge}")
-    private int maximumConnectionAge = 1800000;
+    private int maximumConnectionAge = 3600000;
 
     @Value("${connectionManager.sshOperationTimeout}")
-    private int sshOperationTimeout = 60000;
+    private int sshOperationTimeout = 120000;
+
+    @Value("${connectionManager.scriptOperationTimeout}")
+    private int scriptOperationTimeout = 1800000;
 
     private final ReentrantLock connectionMapLock = new ReentrantLock();
 
@@ -111,7 +114,7 @@ public class ConnectionManagerService {
                 }
                 connectionsToCloseLazily.clear();
             }
-        }, sshOperationTimeout, sshOperationTimeout);
+        }, maximumConnectionAge, maximumConnectionAge);
     }
 
     @PreDestroy
@@ -223,7 +226,7 @@ public class ConnectionManagerService {
 
                     if (connectionAge + maximumConnectionAge < System.currentTimeMillis()) {
                         logger.warn ("Previous connection to " + ipAddress + " is too old. Recreating ...");
-                        closeAndRemoveConnection(ipAddress, connection);
+                        removeConnectionAndRegisterClose(ipAddress, connection);
                         return getConnectionInternal(ipAddress);
                     }
 
@@ -237,7 +240,7 @@ public class ConnectionManagerService {
 
                 } catch (IOException | IllegalStateException e) {
                     logger.warn ("Previous connection to " + ipAddress + " got into problems ("+e.getMessage()+"). Recreating ...");
-                    closeAndRemoveConnection(ipAddress, connection);
+                    removeConnectionAndRegisterClose(ipAddress, connection);
                     return getConnectionInternal(ipAddress);
                 }
             }
@@ -255,10 +258,10 @@ public class ConnectionManagerService {
 
     }
 
-    private void closeAndRemoveConnection(String ipAddress, Connection connection) {
+    private void removeConnectionAndRegisterClose(String ipAddress, Connection connection) {
         connectionMap.remove(ipAddress);
         connectionAges.remove(ipAddress);
-        closeConnection(connection);
+        connectionsToCloseLazily.add (connection);
     }
 
     protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
@@ -266,7 +269,7 @@ public class ConnectionManagerService {
         logger.info ("Creating connection to " + ipAddress);
         Connection connection = new Connection(ipAddress, sshPort);
         connection.setTCPNoDelay(true);
-        connection.connect(null, tcpConnectionTimeout, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
+        connection.connect(null, tcpConnectionTimeout, scriptOperationTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 
         JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
 

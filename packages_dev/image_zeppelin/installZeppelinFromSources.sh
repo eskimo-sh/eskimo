@@ -105,10 +105,16 @@ chown -R $USER_TO_USE /home/$USER_TO_USE
 echo " - Allowing local build user to use build folder"
 chmod -R 777 .
 
-echo " - Checking Zeppelin git repository out"
+echo " - Downloading Zeppelin git repository archive"
 rm -Rf zeppelin
-git clone https://github.com/apache/zeppelin.git zeppelin > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -1
+wget https://github.com/apache/zeppelin/archive/branch-$ZEPPELIN_VERSION.zip  > /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -2
+
+echo " - Extracting Zeppelin source code"
+unzip branch-$ZEPPELIN_VERSION.zip   > /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -2
+
+mv zeppelin-branch-$ZEPPELIN_VERSION zeppelin
 
 echo " - Changing build folder owner"
 chown -R $USER_TO_USE zeppelin
@@ -122,42 +128,53 @@ fail_if_error $? "/tmp/zeppelin_install_log" -2
 echo " - HACK - Fixing ElasticSearch interpreter"
 sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
 
+echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+
+echo " - Fixing Java interpreter"
+rm /etc/alternatives/java
+ln -s /usr/lib/jvm/java-8-openjdk-amd64/bin/java /etc/alternatives/java
+
 echo " - build zeppelin with all interpreters"
-for i in `seq 1 5`; do  # 5 attempts since sometimes download of packages fails
+for i in `seq 1 2`; do  # 2 attempts since sometimes download of packages fails
     echo "   + attempt $i"
-    su $USER_TO_USE -c "mvn clean install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
+    su -p $USER_TO_USE -c "mvn clean package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
     if [[ $? == 0 ]]; then
         echo "   + succeeded !"
         break
     else
-        if [[ $i == 5 ]]; then
+        if [[ $i == 2 ]]; then
             cat "/tmp/zeppelin_install_log"
             exit -10
         fi
     fi
 done
 
+echo " - Installing with maven"
+su -p $USER_TO_USE -c "mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
+fail_if_error $? "/tmp/zeppelin_install_log" -6
 
 echo " - Creating setup temp directory"
 mkdir -p /tmp/zeppelin_setup/
 
 echo " - Copy Zeppelin sources to temp directory"
-cp zeppelin-distribution/target/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz /tmp/zeppelin_setup/  > /tmp/zeppelin_install_log 2>&1
+cp zeppelin-distribution/target/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz /tmp/zeppelin_setup/  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -6
 
 echo " - Changing to setup temp directory"
 cd /tmp/zeppelin_setup/
 
 echo " - Extracting zeppelin-$ZEPPELIN_VERSION"
-tar -xvf zeppelin-$ZEPPELIN_VERSION-SNAPSHOT.tar.gz > /tmp/zeppelin_install_log 2>&1
+tar -xvf zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 echo " - Installing Zeppelin"
-sudo chown root.staff -R zeppelin-$ZEPPELIN_VERSION-SNAPSHOT
-sudo mv zeppelin-$ZEPPELIN_VERSION-SNAPSHOT /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT
+sudo chown root.staff -R zeppelin-$ZEPPELIN_VERSION_SNAPSHOT
+sudo mv zeppelin-$ZEPPELIN_VERSION_SNAPSHOT /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT
 
-echo " - symlinking /usr/local/lib/zeppelin/ to /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT/"
-sudo ln -s /usr/local/lib/zeppelin-$ZEPPELIN_VERSION-SNAPSHOT /usr/local/lib/zeppelin
+echo " - symlinking /usr/local/lib/zeppelin/ to /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT/"
+sudo ln -s /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT /usr/local/lib/zeppelin
 
 #echo " - Installing required interpreters"
 #sudo /usr/local/lib/zeppelin/bin/install-interpreter.sh --name md,shell,jdbc,python,angular,elasticsearch,flink >> /tmp/zeppelin_install_log 2>&1
@@ -177,7 +194,6 @@ rm -Rf /usr/local/lib/zeppelin/interpreter/kotlin
 rm -Rf /usr/local/lib/zeppelin/interpreter/ksql
 rm -Rf /usr/local/lib/zeppelin/interpreter/lens
 rm -Rf /usr/local/lib/zeppelin/interpreter/livy
-rm -Rf /usr/local/lib/zeppelin/interpreter/mongodb
 rm -Rf /usr/local/lib/zeppelin/interpreter/neo4j
 rm -Rf /usr/local/lib/zeppelin/interpreter/pig
 rm -Rf /usr/local/lib/zeppelin/interpreter/sap

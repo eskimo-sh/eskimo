@@ -49,10 +49,10 @@ rm -f /tmp/es_build_log
 echo " - Building image elasticsearch"
 build_image elasticsearch_template /tmp/es_build_log
 
-# ElasticSearch has it's own JDK
-#echo " - Installing OpenJDK 11"
-#docker exec -i elasticsearch_template apt-get install -y openjdk-11-jdk >> /tmp/es_build_log 2>&1
-#fail_if_error $? "/tmp/es_build_log" -3
+# ElasticSearch doesn't anymore have it's own JDK
+echo " - Installing OpenJDK 11"
+docker exec -i elasticsearch_template apt-get install -y openjdk-11-jdk >> /tmp/es_build_log 2>&1
+fail_if_error $? "/tmp/es_build_log" -3
 
 echo " - Installing Elasticsearch"
 docker exec -i elasticsearch_template bash /scripts/installElasticSearch.sh | tee -a /tmp/es_build_log 2>&1

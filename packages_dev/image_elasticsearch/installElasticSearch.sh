@@ -92,6 +92,10 @@ chmod -R 777 /usr/local/lib/elasticsearch-$ES_VERSION/config/
 echo " - symlinking /usr/local/lib/elasticsearch/ to /usr/local/lib/elasticsearch-$ES_VERSION/"
 ln -s /usr/local/lib/elasticsearch-$ES_VERSION /usr/local/lib/elasticsearch
 
+echo " - replacing ElasticSearch bundled JDK by OS JDK"
+rm -Rf /usr/local/lib/elasticsearch/jdk
+ln -s /usr/lib/jvm/java-1.11.0-openjdk-amd64 /usr/local/lib/elasticsearch/jdk
+
 echo " - Registering test cleaning traps"
 export ES_PROC_ID=-1
 function check_stop_es(){

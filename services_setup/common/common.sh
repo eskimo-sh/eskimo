@@ -44,34 +44,34 @@ docker_cp_script() {
 
     if [[ $1 == "" ]]; then
         echo "expected Script filename as first argument"
-        exit 1
+        exit 91
     fi
     export SCRIPT=$1
 
     if [[ $2 == "" ]]; then
         echo "expected target folder as second argument"
-        exit 2
+        exit 92
     fi
     export FOLDER=$2
 
     if [[ $3 == "" ]]; then
         echo "expected docker container name folder as third argument"
-        exit 3
+        exit 93
     fi
     export CONTAINER=$3
 
     if [[ $4 == "" ]]; then
         echo "expected target folder as fourth argument"
-        exit 4
+        exit 94
     fi
     export LOGFILE=$4
 
     echo " - Copying $SCRIPT Script to $CONTAINER"
     docker cp $SCRIPT_DIR/$SCRIPT $CONTAINER:/usr/local/$FOLDER/$SCRIPT >> $LOGFILE 2>&1
-    fail_if_error $? "$LOGFILE" -20
+    fail_if_error $? "$LOGFILE" 95
 
     docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/$FOLDER/$SCRIPT" >> $LOGFILE 2>&1
-    fail_if_error $? "$LOGFILE" -21
+    fail_if_error $? "$LOGFILE" 96
 }
 
 
@@ -87,36 +87,36 @@ function handle_topology_settings() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit 2
+        exit 81
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit 3
+        exit 82
     fi
     export LOG_FILE=$2
 
     echo " - Copying Topology Injection Script"
     docker cp $SCRIPT_DIR/inContainerInjectTopology.sh $CONTAINER:/usr/local/sbin/inContainerInjectTopology.sh >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE -20
+    fail_if_error $? $LOG_FILE 83
 
     docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE -21
+    fail_if_error $? $LOG_FILE 84
 
     echo " - Copying Service Start Script"
     docker cp $SCRIPT_DIR/inContainerStartService.sh $CONTAINER:/usr/local/sbin/inContainerStartService.sh >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE -22
+    fail_if_error $? $LOG_FILE 85
 
     docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE -24
+    fail_if_error $? $LOG_FILE 86
 
     echo " - Copying settingsInjector.sh Script"
     docker cp $SCRIPT_DIR/settingsInjector.sh $CONTAINER:/usr/local/sbin/settingsInjector.sh >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE -23
+    fail_if_error $? $LOG_FILE 87
 
     docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE -24
+    fail_if_error $? $LOG_FILE 88
 }
 
 # This is used to load the topology definition file
@@ -216,13 +216,13 @@ function install_and_check_service_file() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit 2
+        exit 22
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit 3
+        exit 23
     fi
     export LOG_FILE=$2
 
@@ -232,7 +232,7 @@ function install_and_check_service_file() {
         export systemd_units_dir=/usr/lib/systemd/system/
     else
         echo "Couldn't find systemd unit files directory"
-        exit 4
+        exit 24
     fi
 
     echo " - Copying $CONTAINER systemd file"
@@ -242,32 +242,32 @@ function install_and_check_service_file() {
     echo " - Reloading systemd config"
     if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi # hacky hack - I get weird and unexplainable errors here sometimes.
     sudo systemctl daemon-reload >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -6
+    fail_if_error $? "$LOG_FILE" 25
 
     echo " - Checking Systemd file"
     if [[ `sudo systemctl status $CONTAINER | grep 'could not be found'` != "" ]]; then
         echo "$CONTAINER systemd file installation failed"
-        exit 5
+        exit 26
     fi
     sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
     if [[ $? != 0 && $? != 3 ]]; then
         echo "$CONTAINER systemd file doesn't work as expected"
-        exit 6
+        exit 27
     fi
 
     echo " - Testing systemd startup - starting $CONTAINER"
     sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -7
+    fail_if_error $? "$LOG_FILE" 28
 
     echo " - Testing systemd startup - Checking startup"
     if [[ -z "$NO_SLEEP" ]]; then sleep 12; fi
     sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -8
+    fail_if_error $? "$LOG_FILE" 29
 
     echo " - Testing systemd startup - Make sure service is really running"
     if [[ `systemctl show -p SubState $CONTAINER | grep exited` != "" ]]; then
         echo "$CONTAINER service is actually not really running"
-        exit 7
+        exit 30
     fi
 
     #echo " - Testing systemd startup - stopping $CONTAINER"
@@ -276,7 +276,7 @@ function install_and_check_service_file() {
 
     echo " - Enabling $CONTAINER on startup"
     sudo systemctl enable $CONTAINER >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -10
+    fail_if_error $? "$LOG_FILE" 31
 
     #echo " - Testing systemd startup - starting $CONTAINER (again)"
     #sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
@@ -291,13 +291,13 @@ function commit_container() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
-        exit 2
+        exit 71
     fi
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
         echo "Log file path needs to be passed in argument"
-        exit 3
+        exit 72
     fi
     export LOG_FILE=$2
 
@@ -305,14 +305,14 @@ function commit_container() {
     # Now that we've modified the container we have to commit the changes.
     echo " - Commiting the changes to the local template"
     docker commit $CONTAINER eskimo:$CONTAINER  >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -3
+    fail_if_error $? "$LOG_FILE" 73
 
     # Stop setup container and and delete it
     docker stop $CONTAINER  >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -4
+    fail_if_error $? "$LOG_FILE" 74
 
     docker container rm $CONTAINER >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" -5
+    fail_if_error $? "$LOG_FILE" 75
 
 }
 
@@ -347,17 +347,27 @@ function build_container() {
     fi
 
     echo " - Importing latest docker template for $IMAGE"
-    gunzip -c ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz | docker load >> $LOG_FILE 2>&1
+
+    if [[ ! -f ${SCRIPT_DIR}/docker_template_"$IMAGE".tar ]]; then
+        echo "   + Decompressing archive"
+        gunzip ${SCRIPT_DIR}/docker_template_"$IMAGE".tar.gz  > $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 16
+    fi
+
+    echo "   + Docker loading archive"
+    docker load -i ${SCRIPT_DIR}/docker_template_"$IMAGE".tar >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         # dunno why but docker load is randomly failing from times to times
         echo "   + Second attempt"
-        gunzip -c ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz | docker load >> $LOG_FILE 2>&1
+        docker load -i ${SCRIPT_DIR}/docker_template_"$IMAGE".tar >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 6
     fi
 
     echo " - Killing any previous containers"
     sudo systemctl stop $CONTAINER > /dev/null 2>&1
     if [[ `docker ps -a -q -f name=$CONTAINER` != "" ]]; then
+
+        echo "   + Forcing stop of previous containers"
         docker stop $CONTAINER > /dev/null 2>&1
         docker container rm $CONTAINER > /dev/null 2>&1
     fi

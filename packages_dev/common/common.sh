@@ -38,12 +38,12 @@
 export ESKIMO_VERSION=0.4
 export DEBIAN_VERSION=debian_10_buster
 
-export FLINK_VERSION=1.10.1
+export FLINK_VERSION=1.12.1
 export FLINK_HADOOP_VERSION=2.8.3-10.0
 
 export HADOOP_MAJOR_VERSION=2.8
 
-export SPARK_VERSION=2.4.5
+export SPARK_VERSION=2.4.7
 export SPARK_VERSION_MAJOR=2.4
 
 export AMESOS_VERSION=1.8.1
@@ -53,10 +53,10 @@ export MARATHON_VERSION=1.8.222-86475ddac
 
 export DOCKER_REGISTRY_VERSION=2.6.2~ds1-2+b21_amd64
 
-export ES_VERSION=7.6.2
+export ES_VERSION=7.10.2
 export ES_VERSION_MAJOR=7
 
-export CEREBRO_VERSION=0.9.2
+export CEREBRO_VERSION=0.9.3
 
 export KAFKA_VERSION=2.4.1
 export KAFKA_MANAGER_VERSION=3.0.0.5
@@ -75,9 +75,10 @@ export PROMETHEUS_PUSHGATEWAY_VERSION=1.3.1
 export PROMETHEUS_MESOS_EXPORTER_VERSION=1.1.2
 
 # Zeppelin
-export ZEPPELIN_VERSION_FULL=0.9.0-eskimo
-export ZEPPELIN_VERSION=0.9.0
-export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master
+export ZEPPELIN_VERSION_FULL=0.9.0
+export ZEPPELIN_VERSION=0.9
+export ZEPPELIN_VERSION_SNAPSHOT=0.9.1-SNAPSHOT
+export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master (which is rarely working)
 
 
 # This functions ensures that internet is available on host machine (the one running eskimo)

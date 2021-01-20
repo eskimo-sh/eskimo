@@ -41,6 +41,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
+import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -543,7 +544,7 @@ public class SystemService {
                 statusMap.put(("node_alive_" + nodeName), "OK");
 
                 String allServicesStatus = sshCommandService.runSSHScript(ipAddress,
-                        "sudo systemctl status --no-pager -al " + servicesDefinition.getAllServicesString() + " 2>/dev/null ", false);
+                        "sudo systemctl status --no-pager --no-block -al " + servicesDefinition.getAllServicesString() + " 2>/dev/null ", false);
 
                 SystemStatusParser parser = new SystemStatusParser(allServicesStatus);
 
@@ -763,7 +764,7 @@ public class SystemService {
         }
     }
 
-    void callUninstallScript(StringBuilder sb, String ipAddress, String service) throws SystemException {
+    void callUninstallScript(StringBuilder sb, Connection connection, String service) throws SystemException {
         File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
             throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
@@ -774,7 +775,7 @@ public class SystemService {
             if (uninstallScriptFile.exists()) {
                 sb.append(" - Calling uninstall script\n");
 
-                sb.append(sshCommandService.runSSHScriptPath(ipAddress, uninstallScriptFile.getAbsolutePath()));
+                sb.append(sshCommandService.runSSHScriptPath(connection, uninstallScriptFile.getAbsolutePath()));
             }
         } catch (SSHCommandException e) {
             logger.warn (e, e);
@@ -782,24 +783,24 @@ public class SystemService {
         }
     }
 
-    void installationSetup(StringBuilder sb, String ipAddress, String service) throws SystemException {
+    void installationSetup(StringBuilder sb, Connection connection, String node, String service) throws SystemException {
         try {
-            exec(ipAddress, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", ipAddress});
+            exec(connection, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node});
         } catch (SSHCommandException e) {
             logger.debug (e, e);
             sb.append(e.getMessage());
-            throw new SystemException ("Setup.sh script execution for " + service + " on node " + ipAddress + " failed.", e);
+            throw new SystemException ("Setup.sh script execution for " + service + " on node " + node + " failed.", e);
         }
     }
 
-    void installationCleanup(StringBuilder sb, String ipAddress, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
-        exec(ipAddress, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
-        exec(ipAddress, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
+    void installationCleanup(StringBuilder sb, Connection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
+        exec(connection, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
+        exec(connection, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
 
         if (StringUtils.isNotBlank(imageName)) {
             try {
                 sb.append(" - Deleting docker template image");
-                exec(ipAddress, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
+                exec(connection, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
             } catch (SSHCommandException e) {
                 logger.error(e, e);
                 sb.append(e.getMessage());
@@ -815,12 +816,12 @@ public class SystemService {
         }
     }
 
-    void exec(String ipAddress, StringBuilder sb, String[] setupScript) throws SSHCommandException {
-        sb.append(sshCommandService.runSSHCommand(ipAddress, setupScript));
+    void exec(Connection connection, StringBuilder sb, String[] setupScript) throws SSHCommandException {
+        sb.append(sshCommandService.runSSHCommand(connection, setupScript));
     }
 
-    void exec(String ipAddress, StringBuilder sb, String command) throws SSHCommandException {
-        sb.append(sshCommandService.runSSHCommand(ipAddress, command));
+    void exec(Connection connection, StringBuilder sb, String command) throws SSHCommandException {
+        sb.append(sshCommandService.runSSHCommand(connection, command));
     }
 
     List<Pair<String, String>> buildDeadIps(Set<String> allIpAddresses, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
@@ -893,7 +894,7 @@ public class SystemService {
         deadIps.add(ipAddress);
     }
 
-    File createRemotePackageFolder(StringBuilder sb, String ipAddress, String service, String imageName) throws SystemException, IOException, SSHCommandException {
+    File createRemotePackageFolder(StringBuilder sb, Connection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist
@@ -909,7 +910,7 @@ public class SystemService {
         if (StringUtils.isBlank(tempDir)) {
             throw new SystemException("Unable to get system temporary directory.");
         }
-        File tmpArchiveFile = createTempFile(service, ipAddress, ".tgz");
+        File tmpArchiveFile = createTempFile(service, node, ".tgz");
         Files.delete(tmpArchiveFile.toPath());
 
         File archive = new File(tempDir + "/" + tmpArchiveFile.getName());
@@ -921,13 +922,13 @@ public class SystemService {
         // 2. copy it over to target node and extract it
 
         // 2.1
-        sshCommandService.copySCPFile(ipAddress, archive.getAbsolutePath());
+        sshCommandService.copySCPFile(connection, archive.getAbsolutePath());
 
-        exec(ipAddress, sb, "rm -Rf " +SystemService. TMP_PATH_PREFIX + service);
-        exec(ipAddress, sb, "rm -f " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
-        exec(ipAddress, sb, "mv " +  tmpArchiveFile.getName() + " " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
-        exec(ipAddress, sb, "tar xfz " + SystemService.TMP_PATH_PREFIX + service + ".tgz --directory=" + SystemService.TMP_PATH_PREFIX);
-        exec(ipAddress, sb, "chmod 755 " + SystemService.TMP_PATH_PREFIX + service + "/setup.sh");
+        exec(connection, sb, "rm -Rf " +SystemService. TMP_PATH_PREFIX + service);
+        exec(connection, sb, "rm -f " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
+        exec(connection, sb, "mv " +  tmpArchiveFile.getName() + " " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
+        exec(connection, sb, "tar xfz " + SystemService.TMP_PATH_PREFIX + service + ".tgz --directory=" + SystemService.TMP_PATH_PREFIX);
+        exec(connection, sb, "chmod 755 " + SystemService.TMP_PATH_PREFIX + service + "/setup.sh");
 
         // 2.2 delete local archive
         try {
@@ -945,11 +946,13 @@ public class SystemService {
             if (containerFile.exists()) {
 
                 sb.append(" - Copying over docker image ").append(imageFileName).append("\n");
-                sshCommandService.copySCPFile(ipAddress, packageDistributionPath + "/" + imageFileName);
+                sshCommandService.copySCPFile(connection, packageDistributionPath + "/" + imageFileName);
 
-                exec(ipAddress, sb, new String[]{"mv", imageFileName, SystemService.TMP_PATH_PREFIX + service + "/"});
+                exec(connection, sb, new String[]{"mv", imageFileName, SystemService.TMP_PATH_PREFIX + service + "/"});
 
-                exec(ipAddress, sb, new String[]{"ln", "-s", SystemService.TMP_PATH_PREFIX + service + "/" + imageFileName, SystemService.TMP_PATH_PREFIX + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
+                exec(connection, sb, new String[]{"mv",
+                        SystemService.TMP_PATH_PREFIX + service + "/" + imageFileName,
+                        SystemService.TMP_PATH_PREFIX + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
 
             } else {
                 sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");

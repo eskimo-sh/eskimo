@@ -111,6 +111,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
         marathonService.setMemoryComputer(memoryComputer);
         marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
+        marathonService.setConnectionManagerService(connectionManagerService);
 
         systemService.setMarathonService(marathonService);
         return marathonService;

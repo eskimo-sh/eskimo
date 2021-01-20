@@ -6,6 +6,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -274,30 +275,41 @@ public class NodesConfigurationService {
         }
     }
 
-    void installEskimoBaseSystem(StringBuilder sb, String ipAddress) throws SSHCommandException {
-        sb.append (sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
+    void installEskimoBaseSystem(StringBuilder sb, String node) throws SSHCommandException {
+        Connection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(node);
 
-        sb.append(" - Copying jq program\n");
-        copyCommand ("jq-1.6-linux64", USR_LOCAL_BIN_JQ, ipAddress);
+            sb.append(sshCommandService.runSSHScriptPath(connection, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
-        sb.append(" - Copying mesos-cli script\n");
-        copyCommand ("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, ipAddress);
+            sb.append(" - Copying jq program\n");
+            copyCommand("jq-1.6-linux64", USR_LOCAL_BIN_JQ, connection);
 
-        sb.append(" - Copying gluster-mount script\n");
-        copyCommand ("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, ipAddress);
+            sb.append(" - Copying mesos-cli script\n");
+            copyCommand("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, connection);
 
-        connectionManagerService.forceRecreateConnection(ipAddress); // user privileges may have changed
+            sb.append(" - Copying gluster-mount script\n");
+            copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
+
+        } catch (ConnectionManagerException e) {
+            throw new SSHCommandException(e);
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
     private String installMesos(String ipAddress) throws SSHCommandException {
         return sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-mesos.sh");
     }
 
-    void copyCommand (String source, String target, String ipAddress) throws SSHCommandException {
-        sshCommandService.copySCPFile(ipAddress, servicesSetupPath + "/base-eskimo/" + source);
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", source, target});
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chown", "root.root", target});
-        sshChmod755(ipAddress, target);
+    void copyCommand (String source, String target, Connection connection) throws SSHCommandException {
+        sshCommandService.copySCPFile(connection, servicesSetupPath + "/base-eskimo/" + source);
+        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", source, target});
+        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chown", "root.root", target});
+        sshChmod755(connection, target);
     }
 
     private boolean isMissingOnNode(String installation, String ipAddress) {
@@ -312,32 +324,36 @@ public class NodesConfigurationService {
         }
     }
 
-    void installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String ipAddress)
+    void installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String node)
             throws SystemException, SSHCommandException, IOException {
 
-        File tempTopologyFile = systemService.createTempFile("eskimo_topology", ipAddress, ".sh");
+        Connection connection = null;
         try {
-            FileUtils.delete(tempTopologyFile);
-        } catch (FileUtils.FileDeleteFailedException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        }
-        try {
-            FileUtils.writeFile(tempTopologyFile, servicesDefinition
-                    .getTopology(nodesConfig, marathonConfig, ipAddress)
-                    .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (ipAddress)));
-        } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        }
-        sshCommandService.copySCPFile(ipAddress, tempTopologyFile.getAbsolutePath());
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempTopologyFile.getName(), "/etc/eskimo_topology.sh"});
-        sshChmod755(ipAddress, "/etc/eskimo_topology.sh");
 
-        try {
+            connection = connectionManagerService.getPrivateConnection(node);
+
+            File tempTopologyFile = systemService.createTempFile("eskimo_topology", node, ".sh");
+            try {
+                FileUtils.delete(tempTopologyFile);
+            } catch (FileUtils.FileDeleteFailedException e) {
+                logger.error (e, e);
+                throw new SystemException(e);
+            }
+            try {
+                FileUtils.writeFile(tempTopologyFile, servicesDefinition
+                        .getTopology(nodesConfig, marathonConfig, node)
+                        .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (node)));
+            } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
+                logger.error (e, e);
+                throw new SystemException(e);
+            }
+            sshCommandService.copySCPFile(connection, tempTopologyFile.getAbsolutePath());
+            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", tempTopologyFile.getName(), "/etc/eskimo_topology.sh"});
+            sshChmod755(connection, "/etc/eskimo_topology.sh");
+
             ServicesSettingsWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
-            File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-settings", ipAddress, ".json");
+            File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-settings", node, ".json");
             try {
                 FileUtils.delete(tempServicesSettingsFile);
             } catch (FileUtils.FileDeleteFailedException e) {
@@ -347,13 +363,21 @@ public class NodesConfigurationService {
 
             FileUtils.writeFile(tempServicesSettingsFile, servicesConfig.getFormattedValue());
 
-            sshCommandService.copySCPFile(ipAddress, tempServicesSettingsFile.getAbsolutePath());
-            sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-settings.json"});
-            sshChmod755(ipAddress, "/etc/eskimo_services-settings.json");
+            sshCommandService.copySCPFile(connection, tempServicesSettingsFile.getAbsolutePath());
+            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-settings.json"});
+            sshChmod755(connection, "/etc/eskimo_services-settings.json");
 
         } catch (FileException | SetupException e) {
             logger.error (e, e);
             throw new SystemException(e);
+
+        } catch (ConnectionManagerException e) {
+            throw new SystemException(e);
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
         }
     }
 
@@ -366,17 +390,29 @@ public class NodesConfigurationService {
         }
     }
 
-    private void uploadMesos(String ipAddress) throws SSHCommandException, SystemException {
+    private void uploadMesos(String node) throws SSHCommandException, SystemException {
+        Connection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(node);
 
-        messagingService.addLines(" - Uploading mesos distribution");
-        String mesosFlavour = "mesos-" + getNodeFlavour(ipAddress);
+            messagingService.addLines(" - Uploading mesos distribution");
+            String mesosFlavour = "mesos-" + getNodeFlavour(connection);
 
-        File packageDistributionDir = new File (packageDistributionPath);
+            File packageDistributionDir = new File (packageDistributionPath);
 
-        String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
-        File mesosDistrib = new File (packageDistributionDir, mesosFileName);
+            String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
+            File mesosDistrib = new File (packageDistributionDir, mesosFileName);
 
-        sshCommandService.copySCPFile(ipAddress, mesosDistrib.getAbsolutePath());
+            sshCommandService.copySCPFile(connection, mesosDistrib.getAbsolutePath());
+
+        } catch (ConnectionManagerException e) {
+            throw new SystemException(e);
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
     void uninstallService(String service, String ipAddress) throws SystemException {
@@ -403,8 +439,8 @@ public class NodesConfigurationService {
                 status -> status.setInstallationFlag(service, nodeName, "OK"));
     }
 
-    void restartServiceForSystem(String service, String ipAddress) throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
+    void restartServiceForSystem(String service, String node) throws SystemException {
+        String nodeName = node.replace(".", "-");
 
         if (servicesDefinition.getService(service).isMarathon()) {
 
@@ -420,87 +456,113 @@ public class NodesConfigurationService {
                     status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
 
         } else {
-            systemOperationService.applySystemOperation("Restart of " + service + " on " + ipAddress,
-                    builder -> builder.append(sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + service)),
+            systemOperationService.applySystemOperation("Restart of " + service + " on " + node,
+                    builder -> builder.append(sshCommandService.runSSHCommand(node, "sudo systemctl restart " + service)),
                     status -> status.setInstallationFlag(service, nodeName, "OK"));
         }
     }
 
 
-    private void proceedWithServiceUninstallation(StringBuilder sb, String ipAddress, String service)
+    private void proceedWithServiceUninstallation(StringBuilder sb, String node, String service)
             throws SSHCommandException, SystemException {
 
-        // 1. Calling uninstall.sh script if it exists
-        systemService.callUninstallScript(sb, ipAddress, service);
+        Connection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(node);
 
-        // 2. Stop service
-        sb.append(" - Stopping Service\n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + service);
+            // 1. Calling uninstall.sh script if it exists
+            systemService.callUninstallScript(sb, connection, service);
 
-        // 3. Uninstall systemd service file
-        sb.append(" - Removing systemd Service File\n");
-        // Find systemd unit config files directory
-        String foundStandardFlag = sshCommandService.runSSHScript(ipAddress, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
-        if (foundStandardFlag.contains("found_standard")) {
-            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /lib/systemd/system/" + service + ".service");
-        } else {
-            sshCommandService.runSSHCommand(ipAddress, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");
+            // 2. Stop service
+            sb.append(" - Stopping Service\n");
+            sshCommandService.runSSHCommand(connection, "sudo systemctl stop " + service);
+
+            // 3. Uninstall systemd service file
+            sb.append(" - Removing systemd Service File\n");
+            // Find systemd unit config files directory
+            String foundStandardFlag = sshCommandService.runSSHScript(connection, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
+            if (foundStandardFlag.contains("found_standard")) {
+                sshCommandService.runSSHCommand(connection, "sudo rm -f  /lib/systemd/system/" + service + ".service");
+            } else {
+                sshCommandService.runSSHCommand(connection, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");
+            }
+
+            // 4. Delete docker container
+            sb.append(" - Removing docker container \n");
+            sshCommandService.runSSHCommand(connection, "sudo docker rm -f " + service + " || true ");
+
+            // 5. Delete docker image
+            sb.append(" - Removing docker image \n");
+            sshCommandService.runSSHCommand(connection, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
+
+            // 6. Reloading systemd daemon
+            sb.append(" - Reloading systemd daemon \n");
+            sshCommandService.runSSHCommand(connection, "sudo systemctl daemon-reload");
+            sshCommandService.runSSHCommand(connection, "sudo systemctl reset-failed");
+
+        } catch (ConnectionManagerException e) {
+            throw new SSHCommandException(e);
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
         }
-
-        // 4. Delete docker container
-        sb.append(" - Removing docker container \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo docker rm -f " + service + " || true ");
-
-        // 5. Delete docker image
-        sb.append(" - Removing docker image \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
-
-        // 6. Reloading systemd daemon
-        sb.append(" - Reloading systemd daemon \n");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl daemon-reload");
-        sshCommandService.runSSHCommand(ipAddress, "sudo systemctl reset-failed");
     }
 
-    private void proceedWithServiceInstallation(StringBuilder sb, String ipAddress, String service)
+    private void proceedWithServiceInstallation(StringBuilder sb, String node, String service)
             throws IOException, SystemException, SSHCommandException {
 
         String imageName = servicesDefinition.getService(service).getImageName();
 
-        sb.append(" - Creating archive and copying it over\n");
-        File tmpArchiveFile = systemService.createRemotePackageFolder(sb, ipAddress, service, imageName);
+        Connection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(node);
 
-        // 4. call setup script
-        systemService.installationSetup(sb, ipAddress, service);
+            sb.append(" - Creating archive and copying it over\n");
+            File tmpArchiveFile = systemService.createRemotePackageFolder(sb, connection, node, service, imageName);
 
-        // 5. cleanup
-        systemService.installationCleanup(sb, ipAddress, service, imageName, tmpArchiveFile);
+            // 4. call setup script
+            systemService.installationSetup(sb, connection, node, service);
+
+            // 5. cleanup
+            systemService.installationCleanup(sb, connection, service, imageName, tmpArchiveFile);
+
+        } catch (ConnectionManagerException e) {
+            throw new SSHCommandException(e);
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
-    private void sshChmod755 (String ipAddress, String file) throws SSHCommandException {
-        sshChmod (ipAddress, file, "755");
+    private void sshChmod755 (Connection connection, String file) throws SSHCommandException {
+        sshChmod (connection, file, "755");
     }
 
-    private void sshChmod (String ipAddress, String file, String mode) throws SSHCommandException {
-        sshCommandService.runSSHCommand(ipAddress, new String[]{"sudo", "chmod", mode, file});
+    private void sshChmod (Connection connection, String file, String mode) throws SSHCommandException {
+        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chmod", mode, file});
     }
 
-    String getNodeFlavour(String ipAddress) throws SSHCommandException, SystemException {
+    String getNodeFlavour(Connection connection) throws SSHCommandException, SystemException {
         // Find out if debian or RHEL or SUSE
         String flavour = null;
-        String rawIsDebian = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
+        String rawIsDebian = sshCommandService.runSSHScript(connection, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
         if (rawIsDebian.contains("debian")) {
             flavour = "debian";
         }
 
         if (flavour == null) {
-            String rawIsRedHat = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
+            String rawIsRedHat = sshCommandService.runSSHScript(connection, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
             if (rawIsRedHat.contains("redhat")) {
                 flavour = "redhat";
             }
         }
 
         if (flavour == null) {
-            String rawIsSuse = sshCommandService.runSSHScript(ipAddress, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
+            String rawIsSuse = sshCommandService.runSSHScript(connection, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
             if (rawIsSuse.contains("suse")) {
                 flavour = "suse";
             }

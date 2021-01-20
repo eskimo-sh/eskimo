@@ -91,14 +91,36 @@ rm -f __installFlinkEff.sh
 
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
+
+    echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
+    docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
+    fail_if_error $? "/tmp/zeppelin_build_log" -3
+
     docker exec -i zeppelin_template bash /scripts/installZeppelinFromSources.sh $USER $UID | tee /tmp/zeppelin_build_log 2>&1
+    if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+        echo " - In container install script ended up in error"
+        cat /tmp/zeppelin_build_log
+        exit 103
+    fi
+
+    echo "   + downloading built archive to /tmp/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz"
+    docker cp zeppelin_template:/tmp/zeppelin_setup/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz /tmp/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz > /tmp/zeppelin_build_log 2>&1
+    fail_if_error $? "/tmp/zeppelin_build_log" 110
+
 else
+
+    if [[ -d $SCRIPT_DIR/patches ]]; then
+        echo " - Copying patches folder"
+        docker cp patches zeppelin_template:/patches > /tmp/zeppelin_build_log 2>&1
+        fail_if_error $? "/tmp/zeppelin_build_log" 111
+    fi
+
     docker exec -i zeppelin_template bash /scripts/installZeppelin.sh | tee /tmp/zeppelin_build_log 2>&1
-fi
-if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/zeppelin_build_log
-    exit 103
+    if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+        echo " - In container install script ended up in error"
+        cat /tmp/zeppelin_build_log
+        exit 104
+    fi
 fi
 
 #docker exec -it zeppelin_template bash

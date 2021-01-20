@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import com.trilead.ssh2.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -100,23 +101,35 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+                return runSSHScript((String)null, script, throwsException);
+            }
+            @Override
+            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
                 }
-                if (script.startsWith("sudo systemctl status --no-pager -al")) {
+                if (script.startsWith("sudo systemctl status --no-pager")) {
                     return systemStatusTest;
                 }
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+            public String runSSHCommand(Connection connection, String command) {
+                return runSSHCommand((String)null, command);
+            }
+            @Override
+            public String runSSHCommand(String hostAddress, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+            public void copySCPFile(Connection connection, String filePath) {
+                // just do nothing
+            }
+            @Override
+            public void copySCPFile(String hostAddress, String filePath)  {
                 // just do nothing
             }
         });
