@@ -46,7 +46,9 @@ export HADOOP_MAJOR_VERSION=2.8
 export SPARK_VERSION=2.4.7
 export SPARK_VERSION_MAJOR=2.4
 
-export AMESOS_VERSION=1.8.1
+# CAUTION : This version number needs to be aligned with the expected mesos version defined in
+# /services_setup/base-eskimo/install-mesos.sh
+export AMESOS_VERSION=1.11.0
 
 export MARATHON_VERSION_SHORT=1.8.222
 export MARATHON_VERSION=1.8.222-86475ddac

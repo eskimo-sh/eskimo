@@ -211,7 +211,7 @@ wait_for_executor_registered() {
             -H 'Content-Type: application/json' \
             -XPOST http://$BOX_IP/mesos-master/tasks \
             2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+            jq -r ' .tasks | .[] | select (.name|contains("zeppelin_spark")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
         if [[ $spark_exec_status != "" ]]; then
             echo_date "   + Found zeppelin spark executor running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
             break
@@ -236,7 +236,7 @@ wait_for_executor_unregistered() {
             -H 'Content-Type: application/json' \
             -XPOST http://$BOX_IP/mesos-master/tasks \
             2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+            jq -r ' .tasks | .[] | select (.name|contains("zeppelin_spark")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
             break

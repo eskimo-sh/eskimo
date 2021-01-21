@@ -107,7 +107,7 @@ echo " - Installing a few utility tools"
 docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils sudo procps" > /tmp/build-mesos-debian-log 2>&1
 
 echo " - Installing build tools"
-docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" >/ tmp/build-mesos-debian-log 2>&1
+docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" > /tmp/build-mesos-debian-log 2>&1
 
 #echo " - Installing swapspace"
 #docker exec -i build_debian bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y swapspace" > /tmp/build-mesos-debian-log 2>&1

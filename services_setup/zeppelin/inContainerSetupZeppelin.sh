@@ -142,6 +142,14 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"\/usr\/local\/lib\/spark\/\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"spark.app.name\",\n'\
+'          \"value\": \"\",'\
+'/'\
+'          \"name\": \"spark.app.name\",\n'\
+'          \"value\": \"zeppelin_spark\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
 
 echo " - Configuring ElasticSearch interpreter"
 
