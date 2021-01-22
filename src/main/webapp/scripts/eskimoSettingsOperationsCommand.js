@@ -72,23 +72,23 @@ eskimo.SettingsOperationsCommand = function() {
 
         console.log (command);
 
-        var commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
+        let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
 
         // installations
         commandDescription += "<strong>Settings Changes</strong><br><br>";
 
-        for (var service in command.settings) {
+        for (let service in command.settings) {
 
-            var serviceSetting = command.settings[service];
+            let serviceSetting = command.settings[service];
 
-            for (var file in serviceSetting) {
+            for (let file in serviceSetting) {
 
-                var fileSettings = serviceSetting[file];
+                let fileSettings = serviceSetting[file];
 
                 commandDescription = commandDescription +
                     '<strong>' + service+ ' / ' + file + "</strong><br>";
 
-                for (var i = 0; i < fileSettings.length; i++) {
+                for (let i = 0; i < fileSettings.length; i++) {
                     commandDescription = renderOperation(
                         "Changing " + fileSettings[i].key
                             + (fileSettings[i].oldValue != null && fileSettings[i].oldValue != "" ? (" from " + fileSettings[i].oldValue) : "")
@@ -104,7 +104,7 @@ eskimo.SettingsOperationsCommand = function() {
         // restarts
         commandDescription += "<strong>Services to be restarted</strong><br><br>";
 
-        for (var i = 0; i < command.restarts.length; i++) {
+        for (let i = 0; i < command.restarts.length; i++) {
             commandDescription = renderOperation(command.restarts[i], commandDescription);
         }
 

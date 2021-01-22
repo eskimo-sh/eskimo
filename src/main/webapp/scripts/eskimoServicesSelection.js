@@ -45,10 +45,10 @@ eskimo.ServicesSelection = function() {
 
     const NODE_ID_FIELD = "node_id";
 
-    var nodeNbrInConfiguration = -1;
-    var servicesSelectedcallback = null;
+    let nodeNbrInConfiguration = -1;
+    let servicesSelectedcallback = null;
 
-    var SERVICES_CONFIGURATION = [];
+    let SERVICES_CONFIGURATION = [];
 
     // Initialize HTML Div from Template
     this.initialize = function() {
@@ -96,7 +96,7 @@ eskimo.ServicesSelection = function() {
     };
 
     this.getCurrentNodesConfig = function() {
-        var setupConfig = $("form#nodes-config").serializeObject();
+        let setupConfig = $("form#nodes-config").serializeObject();
         //console.log (setupConfig);
         return setupConfig;
     };
@@ -105,13 +105,13 @@ eskimo.ServicesSelection = function() {
 
         servicesSelectedcallback = callback;
 
-        var configuredServices = that.eskimoNodesConfig.getConfiguredServices();
-        var nbrOfNodes = that.eskimoNodesConfig.getNodesCount();
+        let configuredServices = that.eskimoNodesConfig.getConfiguredServices();
+        let nbrOfNodes = that.eskimoNodesConfig.getNodesCount();
 
         // clear all boxes
-        for (var i = 0; i < configuredServices.length; i++) {
+        for (let i = 0; i < configuredServices.length; i++) {
 
-            var choice = $('#' + configuredServices[i] + "-choice");
+            let choice = $('#' + configuredServices[i] + "-choice");
 
             if (!choice.get(0) || choice.get(0) == null) {
                 throw "Couldn't find choice for " + configuredServices[i];
@@ -120,7 +120,7 @@ eskimo.ServicesSelection = function() {
             choice.get(0).checked = false;
             choice.removeClass("disabled")
 
-            var label = $('#' + configuredServices[i] + "-label");
+            let label = $('#' + configuredServices[i] + "-label");
             label.removeClass("disabled-label");
             label.removeClass("forced-label");
         }
@@ -130,12 +130,12 @@ eskimo.ServicesSelection = function() {
         if (nodeNbr != null && nodeNbr != "empty") {
 
             // check and disable mandatory services
-            for (var serviceName in SERVICES_CONFIGURATION) {
-                var serviceConfig = SERVICES_CONFIGURATION[serviceName];
+            for (let serviceName in SERVICES_CONFIGURATION) {
+                let serviceConfig = SERVICES_CONFIGURATION[serviceName];
                 if (serviceConfig.mandatory) {
 
-                    var choice = $('#' + serviceName + '-choice');
-                    var label = $('#' + serviceName + '-label');
+                    let choice = $('#' + serviceName + '-choice');
+                    let label = $('#' + serviceName + '-label');
 
                     if (serviceConfig.conditional == "MULTIPLE_NODES") {
 
@@ -156,12 +156,12 @@ eskimo.ServicesSelection = function() {
 
             // check and disable unique services
             if (isRange) {
-                for (var serviceName in SERVICES_CONFIGURATION) {
-                    var serviceConfig = SERVICES_CONFIGURATION[serviceName];
+                for (let serviceName in SERVICES_CONFIGURATION) {
+                    let serviceConfig = SERVICES_CONFIGURATION[serviceName];
                     if (serviceConfig.unique) {
 
-                        var choice = $('#' + serviceName + '-choice');
-                        var label = $('#' + serviceName + '-label');
+                        let choice = $('#' + serviceName + '-choice');
+                        let label = $('#' + serviceName + '-label');
 
                         choice.get(0).checked = false;
                         choice.addClass("disabled");
@@ -175,15 +175,15 @@ eskimo.ServicesSelection = function() {
             $("#services-selection-button-select-all").css("visibility", "hidden");
 
             // enabling node ntp to nake it selectaBLE
-            var setupConfig = that.getCurrentNodesConfig();
+            let setupConfig = that.getCurrentNodesConfig();
 
-            for (var key in setupConfig) {
-                //var re = /([a-zA-Z\-_]+)([0-9]+)/;
-                var re = /([a-zA-Z\-_]+)([0-9]*)/;
-                var match = key.match(re);
+            for (let key in setupConfig) {
+                //let re = /([a-zA-Z\-_]+)([0-9]+)/;
+                let re = /([a-zA-Z\-_]+)([0-9]*)/;
+                let match = key.match(re);
 
-                var serviceName = null;
-                var nbr = -1;
+                let serviceName = null;
+                let nbr = -1;
                 if (match[2] != null && match[2] != "") {
                     nbr = parseInt(match[2]);
                     serviceName = match[1]
@@ -210,19 +210,19 @@ eskimo.ServicesSelection = function() {
 
     function servicesSelectionSelectAll() {
 
-        var allSelected = true;
+        let allSelected = true;
 
-        var configuredServices = that.eskimoNodesConfig.getConfiguredServices();
+        let configuredServices = that.eskimoNodesConfig.getConfiguredServices();
 
         // are they all selected already
-        for (var i = 0; i < configuredServices.length; i++) {
+        for (let i = 0; i < configuredServices.length; i++) {
             if (!$('#' + configuredServices[i] + "-choice").get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
-        for (var i = 0; i < configuredServices.length; i++) {
+        for (let i = 0; i < configuredServices.length; i++) {
             $('#' + configuredServices[i] + "-choice").get(0).checked = !allSelected;
         }
     }
@@ -237,15 +237,15 @@ eskimo.ServicesSelection = function() {
 
         $('#services-selection-modal').modal("hide");
 
-        var serviceSelection = $("#services-selection-form").serializeObject();
+        let serviceSelection = $("#services-selection-form").serializeObject();
 
-        var retModel = {};
+        let retModel = {};
 
-        for (var key in serviceSelection) {
+        for (let key in serviceSelection) {
 
-            var serviceName = key.substring(0, key.length - "-choice".length);
+            let serviceName = key.substring(0, key.length - "-choice".length);
 
-            var value = serviceSelection[key];
+            let value = serviceSelection[key];
 
             if (nodeNbrInConfiguration != null && nodeNbrInConfiguration != "empty") {
                 if (value == "choice") {
@@ -268,14 +268,14 @@ eskimo.ServicesSelection = function() {
 
         //console.log (radioButton.id);
 
-        var re = /([a-zA-Z\-_]+)([0-9]*)-(choice)/;
-        var match = this.id.match(re);
+        let re = /([a-zA-Z\-_]+)([0-9]*)-(choice)/;
+        let match = this.id.match(re);
 
 
         console.log(this.id + " - " + match[1] + " - " + match[2] + " - " + match[3]);
-        var radioName = match[1];
+        let radioName = match[1];
 
-        var value = (match[3] != null && match[3] != "") ? "choice" : match[2];
+        let value = (match[3] != null && match[3] != "") ? "choice" : match[2];
 
         if ($('form#services-selection-form input[name=' + radioName + (value == "choice" ? "-choice" : "") + ']:checked').val() == value) {
             setTimeout(
@@ -288,8 +288,8 @@ eskimo.ServicesSelection = function() {
     this.servicesSelectionRadioMouseDown = servicesSelectionRadioMouseDown;
 
     function getService (row, col) {
-        for (var serviceName in SERVICES_CONFIGURATION) {
-            var serviceConfig = SERVICES_CONFIGURATION[serviceName];
+        for (let serviceName in SERVICES_CONFIGURATION) {
+            let serviceConfig = SERVICES_CONFIGURATION[serviceName];
 
             if (serviceConfig.row == row && serviceConfig.col == col) {
                 return serviceConfig;
@@ -302,13 +302,13 @@ eskimo.ServicesSelection = function() {
 
     function initModalServicesConfig() {
 
-        var newIn = '<form id="services-selection-form">';
+        let newIn = '<form id="services-selection-form">';
 
-        for (var row = 1; row <= 10; row++) {
+        for (let row = 1; row <= 10; row++) {
 
-            var oneFound = false;
-            for (var col = 1; col <= 3; col++) {
-                var serviceConfig = getService(row, col);
+            let oneFound = false;
+            for (let col = 1; col <= 3; col++) {
+                let serviceConfig = getService(row, col);
                 //alert (serviceConfig.name + " - " + row + " - " + col);
                 if (serviceConfig != null) {
                     oneFound = true;
@@ -318,10 +318,10 @@ eskimo.ServicesSelection = function() {
                 break; // done
             }
 
-            var rowHTML =  '<div class="col-md-12"> ';
-            for (var col = 1; col <= 3; col++) {
+            let rowHTML =  '<div class="col-md-12"> ';
+            for (let col = 1; col <= 3; col++) {
 
-                var serviceConfig = getService (row, col);
+                let serviceConfig = getService (row, col);
                 if (serviceConfig != null) {
 
                     if (serviceConfig.unique) {

@@ -39,9 +39,9 @@ eskimo.Notifications = function() {
 
     const that = this;
 
-    var lastLineNotifications = 0;
-    var notifications = [];
-    var newNotificationsCount = 0;
+    let lastLineNotifications = 0;
+    let notifications = [];
+    let newNotificationsCount = 0;
 
     this.initialize = function () {
         loadLastLine();
@@ -78,7 +78,7 @@ eskimo.Notifications = function() {
                 if (data && data.status) {
                     //console.log(data.notifications);
 
-                    for (var i = 0; i < data.notifications.length; i++) {
+                    for (let i = 0; i < data.notifications.length; i++) {
                         addNotification(data.notifications[i]);
                     }
 
@@ -107,7 +107,7 @@ eskimo.Notifications = function() {
 
     function addNotification(notification) {
 
-        var today = new Date();
+        let today = new Date();
         notification.tstamp = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
         notifications.push(notification);
@@ -144,7 +144,7 @@ eskimo.Notifications = function() {
 
     function renderNotifications() {
 
-        var notificationHTML = '' +
+        let notificationHTML = '' +
             '<li class="hoe-submenu-label">\n' +
             '    <h3><span id="notifications-count" class="bold">' +
             notifications.length +
@@ -154,7 +154,7 @@ eskimo.Notifications = function() {
             '    </a></h3>\n' +
             '</li>';
 
-        var start = 0;
+        let start = 0;
         if (notifications.length > 10) {
             start = notifications.length - 10;
             notificationHTML = notificationHTML + '' +
@@ -166,9 +166,9 @@ eskimo.Notifications = function() {
         }
 
 
-        for (var i = start; i < notifications.length; i++) {
+        for (let i = start; i < notifications.length; i++) {
 
-            var notification = notifications[i];
+            let notification = notifications[i];
 
             if (notification.type == "error" || notification.type == "Error") {
 

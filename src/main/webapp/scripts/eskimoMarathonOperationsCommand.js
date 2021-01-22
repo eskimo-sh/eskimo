@@ -71,12 +71,12 @@ eskimo.MarathonOperationsCommand = function() {
 
         console.log (command);
 
-        var commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
+        let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
 
         // installations
         commandDescription += "<strong>Marathon Services Installation</strong><br><br>";
 
-        for (var i = 0; i < command.installations.length; i++) {
+        for (let i = 0; i < command.installations.length; i++) {
             commandDescription = renderOperation(command.installations[i], commandDescription);
         }
 
@@ -85,7 +85,7 @@ eskimo.MarathonOperationsCommand = function() {
         // uninstallations
         commandDescription += "<strong>Marathon Services Uninstallation</strong><br><br>";
 
-        for (var i = 0; i < command.uninstallations.length; i++) {
+        for (let i = 0; i < command.uninstallations.length; i++) {
             commandDescription = renderOperation(command.uninstallations[i], commandDescription);
         }
 
@@ -95,7 +95,7 @@ eskimo.MarathonOperationsCommand = function() {
         // reinstallations
         commandDescription += "<b>Services Restart</b><br><br>";
 
-        for (var i = 0; i < command.restarts.length; i++) {
+        for (let i = 0; i < command.restarts.length; i++) {
             commandDescription = renderOperation(command.restarts[i], commandDescription);
         }
 

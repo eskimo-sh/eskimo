@@ -43,9 +43,9 @@ eskimo.Consoles = function() {
     const that = this;
 
     // Caution : this variable is populated by EskimoNodesStatus.
-    var availableNodes = [];
+    let availableNodes = [];
 
-    var openedConsoles = [];
+    let openedConsoles = [];
 
     this.initialize = function() {
 

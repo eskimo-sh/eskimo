@@ -387,8 +387,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showStatusMessage ('test');");
 
-        assertCssValue("#service-status-warning", "display", "block");
-        assertCssValue("#service-status-warning", "visibility", "visible");
+        assertCssValue("#service-status-warning", "display", "inherit");
+        assertCssValue("#service-status-warning", "visibility", "inherit");
 
         assertAttrValue("#service-status-warning-message", "class", "alert alert-warning");
 

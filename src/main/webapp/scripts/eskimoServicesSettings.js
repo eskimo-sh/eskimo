@@ -45,7 +45,7 @@ eskimo.ServicesSettings = function () {
 
     const that = this;
 
-    var SERVICES_SETTINGS = [];
+    let SERVICES_SETTINGS = [];
 
     // Initialize HTML Div from Template
     this.initialize = function() {
@@ -101,7 +101,7 @@ eskimo.ServicesSettings = function () {
 
     function saveServicesSettings() {
 
-        var servicesConfigForm = $("form#services-settings").serializeObject();
+        let servicesConfigForm = $("form#services-settings").serializeObject();
 
         that.eskimoMain.showProgressbar();
 
@@ -144,11 +144,11 @@ eskimo.ServicesSettings = function () {
     }
 
     function showServicesSettingsMessage(message, success) {
-        var servicesSettingsWarning = $("#services-settings-warning");
+        let servicesSettingsWarning = $("#services-settings-warning");
         servicesSettingsWarning.css("display", "inherit");
         servicesSettingsWarning.css("visibility", "inherit");
 
-        var servicesSettingsWarningMessage = $("#services-settings-warning-message");
+        let servicesSettingsWarningMessage = $("#services-settings-warning-message");
         servicesSettingsWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
         servicesSettingsWarningMessage.html(message);
 
@@ -178,12 +178,12 @@ eskimo.ServicesSettings = function () {
 
     function layoutServicesSettings() {
 
-        var servicesSettingsContent = '<div class="panel panel-default">';
+        let servicesSettingsContent = '<div class="panel panel-default">';
 
-        for (var i = 0; i < SERVICES_SETTINGS.length; i++) {
-            var serviceEditableSettings = SERVICES_SETTINGS[i];
-            var serviceName = serviceEditableSettings.name;
-            var serviceEditableSettingsArray = serviceEditableSettings.settings;
+        for (let i = 0; i < SERVICES_SETTINGS.length; i++) {
+            let serviceEditableSettings = SERVICES_SETTINGS[i];
+            let serviceName = serviceEditableSettings.name;
+            let serviceEditableSettingsArray = serviceEditableSettings.settings;
             if (serviceEditableSettingsArray.length > 0) {
 
                 servicesSettingsContent = servicesSettingsContent +
@@ -198,9 +198,9 @@ eskimo.ServicesSettings = function () {
                     '<div id="collapse-'+serviceName+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
                     '<div class="panel-body">';
 
-                for (var j = 0; j < serviceEditableSettingsArray.length; j++) {
+                for (let j = 0; j < serviceEditableSettingsArray.length; j++) {
 
-                    var serviceEditableSettingsFile = serviceEditableSettingsArray[j];
+                    let serviceEditableSettingsFile = serviceEditableSettingsArray[j];
                     console.log (serviceEditableSettingsFile);
 
                     servicesSettingsContent = servicesSettingsContent +
@@ -209,11 +209,11 @@ eskimo.ServicesSettings = function () {
                         '<h5><strong>Configuration file</strong> : ' + serviceEditableSettingsFile.filename + '</h5>' +
                         '</div>';
 
-                    for (var k = 0; k < serviceEditableSettingsFile.properties.length; k++) {
+                    for (let k = 0; k < serviceEditableSettingsFile.properties.length; k++) {
 
-                        var property = serviceEditableSettingsFile.properties[k];
+                        let property = serviceEditableSettingsFile.properties[k];
 
-                        var inputName = serviceName + "-" + property.name.replace(/\./g, "-");
+                        let inputName = serviceName + "-" + property.name.replace(/\./g, "-");
 
                         servicesSettingsContent = servicesSettingsContent +
                             '<div class="col-md-12 col-sd-12">\n' +

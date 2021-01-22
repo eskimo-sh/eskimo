@@ -269,6 +269,7 @@ public abstract class AbstractWebTest {
         js("eskimoMain.showProgressbar = function() {}");
         js("eskimoMain.isSetupLoaded = function() { return true; }");
         js("eskimoMain.serviceMenuClear = function() { return true; }");
+        js("eskimoMain.windowResize = function() {  }");
 
         js("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 

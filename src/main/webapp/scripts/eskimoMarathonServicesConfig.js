@@ -46,7 +46,7 @@ eskimo.MarathonServicesConfig = function() {
     const that = this;
 
     // initialized by backend
-    var MARATHON_SERVICES = [];
+    let MARATHON_SERVICES = [];
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -56,7 +56,7 @@ eskimo.MarathonServicesConfig = function() {
 
                 $("#save-marathon-servicesbtn").click(function (e) {
 
-                    var setupConfig = $("form#marathon-servicesconfig").serializeObject();
+                    let setupConfig = $("form#marathon-servicesconfig").serializeObject();
 
                     console.log(setupConfig);
 
@@ -134,17 +134,17 @@ eskimo.MarathonServicesConfig = function() {
 
     function selectAll(){
 
-        var allSelected = true;
+        let allSelected = true;
 
         // are they all selected already
-        for (var i = 0; i < MARATHON_SERVICES.length; i++) {
+        for (let i = 0; i < MARATHON_SERVICES.length; i++) {
             if (!$('#' + MARATHON_SERVICES[i] + "_install").get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
-        for (var i = 0; i < MARATHON_SERVICES.length; i++) {
+        for (let i = 0; i < MARATHON_SERVICES.length; i++) {
             $('#' + MARATHON_SERVICES[i] + "_install").get(0).checked = !allSelected;
         }
     }
@@ -152,11 +152,11 @@ eskimo.MarathonServicesConfig = function() {
 
     this.renderMarathonConfig = function (marathonConfig) {
 
-        var marathonServicesTableBody = $("#marathon-services-table-body");
+        let marathonServicesTableBody = $("#marathon-services-table-body");
 
-        for (var i = 0; i < MARATHON_SERVICES.length; i++) {
+        for (let i = 0; i < MARATHON_SERVICES.length; i++) {
 
-            var marathonServiceRow = '<tr>';
+            let marathonServiceRow = '<tr>';
 
             marathonServiceRow += ''+
                 '<td>' +
@@ -177,11 +177,11 @@ eskimo.MarathonServicesConfig = function() {
 
         if (marathonConfig) {
 
-            for (var installFlag in marathonConfig) {
-                var indexOfInstall = installFlag.indexOf("_install");
+            for (let installFlag in marathonConfig) {
+                let indexOfInstall = installFlag.indexOf("_install");
                 if (indexOfInstall > -1) {
-                    var serviceName = installFlag.substring(0,indexOfInstall);
-                    var flag = marathonConfig[installFlag];
+                    let serviceName = installFlag.substring(0,indexOfInstall);
+                    let flag = marathonConfig[installFlag];
 
                     console.log (serviceName + " - " + flag);
 
@@ -198,7 +198,7 @@ eskimo.MarathonServicesConfig = function() {
 
         that.eskimoMarathonServicesSelection.showMarathonServiceSelection();
 
-        var marathonServicesSelectionHTML = $('#marathon-services-container-table').html();
+        let marathonServicesSelectionHTML = $('#marathon-services-container-table').html();
         marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/marathon\-services/g, "marathon-services-selection");
         marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/_install/g, "_reinstall");
 
@@ -260,11 +260,11 @@ eskimo.MarathonServicesConfig = function() {
     this.proceedWithReinstall = function (reinstallConfig) {
 
         // rename _reinstall to _install in reinstallConfig
-        var model = {};
+        let model = {};
 
-        for (var reinstallKey in reinstallConfig) {
+        for (let reinstallKey in reinstallConfig) {
 
-            var installKey = reinstallKey.substring(0, reinstallKey.indexOf("_reinstall")) + "_install";
+            let installKey = reinstallKey.substring(0, reinstallKey.indexOf("_reinstall")) + "_install";
             model[installKey] = reinstallConfig[reinstallKey];
         }
 

@@ -69,19 +69,19 @@ eskimo.MarathonServicesSelection = function() {
 
     function marathonServicesSelectionSelectAll() {
 
-        var allSelected = true;
+        let allSelected = true;
 
-        var marathonServices = that.eskimoMarathonServicesConfig.getMarathonServices();
+        let marathonServices = that.eskimoMarathonServicesConfig.getMarathonServices();
 
         // are they all selected already
-        for (var i = 0; i < marathonServices.length; i++) {
+        for (let i = 0; i < marathonServices.length; i++) {
             if (!$('#' + marathonServices[i] + "_reinstall").get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
-        for (var i = 0; i < marathonServices.length; i++) {
+        for (let i = 0; i < marathonServices.length; i++) {
             $('#' + marathonServices[i] + "_reinstall").get(0).checked = !allSelected;
         }
     }
@@ -96,7 +96,7 @@ eskimo.MarathonServicesSelection = function() {
 
         $('#marathon-services-selection-modal').modal("hide");
 
-        var reinstallConfig = $("form#marathon-servicesreinstall").serializeObject();
+        let reinstallConfig = $("form#marathon-servicesreinstall").serializeObject();
 
         that.eskimoMarathonServicesConfig.proceedWithReinstall (reinstallConfig);
     }

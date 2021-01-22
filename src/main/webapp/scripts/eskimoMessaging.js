@@ -44,9 +44,9 @@ eskimo.Messaging = function() {
 
     const that = this;
 
-    var messagingPollingHandle = null;
+    let messagingPollingHandle = null;
 
-    var lastLineMessaging = 0;
+    let lastLineMessaging = 0;
 
     this.initialize = function () {
         loadLastLine();
@@ -184,7 +184,7 @@ eskimo.Messaging = function() {
     this.fetchLastMessages = fetchLastMessages;
 
     function startOperationInProgress() {
-        var pendingBarWrapper = $("#progress-bar-pending-wrapper");
+        let pendingBarWrapper = $("#progress-bar-pending-wrapper");
         pendingBarWrapper.css("visibility", "inherit");
         pendingBarWrapper.css("display", "block");
 
@@ -217,7 +217,7 @@ eskimo.Messaging = function() {
                 $("#pending-message-title").html("<h3>Processing completed successfully.</h3>");
             }
 
-            var pendingBarWrapper = $("#progress-bar-pending-wrapper");
+            let pendingBarWrapper = $("#progress-bar-pending-wrapper");
             pendingBarWrapper.css("visibility", "hidden");
             pendingBarWrapper.css("display", "none");
 

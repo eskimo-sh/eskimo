@@ -52,16 +52,16 @@ eskimo.SystemStatus = function() {
     const STATUS_UPDATE_INTERVAL = 4000;
 
     // initialized by backend
-    var STATUS_SERVICES = [];
-    var SERVICES_STATUS_CONFIG = {};
+    let STATUS_SERVICES = [];
+    let SERVICES_STATUS_CONFIG = {};
 
-    var nodeFilter = "";
+    let nodeFilter = "";
 
-    var disconnectedFlag = true;
+    let disconnectedFlag = true;
 
-    var statusUpdateTimeoutHandler = null;
+    let statusUpdateTimeoutHandler = null;
 
-    var prevHidingMessageTimeout = null;
+    let prevHidingMessageTimeout = null;
 
     this.initialize = function () {
         // Initialize HTML Div from Template
@@ -96,7 +96,7 @@ eskimo.SystemStatus = function() {
                 });
 
                 // initialize menus
-                var serviceMenuContent = '' +
+                let serviceMenuContent = '' +
                     '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
                     '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
                     '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
@@ -107,7 +107,7 @@ eskimo.SystemStatus = function() {
 
                 $('#serviceContextMenuTemplate').html(serviceMenuContent);
 
-                var nodeMenuContent = '' +
+                let nodeMenuContent = '' +
                     '    <li><a id="terminal" tabindex="-1" href="#" title="Start Service"><i class="fa fa-terminal"></i> SSH Terminal</a></li>\n' +
                     '    <li><a id="file_manager" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-folder"></i> SFTP File Manager</a></li>\n';
 
@@ -126,14 +126,14 @@ eskimo.SystemStatus = function() {
                 // Open context menu
                 $(this).on("click", function (e) {
 
-                    var target = $(e.target);
+                    let target = $(e.target);
 
-                    var nodeMenu = $("#nodeContextMenu");
+                    let nodeMenu = $("#nodeContextMenu");
                     nodeMenu.html($("#nodeContextMenuTemplate").html());
 
 
                     //open menu
-                    var $menu = nodeMenu
+                    let $menu = nodeMenu
                         .data("invokedOn", target)
                         .show()
                         .css({
@@ -145,8 +145,8 @@ eskimo.SystemStatus = function() {
                         .on('click', 'a', function (evt) {
                             $menu.hide();
 
-                            var $invokedOn = $menu.data("invokedOn");
-                            var $selectedMenu = $(evt.target);
+                            let $invokedOn = $menu.data("invokedOn");
+                            let $selectedMenu = $(evt.target);
 
                             settings.menuSelected.call(this, $invokedOn, $selectedMenu);
                         });
@@ -169,22 +169,22 @@ eskimo.SystemStatus = function() {
                 // Open context menu
                 $(this).on("click", function (e) {
 
-                    var target = $(e.target);
+                    let target = $(e.target);
 
-                    //var nodeAddress = $(target).closest("td.status-node-cell").data('eskimo-node');
-                    var service = $(target).closest("td.status-node-cell").data('eskimo-service');
+                    //let nodeAddress = $(target).closest("td.status-node-cell").data('eskimo-node');
+                    let service = $(target).closest("td.status-node-cell").data('eskimo-service');
 
-                    var additionalCommands = SERVICES_STATUS_CONFIG[service].commands;
+                    let additionalCommands = SERVICES_STATUS_CONFIG[service].commands;
 
                     // TODO make it empty if no commmand
-                    var additionalCommandsHTML = '';
+                    let additionalCommandsHTML = '';
 
                     if (additionalCommands) {
                         if (additionalCommands.length > 0) {
                             additionalCommandsHTML += '<li class="divider"></li>';
                         }
 
-                        for (var i = 0; i < additionalCommands.length; i++) {
+                        for (let i = 0; i < additionalCommands.length; i++) {
                             additionalCommandsHTML +=
                                 '<li><a id="' + additionalCommands[i].id + '" ' +
                                 '       tabindex="-1" ' +
@@ -198,12 +198,12 @@ eskimo.SystemStatus = function() {
                         }
                     }
 
-                    var serviceMenu = $("#serviceContextMenu");
+                    let serviceMenu = $("#serviceContextMenu");
                     serviceMenu.html($("#serviceContextMenuTemplate").html() + additionalCommandsHTML);
 
 
                     //open menu
-                    var $menu = serviceMenu
+                    let $menu = serviceMenu
                         .data("invokedOn", target)
                         .show()
                         .css({
@@ -215,8 +215,8 @@ eskimo.SystemStatus = function() {
                         .on('click', 'a', function (evt) {
                             $menu.hide();
 
-                            var $invokedOn = $menu.data("invokedOn");
-                            var $selectedMenu = $(evt.target);
+                            let $invokedOn = $menu.data("invokedOn");
+                            let $selectedMenu = $(evt.target);
 
                             settings.menuSelected.call(this, $invokedOn, $selectedMenu);
                         });
@@ -237,14 +237,14 @@ eskimo.SystemStatus = function() {
     };
 
     function getMenuPosition(settings, mouse, direction, scrollDir, menu) {
-        var win = $("#inner-content-status")[direction](),
+        let win = $("#inner-content-status")[direction](),
             scroll = $("#inner-content-status")[scrollDir](),
-            menu = $(menu)[direction](),
+            menuTarget = $(menu)[direction](),
             position = mouse + scroll;
 
         // opening menu would pass the side of the page
-        if (mouse + menu > win && menu < mouse)
-            position -= menu;
+        if (mouse + menuTarget > win && menuTarget < mouse)
+            position -= menuTarget;
 
         return position;
     }
@@ -344,11 +344,11 @@ eskimo.SystemStatus = function() {
             clearTimeout(prevHidingMessageTimeout);
         }
 
-        var serviceStatusWarning = $("#service-status-warning");
-        serviceStatusWarning.css("display", "block");
-        serviceStatusWarning.css("visibility", "visible");
+        let serviceStatusWarning = $("#service-status-warning");
+        serviceStatusWarning.css("display", "inherit");
+        serviceStatusWarning.css("visibility", "inherit");
 
-        var serviceStatusWarningMessage = $("#service-status-warning-message");
+        let serviceStatusWarningMessage = $("#service-status-warning-message");
         serviceStatusWarningMessage.html(message);
 
         if (error) {
@@ -463,9 +463,9 @@ eskimo.SystemStatus = function() {
         if (!nodeServicesStatus) {
             return false;
         }
-        for (var key in nodeServicesStatus) {
+        for (let key in nodeServicesStatus) {
             if (key.indexOf("service_"+service+"_") > -1) {
-                var serviceStatus = nodeServicesStatus[key];
+                let serviceStatus = nodeServicesStatus[key];
                 if (serviceStatus == "OK") {
                     return true;
                 }
@@ -481,7 +481,7 @@ eskimo.SystemStatus = function() {
             url: "grafana/api/dashboards/uid/" +monitoringDashboardId,
             success: function (data, status, jqXHR) {
 
-                var forceRefresh = false;
+                let forceRefresh = false;
                 if ($("#status-monitoring-dashboard-frame").css("display") == "none") {
 
 
@@ -493,10 +493,10 @@ eskimo.SystemStatus = function() {
                     forceRefresh = true;
                 }
 
-                var url = "grafana/d/" + monitoringDashboardId + "/monitoring?orgId=1&&kiosk&refresh="
+                let url = "grafana/d/" + monitoringDashboardId + "/monitoring?orgId=1&&kiosk&refresh="
                     + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
 
-                var prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
+                let prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
                 if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
                     $("#status-monitoring-dashboard-frame").attr('src', url);
 
@@ -517,7 +517,7 @@ eskimo.SystemStatus = function() {
 
     function hideGrafanaDashboard() {
 
-        var statusMonitoringInfo = $('.status-monitoring-info');
+        let statusMonitoringInfo = $('.status-monitoring-info');
         statusMonitoringInfo.css("min-height", "220px");
         statusMonitoringInfo.css("height", "220px");
 
@@ -526,7 +526,7 @@ eskimo.SystemStatus = function() {
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-12");
 
-        var statusMonitoringGrafana = $('#status-monitoring-grafana');
+        let statusMonitoringGrafana = $('#status-monitoring-grafana');
         statusMonitoringGrafana.css("display", "none");
         statusMonitoringGrafana.css("visibility", "hidden");
     }
@@ -534,7 +534,7 @@ eskimo.SystemStatus = function() {
 
     function showGrafanaDashboard() {
 
-        var statusMonitoringInfo = $('.status-monitoring-info');
+        let statusMonitoringInfo = $('.status-monitoring-info');
         statusMonitoringInfo.css("min-height", "413px");
         statusMonitoringInfo.css("height", "413px");
 
@@ -543,7 +543,7 @@ eskimo.SystemStatus = function() {
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-4");
 
-        var statusMonitoringGrafana = $('#status-monitoring-grafana');
+        let statusMonitoringGrafana = $('#status-monitoring-grafana');
         statusMonitoringGrafana.css("display", "inherit");
         statusMonitoringGrafana.css("visibility", "inherit");
     }
@@ -554,9 +554,9 @@ eskimo.SystemStatus = function() {
         // A. Handle Grafana Dashboard ID display
 
         // A.1 Find out if grafana is available
-        var grafanaAvailable = this.serviceIsUp (nodeServicesStatus, "grafana");
+        let grafanaAvailable = this.serviceIsUp (nodeServicesStatus, "grafana");
 
-        var monitoringDashboardId = systemStatus.monitoringDashboardId;
+        let monitoringDashboardId = systemStatus.monitoringDashboardId;
 
         // grafana disabled (no dashboard configured)
         if (monitoringDashboardId == null
@@ -587,7 +587,7 @@ eskimo.SystemStatus = function() {
             // render iframe with refresh period (default 30s)
             else {
 
-                var refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
+                let refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
                 setTimeout(function () {
                     that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
@@ -610,10 +610,10 @@ eskimo.SystemStatus = function() {
         // C. Cluster nodes and services
         let nodesWithproblem = [];
         if (nodeServicesStatus) {
-            for (var key in nodeServicesStatus) {
+            for (let key in nodeServicesStatus) {
                 if (key.indexOf("node_alive_") > -1) {
-                    var nodeName = key.substring("node_alive_".length);
-                    var nodeAlive = nodeServicesStatus[key];
+                    let nodeName = key.substring("node_alive_".length);
+                    let nodeAlive = nodeServicesStatus[key];
                     if (nodeAlive != "OK") {
                         nodesWithproblem.push(nodeName.replace(/-/g, "."));
                     }
@@ -633,10 +633,10 @@ eskimo.SystemStatus = function() {
         // find out about services status
         let servicesWithproblem = [];
         if (nodeServicesStatus) {
-            for (var key in nodeServicesStatus) {
+            for (let key in nodeServicesStatus) {
                 if (key.indexOf("service_") > -1) {
-                    var serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
-                    var serviceAlive = nodeServicesStatus[key];
+                    let serviceName = key.substring("service_".length, key.indexOf("_", "service_".length));
+                    let serviceAlive = nodeServicesStatus[key];
                     if (serviceAlive != "OK") {
                         if (servicesWithproblem.length <= 0 || !servicesWithproblem.includes(serviceName)) {
                             servicesWithproblem.push(serviceName);
@@ -661,12 +661,12 @@ eskimo.SystemStatus = function() {
 
         // C. System Information Actions
 
-        var systemInformationActions = '';
+        let systemInformationActions = '';
 
         if (systemStatus.links && systemStatus.links.length && systemStatus.links.length > 0) {
-            for (var i = 0; i < systemStatus.links.length; i++) {
+            for (let i = 0; i < systemStatus.links.length; i++) {
 
-                var link = systemStatus.links[i];
+                let link = systemStatus.links[i];
 
                 if (that.eskimoServices.isServiceAvailable(link.service)
                     && this.serviceIsUp (nodeServicesStatus, link.service)) {
@@ -728,20 +728,20 @@ eskimo.SystemStatus = function() {
         let availableNodes = [];
 
         // loop on node nbrs and get Node Name + create table row
-        for (var key in nodeServicesStatus) {
+        for (let key in nodeServicesStatus) {
             if (key.indexOf("node_nbr_") > -1) {
-                var nodeName = key.substring("node_nbr_".length);
-                var nbr = nodeServicesStatus[key];
+                let nodeName = key.substring("node_nbr_".length);
+                let nbr = nodeServicesStatus[key];
                 nodeNamesByNbr [parseInt(nbr)] = nodeName;
             }
         }
 
-        for (var nbr = 1; nbr < nodeNamesByNbr.length; nbr++) { // 0 is empty
+        for (let nbr = 1; nbr < nodeNamesByNbr.length; nbr++) { // 0 is empty
 
-            var nodeName = nodeNamesByNbr[nbr];
+            let nodeName = nodeNamesByNbr[nbr];
 
-            var nodeAddress = nodeServicesStatus["node_address_" + nodeName];
-            var nodeAlive = nodeServicesStatus["node_alive_" + nodeName];
+            let nodeAddress = nodeServicesStatus["node_address_" + nodeName];
+            let nodeAlive = nodeServicesStatus["node_alive_" + nodeName];
 
             // if at least one node is up, show the consoles menu
             if (nodeAlive == 'OK') {
@@ -753,11 +753,11 @@ eskimo.SystemStatus = function() {
                 availableNodes.push({"nbr": nbr, "nodeName": nodeName, "nodeAddress": nodeAddress});
             }
 
-            for (var sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
-                var service = STATUS_SERVICES[sNb];
+            for (let sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
+                let service = STATUS_SERVICES[sNb];
                 if (nodeAlive == 'OK') {
 
-                    var serviceStatus = nodeServicesStatus["service_" + service + "_" + nodeName];
+                    let serviceStatus = nodeServicesStatus["service_" + service + "_" + nodeName];
 
                     if (serviceStatus) {
 
@@ -790,11 +790,11 @@ eskimo.SystemStatus = function() {
 
     this.renderNodesStatusEmpty = function() {
 
-        var statusRenderOptions = $(".status-render-options");
+        let statusRenderOptions = $(".status-render-options");
         statusRenderOptions.css("visibility", "hidden");
         statusRenderOptions.css("display", "none");
 
-        var statusContainerEmpty = $("#status-node-container-empty");
+        let statusContainerEmpty = $("#status-node-container-empty");
         statusContainerEmpty.css("visibility", "inherit");
         statusContainerEmpty.css("display", "inherit");
     };
@@ -814,9 +814,9 @@ eskimo.SystemStatus = function() {
         $(selector).nodeContextMenu({
             menuSelected: function (invokedOn, selectedMenu) {
 
-                var action = selectedMenu.attr('id');
-                var nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
-                var nodeName = $(invokedOn).closest("td."+dataSelector).data('eskimo-node-name');
+                let action = selectedMenu.attr('id');
+                let nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
+                let nodeName = $(invokedOn).closest("td."+dataSelector).data('eskimo-node-name');
 
                 if (action == "terminal") {
                     showTerminal(nodeAddress, nodeName);
@@ -837,9 +837,9 @@ eskimo.SystemStatus = function() {
         $(selector).serviceContextMenu({
             menuSelected: function (invokedOn, selectedMenu) {
 
-                var action = selectedMenu.attr('id');
-                var nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
-                var service = $(invokedOn).closest("td."+dataSelector).data('eskimo-service');
+                let action = selectedMenu.attr('id');
+                let nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
+                let service = $(invokedOn).closest("td."+dataSelector).data('eskimo-service');
 
                 if (action == "show_journal") {
                     showJournal(service, nodeAddress);
@@ -866,27 +866,27 @@ eskimo.SystemStatus = function() {
 
     this.generateTableHeader = function() {
 
-        var tableHeaderHtml = ''+
+        let tableHeaderHtml = ''+
             '<tr id="header_1" class="status-node-table-header">\n'+
             '<td class="status-node-cell" rowspan="2">Status</td>\n' +
             '<td class="status-node-cell" rowspan="2">No</td>\n' +
             '<td class="status-node-cell" rowspan="2">IP Address</td>\n';
 
         // Phase 1 : render first row
-        var prevGroup = null;
-        for (var i = 0; i < STATUS_SERVICES.length; i++) {
+        let prevGroup = null;
+        for (let i = 0; i < STATUS_SERVICES.length; i++) {
 
-            var serviceName = STATUS_SERVICES[i];
-            var serviceStatusConfig = SERVICES_STATUS_CONFIG[serviceName];
+            let serviceName = STATUS_SERVICES[i];
+            let serviceStatusConfig = SERVICES_STATUS_CONFIG[serviceName];
 
             if (serviceStatusConfig.group != null && serviceStatusConfig.group != "") {
 
                 if (prevGroup == null || serviceStatusConfig.group != prevGroup) {
 
                     // first need to know size of group
-                    var sizeOfGroup = 1;
-                    for (var j = i + 1; j < STATUS_SERVICES.length; j++) {
-                        var nextGroup = SERVICES_STATUS_CONFIG[STATUS_SERVICES[j]].group;
+                    let sizeOfGroup = 1;
+                    for (let j = i + 1; j < STATUS_SERVICES.length; j++) {
+                        let nextGroup = SERVICES_STATUS_CONFIG[STATUS_SERVICES[j]].group;
                         if (nextGroup != null && nextGroup == serviceStatusConfig.group) {
                             sizeOfGroup++;
                         } else {
@@ -915,10 +915,10 @@ eskimo.SystemStatus = function() {
                 '<tr id="header_2" class="status-node-table-header">\n';
 
         // Phase 2 : render second row
-        for (var i = 0; i < STATUS_SERVICES.length; i++) {
+        for (let i = 0; i < STATUS_SERVICES.length; i++) {
 
-            var serviceName = STATUS_SERVICES[i];
-            var serviceStatusConfig = SERVICES_STATUS_CONFIG[serviceName];
+            let serviceName = STATUS_SERVICES[i];
+            let serviceStatusConfig = SERVICES_STATUS_CONFIG[serviceName];
 
             if (serviceStatusConfig.group && serviceStatusConfig.group != "") {
                 tableHeaderHtml = tableHeaderHtml +
@@ -936,31 +936,31 @@ eskimo.SystemStatus = function() {
 
     this.renderNodesStatusTable = function (data, blocking, availableNodes, nodeNamesByNbr) {
 
-        var statusRenderOptions = $(".status-render-options");
+        let statusRenderOptions = $(".status-render-options");
         statusRenderOptions.css("visibility", "hidden");
         statusRenderOptions.css("display", "none");
 
-        var statucContainerTable = $("#status-node-container-table");
+        let statucContainerTable = $("#status-node-container-table");
         statucContainerTable.css("visibility", "inherit");
         statucContainerTable.css("display", "inherit");
 
         // clear table
         $("#status-node-table-head").html(this.generateTableHeader());
 
-        var statusContainerTableBody = $("#status-node-table-body");
+        let statusContainerTableBody = $("#status-node-table-body");
         statusContainerTableBody.html("");
 
-        for (var nbr = 1; nbr < nodeNamesByNbr.length; nbr++) { // 0 is empty
+        for (let nbr = 1; nbr < nodeNamesByNbr.length; nbr++) { // 0 is empty
 
-            var nodeHasIssues = false;
-            var nodeHasMasters = false;
+            let nodeHasIssues = false;
+            let nodeHasMasters = false;
 
-            var nodeName = nodeNamesByNbr[nbr];
+            let nodeName = nodeNamesByNbr[nbr];
 
-            var nodeAddress = data["node_address_" + nodeName];
-            var nodeAlive = data["node_alive_" + nodeName];
+            let nodeAddress = data["node_address_" + nodeName];
+            let nodeAlive = data["node_alive_" + nodeName];
 
-            var arrayRow = ' ' +
+            let arrayRow = ' ' +
                 '<tr id="' + nodeName + '">\n' +
                 '    <td class="status-node-cell-intro">\n';
 
@@ -982,13 +982,13 @@ eskimo.SystemStatus = function() {
                 '        data-eskimo-node="' + nodeAddress + '"' +
                 '        data-eskimo-node-name="' + nodeName + '">' + nodeAddress + '</td>\n';
 
-            for (var sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
+            for (let sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
 
-                var service = STATUS_SERVICES[sNb];
+                let service = STATUS_SERVICES[sNb];
 
                 if (nodeAlive == 'OK') {
 
-                    var serviceStatus = data["service_" + service + "_" + nodeName];
+                    let serviceStatus = data["service_" + service + "_" + nodeName];
                     //console.log ("For service '" + service + "' on node '" + nodeName + "' got '"+ serviceStatus + "'");
                     if (!serviceStatus) {
 
@@ -1034,7 +1034,7 @@ eskimo.SystemStatus = function() {
                             nodeHasMasters = true;
                         }
 
-                        var color = "darkgreen";
+                        let color = "darkgreen";
                         if (serviceStatus == "TD") {
                             color = "violet";
                         } else if (serviceStatus == "restart") {
@@ -1065,7 +1065,7 @@ eskimo.SystemStatus = function() {
 
             arrayRow += '</tr>';
 
-            var newRow = $(arrayRow);
+            let newRow = $(arrayRow);
 
             // filtering
             if (   !nodeFilter || ((nodeFilter == "master") && nodeHasMasters)
@@ -1096,7 +1096,7 @@ eskimo.SystemStatus = function() {
         });
     };
 
-    var inUpdateStatus = false;
+    let inUpdateStatus = false;
     function updateStatus(blocking) {
 
         if (inUpdateStatus) {

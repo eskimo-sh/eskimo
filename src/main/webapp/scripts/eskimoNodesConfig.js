@@ -48,16 +48,16 @@ eskimo.NodesConfig = function() {
     const NODE_ID_FIELD = "node_id";
 
     // initialized by backend
-    var UNIQUE_SERVICES = [];
-    var MULTIPLE_SERVICES = [];
-    var MANDATORY_SERVICES = [];
-    var CONFIGURED_SERVICES = [];
+    let UNIQUE_SERVICES = [];
+    let MULTIPLE_SERVICES = [];
+    let MANDATORY_SERVICES = [];
+    let CONFIGURED_SERVICES = [];
 
-    var SERVICES_CONFIGURATION = [];
+    let SERVICES_CONFIGURATION = [];
 
-    var SERVICES_DEPENDENCIES = [];
+    let SERVICES_DEPENDENCIES = [];
 
-    var nodes = [];
+    let nodes = [];
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -79,7 +79,7 @@ eskimo.NodesConfig = function() {
 
                 $("#save-nodes-btn").click(function (e) {
 
-                    var setupConfig = $("form#nodes-config").serializeObject();
+                    let setupConfig = $("form#nodes-config").serializeObject();
 
                     //console.log(setupConfig);
 
@@ -165,7 +165,7 @@ eskimo.NodesConfig = function() {
     }
 
     function getServiceLogoPath(service) {
-        var serviceConfig = SERVICES_CONFIGURATION[service];
+        let serviceConfig = SERVICES_CONFIGURATION[service];
         if (serviceConfig == null) {
             console.error ("Could not find logo for service " + service);
             return "undefined";
@@ -175,7 +175,7 @@ eskimo.NodesConfig = function() {
     this.getServiceLogoPath = getServiceLogoPath;
 
     function getServiceIconPath(service) {
-        var serviceConfig = SERVICES_CONFIGURATION[service];
+        let serviceConfig = SERVICES_CONFIGURATION[service];
         if (serviceConfig == null) {
             console.error ("Could not find icon for service " + service);
             return "undefined";
@@ -185,7 +185,7 @@ eskimo.NodesConfig = function() {
     this.getServiceIconPath = getServiceIconPath;
 
     this.isServiceUnique = function (service) {
-        var serviceConfig = SERVICES_CONFIGURATION[service];
+        let serviceConfig = SERVICES_CONFIGURATION[service];
         if (serviceConfig == null) {
             console.error ("Could not definition for service " + service);
             return false;
@@ -221,11 +221,11 @@ eskimo.NodesConfig = function() {
 
     this.renderNodesConfig = function (data) {
 
-        var re = /([a-zA-Z\-_]+)([0-9]*)/;
+        let re = /([a-zA-Z\-_]+)([0-9]*)/;
 
         // render nodes and range containers
-        var nodeIds = [];
-        for (var serviceConfig in data) {
+        let nodeIds = [];
+        for (let serviceConfig in data) {
             //console.log(attr);
             if (serviceConfig.indexOf(NODE_ID_FIELD) > -1) {
                 nodeIds.push(serviceConfig);
@@ -233,8 +233,8 @@ eskimo.NodesConfig = function() {
         }
         nodeIds.sort();
         //console.log(nodeIds);
-        for (var i = 0; i < nodeIds.length; i++) {
-            var ipAddress = data[nodeIds[i]];
+        for (let i = 0; i < nodeIds.length; i++) {
+            let ipAddress = data[nodeIds[i]];
             if (ipAddress.indexOf("-") > -1) { // range
                 addRange()
             } else {
@@ -243,38 +243,38 @@ eskimo.NodesConfig = function() {
         }
 
         // then empty service placeholders
-        for (var serviceConfig in data) {
+        for (let serviceConfig in data) {
 
             if (serviceConfig.indexOf(NODE_ID_FIELD) > -1) {
                 $("#" + serviceConfig).val(data[serviceConfig]);
 
-                var match = serviceConfig.match(re);
+                let match = serviceConfig.match(re);
 
-                var nbr = match[2];
+                let nbr = match[2];
 
-                var field = $("#field" + nbr);
-                var placeHolderMs = field.find(".configured-multiple-services-placeholder");
+                let field = $("#field" + nbr);
+                let placeHolderMs = field.find(".configured-multiple-services-placeholder");
                 placeHolderMs.html("");
 
-                var placeHolderUs = field.find(".configured-unique-services-placeholder");
+                let placeHolderUs = field.find(".configured-unique-services-placeholder");
                 placeHolderUs.html("");
             }
         }
 
         // finally fill them up !
-        for (var serviceConfig in data) {
+        for (let serviceConfig in data) {
 
             if (serviceConfig.indexOf(NODE_ID_FIELD) == -1) {
 
-                var match = serviceConfig.match(re);
+                let match = serviceConfig.match(re);
 
-                var serviceName = null;
-                var nbr = -1;
+                let serviceName = null;
+                let nbr = -1;
                 if (match[2] != null && match[2] != "") {
                     nbr = parseInt(match[2]);
                     serviceName = match[1]
 
-                    var placeHolder = $("#field" + nbr).find(".configured-multiple-services-placeholder");
+                    let placeHolder = $("#field" + nbr).find(".configured-multiple-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
                         '<img class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
@@ -286,7 +286,7 @@ eskimo.NodesConfig = function() {
                     nbr = data[serviceConfig];
                     serviceName = serviceConfig;
 
-                    var placeHolder = $("#field" + nbr).find(".configured-unique-services-placeholder");
+                    let placeHolder = $("#field" + nbr).find(".configured-unique-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
                         '<img class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
@@ -362,17 +362,17 @@ eskimo.NodesConfig = function() {
     function onServicesSelectedForNode (model, nodeNbr) {
         console.log (nodeNbr, model);
 
-        var re = /([a-zA-Z\-_]+)([0-9]*)/;
+        let re = /([a-zA-Z\-_]+)([0-9]*)/;
 
         // clear all boxes
-        for (var i = 0; i < CONFIGURED_SERVICES.length; i++) {
+        for (let i = 0; i < CONFIGURED_SERVICES.length; i++) {
             $('#'+CONFIGURED_SERVICES[i]+nodeNbr).get(0).checked = false;
         }
 
-        for (var key in model) {
-            var match = key.match(re);
+        for (let key in model) {
+            let match = key.match(re);
 
-            var serviceName = null;
+            let serviceName = null;
             if (match[2] != null && match[2] != "") {
                 serviceName = match[1]
 
@@ -384,18 +384,18 @@ eskimo.NodesConfig = function() {
         }
 
         //console.log (nodes.length);
-        for (var i = 1; i <= nodes.length; i++) {
+        for (let i = 1; i <= nodes.length; i++) {
 
-            var field = $("#field" + i);
-            var placeHolderMs = field.find(".configured-multiple-services-placeholder");
+            let field = $("#field" + i);
+            let placeHolderMs = field.find(".configured-multiple-services-placeholder");
             placeHolderMs.html("");
 
-            var placeHolderUs = field.find(".configured-unique-services-placeholder");
+            let placeHolderUs = field.find(".configured-unique-services-placeholder");
             placeHolderUs.html("");
 
-            for (var j = 0; j < UNIQUE_SERVICES.length; j++) {
+            for (let j = 0; j < UNIQUE_SERVICES.length; j++) {
 
-                var effServiceName = UNIQUE_SERVICES[j];
+                let effServiceName = UNIQUE_SERVICES[j];
                 if ($('#' + effServiceName + i).length) {
                     if ($('#' + effServiceName + i).get(0).checked) {
                         placeHolderUs.html(placeHolderUs.html() +
@@ -409,8 +409,8 @@ eskimo.NodesConfig = function() {
                 }
             }
 
-            for (var j = 0; j < MULTIPLE_SERVICES.length; j++) {
-                var effServiceName = MULTIPLE_SERVICES[j];
+            for (let j = 0; j < MULTIPLE_SERVICES.length; j++) {
+                let effServiceName = MULTIPLE_SERVICES[j];
                 if ($('#'+effServiceName+i).length) {
                     if ($('#'+effServiceName+i).get(0).checked) {
                         placeHolderMs.html(placeHolderMs.html() +
@@ -429,12 +429,12 @@ eskimo.NodesConfig = function() {
     this.checkNodesSetup = checkNodesSetup;
 
     function removeNode (removeId) {
-        var fieldNum = removeId.substring(6);
+        let fieldNum = removeId.substring(6);
 
         console.log ("  - splicing nodes with " + removeId + " - " + fieldNum);
         nodes.splice(fieldNum - 1, 1);
 
-        for (var i = fieldNum - 1; i < nodes.length; i++) {
+        for (let i = fieldNum - 1; i < nodes.length; i++) {
             console.log("  - shiffting field  " + i);
             $(nodes[i]["field"]).attr("name", "field" + (i + 1));
             $(nodes[i]["field"]).attr("id", "field" + (i + 1));
@@ -444,7 +444,7 @@ eskimo.NodesConfig = function() {
             $(nodes[i]["remove"]).attr("id", "remove" + (i + 1));
             $(nodes[i]["label"]).html(getNodeTitle(nodes[i]["type"] == "range") + '<div class="server-title-text">' + (i + 1) + '</div>');
             $(nodes[i]["label"]).attr("id", "label" + (i + 1));
-            for (var j = 0; j < UNIQUE_SERVICES.length; j++) {
+            for (let j = 0; j < UNIQUE_SERVICES.length; j++) {
 
                 $(nodes[i][UNIQUE_SERVICES[j]]).attr("value", (i + 1));
 
@@ -452,7 +452,7 @@ eskimo.NodesConfig = function() {
                 $(nodes[i][UNIQUE_SERVICES[j]]).attr("id", UNIQUE_SERVICES[j] + (i + 1));
             }
 
-            for (var j = 0; j < MULTIPLE_SERVICES.length; j++) {
+            for (let j = 0; j < MULTIPLE_SERVICES.length; j++) {
 
                 // need to rewrite name as well for multiple services
                 $(nodes[i][MULTIPLE_SERVICES[j]]).attr("name", MULTIPLE_SERVICES[j] + (i + 1));
@@ -467,12 +467,12 @@ eskimo.NodesConfig = function() {
             nodes[i]["configure"] = "#configure"+(i + 1);
             nodes[i]["remove"] = "#remove"+(i + 1);
             nodes[i]["label"] = "#label"+(i + 1);
-            for (var j = 0; j < CONFIGURED_SERVICES.length; j++) {
+            for (let j = 0; j < CONFIGURED_SERVICES.length; j++) {
                 nodes[i][CONFIGURED_SERVICES[j]] = "#" + CONFIGURED_SERVICES[j] + (i + 1);
             }
         }
 
-        var fieldID = "#field" + fieldNum;
+        let fieldID = "#field" + fieldNum;
         $(this).remove();
         $(fieldID).remove();
     }
@@ -506,10 +506,10 @@ eskimo.NodesConfig = function() {
 
     function showServiceSelection(e) {
 
-        var configureButtonId = $(e.target).attr("id");
-        var nodeNbr = configureButtonId.substring("configure".length);
+        let configureButtonId = $(e.target).attr("id");
+        let nodeNbr = configureButtonId.substring("configure".length);
 
-        var isRange = $(e.target).data("is-range");
+        let isRange = $(e.target).data("is-range");
 
         //console.log (nodeNbr + " - " + isRange);
 
@@ -524,36 +524,36 @@ eskimo.NodesConfig = function() {
             $("#nodes-placeholder").html('');
         }
 
-        var next = nodes.length + 1;
+        let next = nodes.length + 1;
         //console.log ("Node node ID : " + next);
 
-        var uniqueServicesDiv = '' +
+        let uniqueServicesDiv = '' +
             '<div class="col-md-3 configured-unique-services-placeholder"></div>' +
             '<div style="visibility: hidden; display: none;">';
 
-        for (var i = 0; i < UNIQUE_SERVICES.length; i++) {
+        for (let i = 0; i < UNIQUE_SERVICES.length; i++) {
 
-            var uniqueService = UNIQUE_SERVICES[i];
+            let uniqueService = UNIQUE_SERVICES[i];
 
             uniqueServicesDiv +='  <input  type="radio" class="input-md" name="' + uniqueService + '" id="' + uniqueService + next + '" value="'+next+'"></input>';
         }
 
         uniqueServicesDiv += "</div>";
 
-        var multipleServicesDiv = '' +
+        let multipleServicesDiv = '' +
             '<div class="col-md-3 configured-multiple-services-placeholder"></div>' +
             '<div style="visibility: hidden; display: none;">';
 
-        for (var i = 0; i < MULTIPLE_SERVICES.length; i++) {
+        for (let i = 0; i < MULTIPLE_SERVICES.length; i++) {
 
-            var multipleService = MULTIPLE_SERVICES[i];
+            let multipleService = MULTIPLE_SERVICES[i];
 
             multipleServicesDiv +=' <input  type="checkbox" class="input-md" name="' + multipleService + next + '" id="' + multipleService + next + '" ></input>'
         }
 
         multipleServicesDiv = multipleServicesDiv + "</div>";
 
-        var newIn = ' '+
+        let newIn = ' '+
             '<div id="field'+ next +'" class="form-group col-md-12 node-config-element" >'+
             '    <div class="col-md-12 node-config-element-wrapper"> '+
             '        <label class="col-md-3 control-label" id="label'+next+'">'+getNodeTitle(isRange)+' <div class="server-title-text">' + next + '</div></label> '+
@@ -589,7 +589,7 @@ eskimo.NodesConfig = function() {
         nodes[next-1]["configure"] = "#configure"+next;
         nodes[next-1]["label"] = "#label"+next;
 
-        for (var j = 0; j < CONFIGURED_SERVICES.length; j++) {
+        for (let j = 0; j < CONFIGURED_SERVICES.length; j++) {
             nodes[next - 1][CONFIGURED_SERVICES[j]] = "#" + CONFIGURED_SERVICES[j] + next;
         }
 

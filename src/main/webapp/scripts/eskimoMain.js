@@ -40,33 +40,33 @@ eskimo.Main = function() {
 
     const that = this;
 
-    var setupLoaded = false;
-    var setupDone = false;
+    let setupLoaded = false;
+    let setupDone = false;
 
-    var dontMessWithSidebarSizeAnyMore = false;
+    let dontMessWithSidebarSizeAnyMore = false;
 
-    var eskimoSetup = null;
-    var eskimoNodesConfig = null;
-    var eskimoSystemStatus = null;
-    var eskimoMessaging = null;
-    var eskimoConsoles = null;
-    var eskimoNotifications = null;
-    var eskimoServices = null;
-    var eskimoServicesSelection = null;
-    var eskimoMarathonServicesSelection = null;
-    var eskimoMarathonServicesConfig = null;
-    var eskimoServicesSettings = null;
-    var eskimoFileManagers = null;
-    var eskimoOperationsCommand = null;
-    var eskimoSetupCommand = null;
-    var eskimoMarathonOperationsCommand = null;
-    var eskimoSettingsOperationsCommand = null;
-    var eskimoAbout = null;
+    let eskimoSetup = null;
+    let eskimoNodesConfig = null;
+    let eskimoSystemStatus = null;
+    let eskimoMessaging = null;
+    let eskimoConsoles = null;
+    let eskimoNotifications = null;
+    let eskimoServices = null;
+    let eskimoServicesSelection = null;
+    let eskimoMarathonServicesSelection = null;
+    let eskimoMarathonServicesConfig = null;
+    let eskimoServicesSettings = null;
+    let eskimoFileManagers = null;
+    let eskimoOperationsCommand = null;
+    let eskimoSetupCommand = null;
+    let eskimoMarathonOperationsCommand = null;
+    let eskimoSettingsOperationsCommand = null;
+    let eskimoAbout = null;
 
-    var operationInProgress = false;
-    var operationInProgressOwner = false;
+    let operationInProgress = false;
+    let operationInProgressOwner = false;
 
-    var menuHidingPos = 0;
+    let menuHidingPos = 0;
 
     this.doInitializeInternal = function() {
         $("#eskimoTitle").html("Eskimo CE");
@@ -193,7 +193,7 @@ eskimo.Main = function() {
 
         eskimoAbout.initialize();
 
-        $(window).resize (this.menuResize);
+        $(window).resize (this.windowResize);
 
         // menu scrolling
         $("#menu-scroll-up").click(menuUp);
@@ -219,6 +219,8 @@ eskimo.Main = function() {
         $("#main-menu-logout-link").click(function() {
             window.location = "logout";
         });
+
+        this.windowResize();
     };
 
     this.initialize = function() {
@@ -311,7 +313,7 @@ eskimo.Main = function() {
     };
 
     this.handleMarathonSubsystem = function (enableMarathon) {
-        var menuMarathonConfig = $("#menu-marathon-configuration");
+        let menuMarathonConfig = $("#menu-marathon-configuration");
         if (enableMarathon) {
             if (menuMarathonConfig.hasClass("menu-hidden")) {
                 menuMarathonConfig.css("visibility", "visible");
@@ -331,7 +333,7 @@ eskimo.Main = function() {
     };
 
     function getDisplayedService () {
-        var displayService = null;
+        let displayService = null;
         $(".inner-content").each(function (nbr, innerContent) {
             if ($(innerContent).css("visibility") == "visible") {
                 displayService = $(innerContent).attr('id').substring("inner-content-".length);
@@ -341,7 +343,7 @@ eskimo.Main = function() {
     }
 
     this.isCurrentDisplayedService = function (service) {
-        var displayedService = getDisplayedService ();
+        let displayedService = getDisplayedService ();
         //console.log ("displayedService is : " + service);
         return displayedService == service;
     };
@@ -353,9 +355,9 @@ eskimo.Main = function() {
 
             $(".folder-menu-items").each(function () {
 
-                var menuService = this.id.substring('folderMenu'.length);
+                let menuService = this.id.substring('folderMenu'.length);
 
-                var service = getHyphenSeparated(menuService);
+                let service = getHyphenSeparated(menuService);
 
                 $(this).attr("class", "folder-menu-items disabled");
 
@@ -368,11 +370,11 @@ eskimo.Main = function() {
 
             $(".folder-menu-items").each(function () {
 
-                var menuService = this.id.substring('folderMenu'.length);
+                let menuService = this.id.substring('folderMenu'.length);
 
-                var service = getHyphenSeparated(menuService);
+                let service = getHyphenSeparated(menuService);
 
-                var serviceUp = that.getSystemStatus().serviceIsUp(nodeServicesStatus, service);
+                let serviceUp = that.getSystemStatus().serviceIsUp(nodeServicesStatus, service);
 
                 if (!serviceUp || !that.getServices().isServiceAvailable(service)) {
                     $(this).attr("class", "folder-menu-items disabled");
@@ -386,13 +388,13 @@ eskimo.Main = function() {
     this.serviceMenuClear = serviceMenuClear;
 
     this.showProgressbar = function () {
-        var contentProgressBar = $(".inner-content-show");
+        let contentProgressBar = $(".inner-content-show");
         contentProgressBar.css("visibility", "visible");
         contentProgressBar.css("display", "flex");
     };
 
     function hideProgressbar () {
-        var contentProgressBar = $(".inner-content-show");
+        let contentProgressBar = $(".inner-content-show");
         contentProgressBar.css("visibility", "hidden");
         contentProgressBar.css("display", "none");
     }
@@ -404,7 +406,7 @@ eskimo.Main = function() {
     };
 
     this.setNavigationCompact = function () {
-        var hoeAppContainer = $('#hoeapp-container');
+        let hoeAppContainer = $('#hoeapp-container');
         if (!dontMessWithSidebarSizeAnyMore && !hoeAppContainer.hasClass("hoe-minimized-lpanel")) {
             if ($('#hoeapp-wrapper').attr("hoe-device-type") !== "phone") {
                 hoeAppContainer.toggleClass('hoe-minimized-lpanel');
@@ -507,11 +509,23 @@ eskimo.Main = function() {
         return eskimoAbout;
     };
 
+    this.windowResize = function() {
+
+        var viewPortHeight = $("body").innerHeight();
+        var viewPortWidth = $("body").innerWidth();
+
+        var headerHeight = $("#hoe-header").height();;
+
+        $(".inner-content").css("height", (viewPortHeight - headerHeight) + "px");
+
+        that.menuResize();
+    };
+
     this.menuResize = function() {
         // alert (window.innerHeight + " - " + window.innerWidth);
 
-        var actualMenuHeight = $("#menu-container").height();
-        var menuContainerHeight = $("#hoe-left-panel").height();
+        let actualMenuHeight = $("#menu-container").height();
+        let menuContainerHeight = $("#hoe-left-panel").height();
 
         //console.log (menuContainerHeight + " -  " + actualMenuHeight);
 
@@ -570,8 +584,8 @@ eskimo.Main = function() {
 
     function menuDown (e) {
 
-        var actualMenuHeight = $("#menu-container").height();
-        var menuContainerHeight = $("#hoe-left-panel").height();
+        let actualMenuHeight = $("#menu-container").height();
+        let menuContainerHeight = $("#hoe-left-panel").height();
 
         // IF AND ONLY IF size is not sufficient for current menu site, THEN
         if (menuContainerHeight - 80 < actualMenuHeight) {

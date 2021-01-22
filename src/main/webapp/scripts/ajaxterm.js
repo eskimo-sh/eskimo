@@ -32,7 +32,7 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
-var ajaxterm={};
+let ajaxterm={};
 
 ajaxterm.Terminal=function(id,options) {
 
@@ -40,43 +40,43 @@ ajaxterm.Terminal=function(id,options) {
     const that = this;
 
     // options
-    var width  = options.width || 80; // dimension of the terminal
-    var height = options.height || 25;
-    var endpoint = options.endpoint;  // URL of the server endpoint that delivers the request to Session.handleUpdate
-    var additionalQueryString = options.query; // additional parameters sent to the server
+    const width  = options.width || 80; // dimension of the terminal
+	const height = options.height || 25;
+    const endpoint = options.endpoint;  // URL of the server endpoint that delivers the request to Session.handleUpdate
+    const additionalQueryString = options.query; // additional parameters sent to the server
 
-	var ie=0;
+	let ie=0;
 	if(window.ActiveXObject)
 		ie=1;
-	var sid=""+Math.round(Math.random()*1000000000);
-	var query0="s="+sid+"&w="+width+"&h="+height;
-	var query1=query0+"&c=1&k=";
-	var timeout;
-    var screenTimestamp = 0;
-	var error_timeout;
-	var keybuf=[];
-	var sending=0;
-	var rmax=1;
+	let sid=""+Math.round(Math.random()*1000000000);
+	let query0="s="+sid+"&w="+width+"&h="+height;
+	let query1=query0+"&c=1&k=";
+	let timeout;
+	let screenTimestamp = 0;
+	let error_timeout;
+	let keybuf=[];
+	let sending=0;
+	let rmax=1;
 
-	var closed = false;
+	let closed = false;
 
-    var systemPasteReady = false;
-    var systemPasteContent;
-    var cpTextArea;
+	let systemPasteReady = false;
+	let systemPasteContent;
+	let cpTextArea;
 
-	var div=(typeof(id)=="string" ? document.getElementById(id) : id);
-    var fitter=document.createElement('div');   // for shrinking the screen area to the right size
-	var dstat=document.createElement('pre');
-	var sled=document.createElement('span');    // status LED. indicate the communication with the server
-	var opt_get=document.createElement('a');    //
-	var opt_color=document.createElement('a');
-	var sdebug=document.createElement('span');
-    var spacer=document.createElement('div');   // creates border & padding around the main screen
-    var screen = document.createElement('div'); // holds dterm&cursor. origin of the cursor positioning
-	var dterm=document.createElement('div');    // area that shows the screen
-    var cursor=document.createElement('div');   // cursor
-	var showPrevTab = null;
-    var showNextTab = null;
+	let div = (typeof(id)=="string" ? document.getElementById(id) : id);
+	let fitter = document.createElement('div');   // for shrinking the screen area to the right size
+	let dstat = document.createElement('pre');
+	let sled = document.createElement('span');    // status LED. indicate the communication with the server
+	let optGet = document.createElement('a');    //
+	let optColor = document.createElement('a');
+	let sdebug = document.createElement('span');
+	let spacer = document.createElement('div');   // creates border & padding around the main screen
+	let screen = document.createElement('div'); // holds dterm&cursor. origin of the cursor positioning
+	let dterm = document.createElement('div');    // area that shows the screen
+	let cursor = document.createElement('div');   // cursor
+	let showPrevTab = null;
+	let showNextTab = null;
 
 	this.getSessionId = function () {
 		return sid;
@@ -121,18 +121,18 @@ ajaxterm.Terminal=function(id,options) {
 	}
 
 	function do_get(event) {
-		opt_get.className=(opt_get.className=='off')?'on':'off';
-		debug('GET '+opt_get.className);
+		optGet.className=(optGet.className == 'off')?'on':'off';
+		debug('GET '+optGet.className);
 	}
 
 	function do_color(event) {
-		var o=opt_color.className=(opt_color.className=='off')?'on':'off';
+		var o=optColor.className=(optColor.className == 'off')?'on':'off';
 		if (o == 'on') {
             query1 = query0 + "&c=1&k=";
         } else {
             query1 = query0 + "&k=";
         }
-		debug('Color '+opt_color.className);
+		debug('Color '+optColor.className);
 	}
 
 	function update() {
@@ -151,7 +151,7 @@ ajaxterm.Terminal=function(id,options) {
 			}
 			var query=query1+send+"&t="+screenTimestamp;
             if (additionalQueryString)  query+='&'+additionalQueryString;
-			if(opt_get.className=='on') {
+			if(optGet.className=='on') {
 				r.open("GET",endpoint+"?"+query,true);
 				if(ie) {
 					r.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
@@ -202,7 +202,7 @@ ajaxterm.Terminal=function(id,options) {
 
 			error_timeout=window.setTimeout(error,5000);
 
-			if(opt_get.className == 'on') {
+			if(optGet.className == 'on') {
 				r.send(null);
 			} else {
 				r.send(query);
@@ -465,9 +465,9 @@ ajaxterm.Terminal=function(id,options) {
 		sled.className='off';
 		dstat.appendChild(sled);
 		dstat.appendChild(document.createTextNode(' '));
-		opt_add(opt_color,'Colors');
-		opt_color.className='on';
-		//opt_add(opt_get,'GET');
+		opt_add(optColor,'Colors');
+		optColor.className='on';
+		//opt_add(optGet,'GET');
 		dstat.appendChild(sdebug);
 		dstat.className='stat';
         div.appendChild(fitter);
@@ -484,12 +484,12 @@ ajaxterm.Terminal=function(id,options) {
         spacer.appendChild(screen);
         screen.className='screen';
         screen.appendChild(dterm);
-		if(opt_color.addEventListener) {
-			opt_get.addEventListener('click',do_get,true);
-			opt_color.addEventListener('click',do_color,true);
+		if(optColor.addEventListener) {
+			optGet.addEventListener('click',do_get,true);
+			optColor.addEventListener('click',do_color,true);
 		} else {
-			opt_get.attachEvent("onclick", do_get);
-			opt_color.attachEvent("onclick", do_color);
+			optGet.attachEvent("onclick", do_get);
+			optColor.attachEvent("onclick", do_color);
 		}
         div.onkeypress=keypress;
         div.onkeydown=keydown;

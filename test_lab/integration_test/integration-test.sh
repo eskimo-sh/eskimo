@@ -213,7 +213,8 @@ wait_for_executor_registered() {
             2> /dev/null |
             jq -r ' .tasks | .[] | select (.name|contains("zeppelin_spark")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
         if [[ $spark_exec_status != "" ]]; then
-            echo_date "   + Found zeppelin spark executor running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
+            #echo_date "   + Found zeppelin spark executor running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
+            echo_date "   + Found zeppelin spark executor running"
             break
         fi
         if [[ $attempt == 30 ]]; then

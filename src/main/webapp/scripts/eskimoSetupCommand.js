@@ -65,7 +65,7 @@ eskimo.SetupCommand = function() {
 
         console.log (command);
 
-        var commandDescription = "<strong>Following Operations are about to be applied</strong>";
+        let commandDescription = "<strong>Following Operations are about to be applied</strong>";
 
         // Build of packages
         if (command.buildPackage != null && command.buildPackage.length > 0) {
@@ -78,7 +78,7 @@ eskimo.SetupCommand = function() {
                 '<strong>List of packages to be built</strong><br>';
 
 
-            for (var i = 0; i < command.buildPackage.length; i++) {
+            for (let i = 0; i < command.buildPackage.length; i++) {
                 commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildPackage[i] + '</strong><br>';
             }
         }
@@ -92,7 +92,7 @@ eskimo.SetupCommand = function() {
                 '<strong>List of packages to be downloaded</strong><br>';
 
 
-            for (var i = 0; i < command.downloadPackages.length; i++) {
+            for (let i = 0; i < command.downloadPackages.length; i++) {
                 commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadPackages[i] + '</strong><br>';
             }
         }
@@ -108,7 +108,7 @@ eskimo.SetupCommand = function() {
                 '<strong>List of Mesos packages to be built</strong><br>';
 
 
-            for (var i = 0; i < command.buildMesos.length; i++) {
+            for (let i = 0; i < command.buildMesos.length; i++) {
                 commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildMesos[i] + '</strong><br>';
             }
         }
@@ -122,7 +122,7 @@ eskimo.SetupCommand = function() {
                 '<strong>List of Mesos packages to be downloaded</strong><br>';
 
 
-            for (var i = 0; i < command.downloadMesos.length; i++) {
+            for (let i = 0; i < command.downloadMesos.length; i++) {
                 commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadMesos[i] + '</strong><br>';
             }
         }
@@ -134,7 +134,7 @@ eskimo.SetupCommand = function() {
                 '<br>';
 
 
-            for (var i = 0; i < command.packageUpdates.length; i++) {
+            for (let i = 0; i < command.packageUpdates.length; i++) {
                 commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.packageUpdates[i] + '</strong><br>';
             }
         }

@@ -18,7 +18,7 @@ public class StreamUtilsTest {
         assertEquals(source, baos.toString());
 
         assertThrows(NullPointerException.class, () -> StreamUtils.copy(null, (OutputStream)null) );
-        assertThrows(NullPointerException.class, () -> StreamUtils.copyThenClose(null, null) );
+        assertThrows(IOException.class, () -> StreamUtils.copyThenClose(null, null) );
     }
 
     @Test

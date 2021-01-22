@@ -36,10 +36,10 @@ const ESK_STRING_UPPER_CASE = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 const ESK_STRING_LOWER_CASE = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
 function getHyphenSeparated (string) {
-    var result = '';
-    for (var i = 0; i < string.length; i++) {
-        var strChar = string.charAt(i);
-        var idx = ESK_STRING_UPPER_CASE.indexOf(strChar);
+    let result = '';
+    for (let i = 0; i < string.length; i++) {
+        let strChar = string.charAt(i);
+        let idx = ESK_STRING_UPPER_CASE.indexOf(strChar);
         if (idx >= 0) {
             if (i > 0) {
                 result += "-";
@@ -67,8 +67,8 @@ function noOp() {
 }
 
 $.fn.serializeObject = function() {
-    var o = {};
-    var a = this.serializeArray();
+    let o = {};
+    let a = this.serializeArray();
     $.each(a, function() {
         if (o[this.name]) {
             if (!o[this.name].push) {

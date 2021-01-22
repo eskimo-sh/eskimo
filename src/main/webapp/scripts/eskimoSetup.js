@@ -55,7 +55,7 @@ eskimo.Setup = function() {
 
                 $('#btn-file-ssh-key').on('fileselect', function (event, numFiles, label) {
 
-                    var input = $(this).parents('.input-group').find(':text'),
+                    let input = $(this).parents('.input-group').find(':text'),
                         content = numFiles > 1 ? numFiles + ' files selected' : label;
 
                     if (input.length) {
@@ -83,14 +83,14 @@ eskimo.Setup = function() {
                 });
 
                 $(document).on('change', '#btn-file-ssh-key', function () {
-                    var input = $(this),
+                    let input = $(this),
                         numFiles = input.get(0).files ? input.get(0).files.length : 1,
                         label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
                     input.trigger('fileselect', [numFiles, label]);
 
-                    var files = $(this).get(0).files; // FileList object
+                    let files = $(this).get(0).files; // FileList object
 
-                    var reader = new FileReader();
+                    let reader = new FileReader();
 
                     reader.onload = function () {
                         $("#content-ssh-key").val(reader.result);
@@ -206,11 +206,11 @@ eskimo.Setup = function() {
     this.showSetup = showSetup;
 
     function showSetupMessage(message, success) {
-        var setupWarning = $("#setup-warning");
+        let setupWarning = $("#setup-warning");
         setupWarning.css("display", "inherit");
         setupWarning.css("visibility", "inherit");
 
-        var setupWarningMessage = $("#setup-warning-message");
+        let setupWarningMessage = $("#setup-warning-message");
         setupWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
         setupWarningMessage.html(message);
 
@@ -269,19 +269,19 @@ eskimo.Setup = function() {
     function saveSetup () {
 
         // coherence checks
-        var setupStorage = $("#setup_storage");
+        let setupStorage = $("#setup_storage");
         if (setupStorage.val() == null || setupStorage.val() == "") {
             showSetupMessage("Configuration Storage path should be set", false);
             return false;
         }
 
-        var sshUserName = $("#ssh_username");
+        let sshUserName = $("#ssh_username");
         if (sshUserName.val() == null || sshUserName.val() == "") {
             showSetupMessage("SSH Username to use to reach cluster nodes should be set", false);
             return false;
         }
 
-        var contentSShKey = $("#content-ssh-key");
+        let contentSShKey = $("#content-ssh-key");
         if (contentSShKey.val() == null || contentSShKey.val() == "") {
             showSetupMessage("SSH Identity Private Key to use to reach cluster nodes should be set", false);
             return false;
@@ -289,7 +289,7 @@ eskimo.Setup = function() {
 
         that.eskimoMain.showProgressbar();
 
-        var setupConfig = $("form#setup-config").serializeObject();
+        let setupConfig = $("form#setup-config").serializeObject();
 
         doSaveSetup(setupConfig);
     }

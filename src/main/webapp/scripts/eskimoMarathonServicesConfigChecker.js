@@ -67,17 +67,17 @@ function doCheckMarathonSetup (nodesConfig, marathonSetupConfig, servicesDepende
         // data is nodesConfig
 
         // check service dependencies
-        for (var key in marathonSetupConfig) {
-            var re = /([a-zA-Z\-]+)_install/;
+        for (let key in marathonSetupConfig) {
+            let re = /([a-zA-Z\-]+)_install/;
 
-            var matcher = key.match(re);
+            let matcher = key.match(re);
 
-            var serviceName = matcher[1];
+            let serviceName = matcher[1];
 
-            var serviceDeps = servicesDependencies[serviceName];
+            let serviceDeps = servicesDependencies[serviceName];
 
-            for (var i = 0; i < serviceDeps.length; i++) {
-                var dependency = serviceDeps[i];
+            for (let i = 0; i < serviceDeps.length; i++) {
+                let dependency = serviceDeps[i];
 
                 // I want the dependency on same node
                 if (dependency.mes == "SAME_NODE") {

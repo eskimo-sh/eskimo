@@ -61,8 +61,8 @@ eskimo.OperationsCommand = function() {
 
     function renderOperation(operation, commandDescription) {
 
-        for (var service in operation) {
-            var ipAddress = operation[service];
+        for (let service in operation) {
+            let ipAddress = operation[service];
 
             commandDescription = commandDescription +
                 '<i class="fa fa-arrow-right"></i>&nbsp;' + service + " on " + ipAddress + "<br>";
@@ -75,12 +75,12 @@ eskimo.OperationsCommand = function() {
 
         //console.log (command);
 
-        var commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
+        let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
 
         // installations
         commandDescription += "<strong>Services Installation</strong><br><br>";
 
-        for (var i = 0; i < command.installations.length; i++) {
+        for (let i = 0; i < command.installations.length; i++) {
             commandDescription = renderOperation(command.installations[i], commandDescription);
         }
 
@@ -89,7 +89,7 @@ eskimo.OperationsCommand = function() {
         // uninstallations
         commandDescription += "<strong>Services Uninstallation</strong><br><br>";
 
-        for (var i = 0; i < command.uninstallations.length; i++) {
+        for (let i = 0; i < command.uninstallations.length; i++) {
             commandDescription = renderOperation(command.uninstallations[i], commandDescription);
         }
 
@@ -98,7 +98,7 @@ eskimo.OperationsCommand = function() {
         // reinstallations
         commandDescription += "<strong>Services Restart</strong><br><br>";
 
-        for (var i = 0; i < command.restarts.length; i++) {
+        for (let i = 0; i < command.restarts.length; i++) {
             commandDescription = renderOperation(command.restarts[i], commandDescription);
         }
 

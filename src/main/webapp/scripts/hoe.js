@@ -32,7 +32,7 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
-var initHoe = function() {
+let initHoe = function() {
     window.HoeDatapp = {
         appinit: function() {
             HoeDatapp.HandleSidebartoggle();
@@ -144,11 +144,11 @@ var initHoe = function() {
         Handlecontentheight: function() {
 
             function setHeight() {
-                var WH = $(window).height();
-                var HH = $("#hoe-header").innerHeight();
-                var FH = $("#footer").innerHeight();
-                var contentH = WH - HH - FH - 2;
-				var lpanelH = WH - HH - 2;
+                let WH = $(window).height();
+                let HH = $("#hoe-header").innerHeight();
+                let FH = $("#footer").innerHeight();
+                let contentH = WH - HH - FH - 2;
+				let lpanelH = WH - HH - 2;
                 $("#main-content ").css('min-height', contentH)
 				 $(".inner-left-panel ").css('height', lpanelH)
 
@@ -190,11 +190,11 @@ var initHoe = function() {
 
         },
         HandlepanelmenuClick: function(jqEl) {
-            var compactMenu = jqEl.closest('.hoe-minimized-lpanel').length;
+            let compactMenu = jqEl.closest('.hoe-minimized-lpanel').length;
             if (compactMenu === 0) {
                 jqEl.parent('.hoe-has-menu').parent('ul').find('ul:visible').slideUp('fast');
                 jqEl.parent('.hoe-has-menu').parent('ul').find('.opened').removeClass('opened');
-                var submenu = jqEl.parent('.hoe-has-menu').find('>.hoe-sub-menu');
+                let submenu = jqEl.parent('.hoe-has-menu').find('>.hoe-sub-menu');
                 if (submenu.is(':hidden')) {
                     submenu.slideDown('fast');
                     jqEl.parent('.hoe-has-menu').addClass('opened');
@@ -206,7 +206,7 @@ var initHoe = function() {
 
             /*
             if (jqEl[0] && jqEl[0] != null && jqEl[0].parentNode.id && jqEl[0].parentNode.id != null) {
-                var folderIdFl = jqEl[0].parentNode.id;
+                let folderIdFl = jqEl[0].parentNode.id;
                 selectFolder (folderIdFl.substring("folder_".length));
             }
             */
@@ -242,7 +242,7 @@ var initHoe = function() {
 
             function Responsivelpanel() {
 
-				var totalwidth = $(window)[0].innerWidth;
+				let totalwidth = $(window)[0].innerWidth;
                 if (totalwidth >= 768 && totalwidth <= 1024) {
                     $('#hoeapp-wrapper').attr("hoe-device-type", "tablet");
                     $('#hoe-header, #hoeapp-container').addClass('hoe-minimized-lpanel');

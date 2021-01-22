@@ -50,12 +50,12 @@ eskimo.Services = function () {
 
     let EMPTY_FRAMETARGET = "html/emptyPage.html";
 
-    var UI_SERVICES = [];
-    var UI_SERVICES_CONFIG = {};
+    let UI_SERVICES = [];
+    let UI_SERVICES_CONFIG = {};
 
-    var serviceInitialized = {};
+    let serviceInitialized = {};
 
-    var uiConfigsToRetry = [];
+    let uiConfigsToRetry = [];
 
 
     this.initialize = function () {
@@ -156,7 +156,7 @@ eskimo.Services = function () {
 
     this.isServiceAvailable = function (service) {
 
-        var uiConfig = UI_SERVICES_CONFIG[service];
+        let uiConfig = UI_SERVICES_CONFIG[service];
         if (uiConfig == null) {
             //console.log ("service " + service + " - has not uiConfig (A)");
             return false;
@@ -177,7 +177,7 @@ eskimo.Services = function () {
 
     this.refreshIframe = function (service) {
 
-        var uiConfig = UI_SERVICES_CONFIG[service];
+        let uiConfig = UI_SERVICES_CONFIG[service];
 
         // reset to empty frame ...
         $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
@@ -189,10 +189,10 @@ eskimo.Services = function () {
     };
 
     function buildUrl(uiConfig, nodeAddress) {
-        var actualUrl = null;
+        let actualUrl = null;
         if (uiConfig.urlTemplate != null && uiConfig.urlTemplate != "") {
 
-            var indexOfNodeAddress = uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}");
+            let indexOfNodeAddress = uiConfig.urlTemplate.indexOf("{NODE_ADDRESS}");
 
             if (indexOfNodeAddress <= 0) {
                 actualUrl = uiConfig.urlTemplate;
@@ -223,11 +223,11 @@ eskimo.Services = function () {
 
     function shouldReinitialize(service, nodeAddress) {
 
-        var uiConfig = UI_SERVICES_CONFIG[service];
+        let uiConfig = UI_SERVICES_CONFIG[service];
 
-        var urlChanged = false;
+        let urlChanged = false;
         if (uiConfig.actualUrl != null && uiConfig.actualUrl != "") {
-            var newUrl = buildUrl(uiConfig, nodeAddress);
+            let newUrl = buildUrl(uiConfig, nodeAddress);
             if (uiConfig.actualUrl != newUrl) {
                 urlChanged = true;
             }
@@ -243,7 +243,7 @@ eskimo.Services = function () {
     function disableFrameConsole (iFrameId) {
         if (!DEBUG) {
             setTimeout(function () {
-                var iFrame = $(iFrameId).get(0);
+                let iFrame = $(iFrameId).get(0);
                 if (iFrame) {
                     iFrame.contentWindow.console.log = function () {
                         // No Op
@@ -255,7 +255,7 @@ eskimo.Services = function () {
 
     function removeFromRetry (uiConfig) {
         // remove from retry list
-        for (var j = 0; j < uiConfigsToRetry.length; j++) {
+        for (let j = 0; j < uiConfigsToRetry.length; j++) {
             if (uiConfigsToRetry[j] == uiConfig) {
                 //console.trace();
                 //console.log("removing from retry " + uiConfigsToRetry[j].service);
@@ -293,9 +293,9 @@ eskimo.Services = function () {
 
         //console.log ("periodicRetryServices - " + uiConfigsToRetry.length);
 
-        for (var i = 0; i < uiConfigsToRetry.length; i++) {
+        for (let i = 0; i < uiConfigsToRetry.length; i++) {
 
-            var uiConfig = uiConfigsToRetry[i];
+            let uiConfig = uiConfigsToRetry[i];
 
             setTimeout (function (effUIConfig) {
                 $.ajax({
@@ -320,8 +320,8 @@ eskimo.Services = function () {
     };
 
     function alreadyInRetry (uiConfig) {
-        for (var i = 0; i < uiConfigsToRetry.length; i++) {
-            var inUiConfig = uiConfigsToRetry[i];
+        for (let i = 0; i < uiConfigsToRetry.length; i++) {
+            let inUiConfig = uiConfigsToRetry[i];
             if (inUiConfig.title == uiConfig.title) {
                 return true;
             }
@@ -331,9 +331,9 @@ eskimo.Services = function () {
 
     this.handleServiceDisplay = function (service, uiConfig, nodeAddress, immediate) {
 
-        //var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
+        //let serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
 
-        var reinitialize = shouldReinitialize(service, nodeAddress);
+        let reinitialize = shouldReinitialize(service, nodeAddress);
 
         /*
         console.log ("service display : " + service +
@@ -349,7 +349,7 @@ eskimo.Services = function () {
 
         if ((!serviceInitialized[service] || reinitialize) && !uiConfig.refreshWaiting) {
 
-            var waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
+            let waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
 
             uiConfig.targetUrl = buildUrl(uiConfig, nodeAddress);
             uiConfig.service = service;
@@ -368,7 +368,7 @@ eskimo.Services = function () {
 
     this.handleServiceHiding = function (service, uiConfig) {
 
-        var comingFromMenuHook = true;
+        let comingFromMenuHook = true;
         if (!uiConfig) { // if coming from eskimoMain.serviceMenuClear()
             uiConfig = UI_SERVICES_CONFIG[service];
             comingFromMenuHook = false;
@@ -383,7 +383,7 @@ eskimo.Services = function () {
 
         /*
         // menu
-        var serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
+        let serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
         serviceMenu.attr("class", "folder-menu-items disabled");
         */
 
@@ -412,7 +412,7 @@ eskimo.Services = function () {
 
     function serviceMenuServiceFoundHook(nodeName, nodeAddress, service, found, immediate) {
 
-        var uiConfig = UI_SERVICES_CONFIG[service];
+        let uiConfig = UI_SERVICES_CONFIG[service];
 
         if (uiConfig != null) {
 
@@ -432,13 +432,13 @@ eskimo.Services = function () {
 
     function createServicesMenu() {
 
-        for (var i = UI_SERVICES.length - 1; i >= 0; i--) {
+        for (let i = UI_SERVICES.length - 1; i >= 0; i--) {
 
-            var service = UI_SERVICES[i];
+            let service = UI_SERVICES[i];
 
-            var uiConfig = UI_SERVICES_CONFIG[service];
+            let uiConfig = UI_SERVICES_CONFIG[service];
 
-            var menuEntry = '' +
+            let menuEntry = '' +
                 '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                 '    <a id="services-menu_' + service + '" href="#">\n' +
                 '        <img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img>\n' +
@@ -449,7 +449,7 @@ eskimo.Services = function () {
             $("#mainFolderMenuAnchor").after(menuEntry);
 
             $("#services-menu_" + service).click(function() {
-                var serviceName = this.id.substring("services-menu_".length);
+                let serviceName = this.id.substring("services-menu_".length);
                 showServiceIFrame(serviceName);
             });
         }
@@ -461,13 +461,13 @@ eskimo.Services = function () {
 
     function createServicesIFrames() {
 
-        for (var i = 0; i < UI_SERVICES.length; i++) {
+        for (let i = 0; i < UI_SERVICES.length; i++) {
 
-            var service = UI_SERVICES[i];
+            let service = UI_SERVICES[i];
 
             serviceInitialized[service] = false;
 
-            var iframeWrapperString = '' +
+            let iframeWrapperString = '' +
                 '<div class="inner-content inner-content-frame-container" id="inner-content-' + service + '" style="visibility: hidden;">\n' +
                 '    <div id="' + service + '-management"\n' +
                 '         class="panel theme-panel inner-content-inner inner-content-inner-frame" >\n' +
@@ -480,6 +480,8 @@ eskimo.Services = function () {
 
             $("#main-content").append($(iframeWrapperString));
         }
+
+        that.eskimoMain.windowResize();
     }
     /** for tests */
     this.createServicesIFrames = createServicesIFrames;
