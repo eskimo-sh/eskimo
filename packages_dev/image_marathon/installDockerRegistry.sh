@@ -53,7 +53,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Installing docker registry"
-dpkg -i docker-registry_2.6.2~ds1-2+b21_amd64.deb > /tmp/docker_registry_install_log 2>&1
+dpkg -i docker-registry_$DOCKER_REGISTRY_VERSION.deb > /tmp/docker_registry_install_log 2>&1
 fail_if_error $? "/tmp/docker_registry_install_log" -2
 
 

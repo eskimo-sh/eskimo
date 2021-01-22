@@ -149,8 +149,6 @@ public class ProxyServlet extends HttpServlet {
             this.doLog = Boolean.parseBoolean(doLogStr);
         }
 
-        /* JKE : I am removing the possibility to change these. A lot of these settings mess up wuite a lot the services
-        proxying
         String doForwardIPString = getConfigParam(P_FORWARDEDFOR);
         if (StringUtils.isNotBlank(doForwardIPString)) {
             this.doForwardIP = Boolean.parseBoolean(doForwardIPString);
@@ -195,7 +193,6 @@ public class ProxyServlet extends HttpServlet {
         if (StringUtils.isNotBlank(useSystemPropertiesString)) {
             this.useSystemProperties = Boolean.parseBoolean(useSystemPropertiesString);
         }
-        */
 
         initTarget();//sets target*
     }

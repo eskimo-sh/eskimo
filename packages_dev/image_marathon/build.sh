@@ -51,7 +51,10 @@ build_image marathon_template /tmp/marathon_build_log
 
 echo " - Installing OpenJDK 11"
 docker exec -i marathon_template apt-get install -y openjdk-11-jdk > /tmp/marathon_build_log 2>&1
-fail_if_error $? "/tmp/marathon_build_log" -3
+
+#echo " - Installing Marathon build tools "
+#docker exec -i marathon_template apt-get install -y maven gnupg > /tmp/marathon_build_log 2>&1
+#fail_if_error $? "/tmp/marathon_build_log" -3
 
 echo " - Installing Docker Registry"
 docker exec -i marathon_template bash /scripts/installDockerRegistry.sh | tee /tmp/marathon_build_log 2>&1

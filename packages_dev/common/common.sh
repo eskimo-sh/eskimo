@@ -50,10 +50,13 @@ export SPARK_VERSION_MAJOR=2.4
 # /services_setup/base-eskimo/install-mesos.sh
 export AMESOS_VERSION=1.11.0
 
+# from binaries
 export MARATHON_VERSION_SHORT=1.8.222
 export MARATHON_VERSION=1.8.222-86475ddac
+# from sources
+#export MARATHON_VERSION=1.10.17
 
-export DOCKER_REGISTRY_VERSION=2.6.2~ds1-2+b21_amd64
+export DOCKER_REGISTRY_VERSION=2.7.1+ds2-7_amd64
 
 export ES_VERSION=7.10.2
 export ES_VERSION_MAJOR=7

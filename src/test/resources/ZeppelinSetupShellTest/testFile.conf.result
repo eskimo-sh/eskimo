@@ -18,9 +18,6 @@ export SPARK_HOME=/usr/local/lib/spark/
 
 <value>0.0.0.0</value>
 
-          "name": "zeppelin.spark.useNew",
-          "value": false,
-
           "name": "elasticsearch.client.type",
           "value": "http",
 
@@ -45,7 +42,7 @@ export SPARK_HOME=/usr/local/lib/spark/
           "name": "elasticsearch.host",
           "value": "192.168.10.11",
 
-          "name": "master",
+          "name": "spark.master",
           "value": "mesos://zk://192.168.10.13:2181/mesos",
 
           "name": "flink.execution.remote.host",

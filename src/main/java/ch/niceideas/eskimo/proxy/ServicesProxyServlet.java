@@ -76,6 +76,14 @@ public class ServicesProxyServlet extends ProxyServlet {
         this.servicesDefinition = servicesDefinition;
     }
 
+    @Override
+    public void init() throws ServletException {
+        // I am removing the possibility to change these. A lot of these settings mess up wuite a lot the services
+        /*
+        super.init();
+        */
+    }
+
     private String getServiceName(HttpServletRequest servletRequest) {
         String uri = servletRequest.getRequestURI();
         if (StringUtils.isBlank(configuredContextPath)) {
