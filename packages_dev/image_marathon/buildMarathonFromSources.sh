@@ -34,46 +34,37 @@
 # Software.
 #
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . $SCRIPT_DIR/common.sh "$@"
-
 
 echo "-- INSTALLING MARATHON -----------------------------------------------------------"
 
-if [ -z "$MARATHON_VERSION" ]; then
-    echo "Need to set MARATHON_VERSION environment variable before calling this script !"
+if [ -z "$MARATHON_VERSION_SOURCES_GITHUB" ]; then
+    echo "Need to set MARATHON_VERSION_SOURCES_GITHUB environment variable before calling this script !"
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+    cd $saved_dir
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
-mkdir -p /tmp/marathon_setup
-cd /tmp/marathon_setup
+rm -Rf /tmp/marathon_source_build
+mkdir -p /tmp/marathon_source_build
+cd /tmp/marathon_source_build
 
 echo " - Updating dependencies for libmesos "
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
-            libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev \
-            > /tmp/marathon_install_log 2>&1
+    libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev \
+    > /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -2
 
-echo " - Downloading marathon-$MARATHON_VERSION"
-wget https://github.com/mesosphere/marathon/archive/v$MARATHON_VERSION.tar.gz > /tmp/marathon_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo " -> Failed to downolad marathon-$MARATHON_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/marathon-$MARATHON_VERSION.tgz > /tmp/marathon_install_log 2>&1
-    fail_if_error $? "/tmp/marathon_install_log" -1
-fi
-
-echo " - Extracting marathon-$MARATHON_VERSION"
-tar -xvf v$MARATHON_VERSION.tar.gz > /tmp/marathon_install_log 2>&1
-fail_if_error $? "/tmp/marathon_install_log" -2
-
+echo " - Downloading marathon-$MARATHON_VERSION_SOURCES_GITHUB"
+git clone https://github.com/mesosphere/marathon.git > /tmp/marathon_install_log 2>&1
+fail_if_error $? "/tmp/marathon_install_log" -1
 
 echo " - Installing SBT build system"
 
@@ -82,50 +73,45 @@ echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.li
 fail_if_error $? "/tmp/marathon_install_log" -1
 
 echo "   + Adding sbt source to keyring"
-curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add  > /tmp/marathon_install_log 2>&1
+curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add > /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -1
 
 echo "   + Updating apt sources"
-sudo apt-get update  > /tmp/marathon_install_log 2>&1
+sudo apt-get update > /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -1
 
 echo "   + Installing sbt"
-sudo apt-get install sbt  > /tmp/marathon_install_log 2>&1
+sudo apt-get install sbt > /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -1
 
+cd marathon
 
-bash
+echo " - Checking out branch $MARATHON_VERSION_SOURCES_GITHUB"
+git checkout tags/v$MARATHON_VERSION_SOURCES_GITHUB -b marathon-v"$MARATHON_VERSION_SOURCES_GITHUB"-branch > /tmp/marathon_install_log 2>&1
+fail_if_error $? "/tmp/marathon_install_log" -1
 
+# Patch for this problem
+# [error] /tmp/marathon_source_build/marathon/src/main/scala/mesosphere/marathon/core/task/update/impl/TaskStatusUpdateProcessorImpl.scala:66:42: value REASON_CONTAINER_MEMORY_REQUEST_EXCEEDED is not a member of object org.apache.mesos.Protos.TaskStatus.Reason
 
+# in src/main/scala/mesosphere/marathon/core/task/update/impl/TaskStatusUpdateProcessorImpl.scala
+# Change
 
-apt-get install libpulse0 libasyncns0 libsndfile1 libwrap0 libflac8 libogg0 libvorbis0a libvorbisenc2
-
-
-
-wget http://ftp.us.debian.org/debian/pool/main/o/openjdk-8/openjdk-8-jdk_8u275-b01-1_amd64.deb
-wget http://ftp.us.debian.org/debian/pool/main/o/openjdk-8/openjdk-8-jre_8u275-b01-1_amd64.deb
-wget http://ftp.us.debian.org/debian/pool/main/o/openjdk-8/openjdk-8-jdk-headless_8u275-b01-1_amd64.deb
-wget http://ftp.us.debian.org/debian/pool/main/o/openjdk-8/openjdk-8-jre-headless_8u275-b01-1_amd64.deb
-
-
-
-
-
-echo " - Installing marathon"
-sudo chown root.staff -R marathon-$MARATHON_VERSION
-sudo mv marathon-$MARATHON_VERSION /usr/local/lib/marathon-$MARATHON_VERSION
-
-echo " - symlinking /usr/local/lib/marathon/ to /usr/local/lib/marathon-$MARATHON_VERSION"
-sudo ln -s /usr/local/lib/marathon-$MARATHON_VERSION /usr/local/lib/marathon
+echo " - Patching branch $MARATHON_VERSION_SOURCES_GITHUB (https://jira.d2iq.com/browse/MARATHON-8750)"
+sed -i -n '1h;1!H;${;g;s/'\
+'      case MesosProtos.TaskStatus.Reason.REASON_CONTAINER_MEMORY_REQUEST_EXCEEDED =>\n'\
+'        oomKilledTasksWithinLimits.increment()'\
+'/'\
+''\
+'/g;p;}' src/main/scala/mesosphere/marathon/core/task/update/impl/TaskStatusUpdateProcessorImpl.scala
 
 
-#echo " - Checking Marathon Installation"
-#/usr/local/lib/marathon-$MARATHON_VERSION/bin/run-example MarathonPi 10 > /tmp/marathon_run_log 2>&1 &
-#fail_if_error $? "/tmp/marathon_run_log" -3
+echo " - Building branch $MARATHON_VERSION_SOURCES_GITHUB"
+sbt universal:packageZipTarball  > /tmp/marathon_install_log 2>&1
+fail_if_error $? "/tmp/marathon_install_log" -1
 
-
-sudo rm -Rf /tmp/marathon_setup
-returned_to_saved_dir
+echo " - Linking result tarball"
+cd /tmp/marathon_source_build/marathon/target/universal/
+ln -s marathon-$MARATHON_VERSION_SOURCES_GITHUB-*.tgz marathon-$MARATHON_VERSION_SOURCES_GITHUB.tgz
 
 
 

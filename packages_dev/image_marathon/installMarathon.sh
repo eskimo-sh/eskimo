@@ -53,6 +53,7 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
+sudo rm -Rf /tmp/marathon_setup
 mkdir -p /tmp/marathon_setup
 cd /tmp/marathon_setup
 
@@ -62,19 +63,33 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
             > /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -2
 
-echo " - Downloading marathon-$MARATHON_VERSION"
-wget https://downloads.mesosphere.io/marathon/builds/$MARATHON_VERSION/marathon-$MARATHON_VERSION.tgz  > /tmp/marathon_install_log 2>&1
+if [[ -f /tmp/marathon-$MARATHON_VERSION_SHORT.tgz ]]; then
 
-
-if [[ $? != 0 ]]; then
-    echo " -> Failed to downolad marathon-$MARATHON_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/marathon-$MARATHON_VERSION.tgz > /tmp/marathon_install_log 2>&1
+    echo " - Using local marathon distribution marathon-$MARATHON_VERSION_SHORT.tgz"
+    mv /tmp/marathon-$MARATHON_VERSION_SHORT.tgz ./marathon-$MARATHON_VERSION_SHORT.tgz > /tmp/marathon_install_log 2>&1
     fail_if_error $? "/tmp/marathon_install_log" -1
+
+    export VERSION_TO_USE=$MARATHON_VERSION_SHORT
+
+else
+
+    echo " - Downloading marathon-$MARATHON_VERSION"
+    wget https://downloads.mesosphere.io/marathon/builds/$MARATHON_VERSION/marathon-$MARATHON_VERSION.tgz  > /tmp/marathon_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo " -> Failed to downolad marathon-$MARATHON_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
+        wget http://niceideas.ch/mes/marathon-$MARATHON_VERSION.tgz > /tmp/marathon_install_log 2>&1
+        fail_if_error $? "/tmp/marathon_install_log" -1
+    fi
+
+    export VERSION_TO_USE=$MARATHON_VERSION
+
 fi
 
-echo " - Extracting marathon-$MARATHON_VERSION"
-tar -xvf marathon-$MARATHON_VERSION.tgz > /tmp/marathon_install_log 2>&1
+echo " - Extracting marathon-$VERSION_TO_USE"
+tar -xvf marathon-$VERSION_TO_USE.tgz > /tmp/marathon_install_log 2>&1
 fail_if_error $? "/tmp/marathon_install_log" -2
+
+#bash
 
 echo " - Installing marathon"
 sudo chown root.staff -R marathon-$MARATHON_VERSION
@@ -83,6 +98,9 @@ sudo mv marathon-$MARATHON_VERSION /usr/local/lib/marathon-$MARATHON_VERSION
 echo " - symlinking /usr/local/lib/marathon/ to /usr/local/lib/marathon-$MARATHON_VERSION"
 sudo ln -s /usr/local/lib/marathon-$MARATHON_VERSION /usr/local/lib/marathon
 
+
+
+#TODO TEST STARTUP
 
 #echo " - Checking Marathon Installation"
 #/usr/local/lib/marathon-$MARATHON_VERSION/bin/run-example MarathonPi 10 > /tmp/marathon_run_log 2>&1 &

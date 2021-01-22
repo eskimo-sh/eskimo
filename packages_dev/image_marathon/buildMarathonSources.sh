@@ -40,7 +40,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "Building Marathon Image"
+echo "Building Marathon Package from sources"
 echo "--------------------------------------------------------------------------------"
 
 # reinitializing log
@@ -48,10 +48,26 @@ rm -f /tmp/marathon_source_build_log
 
 echo " - Building image marathon"
 
+if [[ -z "$NO_BASE_IMAGE" ]]; then
+    echo " - Checking if base eskimo image is available"
+    if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
+        echo " - Trying to load base eskimo image"
+        for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
+            echo "   + loading image $i"
+            gunzip -c $i | docker load >  /tmp/marathon_source_build_log 2>&1
+            fail_if_error $?  /tmp/marathon_source_build_log -10
+        done
+    fi
+fi
 
-# build
+echo " - Deleting any previous containers"
+if [[ `docker ps -a -q -f name=marathon_source` != "" ]]; then
+    docker stop marathon_source > /dev/null 2>&1
+    docker container rm marathon_source > /dev/null 2>&1
+fi
+
 echo " - building docker image marathon_source"
-docker build --iidfile id_file --tag eskimo:"marathon_source" . < DockerFile.build  >  /tmp/marathon_source_build_log 2>&1
+docker build --iidfile id_file --tag eskimo:"marathon_source" - < Dockerfile.build  >  /tmp/marathon_source_build_log 2>&1
 fail_if_error $?  /tmp/marathon_source_build_log -11
 
 export TMP_FOLDER=/tmp
@@ -107,7 +123,7 @@ docker exec -i -e DEBIAN_FRONTEND=noninteractive marathon_source apt-get -yq upg
 fail_if_error $? "/tmp/marathon_source_build_log" -2
 
 echo " - Installing required utility tools for eskimo framework"
-docker exec -i marathon_source apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq > /tmp/marathon_source_build_log 2>&1
+docker exec -i marathon_source apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq apt-transport-https ca-certificates > /tmp/marathon_source_build_log 2>&1
 fail_if_error $? "/tmp/marathon_source_build_log" -2
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -128,6 +144,10 @@ if [[ `tail -n 1 /tmp/marathon_source_build_log | grep " - In container install 
     exit 103
 fi
 
+echo " - Copying result tarball from container"
+docker cp -L marathon_source:/tmp/marathon_source_build/marathon/target/universal/marathon-"$MARATHON_VERSION_SOURCES_GITHUB".tgz \
+       marathon-"$MARATHON_VERSION_SOURCES_GITHUB".tgz  > /tmp/marathon_source_build_log 2>&1
+fail_if_error $? "/tmp/marathon_source_build_log" -3
 
 #echo " - TODO"
 #docker exec -it marathon_source bash
@@ -136,6 +156,10 @@ fi
 echo " - Cleaning up image"
 docker exec -i marathon_source apt-get remove -y git gcc adwaita-icon-theme >> /tmp/marathon_source_build_log 2>&1
 docker exec -i marathon_source apt-get -y auto-remove >> /tmp/marathon_source_build_log 2>&1
+
+
+echo " - Cleaning build directory"
+sudo rm -Rf /tmp/marathon_source_build
 
 echo " - Closing and saving image marathon"
 close_and_save_image marathon_source /tmp/marathon_source_build_log $MARATHON_VERSION_SHORT

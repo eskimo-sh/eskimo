@@ -64,6 +64,13 @@ if [[ `tail -n 1 /tmp/marathon_build_log | grep " - In container install SUCCESS
     exit 102
 fi
 
+# Test if marathon distributable is available in local folder
+if [[ -f "./marathon-$MARATHON_VERSION_SHORT.tgz" ]]; then
+    echo "   + Marathon local distribution found. Copying local files "
+    docker cp ./marathon-$MARATHON_VERSION_SHORT.tgz  marathon_template:/tmp/marathon-$MARATHON_VERSION_SHORT.tgz > /tmp/gluster_build_log 2>&1
+    fail_if_error $? "/tmp/gluster_build_log" 6
+fi
+
 echo " - Installing marathon"
 docker exec -i marathon_template bash /scripts/installMarathon.sh | tee /tmp/marathon_build_log 2>&1
 if [[ `tail -n 1 /tmp/marathon_build_log | grep " - In container install SUCCESS"` == "" ]]; then
