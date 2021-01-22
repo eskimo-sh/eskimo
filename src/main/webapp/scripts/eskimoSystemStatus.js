@@ -370,15 +370,15 @@ eskimo.SystemStatus = function() {
     }
     this.showStatusWhenServiceUnavailable = showStatusWhenServiceUnavailable;
 
-    function serviceAction (action, service, nodeAddress) {
-        serviceActionInternal (action, service, nodeAddress, false);
+    function serviceAction (action, service, node) {
+        serviceActionInternal (action, service, node, false);
     }
 
-    function serviceActionCustom (action, service, nodeAddress) {
-        serviceActionInternal (action, service, nodeAddress, true);
+    function serviceActionCustom (action, service, node) {
+        serviceActionInternal (action, service, node, true);
     }
 
-    function serviceActionInternal (action, service, nodeAddress, custom) {
+    function serviceActionInternal (action, service, node, custom) {
 
         that.eskimoMessaging.showMessages();
 
@@ -391,8 +391,8 @@ eskimo.SystemStatus = function() {
             timeout: 1000 * 3600,
             contentType: "application/json; charset=utf-8",
             url: (custom ?
-                "service-custom-action?action=" + action + "&service=" + service + "&address=" + nodeAddress :
-                action + "?service=" + service + "&address=" + nodeAddress),
+                "service-custom-action?action=" + action + "&service=" + service + "&nodeAddress=" + node :
+                action + "?service=" + service + "&address=" + node),
             success: function (data, status, jqXHR) {
 
                 // OK
@@ -417,45 +417,45 @@ eskimo.SystemStatus = function() {
         });
     }
 
-    function showJournal (service, nodeAddress) {
-        console.log("showJournal", service, nodeAddress);
+    function showJournal (service, node) {
+        console.log("showJournal", service, node);
 
-        serviceAction("show-journal", service, nodeAddress);
+        serviceAction("show-journal", service, node);
     }
     this.showJournal = showJournal;
 
-    function startService (service, nodeAddress) {
-        console.log("startService ", service, nodeAddress);
+    function startService (service, node) {
+        console.log("startService ", service, node);
 
-        serviceAction("start-service", service, nodeAddress);
+        serviceAction("start-service", service, node);
     }
     this.startService = startService;
 
-    function stopService (service, nodeAddress) {
-        console.log("stoptService ", service, nodeAddress);
+    function stopService (service, node) {
+        console.log("stoptService ", service, node);
 
-        serviceAction("stop-service", service, nodeAddress);
+        serviceAction("stop-service", service, node);
     }
     this.stopService = stopService;
 
-    function restartService (service, nodeAddress) {
-        console.log("restartService ", service, nodeAddress);
+    function restartService (service, node) {
+        console.log("restartService ", service, node);
 
-        serviceAction("restart-service", service, nodeAddress);
+        serviceAction("restart-service", service, node);
     }
     this.restartService = restartService;
 
-    function reinstallService (service, nodeAddress) {
-        console.log("reinstallService ", service, nodeAddress);
-        if (confirm ("Are you sure you want to reinstall " + service + " on " + nodeAddress + " ?")) {
-            serviceAction("reinstall-service", service, nodeAddress);
+    function reinstallService (service, node) {
+        console.log("reinstallService ", service, node);
+        if (confirm ("Are you sure you want to reinstall " + service + " on " + node + " ?")) {
+            serviceAction("reinstall-service", service, node);
         }
     }
     this.reinstallService = reinstallService;
 
-    function performServiceAction (action, service, nodeAddress) {
-        console.log("performServiceAction ", action, service, nodeAddress);
-        serviceActionCustom(action, service, nodeAddress);
+    function performServiceAction (action, service, node) {
+        console.log("performServiceAction ", action, service, node);
+        serviceActionCustom(action, service, node);
     }
     this.reinstallService = reinstallService;
 
@@ -711,11 +711,11 @@ eskimo.SystemStatus = function() {
         setTimeout (that.monitoringDashboardFrameTamper, 10000);
     };
 
-    this.callServiceMenuHooks  = function (serviceStatus, nodeName, nodeAddress, service, blocking) {
+    this.callServiceMenuHooks  = function (serviceStatus, nodeName, node, service, blocking) {
         if (serviceStatus == "NA" || serviceStatus == "KO") {
-            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, false, blocking);
+            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, node, service, false, blocking);
         } else if (serviceStatus == "OK") {
-            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, nodeAddress, service, true, blocking);
+            that.eskimoServices.serviceMenuServiceFoundHook(nodeName, node, service, true, blocking);
         }
     };
 
@@ -740,7 +740,7 @@ eskimo.SystemStatus = function() {
 
             let nodeName = nodeNamesByNbr[nbr];
 
-            let nodeAddress = nodeServicesStatus["node_address_" + nodeName];
+            let node = nodeServicesStatus["node_address_" + nodeName];
             let nodeAlive = nodeServicesStatus["node_alive_" + nodeName];
 
             // if at least one node is up, show the consoles menu
@@ -750,7 +750,7 @@ eskimo.SystemStatus = function() {
                 $("#folderMenuConsoles").attr("class", "folder-menu-items");
                 $("#folderMenuFileManagers").attr("class", "folder-menu-items");
 
-                availableNodes.push({"nbr": nbr, "nodeName": nodeName, "nodeAddress": nodeAddress});
+                availableNodes.push({"nbr": nbr, "nodeName": nodeName, "nodeAddress": node});
             }
 
             for (let sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
@@ -763,12 +763,12 @@ eskimo.SystemStatus = function() {
 
                         if (SERVICES_STATUS_CONFIG[service].unique) {
 
-                            this.callServiceMenuHooks (serviceStatus, nodeName, nodeAddress, service, blocking);
+                            this.callServiceMenuHooks (serviceStatus, nodeName, node, service, blocking);
                         } else {
 
                             // check master and only do it if nodeAddress is master, otherwise don't bother'
                             if (masters && masters[service] == nodeName) {
-                                this.callServiceMenuHooks (serviceStatus, nodeName, nodeAddress, service, blocking);
+                                this.callServiceMenuHooks (serviceStatus, nodeName, node, service, blocking);
                             }
                         }
                     }
@@ -799,14 +799,14 @@ eskimo.SystemStatus = function() {
         statusContainerEmpty.css("display", "inherit");
     };
 
-    function showTerminal(nodeAddress, nodeName) {
+    function showTerminal(node, nodeName) {
         that.eskimoConsoles.showConsoles();
-        that.eskimoConsoles.openConsole(nodeAddress, nodeName)
+        that.eskimoConsoles.openConsole(node, nodeName)
     }
 
-    function showFileManager(nodeAddress, nodeName) {
+    function showFileManager(node, nodeName) {
         that.eskimoFileManagers.showFileManagers();
-        that.eskimoFileManagers.openFileManager(nodeAddress, nodeName)
+        that.eskimoFileManagers.openFileManager(node, nodeName)
     }
 
     function registerNodeMenu(selector, dataSelector) {
@@ -815,14 +815,14 @@ eskimo.SystemStatus = function() {
             menuSelected: function (invokedOn, selectedMenu) {
 
                 let action = selectedMenu.attr('id');
-                let nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
+                let node = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
                 let nodeName = $(invokedOn).closest("td."+dataSelector).data('eskimo-node-name');
 
                 if (action == "terminal") {
-                    showTerminal(nodeAddress, nodeName);
+                    showTerminal(node, nodeName);
 
                 } else if (action == "file_manager") {
-                    showFileManager(nodeAddress, nodeName);
+                    showFileManager(node, nodeName);
 
                 } else {
                     alert ("Unknown action : " + action);
@@ -838,26 +838,26 @@ eskimo.SystemStatus = function() {
             menuSelected: function (invokedOn, selectedMenu) {
 
                 let action = selectedMenu.attr('id');
-                let nodeAddress = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
+                let node = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
                 let service = $(invokedOn).closest("td."+dataSelector).data('eskimo-service');
 
                 if (action == "show_journal") {
-                    showJournal(service, nodeAddress);
+                    showJournal(service, node);
 
                 } else if (action == "start") {
-                    startService(service, nodeAddress);
+                    startService(service, node);
 
                 } else if (action == "stop") {
-                    stopService(service, nodeAddress);
+                    stopService(service, node);
 
                 } else if (action == "restart") {
-                    restartService(service, nodeAddress);
+                    restartService(service, node);
 
                 } else if (action == "reinstall") {
-                    reinstallService(service, nodeAddress);
+                    reinstallService(service, node);
 
                 } else {
-                    performServiceAction (action, service, nodeAddress);
+                    performServiceAction (action, service, node);
                 }
             }
         })
@@ -870,7 +870,7 @@ eskimo.SystemStatus = function() {
             '<tr id="header_1" class="status-node-table-header">\n'+
             '<td class="status-node-cell" rowspan="2">Status</td>\n' +
             '<td class="status-node-cell" rowspan="2">No</td>\n' +
-            '<td class="status-node-cell" rowspan="2">IP Address</td>\n';
+            '<td class="status-node-cell" rowspan="2">Node</td>\n';
 
         // Phase 1 : render first row
         let prevGroup = null;
@@ -957,7 +957,7 @@ eskimo.SystemStatus = function() {
 
             let nodeName = nodeNamesByNbr[nbr];
 
-            let nodeAddress = data["node_address_" + nodeName];
+            let node = data["node_address_" + nodeName];
             let nodeAlive = data["node_alive_" + nodeName];
 
             let arrayRow = ' ' +
@@ -976,11 +976,11 @@ eskimo.SystemStatus = function() {
             arrayRow +=
                 '    </td>\n' +
                 '    <td class="status-node-cell-intro"' +
-                '        data-eskimo-node="' + nodeAddress + '"' +
+                '        data-eskimo-node="' + node + '"' +
                 '        data-eskimo-node-name="' + nodeName + '">' + nbr + '</td>\n' +
                 '    <td class="status-node-cell-intro" ' +
-                '        data-eskimo-node="' + nodeAddress + '"' +
-                '        data-eskimo-node-name="' + nodeName + '">' + nodeAddress + '</td>\n';
+                '        data-eskimo-node="' + node + '"' +
+                '        data-eskimo-node-name="' + nodeName + '">' + node + '</td>\n';
 
             for (let sNb = 0; sNb < STATUS_SERVICES.length; sNb++) {
 
@@ -1014,7 +1014,7 @@ eskimo.SystemStatus = function() {
 
                         arrayRow +=
                             '    <td class="status-node-cell'+(that.eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
-                            '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'" \'>' +
+                            '         data-eskimo-node="'+node+'" data-eskimo-service="'+service+'" \'>' +
                             '<span class="service-status-error">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
@@ -1044,7 +1044,7 @@ eskimo.SystemStatus = function() {
 
                         arrayRow +=
                             '    <td class="status-node-cell'+(that.eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
-                            '         data-eskimo-node="'+nodeAddress+'" data-eskimo-service="'+service+'">\n' +
+                            '         data-eskimo-node="'+node+'" data-eskimo-service="'+service+'">\n' +
                             '<span style="color: '+color+';">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +

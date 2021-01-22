@@ -84,7 +84,7 @@ public class Topology {
 
     public static Topology create(
             NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
-            ServicesDefinition servicesDefinition, String contextPath, String currentNodeIpAddress)
+            ServicesDefinition servicesDefinition, String contextPath, String currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
 
         Topology topology = new Topology();
@@ -106,7 +106,7 @@ public class Topology {
             }
 
             // Define master for marathon services
-            if (currentNodeIpAddress != null && marathonConfig != null) {
+            if (currentNode != null && marathonConfig != null) {
                 for (String key : marathonConfig.getEnabledServices()) {
 
                     Service service = servicesDefinition.getService(key);
@@ -114,7 +114,7 @@ public class Topology {
                         throw new NodesConfigurationException("Could not find any service definition matching " + key);
                     }
 
-                    int currentNodeNumber = nodesConfig.getNodeNumber(currentNodeIpAddress);
+                    int currentNodeNumber = nodesConfig.getNodeNumber(currentNode);
 
                     topology.defineMasters(service, currentNodeNumber, nodesConfig);
                 }
@@ -132,7 +132,7 @@ public class Topology {
             Service service, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, FileException, SetupException {
 
-        String ipAddress = nodesConfig.getNodeAddress (nodeNbr);
+        String node = nodesConfig.getNodeAddress (nodeNbr);
 
         for (String addEnv : service.getAdditionalEnvironment()) {
             Map<String, String> addEnvForService = additionalEnvironment.computeIfAbsent(service.getName(), k -> new HashMap<>());
@@ -141,7 +141,7 @@ public class Topology {
 
                 servicesDefinition.executeInEnvironmentLock(persistentEnvironment -> {
 
-                    String variableName = NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase()+"_"+ipAddress.replace(".", "");
+                    String variableName = NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase()+"_"+node.replace(".", "");
 
                     String varValue = (String) persistentEnvironment.getValueForPath(variableName);
                     if (StringUtils.isBlank(varValue)) {
@@ -181,10 +181,10 @@ public class Topology {
 
                 List<String> allNodeList = new ArrayList<>(nodesConfig.getAllNodeAddressesWithService(serviceToList));
                 Collections.sort(allNodeList);
-                String allAddresses = String.join(",", allNodeList.toArray(new String[0]));
+                String allNodes = String.join(",", allNodeList.toArray(new String[0]));
 
-                if (StringUtils.isNotBlank(allAddresses)) {
-                    addEnvForService.put(varName, allAddresses);
+                if (StringUtils.isNotBlank(allNodes)) {
+                    addEnvForService.put(varName, allNodes);
                 }
 
             } else if (addEnv.equals("CONTEXT_PATH")) {
@@ -214,7 +214,7 @@ public class Topology {
             throws ServiceDefinitionException, NodesConfigurationException {
 
         Set<String> otherMasters = new HashSet<>();
-        String ipAddress = nodesConfig.getNodeAddress(nodeNbr);
+        String node = nodesConfig.getNodeAddress(nodeNbr);
 
         switch (dep.getMes()) {
 
@@ -236,16 +236,16 @@ public class Topology {
 
                 String multiServiceValue = (String) nodesConfig.getValueForPath(dep.getMasterService() + nodeNbr);
                 if (StringUtils.isNotBlank(multiServiceValue)) {
-                    definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), ipAddress);
+                    definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.replace(".", ""), node);
                 } else {
                     String uniqueServiceNbrString = (String) nodesConfig.getValueForPath(dep.getMasterService());
                     if (StringUtils.isNotBlank(uniqueServiceNbrString)) {
-                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+ipAddress.replace(".", ""), ipAddress);
+                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.replace(".", ""), node);
                     } else {
                         String masterIp = findFirstServiceIP(nodesConfig, dep.getMasterService());
                         masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp);
                         if (StringUtils.isNotBlank(masterIp)) {
-                            definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + ipAddress.replace(".", ""), masterIp);
+                            definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + node.replace(".", ""), masterIp);
                         }
                     }
                 }
@@ -278,7 +278,7 @@ public class Topology {
                 }
                 if (StringUtils.isNotBlank(masterIp)) {
                     masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp);
-                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + ipAddress.replace(".", ""), masterIp);
+                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + node.replace(".", ""), masterIp);
                 }
                 break;
 
@@ -344,8 +344,8 @@ public class Topology {
         int nodeNbr = Integer.MAX_VALUE;
 
         for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            String otherIp = nodesConfig.getNodeAddress(candidateNbr);
-            if (!existingMasters.contains(otherIp)
+            String otherNode = nodesConfig.getNodeAddress(candidateNbr);
+            if (!existingMasters.contains(otherNode)
                     && (candidateNbr < nodeNbr)) {
                 nodeNbr = candidateNbr;
             }
@@ -361,9 +361,9 @@ public class Topology {
 
         // Try to find any other number running ElasticSearch
         for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            String otherIp = nodesConfig.getNodeAddress(otherNbr);
-            if (!existingMasters.contains(otherIp)) {
-                return otherIp;
+            String otherNode = nodesConfig.getNodeAddress(otherNbr);
+            if (!existingMasters.contains(otherNode)) {
+                return otherNode;
             }
         }
 
@@ -393,12 +393,12 @@ public class Topology {
     private String findNodeIp(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
         if (nodeNumber > -1) {
             // return IP address correspondoing to master number
-            String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
-            if (StringUtils.isBlank(ipAddress)) {
+            String node = nodesConfig.getNodeAddress(nodeNumber);
+            if (StringUtils.isBlank(node)) {
                 throw new NodesConfigurationException("Inconsistency : could not find IP of " + nodeNumber);
             }
 
-            return ipAddress;
+            return node;
         }
         return null;
     }
@@ -409,9 +409,9 @@ public class Topology {
 
         List<String> retMasters = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            String ipAddress = definedMasters.get(MASTER_PREFIX + variableName + "_" + i);
-            if (StringUtils.isNotBlank(ipAddress)) {
-                retMasters.add(ipAddress);
+            String node = definedMasters.get(MASTER_PREFIX + variableName + "_" + i);
+            if (StringUtils.isNotBlank(node)) {
+                retMasters.add(node);
             }
         }
 
@@ -467,11 +467,11 @@ public class Topology {
 
         // Add self variable
         sb.append("\n#Self identification\n");
-        String ipAddress = nodesConfig.getNodeAddress(nodeNbr);
-        if (StringUtils.isBlank(ipAddress)) {
-            throw new NodesConfigurationException("No IP address found for node number " + nodeNbr);
+        String node = nodesConfig.getNodeAddress(nodeNbr);
+        if (StringUtils.isBlank(node)) {
+            throw new NodesConfigurationException("No Node Address found for node number " + nodeNbr);
         }
-        appendExport(sb, "SELF_IP_ADDRESS", ipAddress);
+        appendExport(sb, "SELF_IP_ADDRESS", node);
 
         appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);
 

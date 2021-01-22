@@ -56,7 +56,7 @@ public class SystemAdminControllerTest {
     public void testShowJournal() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void showJournal(String service, String ipAddress) throws SSHCommandException {
+            public void showJournal(String service, String node) throws SSHCommandException {
                 // No Op
             }
         });
@@ -70,7 +70,7 @@ public class SystemAdminControllerTest {
     public void testStartService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void startService(String service, String ipAddress) throws SSHCommandException {
+            public void startService(String service, String node) throws SSHCommandException {
                 // No Op
             }
         });
@@ -81,7 +81,7 @@ public class SystemAdminControllerTest {
 
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void startService(String service, String ipAddress) throws SSHCommandException {
+            public void startService(String service, String node) throws SSHCommandException {
                 throw new SSHCommandException("Test Error");
             }
         });
@@ -96,7 +96,7 @@ public class SystemAdminControllerTest {
     public void testStopService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void stopService(String service, String ipAddress) throws SSHCommandException {
+            public void stopService(String service, String node) throws SSHCommandException {
                 // No Op
             }
         });
@@ -110,7 +110,7 @@ public class SystemAdminControllerTest {
     public void testRestartService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void restartService(String service, String ipAddress) throws SSHCommandException {
+            public void restartService(String service, String node) throws SSHCommandException {
                 // No Op
             }
         });
@@ -124,7 +124,7 @@ public class SystemAdminControllerTest {
     public void testServiceActionCustom() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void callCommand(String commandId, String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
+            public void callCommand(String commandId, String serviceName, String node) throws SSHCommandException, MarathonException {
                 // No Op
             }
         });

@@ -127,55 +127,55 @@ public class ProxyManagerService {
 
     public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
         return proxyTunnelConfigs.values().stream()
-                .filter(config -> config.getRemoteAddress().equals(host))
+                .filter(config -> config.getNode().equals(host))
                 .collect(Collectors.toList());
     }
 
-    public void updateServerForService(String serviceName, String ipAddress) throws ConnectionManagerException {
+    public void updateServerForService(String serviceName, String node) throws ConnectionManagerException {
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
 
             // need to make a distinction between unique and multiple services here !!
-            String serviceId = service.getServiceId(ipAddress);
+            String serviceId = service.getServiceId(node);
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
-            if (prevConfig == null || !prevConfig.getRemoteAddress().equals(ipAddress)) {
+            if (prevConfig == null || !prevConfig.getNode().equals(node)) {
 
                 // Handle host has changed !
-                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(serviceName, generateLocalPort(), ipAddress, service.getUiConfig().getProxyTargetPort());
+                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(serviceName, generateLocalPort(), node, service.getUiConfig().getProxyTargetPort());
                 proxyTunnelConfigs.put(serviceId, newConfig);
 
                 if (prevConfig != null) {
                     logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to "
-                            + ipAddress + " and " + prevConfig.getRemoteAddress() + " (dropping service)");
+                            + node + " and " + prevConfig.getNode() + " (dropping service)");
                     try {
-                        connectionManagerService.recreateTunnels(prevConfig.getRemoteAddress());
+                        connectionManagerService.recreateTunnels(prevConfig.getNode());
                     } catch (ConnectionManagerException e) {
-                        logger.error ("Couldn't drop former tunnels for " + serviceName + " on " + prevConfig.getRemoteAddress() +
+                        logger.error ("Couldn't drop former tunnels for " + serviceName + " on " + prevConfig.getNode() +
                                 " - got " + e.getClass() + ":" + e.getMessage());
                     }
                 } else {
-                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to " + ipAddress);
+                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to " + node);
                 }
 
-                connectionManagerService.recreateTunnels (ipAddress);
+                connectionManagerService.recreateTunnels (node);
                 webSocketProxyServer.removeForwardersForService(serviceId); // just remove them, they will be recreated automagically
             }
         }
     }
 
-    public void removeServerForService(String serviceName, String ipAddress) {
+    public void removeServerForService(String serviceName, String node) {
 
         Service service = servicesDefinition.getService(serviceName);
-        String serviceId = service.getServiceId(ipAddress);
+        String serviceId = service.getServiceId(node);
 
         ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
         if (prevConfig != null) {
 
             proxyTunnelConfigs.remove(serviceId);
-            connectionManagerService.dropTunnels (prevConfig.getRemoteAddress());
+            connectionManagerService.dropTunnels (prevConfig.getNode());
             webSocketProxyServer.removeForwardersForService(serviceId);
         }
 

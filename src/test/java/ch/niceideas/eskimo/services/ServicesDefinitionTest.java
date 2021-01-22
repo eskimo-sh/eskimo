@@ -447,8 +447,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         AtomicReference<String> callRef = new AtomicReference<>();
         logCommand.call("192.168.10.11", new SSHCommandService() {
-            public String runSSHCommand(String hostAddress, String command) {
-                callRef.set(hostAddress + "-" + command);
+            public String runSSHCommand(String node, String command) {
+                callRef.set(node + "-" + command);
                 return callRef.get();
             }
         });

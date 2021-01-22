@@ -69,8 +69,8 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     protected SystemService createSystemService() {
         SystemService ss = new SystemService(false) {
             @Override
-            protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
-                File retFile = new File (System.getProperty("java.io.tmpdir") + "/" + serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
+            protected File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
+                File retFile = new File (System.getProperty("java.io.tmpdir") + "/" + serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
                 retFile.createNewFile();
                 return retFile;
             }
@@ -113,15 +113,15 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
             @Override
-            public void forceRecreateConnection(String ipAddress) {
+            public void forceRecreateConnection(String node) {
                 // No-Op
             }
             @Override
-            public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+            public Connection getPrivateConnection (String node) throws ConnectionManagerException {
                 return null;
             }
             @Override
-            public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
+            public Connection getSharedConnection (String node) throws ConnectionManagerException {
                 return null;
             }
         });
@@ -219,7 +219,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public synchronized String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+            public synchronized String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -238,7 +238,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public synchronized String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+            public synchronized String runSSHCommand(String node, String command) throws SSHCommandException {
                 testSSHCommandScript.append(command).append("\n");
                 if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
                     return "OK";
@@ -251,7 +251,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
             @Override
-            public synchronized void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+            public synchronized void copySCPFile(String node, String filePath) throws SSHCommandException {
                 // just do nothing
             }
         };
@@ -264,15 +264,15 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
             @Override
-            public void forceRecreateConnection(String ipAddress) {
+            public void forceRecreateConnection(String node) {
                 // no Op
             }
             @Override
-            public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+            public Connection getPrivateConnection (String node) throws ConnectionManagerException {
                 return null;
             }
             @Override
-            public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
+            public Connection getSharedConnection (String node) throws ConnectionManagerException {
                 return null;
             }
         });

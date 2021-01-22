@@ -16,13 +16,13 @@ public class LogFileStrategy implements MdStrategy {
 
     @Override
     public Date detectMaster(
-            Service service, String ipAddress, MasterDetection masterDetection,
+            Service service, String node, MasterDetection masterDetection,
             MasterService masterService, SSHCommandService sshCommandService,
             MessagingService messagingService, NotificationService notificationService) throws MasterDetectionException {
 
         String ping = null;
         try {
-            ping = sendPing(sshCommandService, ipAddress);
+            ping = sendPing(sshCommandService, node);
         } catch (SSHCommandException e) {
             logger.warn(e.getMessage());
             logger.debug(e, e);
@@ -31,7 +31,7 @@ public class LogFileStrategy implements MdStrategy {
         if (StringUtils.isNotBlank(ping) && ping.startsWith("OK")) {
 
             try {
-                String grepResult = sshCommandService.runSSHScript(ipAddress,
+                String grepResult = sshCommandService.runSSHScript(node,
                         "grep '" + masterDetection.getGrep() + "' " + masterDetection.getLogFile() , false);
 
                 if (StringUtils.isNotBlank(grepResult)) {
@@ -65,7 +65,7 @@ public class LogFileStrategy implements MdStrategy {
         return null;
     }
 
-    String sendPing(SSHCommandService sshCommandService, String ipAddress) throws SSHCommandException {
-        return sshCommandService.runSSHScript(ipAddress, "echo OK", false);
+    String sendPing(SSHCommandService sshCommandService, String node) throws SSHCommandException {
+        return sshCommandService.runSSHScript(node, "echo OK", false);
     }
 }

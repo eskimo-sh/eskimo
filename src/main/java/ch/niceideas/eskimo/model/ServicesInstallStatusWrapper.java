@@ -85,9 +85,9 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public boolean isServiceInstalledAnywhere(String service) {
         try {
-            for (String ipAddress : getIpAddressesAndMarathonFlags()) {
-                if ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "-")))
-                        || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + ipAddress.replace(".", "-")))) {
+            for (String node : getNodesAndMarathonFlags()) {
+                if ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.replace(".", "-")))
+                        || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.replace(".", "-")))) {
                     return true;
                 }
             }
@@ -130,7 +130,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .collect(Collectors.toList());
     }
 
-    public Set<String> getIpAddressesAndMarathonFlags() {
+    public Set<String> getNodesAndMarathonFlags() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
@@ -175,7 +175,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         setValueForPath(service + INSTALLED_ON_IP_FLAG + nodeName, flag);
     }
 
-    public Set<String> getIpAddresses() {
+    public Set<String> getNodes() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
@@ -196,7 +196,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         return allNodes.get(0);
     }
 
-    public String getFirstIpAddress(String service) {
+    public String getFirstNode(String service) {
         String serviceNodeName = getFirstNodeName(service);
         if (StringUtils.isBlank(serviceNodeName)) {
             return null;

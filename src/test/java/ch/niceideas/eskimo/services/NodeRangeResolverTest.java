@@ -90,7 +90,7 @@ public class NodeRangeResolverTest {
             nrr.resolveRanges(nodesConfig);
         });
 
-        assertEquals("Configuration is illegal. IP address 192.168.10.11 is referenced by multiple ranges / nodes", exception.getMessage());
+        assertEquals("Configuration is illegal. Node Address 192.168.10.11 is referenced by multiple ranges / nodes", exception.getMessage());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class NodeRangeResolverTest {
             nrr.resolveRanges(nodesConfig);
         });
 
-        assertEquals("Configuration is illegal. IP address 192.168.10.13 is referenced by multiple ranges / nodes", exception.getMessage());
+        assertEquals("Configuration is illegal. Node Address 192.168.10.13 is referenced by multiple ranges / nodes", exception.getMessage());
     }
 
     @Test
@@ -283,7 +283,7 @@ public class NodeRangeResolverTest {
         assertNotNull(resolvedConfig);
 
         assertEquals("node_id1,node_id2,node_id3,node_id4,node_id5,node_id6,node_id7", String.join(",",
-                resolvedConfig.getIpAddressKeys().stream()
+                resolvedConfig.getNodeAddressKeys().stream()
                         .sorted(Comparators.comparable())
                         .toArray(String[]::new)));
 

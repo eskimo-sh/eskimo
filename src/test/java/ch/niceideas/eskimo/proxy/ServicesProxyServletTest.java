@@ -73,7 +73,7 @@ public class ServicesProxyServletTest {
 
         pms.setConnectionManagerService(new ConnectionManagerService() {
             @Override
-            protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+            protected void recreateTunnels(Connection connection, String node) throws ConnectionManagerException {
                 // No Op
             }
             @Override

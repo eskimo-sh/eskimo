@@ -73,8 +73,8 @@ public class SSHCommandService {
         return runSSHScript(connection, script, true);
     }
 
-    public String runSSHScript(String hostAddress, String script) throws SSHCommandException {
-        return runSSHScript(hostAddress, script, true);
+    public String runSSHScript(String node, String script) throws SSHCommandException {
+        return runSSHScript(node, script, true);
     }
 
     public String runSSHCommand(Connection connection, String[] command) throws SSHCommandException {
@@ -90,8 +90,8 @@ public class SSHCommandService {
         return runSSHScript(connection, getScriptContent(scriptName));
     }
 
-    public String runSSHScriptPath(String hostAddress, String scriptName) throws SSHCommandException {
-        return runSSHScript(hostAddress, getScriptContent(scriptName));
+    public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
+        return runSSHScript(node, getScriptContent(scriptName));
     }
 
     String getScriptContent(String scriptName) throws SSHCommandException {
@@ -118,9 +118,9 @@ public class SSHCommandService {
         return scriptContent;
     }
 
-    public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+    public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
+            Connection connection = connectionManagerService.getSharedConnection(node);
 
             return runSSHScript(connection, script, throwsException);
 
@@ -189,9 +189,9 @@ public class SSHCommandService {
         }
     }
 
-    public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+    public String runSSHCommand(String node, String command) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
+            Connection connection = connectionManagerService.getSharedConnection(node);
             return runSSHCommand(connection, command);
         } catch (ConnectionManagerException e) {
             logger.error (e, e);
@@ -216,9 +216,9 @@ public class SSHCommandService {
         }
     }
 
-    public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+    public void copySCPFile(String node, String filePath) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getSharedConnection(hostAddress);
+            Connection connection = connectionManagerService.getSharedConnection(node);
             copySCPFile(connection, filePath);
 
         } catch (ConnectionManagerException e) {

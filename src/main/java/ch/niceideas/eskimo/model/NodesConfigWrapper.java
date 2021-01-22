@@ -93,7 +93,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         }
     }
 
-    public List<String> getIpAddressKeys() {
+    public List<String> getNodeAddressKeys() {
         return getRootKeys().stream()
                 .filter(key -> key.startsWith(NODE_ID_FIELD))
                 .collect(Collectors.toList());
@@ -144,7 +144,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
     public List<Pair<String, String>> getNodeAdresses() {
         List<Pair<String, String>> retList = new ArrayList<>();
 
-        getIpAddressKeys()
+        getNodeAddressKeys()
                 .forEach(key -> {
                     try {
                         retList.add(new Pair<>(key.substring(NODE_ID_FIELD.length()), (String) getValueForPath(key)));
@@ -156,8 +156,8 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         return retList;
     }
 
-    public List<String> getServicesForIpAddress (String ipAddress) throws SystemException {
-        return getServicesForNode(getNodeNumber(ipAddress));
+    public List<String> getServicesForNode(String node) throws SystemException {
+        return getServicesForNode(getNodeNumber(node));
     }
 
     public static ParsedNodesConfigProperty parseProperty (String property) {
@@ -198,12 +198,12 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .collect(Collectors.toList());
     }
 
-    public int getNodeNumber(String ipAddress) throws SystemException {
+    public int getNodeNumber(String node) throws SystemException {
         for (String key : getRootKeys()) {
             if (key.startsWith(NODE_ID_FIELD)) {
 
                 try {
-                    if (getValueForPath(key).equals(ipAddress)) {
+                    if (getValueForPath(key).equals(node)) {
                         return Integer.parseInt(key.substring(NODE_ID_FIELD.length()));
                     }
                 } catch (JSONException e) {
@@ -212,7 +212,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 }
             }
         }
-        throw new SystemException("Impossible to find node number for ipAddress " + ipAddress);
+        throw new SystemException("Impossible to find node number for node " + node);
     }
 
     public boolean shouldInstall(String service, int nodeNbr) {
@@ -232,8 +232,8 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         return shall;
     }
 
-    public List<String> getIpAddresses() {
-        return getIpAddressKeys().stream()
+    public List<String> getNodeAddresses() {
+        return getNodeAddressKeys().stream()
                 .map(key -> {
                     try {
                         return (String) getValueForPath(key);

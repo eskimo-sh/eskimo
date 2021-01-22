@@ -23,7 +23,7 @@ public class Command {
         }});
     }
 
-    public String call(String ipAddress, SSHCommandService sshCommandService) throws SSHCommandException {
-        return sshCommandService.runSSHCommand(ipAddress, commandCall);
+    public String call(String node, SSHCommandService sshCommandService) throws SSHCommandException {
+        return sshCommandService.runSSHCommand(node, commandCall);
     }
 }

@@ -67,8 +67,8 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
     protected SystemService createSystemService() {
         SystemService ss = new SystemService(false) {
             @Override
-            protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
-                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ipAddress+extension);
+            protected File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
+                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
                 retFile.createNewFile();
                 return retFile;
             }
@@ -105,7 +105,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
+            public String runSSHScript(String node, String script, boolean throwsException) {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -120,7 +120,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) {
+            public String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
@@ -129,7 +129,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 // just do nothing
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath)  {
+            public void copySCPFile(String node, String filePath)  {
                 // just do nothing
             }
         });

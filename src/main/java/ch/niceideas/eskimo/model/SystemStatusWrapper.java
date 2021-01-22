@@ -141,7 +141,7 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         return StringUtils.isNotBlank(serviceStatus) && !serviceStatus.equals("NA");
     }
 
-    public Set<String> getIpAddresses() {
+    public Set<String> getNodes() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(NODE_ALIVE_FLAG))
                 .map(key -> key.substring(key.indexOf(NODE_ALIVE_FLAG) + NODE_ALIVE_FLAG.length()))

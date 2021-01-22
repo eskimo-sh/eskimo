@@ -311,7 +311,7 @@ public class MarathonService {
             if (StringUtils.isBlank(nodeIp)) {
 
                 // service is not started by marathon, assuming it on marathon node
-                nodeIp = servicesInstallStatus.getFirstIpAddress(MARATHON);
+                nodeIp = servicesInstallStatus.getFirstNode(MARATHON);
             }
 
             String status = "notOK";
@@ -339,8 +339,8 @@ public class MarathonService {
             // Find out node running marathon
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            String marathonIpAddress = servicesInstallStatus.getFirstIpAddress(MARATHON);
-            if (StringUtils.isBlank(marathonIpAddress)) {
+            String marathonNode = servicesInstallStatus.getFirstNode(MARATHON);
+            if (StringUtils.isBlank(marathonNode)) {
                 String message = "Marathon doesn't seem to be installed";
                 notificationService.addError(message);
                 messagingService.addLines(message);
@@ -379,9 +379,9 @@ public class MarathonService {
 
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
 
-            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<String>(){{add(marathonIpAddress);}}, nodesConfig, liveIps, deadIps);
+            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<String>(){{add(marathonNode);}}, nodesConfig, liveIps, deadIps);
 
-            if (deadIps.contains(marathonIpAddress)) {
+            if (deadIps.contains(marathonNode)) {
                 String message = "The marathon node is dead. cannot proceed any further with installation.";
                 notificationService.addError(message);
                 messagingService.addLines(message);
@@ -422,11 +422,11 @@ public class MarathonService {
 
             // Installation in batches (groups following dependencies) - deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getInstallations(), 1, marathonOperationWaitTimoutSeconds,
-                    (operation, error) -> installMarathonService(operation, marathonIpAddress));
+                    (operation, error) -> installMarathonService(operation, marathonNode));
 
             // uninstallations - deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getUninstallations(), 1, marathonOperationWaitTimoutSeconds,
-                    (operation, error) -> uninstallMarathonService(operation, marathonIpAddress));
+                    (operation, error) -> uninstallMarathonService(operation, marathonNode));
 
             /*
             // restarts
@@ -434,9 +434,9 @@ public class MarathonService {
                 performPooledOperation(restarts, parallelismInstallThreadCount, marathonOperationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (liveIps.contains(ipAddress)) {
-                                restartServiceForSystem(service, ipAddress);
+                            String node = operation.getValue();
+                            if (liveIps.contains(node)) {
+                                restartServiceForSystem(service, node);
                             }
                         });
             }
@@ -491,7 +491,7 @@ public class MarathonService {
         }
     }
 
-    void uninstallMarathonService(String service, String marathonIpAddress) throws SystemException {
+    void uninstallMarathonService(String service, String marathonNode) throws SystemException {
         String nodeIp = null;
         try {
             Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service);
@@ -500,10 +500,10 @@ public class MarathonService {
             logger.warn (e.getMessage());
             logger.debug (e, e);
         }
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on marathon node " + marathonIpAddress,
+        systemOperationService.applySystemOperation("Uninstallation of " + service + " on marathon node " + marathonNode,
                 builder -> {
                     try {
-                        proceedWithMarathonServiceUninstallation(builder, marathonIpAddress, service);
+                        proceedWithMarathonServiceUninstallation(builder, marathonNode, service);
                     } catch (MarathonException e) {
                         logger.error (e, e);
                         throw new SystemException(e);
@@ -518,10 +518,10 @@ public class MarathonService {
     }
 
 
-    void installMarathonService(String service, String marathonIpAddress)
+    void installMarathonService(String service, String marathonNode)
             throws SystemException {
-        systemOperationService.applySystemOperation("installation of " + service + " on marathon node " + marathonIpAddress,
-                builder -> proceedWithMarathonServiceInstallation(builder, marathonIpAddress, service),
+        systemOperationService.applySystemOperation("installation of " + service + " on marathon node " + marathonNode,
+                builder -> proceedWithMarathonServiceInstallation(builder, marathonNode, service),
                 status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
     }
 
@@ -608,14 +608,14 @@ public class MarathonService {
         // 3.1 Node answers
         try {
 
-            String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress(MARATHON);
+            String marathonNode = servicesInstallationStatus.getFirstNode(MARATHON);
 
             String ping = null;
-            if (!StringUtils.isBlank(marathonIpAddress)) {
+            if (!StringUtils.isBlank(marathonNode)) {
 
                 // find out if SSH connection to host can succeeed
                 try {
-                    ping = systemService.sendPing(marathonIpAddress);
+                    ping = systemService.sendPing(marathonNode);
                 } catch (SSHCommandException e) {
                     logger.warn(e.getMessage());
                     logger.debug(e, e);
@@ -638,8 +638,8 @@ public class MarathonService {
                 // if marathon is not answering, we assume service is still installed if it has been installed before
                 // we identify it on marathon node then.
                 if (nodeIp != null && nodeIp.equals(MARATHON_NA_FLAG)) {
-                    if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstIpAddress(service))) {
-                        nodeIp = marathonIpAddress;
+                    if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstNode(service))) {
+                        nodeIp = marathonNode;
                     } else {
                         nodeIp = null;
                     }
@@ -652,8 +652,8 @@ public class MarathonService {
 
                 // uninstalled services are identified on the marathon node
                 if (StringUtils.isBlank(nodeName)) {
-                    if (StringUtils.isNotBlank(marathonIpAddress)) {
-                        nodeName = marathonIpAddress.replace(".", "-");
+                    if (StringUtils.isNotBlank(marathonNode)) {
+                        nodeName = marathonNode.replace(".", "-");
                     } else {
                         nodeName = servicesInstallationStatus.getFirstNodeName(MARATHON);
                     }

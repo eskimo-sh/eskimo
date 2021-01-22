@@ -229,15 +229,15 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     void getTestClient(String mimeType) throws IOException, ConnectionManagerException {
         sc = new FileManagerService() {
             @Override
-            SFTPv3Client getClient(@RequestParam("address") String hostAddress) throws ConnectionManagerException, IOException {
+            SFTPv3Client getClient(@RequestParam("address") String node) throws ConnectionManagerException, IOException {
                 return new SFTPv3Client(cm.getSharedConnection("localhost"));
             }
             @Override
-            String getFileMimeType(String hostAddress, String newPath) throws SSHCommandException {
+            String getFileMimeType(String node, String newPath) throws SSHCommandException {
                 return mimeType;
             }
             @Override
-            public Pair<String, JSONObject> navigateFileManager(String hostAddress, String folder, String subFolder) throws IOException {
+            public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
                 return new Pair<>("/test", new JSONObject(new HashMap<String, Object>() {{
 
                     put ("test", new JSONObject(new HashMap<String, Object>() {{

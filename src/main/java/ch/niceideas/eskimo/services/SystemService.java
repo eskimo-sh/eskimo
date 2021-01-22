@@ -242,52 +242,52 @@ public class SystemService {
         nodesConfigurationService.applyNodesConfig(command);
     }
 
-    public void showJournal(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
-        applyServiceOperation(serviceName, ipAddress, "Showing journal of", () -> {
+    public void showJournal(String serviceName, String node) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, node, "Showing journal of", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
                 throw new UnsupportedOperationException("Showing marathon service journal for " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(ipAddress, "sudo journalctl -u " + serviceName);
+                return sshCommandService.runSSHCommand(node, "sudo journalctl -u " + serviceName);
             }
         });
     }
 
-    public void startService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
-        applyServiceOperation(serviceName, ipAddress, "Starting", () -> {
+    public void startService(String serviceName, String node) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, node, "Starting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
                 throw new UnsupportedOperationException("Starting marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl start " + serviceName);
+                return sshCommandService.runSSHCommand(node, "sudo systemctl start " + serviceName);
             }
         });
     }
 
-    public void stopService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
-        applyServiceOperation(serviceName, ipAddress, "Stopping", () -> {
+    public void stopService(String serviceName, String node) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, node, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
                 throw new UnsupportedOperationException("Stopping marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl stop " + serviceName);
+                return sshCommandService.runSSHCommand(node, "sudo systemctl stop " + serviceName);
             }
         });
     }
 
-    public void restartService(String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
-        applyServiceOperation(serviceName, ipAddress, "Restarting", () -> {
+    public void restartService(String serviceName, String node) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, node, "Restarting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
                 throw new UnsupportedOperationException("Restarting marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(ipAddress, "sudo systemctl restart " + serviceName);
+                return sshCommandService.runSSHCommand(node, "sudo systemctl restart " + serviceName);
             }
         });
     }
 
-    public void callCommand(String commandId, String serviceName, String ipAddress) throws SSHCommandException, MarathonException {
-        applyServiceOperation(serviceName, ipAddress, "Calling command " + commandId , () -> {
+    public void callCommand(String commandId, String serviceName, String node) throws SSHCommandException, MarathonException {
+        applyServiceOperation(serviceName, node, "Calling command " + commandId , () -> {
             Service service = servicesDefinition.getService(serviceName);
 
             Command command = service.getCommand (commandId);
@@ -295,7 +295,7 @@ public class SystemService {
                 throw new SSHCommandException("Command " + commandId + " is unknown for service " + serviceName);
             }
 
-            return command.call (ipAddress, sshCommandService);
+            return command.call (node, sshCommandService);
         });
     }
 
@@ -305,20 +305,20 @@ public class SystemService {
         });
     }
 
-    void applyServiceOperation(String service, String ipAddress, String opLabel, ServiceOperation<String> operation) throws SSHCommandException, MarathonException {
+    void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SSHCommandException, MarathonException {
 
         boolean success = false;
         setProcessingPending();
         try {
 
-            notificationService.addDoing(opLabel + " " + service + " on " + ipAddress);
-            String message = opLabel + " " + service + " on " + ipAddress;
+            notificationService.addDoing(opLabel + " " + service + " on " + node);
+            String message = opLabel + " " + service + " on " + node;
             logOperationMessage (message);
             messagingService.addLines("Done "
                     + message
                     + "\n-------------------------------------------------------------------------------\n"
                     + operation.call());
-            notificationService.addInfo(opLabel + " " + service + " succeeded on " + ipAddress);
+            notificationService.addInfo(opLabel + " " + service + " succeeded on " + node);
 
             success = true;
         } finally {
@@ -370,11 +370,11 @@ public class SystemService {
                 for (Pair<String, String> nbrAndPair : nodesConfig.getNodeAdresses()) {
 
                     int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
-                    String ipAddress = nbrAndPair.getValue();
-                    String nodeName = ipAddress.replace(".", "-");
+                    String node = nbrAndPair.getValue();
+                    String nodeName = node.replace(".", "-");
 
                     statusMap.put(("node_nbr_" + nodeName), "" + nodeNbr);
-                    statusMap.put(("node_address_" + nodeName), ipAddress);
+                    statusMap.put(("node_address_" + nodeName), node);
 
                     threadPool.execute(() -> {
                         try {
@@ -399,13 +399,13 @@ public class SystemService {
                 } catch (MarathonException e) {
                     logger.debug(e, e);
                     // workaround : flag all marathon services as KO on marathon node
-                    String marathonIpAddress = servicesInstallationStatus.getFirstIpAddress(MARATHON_SERVICE_NAME);
-                    if (StringUtils.isNotBlank(marathonIpAddress)) {
-                        String marathonNode = marathonIpAddress.replace(".", "-");
+                    String marathonNode = servicesInstallationStatus.getFirstNode(MARATHON_SERVICE_NAME);
+                    if (StringUtils.isNotBlank(marathonNode)) {
+                        String marathonNodeName = marathonNode.replace(".", "-");
                         MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
                         for (String service : servicesDefinition.listMarathonServices()) {
                             if (marathonService.shouldInstall(marathonConfig, service)) {
-                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + marathonNode, "KO");
+                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + marathonNodeName, "KO");
                             }
                         }
                     }
@@ -428,27 +428,27 @@ public class SystemService {
             // 5. Handle status update if a service seem to have disappeared
 
             // 5.1 Test if any additional node should be check for being live
-            Set<String> systemStatusIpAddresses = systemStatus.getIpAddresses();
-            Set<String> additionalIpToTests = servicesInstallationStatus.getIpAddresses().stream()
-                    .filter(ip -> !systemStatusIpAddresses.contains(ip))
+            Set<String> systemStatusNodes = systemStatus.getNodes();
+            Set<String> additionalIpToTests = servicesInstallationStatus.getNodes().stream()
+                    .filter(ip -> !systemStatusNodes.contains(ip))
                     .collect(Collectors.toSet());
 
-            Set<String> configuredAddressesAndOtherLiveAddresses = new HashSet<>(systemStatusIpAddresses);
-            for (String ipAddress : additionalIpToTests) {
+            Set<String> configuredNodesAndOtherLiveNodes = new HashSet<>(systemStatusNodes);
+            for (String node : additionalIpToTests) {
 
                 // find out if SSH connection to host can succeed
                 try {
-                    String ping = sendPing(ipAddress);
+                    String ping = sendPing(node);
 
                     if (ping.startsWith("OK")) {
-                        configuredAddressesAndOtherLiveAddresses.add(ipAddress);
+                        configuredNodesAndOtherLiveNodes.add(node);
                     }
                 } catch (SSHCommandException e) {
                     logger.debug(e, e);
                 }
             }
 
-            handleStatusChanges(servicesInstallationStatus, systemStatus, configuredAddressesAndOtherLiveAddresses);
+            handleStatusChanges(servicesInstallationStatus, systemStatus, configuredNodesAndOtherLiveNodes);
 
             lastStatus.set (systemStatus);
             lastStatusException.set (null);
@@ -469,8 +469,8 @@ public class SystemService {
         }
     }
 
-    String sendPing(String ipAddress) throws SSHCommandException {
-        return sshCommandService.runSSHScript(ipAddress, "echo OK", false);
+    String sendPing(String node) throws SSHCommandException {
+        return sshCommandService.runSSHScript(node, "echo OK", false);
     }
 
     <T> void performPooledOperation(
@@ -520,8 +520,8 @@ public class SystemService {
                 throws SystemException {
 
         int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
-        String ipAddress = nbrAndPair.getValue();
-        String nodeName = ipAddress.replace(".", "-");
+        String node = nbrAndPair.getValue();
+        String nodeName = node.replace(".", "-");
 
         // 3.1 Node answers
         try {
@@ -529,7 +529,7 @@ public class SystemService {
             // find out if SSH connection to host can succeeed
             String ping = null;
             try {
-                ping = sendPing(ipAddress);
+                ping = sendPing(node);
             } catch (SSHCommandException e) {
                 logger.warn(e.getMessage());
                 logger.debug(e, e);
@@ -543,7 +543,7 @@ public class SystemService {
 
                 statusMap.put(("node_alive_" + nodeName), "OK");
 
-                String allServicesStatus = sshCommandService.runSSHScript(ipAddress,
+                String allServicesStatus = sshCommandService.runSSHScript(node,
                         "sudo systemctl status --no-pager --no-block -al " + servicesDefinition.getAllServicesString() + " 2>/dev/null ", false);
 
                 SystemStatusParser parser = new SystemStatusParser(allServicesStatus);
@@ -560,7 +560,7 @@ public class SystemService {
                     boolean running = serviceStatus.equals("running");
 
                     feedInServiceStatus (
-                            statusMap, servicesInstallationStatus, ipAddress, nodeName, nodeName,
+                            statusMap, servicesInstallationStatus, node, nodeName, nodeName,
                             service, shall, installed, running);
                 }
             }
@@ -573,7 +573,7 @@ public class SystemService {
     void feedInServiceStatus (
             Map<String, String> statusMap,
             ServicesInstallStatusWrapper servicesInstallationStatus,
-            String ipAddress,
+            String node,
             String nodeName,
             String referenceNodeName,
             String service,
@@ -603,7 +603,7 @@ public class SystemService {
                     }
 
                     // configure proxy if required
-                    proxyManagerService.updateServerForService(service, ipAddress);
+                    proxyManagerService.updateServerForService(service, node);
                 }
             }
         } else {
@@ -615,7 +615,7 @@ public class SystemService {
 
     public void handleStatusChanges(
             ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus,
-            Set<String> configuredAddressesAndOtherLiveAddresses)
+            Set<String> configuredNodesAndOtherLiveNodes)
                 throws FileException, SetupException {
 
         // If there is some processing pending, then nothing is reliable, just move on
@@ -675,7 +675,7 @@ public class SystemService {
                     // => so nothing to do, don't touch anything in installed services registry
 
                     // c. if node is both down and not configured anymore, we just remove all services whatever their statuses
-                    if (!configuredAddressesAndOtherLiveAddresses.contains(nodeIp)
+                    if (!configuredNodesAndOtherLiveNodes.contains(nodeIp)
                             && countErrorAndRemoveServices(servicesInstallationStatus, savedService, nodeName, originalNodeName)) {
                         changes = true;
                     }
@@ -824,42 +824,42 @@ public class SystemService {
         sb.append(sshCommandService.runSSHCommand(connection, command));
     }
 
-    List<Pair<String, String>> buildDeadIps(Set<String> allIpAddresses, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
+    List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
         List<Pair<String, String>> nodesSetup = new ArrayList<>();
 
         // Find out about dead IPs
-        Set<String> ipAddressesToTest = new HashSet<>(allIpAddresses);
-        ipAddressesToTest.addAll(nodesConfig.getIpAddresses());
-        for (String ipAddress : ipAddressesToTest) {
+        Set<String> nodesToTest = new HashSet<>(allNodes);
+        nodesToTest.addAll(nodesConfig.getNodeAddresses());
+        for (String node : nodesToTest) {
 
-            if (!ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
+            if (!node.equals(OperationsCommand.MARATHON_FLAG)) {
 
                 // handle potential interruption request
                 if (isInterrupted()) {
                     return null;
                 }
 
-                nodesSetup.add(new Pair<>("node_setup", ipAddress));
+                nodesSetup.add(new Pair<>("node_setup", node));
 
                 // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
 
                 // find out if SSH connection to host can succeed
                 try {
-                    String ping = sendPing(ipAddress);
+                    String ping = sendPing(node);
 
                     if (!ping.startsWith("OK")) {
 
-                        handleNodeDead(deadIps, ipAddress);
+                        handleNodeDead(deadIps, node);
                     } else {
-                        liveIps.add(ipAddress);
+                        liveIps.add(node);
                     }
 
                     // Ensure sudo is possible
-                    checkSudoPossible (deadIps, ipAddress);
+                    checkSudoPossible (deadIps, node);
 
                 } catch (SSHCommandException e) {
                     logger.debug(e, e);
-                    handleSSHFails(deadIps, ipAddress);
+                    handleSSHFails(deadIps, node);
                 }
             }
         }
@@ -870,28 +870,28 @@ public class SystemService {
         return nodesSetup;
     }
 
-    private void checkSudoPossible(Set<String> deadIps, String ipAddress) throws SSHCommandException {
+    private void checkSudoPossible(Set<String> deadIps, String node) throws SSHCommandException {
 
-        String result = sshCommandService.runSSHScript(ipAddress, "sudo ls", false);
+        String result = sshCommandService.runSSHScript(node, "sudo ls", false);
         if (   result.contains("a terminal is required to read the password")
             || result.contains("a password is required")) {
-            messagingService.addLines("\nNode " + ipAddress + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
-            notificationService.addError("Node " + ipAddress + " sudo problem");
-            deadIps.add(ipAddress);
+            messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
+            notificationService.addError("Node " + node + " sudo problem");
+            deadIps.add(node);
         }
 
     }
 
-    void handleNodeDead(Set<String> deadIps, String ipAddress) {
-        messagingService.addLines("\nNode seems dead " + ipAddress);
-        notificationService.addError("Node " + ipAddress + " is dead.");
-        deadIps.add(ipAddress);
+    void handleNodeDead(Set<String> deadIps, String node) {
+        messagingService.addLines("\nNode seems dead " + node);
+        notificationService.addError("Node " + node + " is dead.");
+        deadIps.add(node);
     }
 
-    void handleSSHFails(Set<String> deadIps, String ipAddress) {
-        messagingService.addLines("\nNode " + ipAddress + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
-        notificationService.addError("Node " + ipAddress + " not reachable.");
-        deadIps.add(ipAddress);
+    void handleSSHFails(Set<String> deadIps, String node) {
+        messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
+        notificationService.addError("Node " + node + " not reachable.");
+        deadIps.add(node);
     }
 
     File createRemotePackageFolder(StringBuilder sb, Connection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
@@ -961,7 +961,7 @@ public class SystemService {
         return tmpArchiveFile;
     }
 
-    File createTempFile(String service, String ipAddress, String extension) throws IOException {
+    File createTempFile(String service, String node, String extension) throws IOException {
         return File.createTempFile(service, extension);
     }
 

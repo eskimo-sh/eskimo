@@ -62,10 +62,10 @@ eskimo.OperationsCommand = function() {
     function renderOperation(operation, commandDescription) {
 
         for (let service in operation) {
-            let ipAddress = operation[service];
+            let node = operation[service];
 
             commandDescription = commandDescription +
-                '<i class="fa fa-arrow-right"></i>&nbsp;' + service + " on " + ipAddress + "<br>";
+                '<i class="fa fa-arrow-right"></i>&nbsp;' + service + " on " + node + "<br>";
         }
 
         return commandDescription;

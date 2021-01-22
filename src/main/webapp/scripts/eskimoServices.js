@@ -188,7 +188,7 @@ eskimo.Services = function () {
         });
     };
 
-    function buildUrl(uiConfig, nodeAddress) {
+    function buildUrl(uiConfig, node) {
         let actualUrl = null;
         if (uiConfig.urlTemplate != null && uiConfig.urlTemplate != "") {
 
@@ -199,7 +199,7 @@ eskimo.Services = function () {
             } else {
 
                 actualUrl = uiConfig.urlTemplate.substring(0, indexOfNodeAddress)
-                    + nodeAddress.replace(/\./g, "-")
+                    + node.replace(/\./g, "-")
                     + uiConfig.urlTemplate.substring(indexOfNodeAddress + 14);
             }
         } else {
@@ -213,7 +213,7 @@ eskimo.Services = function () {
             } else {
                 actualUrl = uiConfig.proxyContext
                     + (uiConfig.proxyContext.endsWith ("/") ? "" : "/")
-                    + nodeAddress.replace(/\./g, "-");
+                    + node.replace(/\./g, "-");
             }
         }
         return actualUrl;
@@ -221,13 +221,13 @@ eskimo.Services = function () {
     /* For tests */
     this.buildUrl = buildUrl;
 
-    function shouldReinitialize(service, nodeAddress) {
+    function shouldReinitialize(service, node) {
 
         let uiConfig = UI_SERVICES_CONFIG[service];
 
         let urlChanged = false;
         if (uiConfig.actualUrl != null && uiConfig.actualUrl != "") {
-            let newUrl = buildUrl(uiConfig, nodeAddress);
+            let newUrl = buildUrl(uiConfig, node);
             if (uiConfig.actualUrl != newUrl) {
                 urlChanged = true;
             }
@@ -329,11 +329,11 @@ eskimo.Services = function () {
         return false;
     }
 
-    this.handleServiceDisplay = function (service, uiConfig, nodeAddress, immediate) {
+    this.handleServiceDisplay = function (service, uiConfig, node, immediate) {
 
         //let serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
 
-        let reinitialize = shouldReinitialize(service, nodeAddress);
+        let reinitialize = shouldReinitialize(service, node);
 
         /*
         console.log ("service display : " + service +
@@ -351,7 +351,7 @@ eskimo.Services = function () {
 
             let waitTime = (immediate || !reinitialize) ? 0 : uiConfig.waitTime;
 
-            uiConfig.targetUrl = buildUrl(uiConfig, nodeAddress);
+            uiConfig.targetUrl = buildUrl(uiConfig, node);
             uiConfig.service = service;
             uiConfig.targetWaitTime = waitTime;
 
@@ -410,7 +410,7 @@ eskimo.Services = function () {
         }
     };
 
-    function serviceMenuServiceFoundHook(nodeName, nodeAddress, service, found, immediate) {
+    function serviceMenuServiceFoundHook(nodeName, node, service, found, immediate) {
 
         let uiConfig = UI_SERVICES_CONFIG[service];
 
@@ -419,7 +419,7 @@ eskimo.Services = function () {
             if (found) {
 
                 // handle iframe display
-                that.handleServiceDisplay(service, uiConfig, nodeAddress, immediate);
+                that.handleServiceDisplay(service, uiConfig, node, immediate);
 
             } else {
 

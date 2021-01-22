@@ -272,18 +272,18 @@ public class NodesConfigurationChecker {
         int nodeCount = 0;
 
         // check IP addresses and ranges configuration
-        for (String key : nodesConfig.getIpAddressKeys()) {
+        for (String key : nodesConfig.getNodeAddressKeys()) {
             nodeCount++;
             int nodeNbr = Integer.parseInt(key.substring(NodesConfigWrapper.NODE_ID_FIELD.length()));
-            String ipAddress = (String) nodesConfig.getValueForPath (key);
-            if (StringUtils.isBlank(ipAddress)) {
+            String node = (String) nodesConfig.getValueForPath (key);
+            if (StringUtils.isBlank(node)) {
                 throw new NodesConfigurationException("Node "
                         + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length()) + " has no IP configured.");
             } else {
-                Matcher matcher = ipAddressCheck.matcher(ipAddress);
+                Matcher matcher = ipAddressCheck.matcher(node);
                 if (!matcher.matches()) {
                     throw new NodesConfigurationException("Node " + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length())
-                            + " has IP configured as " + ipAddress + " which is not an IP address or a range.");
+                            + " has IP configured as " + node + " which is not an IP address or a range.");
                 }
 
                 if (StringUtils.isNotBlank(matcher.group(1))) { // then it's a range

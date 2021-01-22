@@ -25,7 +25,7 @@ public class FileManagerControlerTest {
     public void testRemoveFileManager() {
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public void removeFileManager(@RequestParam("address") String hostAddress) {
+            public void removeFileManager(@RequestParam("address") String node) {
                 // NO-OP
             }
         });
@@ -39,7 +39,7 @@ public class FileManagerControlerTest {
     public void testNavigateFileManager() {
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public Pair<String, JSONObject> navigateFileManager(String hostAddress, String folder, String subFolder) throws IOException {
+            public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
 
                 return new Pair<>("/etc/", new JSONObject(new HashMap<String, Object>(){{
                     put("passwd", new JSONObject(new HashMap<String, Object>() {{
@@ -69,7 +69,7 @@ public class FileManagerControlerTest {
 
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public Pair<String, JSONObject> navigateFileManager(String hostAddress, String folder, String subFolder) throws IOException {
+            public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
                 throw new IOException ("Test Error");
             }
         });
@@ -84,7 +84,7 @@ public class FileManagerControlerTest {
     public void testCreateFile() {
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public Pair<String, JSONObject> createFile(String hostAddress, String folder, String fileName) throws IOException {
+            public Pair<String, JSONObject> createFile(String node, String folder, String fileName) throws IOException {
                 return new Pair<>("/etc/", new JSONObject(new HashMap<String, Object>(){{
                     put("passwd", new JSONObject(new HashMap<String, Object>() {{
                         put ("permissions", "rwxrwxrwx");
@@ -113,7 +113,7 @@ public class FileManagerControlerTest {
 
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public Pair<String, JSONObject> createFile(String hostAddress, String folder, String fileName) throws IOException {
+            public Pair<String, JSONObject> createFile(String node, String folder, String fileName) throws IOException {
                 throw new IOException("Test Error");
             }
         });
@@ -129,7 +129,7 @@ public class FileManagerControlerTest {
 
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public String deletePath(String hostAddress, String folder, String file) throws IOException {
+            public String deletePath(String node, String folder, String file) throws IOException {
                 return folder + file;
             }
         });
@@ -142,7 +142,7 @@ public class FileManagerControlerTest {
 
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public String deletePath(String hostAddress, String folder, String file) throws IOException {
+            public String deletePath(String node, String folder, String file) throws IOException {
                 throw new IOException("Test Error");
             }
         });
@@ -157,7 +157,7 @@ public class FileManagerControlerTest {
     public void testHandleFileUpload() {
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public void uploadFile(String hostAddress, String folder, String name, InputStream fileContent) throws IOException {
+            public void uploadFile(String node, String folder, String name, InputStream fileContent) throws IOException {
                 // NO OP
             }
         });
@@ -184,7 +184,7 @@ public class FileManagerControlerTest {
 
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public void uploadFile(String hostAddress, String folder, String name, InputStream fileContent) throws IOException {
+            public void uploadFile(String node, String folder, String name, InputStream fileContent) throws IOException {
                 throw new IOException ("Test Error");
             }
         });
@@ -199,7 +199,7 @@ public class FileManagerControlerTest {
     public void testOpenFile() {
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public JSONObject openFile(String hostAddress, String folder, String file) {
+            public JSONObject openFile(String node, String folder, String file) {
 
                 return new JSONObject(new HashMap<String, Object>() {{
                     put("status", "OK");
@@ -221,7 +221,7 @@ public class FileManagerControlerTest {
 
         fmc.setFileManagerService(new FileManagerService() {
             @Override
-            public JSONObject openFile(String hostAddress, String folder, String file) {
+            public JSONObject openFile(String node, String folder, String file) {
                 throw new JSONException("TEST ERROR");
             }
         });

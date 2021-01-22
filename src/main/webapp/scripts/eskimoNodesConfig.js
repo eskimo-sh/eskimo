@@ -234,8 +234,8 @@ eskimo.NodesConfig = function() {
         nodeIds.sort();
         //console.log(nodeIds);
         for (let i = 0; i < nodeIds.length; i++) {
-            let ipAddress = data[nodeIds[i]];
-            if (ipAddress.indexOf("-") > -1) { // range
+            let node = data[nodeIds[i]];
+            if (node.indexOf("-") > -1) { // range
                 addRange()
             } else {
                 addNode();

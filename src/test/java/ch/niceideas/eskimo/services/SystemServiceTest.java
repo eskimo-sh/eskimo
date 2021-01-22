@@ -68,8 +68,8 @@ public class SystemServiceTest extends AbstractSystemTest {
     protected SystemService createSystemService() {
         SystemService ss = new SystemService(false) {
             @Override
-            protected File createTempFile(String serviceOrFlag, String ipAddress, String extension) throws IOException {
-                File retFile = new File ("/tmp/" + serviceOrFlag + "-" + testRunUUID + "-" + ipAddress + extension);
+            protected File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
+                File retFile = new File ("/tmp/" + serviceOrFlag + "-" + testRunUUID + "-" + node + extension);
                 retFile.createNewFile();
                 return retFile;
             }
@@ -178,7 +178,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
+            public String runSSHScript(String node, String script, boolean throwsException) {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -189,12 +189,12 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) {
+            public String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) {
+            public void copySCPFile(String node, String filePath) {
                 // just do nothing
             }
         });
@@ -256,7 +256,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
+            public String runSSHScript(String node, String script, boolean throwsException) {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -267,12 +267,12 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) {
+            public String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath){
+            public void copySCPFile(String node, String filePath){
                 // just do nothing
             }
         });
@@ -315,7 +315,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
+            public String runSSHScript(String node, String script, boolean throwsException) {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -326,12 +326,12 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) {
+            public String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) {
+            public void copySCPFile(String node, String filePath) {
                 // just do nothing
             }
         });
@@ -373,7 +373,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException){
+            public String runSSHScript(String node, String script, boolean throwsException){
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -384,12 +384,12 @@ public class SystemServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) {
+            public String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) {
+            public void copySCPFile(String node, String filePath) {
                 // just do nothing
             }
         });
@@ -755,10 +755,10 @@ public class SystemServiceTest extends AbstractSystemTest {
         // IMPORTANT : they should be kept if they are still there to be properly uninstalled indeed !
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        logger.debug (systemStatus.getIpAddresses());
+        logger.debug (systemStatus.getNodes());
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        logger.debug (servicesInstallStatus.getIpAddresses());
+        logger.debug (servicesInstallStatus.getNodes());
 
         // remove all status for node 2
         List<String> toBeremoved = new ArrayList<>();

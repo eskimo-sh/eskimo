@@ -84,8 +84,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
     protected SystemService createSystemService() {
         return new SystemService(false) {
             @Override
-            String sendPing(String ipAddress) throws SSHCommandException {
-                super.sendPing(ipAddress);
+            String sendPing(String node) throws SSHCommandException {
+                super.sendPing(node);
                 return "OK";
             }
         };
@@ -204,12 +204,12 @@ public class MarathonServiceTest extends AbstractSystemTest {
                 return request.getRequestLine().getUri();
             }
             @Override
-            void installMarathonService(String service, String marathonIpAddress) {
-                installList.add (service+"-"+marathonIpAddress);
+            void installMarathonService(String service, String marathonNode) {
+                installList.add (service+"-"+ marathonNode);
             }
             @Override
-            void uninstallMarathonService(String service, String marathonIpAddress) throws SystemException {
-                uninstallList.add (service+"-"+marathonIpAddress);
+            void uninstallMarathonService(String service, String marathonNode) throws SystemException {
+                uninstallList.add (service+"-"+ marathonNode);
             }
         });
 
@@ -623,8 +623,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         systemService = new SystemService(false) {
             @Override
-            String sendPing(String ipAddress) throws SSHCommandException {
-                super.sendPing(ipAddress);
+            String sendPing(String node) throws SSHCommandException {
+                super.sendPing(node);
                 throw new SSHCommandException("Node dead");
             }
         };

@@ -120,7 +120,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/show-journal")
     @ResponseBody
-    public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+    public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isMarathon()) {
             return performMarathonOperation(
@@ -129,15 +129,15 @@ public class SystemAdminController extends AbstractOperationController {
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.showJournal(serviceName, address),
-                    serviceName + " journal display from " + address + ".");
+                    sysService -> sysService.showJournal(serviceName, node),
+                    serviceName + " journal display from " + node + ".");
         }
 
     }
 
     @GetMapping("/start-service")
     @ResponseBody
-    public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+    public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isMarathon()) {
             return performMarathonOperation(
@@ -146,14 +146,14 @@ public class SystemAdminController extends AbstractOperationController {
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.startService(serviceName, address),
-                    serviceName + " has been started successfuly on " + address + ".");
+                    sysService -> sysService.startService(serviceName, node),
+                    serviceName + " has been started successfuly on " + node + ".");
         }
     }
 
     @GetMapping("/stop-service")
     @ResponseBody
-    public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+    public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isMarathon()) {
             return performMarathonOperation(
@@ -162,14 +162,14 @@ public class SystemAdminController extends AbstractOperationController {
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.stopService(serviceName, address),
-                    serviceName + " has been stopped successfuly on " + address + ".");
+                    sysService -> sysService.stopService(serviceName, node),
+                    serviceName + " has been stopped successfuly on " + node + ".");
         }
     }
 
     @GetMapping("/restart-service")
     @ResponseBody
-    public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+    public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         Service service = servicesDefinition.getService(serviceName);
         if (service.isMarathon()) {
@@ -179,8 +179,8 @@ public class SystemAdminController extends AbstractOperationController {
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.restartService(serviceName, address),
-                    serviceName + " has been restarted successfuly on " + address + ".");
+                    sysService -> sysService.restartService(serviceName, node),
+                    serviceName + " has been restarted successfuly on " + node + ".");
         }
     }
 
@@ -189,15 +189,15 @@ public class SystemAdminController extends AbstractOperationController {
     public String serviceActionCustom(
             @RequestParam(name="action") String commandId,
             @RequestParam(name="service") String serviceName,
-            @RequestParam(name="address") String address) {
+            @RequestParam(name="nodeAddress") String node) {
         return performSystemOperation(
-                sysService -> sysService.callCommand(commandId, serviceName, address),
-                "command " + commandId + " for " + serviceName + " has been executed successfuly on " + address + ".");
+                sysService -> sysService.callCommand(commandId, serviceName, node),
+                "command " + commandId + " for " + serviceName + " has been executed successfuly on " + node + ".");
     }
 
     @GetMapping("/reinstall-service")
     @ResponseBody
-    public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="address") String address) {
+    public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         try {
 
@@ -212,7 +212,7 @@ public class SystemAdminController extends AbstractOperationController {
             if (service.isMarathon()) {
                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
             } else {
-                nodeName = address.replaceAll("\\.", "-");
+                nodeName = node.replaceAll("\\.", "-");
             }
 
             ServicesInstallStatusWrapper formerServicesInstallationStatus = configurationService.loadServicesInstallationStatus();
@@ -251,7 +251,7 @@ public class SystemAdminController extends AbstractOperationController {
 
                 return performSystemOperation(
                         sysService -> sysService.delegateApplyNodesConfig(operationsCommand),
-                        serviceName + " has been reinstalled successfuly on " + address + ".");
+                        serviceName + " has been reinstalled successfuly on " + node + ".");
             }
         } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);

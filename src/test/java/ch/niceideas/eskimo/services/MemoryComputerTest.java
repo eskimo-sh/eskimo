@@ -66,8 +66,8 @@ public class MemoryComputerTest {
 
         memoryComputer.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
-                switch (hostAddress) {
+            public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+                switch (node) {
                     case "192.168.10.11":
                         return "MemTotal:        5969796 kB";
                     case "192.168.10.12":
@@ -77,11 +77,11 @@ public class MemoryComputerTest {
                 }
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+            public String runSSHCommand(String node, String command) throws SSHCommandException {
                 return null;
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+            public void copySCPFile(String node, String filePath) throws SSHCommandException {
                 // just do nothing
             }
         });
@@ -165,15 +165,15 @@ public class MemoryComputerTest {
 
         memoryComputer.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) throws SSHCommandException {
+            public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
                 return "MemTotal:        20000000 kB";
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) throws SSHCommandException {
+            public String runSSHCommand(String node, String command) throws SSHCommandException {
                 return null;
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) throws SSHCommandException {
+            public void copySCPFile(String node, String filePath) throws SSHCommandException {
                 // just do nothing
             }
         });

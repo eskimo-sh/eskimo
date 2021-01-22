@@ -99,15 +99,14 @@ public class MemoryComputer {
         // 2. for every node
         for (Map.Entry<String, Long> entry: memoryMap.entrySet()) {
 
-
-            String nodeAddress = entry.getKey();
+            String node = entry.getKey();
             Map<String, Long> nodeMemoryModel = new HashMap<>();
 
             long totalMemory = entry.getValue();
 
             // 2..1  Compute total amount of memory shards (high = 3, medium = 2, small = 1, neglectable = 0)
             //       assume filesystem cache has to keep a high share (3) or medium share (2) => dynamical
-            Set<String> services = new HashSet<>(nodesConfig.getServicesForIpAddress (nodeAddress));
+            Set<String> services = new HashSet<>(nodesConfig.getServicesForNode(node));
 
             Long sumOfParts = services.stream()
                     .map (service -> servicesDefinition.getService(service))
@@ -123,7 +122,7 @@ public class MemoryComputer {
                     .filter (service -> service.getMemoryConsumptionSize().getNbrParts() > 0)
                     .forEach(service -> nodeMemoryModel.put (service.getName(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
 
-            retMap.put(nodeAddress, nodeMemoryModel);
+            retMap.put(node, nodeMemoryModel);
         }
 
         return retMap;
@@ -136,13 +135,13 @@ public class MemoryComputer {
         AtomicReference<Exception> error = new AtomicReference<>();
 
         // iterator in IP addresses
-        for (String ipAddress : nodesConfig.getIpAddresses()) {
+        for (String node : nodesConfig.getNodeAddresses()) {
 
-            if (!deadIps.contains(ipAddress)) {
+            if (!deadIps.contains(node)) {
 
                 threadPool.execute(() -> {
                     try {
-                        String nodeMemory = sshCommandService.runSSHScript(ipAddress, "cat /proc/meminfo | grep MemTotal", false);
+                        String nodeMemory = sshCommandService.runSSHScript(node, "cat /proc/meminfo | grep MemTotal", false);
                         nodeMemory = nodeMemory.trim();
                         if (!nodeMemory.startsWith("MemTotal")) {
                             throw new SSHCommandException("Impossible to understand the format of the meminof result. Missing 'MemTotal' in " + nodeMemory);
@@ -160,7 +159,7 @@ public class MemoryComputer {
                             throw new SSHCommandException("Impossible to understand the format of " + nodeMemory);
                         }
                         long memory = Long.parseLong(nodeMemory.substring(9, nodeMemory.length() - 2).trim());
-                        memoryMap.put (ipAddress, memory / divider);
+                        memoryMap.put (node, memory / divider);
                     } catch (SSHCommandException e) {
                         logger.error (e, e);
                         error.set(e);

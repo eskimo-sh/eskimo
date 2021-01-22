@@ -9,6 +9,6 @@ public class ProxyTunnelConfig {
 
     private final String serviceName;
     private final int localPort;
-    private final String remoteAddress;
+    private final String node;
     private final int remotePort;
 }

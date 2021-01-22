@@ -107,24 +107,24 @@ public class FileManagerService {
         this.sshCommandService = sshCommandService;
     }
 
-    public void removeFileManager(@RequestParam("address") String hostAddress) {
-        logger.debug(hostAddress);
+    public void removeFileManager(String node) {
+        logger.debug(node);
 
-        SFTPv3Client client = sftpClients.get(hostAddress);
+        SFTPv3Client client = sftpClients.get(node);
         if (client == null) {
-            throw new IllegalStateException("Session not found : " + hostAddress);
+            throw new IllegalStateException("Session not found : " + node);
         }
 
         client.close();
-        sftpClients.remove(hostAddress);
+        sftpClients.remove(node);
 
     }
 
-    public Pair<String, JSONObject> navigateFileManager(String hostAddress, String folder, String subFolder) throws IOException {
+    public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
 
         try {
 
-            SFTPv3Client client = getClient(hostAddress);
+            SFTPv3Client client = getClient(node);
 
             String newPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + subFolder);
 
@@ -139,7 +139,7 @@ public class FileManagerService {
         }
     }
 
-    public Pair<String, JSONObject> createFile(String hostAddress, String folder, String fileName) throws IOException {
+    public Pair<String, JSONObject> createFile(String node, String folder, String fileName) throws IOException {
 
         try {
 
@@ -147,13 +147,13 @@ public class FileManagerService {
                 throw new IOException("Passed fileName is blank");
             }
 
-            SFTPv3Client client = getClient(hostAddress);
+            SFTPv3Client client = getClient(node);
 
             String newFilePath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + fileName);
 
             client.createFile(newFilePath);
 
-            return navigateFileManager (hostAddress, folder, ".");
+            return navigateFileManager (node, folder, ".");
 
         } catch (IOException | ConnectionManagerException | JSONException e) {
             logger.error (e, e);
@@ -161,21 +161,21 @@ public class FileManagerService {
         }
     }
 
-    public JSONObject openFile(String hostAddress, String folder, String file) {
+    public JSONObject openFile(String node, String folder, String file) {
 
         try {
 
-            SFTPv3Client client = getClient(hostAddress);
+            SFTPv3Client client = getClient(node);
 
             String newPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + file);
 
             // test file type
-            String fileMimeType = getFileMimeType(hostAddress, newPath);
+            String fileMimeType = getFileMimeType(node, newPath);
             logger.info ("File " + newPath + " has MIME type " + fileMimeType);
 
             if (fileMimeType.contains("inode/directory")) {
 
-                Pair <String, JSONObject> result = navigateFileManager (hostAddress, folder, file);
+                Pair <String, JSONObject> result = navigateFileManager (node, folder, file);
                 return new JSONObject(new HashMap<String, Object>() {{
                     put ("status", "OK");
                     put ("folder", result.getKey());
@@ -236,15 +236,15 @@ public class FileManagerService {
     }
 
 
-    public void downloadFile(String hostAddress, String folder, String file, HttpServletResponseAdapter response) {
+    public void downloadFile(String node, String folder, String file, HttpServletResponseAdapter response) {
         try {
 
-            SFTPv3Client client = getClient(hostAddress);
+            SFTPv3Client client = getClient(node);
 
             String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + file);
 
             // test file type
-            String fileMimeType = getFileMimeType(hostAddress, fullPath).trim();
+            String fileMimeType = getFileMimeType(node, fullPath).trim();
             if (fileMimeType.endsWith("\n")) {
                 fileMimeType = fileMimeType.substring(0, fileMimeType.length() - 1);
             }
@@ -263,10 +263,10 @@ public class FileManagerService {
         }
     }
 
-    public String deletePath(String hostAddress, String folder, String file) throws IOException {
+    public String deletePath(String node, String folder, String file) throws IOException {
 
         try {
-            SFTPv3Client client = getClient(hostAddress);
+            SFTPv3Client client = getClient(node);
 
             String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + file);
 
@@ -280,18 +280,18 @@ public class FileManagerService {
         }
     }
 
-    public void uploadFile(String hostAddress, String folder, String name, InputStream fileContent) throws IOException {
+    public void uploadFile(String node, String folder, String name, InputStream fileContent) throws IOException {
 
         SFTPv3Client client = null;
 
         try {
             // getting dedicated client for file upload
-            Connection con = connectionManagerService.getSharedConnection(hostAddress);
+            Connection con = connectionManagerService.getSharedConnection(node);
             client = new SFTPv3Client (con);
 
             String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + name);
 
-            writeFile(hostAddress, fullPath, fileContent);
+            writeFile(node, fullPath, fileContent);
 
         } catch (ConnectionManagerException ex) {
             logger.error("Upload error. Filename was " + name, ex);
@@ -304,10 +304,10 @@ public class FileManagerService {
         }
     }
 
-    protected void writeFile(String hostAddress, String fullPath, InputStream fileContent) throws IOException {
+    protected void writeFile(String node, String fullPath, InputStream fileContent) throws IOException {
 
         try {
-            SFTPv3Client client = getClient(hostAddress);
+            SFTPv3Client client = getClient(node);
 
             OutputStream os = client.writeToFile(fullPath);
 
@@ -319,8 +319,8 @@ public class FileManagerService {
         }
     }
 
-    String getFileMimeType(String hostAddress, String newPath) throws SSHCommandException {
-        return sshCommandService.runSSHCommand(hostAddress, "file --brief --mime-type " + StringEscapeUtils.escapeXSI(newPath));
+    String getFileMimeType(String node, String newPath) throws SSHCommandException {
+        return sshCommandService.runSSHCommand(node, "file --brief --mime-type " + StringEscapeUtils.escapeXSI(newPath));
     }
 
     boolean isTextMimeType(String fileMimeType) {
@@ -338,16 +338,16 @@ public class FileManagerService {
         }
     }
 
-    synchronized SFTPv3Client getClient(String hostAddress) throws ConnectionManagerException, IOException {
+    synchronized SFTPv3Client getClient(String node) throws ConnectionManagerException, IOException {
 
-        SFTPv3Client client = sftpClients.get(hostAddress);
+        SFTPv3Client client = sftpClients.get(node);
 
         if (client == null) {
 
-            Connection con = connectionManagerService.getSharedConnection(hostAddress);
+            Connection con = connectionManagerService.getSharedConnection(node);
             client = new SFTPv3Client (con);
 
-            sftpClients.put(hostAddress, client);
+            sftpClients.put(node, client);
 
         } else {
 
@@ -355,26 +355,26 @@ public class FileManagerService {
             boolean recreate = false;
             try {
                 if (!client.exists("/")) {
-                    logger.warn("SFTP Client for " + hostAddress + " got into problems. Recreating");
+                    logger.warn("SFTP Client for " + node + " got into problems. Recreating");
                     recreate = true;
                 }
             } catch (IOException e) {
-                logger.warn("SFTP Client for " + hostAddress + " got into problems. Recreating");
+                logger.warn("SFTP Client for " + node + " got into problems. Recreating");
                 logger.warn (e.getMessage());
                 logger.debug (e, e);
                 recreate = true;
             }
             if (recreate) {
-                return recreateClient(hostAddress);
+                return recreateClient(node);
             }
         }
 
         return client;
     }
 
-    private SFTPv3Client recreateClient(@RequestParam("address") String hostAddress) throws ConnectionManagerException, IOException {
-        sftpClients.remove(hostAddress);
-        return getClient(hostAddress);
+    private SFTPv3Client recreateClient(String node) throws ConnectionManagerException, IOException {
+        sftpClients.remove(node);
+        return getClient(node);
     }
 
     JSONObject directoryListToJson(List<SFTPv3DirectoryEntry> folder) {

@@ -417,9 +417,9 @@ public class ServicesDefinition implements InitializingBean {
         return String.join(" ", listAllServices());
     }
 
-    public Topology getTopology(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, String currentNodeIpAddress)
+    public Topology getTopology(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, String currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
-        return Topology.create(nodesConfig, marathonConfig, this, configuredContextPath, currentNodeIpAddress);
+        return Topology.create(nodesConfig, marathonConfig, this, configuredContextPath, currentNode);
     }
 
     public Service getService(String serviceName) {

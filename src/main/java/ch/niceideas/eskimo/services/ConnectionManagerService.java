@@ -139,9 +139,9 @@ public class ConnectionManagerService {
         this.configurationService = configurationService;
     }
 
-    public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+    public Connection getPrivateConnection (String node) throws ConnectionManagerException {
         try {
-            return createConnectionInternal(ipAddress);
+            return createConnectionInternal(node);
         } catch (IOException | JSONException | FileException | SetupException e) {
             logger.error (e.getMessage());
             logger.debug (e, e);
@@ -149,18 +149,18 @@ public class ConnectionManagerService {
         }
     }
 
-    public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
-        return getConnectionInternal(ipAddress);
+    public Connection getSharedConnection (String node) throws ConnectionManagerException {
+        return getConnectionInternal(node);
     }
 
 
-    public void forceRecreateConnection(String ipAddress) {
+    public void forceRecreateConnection(String node) {
 
         connectionMapLock.lock();
 
         try {
 
-            Connection connection = connectionMap.get(ipAddress);
+            Connection connection = connectionMap.get(node);
 
             if (connection == null) {
                 throw new IllegalStateException();
@@ -168,8 +168,8 @@ public class ConnectionManagerService {
 
             connectionsToCloseLazily.add (connection);
 
-            connectionMap.remove(ipAddress);
-            connectionAges.remove(ipAddress);
+            connectionMap.remove(node);
+            connectionAges.remove(node);
 
             // tunnels should be closed immediately !
             final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
@@ -199,22 +199,22 @@ public class ConnectionManagerService {
         }
     }
 
-    private Connection getConnectionInternal (String ipAddress) throws ConnectionManagerException {
+    private Connection getConnectionInternal (String node) throws ConnectionManagerException {
 
         connectionMapLock.lock();
 
         try {
 
-            Connection connection = connectionMap.get(ipAddress);
+            Connection connection = connectionMap.get(node);
 
             // if connection doesn't exist, create it
             if (connection == null) {
-                connection = createConnectionInternal(ipAddress);
+                connection = createConnectionInternal(node);
 
-                recreateTunnels(connection, ipAddress);
+                recreateTunnels(connection, node);
 
-                connectionMap.put(ipAddress, connection);
-                connectionAges.put(ipAddress, System.currentTimeMillis());
+                connectionMap.put(node, connection);
+                connectionAges.put(node, System.currentTimeMillis());
             }
 
             // otherwise test it and attempt to recreate it if it is down or too old
@@ -222,12 +222,12 @@ public class ConnectionManagerService {
 
                 try {
 
-                    Long connectionAge = connectionAges.get(ipAddress);
+                    Long connectionAge = connectionAges.get(node);
 
                     if (connectionAge + maximumConnectionAge < System.currentTimeMillis()) {
-                        logger.warn ("Previous connection to " + ipAddress + " is too old. Recreating ...");
-                        removeConnectionAndRegisterClose(ipAddress, connection);
-                        return getConnectionInternal(ipAddress);
+                        logger.warn ("Previous connection to " + node + " is too old. Recreating ...");
+                        removeConnectionAndRegisterClose(node, connection);
+                        return getConnectionInternal(node);
                     }
 
                     try (ConnectionOperationWatchDog sg = new ConnectionOperationWatchDog(connection)) {
@@ -236,19 +236,19 @@ public class ConnectionManagerService {
                     }
 
                     // update connection age
-                    connectionAges.put(ipAddress, System.currentTimeMillis());
+                    connectionAges.put(node, System.currentTimeMillis());
 
                 } catch (IOException | IllegalStateException e) {
-                    logger.warn ("Previous connection to " + ipAddress + " got into problems ("+e.getMessage()+"). Recreating ...");
-                    removeConnectionAndRegisterClose(ipAddress, connection);
-                    return getConnectionInternal(ipAddress);
+                    logger.warn ("Previous connection to " + node + " got into problems ("+e.getMessage()+"). Recreating ...");
+                    removeConnectionAndRegisterClose(node, connection);
+                    return getConnectionInternal(node);
                 }
             }
 
             return connection;
 
         } catch (IOException | JSONException | FileException | SetupException e) {
-            logger.error ("When recreating connection to " + ipAddress +" - got " + e.getClass() + ":" + e.getMessage());
+            logger.error ("When recreating connection to " + node +" - got " + e.getClass() + ":" + e.getMessage());
             logger.debug (e, e);
             throw new ConnectionManagerException(e);
 
@@ -258,16 +258,16 @@ public class ConnectionManagerService {
 
     }
 
-    private void removeConnectionAndRegisterClose(String ipAddress, Connection connection) {
-        connectionMap.remove(ipAddress);
-        connectionAges.remove(ipAddress);
+    private void removeConnectionAndRegisterClose(String node, Connection connection) {
+        connectionMap.remove(node);
+        connectionAges.remove(node);
         connectionsToCloseLazily.add (connection);
     }
 
-    protected Connection createConnectionInternal(String ipAddress) throws IOException, FileException, SetupException {
+    protected Connection createConnectionInternal(String node) throws IOException, FileException, SetupException {
 
-        logger.info ("Creating connection to " + ipAddress);
-        Connection connection = new Connection(ipAddress, sshPort);
+        logger.info ("Creating connection to " + node);
+        Connection connection = new Connection(node, sshPort);
         connection.setTCPNoDelay(true);
         connection.connect(null, tcpConnectionTimeout, scriptOperationTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 
@@ -303,10 +303,10 @@ public class ConnectionManagerService {
     }
 
 
-    protected void dropTunnels(Connection connection, String ipAddress) {
+    protected void dropTunnels(Connection connection, String node) {
 
         // Find out about declared forwarders to be handled (those that need to stay)
-        List<ProxyTunnelConfig> keptTunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
+        List<ProxyTunnelConfig> keptTunnelConfigs = proxyManagerService.getTunnelConfigForHost(node);
 
         // close port forwarders that are not declared anymore
         final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
@@ -325,14 +325,14 @@ public class ConnectionManagerService {
         }
     }
 
-    protected void recreateTunnels(Connection connection, String ipAddress) throws ConnectionManagerException {
+    protected void recreateTunnels(Connection connection, String node) throws ConnectionManagerException {
 
         final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
 
-        dropTunnels (connection, ipAddress);
+        dropTunnels (connection, node);
 
         // Find out about declared forwarders to be handled
-        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(ipAddress);
+        List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(node);
 
         // recreate those that need to be recreated
         List<ProxyTunnelConfig> toBeCreated = tunnelConfigs.stream()
@@ -341,7 +341,7 @@ public class ConnectionManagerService {
 
         for (ProxyTunnelConfig config : toBeCreated) {
             previousForwarders.add (new LocalPortForwarderWrapper(
-                    config.getServiceName(), connection, config.getLocalPort(), config.getRemoteAddress(), config.getRemotePort()));
+                    config.getServiceName(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort()));
         }
     }
 
@@ -417,7 +417,7 @@ public class ConnectionManagerService {
         }
 
         public boolean matches(ProxyTunnelConfig config) {
-            return matches(config.getRemoteAddress(), config.getRemotePort());
+            return matches(config.getNode(), config.getRemotePort());
         }
 
         public String getServiceName() {

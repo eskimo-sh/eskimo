@@ -74,12 +74,12 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
         for (String service : servicesDefinition.listServicesOrderedByDependencies()) {
             for (int nodeNumber : nodesConfig.getNodeNumbers(service)) {
 
-                String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
-                String nodeName = ipAddress.replace(".", "-");
+                String node = nodesConfig.getNodeAddress(nodeNumber);
+                String nodeName = node.replace(".", "-");
 
                 if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
 
-                    retCommand.addInstallation(new SerializablePair<>(service, ipAddress));
+                    retCommand.addInstallation(new SerializablePair<>(service, node));
                 }
             }
         }
@@ -93,10 +93,10 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
 
             if (!servicesDefinition.getService(installedService).isMarathon()) {
 
-                String ipAddress = nodeName.replace("-", ".");
+                String node = nodeName.replace("-", ".");
 
                 try {
-                    int nodeNbr = nodesConfig.getNodeNumber(ipAddress);
+                    int nodeNbr = nodesConfig.getNodeNumber(node);
                     boolean found = false;
 
                     // search it in config
@@ -109,12 +109,12 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
                     }
 
                     if (!found) {
-                        retCommand.addUninstallation(new SerializablePair<>(installedService, ipAddress));
+                        retCommand.addUninstallation(new SerializablePair<>(installedService, node));
                     }
 
                 } catch (SystemException e) {
                     logger.debug(e, e);
-                    retCommand.addUninstallation(new SerializablePair<>(installedService, ipAddress));
+                    retCommand.addUninstallation(new SerializablePair<>(installedService, node));
                 }
             }
         }
@@ -149,9 +149,9 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
             if (!servicesDefinition.getService(restartedService).isMarathon()) {
                 for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
-                    String ipAddress = nodesConfig.getNodeAddress(nodeNumber);
+                    String node = nodesConfig.getNodeAddress(nodeNumber);
 
-                    retCommand.addRestartIfNotInstalled(restartedService, ipAddress);
+                    retCommand.addRestartIfNotInstalled(restartedService, node);
                 }
 
             } else {
@@ -189,8 +189,8 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
         return rawNodesConfig;
     }
 
-    void addRestartIfNotInstalled(String service, String ipAddress) {
-        SerializablePair<String, String> addedPair = new SerializablePair<>(service, ipAddress);
+    void addRestartIfNotInstalled(String service, String node) {
+        SerializablePair<String, String> addedPair = new SerializablePair<>(service, node);
         if (!getInstallations().contains(addedPair)) {
             restarts.add(addedPair);
         }
@@ -222,7 +222,7 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
                 .collect(Collectors.toList());
     }
 
-    public Set<String> getAllIpAddresses() {
+    public Set<String> getAllNodes() {
         Set<String> retSet = new HashSet<>();
         getInstallations().stream()
                 .map(Pair::getValue)

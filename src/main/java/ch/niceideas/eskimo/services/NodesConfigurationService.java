@@ -147,7 +147,7 @@ public class NodesConfigurationService {
             Set<String> liveIps = new HashSet<>();
             Set<String> deadIps = new HashSet<>();
 
-            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(command.getAllIpAddresses(), nodesConfig, liveIps, deadIps);
+            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(command.getAllNodes(), nodesConfig, liveIps, deadIps);
             if (nodesSetup == null) {
                 return;
             }
@@ -163,30 +163,30 @@ public class NodesConfigurationService {
             // Nodes setup
             systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
-                        String ipAddress = operation.getValue();
-                        if (nodesConfig.getIpAddresses().contains(ipAddress) && liveIps.contains(ipAddress)) {
+                        String node = operation.getValue();
+                        if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
 
-                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("base_system", ipAddress))) {
-                                systemOperationService.applySystemOperation("Installation of Base System on " + ipAddress,
-                                        builder -> installEskimoBaseSystem(builder, ipAddress), null);
+                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("base_system", node))) {
+                                systemOperationService.applySystemOperation("Installation of Base System on " + node,
+                                        builder -> installEskimoBaseSystem(builder, node), null);
 
-                                flagInstalledOnNode("base_system", ipAddress);
+                                flagInstalledOnNode("base_system", node);
                             }
 
                             // topology
                             if (!systemService.isInterrupted() && (error.get() == null)) {
-                                systemOperationService.applySystemOperation("Installation of Topology and settings on " + ipAddress,
-                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, ipAddress), null);
+                                systemOperationService.applySystemOperation("Installation of Topology and settings on " + node,
+                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, node), null);
                             }
 
-                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("mesos", ipAddress))) {
-                                systemOperationService.applySystemOperation("Installation of Mesos on " + ipAddress,
+                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("mesos", node))) {
+                                systemOperationService.applySystemOperation("Installation of Mesos on " + node,
                                         builder -> {
-                                            uploadMesos(ipAddress);
-                                            builder.append (installMesos(ipAddress));
+                                            uploadMesos(node);
+                                            builder.append (installMesos(node));
                                         }, null);
 
-                                flagInstalledOnNode("mesos", ipAddress);
+                                flagInstalledOnNode("mesos", node);
                             }
                         }
                     });
@@ -198,9 +198,9 @@ public class NodesConfigurationService {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
                             String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            String nodeName = ipAddress.replace(".", "-");
-                            if (ipAddress.equals(OperationsCommand.MARATHON_FLAG)) {
+                            String node = operation.getValue();
+                            String nodeName = node.replace(".", "-");
+                            if (node.equals(OperationsCommand.MARATHON_FLAG)) {
                                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
                             }
                             servicesInstallationStatus.setInstallationFlag(service, nodeName, "restart");
@@ -219,9 +219,9 @@ public class NodesConfigurationService {
                 systemService.performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (liveIps.contains(ipAddress)) {
-                                installService(service, ipAddress);
+                            String node = operation.getValue();
+                            if (liveIps.contains(node)) {
+                                installService(service, node);
                             }
                         });
             }
@@ -235,16 +235,16 @@ public class NodesConfigurationService {
                 systemService.performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (!deadIps.contains(ipAddress)) {
-                                uninstallService(service, ipAddress);
+                            String node = operation.getValue();
+                            if (!deadIps.contains(node)) {
+                                uninstallService(service, node);
                             } else {
-                                if (!liveIps.contains(ipAddress)) {
+                                if (!liveIps.contains(node)) {
                                     // this means that the node has been de-configured
                                     // (since if it is neither dead nor alive then it just hasn't been tested since it's not
                                     // in the config anymore)
                                     // just consider it uninstalled
-                                    uninstallServiceNoOp(service, ipAddress);
+                                    uninstallServiceNoOp(service, node);
                                 }
                             }
                         });
@@ -256,14 +256,14 @@ public class NodesConfigurationService {
                 systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
-                            String ipAddress = operation.getValue();
-                            if (ipAddress.equals(OperationsCommand.MARATHON_FLAG) || liveIps.contains(ipAddress)) {
-                                restartServiceForSystem(service, ipAddress);
+                            String node = operation.getValue();
+                            if (node.equals(OperationsCommand.MARATHON_FLAG) || liveIps.contains(node)) {
+                                restartServiceForSystem(service, node);
                             }
                         });
             }
 
-            if (!systemService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getIpAddresses()))) {
+            if (!systemService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getNodeAddresses()))) {
                 throw new SystemException("At least one configured node was found dead");
             }
 
@@ -301,8 +301,8 @@ public class NodesConfigurationService {
         }
     }
 
-    private String installMesos(String ipAddress) throws SSHCommandException {
-        return sshCommandService.runSSHScriptPath(ipAddress, servicesSetupPath + "/base-eskimo/install-mesos.sh");
+    private String installMesos(String node) throws SSHCommandException {
+        return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-mesos.sh");
     }
 
     void copyCommand (String source, String target, Connection connection) throws SSHCommandException {
@@ -312,11 +312,11 @@ public class NodesConfigurationService {
         sshChmod755(connection, target);
     }
 
-    private boolean isMissingOnNode(String installation, String ipAddress) {
+    private boolean isMissingOnNode(String installation, String node) {
 
         try {
-            messagingService.addLine("\nChecking " + installation + " on node " + ipAddress);
-            String result = sshCommandService.runSSHCommand(ipAddress, "cat /etc/eskimo_flag_" + installation + "_installed");
+            messagingService.addLine("\nChecking " + installation + " on node " + node);
+            String result = sshCommandService.runSSHCommand(node, "cat /etc/eskimo_flag_" + installation + "_installed");
             return StringUtils.isBlank(result) || !result.contains("OK");
         } catch (SSHCommandException e) {
             logger.debug(e, e);
@@ -381,9 +381,9 @@ public class NodesConfigurationService {
         }
     }
 
-    private void flagInstalledOnNode(String installation, String ipAddress) throws SystemException {
+    private void flagInstalledOnNode(String installation, String node) throws SystemException {
         try {
-            sshCommandService.runSSHCommand(ipAddress, "sudo bash -c \"echo OK > /etc/eskimo_flag_" + installation + "_installed\"");
+            sshCommandService.runSSHCommand(node, "sudo bash -c \"echo OK > /etc/eskimo_flag_" + installation + "_installed\"");
         } catch (SSHCommandException e) {
             logger.error(e, e);
             throw new SystemException(e.getMessage(), e);
@@ -415,27 +415,27 @@ public class NodesConfigurationService {
         }
     }
 
-    void uninstallService(String service, String ipAddress) throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
-                builder -> proceedWithServiceUninstallation(builder, ipAddress, service),
+    void uninstallService(String service, String node) throws SystemException {
+        String nodeName = node.replace(".", "-");
+        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + node,
+                builder -> proceedWithServiceUninstallation(builder, node, service),
                 status -> status.removeInstallationFlag(service, nodeName));
-        proxyManagerService.removeServerForService(service, ipAddress);
+        proxyManagerService.removeServerForService(service, node);
     }
 
-    void uninstallServiceNoOp(String service, String ipAddress) throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + ipAddress,
+    void uninstallServiceNoOp(String service, String node) throws SystemException {
+        String nodeName = node.replace(".", "-");
+        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + node,
                 builder -> {},
                 status -> status.removeInstallationFlag(service, nodeName));
-        proxyManagerService.removeServerForService(service, ipAddress);
+        proxyManagerService.removeServerForService(service, node);
     }
 
-    void installService(String service, String ipAddress)
+    void installService(String service, String node)
             throws SystemException {
-        String nodeName = ipAddress.replace(".", "-");
-        systemOperationService.applySystemOperation("installation of " + service + " on " + ipAddress,
-                builder -> proceedWithServiceInstallation(builder, ipAddress, service),
+        String nodeName = node.replace(".", "-");
+        systemOperationService.applySystemOperation("installation of " + service + " on " + node,
+                builder -> proceedWithServiceInstallation(builder, node, service),
                 status -> status.setInstallationFlag(service, nodeName, "OK"));
     }
 

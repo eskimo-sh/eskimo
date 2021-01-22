@@ -68,9 +68,9 @@ public class FileManagerController {
 
     @GetMapping("/file-manager-remove")
     @ResponseBody
-    public String removeFileManager(@RequestParam("address") String hostAddress) {
+    public String removeFileManager(@RequestParam("nodeAddress") String node) {
         try {
-            fileManagerService.removeFileManager(hostAddress);
+            fileManagerService.removeFileManager(node);
 
             return ReturnStatusHelper.createOKStatus();
         } catch (JSONException e) {
@@ -81,21 +81,21 @@ public class FileManagerController {
 
     @GetMapping("/file-manager-connect")
     @ResponseBody
-    public String connectFileManager(@RequestParam("address") String hostAddress) {
+    public String connectFileManager(@RequestParam("nodeAddress") String node) {
 
-       return navigateFileManager(hostAddress, "/", ".");
+       return navigateFileManager(node, "/", ".");
 
     }
 
     @GetMapping("/file-manager-navigate")
     @ResponseBody
     public String navigateFileManager(
-            @RequestParam("address") String hostAddress,
+            @RequestParam("nodeAddress") String node,
             @RequestParam("folder") String folder,
             @RequestParam("subFolder") String subFolder) {
 
         try {
-            Pair<String, JSONObject> result = fileManagerService.navigateFileManager(hostAddress, folder, subFolder);
+            Pair<String, JSONObject> result = fileManagerService.navigateFileManager(node, folder, subFolder);
 
             return ReturnStatusHelper.createOKStatus (map -> {
                 map.put("folder", result.getKey());
@@ -109,12 +109,12 @@ public class FileManagerController {
     @GetMapping("/file-manager-create-file")
     @ResponseBody
     public String createFile(
-            @RequestParam("address") String hostAddress,
+            @RequestParam("nodeAddress") String node,
             @RequestParam("folder") String folder,
             @RequestParam("fileName") String fileName) {
 
         try {
-            Pair<String, JSONObject> result = fileManagerService.createFile(hostAddress, folder, fileName);
+            Pair<String, JSONObject> result = fileManagerService.createFile(node, folder, fileName);
 
             return ReturnStatusHelper.createOKStatus (map -> {
                 map.put("folder", result.getKey());
@@ -129,12 +129,12 @@ public class FileManagerController {
     @GetMapping("/file-manager-open-file")
     @ResponseBody
     public String openFile(
-            @RequestParam("address") String hostAddress,
+            @RequestParam("nodeAddress") String node,
             @RequestParam("folder") String folder,
             @RequestParam("file") String file) {
 
         try {
-            return fileManagerService.openFile(hostAddress, folder, file).toString(2);
+            return fileManagerService.openFile(node, folder, file).toString(2);
 
         } catch (JSONException e) {
             logger.error (e, e);
@@ -145,12 +145,12 @@ public class FileManagerController {
 
     @GetMapping(value = "/file-manager-download/{filename}")
     public void downloadFile(
-            @RequestParam("address") String hostAddress,
+            @RequestParam("nodeAddress") String node,
             @RequestParam("folder") String folder,
             @RequestParam("file") String file,
             HttpServletResponse response) {
         response.setHeader("Content-Disposition", "attachment");
-        fileManagerService.downloadFile (hostAddress, folder, file, new FileManagerService.HttpServletResponseAdapter() {
+        fileManagerService.downloadFile (node, folder, file, new FileManagerService.HttpServletResponseAdapter() {
 
             @Override
             public void setContentType(String type) {
@@ -173,12 +173,12 @@ public class FileManagerController {
     @GetMapping(value = "/file-manager-delete")
     @ResponseBody
     public String deletePath (
-            @RequestParam("address") String hostAddress,
+            @RequestParam("nodeAddress") String node,
             @RequestParam("folder") String folder,
             @RequestParam("file") String file) {
 
         try {
-            String deletedPath =  fileManagerService.deletePath(hostAddress, folder, file);
+            String deletedPath =  fileManagerService.deletePath(node, folder, file);
 
             return ReturnStatusHelper.createOKStatus (map -> map.put("path", deletedPath));
 
@@ -191,13 +191,13 @@ public class FileManagerController {
     @PostMapping("/file-manager-upload")
     @ResponseBody
     public String handleFileUpload(
-            @RequestParam("address") String hostAddress,
+            @RequestParam("nodeAddress") String node,
             @RequestParam("folder") String folder,
             @RequestParam("filename") String filename,
             @RequestParam("file") MultipartFile file) {
 
         try {
-            fileManagerService.uploadFile (hostAddress, folder, filename, file.getInputStream());
+            fileManagerService.uploadFile (node, folder, filename, file.getInputStream());
 
             return ReturnStatusHelper.createOKStatus (map -> map.put("file", file.getName()));
 

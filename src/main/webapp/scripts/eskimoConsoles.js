@@ -316,7 +316,7 @@ eskimo.Consoles = function() {
         );
     }
 
-    function openConsole (nodeAddress, nodeName) {
+    function openConsole (node, nodeName) {
 
         // add tab entry
         var consoleFound = false;
@@ -331,7 +331,7 @@ eskimo.Consoles = function() {
             // Add tab entry
             consoleTabList.append($(''+
                 '<li id="console_' + nodeName + '">'+
-                '<a id="select_console_' + nodeName + '" href="#">' + nodeAddress +
+                '<a id="select_console_' + nodeName + '" href="#">' + node +
                 '</a></li>'));
 
             var consoleContent = '<div class="col-md-12 ajaxterminal" id="consoles-console-' + nodeName + '">\n' +
@@ -352,12 +352,12 @@ eskimo.Consoles = function() {
             var t = new ajaxterm.Terminal("term_"+nodeName, {
                 width: getTerminalWidth(),
                 height: getTerminalHeight(),
-                endpoint: "./terminal?node="+nodeAddress
+                endpoint: "./terminal?node="+node
             });
             t.setShowNextTab(showNextTab);
             t.setShowPrevTab(showPrevTab);
 
-            openedConsoles.push({"nodeName" : nodeName, "nodeAddress": nodeAddress, "terminal" : t});
+            openedConsoles.push({"nodeName" : nodeName, "nodeAddress": node, "terminal" : t});
 
             // register on click handler to actually open console
             $('#select_console_' + nodeName).click(function() {
@@ -366,7 +366,7 @@ eskimo.Consoles = function() {
             });
 
         }
-        selectConsole(nodeAddress, nodeName);
+        selectConsole(node, nodeName);
     }
     this.openConsole = openConsole;
 

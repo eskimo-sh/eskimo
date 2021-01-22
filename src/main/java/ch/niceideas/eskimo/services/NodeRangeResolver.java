@@ -59,14 +59,14 @@ public class NodeRangeResolver  {
         NodesConfigWrapper retNodesConfig = NodesConfigWrapper.empty();
 
         // This is used to check there is no overlap
-        Set<String> ipaddresses = new HashSet<>();
+        Set<String> nodes = new HashSet<>();
 
         // 1. build set of Numbers that have to be resolved
         Map<Integer, List<String>> toBeResolvedNumbers = new HashMap<>();
 
         Integer maxNodeNbr = 0;
 
-        for (String key : rawNodesConfig.getIpAddressKeys()) {
+        for (String key : rawNodesConfig.getNodeAddressKeys()) {
             String value = (String) rawNodesConfig.getValueForPath(key);
             Integer nodeNbr = Integer.valueOf(key.substring(NODE_ID_FLAG.length()));
             if (nodeNbr.compareTo(maxNodeNbr) > 0) {
@@ -98,7 +98,7 @@ public class NodeRangeResolver  {
                         String generatedValue = entry.getValue();
 
                         if (generatedKey.startsWith(NODE_ID_FLAG)) {
-                            checkAddress(ipaddresses, generatedValue);
+                            checkNode(nodes, generatedValue);
                             Integer newNnodeNbr = Integer.valueOf(generatedKey.substring(NODE_ID_FLAG.length()));
                             if (newNnodeNbr.compareTo(maxNodeNbr) > 0) {
                                 maxNodeNbr = newNnodeNbr;
@@ -110,7 +110,7 @@ public class NodeRangeResolver  {
                 }
             } else {
                 if (key.startsWith(NODE_ID_FLAG)) {
-                    checkAddress(ipaddresses, value);
+                    checkNode(nodes, value);
                 }
 
                 retNodesConfig.setValueForPath(key, value);
@@ -120,11 +120,11 @@ public class NodeRangeResolver  {
         return retNodesConfig;
     }
 
-    void checkAddress(Set<String> ipaddresses, String value) throws NodesConfigurationException {
-        if (ipaddresses.contains(value)) {
-            throw new NodesConfigurationException("Configuration is illegal. IP address " + value + " is referenced by multiple ranges / nodes");
+    void checkNode(Set<String> nodes, String value) throws NodesConfigurationException {
+        if (nodes.contains(value)) {
+            throw new NodesConfigurationException("Configuration is illegal. Node Address " + value + " is referenced by multiple ranges / nodes");
         } else {
-            ipaddresses.add (value);
+            nodes.add (value);
         }
     }
 
@@ -145,7 +145,7 @@ public class NodeRangeResolver  {
 
                 boolean first = true;
                 int actualNbr = -1;
-                for (String ipAddress : rangeIps) {
+                for (String node : rangeIps) {
                     if (first) {
                         actualNbr = rangeNodeNbr;
                     } else {
@@ -155,7 +155,7 @@ public class NodeRangeResolver  {
                     String newKey = key.endsWith(rangeNodeNbr.toString()) ? property.getServiceName() + actualNbr : property.getServiceName();
                     String newValue;
                     if (key.endsWith(rangeNodeNbr.toString())) {
-                        newValue = key.startsWith(NODE_ID_FLAG) ? ipAddress : value;
+                        newValue = key.startsWith(NODE_ID_FLAG) ? node : value;
                     } else {
                         newValue = ""+actualNbr;
                     }

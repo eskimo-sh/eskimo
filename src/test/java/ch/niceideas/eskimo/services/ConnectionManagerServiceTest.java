@@ -123,8 +123,8 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
-            protected Connection createConnectionInternal(String ipAddress) {
-                return new Connection(ipAddress, getSShPort()) {
+            protected Connection createConnectionInternal(String node) {
+                return new Connection(node, getSShPort()) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
                         createCalledFor.add(""+port_to_connect);
                         return null;
@@ -135,9 +135,9 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(Connection connection, String ipAddress)  {
-                super.dropTunnels(connection, ipAddress);
-                dropCalledFor.add(ipAddress);
+            protected void dropTunnels(Connection connection, String node)  {
+                super.dropTunnels(connection, node);
+                dropCalledFor.add(node);
             }
         };
         cm.setSetupService (setupService);
@@ -191,8 +191,8 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
-            protected Connection createConnectionInternal(String ipAddress) {
-                return new Connection(ipAddress, getSShPort()) {
+            protected Connection createConnectionInternal(String node) {
+                return new Connection(node, getSShPort()) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
                         return null;
                     }
@@ -202,11 +202,11 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(Connection connection, String ipAddress) {
+            protected void dropTunnels(Connection connection, String node) {
                 // NO-OP
             }
             @Override
-            protected void recreateTunnels(Connection connection, String ipAddress) {
+            protected void recreateTunnels(Connection connection, String node) {
                 // NO-OP
             }
         };

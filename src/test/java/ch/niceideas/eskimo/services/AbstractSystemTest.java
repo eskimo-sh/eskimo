@@ -162,12 +162,12 @@ public abstract class AbstractSystemTest {
                 return runSSHScript("192.168.10.11", script, throwsException);
             }
             @Override
-            public String runSSHScript(String hostAddress, String script, boolean throwsException) {
+            public String runSSHScript(String node, String script, boolean throwsException) {
                 if (script.equals("echo OK")) {
                     return "OK";
                 }
                 if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
-                    switch (hostAddress) {
+                    switch (node) {
                         case "192.168.10.11":
                             return "MemTotal:        5969796 kB";
                         case "192.168.10.12":
@@ -177,7 +177,7 @@ public abstract class AbstractSystemTest {
                     }
                 }
                 if (script.equals("grep 'I am the new leader' /var/log/gluster/egmi/egmi.log")) {
-                    if (hostAddress.equals("192.168.10.11")) {
+                    if (node.equals("192.168.10.11")) {
                         return "2021-01-17 22:44:05,633 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail\n" +
                                 "2021-01-17 22:44:36,564 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options: \n" +
                                 "2021-01-17 22:44:36,682 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options: \n" +
@@ -199,7 +199,7 @@ public abstract class AbstractSystemTest {
                 return runSSHCommand("192.168.10.11", command);
             }
             @Override
-            public String runSSHCommand(String hostAddress, String command) {
+            public String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 return testSSHCommandResultBuilder.toString();
             }
@@ -208,8 +208,8 @@ public abstract class AbstractSystemTest {
                 copySCPFile("192.168.10.11", filePath);
             }
             @Override
-            public void copySCPFile(String hostAddress, String filePath) {
-                testSCPCommands.append(hostAddress).append("-").append(filePath).append("\n");
+            public void copySCPFile(String node, String filePath) {
+                testSCPCommands.append(node).append("-").append(filePath).append("\n");
             }
         };
 
@@ -245,12 +245,12 @@ public abstract class AbstractSystemTest {
 
         connectionManagerService = new ConnectionManagerService() {
             @Override
-            public Connection getPrivateConnection (String ipAddress) throws ConnectionManagerException {
+            public Connection getPrivateConnection (String node) throws ConnectionManagerException {
                 return null;
             }
 
             @Override
-            public Connection getSharedConnection (String ipAddress) throws ConnectionManagerException {
+            public Connection getSharedConnection (String node) throws ConnectionManagerException {
                 return null;
             }
         };

@@ -45,7 +45,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -281,7 +280,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             if (config == null) {
                 throw new IllegalStateException("Asked for procy for service " + key + " - but none has been configured !");
             }
-            input = input.replaceAll(config.getRemoteAddress()+":"+config.getLocalPort(), "/" + key);
+            input = input.replaceAll(config.getNode()+":"+config.getLocalPort(), "/" + key);
         }
 
         return input;
