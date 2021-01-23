@@ -109,30 +109,58 @@ if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
 
     echo " - Installing raw samples "
 
-    echo "   + Creating temp dir /tmp/eskimo_samples"
-    mkdir /tmp/eskimo_samples
+# XXX Hack required for zeppelin pre-0.9 bug where notebooks imported through APIs are not anymore available after a restart
+#    echo "   + Creating temp dir /tmp/eskimo_samples"
+#    mkdir /tmp/eskimo_samples
+#
+#    echo "   + Copying archive there"
+#    cp /usr/local/lib/zeppelin/eskimo_samples.tgz /tmp/eskimo_samples/
+#
+#    echo "   + changing dir for temp dir"
+#    cd  /tmp/eskimo_samples/
+#
+#    echo "   + Extracting archive"
+#    tar xvfz eskimo_samples.tgz > /tmp/eskimo_samples_extract.log 2>&1;
+#
+#    echo "   + for each of them, see if it needs to be copied"
+#    IFS=$'\n'
+#    for i in `ls -1 *.zpln`; do
+#
+#        echo "      - extracting notebook name"
+#        notebook_name=`echo $i | cut -d '_' -f 1`
+#
+#        echo "      - checking if $notebook_name is already installed"
+#        if [[ `find /var/lib/spark/data/zeppelin/notebooks/ -name "$notebook_name*" 2>/dev/null` == "" ]]; then
+#
+#            echo "      - installing $notebook_name "
+#            cp $i /var/lib/spark/data/zeppelin/notebooks/
+#        fi
+#    done
 
-    echo "   + Copying archive there"
-    cp /usr/local/lib/zeppelin/eskimo_samples.tgz /tmp/eskimo_samples/
+    echo " - Waiting for Zeppelin availability"
+    function wait_forZeppelin() {
+        for i in `seq 0 1 120`; do
+            sleep 2
+            eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
+            if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
+                echo " - Zeppelin is available."
+                break
+            fi
+        done
+    }
 
-    echo "   + changing dir for temp dir"
-    cd  /tmp/eskimo_samples/
+    wait_forZeppelin
 
-    echo "   + Extracting archive"
-    tar xvfz eskimo_samples.tgz > /tmp/eskimo_samples_extract.log 2>&1;
-
-    echo "   + for each of them, see if it needs to be copied"
-    IFS=$'\n'
-    for i in `ls -1 *.zpln`; do
-
-        echo "      - extracting notebook name"
-        notebook_name=`echo $i | cut -d '_' -f 1`
-
-        echo "      - checking if $notebook_name is already installed"
-        if [[ `find /var/lib/spark/data/zeppelin/notebooks/ -name "$notebook_name*" 2>/dev/null` == "" ]]; then
-
-            echo "      - installing $notebook_name "
-            cp $i /var/lib/spark/data/zeppelin/notebooks/
+    # import in 0.9-SNAPSHOT
+    echo " - Importing Zeppelin Sample notebooks"
+    sleep 5 # wait a little more
+    for i in `find /usr/local/lib/zeppelin/eskimo_samples`; do
+        if [[ ! -d $i ]]; then
+            echo "   + importing $i"
+            curl -XPOST -H "Content-Type: application/json" \
+                    http://localhost:38080/api/notebook/import \
+                    -d @"$i" >> zeppelin_install_log 2>&1
+            fail_if_error $? "zeppelin_install_log" -21
         fi
     done
 

@@ -392,7 +392,7 @@ eskimo.SystemStatus = function() {
             contentType: "application/json; charset=utf-8",
             url: (custom ?
                 "service-custom-action?action=" + action + "&service=" + service + "&nodeAddress=" + node :
-                action + "?service=" + service + "&address=" + node),
+                action + "?service=" + service + "&nodeAddress=" + node),
             success: function (data, status, jqXHR) {
 
                 // OK

@@ -214,12 +214,18 @@ fi
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin zeppelin zeppelin_install_log
 
-echo " - HACK import of raw samples archived in docker container"
-docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> zeppelin_install_log 2>&1
-fail_if_error $? "zeppelin_install_log" -40
 
-docker exec --user root zeppelin bash -c "chmod 755 /usr/local/lib/zeppelin/eskimo_samples.tgz" >> zeppelin_install_log 2>&1
-fail_if_error $? "zeppelin_install_log" -41
+# XXX Hack required for zeppelin pre-0.9 bug where notebooks imported through APIs are not anymore available after a restart
+#echo " - HACK import of raw samples archived in docker container"
+#docker cp ./HACK_temp_samples/eskimo_samples.tgz zeppelin:/usr/local/lib/zeppelin/ >> zeppelin_install_log 2>&1
+#fail_if_error $? "zeppelin_install_log" -40
+
+#docker exec --user root zeppelin bash -c "chmod 755 /usr/local/lib/zeppelin/eskimo_samples.tgz" >> zeppelin_install_log 2>&1
+#fail_if_error $? "zeppelin_install_log" -41
+
+echo " - Import of samples in docker container"
+docker cp ./samples zeppelin:/usr/local/lib/zeppelin/eskimo_samples >> zeppelin_install_log 2>&1
+fail_if_error $? "zeppelin_install_log" -40
 
 
 echo " - Committing changes to local template and exiting container zeppelin"
@@ -228,38 +234,6 @@ commit_container zeppelin zeppelin_install_log
 
 echo " - Starting marathon deployment"
 deploy_marathon zeppelin zeppelin_install_log
-
-
-## FIXME . temporary hack
-# the poroblem now with marathon is that deploying zeppelin first can take time and second will happen ony any random
-# node. I need to query marathon to find where.
-#echo " - Waiting for Zeppelin availability"
-#function wait_forZeppelin() {
-#    for i in `seq 0 1 80`; do
-#        sleep 2
-#        eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
-#        if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
-#            echo " - Zeppelin is available."
-#            break
-#        fi
-#    done
-#}
-#
-#wait_forZeppelin
-#
-#
-## import in 0.9-SNAPSHOT
-#echo " - Importing Zeppelin Sample notebooks"
-#sleep 5 # wait a little more
-#for i in `find ./samples/`; do
-#    if [[ ! -d $i ]]; then
-#        echo "   + importing $i"
-#        curl -XPOST -H "Content-Type: application/json" \
-#                http://localhost:38080/api/notebook/import \
-#                -d @"$i" >> zeppelin_install_log 2>&1
-#        fail_if_error $? "zeppelin_install_log" -21
-#    fi
-#done
 
 
 

@@ -71,7 +71,7 @@ docker exec -i zeppelin_template apt-get -y install  python-dev python-six pytho
 fail_if_error $? "/tmp/zeppelin_build_log" -5
 
 echo " - Installing python packages for datascience"
-docker exec -i zeppelin_template pip install pandas scikit-learn matplotlib nltk plotly filelock py4j > /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template pip install pandas scikit-learn matplotlib nltk plotly filelock py4j kafka-python > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
 echo " - Installing GlusterFS client"
@@ -89,12 +89,12 @@ if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS
 fi
 rm -f __installFlinkEff.sh
 
+echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
+docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/zeppelin_build_log" -3
+
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
-
-    echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
-    docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
-    fail_if_error $? "/tmp/zeppelin_build_log" -3
 
     docker exec -i zeppelin_template bash /scripts/installZeppelinFromSources.sh $USER $UID | tee /tmp/zeppelin_build_log 2>&1
     if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
@@ -126,7 +126,7 @@ fi
 #docker exec -it zeppelin_template bash
 
 echo " - Cleaning up image"
-docker exec -i spark_template apt-get remove -y adwaita-icon-theme >> /tmp/spark_build_log 2>&1
+# Don't uninstall adwaita since it removes the java compiler
 docker exec -i spark_template apt-get -y auto-remove >> /tmp/spark_build_log 2>&1
 
 echo " - Closing and saving image zeppelin"
