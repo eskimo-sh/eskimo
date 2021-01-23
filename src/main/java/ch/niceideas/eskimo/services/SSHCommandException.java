@@ -34,7 +34,9 @@
 
 package ch.niceideas.eskimo.services;
 
-public class SSHCommandException extends Exception {
+import ch.niceideas.common.exceptions.CommonBusinessException;
+
+public class SSHCommandException extends CommonBusinessException {
 
     static final long serialVersionUID = -2287516911124229248L;
 

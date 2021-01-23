@@ -34,7 +34,9 @@
 
 package ch.niceideas.eskimo.services;
 
-public class MasterDetectionException extends Exception {
+import ch.niceideas.common.exceptions.CommonBusinessException;
+
+public class MasterDetectionException extends CommonBusinessException {
 
     static final long serialVersionUID = -3317512211124219248L;
 

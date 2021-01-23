@@ -34,7 +34,9 @@
 
 package ch.niceideas.eskimo.services;
 
-public class MarathonException extends Exception {
+import ch.niceideas.common.exceptions.CommonBusinessException;
+
+public class MarathonException extends CommonBusinessException {
 
     static final long serialVersionUID = -3387512211112229248L;
 

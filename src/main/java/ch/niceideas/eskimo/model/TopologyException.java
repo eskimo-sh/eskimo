@@ -34,7 +34,9 @@
 
 package ch.niceideas.eskimo.model;
 
-public class TopologyException extends RuntimeException {
+import ch.niceideas.common.exceptions.CommonRTException;
+
+public class TopologyException extends CommonRTException {
 
     static final long serialVersionUID = -3311512111124119248L;
 

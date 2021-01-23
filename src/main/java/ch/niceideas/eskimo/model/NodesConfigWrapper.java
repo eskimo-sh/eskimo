@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
@@ -270,7 +271,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         return null;
     }
 
-    private static final class NodesConfigWrapperException extends RuntimeException {
+    private static final class NodesConfigWrapperException extends CommonRTException {
 
         public NodesConfigWrapperException (Throwable cause) {
             super (cause);

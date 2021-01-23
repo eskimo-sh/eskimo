@@ -336,7 +336,7 @@ public class SetupService {
     Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
 
         List<File> imageFiles = Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
-                .filter(file -> file.getName().contains(prefix) && file.getName().contains("_"+packageName+"_"))
+                .filter(file -> file.getName().contains(prefix) && file.getName().contains("_" + packageName + "_"))
                 .collect(Collectors.toList());
 
         File lastVersionFile = null;

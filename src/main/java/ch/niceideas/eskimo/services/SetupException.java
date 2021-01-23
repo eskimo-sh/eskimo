@@ -34,7 +34,9 @@
 
 package ch.niceideas.eskimo.services;
 
-public class SetupException extends Exception {
+import ch.niceideas.common.exceptions.CommonBusinessException;
+
+public class SetupException extends CommonBusinessException {
 
     static final long serialVersionUID = -3217516911124229248L;
 

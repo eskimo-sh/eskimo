@@ -35,10 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.common.utils.*;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -152,18 +149,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(ServicesInstallStatusWrapper::parseInstallStatusFlag)
-                .sorted((o1, o2) -> {
-                    if (o1 == null) {
-                        return -1;
-                    }
-                    if (o2 == null) {
-                        return 1;
-                    }
-                    if (o1.getKey().equals(o2.getKey())) {
-                        return o1.getValue().compareTo(o2.getValue());
-                    }
-                    return o1.getKey().compareTo(o2.getKey());
-                })
+                .sorted(new PairComparator<>())
                 .collect(Collectors.toList());
     }
 
