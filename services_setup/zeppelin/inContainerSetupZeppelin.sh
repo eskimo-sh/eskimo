@@ -65,6 +65,9 @@ bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_elasticsearch /v
 echo " - Enabling spark user to call glusterMountCheckerPeriodic.sh"
 bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/spark"
 
+echo " - Enabling few other required sudo rights"
+bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /tmp/zeppelin_import_log\" >> /etc/sudoers.d/spark"
+
 # zeppelin is not mounting /var/lib/spark from host but gluster shares inside
 # still need to be able to manipulate that directory !
 chown spark /var/lib/spark

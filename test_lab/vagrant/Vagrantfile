@@ -61,9 +61,9 @@ nodes = [
   { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.10.13', :ram => 6000},
   { :hostname => 'cent-node2', :box => 'fedora/31-cloud-base', :ip => '192.168.10.14', :ram => 6000 },
   { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.10.15', :ram => 10000},
-  { :hostname => 'test-node1', :box => 'centos/7',  :ip => '192.168.10.21', :ram => 6000},
+  { :hostname => 'test-node1', :box => 'bento/centos-8',  :ip => '192.168.10.21', :ram => 6000},
   { :hostname => 'test-node2', :box => 'centos/7',  :ip => '192.168.10.22', :ram => 6000},
-  { :hostname => 'test-node3', :box => 'centos/7',  :ip => '192.168.10.23', :ram => 6000},
+  { :hostname => 'test-node3', :box => 'bento/centos-8',  :ip => '192.168.10.23', :ram => 6000},
   { :hostname => 'test-node3-bis', :box => 'fedora/31-cloud-base', :ip => '192.168.10.23', :ram => 6000 },
   { :hostname => 'test-large', :box => 'centos/7',  :ip => '192.168.10.31', :ram => 10000},
   { :hostname => 'integration-test', :box => 'centos/7',  :ip => '192.168.10.41', :ram => 14000},
@@ -148,6 +148,15 @@ Vagrant.configure("2") do |config|
               SHELL
           end
       end
+
+      if (node[:box].equal?("debian/testing"))
+                nodeconfig.vm.provision "shell" do |s|
+                    s.inline = <<-SHELL
+                        sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+                        sudo grub-mkconfig -o /boot/grub/grub.cfg
+                    SHELL
+                end
+            end
 
       # Node provisionning
       #nodeconfig.vm.provision "shell", path: "../provisionning/provision.sh", args: node[:prov_args]

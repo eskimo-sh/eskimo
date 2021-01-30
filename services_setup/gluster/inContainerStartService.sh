@@ -42,13 +42,18 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh gluster
 
-echo " - Starting EGMI backend"
-/usr/local/lib/egmi/bin/egmi.sh &
-EGMI_PID=$!
+echo " - Cleaning all volume PID files before starting gluster"
+for i in `find /var/run/gluster/vols/ -name '*.pid'`; do
+    rm -f $i
+done
 
 echo " - Starting service"
 /usr/sbin/glusterd -l /var/log/gluster/glusterfs.log -f /var/lib/gluster/glusterfs.VOLUME_FILE -N &
 GLUSTER_SERVICE=$!
+
+echo " - Starting EGMI backend"
+/usr/local/lib/egmi/bin/egmi.sh &
+EGMI_PID=$!
 
 echo " - Launching Watch Dog on EGMI"
 /usr/local/sbin/containerWatchDog.sh $EGMI_PID $GLUSTER_SERVICE /var/log/gluster/egmi-watchdog.log &

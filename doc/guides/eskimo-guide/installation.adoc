@@ -162,11 +162,12 @@ capacity for this node is as follows:
 * 32 GB RAM (64 GB RAM recommended)
 
 
-===== Fedora nodes specificities
+===== Latest Fedora and Debian Bullseye (or greater) nodes specificities
 
-Fedora has switched to cgroups v2 by default now, but Mesos (and some Docker versions) are not working well with cgroups v2 and
-may fail to start. With Eskimo and current version of mesos, one needs to revert cgroups to v1 on Fedora
-nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
+Latest Fedora as well as Debian from version Bullseye have switched to cgroups v2 by default now,
+but Mesos (and some Docker versions) are not working well with cgroups v2 and may fail to start. +
+With Eskimo and current version of mesos, one needs to revert cgroups to v1 on latest Fedora or
+Debian Bullseye nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
 
 .Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
 ----
@@ -186,6 +187,17 @@ sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
 ----
 
 With this, the _Mesos Agent_ should be able to start successfully on your fedora nodes after a reboot.
+
+====== How to detect this mesos startup problem ?
+
+If you see the following line in file `/var/log/mesos/mesos-slave.ERROR`:
+
+----
+E0125 11:06:41.591089 112533 main.cpp:497] EXIT with status 1: Failed to initialize systemd: Failed to locate systemd cgroups hierarchy: 'mesos_executors.slice' is not a valid cgroup
+----
+
+Then this is an indication that your system is using CGroups V2 and you might want to apply the procedure above to revert
+back to cgroups V1.
 
 [[eskimo_nodes_required_packages]]
 ==== Required packages installation and Internet access on cluster nodes

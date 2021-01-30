@@ -191,6 +191,12 @@ function install_docker_debian_based() {
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gnupg2 >/dev/null 2>&1
 
     echo "  - Add Docker’s official GPG key"
+    export DOCKER_DEB_VERSION=$(lsb_release -cs)
+    if [[ $DOCKER_DEB_VERSION == "bullseye" ]]; then
+        echo "   + HACK reverting debian version to buster for docker (bullseye is not supported)"
+        export DOCKER_DEB_VERSION=buster
+    fi
+
     curl -fsSL https://download.docker.com/linux/$LINUX_DISTRIBUTION/gpg | sudo apt-key add -  >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to add docker GPG key"
@@ -201,7 +207,7 @@ function install_docker_debian_based() {
     echo "  - Add Docker repository"
     sudo add-apt-repository \
            "deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION \
-           $(lsb_release -cs) \
+           $DOCKER_DEB_VERSION \
            stable" >>/tmp/install_docker 2>&1
 
     if [[ $? != 0 ]]; then

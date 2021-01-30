@@ -104,12 +104,12 @@ fi
 echo " - creating zeppelin notebook service if it does not exist"
 mkdir -p /var/lib/spark/data/zeppelin/notebooks
 
-echo " - Checking if samples neeed to be installed"
-if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
-
-    echo " - Installing raw samples "
-
-# XXX Hack required for zeppelin pre-0.9 bug where notebooks imported through APIs are not anymore available after a restart
+#echo " - Checking if samples neeed to be installed"
+#if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
+#
+#    echo " - Installing raw samples "
+#
+#    # XXX Hack required for zeppelin pre-0.9 bug where notebooks imported through APIs are not anymore available after a restart
 #    echo "   + Creating temp dir /tmp/eskimo_samples"
 #    mkdir /tmp/eskimo_samples
 #
@@ -137,35 +137,7 @@ if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
 #        fi
 #    done
 
-    echo " - Waiting for Zeppelin availability"
-    function wait_forZeppelin() {
-        for i in `seq 0 1 120`; do
-            sleep 2
-            eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
-            if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
-                echo " - Zeppelin is available."
-                break
-            fi
-        done
-    }
-
-    wait_forZeppelin
-
-    # import in 0.9-SNAPSHOT
-    echo " - Importing Zeppelin Sample notebooks"
-    sleep 5 # wait a little more
-    for i in `find /usr/local/lib/zeppelin/eskimo_samples`; do
-        if [[ ! -d $i ]]; then
-            echo "   + importing $i"
-            curl -XPOST -H "Content-Type: application/json" \
-                    http://localhost:38080/api/notebook/import \
-                    -d @"$i" >> zeppelin_install_log 2>&1
-            fail_if_error $? "zeppelin_install_log" -21
-        fi
-    done
-
-    touch /var/lib/spark/data/zeppelin/samples_installed_flag.marker
-fi
+#fi
 
 echo " - Injecting isolation configuration from settings"
 
@@ -201,5 +173,50 @@ echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
      "ps -efl | grep java | grep org.apache.zeppelin.server.ZeppelinServer | grep -v bash | sed -E 's/[0-9a-zA-Z]{1} [0-9a-zA-Z]{1} spark *([0-9]+).*/\1/'" \
      /var/log/spark/zeppelin/gluster-mount-checker-periodic-watchdog.log &
 
-echo " - Starting service"
-bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh'
+echo " - Starting zeppelin service (asynchronously)"
+bash -c 'cd /home/spark && /usr/local/lib/zeppelin/bin/zeppelin.sh' &
+export ZEPPELIN_PID=$!
+
+echo " - Checking if samples neeed to be installed"
+if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
+
+    echo " - Waiting for Zeppelin availability"
+    function wait_forZeppelin() {
+        for i in `seq 0 1 120`; do
+            sleep 2
+            eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
+            if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
+                echo " - Zeppelin is available."
+                break
+            fi
+        done
+    }
+
+    wait_forZeppelin
+
+    sudo /bin/rm -Rf /tmp/zeppelin_import_log
+
+    # import in 0.9-SNAPSHOT
+    echo " - Importing Zeppelin Sample notebooks"
+    set +e
+    sleep 5 # wait a little more
+    for i in `find /usr/local/lib/zeppelin/eskimo_samples`; do
+        if [[ ! -d $i ]]; then
+            echo "   + importing $i"
+            curl -XPOST -H "Content-Type: application/json" \
+                    http://localhost:38080/api/notebook/import \
+                    -d @"$i" >> /tmp/zeppelin_import_log 2>&1
+            if [[ $? != 0 ]]; then
+                echo "Failed to import $i"
+                cat /tmp/zeppelin_import_log
+                exit 101
+            fi
+        fi
+    done
+    set -e
+
+    touch /var/lib/spark/data/zeppelin/samples_installed_flag.marker
+fi
+
+echo " - Now waiting on zeppelin process"
+wait $ZEPPELIN_PID

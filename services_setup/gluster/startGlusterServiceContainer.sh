@@ -87,7 +87,9 @@ else
 fi
 
 # After a gluster restart, fix gluster mounts on host
-bash /usr/local/sbin/glusterMountChecker.sh
+# XXX : this needs to be done offline since otherwise we're stuck here forever on some OSes
+# (the ones that wait gluster to be started before allowing to mount)
+nohup bash /usr/local/sbin/glusterMountChecker.sh &
 
 echo " - Creating PID file"
 echo $container_process_PID > /var/run/gluster/gluster.pid

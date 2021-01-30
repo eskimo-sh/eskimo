@@ -44,8 +44,6 @@ sed -i s/"hostname=localhost"/"hostname=$SELF_IP_ADDRESS"/g /usr/local/lib/egmi/
 export zookeeper_url=`echo $MASTER_ZOOKEEPER_1 | sed "s/,/:2181,/g"`
 export zookeeper_url=$zookeeper_url:2181
 
-sed -i s/"zookeeper.urls="/"zookeeper.urls=$zookeeper_url"/g /usr/local/lib/egmi/conf/egmi.properties
-
 sed -i s/"target.ip-addresses="/"target.ip-addresses=$ALL_NODES_LIST_gluster"/g /usr/local/lib/egmi/conf/egmi.properties
 
-
+sed -i s/"zookeeper.urls="/"zookeeper.urls=$zookeeper_url"/g /usr/local/lib/egmi/conf/egmi.properties
