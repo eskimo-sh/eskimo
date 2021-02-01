@@ -360,7 +360,7 @@ eskimo.SystemStatus = function() {
         prevHidingMessageTimeout = setTimeout(function () {
             serviceStatusWarning.css("display", "none");
             serviceStatusWarning.css("visibility", "hidden");
-        }, 5000);
+        }, 10000);
 
     }
     this.showStatusMessage = showStatusMessage;
@@ -1117,9 +1117,16 @@ eskimo.SystemStatus = function() {
             type: "GET",
             dataType: "json",
             url: "get-status",
+            timeout: 1000 * 10, // 10 secs
             success: function (data, status, jqXHR) {
 
                 disconnectedFlag = false;
+
+                /*
+                let serviceStatusWarning = $("#service-status-warning");
+                serviceStatusWarning.css("display", "none");
+                serviceStatusWarning.css("visibility", "hidden");
+                */
 
                 that.eskimoMain.serviceMenuClear(data.nodeServicesStatus);
 
