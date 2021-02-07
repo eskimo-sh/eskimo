@@ -1,10 +1,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.MarathonOperationsCommand;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +23,27 @@ public class MarathonServicesConfigControllerTest {
     public void testSetup() {
         mscc.setMessagingService(new MessagingService());
         mscc.setNotificationService(new NotificationService());
+
+        mscc.setSystemService(new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() {
+                return SystemStatusWrapper.empty();
+            }
+        });
+
+        mscc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) {
+                // No-Op
+            }
+        });
+
+        mscc.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
     }
 
     @Test
@@ -35,13 +53,6 @@ public class MarathonServicesConfigControllerTest {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No-Op
-            }
-        });
-
-        mscc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
             }
         });
 
@@ -80,13 +91,6 @@ public class MarathonServicesConfigControllerTest {
             }
         });
 
-        mscc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
         mscc.setConfigurationService(new ConfigurationService() {
             @Override
             public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
@@ -111,13 +115,6 @@ public class MarathonServicesConfigControllerTest {
             @Override
             public void applyMarathonServicesConfig(MarathonOperationsCommand command) {
                 // No Op
-            }
-        });
-
-        mscc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
             }
         });
 
@@ -171,13 +168,6 @@ public class MarathonServicesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
         mscc.setDemoMode(true);
 
         assertEquals ("{\n" +
@@ -192,7 +182,7 @@ public class MarathonServicesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setSystemService(new SystemService(false) {
+        mscc.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public boolean isProcessingPending() {
                 return true;
@@ -216,13 +206,6 @@ public class MarathonServicesConfigControllerTest {
             @Override
             public void applyMarathonServicesConfig(MarathonOperationsCommand command) {
                 // No Op
-            }
-        });
-
-        mscc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
             }
         });
 

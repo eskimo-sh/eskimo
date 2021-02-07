@@ -5,6 +5,7 @@ import ch.niceideas.eskimo.model.MasterStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,16 +13,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SystemStatusControllerTest {
 
-    private SystemStatusController ssc = new SystemStatusController();
+    private SystemStatusController ssc;
 
-    @Test
-    public void testgetLastOperationResult() {
+    @BeforeEach
+    public void setUp() {
+        ssc = new SystemStatusController();
 
-        ssc.setSystemService(new SystemService(false) {
+        ssc.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
             public boolean getLastOperationSuccess() {
                 return true;
             }
         });
+    }
+
+    @Test
+    public void testgetLastOperationResult() {
 
         ssc.setMasterService(new MasterService() {
             public MasterStatusWrapper getMasterStatus() {
@@ -34,7 +41,8 @@ public class SystemStatusControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getLastOperationResult());
 
-        ssc.setSystemService(new SystemService(false) {
+        ssc.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
             public boolean getLastOperationSuccess() {
                 throw new IllegalStateException("Test Error");
             }
@@ -57,12 +65,14 @@ public class SystemStatusControllerTest {
         });
 
         ssc.setSystemService(new SystemService(false) {
+            @Override
             public SystemStatusWrapper getStatus() {
                 return new SystemStatusWrapper("{\"status\":\"OK\"}");
             }
         });
 
         ssc.setMasterService(new MasterService() {
+            @Override
             public MasterStatusWrapper getMasterStatus() {
                 return MasterStatusWrapper.empty();
             }
@@ -83,6 +93,7 @@ public class SystemStatusControllerTest {
                 "}", ssc.getStatus());
 
         ssc.setSystemService(new SystemService(false) {
+            @Override
             public SystemStatusWrapper getStatus()  {
                 return new SystemStatusWrapper("{}");
             }

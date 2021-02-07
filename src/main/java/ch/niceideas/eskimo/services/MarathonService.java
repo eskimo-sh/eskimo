@@ -85,6 +85,9 @@ public class MarathonService {
     @Autowired
     private ConnectionManagerService connectionManagerService;
 
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
@@ -135,6 +138,9 @@ public class MarathonService {
     }
     void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
         this.connectionManagerService = connectionManagerService;
+    }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
     }
 
     public MarathonService() {
@@ -333,7 +339,7 @@ public class MarathonService {
 
         logger.info ("Starting Marathon Deployment Operations");
         boolean success = false;
-        systemService.setProcessingPending();
+        operationsMonitoringService.operationsStarted();
         try {
 
             // Find out node running marathon
@@ -373,7 +379,7 @@ public class MarathonService {
             Set<String> deadIps = new HashSet<>();
 
             // handle potential interruption request
-            if (systemService.isInterrupted()) {
+            if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
 
@@ -389,13 +395,13 @@ public class MarathonService {
                 throw new MarathonException(message);
             }
 
-            if (systemService.isInterrupted()) {
+            if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
 
             ensureMarathonAvailability();
 
-            if (systemService.isInterrupted()) {
+            if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
 
@@ -405,7 +411,7 @@ public class MarathonService {
 
             MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
 
-            if (systemService.isInterrupted()) {
+            if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
 
@@ -449,8 +455,7 @@ public class MarathonService {
             notificationService.addError("Marathon Services installation failed !");
             throw new MarathonException(e);
         } finally {
-            systemService.setLastOperationSuccess (success);
-            systemService.releaseProcessingPending();
+            operationsMonitoringService.operationsFinished(success);
             logger.info ("Marathon Deployment Operations Completed.");
         }
     }

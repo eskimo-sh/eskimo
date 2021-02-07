@@ -49,6 +49,7 @@ eskimo.Main = function() {
     let eskimoNodesConfig = null;
     let eskimoSystemStatus = null;
     let eskimoMessaging = null;
+    let eskimoOperations = null;
     let eskimoConsoles = null;
     let eskimoNotifications = null;
     let eskimoServices = null;
@@ -76,6 +77,7 @@ eskimo.Main = function() {
         eskimoSetup = new eskimo.Setup();
         eskimoNotifications = new eskimo.Notifications();
         eskimoMessaging = new eskimo.Messaging();
+        eskimoOperations = new eskimo.Operations();
         eskimoOperationsCommand = new eskimo.OperationsCommand();
         eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();
         eskimoSetupCommand = new eskimo.SetupCommand();
@@ -97,6 +99,7 @@ eskimo.Main = function() {
             eskimoNodesConfig: eskimoNodesConfig,
             eskimoSystemStatus: eskimoSystemStatus,
             eskimoMessaging: eskimoMessaging,
+            eskimoOperations: eskimoOperations,
             eskimoConsoles: eskimoConsoles,
             eskimoNotifications: eskimoNotifications,
             eskimoServices: eskimoServices,
@@ -131,6 +134,8 @@ eskimo.Main = function() {
 
         eskimoMessaging.initialize();
         // loadLastLine -> get-lastline-messaging
+
+        eskimoOperations.initialize();
 
         eskimoOperationsCommand.initialize();
         // (nothing)
@@ -216,6 +221,7 @@ eskimo.Main = function() {
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
         $("#main-menu-show-marathon-config-link").click(eskimoMarathonServicesConfig.showMarathonServicesConfig);
         $("#main-menu-show-messages-link").click(eskimoMessaging.showMessages);
+        $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
         $("#main-menu-logout-link").click(function() {
             window.location = "logout";
         });

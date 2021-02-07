@@ -73,6 +73,8 @@ public class NodesConfigurationService {
     @Autowired
     private MarathonService marathonService;
 
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
 
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
@@ -132,13 +134,16 @@ public class NodesConfigurationService {
     void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
         this.connectionManagerService = connectionManagerService;
     }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
+    }
 
     public void applyNodesConfig(OperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
 
         logger.info ("Starting System Deployment Operations.");
         boolean success = false;
-        systemService.setProcessingPending();
+        operationsMonitoringService.operationsStarted();
         try {
 
             NodesConfigWrapper rawNodesConfig = command.getRawConfig();
@@ -154,7 +159,7 @@ public class NodesConfigurationService {
 
             MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
 
-            if (systemService.isInterrupted()) {
+            if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
 
@@ -166,7 +171,7 @@ public class NodesConfigurationService {
                         String node = operation.getValue();
                         if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
 
-                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("base_system", node))) {
+                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null && isMissingOnNode("base_system", node))) {
                                 systemOperationService.applySystemOperation("Installation of Base System on " + node,
                                         builder -> installEskimoBaseSystem(builder, node), null);
 
@@ -174,12 +179,12 @@ public class NodesConfigurationService {
                             }
 
                             // topology
-                            if (!systemService.isInterrupted() && (error.get() == null)) {
+                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                 systemOperationService.applySystemOperation("Installation of Topology and settings on " + node,
                                         builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, node), null);
                             }
 
-                            if (!systemService.isInterrupted() && (error.get() == null && isMissingOnNode("mesos", node))) {
+                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null && isMissingOnNode("mesos", node))) {
                                 systemOperationService.applySystemOperation("Installation of Mesos on " + node,
                                         builder -> {
                                             uploadMesos(node);
@@ -192,8 +197,7 @@ public class NodesConfigurationService {
                     });
 
             // first thing first, flag services that need to be restarted as "needing to be restarted"
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
-                    command.getRestarts(), nodesConfig)) {
+            for (List<Pair<String, String>> restarts : command.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
                 for (Pair<String, String> operation : restarts) {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
@@ -213,8 +217,7 @@ public class NodesConfigurationService {
             }
 
             // Installation in batches (groups following dependencies)
-            for (List<Pair<String, String>> installations : servicesInstallationSorter.orderOperations (
-                    command.getInstallations(), nodesConfig)) {
+            for (List<Pair<String, String>> installations : command.getInstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
 
                 systemService.performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
@@ -227,11 +230,7 @@ public class NodesConfigurationService {
             }
 
             // uninstallations
-            List<List<Pair<String, String>>> orderedUninstallations =  servicesInstallationSorter.orderOperations (
-                    command.getUninstallations(), nodesConfig);
-            Collections.reverse(orderedUninstallations);
-
-            for (List<Pair<String, String>> uninstallations : orderedUninstallations) {
+            for (List<Pair<String, String>> uninstallations : command.getUninstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
                 systemService.performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             String service = operation.getKey();
@@ -263,14 +262,13 @@ public class NodesConfigurationService {
                         });
             }
 
-            if (!systemService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getNodeAddresses()))) {
+            if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getNodeAddresses()))) {
                 throw new SystemException("At least one configured node was found dead");
             }
 
             success = true;
         } finally {
-            systemService.setLastOperationSuccess (success);
-            systemService.releaseProcessingPending();
+            operationsMonitoringService.operationsFinished(success);
             logger.info ("System Deployment Operations Completed.");
         }
     }

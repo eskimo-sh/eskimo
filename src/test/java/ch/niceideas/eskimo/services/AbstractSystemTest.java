@@ -90,6 +90,8 @@ public abstract class AbstractSystemTest {
 
     protected ConnectionManagerService connectionManagerService;
 
+    protected OperationsMonitoringService operationsMonitoringService;
+
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
     protected StringBuilder testSSHCommandScript = new StringBuilder();
     protected StringBuilder testSCPCommands = new StringBuilder();
@@ -219,11 +221,18 @@ public abstract class AbstractSystemTest {
 
         notificationService = new NotificationService();
 
+        operationsMonitoringService = new OperationsMonitoringService();
+        operationsMonitoringService.setMessagingService(messagingService);
+        operationsMonitoringService.setNotificationService(notificationService);
+
+        setupService.setOperationsMonitoringService(operationsMonitoringService);
+
         systemOperationService = new SystemOperationService();
         systemOperationService.setNotificationService(notificationService);
         systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
+        systemOperationService.setOperationsMonitoringService(operationsMonitoringService);
 
         setupService.setSystemOperationService (systemOperationService);
 
@@ -266,6 +275,7 @@ public abstract class AbstractSystemTest {
         marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
         marathonService.setConnectionManagerService (connectionManagerService);
+        marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
         systemService.setNodeRangeResolver(nodeRangeResolver);
         systemService.setSetupService(setupService);
@@ -276,6 +286,7 @@ public abstract class AbstractSystemTest {
         systemService.setMessagingService(messagingService);
         systemService.setNotificationService(notificationService);
         systemService.setConfigurationService(configurationService);
+        systemService.setOperationsMonitoringService(operationsMonitoringService);
 
         nodesConfigurationService = createNodesConfigurationService();
         nodesConfigurationService.setConfigurationService(configurationService);
@@ -292,6 +303,7 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService.setSshCommandService(sshCommandService);
         nodesConfigurationService.setSystemOperationService(systemOperationService);
         nodesConfigurationService.setConnectionManagerService(connectionManagerService);
+        nodesConfigurationService.setOperationsMonitoringService(operationsMonitoringService);
     }
 
     protected ProxyManagerService createProxyManagerService() {

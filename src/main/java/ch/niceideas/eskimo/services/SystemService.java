@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -103,6 +102,9 @@ public class SystemService {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
     @Value("${system.failedServicesTriggerCount}")
     private int failedServicesTriggerCount = 5;
 
@@ -121,16 +123,10 @@ public class SystemService {
     @Value("${system.statusUpdatePeriodSeconds}")
     private int statusUpdatePeriodSeconds = 5;
 
-    private final ReentrantLock systemActionLock = new ReentrantLock();
-
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final ScheduledExecutorService statusRefreshScheduler;
     private final AtomicReference<SystemStatusWrapper> lastStatus = new AtomicReference<>();
     private final AtomicReference<Exception> lastStatusException = new AtomicReference<>();
-
-    private final AtomicBoolean interruption = new AtomicBoolean(false);
-    private final AtomicBoolean interruptionNotified = new AtomicBoolean(false);
-    private boolean lastOperationSuccess;
 
     private final Map<String, Integer> serviceMissingCounter = new ConcurrentHashMap<>();
 
@@ -167,6 +163,9 @@ public class SystemService {
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
     }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
+    }
 
     // constructor for spring
     public SystemService() {
@@ -195,47 +194,6 @@ public class SystemService {
         }
     }
 
-
-    public boolean isProcessingPending() {
-        return systemActionLock.isLocked();
-    }
-
-    void setProcessingPending() {
-        systemActionLock.lock();
-    }
-
-    void releaseProcessingPending() {
-        systemActionLock.unlock();
-        interruption.set(false);
-        interruptionNotified.set(false);
-    }
-
-    public void interruptProcessing() {
-        if (isProcessingPending()) {
-            interruption.set(true);
-        }
-    }
-
-    boolean isInterrupted () {
-        notifyInterruption();
-        return interruption.get();
-    }
-
-    void notifyInterruption() {
-        if (interruption.get() && !interruptionNotified.get()) {
-            notificationService.addError("Processing has been interrupted");
-            messagingService.addLine("Processing has been interrupted");
-            interruptionNotified.set(true);
-        }
-    }
-
-    public boolean getLastOperationSuccess() {
-        return lastOperationSuccess;
-    }
-
-    void setLastOperationSuccess(boolean success) {
-        lastOperationSuccess = success;
-    }
 
     public void delegateApplyNodesConfig(OperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
@@ -308,7 +266,7 @@ public class SystemService {
     void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SSHCommandException, MarathonException {
 
         boolean success = false;
-        setProcessingPending();
+        operationsMonitoringService.operationsStarted();
         try {
 
             notificationService.addDoing(opLabel + " " + service + " on " + node);
@@ -322,8 +280,7 @@ public class SystemService {
 
             success = true;
         } finally {
-            setLastOperationSuccess (success);
-            releaseProcessingPending();
+            operationsMonitoringService.operationsFinished(success);
         }
     }
 
@@ -482,10 +439,10 @@ public class SystemService {
 
         for (T opToPerform : operations) {
 
-            if (!isInterrupted()) {
+            if (!operationsMonitoringService.isInterrupted()) {
                 threadPool.execute(() -> {
 
-                    if (!isInterrupted() && (error.get() == null)) {
+                    if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
 
                         try {
                             operation.call(opToPerform, error);
@@ -619,7 +576,7 @@ public class SystemService {
                 throws FileException, SetupException {
 
         // If there is some processing pending, then nothing is reliable, just move on
-        if (!isProcessingPending()) {
+        if (!operationsMonitoringService.isProcessingPending()) {
 
             try {
 
@@ -835,7 +792,7 @@ public class SystemService {
             if (!node.equals(OperationsCommand.MARATHON_FLAG)) {
 
                 // handle potential interruption request
-                if (isInterrupted()) {
+                if (operationsMonitoringService.isInterrupted()) {
                     return null;
                 }
 

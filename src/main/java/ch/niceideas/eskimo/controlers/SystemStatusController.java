@@ -63,6 +63,9 @@ public class SystemStatusController {
     @Autowired
     private MasterService masterService;
 
+    @Autowired
+    protected OperationsMonitoringService operationsMonitoringService;
+
     /* For tests */
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
@@ -76,11 +79,14 @@ public class SystemStatusController {
     void setMasterService(MasterService masterService) {
         this.masterService = masterService;
     }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService  = operationsMonitoringService;
+    }
 
     @GetMapping("/get-last-operation-result")
     @ResponseBody
     public String getLastOperationResult() {
-        return ReturnStatusHelper.createOKStatus(map -> map.put("success", systemService.getLastOperationSuccess()));
+        return ReturnStatusHelper.createOKStatus(map -> map.put("success", operationsMonitoringService.getLastOperationSuccess()));
     }
 
     @GetMapping("/get-status")
@@ -107,21 +113,21 @@ public class SystemStatusController {
                     map.put("masters", masterStatus.getJSONObject().getJSONObject("masters"));
                 }
                 map.put("systemStatus", systemStatus.getJSONObject());
-                map.put("processingPending", systemService.isProcessingPending());
+                map.put("processingPending", operationsMonitoringService.isProcessingPending());
             });
 
         } catch (SetupException e) {
 
             // this is OK. means application is not yet initialized
             logger.debug (e.getCause(), e.getCause());
-            return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("setup", operationsMonitoringService.isProcessingPending());
 
         } catch (SystemService.StatusExceptionWrapperException | MasterService.MasterExceptionWrapperException e) {
 
             if (e.getCause() instanceof SetupException) {
                 // this is OK. means application is not yet initialized
                 logger.debug (e.getCause(), e.getCause());
-                return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("setup", operationsMonitoringService.isProcessingPending());
             } else {
                 logger.debug(e.getCause(), e.getCause());
                 return ReturnStatusHelper.createErrorStatus ((Exception)e.getCause());

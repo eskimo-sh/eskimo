@@ -81,7 +81,7 @@ public class SystemAdminController extends AbstractOperationController {
     public String interruptProcessing() {
 
         try {
-            systemService.interruptProcessing();
+            operationsMonitoringService.interruptProcessing();
 
             return ReturnStatusHelper.createOKStatus();
 
@@ -229,7 +229,7 @@ public class SystemAdminController extends AbstractOperationController {
 
                 MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
                 if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
-                    return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                    return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
                 }
 
                 MarathonOperationsCommand operationsCommand = MarathonOperationsCommand.create(
@@ -243,7 +243,7 @@ public class SystemAdminController extends AbstractOperationController {
 
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
                 if (nodesConfig == null || nodesConfig.isEmpty()) {
-                    return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                    return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
                 }
 
                 OperationsCommand operationsCommand = OperationsCommand.create(

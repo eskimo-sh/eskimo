@@ -7,6 +7,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpSession;
@@ -22,6 +23,16 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ServicesSettingsControllerTest {
 
     private ServicesSettingsController scc = new ServicesSettingsController();
+
+    @BeforeEach
+    public void testSetup() {
+        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+    }
 
     @Test
     public void testLoadServicesConfig() throws Exception {
@@ -59,13 +70,6 @@ public class ServicesSettingsControllerTest {
     public void testPrepareAndSaveServicesConfig() throws Exception {
 
         injectDummyService();
-
-        scc.setSystemService(new SystemService() {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
 
         StringBuilder messages = new StringBuilder();
 
@@ -115,14 +119,14 @@ public class ServicesSettingsControllerTest {
 
         assertEquals("Test Error", messages.toString());
 
-        scc.setSystemService(new SystemService() {
+        injectDummyService();
+
+        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public boolean isProcessingPending() {
                 return true;
             }
         });
-
-        injectDummyService();
 
         assertEquals("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +

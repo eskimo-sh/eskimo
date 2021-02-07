@@ -52,7 +52,7 @@ import javax.servlet.http.HttpSession;
 
 
 @Controller
-public class ServicesSettingsController {
+public class ServicesSettingsController extends AbstractOperationController{
 
     private static final Logger logger = Logger.getLogger(ServicesSettingsController.class);
 
@@ -64,16 +64,6 @@ public class ServicesSettingsController {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
-    private MessagingService messagingService;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private SystemService systemService;
-
-
     /* For tests */
     void setServicesSettingsService(ServicesSettingsService servicesSettingsService) {
         this.servicesSettingsService = servicesSettingsService;
@@ -81,11 +71,6 @@ public class ServicesSettingsController {
     void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
-    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
 
     @GetMapping("/load-services-settings")
     @ResponseBody
@@ -134,7 +119,7 @@ public class ServicesSettingsController {
 
         try {
 
-            if (systemService.isProcessingPending()) {
+            if (operationsMonitoringService.isProcessingPending()) {
                 return ReturnStatusHelper.createOKStatus(map ->
                         map.put("messages", "Some backend operations are currently running. Please retry after they are completed.."));
             }

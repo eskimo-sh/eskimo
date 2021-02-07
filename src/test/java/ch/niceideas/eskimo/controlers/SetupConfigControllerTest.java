@@ -24,6 +24,13 @@ public class SetupConfigControllerTest {
     public void testSetup() {
         scc.setMessagingService(new MessagingService());
         scc.setNotificationService(new NotificationService());
+
+        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
     }
 
     @Test
@@ -36,12 +43,6 @@ public class SetupConfigControllerTest {
             }
         });
 
-        scc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
 
         scc.setConfigurationService(new ConfigurationService() {
             @Override
@@ -124,7 +125,7 @@ public class SetupConfigControllerTest {
             }
         });
 
-        scc.setSystemService(new SystemService(false) {
+        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public boolean isProcessingPending() {
                 return true;
@@ -146,13 +147,6 @@ public class SetupConfigControllerTest {
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        scc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
         scc.setDemoMode (true);
 
         assertEquals ("{\n" +
@@ -168,7 +162,7 @@ public class SetupConfigControllerTest {
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        scc.setSystemService(new SystemService(false) {
+        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public boolean isProcessingPending() {
                 return true;
@@ -209,13 +203,6 @@ public class SetupConfigControllerTest {
             public String applySetup(JsonWrapper setupConfig) throws JSONException {
                 // No Op
                 return "OK";
-            }
-        });
-
-        scc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
             }
         });
 

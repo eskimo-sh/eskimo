@@ -26,6 +26,32 @@ public class NodesConfigControllerTest {
     public void testSetup() {
         ncc.setMessagingService(new MessagingService());
         ncc.setNotificationService(new NotificationService());
+
+        ncc.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
+
+        ncc.setConfigurationService(new ConfigurationService() {
+            @Override
+            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
+                // No Op
+            }
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus(){
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+            @Override
+            public NodesConfigWrapper loadNodesConfig() {
+                return StandardSetupHelpers.getStandard2NodesSetup();
+            }
+            @Override
+            public void saveNodesConfig(NodesConfigWrapper nodesConfig) {
+                // No Op
+            }
+        });
     }
 
     @Test
@@ -35,20 +61,6 @@ public class NodesConfigControllerTest {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No-Op
-            }
-        });
-
-        ncc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
-        ncc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesSetup();
             }
         });
 
@@ -94,13 +106,6 @@ public class NodesConfigControllerTest {
             }
         });
 
-        ncc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
         ncc.setConfigurationService(new ConfigurationService() {
             @Override
             public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
@@ -124,32 +129,6 @@ public class NodesConfigControllerTest {
         ncc.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
             public void applyNodesConfig(OperationsCommand command) {
-                // No Op
-            }
-        });
-
-        ncc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
-        ncc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
-                // No Op
-            }
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus(){
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-            @Override
-            public NodesConfigWrapper loadNodesConfig() {
-                return StandardSetupHelpers.getStandard2NodesSetup();
-            }
-            @Override
-            public void saveNodesConfig(NodesConfigWrapper nodesConfig) {
                 // No Op
             }
         });
@@ -199,13 +178,6 @@ public class NodesConfigControllerTest {
 
         HttpSession session = createHttpSession(sessionContent);
 
-        ncc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
         ncc.setDemoMode(true);
 
         assertEquals ("{\n" +
@@ -221,7 +193,7 @@ public class NodesConfigControllerTest {
 
         HttpSession session = createHttpSession(sessionContent);
 
-        ncc.setSystemService(new SystemService(false) {
+        ncc.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public boolean isProcessingPending() {
                 return true;
@@ -244,28 +216,6 @@ public class NodesConfigControllerTest {
         ncc.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
             public void applyNodesConfig(OperationsCommand command) {
-                // No Op
-            }
-        });
-
-        ncc.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
-        ncc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-            @Override
-            public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, JSONException, SetupException {
-                // No Op
-            }
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
                 // No Op
             }
         });

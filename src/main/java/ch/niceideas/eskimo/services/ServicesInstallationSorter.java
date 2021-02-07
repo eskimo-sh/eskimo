@@ -61,6 +61,9 @@ public class ServicesInstallationSorter {
             List<? extends Pair<String, String>> operations,
             NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException {
 
+        if (operations == null || operations.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // 1. group services togethers
         Map<String, List<Pair<String, String>>> groupedOperations = new HashMap<>();

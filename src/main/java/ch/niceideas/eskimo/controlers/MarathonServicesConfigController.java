@@ -105,14 +105,14 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     public String loadMarathonServicesConfig() {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
         }
 
         try {
             setupService.ensureSetupCompleted();
             MarathonServicesConfigWrapper msConfig = configurationService.loadMarathonServicesConfig();
             if (msConfig == null || msConfig.isEmpty()) {
-                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
             }
             return msConfig.getFormattedValue();
 
@@ -123,7 +123,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
         } catch (SetupException e) {
             // this is OK. means application is not yet initialized
             logger.debug (e, e);
-            return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("setup", operationsMonitoringService.isProcessingPending());
         }
     }
 
@@ -134,7 +134,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
         logger.info ("Got config : " + configAsString);
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
         }
 
         try {
@@ -169,7 +169,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
         logger.info ("Got model : " + reinstallModel);
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
         }
 
         try {
@@ -190,7 +190,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
             MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
             if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
-                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
             }
 
             // Create OperationsCommand
@@ -215,7 +215,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     public String applyMarathonServicesConfig(HttpSession session) {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
         }
 
         try {

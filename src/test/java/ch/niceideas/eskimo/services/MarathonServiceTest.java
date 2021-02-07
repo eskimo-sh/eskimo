@@ -112,6 +112,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
         marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
         marathonService.setConnectionManagerService(connectionManagerService);
+        marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
         systemService.setMarathonService(marathonService);
         return marathonService;
@@ -744,9 +745,12 @@ public class MarathonServiceTest extends AbstractSystemTest {
         };
         ss.setNotificationService(notificationService);
         ss.setMessagingService(messagingService);
+        ss.setOperationsMonitoringService(operationsMonitoringService);
         marathonService.setSystemService(ss);
 
         marathonService.startServiceMarathon(servicesDefinition.getService("cerebro"));
+
+        marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
         System.out.println(testSSHCommandResultBuilder);
         System.err.println(testSSHCommandScript);
@@ -788,7 +792,10 @@ public class MarathonServiceTest extends AbstractSystemTest {
         };
         ss.setNotificationService(notificationService);
         ss.setMessagingService(messagingService);
+        ss.setOperationsMonitoringService(operationsMonitoringService);
         marathonService.setSystemService(ss);
+
+        marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
         marathonService.stopServiceMarathon(servicesDefinition.getService("cerebro"));
 
@@ -832,7 +839,10 @@ public class MarathonServiceTest extends AbstractSystemTest {
         };
         ss.setNotificationService(notificationService);
         ss.setMessagingService(messagingService);
+        ss.setOperationsMonitoringService(operationsMonitoringService);
         marathonService.setSystemService(ss);
+
+        marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
         marathonService.restartServiceMarathon(servicesDefinition.getService("cerebro"));
 

@@ -106,7 +106,7 @@ public class NodesConfigController extends AbstractOperationController {
             setupService.ensureSetupCompleted();
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
-                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
             }
             return nodesConfig.getFormattedValue();
 
@@ -117,7 +117,7 @@ public class NodesConfigController extends AbstractOperationController {
         } catch (SetupException e) {
             // this is OK. means application is not yet initialized
             logger.debug (e, e);
-            return ReturnStatusHelper.createClearStatus("setup", systemService.isProcessingPending());
+            return ReturnStatusHelper.createClearStatus("setup", operationsMonitoringService.isProcessingPending());
         }
     }
 
@@ -145,7 +145,7 @@ public class NodesConfigController extends AbstractOperationController {
 
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null || nodesConfig.isEmpty()) {
-                return ReturnStatusHelper.createClearStatus("missing", systemService.isProcessingPending());
+                return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
             }
 
             // Create OperationsCommand

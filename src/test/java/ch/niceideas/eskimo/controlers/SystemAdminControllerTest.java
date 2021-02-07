@@ -25,12 +25,19 @@ public class SystemAdminControllerTest {
 
         sac.setMessagingService(new MessagingService());
         sac.setNotificationService(new NotificationService());
+
+        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
+            @Override
+            public boolean isProcessingPending() {
+                return false;
+            }
+        });
     }
 
     @Test
     public void testInterruptProcessing() {
 
-        sac.setSystemService(new SystemService(false) {
+        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public void interruptProcessing() {
                 // No Op
@@ -39,7 +46,7 @@ public class SystemAdminControllerTest {
 
         assertEquals ("{\"status\": \"OK\"}", sac.interruptProcessing());
 
-        sac.setSystemService(new SystemService(false) {
+        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public void interruptProcessing() {
                 throw new JSONException("Test Error");
@@ -137,13 +144,6 @@ public class SystemAdminControllerTest {
     @Test
     public void testReinstallService_demoMode() throws Exception {
 
-        sac.setSystemService(new SystemService(true) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
-
         sac.setDemoMode(true);
 
         assertEquals ("{\n" +
@@ -153,9 +153,9 @@ public class SystemAdminControllerTest {
     }
 
     @Test
-    public void testReinstallService_processingPending() throws Exception {
+    public void testReinstallService_processingPending() {
 
-        sac.setSystemService(new SystemService(true) {
+        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
             public boolean isProcessingPending() {
                 return true;
@@ -174,10 +174,7 @@ public class SystemAdminControllerTest {
         AtomicBoolean called = new AtomicBoolean(false);
 
         sac.setSystemService(new SystemService(false) {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
+
             @Override
             public void delegateApplyNodesConfig(OperationsCommand command)  {
                 // No Op

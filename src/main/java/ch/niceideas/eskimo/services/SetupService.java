@@ -95,6 +95,9 @@ public class SetupService {
     @Autowired
     private ApplicationStatusService applicationStatusService;
 
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
     private String storagePathConfDir = System.getProperty("user.dir");
 
     @Value("${system.packageDistributionPath}")
@@ -156,6 +159,9 @@ public class SetupService {
     }
     void setSystemOperationService (SystemOperationService systemOperationService) {
         this.systemOperationService = systemOperationService;
+    }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
     }
 
     void setStoragePathConfDir (String storagePathConfDir) {
@@ -480,7 +486,7 @@ public class SetupService {
     public String applySetup(JsonWrapper setupConfig) {
 
         boolean success = false;
-        systemService.setProcessingPending();
+        operationsMonitoringService.operationsStarted();
         try {
 
             File packagesDistribFolder = new File (packageDistributionPath);
@@ -613,8 +619,7 @@ public class SetupService {
             return ReturnStatusHelper.createErrorStatus (e);
 
         } finally {
-            systemService.setLastOperationSuccess (success);
-            systemService.releaseProcessingPending();
+            operationsMonitoringService.operationsFinished (success);
         }
     }
 
@@ -673,7 +678,7 @@ public class SetupService {
     }
 
     protected void downloadPackage(String fileName) throws SetupException {
-        if (!systemService.isInterrupted()) {
+        if (!operationsMonitoringService.isInterrupted()) {
             try {
                 systemOperationService.applySystemOperation("Downloading of package " + fileName,
                         builder -> {
@@ -720,7 +725,7 @@ public class SetupService {
 
     protected void buildPackage(String image) throws SetupException {
 
-        if (!systemService.isInterrupted()) {
+        if (!operationsMonitoringService.isInterrupted()) {
 
             try {
                 systemOperationService.applySystemOperation("Building of package " + image,

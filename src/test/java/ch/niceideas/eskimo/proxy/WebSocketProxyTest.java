@@ -81,7 +81,10 @@ public class WebSocketProxyTest {
     @AfterEach
     public void tearDown() throws Exception {
         try {
-            this.server.destroy();
+            // this is the only way to avoid waiting 15 seconds eachtime
+            this.server.tomcatServer.destroy();
+            //this.server.tomcatServer.stop();
+            //this.server.destroy();
         }
         catch (Throwable t) {
             logger.error("Failed to undeploy application config", t);
@@ -271,7 +274,8 @@ public class WebSocketProxyTest {
 
         @Override
         public void destroy() throws Exception {
-            tomcatServer.stop();
+            tomcatServer.destroy();
+            //tomcatServer.stop();
         }
     }
 

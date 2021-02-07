@@ -64,6 +64,9 @@ public class SystemOperationService {
     @Autowired
     private SystemService systemService;
 
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
     /* For tests */
     void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
@@ -77,13 +80,16 @@ public class SystemOperationService {
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
+    }
 
     public void applySystemOperation(String message, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
             throws SystemException  {
 
         StringBuilder result = new StringBuilder();
 
-        if (!systemService.isInterrupted()) {
+        if (!operationsMonitoringService.isInterrupted()) {
             try {
                 notificationService.addDoing(message);
                 logOperationMessage(message);

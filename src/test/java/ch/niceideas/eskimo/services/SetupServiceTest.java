@@ -101,6 +101,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setBuildVersion("1.0");
 
         setupService.setMessagingService(messagingService);
+        setupService.setOperationsMonitoringService(operationsMonitoringService);
 
         return setupService;
     }

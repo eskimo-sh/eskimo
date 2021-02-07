@@ -36,6 +36,8 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemService;
 import lombok.Getter;
@@ -44,7 +46,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MarathonOperationsCommand extends JSONOpCommand<String> implements Serializable {
 
@@ -133,5 +137,21 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
             put("uninstallations", new JSONArray(getUninstallations()));
             put("warnings", warnings);
         }});
+    }
+
+    public List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context)
+            throws ServiceDefinitionException, NodesConfigurationException {
+
+        List<Pair<String, String>> allOpList = new ArrayList<>();
+
+        getInstallations().stream()
+                .map (service -> new Pair<>(service, "MARATHON"))
+                .forEach(allOpList::add);
+
+        getUninstallations().stream()
+                .map (service -> new Pair<>(service, "MARATHON"))
+                .forEach(allOpList::add);
+
+        return allOpList;
     }
 }

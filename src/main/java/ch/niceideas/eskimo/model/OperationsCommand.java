@@ -36,10 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.SerializablePair;
-import ch.niceideas.eskimo.services.NodeRangeResolver;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -234,5 +231,38 @@ public class OperationsCommand extends JSONOpCommand<SerializablePair<String, St
                 .map(Pair::getValue)
                 .forEach(retSet::add);
         return retSet;
+    }
+
+    public List<List<Pair<String, String>>> getRestartsInOrder
+            (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
+            throws ServiceDefinitionException, NodesConfigurationException {
+        return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);
+    }
+
+    public List<List<Pair<String, String>>> getInstallationsInOrder
+            (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
+            throws ServiceDefinitionException, NodesConfigurationException {
+        return servicesInstallationSorter.orderOperations (getInstallations(), nodesConfig);
+    }
+
+    public List<List<Pair<String, String>>> getUninstallationsInOrder
+            (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
+            throws ServiceDefinitionException, NodesConfigurationException {
+        List<List<Pair<String, String>>> orderedUninstallations = servicesInstallationSorter.orderOperations (getUninstallations(), nodesConfig);
+        Collections.reverse(orderedUninstallations);
+        return orderedUninstallations;
+    }
+
+    public List<Pair<String, String>> getAllOperationsInOrder
+            (OperationsContext context)
+            throws ServiceDefinitionException, NodesConfigurationException {
+
+        List<Pair<String, String>> allOpList = new ArrayList<>();
+
+        getInstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
+        getUninstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
+        getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
+
+        return allOpList;
     }
 }

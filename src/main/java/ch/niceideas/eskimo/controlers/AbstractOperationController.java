@@ -3,6 +3,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.model.JSONOpCommand;
 import ch.niceideas.eskimo.services.MessagingService;
 import ch.niceideas.eskimo.services.NotificationService;
+import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.json.JSONObject;
@@ -24,6 +25,9 @@ public class AbstractOperationController {
     @Autowired
     protected SystemService systemService;
 
+    @Autowired
+    protected OperationsMonitoringService operationsMonitoringService;
+
     @Value("${eskimo.demoMode}")
     private boolean demoMode = false;
 
@@ -36,6 +40,9 @@ public class AbstractOperationController {
     void setDemoMode (boolean demoMode) {
         this.demoMode = demoMode;
     }
+    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
+    }
 
     protected String returnCommand(JSONOpCommand<? extends Serializable> command) {
         return ReturnStatusHelper.createOKStatus(map -> map.put("command", command.toJSON()));
@@ -45,7 +52,7 @@ public class AbstractOperationController {
 
         JSONObject checkObject = null;
 
-        if (systemService.isProcessingPending()) {
+        if (operationsMonitoringService.isProcessingPending()) {
 
             String message = "Some backend operations are currently running. Please retry after they are completed.";
 

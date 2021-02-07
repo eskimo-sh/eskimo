@@ -111,12 +111,13 @@ public class GlusterSetupTest extends AbstractSetupShellTest {
         String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
         if (StringUtils.isNotBlank(sudoLogs)) {
 
-            //System.err.println (sudoLogs);
+            System.err.println (sudoLogs);
 
             assertTrue(sudoLogs.contains("" +
                     "bash -c echo \"volume management\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    type mgmt/glusterd\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option working-directory /var/lib/gluster/working_directory\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
+                    "bash -c echo \"    option nfs.disable on\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n"+
                     "bash -c echo \"    option transport-type socket,rdma\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport.socket.keepalive-time 20\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport.socket.keepalive-interval 2\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +

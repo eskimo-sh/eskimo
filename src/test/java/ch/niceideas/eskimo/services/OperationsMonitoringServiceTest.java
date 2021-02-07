@@ -32,40 +32,46 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import lombok.Getter;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.*;
+import com.trilead.ssh2.Connection;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class JSONOpCommand<T extends Serializable> implements Serializable {
+import static org.junit.jupiter.api.Assertions.*;
 
-    @Getter
-    private final ArrayList<T> installations = new ArrayList<>();
+public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
-    @Getter
-    private final ArrayList<T> uninstallations = new ArrayList<>();
+    @Test
+    public void testInterruption() {
 
-    void addInstallation(T service) {
-        installations.add(service);
+        // no processing pending => no interruption
+        operationsMonitoringService.interruptProcessing();
+
+        assertFalse(operationsMonitoringService.isInterrupted());
+
+        // test interruption
+        operationsMonitoringService.operationsStarted();
+
+        operationsMonitoringService.interruptProcessing();
+
+        assertTrue(operationsMonitoringService.isInterrupted());
+
+        operationsMonitoringService.operationsFinished(true);
+
+        // no processing anymore
+        assertFalse(operationsMonitoringService.isInterrupted());
     }
 
-    void addUninstallation(T service) {
-        uninstallations.add(service);
-    }
-
-    public abstract JSONObject toJSON ();
-
-    public boolean hasChanges() {
-        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
-    }
-
-    public abstract List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context)
-            throws ServiceDefinitionException, NodesConfigurationException;
 }
