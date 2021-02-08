@@ -44,7 +44,7 @@ public class AbstractOperationController {
         this.operationsMonitoringService = operationsMonitoringService;
     }
 
-    protected String returnCommand(JSONOpCommand<? extends Serializable> command) {
+    protected String returnCommand(JSONOpCommand command) {
         return ReturnStatusHelper.createOKStatus(map -> map.put("command", command.toJSON()));
     }
 

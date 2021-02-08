@@ -264,13 +264,12 @@ public class SystemService {
     }
 
     void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SSHCommandException, MarathonException {
-
+        String message = opLabel + " " + service + " on " + node;
         boolean success = false;
-        operationsMonitoringService.operationsStarted();
+        operationsMonitoringService.operationsStarted(new SimpleOperation (message));
         try {
 
             notificationService.addDoing(opLabel + " " + service + " on " + node);
-            String message = opLabel + " " + service + " on " + node;
             logOperationMessage (message);
             messagingService.addLines("Done "
                     + message

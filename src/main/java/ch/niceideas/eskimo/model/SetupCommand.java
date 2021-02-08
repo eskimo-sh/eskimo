@@ -35,6 +35,9 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import lombok.Data;
@@ -42,12 +45,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
-public class SetupCommand implements Serializable {
+public class SetupCommand implements JSONOpCommand {
 
     private final JsonWrapper rawSetup;
 
@@ -100,5 +101,42 @@ public class SetupCommand implements Serializable {
             put("packageUpdates", new JSONArray(packageUpdates));
             put("none", buildMesos.size() + downloadMesos.size() + buildPackage.size() + downloadPackages.size() + packageUpdates.size() <= 0);
         }});
+    }
+
+    @Override
+    public boolean hasChanges() {
+        return !downloadPackages.isEmpty()
+                || !buildPackage.isEmpty()
+                || !downloadMesos.isEmpty()
+                || !buildMesos.isEmpty()
+                || !packageUpdates.isEmpty();
+    }
+
+    @Override
+    public List<Pair<String, String>> getAllOperationsInOrder(OperationsContext context) {
+
+        List<Pair<String, String>> allOpList = new ArrayList<>();
+
+        downloadPackages.stream()
+                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .forEach(allOpList::add);
+
+        buildPackage.stream()
+                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .forEach(allOpList::add);
+
+        downloadMesos.stream()
+                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .forEach(allOpList::add);
+
+        buildMesos.stream()
+                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .forEach(allOpList::add);
+
+        packageUpdates.stream()
+                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .forEach(allOpList::add);
+
+        return allOpList;
     }
 }

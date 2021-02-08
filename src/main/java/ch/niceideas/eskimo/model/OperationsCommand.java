@@ -47,7 +47,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OperationsCommand extends JSONOpCommand<SerializablePair<String, String>> implements Serializable {
+public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<String, String>> implements Serializable {
 
     private static final Logger logger = Logger.getLogger(OperationsCommand.class);
 

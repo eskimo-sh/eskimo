@@ -413,7 +413,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(setupConfigWrapper);
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService));
 
         // no update (installed flink is latest version !)
         assertEquals(0, downloadPackageList.size());
@@ -470,7 +470,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(setupConfigWrapper);
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService));
 
         // 13 updated packages
         assertEquals(13, downloadPackageList.size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
@@ -516,11 +516,14 @@ public class SetupServiceTest extends AbstractSystemTest {
             }
         });
 
-        setupService.setBuildVersion("1.0-SNAPSHOT");
-
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
         setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        setupService.setBuildVersion("1.0");
+        SetupCommand command = SetupCommand.create(setupConfigWrapper, setupService);
+
+        setupService.setBuildVersion("1.0-SNAPSHOT");
 
         setupService.saveAndPrepareSetup(setupConfig);
 
@@ -529,7 +532,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        String errorResult = setupService.applySetup(setupConfigWrapper);
+        String errorResult = setupService.applySetup(command);
 
         assertEquals("{\n" +
                 "  \"error\": \"Downloading packages is not supported on development version (SNAPSHOT)\",\n" +
@@ -569,7 +572,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(setupConfigWrapper);
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService));
 
         assertEquals(19, downloadPackageList.size());
         assertEquals(0, builtPackageList.size());
@@ -628,7 +631,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(new JsonWrapper(setupConfig));
+        setupService.applySetup(SetupCommand.create(new JsonWrapper(setupConfig), setupService));
 
         assertEquals(19, builtPackageList.size());
         assertEquals(0, downloadPackageList.size());

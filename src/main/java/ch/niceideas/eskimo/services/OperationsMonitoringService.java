@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.eskimo.model.JSONOpCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +23,7 @@ public class OperationsMonitoringService {
     private final AtomicBoolean interruption = new AtomicBoolean(false);
     private final AtomicBoolean interruptionNotified = new AtomicBoolean(false);
     private boolean lastOperationSuccess;
+    private JSONOpCommand currentOperation = null;
 
     void setMessagingService(MessagingService messagingService) {
         this.messagingService = messagingService;
@@ -34,7 +36,8 @@ public class OperationsMonitoringService {
         return systemActionLock.isLocked();
     }
 
-    void operationsStarted() {
+    void operationsStarted(JSONOpCommand operation) {
+        currentOperation = operation;
         systemActionLock.lock();
     }
 
@@ -43,6 +46,7 @@ public class OperationsMonitoringService {
         systemActionLock.unlock();
         interruption.set(false);
         interruptionNotified.set(false);
+        currentOperation = null;
     }
 
     public void interruptProcessing() {

@@ -339,7 +339,7 @@ public class MarathonService {
 
         logger.info ("Starting Marathon Deployment Operations");
         boolean success = false;
-        operationsMonitoringService.operationsStarted();
+        operationsMonitoringService.operationsStarted(command);
         try {
 
             // Find out node running marathon

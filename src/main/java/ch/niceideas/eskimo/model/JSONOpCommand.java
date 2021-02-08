@@ -44,28 +44,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class JSONOpCommand<T extends Serializable> implements Serializable {
+public interface JSONOpCommand extends Serializable {
 
-    @Getter
-    private final ArrayList<T> installations = new ArrayList<>();
+    JSONObject toJSON ();
 
-    @Getter
-    private final ArrayList<T> uninstallations = new ArrayList<>();
+    boolean hasChanges();
 
-    void addInstallation(T service) {
-        installations.add(service);
-    }
-
-    void addUninstallation(T service) {
-        uninstallations.add(service);
-    }
-
-    public abstract JSONObject toJSON ();
-
-    public boolean hasChanges() {
-        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
-    }
-
-    public abstract List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context)
+    List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException;
 }

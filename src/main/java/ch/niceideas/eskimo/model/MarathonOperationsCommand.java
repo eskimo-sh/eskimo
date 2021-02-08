@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MarathonOperationsCommand extends JSONOpCommand<String> implements Serializable {
+public class MarathonOperationsCommand extends JSONInstallOpCommand<String> implements Serializable {
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
 
@@ -139,8 +139,7 @@ public class MarathonOperationsCommand extends JSONOpCommand<String> implements 
         }});
     }
 
-    public List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context)
-            throws ServiceDefinitionException, NodesConfigurationException {
+    public List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context) {
 
         List<Pair<String, String>> allOpList = new ArrayList<>();
 

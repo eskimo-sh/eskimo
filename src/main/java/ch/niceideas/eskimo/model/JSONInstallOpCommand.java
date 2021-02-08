@@ -32,46 +32,36 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.*;
-import com.trilead.ssh2.Connection;
-import org.apache.log4j.Logger;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import lombok.Getter;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+public abstract class JSONInstallOpCommand<T extends Serializable> implements JSONOpCommand {
 
-public class OperationsMonitoringServiceTest extends AbstractSystemTest {
+    @Getter
+    private final ArrayList<T> installations = new ArrayList<>();
 
-    @Test
-    public void testInterruption() {
+    @Getter
+    private final ArrayList<T> uninstallations = new ArrayList<>();
 
-        // no processing pending => no interruption
-        operationsMonitoringService.interruptProcessing();
+    void addInstallation(T service) {
+        installations.add(service);
+    }
 
-        assertFalse(operationsMonitoringService.isInterrupted());
+    void addUninstallation(T service) {
+        uninstallations.add(service);
+    }
 
-        // test interruption
-        operationsMonitoringService.operationsStarted(new SimpleOperation("test"));
-
-        operationsMonitoringService.interruptProcessing();
-
-        assertTrue(operationsMonitoringService.isInterrupted());
-
-        operationsMonitoringService.operationsFinished(true);
-
-        // no processing anymore
-        assertFalse(operationsMonitoringService.isInterrupted());
+    public boolean hasChanges() {
+        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
     }
 
 }

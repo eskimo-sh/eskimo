@@ -143,7 +143,7 @@ public class NodesConfigurationService {
 
         logger.info ("Starting System Deployment Operations.");
         boolean success = false;
-        operationsMonitoringService.operationsStarted();
+        operationsMonitoringService.operationsStarted(command);
         try {
 
             NodesConfigWrapper rawNodesConfig = command.getRawConfig();

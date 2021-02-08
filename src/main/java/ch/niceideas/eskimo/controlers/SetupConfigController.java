@@ -155,7 +155,7 @@ public class SetupConfigController extends AbstractOperationController {
         SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
         session.removeAttribute(PENDING_SETUP_COMMAND);
 
-        return setupService.applySetup(command.getRawSetup());
+        return setupService.applySetup(command);
     }
 
 }

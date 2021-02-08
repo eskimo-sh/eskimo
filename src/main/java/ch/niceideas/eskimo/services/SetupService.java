@@ -483,11 +483,13 @@ public class SetupService {
     }
 
 
-    public String applySetup(JsonWrapper setupConfig) {
+    public String applySetup(SetupCommand setupCommand) {
 
         boolean success = false;
-        operationsMonitoringService.operationsStarted();
+        operationsMonitoringService.operationsStarted(setupCommand);
         try {
+
+            JsonWrapper setupConfig = setupCommand.getRawSetup();
 
             File packagesDistribFolder = new File (packageDistributionPath);
             if (!packagesDistribFolder.exists()) {
