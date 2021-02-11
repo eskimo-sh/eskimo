@@ -76,9 +76,8 @@ public class SetupService {
 
     private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
 
-
     @Autowired
-    private MessagingService messagingService;
+    private NotificationService notificationService;
 
     @Autowired
     private SystemService systemService;
@@ -124,9 +123,6 @@ public class SetupService {
     private String configStoragePathInternal = null;
 
     /** For tests */
-    void setMessagingService (MessagingService messagingService) {
-        this.messagingService = messagingService;
-    }
     void setBuildVersion (String buildVersion) {
         this.buildVersion = buildVersion;
     }
@@ -305,7 +301,7 @@ public class SetupService {
 
         } catch (JSONException | FileException e) {
             logger.error(e, e);
-            messagingService.addLines("\nerror : "
+            notificationService.addError("\nerror : "
                     + e.getMessage());
             throw new SetupException(e);
         }
@@ -378,7 +374,7 @@ public class SetupService {
         JsonWrapper packagesVersion = null;
         try {
             packagesVersion = loadRemotePackagesVersionFile();
-        } catch (SetupException e) {
+        } catch (SetupException | JSONException e) {
             logger.warn (e.getMessage());
             logger.debug(e, e);
         }
@@ -486,8 +482,9 @@ public class SetupService {
     public String applySetup(SetupCommand setupCommand) {
 
         boolean success = false;
-        operationsMonitoringService.operationsStarted(setupCommand);
         try {
+
+            operationsMonitoringService.operationsStarted(setupCommand);
 
             JsonWrapper setupConfig = setupCommand.getRawSetup();
 
@@ -614,10 +611,8 @@ public class SetupService {
             success = true;
             return "{\"status\": \"OK\"}";
 
-        } catch (JSONException | SetupException e) {
+        } catch (JSONException | SetupException | ServiceDefinitionException | NodesConfigurationException e) {
             logger.error(e, e);
-            messagingService.addLines("\nerror : "
-                    + e.getMessage());
             return ReturnStatusHelper.createErrorStatus (e);
 
         } finally {
@@ -682,7 +677,8 @@ public class SetupService {
     protected void downloadPackage(String fileName) throws SetupException {
         if (!operationsMonitoringService.isInterrupted()) {
             try {
-                systemOperationService.applySystemOperation("Downloading of package " + fileName,
+                systemOperationService.applySystemOperation(
+                        new SetupCommand.SetupOperationId(SetupCommand.TYPE_DOWNLOAD, fileName),
                         builder -> {
 
                             File targetFile = new File(packageDistributionPath + "/" + fileName);
@@ -730,7 +726,8 @@ public class SetupService {
         if (!operationsMonitoringService.isInterrupted()) {
 
             try {
-                systemOperationService.applySystemOperation("Building of package " + image,
+                systemOperationService.applySystemOperation(
+                        new SetupCommand.SetupOperationId(SetupCommand.TYPE_BUILD, image),
                         builder -> {
                             try {
 

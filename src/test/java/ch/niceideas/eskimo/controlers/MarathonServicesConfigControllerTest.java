@@ -21,7 +21,6 @@ public class MarathonServicesConfigControllerTest {
 
     @BeforeEach
     public void testSetup() {
-        mscc.setMessagingService(new MessagingService());
         mscc.setNotificationService(new NotificationService());
 
         mscc.setSystemService(new SystemService() {

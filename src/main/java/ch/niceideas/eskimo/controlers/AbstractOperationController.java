@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.model.JSONOpCommand;
-import ch.niceideas.eskimo.services.MessagingService;
+import ch.niceideas.eskimo.services.MessagingManager;
 import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.SystemService;
@@ -11,13 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.HashMap;
 
 public class AbstractOperationController {
-
-    @Resource
-    protected MessagingService messagingService;
 
     @Autowired
     protected NotificationService notificationService;
@@ -35,7 +31,6 @@ public class AbstractOperationController {
     void setSystemService(SystemService systemService) {
         this.systemService = systemService;
     }
-    void setMessagingService(MessagingService messagingService) { this.messagingService = messagingService; }
     void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
     void setDemoMode (boolean demoMode) {
         this.demoMode = demoMode;
@@ -56,7 +51,7 @@ public class AbstractOperationController {
 
             String message = "Some backend operations are currently running. Please retry after they are completed.";
 
-            messagingService.addLines (message);
+            //messagingService.addLines (message);
             notificationService.addError("Operation In Progress");
 
             checkObject = new JSONObject(new HashMap<String, Object>() {{
@@ -67,7 +62,7 @@ public class AbstractOperationController {
 
         if (demoMode) {
 
-            messagingService.addLines (demoMessage);
+            //messagingService.addLines (demoMessage);
             notificationService.addError("Demo Mode");
 
             checkObject = new JSONObject(new HashMap<String, Object>() {{

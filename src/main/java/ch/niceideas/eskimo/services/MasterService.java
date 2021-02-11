@@ -49,7 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -58,9 +57,6 @@ import java.util.stream.Collectors;
 public class MasterService {
 
     private static final Logger logger = Logger.getLogger(MasterService.class);
-
-    @Autowired
-    private MessagingService messagingService;
 
     @Autowired
     private NotificationService notificationService;
@@ -94,9 +90,6 @@ public class MasterService {
      */
     void setSshCommandService(SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
-    }
-    void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
     }
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
@@ -231,7 +224,7 @@ public class MasterService {
 
                             try {
                                 Date masterElectedDate = strategy.detectMaster(
-                                        service, node, masterDetection, this, sshCommandService, messagingService, notificationService);
+                                        service, node, masterDetection, this, sshCommandService, notificationService);
 
                                 if (masterElectedDate != null) {
                                     handleMasterDetectedDate(service, node, masterElectedDate);

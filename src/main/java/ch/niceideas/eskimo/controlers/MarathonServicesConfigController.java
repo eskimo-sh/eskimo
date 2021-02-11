@@ -156,7 +156,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
         } catch (JSONException | SetupException | FileException | MarathonServicesConfigException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             notificationService.addError("Marathon Services installation preparation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
@@ -205,7 +204,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
         } catch (JSONException | FileException | SetupException | SystemException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
@@ -248,7 +246,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
         } catch (JSONException | SetupException | FileException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             notificationService.addError("Marathon Services installation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }

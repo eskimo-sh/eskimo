@@ -35,7 +35,7 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.services.MessagingService;
+import ch.niceideas.eskimo.services.MessagingManager;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -54,10 +54,10 @@ public class MessagingController extends AbstractInformationController<String, S
     private static final Logger logger = Logger.getLogger(MessagingController.class);
 
     @Resource
-    private MessagingService messagingService;
+    private MessagingManager messagingService;
 
     /* For tests */
-    void setMessagingService(MessagingService messagingService) {
+    void setMessagingService(MessagingManager messagingService) {
         this.messagingService = messagingService;
     }
 

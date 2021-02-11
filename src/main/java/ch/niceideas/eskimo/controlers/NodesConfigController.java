@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
@@ -149,7 +149,7 @@ public class NodesConfigController extends AbstractOperationController {
             }
 
             // Create OperationsCommand
-            OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, newServicesInstallStatus, nodesConfig);
+            ServiceOperationsCommand command = ServiceOperationsCommand.create(servicesDefinition, nodeRangeResolver, newServicesInstallStatus, nodesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
@@ -159,7 +159,6 @@ public class NodesConfigController extends AbstractOperationController {
 
         } catch (JSONException | FileException | NodesConfigurationException | SetupException | SystemException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
@@ -179,7 +178,7 @@ public class NodesConfigController extends AbstractOperationController {
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
             // Create OperationsCommand
-            OperationsCommand command = OperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
+            ServiceOperationsCommand command = ServiceOperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
 
             // store command and config in HTTP Session
             session.removeAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);
@@ -189,7 +188,6 @@ public class NodesConfigController extends AbstractOperationController {
 
         } catch (JSONException | SetupException | FileException | NodesConfigurationException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
@@ -206,7 +204,7 @@ public class NodesConfigController extends AbstractOperationController {
                 return checkObject.toString(2);
             }
 
-            OperationsCommand command = (OperationsCommand) session.getAttribute(PENDING_OPERATIONS_COMMAND);
+            ServiceOperationsCommand command = (ServiceOperationsCommand) session.getAttribute(PENDING_OPERATIONS_COMMAND);
             session.removeAttribute(PENDING_OPERATIONS_COMMAND);
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);
@@ -229,7 +227,6 @@ public class NodesConfigController extends AbstractOperationController {
 
         } catch (JSONException | SetupException | FileException | NodesConfigurationException | ServiceDefinitionException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }

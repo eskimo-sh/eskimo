@@ -1,11 +1,9 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +22,6 @@ public class NodesConfigControllerTest {
 
     @BeforeEach
     public void testSetup() {
-        ncc.setMessagingService(new MessagingService());
         ncc.setNotificationService(new NotificationService());
 
         ncc.setOperationsMonitoringService(new OperationsMonitoringService() {
@@ -128,7 +125,7 @@ public class NodesConfigControllerTest {
 
         ncc.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
-            public void applyNodesConfig(OperationsCommand command) {
+            public void applyNodesConfig(ServiceOperationsCommand command) {
                 // No Op
             }
         });
@@ -215,7 +212,7 @@ public class NodesConfigControllerTest {
 
         ncc.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
-            public void applyNodesConfig(OperationsCommand command) {
+            public void applyNodesConfig(ServiceOperationsCommand command) {
                 // No Op
             }
         });

@@ -74,9 +74,6 @@ public class MarathonService {
     private MemoryComputer memoryComputer;
 
     @Autowired
-    private MessagingService messagingService;
-
-    @Autowired
     private NotificationService notificationService;
 
     @Autowired
@@ -127,9 +124,7 @@ public class MarathonService {
     void setMemoryComputer(MemoryComputer memoryComputer) {
         this.memoryComputer = memoryComputer;
     }
-    void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
-    }
+
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -339,19 +334,25 @@ public class MarathonService {
 
         logger.info ("Starting Marathon Deployment Operations");
         boolean success = false;
-        operationsMonitoringService.operationsStarted(command);
         try {
+
+            operationsMonitoringService.operationsStarted(command);
 
             // Find out node running marathon
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
             String marathonNode = servicesInstallStatus.getFirstNode(MARATHON);
             if (StringUtils.isBlank(marathonNode)) {
-                String message = "Marathon doesn't seem to be installed";
-                notificationService.addError(message);
+
+                notificationService.addError("Marathon doesn't seem to be installed");
+
+                String message = "Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.\"";
+                /*
                 messagingService.addLines(message);
                 messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
 
+
+                 */
                 // special case : if some marathon services are getting uninstalled, and marathon is nowhere installed or anything, let's force flag them as uninstalled
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
@@ -359,10 +360,10 @@ public class MarathonService {
                     if (StringUtils.isBlank(marathonNodeName)) {
 
                         if (command.getUninstallations().size() > 0) {
-                            messagingService.addLines("Uninstalled marathon services will be flagged as uninstalled even though no operation can be performed in marathon.");
+                            logger.warn("Uninstalled marathon services will be flagged as uninstalled even though no operation can be performed in marathon.");
                             configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                                for (String uninstalledMarathonService : command.getUninstallations()) {
-                                    servicesInstallationStatus.removeInstallationFlag(uninstalledMarathonService, ServicesInstallStatusWrapper.MARATHON_NODE);
+                                for (MarathonOperationsCommand.MarathonOperationId uninstalledMarathonService : command.getUninstallations()) {
+                                    servicesInstallationStatus.removeInstallationFlag(uninstalledMarathonService.getService(), ServicesInstallStatusWrapper.MARATHON_NODE);
                                 }
                             });
                         }
@@ -388,10 +389,12 @@ public class MarathonService {
             List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<String>(){{add(marathonNode);}}, nodesConfig, liveIps, deadIps);
 
             if (deadIps.contains(marathonNode)) {
-                String message = "The marathon node is dead. cannot proceed any further with installation.";
-                notificationService.addError(message);
+                notificationService.addError("The marathon node is dead. cannot proceed any further with installation.");
+                String message = "The marathon node is dead. cannot proceed any further with installation. Marathon services configuration is saved but will need to be re-applied when marathon is available.";
+                /*
                 messagingService.addLines(message);
                 messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
+                */
                 throw new MarathonException(message);
             }
 
@@ -416,15 +419,24 @@ public class MarathonService {
             }
 
             // Nodes re-setup (topology)
-            systemService.performPooledOperation (new ArrayList<> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
-                    (operation, error) -> {
-                        // topology
-                        if (error.get() == null) {
-                            systemOperationService.applySystemOperation("Installation of Topology and settings on " + operation,
-                                    builder -> nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation), null);
-                        }
+            systemOperationService.applySystemOperation(new MarathonOperationsCommand.MarathonOperationId("Installation", "Topology (All Nodes)"),
+                builder -> {
+                    systemService.performPooledOperation (new ArrayList<> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+                            (operation, error) -> {
+                                // topology
+                                if (error.get() == null) {
+                                    try {
+                                        nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation);
+                                    } catch (SSHCommandException | IOException e) {
+                                        logger.error (e, e);
+                                        builder.append(e.getMessage());
+                                        throw new SystemException(e);
+                                    }
+                                }
+                            });
+                }, null);
 
-                    });
+
 
             // Installation in batches (groups following dependencies) - deploying on marathon 1 service at a time for now
             systemService.performPooledOperation(command.getInstallations(), 1, marathonOperationWaitTimoutSeconds,
@@ -449,9 +461,8 @@ public class MarathonService {
             */
 
             success = true;
-        } catch (FileException | SetupException | SystemException e) {
+        } catch (FileException | SetupException | SystemException | ServiceDefinitionException | NodesConfigurationException e) {
             logger.error (e, e);
-            messagingService.addLines (e.getMessage());
             notificationService.addError("Marathon Services installation failed !");
             throw new MarathonException(e);
         } finally {
@@ -466,68 +477,62 @@ public class MarathonService {
 
             String marathonNodeName = lastStatus.getFirstNodeName(MARATHON);
             if (StringUtils.isBlank(marathonNodeName)) {
-                String message = "Marathon is not available";
-                notificationService.addError(message);
-                messagingService.addLines("Marathon is not available. The changes in marathon services configuration and " +
+                notificationService.addError("Marathon is not available");
+                throw new MarathonException("Marathon is not available. The changes in marathon services configuration and " +
                         "deployments are saved but they will need to be applied again another time when " +
                         "marathon is available");
-                throw new MarathonException(message);
             } else {
 
                 if (!lastStatus.isServiceOKOnNode(MARATHON, marathonNodeName)) {
 
-                    String message = "Marathon is not properly running";
-                    notificationService.addError(message);
-                    messagingService.addLines("Marathon is not properly running. The changes in marathon services configuration and " +
+                    notificationService.addError("Marathon is not properly running");
+                    throw new MarathonException("Marathon is not properly running. The changes in marathon services configuration and " +
                             "deployments are saved but they will need to be applied again another time when " +
                             "marathon is available");
-                    throw new MarathonException(message);
                 }
             }
 
         } catch (SystemService.StatusExceptionWrapperException e) {
 
-            String message = "Couldn't get last marathon Service status";
-            notificationService.addError(message);
+            notificationService.addError("Couldn't get last marathon Service status");
             String warnings = "Couldn't get last marathon Service status to assess feasibility of marathon setup\n";
             warnings += e.getCause().getCause() + ":" + e.getCause().getMessage();
-            messagingService.addLines(warnings);
-            throw new MarathonException(message);
+            throw new MarathonException(warnings);
         }
     }
 
-    void uninstallMarathonService(String service, String marathonNode) throws SystemException {
+    void uninstallMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode) throws SystemException {
         String nodeIp = null;
         try {
-            Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(service);
+            Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(operation.getService());
             nodeIp = nodeNameAndStatus.getKey();
         } catch (MarathonException e) {
             logger.warn (e.getMessage());
             logger.debug (e, e);
         }
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on marathon node " + marathonNode,
+        systemOperationService.applySystemOperation(operation,
                 builder -> {
                     try {
-                        proceedWithMarathonServiceUninstallation(builder, marathonNode, service);
+                        proceedWithMarathonServiceUninstallation(builder, marathonNode, operation.getService());
                     } catch (MarathonException e) {
                         logger.error (e, e);
                         throw new SystemException(e);
                     }
                 },
-                status -> status.removeInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE));
+                status -> status.removeInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.MARATHON_NODE));
         if (nodeIp != null) {
-            proxyManagerService.removeServerForService(service, nodeIp);
+            proxyManagerService.removeServerForService(operation.getService(), nodeIp);
         } else {
-            logger.warn ("No previous IP could be found for service " + service);
+            logger.warn ("No previous IP could be found for service " + operation.getService());
         }
     }
 
 
-    void installMarathonService(String service, String marathonNode)
+    void installMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode)
             throws SystemException {
-        systemOperationService.applySystemOperation("installation of " + service + " on marathon node " + marathonNode,
-                builder -> proceedWithMarathonServiceInstallation(builder, marathonNode, service),
-                status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
+        systemOperationService.applySystemOperation(operation,
+                builder -> proceedWithMarathonServiceInstallation(builder, marathonNode, operation.getService()),
+                status -> status.setInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
     }
 
     private void proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonNode, String service)
@@ -686,7 +691,7 @@ public class MarathonService {
         return false;
     }
 
-    public void showJournalMarathon(Service service) throws MarathonException, SSHCommandException {
+    public void showJournalMarathon(Service service) throws SystemException, MarathonException {
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Showing journal", () -> showJournalMarathonInternal(service));
     }
@@ -828,7 +833,7 @@ public class MarathonService {
         return resultBuilder.toString();
     }
 
-    public void startServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+    public void startServiceMarathon(Service service) throws SystemException, MarathonException {
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Starting", () -> startServiceMarathonInternal(service));
     }
@@ -868,7 +873,7 @@ public class MarathonService {
         return log.toString();
     }
 
-    public void  stopServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+    public void  stopServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> stopServiceMarathonInternal(service));
     }
@@ -908,7 +913,7 @@ public class MarathonService {
         return log.toString();
     }
 
-    public void restartServiceMarathon(Service service) throws MarathonException, SSHCommandException {
+    public void restartServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> restartServiceMarathonInternal(service));
     }

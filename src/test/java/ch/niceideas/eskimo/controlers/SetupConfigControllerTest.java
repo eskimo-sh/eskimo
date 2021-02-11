@@ -22,7 +22,6 @@ public class SetupConfigControllerTest {
 
     @BeforeEach
     public void testSetup() {
-        scc.setMessagingService(new MessagingService());
         scc.setNotificationService(new NotificationService());
 
         scc.setOperationsMonitoringService(new OperationsMonitoringService() {

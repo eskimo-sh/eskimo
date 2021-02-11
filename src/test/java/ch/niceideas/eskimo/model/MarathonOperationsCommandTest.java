@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -57,7 +58,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     }
 
     @Test
-    public void testNoChanges() throws Exception {
+    public void testNoChanges() {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -70,7 +71,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
     }
 
     @Test
-    public void testInstallation() throws Exception {
+    public void testInstallation() {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_MARATHON_NODE");
@@ -89,11 +90,13 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         assertEquals(1, moc.getInstallations().size());
         assertEquals(0, moc.getUninstallations().size());
 
-        assertEquals ("[kafka-manager]", Arrays.toString(moc.getInstallations().toArray()));
+        assertEquals ("kafka-manager", moc.getInstallations().stream()
+                .map(MarathonOperationsCommand.MarathonOperationId::getService)
+                .collect(Collectors.joining(",")));
     }
 
     @Test
-    public void testUninstallation() throws Exception {
+    public void testUninstallation() {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -113,6 +116,8 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         assertEquals(0, moc.getInstallations().size());
         assertEquals(1, moc.getUninstallations().size());
 
-        assertEquals ("[kafka-manager]", Arrays.toString(moc.getUninstallations().toArray()));
+        assertEquals ("kafka-manager", moc.getUninstallations().stream()
+                .map(MarathonOperationsCommand.MarathonOperationId::getService)
+                .collect(Collectors.joining(",")));
     }
 }

@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +54,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
 
     private ServicesSettingsService scs;
 
-    private AtomicReference<OperationsCommand> processedCommand = new AtomicReference<>();
+    private AtomicReference<ServiceOperationsCommand> processedCommand = new AtomicReference<>();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -89,7 +89,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
     protected NodesConfigurationService createNodesConfiguratioNService() {
         return new NodesConfigurationService() {
             @Override
-            public void applyNodesConfig(OperationsCommand command) {
+            public void applyNodesConfig(ServiceOperationsCommand command) {
                 processedCommand.set(command);
             }
         };

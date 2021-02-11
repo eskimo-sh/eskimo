@@ -208,8 +208,13 @@ But it breaks  the menu entry title overlay
     color: red;
 }
 
-.status-table {
+.status-table{
     margin-bottom: 15px;
+}
+
+.operations-table{
+    margin-bottom: 15px;
+    margin-top: 15px;
 }
 
 .notifications-clear-link {
@@ -291,9 +296,13 @@ li.disabled a .menu-text {
 .table > tfoot > tr > td.status-node-cell,
 .table > tfoot > tr > td.status-node-cell-empty,
 .table > tfoot > tr > td.status-node-cell-intro,
+.table > thead > tr > td.operations-cell,
+.table > tbody > tr > td.operations-cell,
 .status-node-cell,
+.operations-cell,
 .status-node-cell-empty,
-.status-node-cell-intro {
+.status-node-cell-intro,
+#marathon-services-table-head > tr > td {
     padding: 2px 5px 2px 5px;
     text-align: center;
     vertical-align: middle;
@@ -305,21 +314,30 @@ li.disabled a .menu-text {
 .table > thead > tr > td.status-node-cell-intro,
 .table > tfoot > tr > td.status-node-cell,
 .table > thead > tr > td.status-node-cell-intro,
+.table > thead > tr > td.operations-cell,
+.table > thead > tr > td.operations-cell-intro,
 .status-node-cell,
-.status-node-cell-intro {
+.status-node-cell-intro,
+.operations-cell,
+.operations-cell-intro {
     cursor: pointer;
 }
 
 .table > thead > tr > td.status-node-cell,
 .table > thead > tr > td.status-node-cell-empty,
-.table > thead > tr > td.status-node-cell-intro {
+.table > thead > tr > td.status-node-cell-intro,
+.table > thead > tr > td.operations-cell,
+.table > thead > tr > td.operations-cell-intro,
+#marathon-services-table-head > tr > td {
     background-color: #F2F2F2;
     font-weight: bold;
 }
 
 .table > tbody > tr > td.status-node-cell i,
 .table > tbody > tr > td.status-node-cell-empty i,
-.table > tbody > tr > td.status-node-cell-intro i {
+.table > tbody > tr > td.status-node-cell-intro i,
+.table > tfoot > tr > td.operations-cell i,
+.table > thead > tr > td.operations-cell-intro i {
     font-size: larger;
 }
 
@@ -1412,4 +1430,17 @@ table.system-information tr td.info-label {
 .top-menu-small {
     margin-left: 2px;
     margin-right: 2px;
+}
+
+#operations-head-log {
+    width: 100px;
+    min-width: 100px;
+}
+
+.progress-operation-wrapper{
+    margin-bottom: 0px;
+}
+
+td.operation-title{
+    text-align: left;
 }

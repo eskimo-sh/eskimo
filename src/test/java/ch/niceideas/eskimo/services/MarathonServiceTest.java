@@ -109,7 +109,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
         marathonService.setSystemOperationService(systemOperationService);
         marathonService.setProxyManagerService(proxyManagerService);
         marathonService.setMemoryComputer(memoryComputer);
-        marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
         marathonService.setConnectionManagerService(connectionManagerService);
         marathonService.setOperationsMonitoringService(operationsMonitoringService);
@@ -205,18 +204,18 @@ public class MarathonServiceTest extends AbstractSystemTest {
                 return request.getRequestLine().getUri();
             }
             @Override
-            void installMarathonService(String service, String marathonNode) {
-                installList.add (service+"-"+ marathonNode);
+            void installMarathonService(MarathonOperationsCommand.MarathonOperationId operationId, String marathonNode) {
+                installList.add (operationId.getService()+"-"+ marathonNode);
             }
             @Override
-            void uninstallMarathonService(String service, String marathonNode) throws SystemException {
-                uninstallList.add (service+"-"+ marathonNode);
+            void uninstallMarathonService(MarathonOperationsCommand.MarathonOperationId operationId, String marathonNode) throws SystemException {
+                uninstallList.add (operationId.getService()+"-"+ marathonNode);
             }
         });
 
         MarathonException exception = assertThrows(MarathonException.class, () -> marathonService.applyMarathonServicesConfig(command));
         assertNotNull(exception);
-        assertEquals("ch.niceideas.eskimo.services.SystemException: Marathon doesn't seem to be installed", exception.getMessage());
+        assertEquals("ch.niceideas.eskimo.services.SystemException: Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.\"", exception.getMessage());
 
         configurationService.saveServicesInstallationStatus(serviceInstallStatus);
 
@@ -270,13 +269,13 @@ public class MarathonServiceTest extends AbstractSystemTest {
         // 2. service does not exist
         marathonService = resetupMarathonService(new MarathonService() {
             @Override
-            protected String queryMarathon(String endpoint) throws MarathonException {
+            protected String queryMarathon(String endpoint) {
                 return "{ \"message\" : \"cerebro does not exist\"} ";
             }
         });
         marathonService.setConfigurationService(new ConfigurationService() {
             @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus()  {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
         });
@@ -360,7 +359,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         MarathonException exception = assertThrows(MarathonException.class, () -> marathonService.ensureMarathonAvailability());
         assertNotNull(exception);
-        assertEquals("Couldn't get last marathon Service status", exception.getMessage());
+        assertEquals("Couldn't get last marathon Service status to assess feasibility of marathon setup\n" +
+                "null:none", exception.getMessage());
 
         // 2. Marathon not available (not installed)
         marathonService.setSystemService(new SystemService() {
@@ -372,7 +372,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         exception = assertThrows(MarathonException.class, () -> marathonService.ensureMarathonAvailability());
         assertNotNull(exception);
-        assertEquals("Marathon is not available", exception.getMessage());
+        assertEquals("Marathon is not available. The changes in marathon services configuration and deployments are saved but they will need to be applied again another time when marathon is available", exception.getMessage());
 
         // 3. Marathon not up and running
         marathonService.setSystemService(new SystemService() {
@@ -384,7 +384,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         exception = assertThrows(MarathonException.class, marathonService::ensureMarathonAvailability);
         assertNotNull(exception);
-        assertEquals("Marathon is not properly running", exception.getMessage());
+        assertEquals("Marathon is not properly running. The changes in marathon services configuration and deployments are saved but they will need to be applied again another time when marathon is available", exception.getMessage());
 
         // 4. Service OK
         marathonService.setSystemService(new SystemService() {
@@ -437,7 +437,22 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
-        marathonService.uninstallMarathonService("cerebro", "192.168.10.11");
+        ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        serviceInstallStatus.setValueForPath("grafana_installed_on_IP_MARATHON_NODE", "OK");
+
+        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"));
+        marathonConfig.setValueForPath("cerebro_install", "off");
+
+        MarathonOperationsCommand command = MarathonOperationsCommand.create (
+                servicesDefinition,
+                systemService,
+                serviceInstallStatus,
+                marathonConfig
+        );
+
+        operationsMonitoringService.operationsStarted(command);
+
+        marathonService.uninstallMarathonService(new MarathonOperationsCommand.MarathonOperationId ("uninstallation", "cerebro"), "192.168.10.11");
 
         assertEquals(1, marathonApiCalls.size());
         assertEquals("http://localhost:12345/v2/apps/cerebro", marathonApiCalls.get(0));
@@ -450,6 +465,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
         System.err.println(testSSHCommandScript);
         System.err.println(String.join(",", marathonApiCalls));
         */
+
+        operationsMonitoringService.operationsFinished(true);
     }
 
     @Test
@@ -473,7 +490,20 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         });
 
-        marathonService.installMarathonService("cerebro", "192.168.10.11");
+        ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        serviceInstallStatus.removeInstallationFlag("cerebro", "MARATHON_NODE");
+        serviceInstallStatus.setValueForPath("grafana_installed_on_IP_MARATHON_NODE", "OK");
+
+        MarathonOperationsCommand command = MarathonOperationsCommand.create (
+                servicesDefinition,
+                systemService,
+                serviceInstallStatus,
+                new MarathonServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"))
+        );
+
+        operationsMonitoringService.operationsStarted(command);
+
+        marathonService.installMarathonService(new MarathonOperationsCommand.MarathonOperationId ("installation", "cerebro"), "192.168.10.11");
 
         // Just testing a few commands
         assertTrue(testSSHCommandScript.toString().contains("tar xfz /tmp/cerebro.tgz --directory=/tmp/"));
@@ -483,6 +513,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         // no API calls from backend (it's actually done by setup script)
         assertEquals(0, marathonApiCalls.size());
+
+        operationsMonitoringService.operationsFinished(true);
     }
 
     @Test
@@ -635,7 +667,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
         systemService.setSshCommandService(sshCommandService);
         systemService.setServicesDefinition(servicesDefinition);
         systemService.setMarathonService(marathonService);
-        systemService.setMessagingService(messagingService);
         systemService.setNotificationService(notificationService);
         marathonService.setSystemService(systemService);
 
@@ -744,7 +775,6 @@ public class MarathonServiceTest extends AbstractSystemTest {
             }
         };
         ss.setNotificationService(notificationService);
-        ss.setMessagingService(messagingService);
         ss.setOperationsMonitoringService(operationsMonitoringService);
         marathonService.setSystemService(ss);
 
@@ -784,14 +814,13 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         SystemService ss = new SystemService() {
             @Override
-            public SystemStatusWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+            public SystemStatusWrapper getStatus() {
                 SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
                 retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "marathon_192-168-10-11", "OK");
                 return retStatus;
             }
         };
         ss.setNotificationService(notificationService);
-        ss.setMessagingService(messagingService);
         ss.setOperationsMonitoringService(operationsMonitoringService);
         marathonService.setSystemService(ss);
 
@@ -820,7 +849,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
             }
             @Override
-            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) throws IOException {
+            protected String sendHttpRequestAndGetResult(ProxyTunnelConfig marathonTunnelConfig, BasicHttpRequest request) {
                 marathonApiCalls.add(request.getRequestLine().getUri());
                 return "{\"deploymentId\": \"1234\"}";
             }
@@ -831,14 +860,13 @@ public class MarathonServiceTest extends AbstractSystemTest {
         });
         SystemService ss = new SystemService() {
             @Override
-            public SystemStatusWrapper getStatus() throws SystemService.StatusExceptionWrapperException {
+            public SystemStatusWrapper getStatus() {
                 SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
                 retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "marathon_192-168-10-11", "OK");
                 return retStatus;
             }
         };
         ss.setNotificationService(notificationService);
-        ss.setMessagingService(messagingService);
         ss.setOperationsMonitoringService(operationsMonitoringService);
         marathonService.setSystemService(ss);
 

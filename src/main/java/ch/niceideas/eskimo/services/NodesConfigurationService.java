@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -51,12 +52,6 @@ public class NodesConfigurationService {
 
     @Autowired
     private SSHCommandService sshCommandService;
-
-    @Autowired
-    private MessagingService messagingService;
-
-    @Autowired
-    private ServicesSettingsService servicesSettingsService;
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -110,12 +105,6 @@ public class NodesConfigurationService {
     void setSshCommandService(SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
     }
-    void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
-    }
-    void setServicesSettingsService(ServicesSettingsService servicesSettingsService) {
-        this.servicesSettingsService = servicesSettingsService;
-    }
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
@@ -138,7 +127,7 @@ public class NodesConfigurationService {
         this.operationsMonitoringService = operationsMonitoringService;
     }
 
-    public void applyNodesConfig(OperationsCommand command)
+    public void applyNodesConfig(ServiceOperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
 
         logger.info ("Starting System Deployment Operations.");
@@ -152,10 +141,15 @@ public class NodesConfigurationService {
             Set<String> liveIps = new HashSet<>();
             Set<String> deadIps = new HashSet<>();
 
-            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(command.getAllNodes(), nodesConfig, liveIps, deadIps);
-            if (nodesSetup == null) {
+            List<Pair<String, String>> nodeSetupPairs = systemService.buildDeadIps(command.getAllNodes(), nodesConfig, liveIps, deadIps);
+            if (nodeSetupPairs == null) {
                 return;
             }
+
+            List<ServiceOperationsCommand.ServiceOperationId> nodesSetup =
+                    nodeSetupPairs.stream()
+                            .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, ServiceOperationsCommand.BASE_SYSTEM, nodeSetupPair.getValue()))
+                            .collect(Collectors.toList());
 
             MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
 
@@ -168,46 +162,50 @@ public class NodesConfigurationService {
             // Nodes setup
             systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
-                        String node = operation.getValue();
+                        String node = operation.getNode();
                         if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
 
-                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null && isMissingOnNode("base_system", node))) {
-                                systemOperationService.applySystemOperation("Installation of Base System on " + node,
-                                        builder -> installEskimoBaseSystem(builder, node), null);
+                            systemOperationService.applySystemOperation(
+                                    new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, ServiceOperationsCommand.BASE_SYSTEM, node),
+                                    builder -> {
 
-                                flagInstalledOnNode("base_system", node);
-                            }
+                                        if (!operationsMonitoringService.isInterrupted() && error.get() == null) {
+                                            operationsMonitoringService.addInfo(operation, "Checking / Installing Base system");
+                                            if (isMissingOnNode("base_system", node)) {
+                                                installEskimoBaseSystem(builder, node);
+                                                flagInstalledOnNode("base_system", node);
+                                            }
+                                        }
 
-                            // topology
-                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
-                                systemOperationService.applySystemOperation("Installation of Topology and settings on " + node,
-                                        builder -> installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, node), null);
-                            }
+                                        // topology
+                                        if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
+                                            operationsMonitoringService.addInfo(operation, "Installing Topology");
+                                            installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, node);
+                                        }
 
-                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null && isMissingOnNode("mesos", node))) {
-                                systemOperationService.applySystemOperation("Installation of Mesos on " + node,
-                                        builder -> {
-                                            uploadMesos(node);
-                                            builder.append (installMesos(node));
-                                        }, null);
+                                        if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
+                                            operationsMonitoringService.addInfo(operation, "Checking / Installing Mesos");
+                                            if (isMissingOnNode("mesos", node)) {
+                                                uploadMesos(node);
+                                                builder.append(installMesos(node));
+                                                flagInstalledOnNode("mesos", node);
+                                            }
+                                        }
 
-                                flagInstalledOnNode("mesos", node);
-                            }
+                                    }, null);
                         }
                     });
 
             // first thing first, flag services that need to be restarted as "needing to be restarted"
-            for (List<Pair<String, String>> restarts : command.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
-                for (Pair<String, String> operation : restarts) {
+            for (List<ServiceOperationsCommand.ServiceOperationId> restarts : command.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
+                for (ServiceOperationsCommand.ServiceOperationId restart : restarts) {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                            String service = operation.getKey();
-                            String node = operation.getValue();
-                            String nodeName = node.replace(".", "-");
-                            if (node.equals(OperationsCommand.MARATHON_FLAG)) {
+                            String nodeName = restart.getNode().replace(".", "-");
+                            if (restart.getNode().equals(ServiceOperationsCommand.MARATHON_FLAG)) {
                                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
                             }
-                            servicesInstallationStatus.setInstallationFlag(service, nodeName, "restart");
+                            servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
                         });
                     } catch (FileException | SetupException e) {
                         logger.error (e, e);
@@ -217,47 +215,41 @@ public class NodesConfigurationService {
             }
 
             // Installation in batches (groups following dependencies)
-            for (List<Pair<String, String>> installations : command.getInstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
+            for (List<ServiceOperationsCommand.ServiceOperationId> installations : command.getInstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
 
                 systemService.performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            String service = operation.getKey();
-                            String node = operation.getValue();
-                            if (liveIps.contains(node)) {
-                                installService(service, node);
+                            if (liveIps.contains(operation.getNode())) {
+                                installService(operation);
                             }
                         });
             }
 
             // uninstallations
-            for (List<Pair<String, String>> uninstallations : command.getUninstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
+            for (List<ServiceOperationsCommand.ServiceOperationId> uninstallations : command.getUninstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
                 systemService.performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            String service = operation.getKey();
-                            String node = operation.getValue();
-                            if (!deadIps.contains(node)) {
-                                uninstallService(service, node);
+                            if (!deadIps.contains(operation.getNode())) {
+                                uninstallService(operation);
                             } else {
-                                if (!liveIps.contains(node)) {
+                                if (!liveIps.contains(operation.getNode())) {
                                     // this means that the node has been de-configured
                                     // (since if it is neither dead nor alive then it just hasn't been tested since it's not
                                     // in the config anymore)
                                     // just consider it uninstalled
-                                    uninstallServiceNoOp(service, node);
+                                    uninstallServiceNoOp(operation);
                                 }
                             }
                         });
             }
 
             // restarts
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (
+            for (List<ServiceOperationsCommand.ServiceOperationId> restarts : servicesInstallationSorter.orderOperations (
                     command.getRestarts(), nodesConfig)) {
                 systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            String service = operation.getKey();
-                            String node = operation.getValue();
-                            if (node.equals(OperationsCommand.MARATHON_FLAG) || liveIps.contains(node)) {
-                                restartServiceForSystem(service, node);
+                            if (operation.getNode().equals(ServiceOperationsCommand.MARATHON_FLAG) || liveIps.contains(operation.getNode())) {
+                                restartServiceForSystem(operation);
                             }
                         });
             }
@@ -313,7 +305,6 @@ public class NodesConfigurationService {
     private boolean isMissingOnNode(String installation, String node) {
 
         try {
-            messagingService.addLine("\nChecking " + installation + " on node " + node);
             String result = sshCommandService.runSSHCommand(node, "cat /etc/eskimo_flag_" + installation + "_installed");
             return StringUtils.isBlank(result) || !result.contains("OK");
         } catch (SSHCommandException e) {
@@ -393,7 +384,6 @@ public class NodesConfigurationService {
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
-            messagingService.addLines(" - Uploading mesos distribution");
             String mesosFlavour = "mesos-" + getNodeFlavour(connection);
 
             File packageDistributionDir = new File (packageDistributionPath);
@@ -413,50 +403,50 @@ public class NodesConfigurationService {
         }
     }
 
-    void uninstallService(String service, String node) throws SystemException {
-        String nodeName = node.replace(".", "-");
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + node,
-                builder -> proceedWithServiceUninstallation(builder, node, service),
-                status -> status.removeInstallationFlag(service, nodeName));
-        proxyManagerService.removeServerForService(service, node);
+    void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+        String nodeName = operationId.getNode().replace(".", "-");
+        systemOperationService.applySystemOperation(operationId,
+                builder -> proceedWithServiceUninstallation(builder, operationId.getNode(), operationId.getService()),
+                status -> status.removeInstallationFlag(operationId.getService(), nodeName));
+        proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
-    void uninstallServiceNoOp(String service, String node) throws SystemException {
-        String nodeName = node.replace(".", "-");
-        systemOperationService.applySystemOperation("Uninstallation of " + service + " on " + node,
+    void uninstallServiceNoOp(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+        String nodeName = operationId.getNode().replace(".", "-");
+        systemOperationService.applySystemOperation(operationId,
                 builder -> {},
-                status -> status.removeInstallationFlag(service, nodeName));
-        proxyManagerService.removeServerForService(service, node);
+                status -> status.removeInstallationFlag(operationId.getService(), nodeName));
+        proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
-    void installService(String service, String node)
+    void installService(ServiceOperationsCommand.ServiceOperationId operationId)
             throws SystemException {
-        String nodeName = node.replace(".", "-");
-        systemOperationService.applySystemOperation("installation of " + service + " on " + node,
-                builder -> proceedWithServiceInstallation(builder, node, service),
-                status -> status.setInstallationFlag(service, nodeName, "OK"));
+        String nodeName = operationId.getNode().replace(".", "-");
+        systemOperationService.applySystemOperation(operationId,
+                builder -> proceedWithServiceInstallation(builder, operationId.getNode(), operationId.getService()),
+                status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
     }
 
-    void restartServiceForSystem(String service, String node) throws SystemException {
-        String nodeName = node.replace(".", "-");
+    void restartServiceForSystem(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+        String nodeName = operationId.getNode().replace(".", "-");
 
-        if (servicesDefinition.getService(service).isMarathon()) {
+        if (servicesDefinition.getService(operationId.getService()).isMarathon()) {
 
-            systemOperationService.applySystemOperation("Restart of " + service + " on marathon node ",
+            systemOperationService.applySystemOperation(operationId,
                     builder -> {
                         try {
-                            builder.append(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(service)));
+                            builder.append(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(operationId.getService())));
                         } catch (MarathonException e) {
                             logger.error (e, e);
                             throw new SystemException (e);
                         }
                     },
-                    status -> status.setInstallationFlag(service, ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
+                    status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
 
         } else {
-            systemOperationService.applySystemOperation("Restart of " + service + " on " + node,
-                    builder -> builder.append(sshCommandService.runSSHCommand(node, "sudo systemctl restart " + service)),
-                    status -> status.setInstallationFlag(service, nodeName, "OK"));
+            systemOperationService.applySystemOperation(operationId,
+                    builder -> builder.append(sshCommandService.runSSHCommand(operationId.getNode(), "sudo systemctl restart " + operationId.getService())),
+                    status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
         }
     }
 

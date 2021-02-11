@@ -38,6 +38,8 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.OperationId;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -53,9 +55,6 @@ public class SystemOperationService {
     private static final Logger logger = Logger.getLogger(SystemOperationService.class);
 
     @Autowired
-    private MessagingService messagingService;
-
-    @Autowired
     private NotificationService notificationService;
 
     @Autowired
@@ -68,9 +67,6 @@ public class SystemOperationService {
     private OperationsMonitoringService operationsMonitoringService;
 
     /* For tests */
-    void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
-    }
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -84,20 +80,24 @@ public class SystemOperationService {
         this.operationsMonitoringService = operationsMonitoringService;
     }
 
-    public void applySystemOperation(String message, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
+    public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
             throws SystemException  {
 
         StringBuilder result = new StringBuilder();
 
         if (!operationsMonitoringService.isInterrupted()) {
+
+            String message = operationId.getMessage();
+
             try {
+                operationsMonitoringService.startOperation(operationId);
                 notificationService.addDoing(message);
-                logOperationMessage(message);
+                logOperationMessage(operationId, message);
 
 
                 operation.call(result);
                 if (StringUtils.isNotBlank(result.toString())) {
-                    messagingService.addLines("\nDone : "
+                    operationsMonitoringService.addInfo(operationId, "\nDone : "
                             + message
                             + "\n-------------------------------------------------------------------------------\n"
                             + result
@@ -111,10 +111,10 @@ public class SystemOperationService {
                 }
 
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.debug(e, e);
                 logger.warn ("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
 
-                messagingService.addLines("\nDone : "
+                operationsMonitoringService.addInfo(operationId, "\nDone : "
                         + message
                         + "\n-------------------------------------------------------------------------------\n"
                         + result
@@ -122,13 +122,18 @@ public class SystemOperationService {
                         + e.getMessage());
 
                 notificationService.addError(message + " failed !");
+                operationsMonitoringService.operationError(operationId);
                 throw new SystemException(e);
+
+            } finally {
+
+                operationsMonitoringService.endOperation(operationId);
             }
         }
     }
 
-    private void logOperationMessage(String operation) {
-        messagingService.addLines(new String[]{
+    private void logOperationMessage(OperationId operationId, String operation) {
+        operationsMonitoringService.addInfo(operationId, new String[]{
                 "\n" + operation
         });
     }

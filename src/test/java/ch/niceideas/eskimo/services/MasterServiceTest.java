@@ -64,7 +64,6 @@ public class MasterServiceTest extends AbstractSystemTest {
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
 
         ms.setConfigurationService(configurationService);
-        ms.setMessagingService(messagingService);
         ms.setNodeRangeResolver(nodeRangeResolver);
         ms.setNotificationService(notificationService);
         ms.setServicesDefinition(servicesDefinition);

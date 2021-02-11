@@ -38,7 +38,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import com.trilead.ssh2.Connection;
@@ -178,18 +178,20 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     public void testInstallService() throws Exception {
 
         ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
-                put("mesos_installed_on_IP_192-168-10-11", "OK");
-                put("mesos_installed_on_IP_192-168-10-13", "OK");
-                put("node_check_IP_192-168-10-11", "OK");
-                put("node_check_IP_192-168-10-13", "OK");
                 put("ntp_installed_on_IP_192-168-10-11", "OK");
                 put("ntp_installed_on_IP_192-168-10-13", "OK");
         }});
 
         configurationService.saveServicesInstallationStatus(savedStatus);
+        configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+
+        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedStatus, StandardSetupHelpers.getStandard2NodesSetup());
+
+        operationsMonitoringService.operationsStarted(command);
 
         // testing zookeeper installation
-        nodesConfigurationService.installService("zookeeper", "localhost");
+        nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId("installation", "zookeeper", "192.168.10.13"));
 
         assertTrue(testSSHCommandScript.toString().startsWith("rm -Rf /tmp/zookeeper\n" +
                 "rm -f /tmp/zookeeper.tgz\n"));
@@ -198,19 +200,27 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 "tar xfz /tmp/zookeeper.tgz --directory=/tmp/\n" +
                 "chmod 755 /tmp/zookeeper/setup.sh\n"));
         assertTrue(testSSHCommandScript.toString().contains(
-                "bash /tmp/zookeeper/setup.sh localhost \n" +
+                "bash /tmp/zookeeper/setup.sh 192.168.10.13 \n" +
                 "rm -Rf /tmp/zookeeper\n" +
                 "rm -f /tmp/zookeeper.tgz\n"));
+
+        operationsMonitoringService.operationsFinished(true);
     }
 
     @Test
     public void testApplyNodesConfig() throws Exception {
 
-        OperationsCommand command = OperationsCommand.create(
+        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8"));
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
+        configurationService.saveNodesConfig(nodesConfig);
+
+        ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,
                 nodeRangeResolver,
-                new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8")),
-                new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"))
+                servicesInstallStatus,
+                nodesConfig
         );
 
         SSHCommandService sshCommandService = new SSHCommandService() {
@@ -300,19 +310,29 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     public void testUninstallation() throws Exception {
 
         ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
-            put("mesos_installed_on_IP_192-168-10-11", "OK");
-            put("mesos_installed_on_IP_192-168-10-13", "OK");
-            put("node_check_IP_192-168-10-11", "OK");
-            put("node_check_IP_192-168-10-13", "OK");
             put("ntp_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-13", "OK");
             put("zookeeper_installed_on_IP_192-168-10-11", "OK");
         }});
 
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("ntp1", "on");
+            put("node_id2", "192.168.10.13");
+            put("ntp2", "on");
+        }});
+
         configurationService.saveServicesInstallationStatus(savedStatus);
+        configurationService.saveNodesConfig(nodesConfig);
+
+        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedStatus, nodesConfig);
+
+        operationsMonitoringService.operationsStarted(command);
+
 
         // testing zookeeper installation
-        nodesConfigurationService.uninstallService("zookeeper", "192.168.10.11");
+        nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "zookeeper", "192.168.10.11"));
 
         assertTrue(testSSHCommandScript.toString().contains(
                 "sudo systemctl stop zookeeper\n" +
@@ -322,6 +342,8 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 "sudo docker image rm -f eskimo:zookeeper\n" +
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
+
+        operationsMonitoringService.operationsFinished(true);
     }
 
 }

@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.eskimo.model.AbstractInformationHolder;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -45,7 +46,7 @@ import java.util.List;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class NotificationService extends AbstractInformationService<JSONObject, List<JSONObject>> {
+public class NotificationService extends AbstractInformationHolder<JSONObject, List<JSONObject>> {
 
     private static final int MAX_HISTORY_SIZE = 100;
 

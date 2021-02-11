@@ -34,14 +34,11 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import lombok.Getter;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface JSONOpCommand extends Serializable {
@@ -50,6 +47,6 @@ public interface JSONOpCommand extends Serializable {
 
     boolean hasChanges();
 
-    List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context)
+    List<? extends OperationId> getAllOperationsInOrder (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException;
 }

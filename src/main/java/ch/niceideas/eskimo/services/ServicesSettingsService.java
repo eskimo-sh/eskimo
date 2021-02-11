@@ -100,7 +100,7 @@ public class ServicesSettingsService {
 
                     ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
-                    OperationsCommand restartCommand = OperationsCommand.createForRestartsOnly(
+                    ServiceOperationsCommand restartCommand = ServiceOperationsCommand.createForRestartsOnly(
                             servicesDefinition,
                             nodeRangeResolver,
                             dirtyServices.toArray(new String[0]),

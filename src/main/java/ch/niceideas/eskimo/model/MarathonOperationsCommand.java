@@ -40,7 +40,9 @@ import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemService;
+import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,8 +51,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class MarathonOperationsCommand extends JSONInstallOpCommand<String> implements Serializable {
+public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOperationsCommand.MarathonOperationId> implements Serializable {
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
 
@@ -72,7 +75,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<String> impl
             if (rawMarathonServicesConfig.isServiceInstallRequired(service)
                     && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
 
-                retCommand.addInstallation(service);
+                retCommand.addInstallation(new MarathonOperationId ("installation", service));
             }
         }
 
@@ -87,7 +90,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<String> impl
                 // search it in config
                 && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
 
-                retCommand.addUninstallation(installedService);
+                retCommand.addUninstallation(new MarathonOperationId ("uninstallation", installedService));
             }
         }
 
@@ -133,24 +136,41 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<String> impl
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("installations", new JSONArray(getInstallations()));
-            put("uninstallations", new JSONArray(getUninstallations()));
+            put("installations", new JSONArray(getInstallations().stream().map(MarathonOperationId::getService).collect(Collectors.toList())));
+            put("uninstallations", new JSONArray(getUninstallations().stream().map(MarathonOperationId::getService).collect(Collectors.toList())));
             put("warnings", warnings);
         }});
     }
 
-    public List<Pair<String, String>> getAllOperationsInOrder (OperationsContext context) {
+    public List<MarathonOperationId> getAllOperationsInOrder (OperationsContext context) {
 
-        List<Pair<String, String>> allOpList = new ArrayList<>();
+        List<MarathonOperationId> allOpList = new ArrayList<>();
 
-        getInstallations().stream()
-                .map (service -> new Pair<>(service, "MARATHON"))
-                .forEach(allOpList::add);
+        getInstallations().forEach(opId -> allOpList.add(new MarathonOperationId("Installation", "Topology (All Nodes)")));
 
-        getUninstallations().stream()
-                .map (service -> new Pair<>(service, "MARATHON"))
-                .forEach(allOpList::add);
+        allOpList.addAll(getInstallations());
+        allOpList.addAll(getUninstallations());
 
         return allOpList;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    public static class MarathonOperationId implements OperationId {
+
+        private final String type;
+        private final String service;
+
+        public boolean isOnNode(String node) {
+            return node.equals(ServicesInstallStatusWrapper.MARATHON_NODE);
+        }
+
+        public boolean isSameNode(OperationId other) {
+            return other.isOnNode(ServicesInstallStatusWrapper.MARATHON_NODE);
+        }
+
+        public String getMessage() {
+            return type + " of " + getService() + " on marathon";
+        }
     }
 }

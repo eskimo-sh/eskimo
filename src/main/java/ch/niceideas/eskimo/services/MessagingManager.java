@@ -34,45 +34,43 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.UnboundList;
+import ch.niceideas.eskimo.model.AbstractInformationHolder;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
-public abstract class AbstractInformationService<T, R> {
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+public class MessagingManager extends AbstractInformationHolder<String, String> {
 
-    protected final List<T> elements = Collections.synchronizedList(new UnboundList<>(getMaxHistorySize()));
+    private static final int MAX_HISTORY_SIZE = 10000;
 
-    public Pair<Integer, R> fetchElements(int lastLine) {
-        if (lastLine > elements.size()) { // this means that a call to clear has been performed
-            // need to refetch everything from scratch !
-            lastLine = 0;
+    @Override
+    protected int getMaxHistorySize() {
+        return MAX_HISTORY_SIZE;
+    }
+
+    @Override
+    protected String buildFetchedData(int lastLine) {
+        StringBuilder ret = new StringBuilder();
+        for (String line : getSubList(lastLine)) {
+            ret.append (line);
+            ret.append ("\n");
         }
-        return new Pair<>(elements.size(), buildFetchedData(lastLine));
+        return ret.toString();
     }
 
-    protected abstract int getMaxHistorySize();
-
-    protected final List<T> getSubList(int lastLine) {
-        return elements.subList(lastLine, elements.size());
+    public void addLine (String lines) {
+        addElement(lines);
     }
 
-    protected abstract R buildFetchedData(int lastLine);
-
-    protected void addElement (T element) {
-        elements.add(element);
+    public void addLines (String[] lines) {
+        addAllElements(Arrays.asList(lines));
     }
 
-    protected void addAllElements(List<T> newElements) {
-        elements.addAll(newElements);
-    }
-
-    public void clear () {
-        elements.clear();
-    }
-
-    public Integer getLastElement() {
-        return elements.size();
+    public void addLines (String lines) {
+        this.addLines(lines.split("\n"));
     }
 }

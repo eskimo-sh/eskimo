@@ -4,6 +4,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.OperationId;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.*;
@@ -67,18 +68,9 @@ public class ServicesSettingsControllerTest {
     }
 
     @Test
-    public void testPrepareAndSaveServicesConfig() throws Exception {
+    public void testPrepareAndSaveServicesConfig() {
 
         injectDummyService();
-
-        StringBuilder messages = new StringBuilder();
-
-        scc.setMessagingService(new MessagingService() {
-            @Override
-            public void addLines (String lines) {
-                messages.append(lines);
-            }
-        });
 
         StringBuilder notifications = new StringBuilder();
 
@@ -115,9 +107,7 @@ public class ServicesSettingsControllerTest {
                 "  \"status\": \"KO\"\n" +
                 "}", scc.saveServicesSettings(session));
 
-        assertEquals("Setting application failed !", notifications.toString());
-
-        assertEquals("Test Error", messages.toString());
+        assertEquals("Setting application failed ! Test Error", notifications.toString());
 
         injectDummyService();
 

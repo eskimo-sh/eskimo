@@ -34,7 +34,7 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.eskimo.services.AbstractInformationService;
+import ch.niceideas.eskimo.model.AbstractInformationHolder;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.springframework.stereotype.Controller;
 
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class AbstractInformationController<T, R>  {
 
-    String getLastlineElement(AbstractInformationService<T, R>  is) {
+    String getLastlineElement(AbstractInformationHolder<T, R> is) {
         return lastLine(is.getLastElement());
     }
 
@@ -50,7 +50,7 @@ public class AbstractInformationController<T, R>  {
         return ReturnStatusHelper.createOKStatus(map -> map.put("lastLine", lastLine));
     }
 
-    public String clear(AbstractInformationService<T, R>  is) {
+    public String clear(AbstractInformationHolder<T, R> is) {
         is.clear();
         return ReturnStatusHelper.createOKStatus();
     }

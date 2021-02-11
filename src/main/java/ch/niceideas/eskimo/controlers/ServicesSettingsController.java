@@ -107,8 +107,7 @@ public class ServicesSettingsController extends AbstractOperationController{
 
         } catch (SetupException | FileException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
-            notificationService.addError("Service Settings Application preparation failed !");
+            notificationService.addError("Service Settings Application preparation failed ! " + e.getMessage());
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
@@ -131,14 +130,9 @@ public class ServicesSettingsController extends AbstractOperationController{
 
             return ReturnStatusHelper.createOKStatus();
 
-        } catch (SystemException e) {
+        } catch (SystemException | SetupException | FileException e) {
             logger.error(e, e);
-            return ReturnStatusHelper.createEncodedErrorStatus(e);
-
-        } catch (SetupException | FileException e) {
-            logger.error(e, e);
-            messagingService.addLines (e.getMessage());
-            notificationService.addError("Setting application failed !");
+            notificationService.addError("Setting application failed ! " + e.getMessage());
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }

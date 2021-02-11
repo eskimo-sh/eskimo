@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,6 +51,8 @@ import java.util.*;
 @Data
 public class SetupCommand implements JSONOpCommand {
 
+    public static final String TYPE_DOWNLOAD = "Download";
+    public static final String TYPE_BUILD = "Build";
     private final JsonWrapper rawSetup;
 
     private final String packageDownloadUrl;
@@ -113,30 +116,50 @@ public class SetupCommand implements JSONOpCommand {
     }
 
     @Override
-    public List<Pair<String, String>> getAllOperationsInOrder(OperationsContext context) {
+    public List<SetupOperationId> getAllOperationsInOrder(OperationsContext context) {
 
-        List<Pair<String, String>> allOpList = new ArrayList<>();
+        List<SetupOperationId> allOpList = new ArrayList<>();
 
         downloadPackages.stream()
-                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
         buildPackage.stream()
-                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .map (pack -> new SetupOperationId(TYPE_BUILD, pack))
                 .forEach(allOpList::add);
 
         downloadMesos.stream()
-                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
         buildMesos.stream()
-                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .map (pack -> new SetupOperationId(TYPE_BUILD, pack))
                 .forEach(allOpList::add);
 
         packageUpdates.stream()
-                .map (pack -> new Pair<>(pack, "DOWNLOAD"))
+                .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
         return allOpList;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    public static class SetupOperationId implements OperationId {
+
+        private final String type;
+        private final String service;
+
+        public boolean isOnNode(String node) {
+            return false;
+        }
+
+        public boolean isSameNode(OperationId other) {
+            return false;
+        }
+
+        public String getMessage() {
+            return type + " of package " + getService();
+        }
     }
 }

@@ -143,7 +143,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testCallCommand() throws Exception {
 
-        SSHCommandException exception = assertThrows(SSHCommandException.class,
+        SystemException exception = assertThrows(SystemException.class,
                 () -> systemService.callCommand("dummy", "ntp", "192.168.10.11"));
         assertNotNull(exception);
         assertEquals("Command dummy is unknown for service ntp", exception.getMessage());
@@ -817,11 +817,15 @@ public class SystemServiceTest extends AbstractSystemTest {
                         "]",
                 ""+notificationService.getSubList(0));
 
+        SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId("test op", "ntp", "192.168.10.11");
+
+        List<String> messages = operationsMonitoringService.getNewMessages(operationId, 0);
+
         assertEquals ("[\n" +
                 "test op ntp on 192.168.10.11, Done test op ntp on 192.168.10.11, " +
                 "-------------------------------------------------------------------------------, " +
                 "OK" +
-                "]", ""+messagingService.getSubList(0));
+                "]", ""+messages);
     }
 
 }

@@ -44,7 +44,6 @@ import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -61,8 +60,6 @@ public abstract class AbstractSystemTest {
     protected SystemService systemService = null;
 
     protected NotificationService notificationService = null;
-
-    protected MessagingService messagingService = null;
 
     protected ProxyManagerService proxyManagerService = null;
 
@@ -217,19 +214,17 @@ public abstract class AbstractSystemTest {
 
         setupService.setSystemService(systemService);
 
-        messagingService = new MessagingService();
-
         notificationService = new NotificationService();
 
         operationsMonitoringService = new OperationsMonitoringService();
-        operationsMonitoringService.setMessagingService(messagingService);
         operationsMonitoringService.setNotificationService(notificationService);
+        operationsMonitoringService.setConfigurationService(configurationService);
+        operationsMonitoringService.setNodeRangeResolver(nodeRangeResolver);
 
         setupService.setOperationsMonitoringService(operationsMonitoringService);
 
         systemOperationService = new SystemOperationService();
         systemOperationService.setNotificationService(notificationService);
-        systemOperationService.setMessagingService(messagingService);
         systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
         systemOperationService.setOperationsMonitoringService(operationsMonitoringService);
@@ -247,6 +242,8 @@ public abstract class AbstractSystemTest {
 
         servicesInstallationSorter = new ServicesInstallationSorter ();
         servicesInstallationSorter.setServicesDefinition(servicesDefinition);
+
+        operationsMonitoringService.setServicesInstallationSorter(servicesInstallationSorter);
 
         servicesSettingsService = new ServicesSettingsService();
         servicesSettingsService.setNodeRangeResolver(nodeRangeResolver);
@@ -272,7 +269,6 @@ public abstract class AbstractSystemTest {
         marathonService.setSystemOperationService(systemOperationService);
         marathonService.setProxyManagerService(proxyManagerService);
         marathonService.setMemoryComputer(memoryComputer);
-        marathonService.setMessagingService(messagingService);
         marathonService.setNotificationService(notificationService);
         marathonService.setConnectionManagerService (connectionManagerService);
         marathonService.setOperationsMonitoringService(operationsMonitoringService);
@@ -283,7 +279,6 @@ public abstract class AbstractSystemTest {
         systemService.setSshCommandService(sshCommandService);
         systemService.setServicesDefinition(servicesDefinition);
         systemService.setMarathonService(marathonService);
-        systemService.setMessagingService(messagingService);
         systemService.setNotificationService(notificationService);
         systemService.setConfigurationService(configurationService);
         systemService.setOperationsMonitoringService(operationsMonitoringService);
@@ -292,10 +287,8 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService.setConfigurationService(configurationService);
         nodesConfigurationService.setMarathonService(marathonService);
         nodesConfigurationService.setMemoryComputer(memoryComputer);
-        nodesConfigurationService.setMessagingService(messagingService);
         nodesConfigurationService.setNodeRangeResolver(nodeRangeResolver);
         nodesConfigurationService.setProxyManagerService(proxyManagerService);
-        nodesConfigurationService.setServicesSettingsService(servicesSettingsService);
         nodesConfigurationService.setServicesDefinition(servicesDefinition);
         nodesConfigurationService.setServicesInstallationSorter(servicesInstallationSorter);
         nodesConfigurationService.setSetupService(setupService);
@@ -316,6 +309,8 @@ public abstract class AbstractSystemTest {
 
     protected SetupService createSetupService() {
         return new SetupService(){
+
+            @Override
             protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
                 destinationFile.createNewFile();
                 try {

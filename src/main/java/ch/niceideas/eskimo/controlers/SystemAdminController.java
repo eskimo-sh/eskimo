@@ -99,7 +99,7 @@ public class SystemAdminController extends AbstractOperationController {
 
             return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
 
-        } catch (SSHCommandException | MarathonException e) {
+        } catch (MarathonException | SystemException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus(e);
         }
@@ -246,7 +246,7 @@ public class SystemAdminController extends AbstractOperationController {
                     return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
                 }
 
-                OperationsCommand operationsCommand = OperationsCommand.create(
+                ServiceOperationsCommand operationsCommand = ServiceOperationsCommand.create(
                         servicesDefinition, nodeRangeResolver, newServicesInstallationStatus, nodesConfig);
 
                 return performSystemOperation(
@@ -255,7 +255,6 @@ public class SystemAdminController extends AbstractOperationController {
             }
         } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);
-            messagingService.addLines (e.getMessage());
             notificationService.addError("Nodes installation failed !");
             return ReturnStatusHelper.createErrorStatus(e);
         }
@@ -266,7 +265,7 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     private interface MarathonOperation {
-        void performOperation (MarathonService marathonService) throws SSHCommandException, MarathonException;
+        void performOperation (MarathonService marathonService) throws MarathonException, SystemException;
     }
 
 }

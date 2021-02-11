@@ -11,5 +11,5 @@ public interface MdStrategy {
     Date detectMaster(
             Service service, String node, MasterDetection masterDetection,
             MasterService masterService, SSHCommandService sshCommandService,
-            MessagingService messagingService, NotificationService notificationService) throws MasterDetectionException;
+            NotificationService notificationService) throws MasterDetectionException;
 }

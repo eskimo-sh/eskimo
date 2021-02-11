@@ -35,8 +35,11 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.model.*;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -47,20 +50,34 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SystemOperationServiceTest extends AbstractSystemTest {
 
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "test"));
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        operationsMonitoringService.operationsFinished(true);
+    }
+
     @Test
     public void testApplySystemOperation() throws Exception {
 
-        systemOperationService.applySystemOperation("Test",
+        OperationId operation = new SimpleOperationCommand.SimpleOperationId("test", "test", "test");
+
+        systemOperationService.applySystemOperation(operation,
                 result -> result.append("In operation\n"),
                 null);
 
-        Pair<Integer, String> messages = messagingService.fetchElements(0);
+        Pair<Integer, String> messages = operationsMonitoringService.fetchNewMessages(operation, 0);
+        //Pair<Integer, String> messages = messagingService.fetchElements(0);
         assertNotNull (messages);
         assertEquals(Integer.valueOf (6), messages.getKey());
         assertEquals("\n" +
-                "Test\n" +
+                "Executing test on test on test\n" +
                 "\n" +
-                "Done : Test\n" +
+                "Done : Executing test on test on test\n" +
                 "-------------------------------------------------------------------------------\n" +
                 "In operation\n" +
                 "--> Completed Successfuly.\n", messages.getValue());
@@ -70,11 +87,11 @@ public class SystemOperationServiceTest extends AbstractSystemTest {
         assertEquals(Integer.valueOf(2), notifications.getKey());
         assertEquals("{\n" +
                 "  \"type\": \"Doing\",\n" +
-                "  \"message\": \"Test\"\n" +
+                "  \"message\": \"Executing test on test on test\"\n" +
                 "}\n" +
                 "{\n" +
                 "  \"type\": \"Info\",\n" +
-                "  \"message\": \"Test succeeded\"\n" +
+                "  \"message\": \"Executing test on test on test succeeded\"\n" +
                 "}", notifications.getValue().stream()
                 .map(object -> {
                     try {

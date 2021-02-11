@@ -48,7 +48,7 @@ eskimo.Operations = function() {
 
     this.initialize = function () {
         // Initialize HTML Div from Template
-        $("#inner-content-operations").load("html/eskimoMessaging.html", function(responseTxt, statusTxt, jqXHR){
+        $("#inner-content-operations").load("html/eskimoOperations.html", function(responseTxt, statusTxt, jqXHR){
 
             if(statusTxt == "success"){
 

@@ -2,7 +2,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import org.json.JSONException;
@@ -23,7 +23,6 @@ public class SystemAdminControllerTest {
         sd.afterPropertiesSet();
         sac.setServicesDefinition(sd);
 
-        sac.setMessagingService(new MessagingService());
         sac.setNotificationService(new NotificationService());
 
         sac.setOperationsMonitoringService(new OperationsMonitoringService() {
@@ -63,7 +62,7 @@ public class SystemAdminControllerTest {
     public void testShowJournal() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void showJournal(String service, String node) throws SSHCommandException {
+            public void showJournal(String service, String node) {
                 // No Op
             }
         });
@@ -77,7 +76,7 @@ public class SystemAdminControllerTest {
     public void testStartService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void startService(String service, String node) throws SSHCommandException {
+            public void startService(String service, String node) {
                 // No Op
             }
         });
@@ -88,8 +87,8 @@ public class SystemAdminControllerTest {
 
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void startService(String service, String node) throws SSHCommandException {
-                throw new SSHCommandException("Test Error");
+            public void startService(String service, String node) throws SystemException {
+                throw new SystemException("Test Error");
             }
         });
 
@@ -103,7 +102,7 @@ public class SystemAdminControllerTest {
     public void testStopService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void stopService(String service, String node) throws SSHCommandException {
+            public void stopService(String service, String node) {
                 // No Op
             }
         });
@@ -117,7 +116,7 @@ public class SystemAdminControllerTest {
     public void testRestartService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void restartService(String service, String node) throws SSHCommandException {
+            public void restartService(String service, String node) {
                 // No Op
             }
         });
@@ -131,7 +130,7 @@ public class SystemAdminControllerTest {
     public void testServiceActionCustom() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void callCommand(String commandId, String serviceName, String node) throws SSHCommandException, MarathonException {
+            public void callCommand(String commandId, String serviceName, String node) {
                 // No Op
             }
         });
@@ -176,7 +175,7 @@ public class SystemAdminControllerTest {
         sac.setSystemService(new SystemService(false) {
 
             @Override
-            public void delegateApplyNodesConfig(OperationsCommand command)  {
+            public void delegateApplyNodesConfig(ServiceOperationsCommand command)  {
                 // No Op
             }
 

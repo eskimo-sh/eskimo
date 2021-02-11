@@ -57,8 +57,8 @@ public class ServicesInstallationSorter {
     }
 
 
-    public List<List<Pair<String, String>>> orderOperations(
-            List<? extends Pair<String, String>> operations,
+    public <T extends OperationId> List<List<T>> orderOperations  (
+            List<T> operations,
             NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException {
 
         if (operations == null || operations.isEmpty()) {
@@ -66,12 +66,12 @@ public class ServicesInstallationSorter {
         }
 
         // 1. group services togethers
-        Map<String, List<Pair<String, String>>> groupedOperations = new HashMap<>();
-        for (Pair<String, String> operation : operations) {
+        Map<String, List<T>> groupedOperations = new HashMap<>();
+        for (T operation : operations) {
 
-            String service = operation.getKey();
+            String service = operation.getService();
 
-            List<Pair<String, String>> operationForService = groupedOperations.computeIfAbsent(service, k -> new ArrayList<>());
+            List<T> operationForService = groupedOperations.computeIfAbsent(service, k -> new ArrayList<>());
 
             operationForService.add(operation);
         }
@@ -84,13 +84,13 @@ public class ServicesInstallationSorter {
 
 
         // 3. Reprocess and separate master installation
-        List<List<Pair<String, String>>> orderedOperationsSteps = new ArrayList<>();
+        List<List<T>> orderedOperationsSteps = new ArrayList<>();
 
         Topology topology = servicesDefinition.getTopology(nodesConfig, null, null);
 
         for (Service service : services) {
 
-            List<Pair<String, String>> group = groupedOperations.get(service.getName());
+            List<T> group = groupedOperations.get(service.getName());
 
             // If service has it's own in dependency, this is where we have an issue
             // then it depends on the type of dependency:
@@ -107,13 +107,13 @@ public class ServicesInstallationSorter {
 
                 for (String master : masters) {
 
-                    List<Pair<String, String>> newGroup = new ArrayList<>();
-                    for (Pair<String, String> operation : group) {
+                    List<T> newGroup = new ArrayList<>();
+                    for (T operation : group) {
 
-                        if (operation.getValue().equals(master)) {
+                        if (operation.isOnNode(master)) {
 
                             // create ad'hoc single group for master
-                            List<Pair<String, String>> singleGroup = new ArrayList<>();
+                            List<T> singleGroup = new ArrayList<>();
                             singleGroup.add(operation);
                             orderedOperationsSteps.add(singleGroup);
 
@@ -139,19 +139,19 @@ public class ServicesInstallationSorter {
         //    but don't allow multiple installations on same node in //
         for (int i = orderedOperationsSteps.size() - 1 ; i >= 0 ; i--) {
 
-            List<Pair<String, String>> current = orderedOperationsSteps.get(i);
+            List<T> current = orderedOperationsSteps.get(i);
             if (i > 0) {
-                List<Pair<String, String>> prev = orderedOperationsSteps.get(i - 1);
+                List<T> prev = orderedOperationsSteps.get(i - 1);
 
                 // Does any service in curent have any dependency on any servic in prev ?
                 Set<Service> currentServices = new HashSet<>();
-                for (Pair<String, String> installation : current) {
-                    currentServices.add(servicesDefinition.getService(installation.getKey()));
+                for (OperationId installation : current) {
+                    currentServices.add(servicesDefinition.getService(installation.getService()));
                 }
 
                 Set<Service> prevServices = new HashSet<>();
-                for (Pair<String, String> installation : prev) {
-                    prevServices.add(servicesDefinition.getService(installation.getKey()));
+                for (OperationId installation : prev) {
+                    prevServices.add(servicesDefinition.getService(installation.getService()));
                 }
 
                 boolean hasDependency = false;
@@ -166,9 +166,9 @@ public class ServicesInstallationSorter {
 
                 // Does any installation happen on same node ?
                 boolean hasSameNode = false;
-                for (Pair<String, String> installCurrent : current) {
-                    for (Pair<String, String> installPrev : prev) {
-                        if (installCurrent.getValue().equals(installPrev.getValue())) {
+                for (OperationId installCurrent : current) {
+                    for (OperationId installPrev : prev) {
+                        if (installCurrent.isSameNode(installPrev)) {
                             hasSameNode = true;
                             break;
                         }

@@ -42,13 +42,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MessagingServiceTest {
+public class MessagingManagerTest {
 
-    private MessagingService ms = null;
+    private MessagingManager ms = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        ms = new MessagingService();
+        ms = new MessagingManager();
         ms.addLines("Test");
         ms.addLines(new String[] {"Test1", "Test2"});
     }
@@ -149,7 +149,7 @@ public class MessagingServiceTest {
         lastLineUser2 = result2_2.getKey();
 
         // server is restarted
-        ms = new MessagingService();
+        ms = new MessagingManager();
 
         Pair<Integer,String> result1_4 = ms.fetchElements(lastLineUser1);
 

@@ -79,9 +79,6 @@ public class SystemService {
     private SetupService setupService;
 
     @Autowired
-    private MessagingService messagingService;
-
-    @Autowired
     private NotificationService notificationService;
 
     @Autowired
@@ -135,9 +132,6 @@ public class SystemService {
      */
     void setSshCommandService(SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
-    }
-    void setMessagingService(MessagingService messagingService) {
-        this.messagingService = messagingService;
     }
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
@@ -195,12 +189,12 @@ public class SystemService {
     }
 
 
-    public void delegateApplyNodesConfig(OperationsCommand command)
+    public void delegateApplyNodesConfig(ServiceOperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
         nodesConfigurationService.applyNodesConfig(command);
     }
 
-    public void showJournal(String serviceName, String node) throws SSHCommandException, MarathonException {
+    public void showJournal(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Showing journal of", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
@@ -211,7 +205,7 @@ public class SystemService {
         });
     }
 
-    public void startService(String serviceName, String node) throws SSHCommandException, MarathonException {
+    public void startService(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Starting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
@@ -222,7 +216,7 @@ public class SystemService {
         });
     }
 
-    public void stopService(String serviceName, String node) throws SSHCommandException, MarathonException {
+    public void stopService(String serviceName, String node) throws SystemException{
         applyServiceOperation(serviceName, node, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
@@ -233,7 +227,7 @@ public class SystemService {
         });
     }
 
-    public void restartService(String serviceName, String node) throws SSHCommandException, MarathonException {
+    public void restartService(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Restarting", () -> {
             Service service = servicesDefinition.getService(serviceName);
             if (service.isMarathon()) {
@@ -244,7 +238,7 @@ public class SystemService {
         });
     }
 
-    public void callCommand(String commandId, String serviceName, String node) throws SSHCommandException, MarathonException {
+    public void callCommand(String commandId, String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Calling command " + commandId , () -> {
             Service service = servicesDefinition.getService(serviceName);
 
@@ -257,28 +251,50 @@ public class SystemService {
         });
     }
 
-    private void logOperationMessage(String operation) {
-        messagingService.addLines(new String[]{
+    private void logOperationMessage(OperationId operationId, String operation) {
+        operationsMonitoringService.addInfo(operationId, new String[]{
                 "\n" + operation
         });
     }
 
-    void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SSHCommandException, MarathonException {
+    void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SystemException {
         String message = opLabel + " " + service + " on " + node;
         boolean success = false;
-        operationsMonitoringService.operationsStarted(new SimpleOperation (message));
+
+        SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId(opLabel, service, node);
+
         try {
 
+            operationsMonitoringService.operationsStarted(new SimpleOperationCommand(opLabel, service, node));
+
+            operationsMonitoringService.startOperation(operationId);
+
             notificationService.addDoing(opLabel + " " + service + " on " + node);
-            logOperationMessage (message);
-            messagingService.addLines("Done "
+            logOperationMessage(operationId, message);
+
+            operationsMonitoringService.addInfo(operationId, "Done "
                     + message
                     + "\n-------------------------------------------------------------------------------\n"
                     + operation.call());
             notificationService.addInfo(opLabel + " " + service + " succeeded on " + node);
 
             success = true;
+        } catch (SSHCommandException | MarathonException | ServiceDefinitionException | NodesConfigurationException e) {
+
+            operationsMonitoringService.addInfo(operationId, "\nDone : "
+                    + message
+                    + "\n-------------------------------------------------------------------------------\n"
+                    + "--> Completed in error : "
+                    + e.getMessage());
+
+            notificationService.addError(message + " failed !");
+            operationsMonitoringService.operationError(operationId);
+            throw new SystemException(e.getMessage(), e);
+
         } finally {
+
+            operationsMonitoringService.endOperation(operationId);
+
             operationsMonitoringService.operationsFinished(success);
         }
     }
@@ -444,13 +460,17 @@ public class SystemService {
                     if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
 
                         try {
+//operationsMonitoringService.startOperation(operation);
                             operation.call(opToPerform, error);
                         } catch (Exception e) {
                             logger.error(e, e);
                             logger.warn ("Storing error - " + e.getClass()+":"+e.getMessage());
                             error.set(e);
+//operationsMonitoringService.operationError(operation, e.getMessage());
                             // actually killing the thread is perhaps not a good idea
                             //throw new PooledOperationException(e.getMessage());
+                        } finally {
+//operationsMonitoringService.endOperation(operation);
                         }
                     }
                 });
@@ -788,7 +808,7 @@ public class SystemService {
         nodesToTest.addAll(nodesConfig.getNodeAddresses());
         for (String node : nodesToTest) {
 
-            if (!node.equals(OperationsCommand.MARATHON_FLAG)) {
+            if (!node.equals(ServiceOperationsCommand.MARATHON_FLAG)) {
 
                 // handle potential interruption request
                 if (operationsMonitoringService.isInterrupted()) {
@@ -820,9 +840,12 @@ public class SystemService {
             }
         }
 
+        /*
         if (!deadIps.isEmpty()) {
             messagingService.addLines("\n");
         }
+        */
+
         return nodesSetup;
     }
 
@@ -831,7 +854,7 @@ public class SystemService {
         String result = sshCommandService.runSSHScript(node, "sudo ls", false);
         if (   result.contains("a terminal is required to read the password")
             || result.contains("a password is required")) {
-            messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
+            //messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
             notificationService.addError("Node " + node + " sudo problem");
             deadIps.add(node);
         }
@@ -839,13 +862,13 @@ public class SystemService {
     }
 
     void handleNodeDead(Set<String> deadIps, String node) {
-        messagingService.addLines("\nNode seems dead " + node);
+        //messagingService.addLines("\nNode seems dead " + node);
         notificationService.addError("Node " + node + " is dead.");
         deadIps.add(node);
     }
 
     void handleSSHFails(Set<String> deadIps, String node) {
-        messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
+        //messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
         notificationService.addError("Node " + node + " not reachable.");
         deadIps.add(node);
     }

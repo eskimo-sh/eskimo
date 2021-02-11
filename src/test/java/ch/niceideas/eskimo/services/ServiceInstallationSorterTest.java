@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationsCommand;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,37 +67,37 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>());
 
-        OperationsCommand oc = OperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
 
-        List<List<Pair<String, String>>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig);
+        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig);
 
         assertNotNull(orderedInstall);
 
         assertEquals(11, orderedInstall.size());
 
         // Test first, third and last group
-        List<Pair<String, String>> group1 = orderedInstall.get(0);
+        List<ServiceOperationsCommand.ServiceOperationId> group1 = orderedInstall.get(0);
         assertEquals(1, group1.size());
-        assertEquals("elasticsearch", group1.get(0).getKey());
-        assertEquals("192.168.10.11", group1.get(0).getValue());
+        assertEquals("elasticsearch", group1.get(0).getService());
+        assertEquals("192.168.10.11", group1.get(0).getNode());
 
-        List<Pair<String, String>> group2 = orderedInstall.get(1);
+        List<ServiceOperationsCommand.ServiceOperationId> group2 = orderedInstall.get(1);
         assertEquals(1, group2.size());
-        assertEquals("elasticsearch", group2.get(0).getKey());
-        assertEquals("192.168.10.13", group2.get(0).getValue());
+        assertEquals("elasticsearch", group2.get(0).getService());
+        assertEquals("192.168.10.13", group2.get(0).getNode());
 
-        List<Pair<String, String>> group6 = orderedInstall.get(6);
+        List<ServiceOperationsCommand.ServiceOperationId> group6 = orderedInstall.get(6);
         assertEquals(2, group6.size());
-        assertEquals("gluster", group6.get(0).getKey());
-        assertEquals("192.168.10.11", group6.get(0).getValue());
-        assertEquals("gluster", group6.get(1).getKey());
+        assertEquals("gluster", group6.get(0).getService());
+        assertEquals("192.168.10.11", group6.get(0).getNode());
+        assertEquals("gluster", group6.get(1).getService());
 
-        List<Pair<String, String>> group8 = orderedInstall.get(9);
+        List<ServiceOperationsCommand.ServiceOperationId> group8 = orderedInstall.get(9);
         assertEquals(2, group8.size());
-        assertEquals("spark-executor", group8.get(0).getKey());
-        assertEquals("192.168.10.11", group8.get(0).getValue());
-        assertEquals("spark-executor", group8.get(1).getKey());
-        assertEquals("192.168.10.13", group8.get(1).getValue());
+        assertEquals("spark-executor", group8.get(0).getService());
+        assertEquals("192.168.10.11", group8.get(0).getNode());
+        assertEquals("spark-executor", group8.get(1).getService());
+        assertEquals("192.168.10.13", group8.get(1).getNode());
 
 
     }

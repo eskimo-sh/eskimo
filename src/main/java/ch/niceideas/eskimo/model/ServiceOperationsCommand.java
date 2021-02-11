@@ -37,6 +37,9 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.eskimo.services.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,23 +50,25 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<String, String>> implements Serializable {
+public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(OperationsCommand.class);
+    private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
 
     public static final String MARATHON_FLAG = "(marathon)";
+    public static final String CHECK_INSTALL_OP_TYPE = "Check / Install";
+    public static final String BASE_SYSTEM = "Base System";
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private final ArrayList<SerializablePair<String, String>> restarts = new ArrayList<>();
+    private final ArrayList<ServiceOperationId> restarts = new ArrayList<>();
 
-    public static OperationsCommand create (
+    public static ServiceOperationsCommand create (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             ServicesInstallStatusWrapper servicesInstallStatus,
             NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
-        OperationsCommand retCommand = new OperationsCommand(rawNodesConfig);
+        ServiceOperationsCommand retCommand = new ServiceOperationsCommand(rawNodesConfig);
 
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
 
@@ -76,7 +81,7 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
 
                 if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
 
-                    retCommand.addInstallation(new SerializablePair<>(service, node));
+                    retCommand.addInstallation(new ServiceOperationId("installation", service, node));
                 }
             }
         }
@@ -88,7 +93,12 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
             String installedService = installationPairs.getKey();
             String nodeName = installationPairs.getValue();
 
-            if (!servicesDefinition.getService(installedService).isMarathon()) {
+            Service service = servicesDefinition.getService(installedService);
+            if (service == null) {
+                throw new IllegalStateException("Cann find service " + installedService + " in services definition");
+            }
+
+            if (!service.isMarathon()) {
 
                 String node = nodeName.replace("-", ".");
 
@@ -106,12 +116,12 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
                     }
 
                     if (!found) {
-                        retCommand.addUninstallation(new SerializablePair<>(installedService, node));
+                        retCommand.addUninstallation(new ServiceOperationId("uninstallation", installedService, node));
                     }
 
                 } catch (SystemException e) {
                     logger.debug(e, e);
-                    retCommand.addUninstallation(new SerializablePair<>(installedService, node));
+                    retCommand.addUninstallation(new ServiceOperationId("uninstallation", installedService, node));
                 }
             }
         }
@@ -119,8 +129,8 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
         // 3. If a services changed, dependent services need to be restarted
         Set<String> changedServices = new HashSet<>();
 
-        changedServices.addAll (retCommand.getInstallations().stream().map(Pair::getKey).collect(Collectors.toList()));
-        changedServices.addAll (retCommand.getUninstallations().stream().map(Pair::getKey).collect(Collectors.toList()));
+        changedServices.addAll (retCommand.getInstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
+        changedServices.addAll (retCommand.getUninstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
 
         Set<String> restartedServices = new HashSet<>();
         changedServices.forEach(service -> restartedServices.addAll (servicesDefinition.getDependentServices(service)));
@@ -140,7 +150,7 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
         return retCommand;
     }
 
-    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, OperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<String> restartedServices) {
+    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<String> restartedServices) {
         for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
 
             if (!servicesDefinition.getService(restartedService).isMarathon()) {
@@ -160,14 +170,14 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
         }
     }
 
-    public static OperationsCommand createForRestartsOnly (
+    public static ServiceOperationsCommand createForRestartsOnly (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             String[] servicesToRestart,
             ServicesInstallStatusWrapper servicesInstallStatus,
             NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
-        OperationsCommand retCommand = new OperationsCommand(rawNodesConfig);
+        ServiceOperationsCommand retCommand = new ServiceOperationsCommand(rawNodesConfig);
 
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
 
@@ -178,7 +188,7 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
         return retCommand;
     }
 
-    OperationsCommand(NodesConfigWrapper rawNodesConfig) {
+    ServiceOperationsCommand(NodesConfigWrapper rawNodesConfig) {
         this.rawNodesConfig = rawNodesConfig;
     }
 
@@ -187,13 +197,12 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
     }
 
     void addRestartIfNotInstalled(String service, String node) {
-        SerializablePair<String, String> addedPair = new SerializablePair<>(service, node);
-        if (!getInstallations().contains(addedPair)) {
-            restarts.add(addedPair);
+        if (!getInstallations().contains(new ServiceOperationId ("installation", service, node))) {
+            restarts.add(new ServiceOperationId ("restart", service, node));
         }
     }
 
-    public List<SerializablePair<String, String>> getRestarts() {
+    public List<ServiceOperationId> getRestarts() {
         return restarts;
     }
 
@@ -205,12 +214,12 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
         }});
     }
 
-    private Collection<Object> toJsonList(List<? extends Pair<String, String>> listOfPairs) {
+    private Collection<Object> toJsonList(List<ServiceOperationId> listOfPairs) {
         return listOfPairs.stream()
-                .map((Function<Pair<String, String>, Object>) pair -> {
+                .map((Function<ServiceOperationId, Object>) id -> {
                     JSONObject ret = new JSONObject();
                     try {
-                        ret.put(pair.getKey(), pair.getValue());
+                        ret.put(id.getService(), id.getNode());
                     } catch (JSONException e) {
                         // cannot happen
                     }
@@ -222,47 +231,71 @@ public class OperationsCommand extends JSONInstallOpCommand<SerializablePair<Str
     public Set<String> getAllNodes() {
         Set<String> retSet = new HashSet<>();
         getInstallations().stream()
-                .map(Pair::getValue)
+                .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
         getUninstallations().stream()
-                .map(Pair::getValue)
+                .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
         restarts.stream()
-                .map(Pair::getValue)
+                .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
         return retSet;
     }
 
-    public List<List<Pair<String, String>>> getRestartsInOrder
+    public List<List<ServiceOperationId>> getRestartsInOrder
             (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, NodesConfigurationException {
         return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);
     }
 
-    public List<List<Pair<String, String>>> getInstallationsInOrder
+    public List<List<ServiceOperationId>> getInstallationsInOrder
             (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, NodesConfigurationException {
         return servicesInstallationSorter.orderOperations (getInstallations(), nodesConfig);
     }
 
-    public List<List<Pair<String, String>>> getUninstallationsInOrder
+    public List<List<ServiceOperationId>> getUninstallationsInOrder
             (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, NodesConfigurationException {
-        List<List<Pair<String, String>>> orderedUninstallations = servicesInstallationSorter.orderOperations (getUninstallations(), nodesConfig);
+        List<List<ServiceOperationId>> orderedUninstallations = servicesInstallationSorter.orderOperations (getUninstallations(), nodesConfig);
         Collections.reverse(orderedUninstallations);
         return orderedUninstallations;
     }
 
-    public List<Pair<String, String>> getAllOperationsInOrder
+    @Override
+    public List<ServiceOperationId> getAllOperationsInOrder
             (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException {
 
-        List<Pair<String, String>> allOpList = new ArrayList<>();
+        List<ServiceOperationId> allOpList = new ArrayList<>();
+
+        getAllNodes().forEach(node -> allOpList.add(new ServiceOperationId(CHECK_INSTALL_OP_TYPE, BASE_SYSTEM, node)));
 
         getInstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
         getUninstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
         getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
 
         return allOpList;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    public static class ServiceOperationId implements OperationId {
+
+        private final String type;
+        private final String service;
+        private final String node;
+
+        public boolean isOnNode(String node) {
+            return this.node.equals(node);
+        }
+
+        public boolean isSameNode(OperationId other) {
+            return other.isOnNode(this.getNode());
+        }
+
+        public String getMessage() {
+            return type + " of " + getService() + " on " + getNode();
+        }
     }
 }

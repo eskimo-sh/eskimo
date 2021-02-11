@@ -18,7 +18,7 @@ public class LogFileStrategy implements MdStrategy {
     public Date detectMaster(
             Service service, String node, MasterDetection masterDetection,
             MasterService masterService, SSHCommandService sshCommandService,
-            MessagingService messagingService, NotificationService notificationService) throws MasterDetectionException {
+            NotificationService notificationService) throws MasterDetectionException {
 
         String ping = null;
         try {

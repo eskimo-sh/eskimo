@@ -34,27 +34,15 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import com.trilead.ssh2.Connection;
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
     @Test
-    public void testInterruption() {
+    public void testInterruption() throws Exception {
 
         // no processing pending => no interruption
         operationsMonitoringService.interruptProcessing();
@@ -62,7 +50,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         assertFalse(operationsMonitoringService.isInterrupted());
 
         // test interruption
-        operationsMonitoringService.operationsStarted(new SimpleOperation("test"));
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "test"));
 
         operationsMonitoringService.interruptProcessing();
 

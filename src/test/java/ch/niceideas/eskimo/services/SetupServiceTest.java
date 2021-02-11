@@ -35,24 +35,25 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.OSDetector;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SetupServiceTest extends AbstractSystemTest {
+
+    private static final Logger logger = Logger.getLogger(SetupServiceTest.class);
 
     private String setupConfig = null;
 
@@ -98,9 +99,10 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setConfigurationService(configurationService);
         configurationService.setSetupService(setupService);
 
+        setupService.setSystemOperationService(systemOperationService);
+
         setupService.setBuildVersion("1.0");
 
-        setupService.setMessagingService(messagingService);
         setupService.setOperationsMonitoringService(operationsMonitoringService);
 
         return setupService;
@@ -197,40 +199,68 @@ public class SetupServiceTest extends AbstractSystemTest {
         packageDevPathTest.mkdirs();
 
         setupService.setPackagesDevPathForTests(packageDevPathTest.getAbsolutePath());
+        setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
 
         FileUtils.writeFile(new File (packageDevPathTest.getAbsolutePath() + "/build.sh"),
                 "#!/bin/bash\n" +
                 "echo $@\n");
 
+        SetupCommand setupCommand = SetupCommand.create(new JsonWrapper(setupConfig), setupService);
+        operationsMonitoringService.operationsStarted(setupCommand);
+
         setupService.buildPackage("cerebro");
 
-        List<String> messages = messagingService.getSubList(0);
+        List<String> messages = operationsMonitoringService.getNewMessages(
+                new SetupCommand.SetupOperationId(SetupCommand.TYPE_BUILD, "cerebro"), 0);
+        //List<String> messages = messagingService.getSubList(0);
         assertEquals (6, messages.size());
 
-        assertEquals("\nBuilding of package cerebro" +
-                    "," +
-                    "," +
-                    "Done : Building of package cerebro,-------------------------------------------------------------------------------," +
-                    "cerebro," +
-                    "--> Completed Successfuly.",
+        assertEquals("\n" +
+                        "Build of package cerebro,,Done : Build of package cerebro,-------------------------------------------------------------------------------,cerebro,--> Completed Successfuly.",
                 String.join(",", messages));
 
         FileUtils.delete(packageDevPathTest);
+
+        operationsMonitoringService.operationsFinished(true);
     }
 
     @Test
     public void testDownloadPackage() throws Exception {
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+                return new JsonWrapper(packagesVersionFile);
+            }
+            @Override
+            protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+                destinationFile.createNewFile();
+                try {
+                    FileUtils.writeFile(destinationFile, "TEST DOWNLOADED CONTENT");
+                } catch (FileException e) {
+                    logger.debug (e, e);
+                    throw new IOException(e);
+                }
+            }
+        });
 
         File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
         packageDevPathTest.delete();
         packageDevPathTest.mkdirs();
 
         setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
+        setupService.setBuildVersion("1.0");
 
-        setupService.downloadPackage("cerebro");
+        JsonWrapper setupConfigJson = new JsonWrapper(setupConfig);
+        setupConfigJson.setValueForPath("setup-mesos-origin", "download");
+        setupConfigJson.setValueForPath("setup-services-origin", "download");
+        SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService);
+        operationsMonitoringService.operationsStarted(setupCommand);
+
+        setupService.downloadPackage("cerebro_0.8.4_1");
 
         assertEquals (1, packageDevPathTest.listFiles().length);
-        assertEquals("cerebro", packageDevPathTest.listFiles()[0].getName());
+        assertEquals("cerebro_0.8.4_1", packageDevPathTest.listFiles()[0].getName());
         assertEquals("TEST DOWNLOADED CONTENT", FileUtils.readFile(packageDevPathTest.listFiles()[0]));
 
         FileUtils.delete(packageDevPathTest);
