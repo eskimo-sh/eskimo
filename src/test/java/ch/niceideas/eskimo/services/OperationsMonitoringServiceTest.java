@@ -34,12 +34,74 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
+import com.trilead.ssh2.Connection;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OperationsMonitoringServiceTest extends AbstractSystemTest {
+
+    private String testRunUUID = UUID.randomUUID().toString();
+
+    @BeforeEach
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+    }
+
+    @Override
+    protected SystemService createSystemService() {
+        SystemService ss = new SystemService(false) {
+            @Override
+            protected File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
+                File retFile = new File (System.getProperty("java.io.tmpdir") + "/" + serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
+                retFile.createNewFile();
+                return retFile;
+            }
+        };
+        ss.setConfigurationService(configurationService);
+        return ss;
+    }
+
+    @Override
+    protected SetupService createSetupService() {
+        return new SetupService() {
+            @Override
+            public String findLastPackageFile(String prefix, String packageName) {
+                return prefix+"_"+packageName+"_dummy_1.dummy";
+            }
+        };
+    }
+
+    @Override
+    protected MarathonService createMarathonService() {
+        return new MarathonService() {
+            @Override
+            protected Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
+                return new Pair<>("192.168.10.11", "running");
+            }
+            @Override
+            protected String queryMarathon (String endpoint, String method) throws MarathonException {
+                return "{}";
+            }
+            @Override
+            protected String restartServiceMarathonInternal(Service service) throws MarathonException {
+                // No Op
+                return "";
+            }
+        };
+    }
 
     @Test
     public void testInterruption() throws Exception {
@@ -61,5 +123,100 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         // no processing anymore
         assertFalse(operationsMonitoringService.isInterrupted());
     }
+
+    @Test
+    public void testGetOperationsMonitoringStatus() throws Exception {
+
+        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8"));
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
+        configurationService.saveNodesConfig(nodesConfig);
+
+        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+                servicesDefinition,
+                nodeRangeResolver,
+                servicesInstallStatus,
+                nodesConfig
+        );
+
+        SSHCommandService sshCommandService = new SSHCommandService() {
+            @Override
+            public synchronized String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
+                return runSSHScript((String)null, script, throwsException);
+            }
+            @Override
+            public synchronized String runSSHScript(String node, String script, boolean throwsException) {
+                testSSHCommandScript.append(script).append("\n");
+                if (script.equals("echo OK")) {
+                    return "OK";
+                }
+                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                    return "debian";
+                }
+                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                    return "MemTotal:        9982656 kB";
+                }
+
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public synchronized String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+                return runSSHCommand((String)null, command);
+            }
+            @Override
+            public synchronized String runSSHCommand(String node, String command) {
+                testSSHCommandScript.append(command).append("\n");
+                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
+                    return "OK";
+                }
+
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public synchronized void copySCPFile(Connection connection, String filePath) {
+                // just do nothing
+            }
+            @Override
+            public synchronized void copySCPFile(String node, String filePath)  {
+                // just do nothing
+            }
+        };
+
+        systemService.setSshCommandService(sshCommandService);
+
+        memoryComputer.setSshCommandService(sshCommandService);
+
+        nodesConfigurationService.setSshCommandService(sshCommandService);
+
+        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
+            public void forceRecreateConnection(String node) {
+                // no Op
+            }
+            @Override
+            public Connection getPrivateConnection (String node) {
+                return null;
+            }
+            @Override
+            public Connection getSharedConnection (String node) {
+                return null;
+            }
+        });
+
+        nodesConfigurationService.applyNodesConfig(command);
+
+        OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
+        assertNotNull (operationsMonitoringStatus);
+
+        //System.err.println (operationsMonitoringStatus.getFormattedValue());
+
+        OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
+                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status.json"), "UTF-8"));
+
+        //assertEquals (expectedStatus.getFormattedValue(), operationsMonitoringStatus.getFormattedValue());
+        assertTrue (expectedStatus.getJSONObject().similar(operationsMonitoringStatus.getJSONObject()));
+    }
+
 
 }

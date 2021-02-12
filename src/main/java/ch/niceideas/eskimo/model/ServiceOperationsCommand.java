@@ -297,5 +297,10 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         public String getMessage() {
             return type + " of " + getService() + " on " + getNode();
         }
+
+        @Override
+        public String toString() {
+            return type+"_"+service+"_"+node;
+        }
     }
 }

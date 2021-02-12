@@ -54,5 +54,10 @@ public class SimpleOperationCommand implements JSONOpCommand {
         public String getMessage() {
             return "Executing " + operation + " on " + getService() + " on " + getNode();
         }
+
+        @Override
+        public String toString() {
+            return operation+"_"+service+"_"+node;
+        }
     }
 }

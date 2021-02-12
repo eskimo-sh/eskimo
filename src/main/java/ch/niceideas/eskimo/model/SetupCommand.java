@@ -161,5 +161,10 @@ public class SetupCommand implements JSONOpCommand {
         public String getMessage() {
             return type + " of package " + getService();
         }
+
+        @Override
+        public String toString() {
+            return type+"_"+service;
+        }
     }
 }

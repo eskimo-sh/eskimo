@@ -172,5 +172,10 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
         public String getMessage() {
             return type + " of " + getService() + " on marathon";
         }
+
+        @Override
+        public String toString() {
+            return type+"_"+service;
+        }
     }
 }

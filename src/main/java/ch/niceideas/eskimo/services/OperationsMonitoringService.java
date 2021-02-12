@@ -2,19 +2,19 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import lombok.Getter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -55,6 +55,31 @@ public class OperationsMonitoringService implements OperationsContext {
     }
     void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
         this.servicesInstallationSorter = servicesInstallationSorter;
+    }
+
+    public OperationsMonitoringStatusWrapper getOperationsMonitoringStatus (Map<String, Integer> lastLinePerOp) {
+        return new OperationsMonitoringStatusWrapper(new JSONObject(new HashMap<String, Object>() {{
+            put("messages", new JSONObject(new HashMap<>() {{
+                    for (OperationId opId : operationLogs.keySet()) {
+                        MessagingManager mgr = operationLogs.computeIfAbsent(opId, (op) -> {
+                            throw new IllegalStateException();
+                        });
+
+                        Pair<Integer, String> newLines = mgr.fetchElements(lastLinePerOp.computeIfAbsent(opId.toString(), (op) -> 0));
+
+                        put(opId.toString(), new JSONObject(new TreeMap<>() {{
+                            put("lastLine", newLines.getKey());
+                            put("lines", Base64.getEncoder().encodeToString(newLines.getValue().getBytes()));
+                        }}));
+                    }
+                }}));
+
+            put("status", new JSONObject(new HashMap<>() {{
+                for (OperationId opId : operationLogs.keySet()) {
+                    put(opId.toString(), operationStatus.computeIfAbsent(opId, (op) -> OperationStatus.INIT).toString());
+                }
+            }}));
+        }}));
     }
 
     public boolean isProcessingPending() {

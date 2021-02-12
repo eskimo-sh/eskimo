@@ -97,11 +97,11 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return new Pair<>("192.168.10.11", "running");
             }
             @Override
-            protected String queryMarathon (String endpoint, String method) throws MarathonException {
+            protected String queryMarathon (String endpoint, String method) {
                 return "{}";
             }
             @Override
-            protected String restartServiceMarathonInternal(Service service) throws MarathonException {
+            protected String restartServiceMarathonInternal(Service service)  {
                 // No Op
                 return "";
             }
@@ -117,11 +117,11 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 // No-Op
             }
             @Override
-            public Connection getPrivateConnection (String node) throws ConnectionManagerException {
+            public Connection getPrivateConnection (String node) {
                 return null;
             }
             @Override
-            public Connection getSharedConnection (String node) throws ConnectionManagerException {
+            public Connection getSharedConnection (String node) {
                 return null;
             }
         });
@@ -229,7 +229,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public synchronized String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+            public synchronized String runSSHScript(String node, String script, boolean throwsException) {
                 testSSHCommandScript.append(script).append("\n");
                 if (script.equals("echo OK")) {
                     return "OK";
@@ -244,11 +244,11 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public synchronized String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+            public synchronized String runSSHCommand(Connection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public synchronized String runSSHCommand(String node, String command) throws SSHCommandException {
+            public synchronized String runSSHCommand(String node, String command) {
                 testSSHCommandScript.append(command).append("\n");
                 if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
                     return "OK";
@@ -257,11 +257,11 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public synchronized void copySCPFile(Connection connection, String filePath) throws SSHCommandException {
+            public synchronized void copySCPFile(Connection connection, String filePath) {
                 // just do nothing
             }
             @Override
-            public synchronized void copySCPFile(String node, String filePath) throws SSHCommandException {
+            public synchronized void copySCPFile(String node, String filePath) {
                 // just do nothing
             }
         };
@@ -278,11 +278,11 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 // no Op
             }
             @Override
-            public Connection getPrivateConnection (String node) throws ConnectionManagerException {
+            public Connection getPrivateConnection (String node) {
                 return null;
             }
             @Override
-            public Connection getSharedConnection (String node) throws ConnectionManagerException {
+            public Connection getSharedConnection (String node)  {
                 return null;
             }
         });
