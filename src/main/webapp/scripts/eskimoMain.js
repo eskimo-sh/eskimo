@@ -271,20 +271,20 @@ eskimo.Main = function() {
 
     function setOperationInProgress (pendingOp) {
         operationInProgress = pendingOp;
-        eskimoMessaging.setOperationInProgress(pendingOp);
+        eskimoOperations.setOperationInProgress(pendingOp);
     }
     this.setOperationInProgress = setOperationInProgress;
 
     function startOperationInProgress () {
         console.log ("eskimoMain - startOperationInProgress");
         setOperationInProgress (true);
-        eskimoMessaging.startOperationInProgress();
+        eskimoOperations.startOperationInProgress();
     }
     this.startOperationInProgress = startOperationInProgress;
 
     function scheduleStopOperationInProgress (success) {
         console.log ("eskimoMain - scheduleStopOperationInProgress");
-        eskimoMessaging.stopOperationInProgress (success, function() {
+        eskimoOperations.stopOperationInProgress (success, function() {
             setOperationInProgress (false);
             hideProgressbar();
         });
@@ -296,8 +296,8 @@ eskimo.Main = function() {
         if (!isOperationInProgress()) { // but frontend has no clue
             startOperationInProgress();
             operationInProgressOwner = true;
-            eskimoMessaging.addMessage("(Recovering messages from backend processing)");
-            eskimoMessaging.showMessages();
+            //eskimoMessaging.addMessage("(Recovering messages from backend processing)");
+            eskimoOperations.showOperations
         }
     }
     this.recoverOperationInProgress = recoverOperationInProgress;

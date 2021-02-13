@@ -39,7 +39,7 @@ eskimo.SetupCommand = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
-    this.eskimoMessaging = null;
+    this.eskimoOperations = null;
     this.eskimoSetup = null;
 
     const that = this;
@@ -158,7 +158,7 @@ eskimo.SetupCommand = function() {
             // first thing : disable button to prevent double submit
             $('#setup-command-button-validate').prop('disabled', true);
 
-            that.eskimoMessaging.showMessages();
+            that.eskimoOperations.showOperations();
 
             that.eskimoMain.startOperationInProgress();
 

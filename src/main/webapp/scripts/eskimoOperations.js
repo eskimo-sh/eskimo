@@ -53,6 +53,8 @@ eskimo.Operations = function() {
             if(statusTxt == "success"){
 
                 $("#clear-messaging-btn").click(function(e) {
+
+                    /*
                     $.ajax({
                         type: "GET",
                         dataType: "json",
@@ -64,6 +66,7 @@ eskimo.Operations = function() {
                         },
                         error: errorHandler
                     });
+                    */
 
                     e.preventDefault();
                     return false;
@@ -111,12 +114,12 @@ eskimo.Operations = function() {
     }
     this.setOperationInProgress = setOperationInProgress;
 
-    function fetchLastMessages(callback) {
+    function fetchOperationStatus(callback) {
         $.ajax({
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "fetch-operations-messages?last_line="+lastLineMessaging,
+            url: "fetch-operations-status?last-lines="  + getLastLines(),
             success: function (data, status, jqXHR) {
 
                 // OK
@@ -139,7 +142,7 @@ eskimo.Operations = function() {
 
                 if (that.eskimoMain.isOperationInProgress() && !callback) {
                     operationsPollingHandle = setTimeout(
-                        fetchLastMessages,
+                        fetchOperationStatus,
                         MESSAGING_POLLING_DELAY);
                 }
             },
@@ -153,13 +156,13 @@ eskimo.Operations = function() {
 
                 if (that.eskimoMain.isOperationInProgress() && !callback) {
                     operationsPollingHandle = setTimeout(
-                        fetchLastMessages,
+                        fetchOperationStatus,
                         MESSAGING_POLLING_DELAY);
                 }
             }
         });
     }
-    this.fetchLastMessages = fetchLastMessages;
+    this.fetchOperationStatus = fetchOperationStatus;
 
     function startOperationInProgress() {
         let pendingBarWrapper = $("#progress-bar-pending-wrapper");
@@ -169,13 +172,10 @@ eskimo.Operations = function() {
         $("#pending-message-title").html("<h3>Processing pending on Eskimo backend ....</h3>");
 
         $("#pending-message-content").html("");
-
-        /*
+        
         operationsPollingHandle = setTimeout(
-            fetchLastMessages,
+            fetchOperationStatus,
             MESSAGING_POLLING_DELAY);
-
-         */
     }
     this.startOperationInProgress = startOperationInProgress;
 
@@ -191,7 +191,7 @@ eskimo.Operations = function() {
 
         /*
         // fetch messages one last time and close OperationInProgress in the end
-        that.fetchLastMessages (function() {
+        that.fetchOperationStatus (function() {
 
             if (!success) {
                 $("#pending-message-title").html("<h3><span class='processing-error'>Processing completed in error !</span></h3>");

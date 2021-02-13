@@ -39,7 +39,7 @@ eskimo.SystemStatus = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoNotifications = null;
-    this.eskimoMessaging = null;
+    this.eskimoOperations = null;
     this.eskimoNodesConfig = null;
     this.eskimoSetup = null;
     this.eskimoServices = null;
@@ -380,7 +380,7 @@ eskimo.SystemStatus = function() {
 
     function serviceActionInternal (action, service, node, custom) {
 
-        that.eskimoMessaging.showMessages();
+        that.eskimoOperations.showOperations();
 
         that.eskimoMain.startOperationInProgress();
 
