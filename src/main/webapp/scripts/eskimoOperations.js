@@ -114,6 +114,10 @@ eskimo.Operations = function() {
     }
     this.setOperationInProgress = setOperationInProgress;
 
+    function getLastLines() {
+
+    }
+
     function fetchOperationStatus(callback) {
         $.ajax({
             type: "GET",

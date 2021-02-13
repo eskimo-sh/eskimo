@@ -51,7 +51,7 @@ public class EskimoMarathonOperationsCommandTest extends AbstractWebTest {
         // instantiate test object
         js("eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();");
         js("eskimoMarathonOperationsCommand.eskimoMain = eskimoMain;");
-        js("eskimoMarathonOperationsCommand.eskimoMessaging = eskimoMessaging;");
+        js("eskimoMarathonOperationsCommand.eskimoOperations = eskimoOperations;");
         js("eskimoMarathonOperationsCommand.initialize()");
 
         waitForElementIdInDOM("marathon-operations-command-body");

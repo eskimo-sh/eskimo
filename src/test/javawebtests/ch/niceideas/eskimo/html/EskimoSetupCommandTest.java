@@ -51,7 +51,7 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
         // instantiate test object
         js("eskimoSetupCommand = new eskimo.SetupCommand();");
         js("eskimoSetupCommand.eskimoMain = eskimoMain;");
-        js("eskimoSetupCommand.eskimoMessaging = eskimoMessaging;");
+        js("eskimoSetupCommand.eskimoOperations = eskimoOperations;");
         js("eskimoSetupCommand.eskimoSetup = eskimoSetup;");
         js("eskimoSetupCommand.initialize()");
 

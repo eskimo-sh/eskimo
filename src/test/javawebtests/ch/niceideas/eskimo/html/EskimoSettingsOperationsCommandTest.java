@@ -51,7 +51,7 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
         // instantiate test object
         js("eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();");
         js("eskimoSettingsOperationsCommand.eskimoMain = eskimoMain;");
-        js("eskimoSettingsOperationsCommand.eskimoMessaging = eskimoMessaging;");
+        js("eskimoSettingsOperationsCommand.eskimoOperations = eskimoOperations;");
         js("eskimoSettingsOperationsCommand.eskimoServicesSettings = eskimoServicesSettings;");
         js("eskimoSettingsOperationsCommand.initialize();");
 

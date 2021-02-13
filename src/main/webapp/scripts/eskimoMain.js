@@ -475,6 +475,9 @@ eskimo.Main = function() {
     this.getMessaging = function() {
         return eskimoMessaging;
     };
+    this.getOperations = function() {
+        return eskimoOperations;
+    };
     this.getConsoles = function() {
         return eskimoConsoles;
     };

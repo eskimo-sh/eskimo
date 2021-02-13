@@ -207,6 +207,11 @@ public abstract class AbstractWebTest {
         js("eskimoMessaging.setOperationInProgress = function() {};");
         js("eskimoMessaging.showMessages = function() {};");
 
+        js("var eskimoOperations = {}");
+        js("eskimoOperations.isOperationInProgress = function() { return false; };");
+        js("eskimoOperations.setOperationInProgress = function() {};");
+        js("eskimoOperations.showOperations = function() {};");
+
         js("var eskimoNotifications = {}");
         js("eskimoNotifications.fetchNotifications = function() {};");
 
@@ -253,6 +258,7 @@ public abstract class AbstractWebTest {
         js("eskimoMain.handleSetupCompleted = function (){};");
         js("eskimoMain.getServices = function (){ return eskimoServices; };");
         js("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
+        js("eskimoMain.getOperations = function (){ return eskimoOperations; };");
         js("eskimoMain.getFileManagers = function (){ return eskimoFileManagers; };");
         js("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
         js("eskimoMain.getNodesConfig = function () { return eskimoNodesConfig; };");
