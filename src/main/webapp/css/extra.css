@@ -316,6 +316,8 @@ li.disabled a .menu-text {
 .table > thead > tr > td.status-node-cell-intro,
 .table > thead > tr > td.operations-cell,
 .table > thead > tr > td.operations-cell-intro,
+.table > tbody > tr > td.operations-cell,
+.table > tbody > tr > td.operations-cell-intro,
 .status-node-cell,
 .status-node-cell-intro,
 .operations-cell,
@@ -1443,4 +1445,22 @@ table.system-information tr td.info-label {
 
 td.operation-title{
     text-align: left;
+}
+
+.operations-log-modal-dialog {
+    width: 90%;
+    height: 90%;
+}
+
+.operations-log-modal-content {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    display: flex;
+}
+
+.operation-log-body {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
 }
