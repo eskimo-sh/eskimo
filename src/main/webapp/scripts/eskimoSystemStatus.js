@@ -1207,7 +1207,7 @@ eskimo.SystemStatus = function() {
 
         // show a message on status page if there is some operations in progress pending
         if (that.eskimoMain.isOperationInProgress()) {
-            showStatusMessage("Pending operations in progress on backend. See 'Backend Messages' for more information.");
+            showStatusMessage("Pending operations in progress on backend. See 'Operations Monitoring' for more information.");
         }
     }
     this.updateStatus = updateStatus;

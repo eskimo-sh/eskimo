@@ -40,6 +40,7 @@ import java.util.*;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class MarathonService {
 
+    public static final String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
     private static final Logger logger = Logger.getLogger(MarathonService.class);
 
     public static final int MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS = 200;
@@ -419,8 +420,8 @@ public class MarathonService {
             }
 
             // Nodes re-setup (topology)
-            systemOperationService.applySystemOperation(new MarathonOperationsCommand.MarathonOperationId("Installation", "Topology (All Nodes)"),
-                builder -> {
+            systemOperationService.applySystemOperation(new MarathonOperationsCommand.MarathonOperationId("Installation", TOPOLOGY_ALL_NODES),
+                    builder -> {
                     systemService.performPooledOperation (new ArrayList<> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
                                 // topology

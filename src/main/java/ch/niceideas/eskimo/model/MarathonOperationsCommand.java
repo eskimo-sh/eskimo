@@ -36,10 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.services.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -146,7 +143,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
 
         List<MarathonOperationId> allOpList = new ArrayList<>();
 
-        getInstallations().forEach(opId -> allOpList.add(new MarathonOperationId("Installation", "Topology (All Nodes)")));
+        allOpList.add(new MarathonOperationId("Installation", MarathonService.TOPOLOGY_ALL_NODES));
 
         allOpList.addAll(getInstallations());
         allOpList.addAll(getUninstallations());
@@ -175,7 +172,8 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
 
         @Override
         public String toString() {
-            return type+"_"+service;
+            return type + "_"
+                    + service.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-");
         }
     }
 }

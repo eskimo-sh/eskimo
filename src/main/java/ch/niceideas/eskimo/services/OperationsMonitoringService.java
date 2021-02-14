@@ -59,6 +59,16 @@ public class OperationsMonitoringService implements OperationsContext {
 
     public OperationsMonitoringStatusWrapper getOperationsMonitoringStatus (Map<String, Integer> lastLinePerOp) {
         return new OperationsMonitoringStatusWrapper(new JSONObject(new HashMap<String, Object>() {{
+
+            put("labels", new JSONArray(new ArrayList<>() {{
+                for (OperationId opId : operationList) {
+                    add(new JSONObject(new HashMap<>(){{
+                        put ("operation", opId.toString());
+                        put ("label", opId.getMessage());
+                    }}));
+                }
+            }}));
+
             put("messages", new JSONObject(new HashMap<>() {{
                     for (OperationId opId : operationLogs.keySet()) {
                         MessagingManager mgr = operationLogs.computeIfAbsent(opId, (op) -> {

@@ -1,116 +1,206 @@
 {
   "messages": {
-    "restart_grafana_(marathon)": {
-      "lines": "CnJlc3RhcnQgb2YgZ3JhZmFuYSBvbiAobWFyYXRob24pCg==",
-      "lastLine": 1
-    },
-    "installation_zeppelin_192.168.10.15": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiB6ZXBwZWxpbiBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHplcHBlbGluIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3IgemVwcGVsaW4gLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 6
-    },
-    "restart_logstash_192.168.10.15": {
-      "lines": "CnJlc3RhcnQgb2YgbG9nc3Rhc2ggb24gMTkyLjE2OC4xMC4xNQo=",
-      "lastLine": 1
-    },
-    "restart_flink-worker_192.168.10.13": {
-      "lines": "CnJlc3RhcnQgb2YgZmxpbmstd29ya2VyIG9uIDE5Mi4xNjguMTAuMTMK",
-      "lastLine": 1
-    },
-    "restart_logstash_192.168.10.13": {
+    "restart_logstash_192-168-10-13": {
       "lines": "CnJlc3RhcnQgb2YgbG9nc3Rhc2ggb24gMTkyLjE2OC4xMC4xMwo=",
       "lastLine": 1
     },
-    "restart_kibana_(marathon)": {
-      "lines": "CnJlc3RhcnQgb2Yga2liYW5hIG9uIChtYXJhdGhvbikK",
+    "restart_logstash_192-168-10-15": {
+      "lines": "CnJlc3RhcnQgb2YgbG9nc3Rhc2ggb24gMTkyLjE2OC4xMC4xNQo=",
       "lastLine": 1
     },
-    "installation_marathon_192.168.10.15": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBtYXJhdGhvbiBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIG1hcmF0aG9uIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3IgbWFyYXRob24gLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 6
-    },
-    "restart_kafka-manager_(marathon)": {
-      "lines": "CnJlc3RhcnQgb2Yga2Fma2EtbWFuYWdlciBvbiAobWFyYXRob24pCg==",
-      "lastLine": 1
-    },
-    "installation_spark-executor_192.168.10.13": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1leGVjdXRvciBvbiAxOTIuMTY4LjEwLjEzCgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWV4ZWN1dG9yIG9uIDE5Mi4xNjguMTAuMTMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3Igc3BhcmstZXhlY3V0b3IgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 6
-    },
-    "restart_flink-app-master_192.168.10.15": {
-      "lines": "CnJlc3RhcnQgb2YgZmxpbmstYXBwLW1hc3RlciBvbiAxOTIuMTY4LjEwLjE1Cg==",
-      "lastLine": 1
-    },
-    "restart_cerebro_(marathon)": {
-      "lines": "CnJlc3RhcnQgb2YgY2VyZWJybyBvbiAobWFyYXRob24pCg==",
-      "lastLine": 1
-    },
-    "Check / Install_Base System_192.168.10.13": {
+    "Check--Install_Base-System_192-168-10-13": {
       "lines": "CkNoZWNrIC8gSW5zdGFsbCBvZiBCYXNlIFN5c3RlbSBvbiAxOTIuMTY4LjEwLjEzCkNoZWNraW5nIC8gSW5zdGFsbGluZyBCYXNlIHN5c3RlbQpJbnN0YWxsaW5nIFRvcG9sb2d5CkNoZWNraW5nIC8gSW5zdGFsbGluZyBNZXNvcwo=",
       "lastLine": 4
     },
-    "installation_mesos-master_192.168.10.15": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1tYXN0ZXIgb24gMTkyLjE2OC4xMC4xNQoKRG9uZSA6IGluc3RhbGxhdGlvbiBvZiBtZXNvcy1tYXN0ZXIgb24gMTkyLjE2OC4xMC4xNQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciBtZXNvcy1tYXN0ZXIgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 6
-    },
-    "Check / Install_Base System_192.168.10.15": {
+    "Check--Install_Base-System_192-168-10-15": {
       "lines": "CkNoZWNrIC8gSW5zdGFsbCBvZiBCYXNlIFN5c3RlbSBvbiAxOTIuMTY4LjEwLjE1CkNoZWNraW5nIC8gSW5zdGFsbGluZyBCYXNlIHN5c3RlbQpJbnN0YWxsaW5nIFRvcG9sb2d5CkNoZWNraW5nIC8gSW5zdGFsbGluZyBNZXNvcwo=",
       "lastLine": 4
     },
-    "installation_spark-executor_192.168.10.15": {
+    "installation_zeppelin_192-168-10-15": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiB6ZXBwZWxpbiBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHplcHBlbGluIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3IgemVwcGVsaW4gLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
+      "lastLine": 6
+    },
+    "restart_flink-worker_192-168-10-13": {
+      "lines": "CnJlc3RhcnQgb2YgZmxpbmstd29ya2VyIG9uIDE5Mi4xNjguMTAuMTMK",
+      "lastLine": 1
+    },
+    "restart_cerebro_marathon": {
+      "lines": "CnJlc3RhcnQgb2YgY2VyZWJybyBvbiAobWFyYXRob24pCg==",
+      "lastLine": 1
+    },
+    "installation_mesos-master_192-168-10-15": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1tYXN0ZXIgb24gMTkyLjE2OC4xMC4xNQoKRG9uZSA6IGluc3RhbGxhdGlvbiBvZiBtZXNvcy1tYXN0ZXIgb24gMTkyLjE2OC4xMC4xNQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciBtZXNvcy1tYXN0ZXIgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
+      "lastLine": 6
+    },
+    "restart_kibana_marathon": {
+      "lines": "CnJlc3RhcnQgb2Yga2liYW5hIG9uIChtYXJhdGhvbikK",
+      "lastLine": 1
+    },
+    "installation_spark-executor_192-168-10-13": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1leGVjdXRvciBvbiAxOTIuMTY4LjEwLjEzCgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWV4ZWN1dG9yIG9uIDE5Mi4xNjguMTAuMTMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3Igc3BhcmstZXhlY3V0b3IgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
+      "lastLine": 6
+    },
+    "installation_marathon_192-168-10-15": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBtYXJhdGhvbiBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIG1hcmF0aG9uIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3IgbWFyYXRob24gLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
+      "lastLine": 6
+    },
+    "installation_spark-executor_192-168-10-15": {
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1leGVjdXRvciBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWV4ZWN1dG9yIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3Igc3BhcmstZXhlY3V0b3IgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
       "lastLine": 6
     },
-    "Check / Install_Base System_(marathon)": {
-      "lines": "",
-      "lastLine": 0
-    },
-    "restart_flink-worker_192.168.10.15": {
-      "lines": "CnJlc3RhcnQgb2YgZmxpbmstd29ya2VyIG9uIDE5Mi4xNjguMTAuMTUK",
+    "restart_flink-app-master_192-168-10-15": {
+      "lines": "CnJlc3RhcnQgb2YgZmxpbmstYXBwLW1hc3RlciBvbiAxOTIuMTY4LjEwLjE1Cg==",
       "lastLine": 1
     },
-    "installation_elasticsearch_192.168.10.13": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBlbGFzdGljc2VhcmNoIG9uIDE5Mi4xNjguMTAuMTMKCkRvbmUgOiBpbnN0YWxsYXRpb24gb2YgZWxhc3RpY3NlYXJjaCBvbiAxOTIuMTY4LjEwLjEzCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIC0gQ3JlYXRpbmcgYXJjaGl2ZSBhbmQgY29weWluZyBpdCBvdmVyCiAtIChubyBjb250YWluZXIgZm91bmQgZm9yIGVsYXN0aWNzZWFyY2ggLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 6
-    },
-    "installation_mesos-agent_192.168.10.13": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1hZ2VudCBvbiAxOTIuMTY4LjEwLjEzCgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIG1lc29zLWFnZW50IG9uIDE5Mi4xNjguMTAuMTMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
-      "lastLine": 6
-    },
-    "installation_spark-history-server_192.168.10.15": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1oaXN0b3J5LXNlcnZlciBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWhpc3Rvcnktc2VydmVyIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3Igc3BhcmstaGlzdG9yeS1zZXJ2ZXIgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 6
-    },
-    "installation_mesos-agent_192.168.10.15": {
+    "installation_mesos-agent_192-168-10-15": {
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1hZ2VudCBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIG1lc29zLWFnZW50IG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
       "lastLine": 6
     },
-    "installation_elasticsearch_192.168.10.15": {
+    "Check--Install_Base-System_marathon": {
+      "lines": "",
+      "lastLine": 0
+    },
+    "installation_elasticsearch_192-168-10-13": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBlbGFzdGljc2VhcmNoIG9uIDE5Mi4xNjguMTAuMTMKCkRvbmUgOiBpbnN0YWxsYXRpb24gb2YgZWxhc3RpY3NlYXJjaCBvbiAxOTIuMTY4LjEwLjEzCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIC0gQ3JlYXRpbmcgYXJjaGl2ZSBhbmQgY29weWluZyBpdCBvdmVyCiAtIChubyBjb250YWluZXIgZm91bmQgZm9yIGVsYXN0aWNzZWFyY2ggLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
+      "lastLine": 6
+    },
+    "installation_spark-history-server_192-168-10-15": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1oaXN0b3J5LXNlcnZlciBvbiAxOTIuMTY4LjEwLjE1CgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWhpc3Rvcnktc2VydmVyIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKIC0gKG5vIGNvbnRhaW5lciBmb3VuZCBmb3Igc3BhcmstaGlzdG9yeS1zZXJ2ZXIgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
+      "lastLine": 6
+    },
+    "installation_elasticsearch_192-168-10-15": {
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBlbGFzdGljc2VhcmNoIG9uIDE5Mi4xNjguMTAuMTUKCkRvbmUgOiBpbnN0YWxsYXRpb24gb2YgZWxhc3RpY3NlYXJjaCBvbiAxOTIuMTY4LjEwLjE1Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIC0gQ3JlYXRpbmcgYXJjaGl2ZSBhbmQgY29weWluZyBpdCBvdmVyCiAtIChubyBjb250YWluZXIgZm91bmQgZm9yIGVsYXN0aWNzZWFyY2ggLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKSAtIERlbGV0aW5nIGRvY2tlciB0ZW1wbGF0ZSBpbWFnZS0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
       "lastLine": 6
+    },
+    "installation_mesos-agent_192-168-10-13": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1hZ2VudCBvbiAxOTIuMTY4LjEwLjEzCgpEb25lIDogaW5zdGFsbGF0aW9uIG9mIG1lc29zLWFnZW50IG9uIDE5Mi4xNjguMTAuMTMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogLSBDcmVhdGluZyBhcmNoaXZlIGFuZCBjb3B5aW5nIGl0IG92ZXIKLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
+      "lastLine": 6
+    },
+    "restart_flink-worker_192-168-10-15": {
+      "lines": "CnJlc3RhcnQgb2YgZmxpbmstd29ya2VyIG9uIDE5Mi4xNjguMTAuMTUK",
+      "lastLine": 1
+    },
+    "restart_kafka-manager_marathon": {
+      "lines": "CnJlc3RhcnQgb2Yga2Fma2EtbWFuYWdlciBvbiAobWFyYXRob24pCg==",
+      "lastLine": 1
+    },
+    "restart_grafana_marathon": {
+      "lines": "CnJlc3RhcnQgb2YgZ3JhZmFuYSBvbiAobWFyYXRob24pCg==",
+      "lastLine": 1
     }
   },
+  "labels": [
+    {
+      "operation": "Check--Install_Base-System_marathon",
+      "label": "Check / Install of Base System on (marathon)"
+    },
+    {
+      "operation": "Check--Install_Base-System_192-168-10-15",
+      "label": "Check / Install of Base System on 192.168.10.15"
+    },
+    {
+      "operation": "Check--Install_Base-System_192-168-10-13",
+      "label": "Check / Install of Base System on 192.168.10.13"
+    },
+    {
+      "operation": "installation_elasticsearch_192-168-10-15",
+      "label": "installation of elasticsearch on 192.168.10.15"
+    },
+    {
+      "operation": "installation_elasticsearch_192-168-10-13",
+      "label": "installation of elasticsearch on 192.168.10.13"
+    },
+    {
+      "operation": "installation_mesos-master_192-168-10-15",
+      "label": "installation of mesos-master on 192.168.10.15"
+    },
+    {
+      "operation": "installation_marathon_192-168-10-15",
+      "label": "installation of marathon on 192.168.10.15"
+    },
+    {
+      "operation": "installation_spark-executor_192-168-10-15",
+      "label": "installation of spark-executor on 192.168.10.15"
+    },
+    {
+      "operation": "installation_spark-executor_192-168-10-13",
+      "label": "installation of spark-executor on 192.168.10.13"
+    },
+    {
+      "operation": "installation_mesos-agent_192-168-10-15",
+      "label": "installation of mesos-agent on 192.168.10.15"
+    },
+    {
+      "operation": "installation_mesos-agent_192-168-10-13",
+      "label": "installation of mesos-agent on 192.168.10.13"
+    },
+    {
+      "operation": "installation_spark-history-server_192-168-10-15",
+      "label": "installation of spark-history-server on 192.168.10.15"
+    },
+    {
+      "operation": "installation_zeppelin_192-168-10-15",
+      "label": "installation of zeppelin on 192.168.10.15"
+    },
+    {
+      "operation": "restart_logstash_192-168-10-15",
+      "label": "restart of logstash on 192.168.10.15"
+    },
+    {
+      "operation": "restart_logstash_192-168-10-13",
+      "label": "restart of logstash on 192.168.10.13"
+    },
+    {
+      "operation": "restart_flink-worker_192-168-10-15",
+      "label": "restart of flink-worker on 192.168.10.15"
+    },
+    {
+      "operation": "restart_flink-worker_192-168-10-13",
+      "label": "restart of flink-worker on 192.168.10.13"
+    },
+    {
+      "operation": "restart_flink-app-master_192-168-10-15",
+      "label": "restart of flink-app-master on 192.168.10.15"
+    },
+    {
+      "operation": "restart_cerebro_marathon",
+      "label": "restart of cerebro on (marathon)"
+    },
+    {
+      "operation": "restart_grafana_marathon",
+      "label": "restart of grafana on (marathon)"
+    },
+    {
+      "operation": "restart_kibana_marathon",
+      "label": "restart of kibana on (marathon)"
+    },
+    {
+      "operation": "restart_kafka-manager_marathon",
+      "label": "restart of kafka-manager on (marathon)"
+    }
+  ],
   "status": {
-    "restart_grafana_(marathon)": "COMPLETE",
-    "installation_zeppelin_192.168.10.15": "COMPLETE",
-    "restart_logstash_192.168.10.15": "COMPLETE",
-    "restart_flink-worker_192.168.10.13": "COMPLETE",
-    "restart_logstash_192.168.10.13": "COMPLETE",
-    "restart_kibana_(marathon)": "COMPLETE",
-    "installation_marathon_192.168.10.15": "COMPLETE",
-    "restart_kafka-manager_(marathon)": "COMPLETE",
-    "installation_spark-executor_192.168.10.13": "COMPLETE",
-    "restart_flink-app-master_192.168.10.15": "COMPLETE",
-    "restart_cerebro_(marathon)": "COMPLETE",
-    "Check / Install_Base System_192.168.10.13": "COMPLETE",
-    "installation_mesos-master_192.168.10.15": "COMPLETE",
-    "Check / Install_Base System_192.168.10.15": "COMPLETE",
-    "installation_spark-executor_192.168.10.15": "COMPLETE",
-    "Check / Install_Base System_(marathon)": "INIT",
-    "restart_flink-worker_192.168.10.15": "COMPLETE",
-    "installation_elasticsearch_192.168.10.13": "COMPLETE",
-    "installation_mesos-agent_192.168.10.13": "COMPLETE",
-    "installation_spark-history-server_192.168.10.15": "COMPLETE",
-    "installation_mesos-agent_192.168.10.15": "COMPLETE",
-    "installation_elasticsearch_192.168.10.15": "COMPLETE"
+    "restart_logstash_192-168-10-13": "COMPLETE",
+    "restart_logstash_192-168-10-15": "COMPLETE",
+    "Check--Install_Base-System_192-168-10-13": "COMPLETE",
+    "Check--Install_Base-System_192-168-10-15": "COMPLETE",
+    "installation_zeppelin_192-168-10-15": "COMPLETE",
+    "restart_flink-worker_192-168-10-13": "COMPLETE",
+    "restart_cerebro_marathon": "COMPLETE",
+    "installation_mesos-master_192-168-10-15": "COMPLETE",
+    "restart_kibana_marathon": "COMPLETE",
+    "installation_spark-executor_192-168-10-13": "COMPLETE",
+    "installation_marathon_192-168-10-15": "COMPLETE",
+    "installation_spark-executor_192-168-10-15": "COMPLETE",
+    "restart_flink-app-master_192-168-10-15": "COMPLETE",
+    "installation_mesos-agent_192-168-10-15": "COMPLETE",
+    "Check--Install_Base-System_marathon": "INIT",
+    "installation_elasticsearch_192-168-10-13": "COMPLETE",
+    "installation_spark-history-server_192-168-10-15": "COMPLETE",
+    "installation_elasticsearch_192-168-10-15": "COMPLETE",
+    "installation_mesos-agent_192-168-10-13": "COMPLETE",
+    "restart_flink-worker_192-168-10-15": "COMPLETE",
+    "restart_kafka-manager_marathon": "COMPLETE",
+    "restart_grafana_marathon": "COMPLETE"
   }
 }

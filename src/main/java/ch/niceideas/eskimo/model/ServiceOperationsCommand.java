@@ -300,7 +300,11 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
         @Override
         public String toString() {
-            return type+"_"+service+"_"+node;
+            return type.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-")
+                    + "_"
+                    + service.replace(" ", "-")
+                    + "_"
+                    + node.replace(".", "-").replace(" ", "-").replace("(", "").replace(")", "");
         }
     }
 }

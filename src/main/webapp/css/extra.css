@@ -1441,6 +1441,10 @@ table.system-information tr td.info-label {
 
 .progress-operation-wrapper{
     margin-bottom: 0px;
+    width: 220px;
+}
+
+.progress-operation-bar{
 }
 
 td.operation-title{
@@ -1463,4 +1467,15 @@ td.operation-title{
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: auto;
+}
+
+.log-message {
+    height: 100%;
+    width: 100%;
+}
+
+.log-message-content {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
 }

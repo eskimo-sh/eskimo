@@ -31,6 +31,7 @@ public class OperationsMonitoringControllerTest {
             @Override
             public OperationsMonitoringStatusWrapper getOperationsMonitoringStatus (Map<String, Integer> lastLinePerOp) {
                 return new OperationsMonitoringStatusWrapper(new JSONObject(new HashMap<String, Object>() {{
+
                     put("messages", new JSONObject(new HashMap<>() {{
                         for (String opId : lastLinePerOp.keySet()) {
                             put(opId, new JSONObject(new TreeMap<>() {{

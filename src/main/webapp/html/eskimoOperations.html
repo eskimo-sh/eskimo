@@ -72,96 +72,6 @@ Software.
                             </tr>
                         </thead>
                         <tbody id="operations-table-body">
-                            <tr id="ntp-192-168-10-21">
-                                <td class="operation-title">Install <b>NTP</b> on <b>192.168.10.21</b></td>
-                                <td class="operations-cell">
-                                    <div id="ntp-192-168-10-21-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="ntp-192-168-10-21-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
-
-                            <tr id="ntp-192-168-10-22">
-                                <td class="operation-title">Install <b>NTP</b> on <b>192.168.10.22</b></td>
-                                <td class="operations-cell">
-                                    <div id="ntp-192-168-10-22-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="ntp-192-168-10-22-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
-
-                            <tr id="ntp-192-168-10-23">
-                                <td class="operation-title">Install <b>NTP</b> on <b>192.168.10.23</b></td>
-                                <td class="operations-cell">
-                                    <div id="ntp-192-168-10-23-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="ntp-192-168-10-23-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
-
-                            <tr id="gluster-192-168-10-21">
-                                <td class="operation-title">Install <b>Gluster</b> on <b>192.168.10.21</b></td>
-                                <td class="operations-cell">
-                                    <div id="gluster-192-168-10-21-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="gluster-192-168-10-21-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
-
-                            <tr id="gluster-192-168-10-22">
-                                <td class="operation-title">Install <b>Gluster</b> on <b>192.168.10.22</b></td>
-                                <td class="operations-cell">
-                                    <div id="gluster-192-168-10-22-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="gluster-192-168-10-22-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
-
-                            <tr id="gluster-192-168-10-23">
-                                <td class="operation-title">Install <b>Gluster</b> on <b>192.168.10.23</b></td>
-                                <td class="operations-cell">
-                                    <div id="gluster-192-168-10-23-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="gluster-192-168-10-23-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
-
-                            <tr id="mesos-master-192-168-10-21">
-                                <td class="operation-title">Install <b>Mesos Master</b> on <b>192.168.10.21</b></td>
-                                <td class="operations-cell">
-                                    <div id="mesos-master-192-168-10-21-progress-wrapper" class="progress progress-striped active progress-operation-wrapper">
-                                        <div id="mesos-master-192-168-10-21-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" >
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="operations-cell">
-                                    <a onclick="javascript:$('#operation-log-modal').modal('show');">Logs</a>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -184,10 +94,8 @@ Software.
             </div>
             <div id="operation-log-body" class="modal-body operation-log-body">
 
-                <div class="col-xs-12 log-message-outer">
-                    <div class="col-md-12" id="log-message">
-                        <pre id="log-message-content">(Here are displayed messages from Eskimo backend)</pre>
-                    </div>
+                <div class="col-md-12 log-message" id="log-message">
+                    <pre id="log-message-content" class="log-message-content">(Here are displayed messages from Eskimo backend)</pre>
                 </div>
 
             </div>

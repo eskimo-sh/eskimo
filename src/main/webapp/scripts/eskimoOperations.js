@@ -54,20 +54,6 @@ eskimo.Operations = function() {
 
                 $("#clear-messaging-btn").click(function(e) {
 
-                    /*
-                    $.ajax({
-                        type: "GET",
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        url: "clear-messaging",
-                        success: function (data, status, jqXHR2) {
-                            lastLineMessaging = 0;
-                            $("#pending-message-content").html("");
-                        },
-                        error: errorHandler
-                    });
-                    */
-
                     e.preventDefault();
                     return false;
                 });
@@ -115,7 +101,97 @@ eskimo.Operations = function() {
     this.setOperationInProgress = setOperationInProgress;
 
     function getLastLines() {
+        // FIXME
+        return "{}";
+    }
 
+    function renderStatus (labels, status) {
+        for (let i = 0; i < labels.length; i++) {
+
+            let operation = labels[i].operation;
+            let opStatus = status[operation];
+            
+            let progress = $("#" + operation + "-progress");
+            let wrapper = $("#" + operation + "-progress-wrapper");
+            
+            if (opStatus == "INIT") {
+
+                progress.html("0%");
+                progress.css("width", "0%");
+
+            } else if (opStatus == "RUNNING") {
+
+                progress.html("30% (Running)");
+                progress.css("width", "30%");
+
+            } else if (opStatus == "ERROR") {
+
+                progress.html("Error!");
+                progress.css("width", "100%");
+                progress.addClass("progress-bar-error");
+                progress.removeClass("progress-bar-info");
+                wrapper.removeClass("progress-striped");
+
+            } else if (opStatus == "CANCELLED") {
+
+                progress.html("Cancelled!");
+                progress.css("width", "100%");
+                progress.addClass("progress-bar-warning");
+                progress.removeClass("progress-bar-info");
+                wrapper.removeClass("progress-striped");
+
+            } else if (opStatus == "COMPLETE") {
+
+                progress.html("100% (Complete)");
+                progress.css("width", "100%");
+                progress.addClass("progress-bar-success");
+                progress.removeClass("progress-bar-info");
+                wrapper.removeClass("progress-striped");
+            }
+
+
+
+        }
+    }
+
+    function renderLabels(labels) {
+
+        // Don't rerender if no changes
+        let newOpString = "";
+        for (let i = 0; i < labels.length; i++) {
+            newOpString += labels[i].operation;
+        }
+
+        let currentOpString = "";
+        $("#operations-table-body").children('tr').each(function () {
+            currentOpString += $(this).attr("id");
+        });
+
+        if (newOpString !== currentOpString) {
+
+            $("#operations-table-body").html("");
+            for (let i = 0; i < labels.length; i++) {
+
+                let operation = labels[i].operation;
+                let label = labels[i].label;
+
+                let operationRow = ""
+                    + "<tr id=\"" + operation + "\">\n" +
+                    "      <td class=\"operation-title\">" + label + "</td>\n" +
+                    "      <td class=\"operations-cell\">\n" +
+                    "          <div id=\"" + operation + "-progress-wrapper\" class=\"progress progress-striped active progress-operation-wrapper\">\n" +
+                    "              <div id=\"" + operation + "-progress\" class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" >\n" +
+                    "              </div>\n" +
+                    "          </div>\n" +
+                    "      </td>\n" +
+                    "      <td class=\"operations-cell\">\n" +
+                    "          <a onclick=\"javascript:$('#operation-log-modal').modal('show');\">Logs</a>\n" +
+                    "      </td>\n" +
+                    "      </tr>";
+
+                $("#operations-table-body").append($(operationRow));
+            }
+        }
     }
 
     function fetchOperationStatus(callback) {
@@ -129,12 +205,14 @@ eskimo.Operations = function() {
                 // OK
                 //console.log(data);
 
-                if (data && data.status) {
+                if (data && data.result == "OK") {
                     //console.log (atob(data.lines));
 
-                    addMessage(atob(data.lines));
+                    console.log (data);
 
-                    lastLineMessaging = data.lastLine;
+                    renderLabels (data.labels);
+
+                    renderStatus (data.labels, data.status);
 
                 } else {
                     console.error("No data received");
@@ -147,7 +225,7 @@ eskimo.Operations = function() {
                 if (that.eskimoMain.isOperationInProgress() && !callback) {
                     operationsPollingHandle = setTimeout(
                         fetchOperationStatus,
-                        MESSAGING_POLLING_DELAY);
+                        OPERATIONS_POLLING_DELAY);
                 }
             },
             error: function (jqXHR, status) {
@@ -161,7 +239,7 @@ eskimo.Operations = function() {
                 if (that.eskimoMain.isOperationInProgress() && !callback) {
                     operationsPollingHandle = setTimeout(
                         fetchOperationStatus,
-                        MESSAGING_POLLING_DELAY);
+                        OPERATIONS_POLLING_DELAY);
                 }
             }
         });
@@ -179,7 +257,7 @@ eskimo.Operations = function() {
         
         operationsPollingHandle = setTimeout(
             fetchOperationStatus,
-            MESSAGING_POLLING_DELAY);
+            1000);
     }
     this.startOperationInProgress = startOperationInProgress;
 
@@ -193,7 +271,6 @@ eskimo.Operations = function() {
         // cancel periodic message fetching
         clearTimeout (operationsPollingHandle);
 
-        /*
         // fetch messages one last time and close OperationInProgress in the end
         that.fetchOperationStatus (function() {
 
@@ -203,15 +280,16 @@ eskimo.Operations = function() {
                 $("#pending-message-title").html("<h3>Processing completed successfully.</h3>");
             }
 
+            /*
             let pendingBarWrapper = $("#progress-bar-pending-wrapper");
             pendingBarWrapper.css("visibility", "hidden");
             pendingBarWrapper.css("display", "none");
+            */
 
             if (callback != null && typeof callback === "function") {
                 callback();
             }
         });
-        */
     }
     this.stopOperationInProgress = stopOperationInProgress;
 

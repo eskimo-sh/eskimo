@@ -57,7 +57,10 @@ public class SimpleOperationCommand implements JSONOpCommand {
 
         @Override
         public String toString() {
-            return operation+"_"+service+"_"+node;
+            return operation.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-")
+                    + "_"
+                    + service.replace(" ", "-")
+                    + "_"+node.replace(".", "-");
         }
     }
 }
