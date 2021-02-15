@@ -46,14 +46,22 @@ eskimo.Operations = function() {
 
     let operationsPollingHandle = null;
 
+    let messagesStore = {};
+
     this.initialize = function () {
         // Initialize HTML Div from Template
         $("#inner-content-operations").load("html/eskimoOperations.html", function(responseTxt, statusTxt, jqXHR){
 
             if(statusTxt == "success"){
 
-                $("#clear-messaging-btn").click(function(e) {
+                $("#operation-log-cancel").click(function(e) {
+                    hideLogs();
+                    e.preventDefault();
+                    return false;
+                });
 
+                $("#operation-log-button-cancel").click(function(e) {
+                    hideLogs();
                     e.preventDefault();
                     return false;
                 });
@@ -81,7 +89,6 @@ eskimo.Operations = function() {
         });
     };
 
-
     function showOperations() {
 
         // maybe Progress bar was shown previously and we don't show it on messages page
@@ -101,8 +108,49 @@ eskimo.Operations = function() {
     this.setOperationInProgress = setOperationInProgress;
 
     function getLastLines() {
-        // FIXME
-        return "{}";
+        let lastLines = {};
+        for (let operation in messagesStore) {
+            lastLines[operation] = messagesStore[operation].lastLine;
+        }
+        return lastLines;
+    }
+
+    function hideLogs () {
+        $('#operation-log-modal').modal('hide');
+    }
+
+    function showLogs (operation) {
+        //alert (operation);
+
+        if (!messagesStore[operation]) {
+            $("#log-message-content").html("(no log received yet for operation)");
+        } else {
+            if (!messagesStore[operation].messages || messagesStore[operation].messages == "") {
+                $("#log-message-content").html("(no log received yet for operation)");
+            } else {
+                $("#log-message-content").html(messagesStore[operation].messages);
+            }
+        }
+
+        $('#operation-log-modal').modal('show');
+    }
+    this.showLogs = showLogs;
+
+    function updateMessages (labels, messages) {
+        for (let i = 0; i < labels.length; i++) {
+
+            let operation = labels[i].operation;
+
+            if (!messagesStore[operation]) {
+                messagesStore[operation] = {
+                    "lastLine": 0,
+                    "messages": ""
+                };
+            }
+
+            messagesStore[operation].lastLine = messages[operation].lastLine;
+            messagesStore[operation].messages += atob(messages[operation].lines);
+        }
     }
 
     function renderStatus (labels, status) {
@@ -148,9 +196,6 @@ eskimo.Operations = function() {
                 progress.removeClass("progress-bar-info");
                 wrapper.removeClass("progress-striped");
             }
-
-
-
         }
     }
 
@@ -169,6 +214,8 @@ eskimo.Operations = function() {
 
         if (newOpString !== currentOpString) {
 
+            messagesStore = {};
+
             $("#operations-table-body").html("");
             for (let i = 0; i < labels.length; i++) {
 
@@ -185,7 +232,7 @@ eskimo.Operations = function() {
                     "          </div>\n" +
                     "      </td>\n" +
                     "      <td class=\"operations-cell\">\n" +
-                    "          <a onclick=\"javascript:$('#operation-log-modal').modal('show');\">Logs</a>\n" +
+                    "          <a onclick=\"javascript:eskimoMain.getOperations().showLogs('" + operation + "');\">Logs</a>\n" +
                     "      </td>\n" +
                     "      </tr>";
 
@@ -199,7 +246,7 @@ eskimo.Operations = function() {
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "fetch-operations-status?last-lines="  + getLastLines(),
+            url: "fetch-operations-status?last-lines="  + JSON.stringify(getLastLines()),
             success: function (data, status, jqXHR) {
 
                 // OK
@@ -213,6 +260,8 @@ eskimo.Operations = function() {
                     renderLabels (data.labels);
 
                     renderStatus (data.labels, data.status);
+
+                    updateMessages (data.labels, data.messages)
 
                 } else {
                     console.error("No data received");
