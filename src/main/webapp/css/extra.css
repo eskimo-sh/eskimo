@@ -1441,7 +1441,7 @@ table.system-information tr td.info-label {
 
 .progress-operation-wrapper{
     margin-bottom: 0px;
-    width: 220px;
+    min-width: 220px;
 }
 
 .progress-operation-bar{

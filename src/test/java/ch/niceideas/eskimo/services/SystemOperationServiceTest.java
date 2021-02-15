@@ -67,19 +67,18 @@ public class SystemOperationServiceTest extends AbstractSystemTest {
         OperationId operation = new SimpleOperationCommand.SimpleOperationId("test", "test", "test");
 
         systemOperationService.applySystemOperation(operation,
-                result -> result.append("In operation\n"),
+                ml -> ml.addInfo("In operation"),
                 null);
 
         Pair<Integer, String> messages = operationsMonitoringService.fetchNewMessages(operation, 0);
         //Pair<Integer, String> messages = messagingService.fetchElements(0);
         assertNotNull (messages);
-        assertEquals(Integer.valueOf (6), messages.getKey());
+        assertEquals(Integer.valueOf (5), messages.getKey());
         assertEquals("\n" +
                 "Executing test on test on test\n" +
-                "\n" +
-                "Done : Executing test on test on test\n" +
-                "-------------------------------------------------------------------------------\n" +
                 "In operation\n" +
+                "--> Done : Executing test on test on test\n" +
+                "-------------------------------------------------------------------------------\n" +
                 "--> Completed Successfuly.\n", messages.getValue());
 
         Pair<Integer, List<JSONObject>> notifications = notificationService.fetchElements(0);

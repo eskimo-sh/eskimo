@@ -167,12 +167,12 @@ public class NodesConfigurationService {
 
                             systemOperationService.applySystemOperation(
                                     new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, ServiceOperationsCommand.BASE_SYSTEM, node),
-                                    builder -> {
+                                    ml -> {
 
                                         if (!operationsMonitoringService.isInterrupted() && error.get() == null) {
                                             operationsMonitoringService.addInfo(operation, "Checking / Installing Base system");
                                             if (isMissingOnNode("base_system", node)) {
-                                                installEskimoBaseSystem(builder, node);
+                                                installEskimoBaseSystem(ml, node);
                                                 flagInstalledOnNode("base_system", node);
                                             }
                                         }
@@ -187,7 +187,7 @@ public class NodesConfigurationService {
                                             operationsMonitoringService.addInfo(operation, "Checking / Installing Mesos");
                                             if (isMissingOnNode("mesos", node)) {
                                                 uploadMesos(node);
-                                                builder.append(installMesos(node));
+                                                ml.addInfo(installMesos(node));
                                                 flagInstalledOnNode("mesos", node);
                                             }
                                         }
@@ -265,20 +265,20 @@ public class NodesConfigurationService {
         }
     }
 
-    void installEskimoBaseSystem(StringBuilder sb, String node) throws SSHCommandException {
+    void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
         Connection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
-            sb.append(sshCommandService.runSSHScriptPath(connection, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
+            ml.addInfo(sshCommandService.runSSHScriptPath(connection, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
-            sb.append(" - Copying jq program\n");
+            ml.addInfo(" - Copying jq program");
             copyCommand("jq-1.6-linux64", USR_LOCAL_BIN_JQ, connection);
 
-            sb.append(" - Copying mesos-cli script\n");
+            ml.addInfo(" - Copying mesos-cli script");
             copyCommand("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, connection);
 
-            sb.append(" - Copying gluster-mount script\n");
+            ml.addInfo(" - Copying gluster-mount script");
             copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
 
         } catch (ConnectionManagerException e) {
@@ -406,7 +406,7 @@ public class NodesConfigurationService {
     void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
         systemOperationService.applySystemOperation(operationId,
-                builder -> proceedWithServiceUninstallation(builder, operationId.getNode(), operationId.getService()),
+                ml -> proceedWithServiceUninstallation(ml, operationId.getNode(), operationId.getService()),
                 status -> status.removeInstallationFlag(operationId.getService(), nodeName));
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
@@ -423,7 +423,7 @@ public class NodesConfigurationService {
             throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
         systemOperationService.applySystemOperation(operationId,
-                builder -> proceedWithServiceInstallation(builder, operationId.getNode(), operationId.getService()),
+                ml -> proceedWithServiceInstallation(ml, operationId.getNode(), operationId.getService()),
                 status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
     }
 
@@ -433,9 +433,9 @@ public class NodesConfigurationService {
         if (servicesDefinition.getService(operationId.getService()).isMarathon()) {
 
             systemOperationService.applySystemOperation(operationId,
-                    builder -> {
+                    ml -> {
                         try {
-                            builder.append(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(operationId.getService())));
+                            ml.addInfo(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(operationId.getService())));
                         } catch (MarathonException e) {
                             logger.error (e, e);
                             throw new SystemException (e);
@@ -445,13 +445,13 @@ public class NodesConfigurationService {
 
         } else {
             systemOperationService.applySystemOperation(operationId,
-                    builder -> builder.append(sshCommandService.runSSHCommand(operationId.getNode(), "sudo systemctl restart " + operationId.getService())),
+                    ml -> ml.addInfo(sshCommandService.runSSHCommand(operationId.getNode(), "sudo systemctl restart " + operationId.getService())),
                     status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
         }
     }
 
 
-    private void proceedWithServiceUninstallation(StringBuilder sb, String node, String service)
+    private void proceedWithServiceUninstallation(MessageLogger ml, String node, String service)
             throws SSHCommandException, SystemException {
 
         Connection connection = null;
@@ -459,14 +459,14 @@ public class NodesConfigurationService {
             connection = connectionManagerService.getPrivateConnection(node);
 
             // 1. Calling uninstall.sh script if it exists
-            systemService.callUninstallScript(sb, connection, service);
+            systemService.callUninstallScript(ml, connection, service);
 
             // 2. Stop service
-            sb.append(" - Stopping Service\n");
+            ml.addInfo(" - Stopping Service");
             sshCommandService.runSSHCommand(connection, "sudo systemctl stop " + service);
 
             // 3. Uninstall systemd service file
-            sb.append(" - Removing systemd Service File\n");
+            ml.addInfo(" - Removing systemd Service File");
             // Find systemd unit config files directory
             String foundStandardFlag = sshCommandService.runSSHScript(connection, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
             if (foundStandardFlag.contains("found_standard")) {
@@ -476,15 +476,15 @@ public class NodesConfigurationService {
             }
 
             // 4. Delete docker container
-            sb.append(" - Removing docker container \n");
+            ml.addInfo(" - Removing docker container");
             sshCommandService.runSSHCommand(connection, "sudo docker rm -f " + service + " || true ");
 
             // 5. Delete docker image
-            sb.append(" - Removing docker image \n");
+            ml.addInfo(" - Removing docker image");
             sshCommandService.runSSHCommand(connection, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
 
             // 6. Reloading systemd daemon
-            sb.append(" - Reloading systemd daemon \n");
+            ml.addInfo(" - Reloading systemd daemon");
             sshCommandService.runSSHCommand(connection, "sudo systemctl daemon-reload");
             sshCommandService.runSSHCommand(connection, "sudo systemctl reset-failed");
 
@@ -498,7 +498,7 @@ public class NodesConfigurationService {
         }
     }
 
-    private void proceedWithServiceInstallation(StringBuilder sb, String node, String service)
+    private void proceedWithServiceInstallation(MessageLogger ml, String node, String service)
             throws IOException, SystemException, SSHCommandException {
 
         String imageName = servicesDefinition.getService(service).getImageName();
@@ -507,14 +507,14 @@ public class NodesConfigurationService {
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
-            sb.append(" - Creating archive and copying it over\n");
-            File tmpArchiveFile = systemService.createRemotePackageFolder(sb, connection, node, service, imageName);
+            ml.addInfo(" - Creating archive and copying it over");
+            File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, node, service, imageName);
 
             // 4. call setup script
-            systemService.installationSetup(sb, connection, node, service);
+            systemService.installationSetup(ml, connection, node, service);
 
             // 5. cleanup
-            systemService.installationCleanup(sb, connection, service, imageName, tmpArchiveFile);
+            systemService.installationCleanup(ml, connection, service, imageName, tmpArchiveFile);
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);

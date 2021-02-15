@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.MemoryModel;
+import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
@@ -311,7 +312,7 @@ public abstract class AbstractSystemTest {
         return new SetupService(){
 
             @Override
-            protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+            protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
                 destinationFile.createNewFile();
                 try {
                     FileUtils.writeFile(destinationFile, "TEST DOWNLOADED CONTENT");

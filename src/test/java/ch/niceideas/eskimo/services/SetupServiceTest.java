@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
@@ -213,10 +214,14 @@ public class SetupServiceTest extends AbstractSystemTest {
         List<String> messages = operationsMonitoringService.getNewMessages(
                 new SetupCommand.SetupOperationId(SetupCommand.TYPE_BUILD, "cerebro"), 0);
         //List<String> messages = messagingService.getSubList(0);
-        assertEquals (6, messages.size());
+        assertEquals (5, messages.size());
 
         assertEquals("\n" +
-                        "Build of package cerebro,,Done : Build of package cerebro,-------------------------------------------------------------------------------,cerebro,--> Completed Successfuly.",
+                        "Build of package cerebro," +
+                        "cerebro," +
+                        "--> Done : Build of package cerebro," +
+                        "-------------------------------------------------------------------------------," +
+                        "--> Completed Successfuly.",
                 String.join(",", messages));
 
         FileUtils.delete(packageDevPathTest);
@@ -233,7 +238,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 return new JsonWrapper(packagesVersionFile);
             }
             @Override
-            protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+            protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
                 destinationFile.createNewFile();
                 try {
                     FileUtils.writeFile(destinationFile, "TEST DOWNLOADED CONTENT");

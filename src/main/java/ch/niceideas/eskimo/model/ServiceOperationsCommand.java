@@ -239,6 +239,10 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         restarts.stream()
                 .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
+
+        // this one can come from restartes flags
+        retSet.remove(ServiceOperationsCommand.MARATHON_FLAG);
+
         return retSet;
     }
 

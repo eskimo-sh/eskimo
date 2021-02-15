@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import lombok.Getter;
@@ -156,19 +157,27 @@ public class OperationsMonitoringService implements OperationsContext {
 
     // Individual operation monitoring
     public void addInfo(OperationId operation, String message) {
-        if (!isProcessingPending()) {
-            throw new IllegalStateException("Need to start an Operations group first.");
+        if (StringUtils.isNotBlank(message)) {
+            if (!isProcessingPending()) {
+                throw new IllegalStateException("Need to start an Operations group first.");
+            }
+            MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> {
+                throw new IllegalStateException();
+            });
+            msgMgr.addLines(message);
         }
-        MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> { throw new IllegalStateException(); });
-        msgMgr.addLines(message);
     }
 
     public void addInfo(OperationId operation, String[] messages) {
-        if (!isProcessingPending()) {
-            throw new IllegalStateException("Need to start an Operations group first.");
+        if (messages != null && messages.length > 0) {
+            if (!isProcessingPending()) {
+                throw new IllegalStateException("Need to start an Operations group first.");
+            }
+            MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> {
+                throw new IllegalStateException();
+            });
+            msgMgr.addLines(messages);
         }
-        MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> { throw new IllegalStateException(); });
-        msgMgr.addLines(messages);
     }
 
     public List<String> getNewMessages (OperationId operation, int lastLine) {
@@ -194,7 +203,7 @@ public class OperationsMonitoringService implements OperationsContext {
         operationStatus.put(operationId, OperationStatus.RUNNING);
     }
 
-    public void operationError(OperationId operationId) {
+    public void endOperationError(OperationId operationId) {
         if (!isProcessingPending()) {
             throw new IllegalStateException("Need to start an Operations group first.");
         }
@@ -205,7 +214,9 @@ public class OperationsMonitoringService implements OperationsContext {
         if (!isProcessingPending()) {
             throw new IllegalStateException("Need to start an Operations group first.");
         }
-        operationStatus.put(operationId, OperationStatus.COMPLETE);
+        if (!operationStatus.get(operationId).equals(OperationStatus.ERROR)) {
+            operationStatus.put(operationId, OperationStatus.COMPLETE);
+        }
     }
 
     @Override

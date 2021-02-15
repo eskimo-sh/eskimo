@@ -421,7 +421,7 @@ public class MarathonService {
 
             // Nodes re-setup (topology)
             systemOperationService.applySystemOperation(new MarathonOperationsCommand.MarathonOperationId("Installation", TOPOLOGY_ALL_NODES),
-                    builder -> {
+                    ml -> {
                     systemService.performPooledOperation (new ArrayList<> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
                                 // topology
@@ -430,7 +430,7 @@ public class MarathonService {
                                         nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation);
                                     } catch (SSHCommandException | IOException e) {
                                         logger.error (e, e);
-                                        builder.append(e.getMessage());
+                                        ml.addInfo(e.getMessage());
                                         throw new SystemException(e);
                                     }
                                 }
@@ -532,11 +532,11 @@ public class MarathonService {
     void installMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
-                builder -> proceedWithMarathonServiceInstallation(builder, marathonNode, operation.getService()),
+                logger -> proceedWithMarathonServiceInstallation(logger, marathonNode, operation.getService()),
                 status -> status.setInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
     }
 
-    private void proceedWithMarathonServiceUninstallation(StringBuilder sb, String marathonNode, String service)
+    private void proceedWithMarathonServiceUninstallation(MessageLogger ml, String marathonNode, String service)
             throws SSHCommandException, SystemException, MarathonException {
 
         Connection connection = null;
@@ -544,35 +544,35 @@ public class MarathonService {
             connection = connectionManagerService.getPrivateConnection(marathonNode);
 
             // 1. Calling uninstall.sh script if it exists
-            systemService.callUninstallScript(sb, connection, service);
+            systemService.callUninstallScript(ml, connection, service);
 
             // 2. Stop service
-            sb.append("Deleting marathon application for ").append(service).append("\n");
+            ml.addInfo("Deleting marathon application for " + service);
             String killResultString = queryMarathon(MARATHON_CONTEXT + service, "DELETE");
             JsonWrapper killResult = new JsonWrapper(killResultString);
 
             String deploymentId = killResult.getValueForPathAsString(DEPLOYMENT_ID_FIELD);
             if (StringUtils.isBlank(deploymentId)) {
-                sb.append("WARNING : Could not find any deployment ID when killing tasks for ").append(service).append("\n");
+                ml.addInfo("WARNING : Could not find any deployment ID when killing tasks for " + service);
             } else {
-                sb.append("Tasks killing deployment ID for ").append(service).append(" is ").append(deploymentId).append("\n");
+                ml.addInfo("Tasks killing deployment ID for " + service + " is " + deploymentId);
             }
 
             // 3. Wait for service to be stopped
             waitForServiceShutdown(service);
 
             // 4. Delete docker container
-            sb.append(" - TODO Removing docker image from registry \n");
+            ml.addInfo(" - TODO Removing docker image from registry");
 
             // 5. remove blobs
-            sb.append(" - Removing service from docker repository \n");
+            ml.addInfo(" - Removing service from docker repository");
 
             // 5.1 remove repository for service
             sshCommandService.runSSHCommand(connection,
                     "docker exec -i --user root marathon bash -c \"rm -Rf /var/lib/marathon/docker_registry/docker/registry/v2/repositories/" + service + "\"");
 
             // 5.2 run garbage collection to remove blobs
-            sb.append(" - Running garbage collection \n");
+            ml.addInfo(" - Running garbage collection");
             sshCommandService.runSSHCommand(connection,
                     "docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
 
@@ -585,7 +585,7 @@ public class MarathonService {
         }
     }
 
-    private void proceedWithMarathonServiceInstallation(StringBuilder sb, String marathonNode, String service)
+    private void proceedWithMarathonServiceInstallation(MessageLogger ml, String marathonNode, String service)
             throws IOException, SystemException, SSHCommandException {
 
         Connection connection = null;
@@ -594,14 +594,14 @@ public class MarathonService {
 
             String imageName = servicesDefinition.getService(service).getImageName();
 
-            sb.append(" - Creating archive and copying it over to marathon node \n");
-            File tmpArchiveFile = systemService.createRemotePackageFolder(sb, connection, marathonNode, service, imageName);
+            ml.addInfo(" - Creating archive and copying it over to marathon node");
+            File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, marathonNode, service, imageName);
 
             // 4. call setup script
-            systemService.installationSetup(sb, connection, marathonNode, service);
+            systemService.installationSetup(ml, connection, marathonNode, service);
 
             // 5. cleanup
-            systemService.installationCleanup(sb, connection, service, imageName, tmpArchiveFile);
+            systemService.installationCleanup(ml, connection, service, imageName, tmpArchiveFile);
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException (e);

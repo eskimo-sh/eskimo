@@ -37,11 +37,10 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.*;
 import com.trilead.ssh2.Connection;
+import org.eclipse.jetty.util.StringUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -127,7 +126,24 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         });
 
         StringBuilder sb = new StringBuilder();
-        nodesConfigurationService.installEskimoBaseSystem(sb, "192.168.10.11");
+        MessageLogger ml = new MessageLogger() {
+            @Override
+            public void addInfo(String message) {
+                if (StringUtils.isNotBlank(message)) {
+                    sb.append(message + "\n");
+                }
+            }
+
+            @Override
+            public void addInfo(String[] messages) {
+                if (messages != null && messages.length > 0) {
+                    for (String message : messages) {
+                        sb.append(message + "\n");
+                    }
+                }
+            }
+        };
+        nodesConfigurationService.installEskimoBaseSystem(ml, "192.168.10.11");
 
 
         assertEquals (" - Copying jq program\n" +

@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
@@ -467,7 +468,17 @@ public class SetupService {
 
             URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
 
-            dowloadFile(new StringBuilder(), tempPackagesVersionFile, downloadUrl, "");
+            dowloadFile(new MessageLogger() {
+                @Override
+                public void addInfo(String message) {
+                    // ignored
+                }
+
+                @Override
+                public void addInfo(String[] messages) {
+                    // ignored
+                }
+            }, tempPackagesVersionFile, downloadUrl, "");
 
             JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
             Files.delete(tempPackagesVersionFile.toPath());
@@ -679,7 +690,7 @@ public class SetupService {
             try {
                 systemOperationService.applySystemOperation(
                         new SetupCommand.SetupOperationId(SetupCommand.TYPE_DOWNLOAD, fileName),
-                        builder -> {
+                        ml -> {
 
                             File targetFile = new File(packageDistributionPath + "/" + fileName);
 
@@ -689,11 +700,10 @@ public class SetupService {
                             File tempFile = new File(targetFile.getAbsolutePath() + TEMP_DOWNLOAD_SUFFIX);
 
                             if (targetFile.exists()) {
-                                builder.append(fileName);
-                                builder.append(" is already downloaded");
+                                ml.addInfo(fileName + " is already downloaded");
                             } else {
 
-                                dowloadFile(builder, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
+                                dowloadFile(ml, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
 
                                 FileUtils.delete(targetFile);
                                 if (!tempFile.renameTo(targetFile)) {
@@ -708,13 +718,13 @@ public class SetupService {
         }
     }
 
-    protected void dowloadFile(StringBuilder builder, File destinationFile, URL downloadUrl, String message) throws IOException {
+    protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
         // download mesos using full java solution, no script (don't want dependency on system script for this)
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream())) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
                 try (FileChannel fileChannel = fileOutputStream.getChannel()) {
 
-                    builder.append(message);
+                    ml.addInfo(message);
                     fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
                 }
             }
@@ -728,7 +738,7 @@ public class SetupService {
             try {
                 systemOperationService.applySystemOperation(
                         new SetupCommand.SetupOperationId(SetupCommand.TYPE_BUILD, image),
-                        builder -> {
+                        ml -> {
                             try {
 
                                 File tempScript = File.createTempFile("tmp_build_script_" + image, ".sh");
@@ -736,13 +746,13 @@ public class SetupService {
                                         "export BUILD_TEMP_FOLDER=" + temporaryBuildFolder +"\n" +
                                         "bash " + packagesDevPath + "/build.sh -n " + image);
 
-                                builder.append(ProcessHelper.exec(new String[]{
+                                ml.addInfo(ProcessHelper.exec(new String[]{
                                         "bash",
                                         tempScript.getAbsolutePath()
                                 }, true));
                             } catch (ProcessHelper.ProcessHelperException | FileException e) {
                                 logger.debug(e, e);
-                                builder.append(e.getMessage());
+                                ml.addInfo(e.getMessage());
                                 throw new ProcessHelper.ProcessHelperException("build.sh script execution for " + image + " failed.");
                             }
                         },

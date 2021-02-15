@@ -288,7 +288,7 @@ public class SystemService {
                     + e.getMessage());
 
             notificationService.addError(message + " failed !");
-            operationsMonitoringService.operationError(operationId);
+            operationsMonitoringService.endOperationError(operationId);
             throw new SystemException(e.getMessage(), e);
 
         } finally {
@@ -740,7 +740,7 @@ public class SystemService {
         }
     }
 
-    void callUninstallScript(StringBuilder sb, Connection connection, String service) throws SystemException {
+    void callUninstallScript(MessageLogger ml, Connection connection, String service) throws SystemException {
         File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
             throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
@@ -749,37 +749,47 @@ public class SystemService {
         try {
             File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
             if (uninstallScriptFile.exists()) {
-                sb.append(" - Calling uninstall script\n");
+                ml.addInfo(" - Calling uninstall script");
 
-                sb.append(sshCommandService.runSSHScriptPath(connection, uninstallScriptFile.getAbsolutePath()));
+                ml.addInfo(sshCommandService.runSSHScriptPath(connection, uninstallScriptFile.getAbsolutePath()));
             }
         } catch (SSHCommandException e) {
             logger.warn (e, e);
-            sb.append (e.getMessage());
+            ml.addInfo (e.getMessage());
         }
     }
 
-    void installationSetup(StringBuilder sb, Connection connection, String node, String service) throws SystemException {
+    void installationSetup(MessageLogger ml, Connection connection, String node, String service) throws SystemException {
         try {
-            exec(connection, sb, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node});
+            exec(connection, ml, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node});
         } catch (SSHCommandException e) {
             logger.debug (e, e);
-            sb.append(e.getMessage());
+            ml.addInfo(e.getMessage());
             throw new SystemException ("Setup.sh script execution for " + service + " on node " + node + " failed.", e);
         }
     }
 
-    void installationCleanup(StringBuilder sb, Connection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
-        exec(connection, sb, "rm -Rf " + TMP_PATH_PREFIX + service);
-        exec(connection, sb, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
+    void installationCleanup(MessageLogger ml, Connection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
+        exec(connection, ml, "rm -Rf " + TMP_PATH_PREFIX + service);
+        exec(connection, ml, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
 
         if (StringUtils.isNotBlank(imageName)) {
             try {
-                sb.append(" - Deleting docker template image");
-                exec(connection, new StringBuilder(), "docker image rm eskimo:" + imageName + "_template");
+                ml.addInfo(" - Deleting docker template image");
+                exec(connection, new MessageLogger() {
+                    @Override
+                    public void addInfo(String message) {
+                        // ignored
+                    }
+
+                    @Override
+                    public void addInfo(String[] messages) {
+                        // ignored
+                    }
+                }, "docker image rm eskimo:" + imageName + "_template");
             } catch (SSHCommandException e) {
                 logger.error(e, e);
-                sb.append(e.getMessage());
+                ml.addInfo(e.getMessage());
                 // ignroed any further
             }
         }
@@ -792,12 +802,12 @@ public class SystemService {
         }
     }
 
-    void exec(Connection connection, StringBuilder sb, String[] setupScript) throws SSHCommandException {
-        sb.append(sshCommandService.runSSHCommand(connection, setupScript));
+    void exec(Connection connection, MessageLogger ml, String[] setupScript) throws SSHCommandException {
+        ml.addInfo(sshCommandService.runSSHCommand(connection, setupScript));
     }
 
-    void exec(Connection connection, StringBuilder sb, String command) throws SSHCommandException {
-        sb.append(sshCommandService.runSSHCommand(connection, command));
+    void exec(Connection connection, MessageLogger ml, String command) throws SSHCommandException {
+        ml.addInfo(sshCommandService.runSSHCommand(connection, command));
     }
 
     List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
@@ -808,35 +818,32 @@ public class SystemService {
         nodesToTest.addAll(nodesConfig.getNodeAddresses());
         for (String node : nodesToTest) {
 
-            if (!node.equals(ServiceOperationsCommand.MARATHON_FLAG)) {
+            // handle potential interruption request
+            if (operationsMonitoringService.isInterrupted()) {
+                return null;
+            }
 
-                // handle potential interruption request
-                if (operationsMonitoringService.isInterrupted()) {
-                    return null;
+            nodesSetup.add(new Pair<>("node_setup", node));
+
+            // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
+
+            // find out if SSH connection to host can succeed
+            try {
+                String ping = sendPing(node);
+
+                if (!ping.startsWith("OK")) {
+
+                    handleNodeDead(deadIps, node);
+                } else {
+                    liveIps.add(node);
                 }
 
-                nodesSetup.add(new Pair<>("node_setup", node));
+                // Ensure sudo is possible
+                checkSudoPossible (deadIps, node);
 
-                // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
-
-                // find out if SSH connection to host can succeed
-                try {
-                    String ping = sendPing(node);
-
-                    if (!ping.startsWith("OK")) {
-
-                        handleNodeDead(deadIps, node);
-                    } else {
-                        liveIps.add(node);
-                    }
-
-                    // Ensure sudo is possible
-                    checkSudoPossible (deadIps, node);
-
-                } catch (SSHCommandException e) {
-                    logger.debug(e, e);
-                    handleSSHFails(deadIps, node);
-                }
+            } catch (SSHCommandException e) {
+                logger.debug(e, e);
+                handleSSHFails(deadIps, node);
             }
         }
 
@@ -873,7 +880,7 @@ public class SystemService {
         deadIps.add(node);
     }
 
-    File createRemotePackageFolder(StringBuilder sb, Connection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
+    File createRemotePackageFolder(MessageLogger ml, Connection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist
@@ -903,11 +910,11 @@ public class SystemService {
         // 2.1
         sshCommandService.copySCPFile(connection, archive.getAbsolutePath());
 
-        exec(connection, sb, "rm -Rf " +SystemService. TMP_PATH_PREFIX + service);
-        exec(connection, sb, "rm -f " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
-        exec(connection, sb, "mv " +  tmpArchiveFile.getName() + " " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
-        exec(connection, sb, "tar xfz " + SystemService.TMP_PATH_PREFIX + service + ".tgz --directory=" + SystemService.TMP_PATH_PREFIX);
-        exec(connection, sb, "chmod 755 " + SystemService.TMP_PATH_PREFIX + service + "/setup.sh");
+        exec(connection, ml, "rm -Rf " +SystemService. TMP_PATH_PREFIX + service);
+        exec(connection, ml, "rm -f " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
+        exec(connection, ml, "mv " +  tmpArchiveFile.getName() + " " + SystemService.TMP_PATH_PREFIX + service + ".tgz");
+        exec(connection, ml, "tar xfz " + SystemService.TMP_PATH_PREFIX + service + ".tgz --directory=" + SystemService.TMP_PATH_PREFIX);
+        exec(connection, ml, "chmod 755 " + SystemService.TMP_PATH_PREFIX + service + "/setup.sh");
 
         // 2.2 delete local archive
         try {
@@ -924,17 +931,17 @@ public class SystemService {
             File containerFile = new File(packageDistributionPath + "/" + imageFileName);
             if (containerFile.exists()) {
 
-                sb.append(" - Copying over docker image ").append(imageFileName).append("\n");
+                ml.addInfo(" - Copying over docker image " + imageFileName);
                 sshCommandService.copySCPFile(connection, packageDistributionPath + "/" + imageFileName);
 
-                exec(connection, sb, new String[]{"mv", imageFileName, SystemService.TMP_PATH_PREFIX + service + "/"});
+                exec(connection, ml, new String[]{"mv", imageFileName, SystemService.TMP_PATH_PREFIX + service + "/"});
 
-                exec(connection, sb, new String[]{"mv",
+                exec(connection, ml, new String[]{"mv",
                         SystemService.TMP_PATH_PREFIX + service + "/" + imageFileName,
                         SystemService.TMP_PATH_PREFIX + service + "/" + SetupService.DOCKER_TEMPLATE_PREFIX + imageName + ".tar.gz"});
 
             } else {
-                sb.append(" - (no container found for ").append(service).append(" - will just invoke setup)");
+                ml.addInfo(" - (no container found for " + service + "OperationsMonitoringServiceTest - will just invoke setup)");
             }
         }
         return tmpArchiveFile;

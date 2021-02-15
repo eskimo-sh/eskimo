@@ -38,8 +38,8 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.OperationId;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -83,8 +83,6 @@ public class SystemOperationService {
     public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
             throws SystemException  {
 
-        StringBuilder result = new StringBuilder();
-
         if (!operationsMonitoringService.isInterrupted()) {
 
             String message = operationId.getMessage();
@@ -95,14 +93,23 @@ public class SystemOperationService {
                 logOperationMessage(operationId, message);
 
 
-                operation.call(result);
-                if (StringUtils.isNotBlank(result.toString())) {
-                    operationsMonitoringService.addInfo(operationId, "\nDone : "
+                operation.call(new MessageLogger () {
+
+                    @Override
+                    public void addInfo(String message) {
+                        operationsMonitoringService.addInfo(operationId, message);
+                    }
+
+                    @Override
+                    public void addInfo(String[] messages) {
+                        operationsMonitoringService.addInfo(operationId, messages);
+                    }
+                });
+
+                operationsMonitoringService.addInfo(operationId, "--> Done : "
                             + message
                             + "\n-------------------------------------------------------------------------------\n"
-                            + result
                             + "--> Completed Successfuly.");
-                }
 
                 notificationService.addInfo(message + " succeeded");
 
@@ -114,15 +121,14 @@ public class SystemOperationService {
                 logger.debug(e, e);
                 logger.warn ("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
 
-                operationsMonitoringService.addInfo(operationId, "\nDone : "
+                operationsMonitoringService.addInfo(operationId, "--> Done : "
                         + message
                         + "\n-------------------------------------------------------------------------------\n"
-                        + result
                         + "--> Completed in error : "
                         + e.getMessage());
 
                 notificationService.addError(message + " failed !");
-                operationsMonitoringService.operationError(operationId);
+                operationsMonitoringService.endOperationError(operationId);
                 throw new SystemException(e);
 
             } finally {
@@ -139,7 +145,7 @@ public class SystemOperationService {
     }
 
     interface SystemOperation {
-        void call(StringBuilder result)
+        void call(MessageLogger logger)
                 throws ProcessHelper.ProcessHelperException, SSHCommandException, SystemException, IOException,
                        FileUtils.FileDeleteFailedException;
     }
