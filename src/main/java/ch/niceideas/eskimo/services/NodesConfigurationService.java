@@ -270,6 +270,7 @@ public class NodesConfigurationService {
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
+            ml.addInfo(" - Calling install-eskimo-base-system.sh");
             ml.addInfo(sshCommandService.runSSHScriptPath(connection, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
             ml.addInfo(" - Copying jq program");
@@ -511,9 +512,11 @@ public class NodesConfigurationService {
             File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, node, service, imageName);
 
             // 4. call setup script
+            ml.addInfo(" - Calling setup script");
             systemService.installationSetup(ml, connection, node, service);
 
             // 5. cleanup
+            ml.addInfo(" - Performing cleanup");
             systemService.installationCleanup(ml, connection, service, imageName, tmpArchiveFile);
 
         } catch (ConnectionManagerException e) {

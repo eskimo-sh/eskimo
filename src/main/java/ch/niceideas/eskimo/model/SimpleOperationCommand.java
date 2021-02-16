@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -35,6 +36,13 @@ public class SimpleOperationCommand implements JSONOpCommand {
         }};
     }
 
+    public static String standardizeOperationMember (String member) {
+        if (StringUtils.isBlank(member)) {
+            return "";
+        }
+        return member.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-").replace(".", "-");
+    }
+
     @Data
     @RequiredArgsConstructor
     public static class SimpleOperationId implements OperationId {
@@ -57,10 +65,11 @@ public class SimpleOperationCommand implements JSONOpCommand {
 
         @Override
         public String toString() {
-            return operation.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-")
+            return standardizeOperationMember(operation)
                     + "_"
-                    + service.replace(" ", "-")
-                    + "_"+node.replace(".", "-");
+                    + standardizeOperationMember (service)
+                    + "_"
+                    + standardizeOperationMember (node);
         }
     }
 }

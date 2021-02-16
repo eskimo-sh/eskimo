@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import org.json.JSONObject;
@@ -49,4 +50,5 @@ public interface JSONOpCommand extends Serializable {
 
     List<? extends OperationId> getAllOperationsInOrder (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException;
+
 }

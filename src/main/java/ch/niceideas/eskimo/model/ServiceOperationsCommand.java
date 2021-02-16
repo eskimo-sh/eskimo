@@ -50,6 +50,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
+
 public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
@@ -304,11 +306,11 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
         @Override
         public String toString() {
-            return type.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-")
+            return standardizeOperationMember (type)
                     + "_"
-                    + service.replace(" ", "-")
+                    + standardizeOperationMember (service)
                     + "_"
-                    + node.replace(".", "-").replace(" ", "-").replace("(", "").replace(")", "");
+                    + standardizeOperationMember (node);
         }
     }
 }

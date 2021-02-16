@@ -53,7 +53,7 @@ export KIBANA_PID=$!
 
 echo " - Waiting for Kibana to be up and running"
 set +e
-for i in `seq 1 60`; do
+for i in `seq 1 90`; do
 
     sleep 5
 
@@ -70,8 +70,8 @@ for i in `seq 1 60`; do
         fi
     fi
 
-    if [[ $i == 60 ]]; then
-        echo "!!! Couldn't get kibana up and running within 300 seconds. Crashing"
+    if [[ $i == 90 ]]; then
+        echo "!!! Couldn't get kibana up and running within 450 seconds. Crashing"
         exit 2
     fi
 done

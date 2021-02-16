@@ -66,8 +66,8 @@ eskimo.Operations = function() {
                     return false;
                 });
 
-                $("#interupt-messaging-btn").click(function(e) {
-                    $("#pending-message-title").html("<h3>Processing pending on Eskimo backend. <strong>(Interrupting ...)</strong></h3>");
+                $("#interupt-operations-btn").click(function(e) {
+                    $("#operations-title").html("<h3>Operations pending .... <strong>(Interrupting ...)</strong></h3>");
                     $.ajax({
                         type: "GET",
                         dataType: "json",
@@ -100,9 +100,9 @@ eskimo.Operations = function() {
 
     function setOperationInProgress (pendingOp) {
         if (pendingOp) {
-            $("#interupt-messaging-btn").attr("class", "btn btn-danger");
+            $("#interupt-operations-btn").attr("class", "btn btn-danger");
         } else {
-            $("#interupt-messaging-btn").attr("class", "btn btn-danger disabled");
+            $("#interupt-operations-btn").attr("class", "btn btn-danger disabled");
         }
     }
     this.setOperationInProgress = setOperationInProgress;
@@ -176,7 +176,7 @@ eskimo.Operations = function() {
 
                 progress.html("Error!");
                 progress.css("width", "100%");
-                progress.addClass("progress-bar-error");
+                progress.addClass("progress-bar-danger");
                 progress.removeClass("progress-bar-info");
                 wrapper.removeClass("progress-striped");
 
@@ -296,24 +296,19 @@ eskimo.Operations = function() {
     this.fetchOperationStatus = fetchOperationStatus;
 
     function startOperationInProgress() {
+        /*
         let pendingBarWrapper = $("#progress-bar-pending-wrapper");
         pendingBarWrapper.css("visibility", "inherit");
         pendingBarWrapper.css("display", "block");
+        */
 
-        $("#pending-message-title").html("<h3>Processing pending on Eskimo backend ....</h3>");
+        $("#operations-title").html("<h3>Operations pending ....</h3>");
 
-        $("#pending-message-content").html("");
-        
         operationsPollingHandle = setTimeout(
             fetchOperationStatus,
             1000);
     }
     this.startOperationInProgress = startOperationInProgress;
-
-    function addMessage (message) {
-        $("#pending-message-content").append(message);
-    }
-    this.addMessage = addMessage;
 
     function stopOperationInProgress (success, callback) {
 
@@ -324,9 +319,9 @@ eskimo.Operations = function() {
         that.fetchOperationStatus (function() {
 
             if (!success) {
-                $("#pending-message-title").html("<h3><span class='processing-error'>Processing completed in error !</span></h3>");
+                $("#operations-title").html("<h3><span class='processing-error'>Operations completed in error !</span></h3>");
             } else {
-                $("#pending-message-title").html("<h3>Processing completed successfully.</h3>");
+                $("#operations-title").html("<h3>Operations completed successfully.</h3>");
             }
 
             /*

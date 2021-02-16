@@ -48,6 +48,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.*;
 
+import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
+
 @Data
 public class SetupCommand implements JSONOpCommand {
 
@@ -164,7 +166,9 @@ public class SetupCommand implements JSONOpCommand {
 
         @Override
         public String toString() {
-            return type+"_"+service;
+            return standardizeOperationMember (type)
+                    + "_"
+                    + standardizeOperationMember (service);
         }
     }
 }

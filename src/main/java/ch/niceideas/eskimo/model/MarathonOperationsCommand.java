@@ -50,6 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
+
 public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOperationsCommand.MarathonOperationId> implements Serializable {
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
@@ -172,8 +174,9 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
 
         @Override
         public String toString() {
-            return type + "_"
-                    + service.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-");
+            return standardizeOperationMember (type)
+                    + "_"
+                    + standardizeOperationMember (service);
         }
     }
 }

@@ -146,7 +146,8 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         nodesConfigurationService.installEskimoBaseSystem(ml, "192.168.10.11");
 
 
-        assertEquals (" - Copying jq program\n" +
+        assertEquals (" - Calling install-eskimo-base-system.sh\n" +
+                " - Copying jq program\n" +
                 " - Copying mesos-cli script\n" +
                 " - Copying gluster-mount script\n", sb.toString());
 
