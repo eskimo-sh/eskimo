@@ -127,7 +127,8 @@ public class OperationsMonitoringService implements OperationsContext {
             interruption.set(true);
 
             operationList.forEach(operationId -> {
-                if (operationStatus.get(operationId) != OperationStatus.COMPLETE) {
+                if (operationStatus.get(operationId) == null ||
+                        operationStatus.get(operationId) == OperationStatus.INIT) {
                     operationStatus.put (operationId, OperationStatus.CANCELLED);
                 }
             });

@@ -218,5 +218,14 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         assertTrue (expectedStatus.getJSONObject().similar(operationsMonitoringStatus.getJSONObject()));
     }
 
+    @Test
+    public void testInterruptionReporting() {
+
+        // same test as above but keep all operations pending (object.wait selectively / then object.notifyAll())
+        // test that the operations selectively blocked are kept running and all the ones not started are cancelled
+
+        fail ("To Be Implemented");
+    }
+
 
 }

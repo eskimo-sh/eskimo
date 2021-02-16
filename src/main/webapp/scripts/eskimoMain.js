@@ -48,7 +48,6 @@ eskimo.Main = function() {
     let eskimoSetup = null;
     let eskimoNodesConfig = null;
     let eskimoSystemStatus = null;
-    let eskimoMessaging = null;
     let eskimoOperations = null;
     let eskimoConsoles = null;
     let eskimoNotifications = null;
@@ -76,7 +75,6 @@ eskimo.Main = function() {
 
         eskimoSetup = new eskimo.Setup();
         eskimoNotifications = new eskimo.Notifications();
-        eskimoMessaging = new eskimo.Messaging();
         eskimoOperations = new eskimo.Operations();
         eskimoOperationsCommand = new eskimo.OperationsCommand();
         eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();
@@ -98,7 +96,6 @@ eskimo.Main = function() {
             eskimoSetup: eskimoSetup,
             eskimoNodesConfig: eskimoNodesConfig,
             eskimoSystemStatus: eskimoSystemStatus,
-            eskimoMessaging: eskimoMessaging,
             eskimoOperations: eskimoOperations,
             eskimoConsoles: eskimoConsoles,
             eskimoNotifications: eskimoNotifications,
@@ -131,9 +128,6 @@ eskimo.Main = function() {
 
         eskimoNotifications.initialize();
         // loadLastLine -> get-lastline-notification
-
-        eskimoMessaging.initialize();
-        // loadLastLine -> get-lastline-messaging
 
         eskimoOperations.initialize();
 
@@ -220,7 +214,6 @@ eskimo.Main = function() {
         $("#main-menu-show-services-settings-link").click(eskimoServicesSettings.showServicesSettings);
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
         $("#main-menu-show-marathon-config-link").click(eskimoMarathonServicesConfig.showMarathonServicesConfig);
-        $("#main-menu-show-messages-link").click(eskimoMessaging.showMessages);
         $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
         $("#main-menu-logout-link").click(function() {
             window.location = "logout";
@@ -296,7 +289,6 @@ eskimo.Main = function() {
         if (!isOperationInProgress()) { // but frontend has no clue
             startOperationInProgress();
             operationInProgressOwner = true;
-            //eskimoMessaging.addMessage("(Recovering messages from backend processing)");
             eskimoOperations.showOperations
         }
     }
@@ -471,9 +463,6 @@ eskimo.Main = function() {
     };
     this.getSystemStatus = function() {
         return eskimoSystemStatus;
-    };
-    this.getMessaging = function() {
-        return eskimoMessaging;
     };
     this.getOperations = function() {
         return eskimoOperations;
