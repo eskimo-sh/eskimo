@@ -47,6 +47,7 @@ eskimo.Operations = function() {
     let operationsPollingHandle = null;
 
     let messagesStore = {};
+    let globalLastLine = 0;
 
     this.initialize = function () {
         // Initialize HTML Div from Template
@@ -112,6 +113,7 @@ eskimo.Operations = function() {
         for (let operation in messagesStore) {
             lastLines[operation] = messagesStore[operation].lastLine;
         }
+        lastLines["global"] = globalLastLine;
         return lastLines;
     }
 
@@ -135,6 +137,18 @@ eskimo.Operations = function() {
         $('#operation-log-modal').modal('show');
     }
     this.showLogs = showLogs;
+
+    function updateGlobalMessages (globalMessages) {
+        globalLastLine = globalMessages.lastLine;
+        if (globalMessages.lines && globalMessages.lines != "") {
+            let previous = $("#operations-global-messages").html("");
+            if (previous == null || previous == "") {
+                $("#operations-global-messages").html(globalMessages);
+            } else {
+                $("#operations-global-messages").html(previous + "<br>" + globalMessages.lines);
+            }
+        }
+    }
 
     function updateMessages (labels, messages) {
         for (let i = 0; i < labels.length; i++) {
@@ -214,6 +228,9 @@ eskimo.Operations = function() {
 
         if (newOpString !== currentOpString) {
 
+            $("#operations-global-messages").html("");
+            $("#operations-global-messages").css("display", "none");
+
             messagesStore = {};
 
             $("#operations-table-body").html("");
@@ -262,6 +279,8 @@ eskimo.Operations = function() {
                     renderStatus (data.labels, data.status);
 
                     updateMessages (data.labels, data.messages)
+
+                    updateGlobalMessages (data.globalMessages);
 
                 } else {
                     console.error("No data received");

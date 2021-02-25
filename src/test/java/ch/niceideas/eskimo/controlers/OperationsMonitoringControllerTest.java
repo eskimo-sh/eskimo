@@ -1,14 +1,9 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.OperationId;
 import ch.niceideas.eskimo.model.OperationStatus;
 import ch.niceideas.eskimo.model.OperationsMonitoringStatusWrapper;
-import ch.niceideas.eskimo.services.MessagingManager;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

@@ -85,6 +85,10 @@
       "lastLine": 4
     }
   },
+  "globalMessages": {
+    "lines": "",
+    "lastLine": 0
+  },
   "labels": [
     {
       "operation": "Check--Install_Base-System_192-168-10-15",

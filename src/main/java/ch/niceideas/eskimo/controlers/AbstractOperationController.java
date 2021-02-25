@@ -1,7 +1,6 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.model.JSONOpCommand;
-import ch.niceideas.eskimo.services.MessagingManager;
 import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.SystemService;
@@ -10,7 +9,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 
 public class AbstractOperationController {

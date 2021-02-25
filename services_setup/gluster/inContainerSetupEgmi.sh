@@ -62,6 +62,8 @@ sudo ln -s /usr/local/lib/egmi/conf /usr/local/etc/egmi
 echo " - Installing __force-remove-brick.sh"
 cp /usr/local/lib/egmi/utils/gluster_container_helpers/* /usr/local/sbin/
 
+echo " - Setting up hostname in egmi.properties"
+sed -i s/"zookeeper.myId=localhost"/"zookeeper.myId=$SELF_IP_ADDRESS"/g /usr/local/lib/egmi/conf/egmi.properties
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

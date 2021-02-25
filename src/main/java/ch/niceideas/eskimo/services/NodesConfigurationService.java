@@ -255,6 +255,7 @@ public class NodesConfigurationService {
             }
 
             if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getNodeAddresses()))) {
+                operationsMonitoringService.addGlobalInfo("At least one configured node was found dead");
                 throw new SystemException("At least one configured node was found dead");
             }
 

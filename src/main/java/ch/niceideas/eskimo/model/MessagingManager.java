@@ -32,7 +32,7 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.model.AbstractInformationHolder;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

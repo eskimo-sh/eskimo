@@ -3,7 +3,6 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import lombok.Getter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -40,6 +38,7 @@ public class OperationsMonitoringService implements OperationsContext {
     private boolean lastOperationSuccess;
 
     private List<? extends OperationId> operationList = null;
+    private final MessagingManager globalMessages = new MessagingManager();
     private final Map<OperationId, MessagingManager> operationLogs = new HashMap<>();
     private final Map<OperationId, OperationStatus> operationStatus = new HashMap<>();
     private JSONOpCommand currentOperation = null;
@@ -68,6 +67,12 @@ public class OperationsMonitoringService implements OperationsContext {
                         put ("label", opId.getMessage());
                     }}));
                 }
+            }}));
+
+            put ("globalMessages", new JSONObject(new HashMap<>() {{
+                Pair<Integer, String> newLines = globalMessages.fetchElements(lastLinePerOp.computeIfAbsent("global", (op) -> 0));
+                put("lastLine", newLines.getKey());
+                put("lines", Base64.getEncoder().encodeToString(newLines.getValue().getBytes()));
             }}));
 
             put("messages", new JSONObject(new HashMap<>() {{
@@ -101,6 +106,7 @@ public class OperationsMonitoringService implements OperationsContext {
         currentOperation = operation;
         systemActionLock.lock();
 
+        globalMessages.clear();
         operationLogs.clear();
         operationStatus.clear();
 
@@ -154,6 +160,10 @@ public class OperationsMonitoringService implements OperationsContext {
 
     private void setLastOperationSuccess(boolean success) {
         lastOperationSuccess = success;
+    }
+
+    public void addGlobalInfo (String message) {
+        globalMessages.addLines(message);
     }
 
     // Individual operation monitoring

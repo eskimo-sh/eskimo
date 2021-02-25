@@ -348,12 +348,8 @@ public class MarathonService {
                 notificationService.addError("Marathon doesn't seem to be installed");
 
                 String message = "Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.\"";
-                /*
-                messagingService.addLines(message);
-                messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
+                operationsMonitoringService.addGlobalInfo(message);
 
-
-                 */
                 // special case : if some marathon services are getting uninstalled, and marathon is nowhere installed or anything, let's force flag them as uninstalled
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
@@ -392,10 +388,7 @@ public class MarathonService {
             if (deadIps.contains(marathonNode)) {
                 notificationService.addError("The marathon node is dead. cannot proceed any further with installation.");
                 String message = "The marathon node is dead. cannot proceed any further with installation. Marathon services configuration is saved but will need to be re-applied when marathon is available.";
-                /*
-                messagingService.addLines(message);
-                messagingService.addLines ("Marathon services configuration is saved but will need to be re-applied when marathon is available.");
-                */
+                operationsMonitoringService.addGlobalInfo(message);
                 throw new MarathonException(message);
             }
 
@@ -464,6 +457,7 @@ public class MarathonService {
             success = true;
         } catch (FileException | SetupException | SystemException | ServiceDefinitionException | NodesConfigurationException e) {
             logger.error (e, e);
+            operationsMonitoringService.addGlobalInfo("Marathon Services installation failed ! <br>" + e.getMessage());
             notificationService.addError("Marathon Services installation failed !");
             throw new MarathonException(e);
         } finally {
@@ -598,9 +592,11 @@ public class MarathonService {
             File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, marathonNode, service, imageName);
 
             // 4. call setup script
+            ml.addInfo(" - Calling setup script");
             systemService.installationSetup(ml, connection, marathonNode, service);
 
             // 5. cleanup
+            ml.addInfo(" - Performing cleanup");
             systemService.installationCleanup(ml, connection, service, imageName, tmpArchiveFile);
 
         } catch (ConnectionManagerException e) {

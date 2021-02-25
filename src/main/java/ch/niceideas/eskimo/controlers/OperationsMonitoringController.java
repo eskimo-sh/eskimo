@@ -35,10 +35,8 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.OperationsMonitoringStatusWrapper;
-import ch.niceideas.eskimo.services.MessagingManager;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
@@ -49,9 +47,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.AbstractMap;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 

@@ -99,12 +99,9 @@ fi
 
 set +e
 
-
-# Creating the mount point if it does not exist
-if [[ ! -d "$MOUNT_POINT" ]]; then
-    echo " - Creating mount point $MOUNT_POINT"
-    mkdir -p $MOUNT_POINT
-fi
+function delete_gluster_lock_file() {
+     rm -Rf /var/lib/gluster/volume_management_lock_$VOLUME
+}
 
 # From here we will be messing with gluster and hence we need to take a lock
 if [[ -f /var/lib/gluster/volume_management_lock_$VOLUME ]] ; then
@@ -112,14 +109,17 @@ if [[ -f /var/lib/gluster/volume_management_lock_$VOLUME ]] ; then
     exit 0
 fi
 
-function delete_gluster_lock_file() {
-     rm -Rf /var/lib/gluster/volume_management_lock_$VOLUME
-}
-
 trap delete_gluster_lock_file 15
 trap delete_gluster_lock_file EXIT
 
 touch /var/lib/gluster/volume_management_lock_$VOLUME
+
+# Creating the mount point if it does not exist
+if [[ ! -d "$MOUNT_POINT" ]]; then
+    echo " - Creating mount point $MOUNT_POINT"
+    mkdir -p $MOUNT_POINT
+fi
+
 
 # This is really just addressing the need to unmount the mount point before anything else is to be attempted
 # In case the underlying gluster transport is not connected and yet the mount point is still referenced as mounted
@@ -148,6 +148,8 @@ if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
     # XXX I change noauto to auto following issues after recover from suspend
     bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.after=gluster.service 0 0\" >> /etc/fstab"
 
+    sleep 1
+
     echo " - reloading systemd daemon"
     /bin/systemctl daemon-reload
 
@@ -159,13 +161,15 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
     echo " - Mounting $MOUNT_POINT"
     /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_$1_log 2>&1
     if [[ $? != 0 ]]; then
-        echo "Failed to mount $MOUNT_POINT"
+        echo "   + Failed to mount $MOUNT_POINT"
         cat /tmp/gluster_mount_$1_log
         exit 10
     fi
 
+    sleep 1
+
     if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
-        echo "Unsuccessfully attempted to mount $MOUNT_POINT"
+        echo "   + Unsuccessfully attempted to mount $MOUNT_POINT"
         cat /tmp/gluster_mount_$1_log
         exit 11
     fi
