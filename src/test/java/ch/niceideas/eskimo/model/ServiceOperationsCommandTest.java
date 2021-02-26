@@ -151,10 +151,9 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals("zookeeper", oc.getUninstallations().get(2).getService());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getNode());
 
-        assertEquals(16, oc.getRestarts().size());
+        assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
@@ -291,10 +290,9 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals("zookeeper", oc.getUninstallations().get(2).getService());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getNode());
 
-        assertEquals(16, oc.getRestarts().size());
+        assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
@@ -403,10 +401,9 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals("zookeeper", oc.getUninstallations().get(2).getService());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getNode());
 
-        assertEquals(16, oc.getRestarts().size());
+        assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
@@ -511,10 +508,9 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals("zookeeper", oc.getUninstallations().get(2).getService());
         assertEquals("192.168.10.13", oc.getUninstallations().get(2).getNode());
 
-        assertEquals(16, oc.getRestarts().size());
+        assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "elasticsearch=192.168.10.11, " +
                 "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +

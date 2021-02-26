@@ -37,7 +37,6 @@
 set -e
 
 #echo " - Handling default indices settings (before framworked settings injection) "
-#export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
 if [[ `echo $ALL_NODES_LIST_elasticsearch | grep ','` == "" ]]; then
     export HAS_MASTER=0
 else

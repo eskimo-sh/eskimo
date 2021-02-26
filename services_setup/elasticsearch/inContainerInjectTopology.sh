@@ -39,13 +39,6 @@ set -e
 echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
-# OLD IMPLEMENTATION
-# ElasticSearch's own ES master is actually the next master to use in the chain
-#export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-#if [[ $MASTER_IP_ADDRESS == "" ]]; then
-#    echo " - No master passed in argument. Zen discovery will not be configured"
-#fi
-
 echo " - Adapting configuration in file elasticsearch.yml"
 
 # I was using node name previously, but now the problem is that a node has to be known by the same name it has
@@ -119,8 +112,6 @@ sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.in
 
 
 # Compute number of elasticsearch nodes and set minimum master nodes for discovery
-#number_of_es_nodes=`cat /etc/eskimo_topology.sh | grep "export MASTER_ELASTICSEARCH_" | cut -d '_' -f 3 | cut -d '=' -f 1 | uniq | wc -l`
-
 if [ $number_of_es_nodes -gt 2 ]; then
     number_of_master_nodes=$((number_of_es_nodes / 2 + 1))
 

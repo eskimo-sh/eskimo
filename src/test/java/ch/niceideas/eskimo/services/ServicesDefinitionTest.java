@@ -87,7 +87,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 new MarathonServicesConfigWrapper(jsonMarathonConfig),
                 "192.168.10.11");
 
-        assertEquals ("export MASTER_ELASTICSEARCH_1=192.168.10.11\n" +
+        assertEquals (
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
@@ -114,7 +114,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_ELASTICSEARCH_1=192.168.10.11\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.12\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.11\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
@@ -172,7 +171,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_ELASTICSEARCH_1=192.168.10.11\n" +
                 "export MASTER_MARATHON_1=192.168.10.11\n" +
                 "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
                 "export MASTER_NTP_1=192.168.10.11\n" +
@@ -317,9 +315,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     public void testGetDependentServices() throws Exception {
 
         String[] elasticsearchDep = def.getDependentServices("elasticsearch").toArray(new String[0]);
-        assertEquals(5, elasticsearchDep.length);
+        assertEquals(4, elasticsearchDep.length);
         assertArrayEquals(new String[] {
-                "elasticsearch",
                 "cerebro",
                 "kibana",
                 "logstash",

@@ -48,18 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
-fi
-
-# ElasticSearch's own ES master is actually the next master to use in the chain
-export MASTER_IP_ADDRESS=`eval echo "\$"$(echo MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $MASTER_IP_ADDRESS == "" ]]; then
-    echo " - No master passed in argument. Zen discovery will not be configured"
+    exit 2
 fi
 
 # reinitializing log
@@ -72,7 +66,7 @@ echo " - Configuring host elasticsearch common part"
 . ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 3
 fi
 
 echo " - Creating shared directory"
@@ -103,7 +97,7 @@ docker exec elasticsearch bash /scripts/inContainerSetupESCommon.sh $elasticsear
 if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat es_install_log
-    exit -102
+    exit 4
 fi
 
 echo " - Configuring Elasticsearch container"
@@ -111,7 +105,7 @@ docker exec elasticsearch bash /scripts/inContainerSetupElasticSearch.sh | tee e
 if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat es_install_log
-    exit -100
+    exit 5
 fi
 
 echo " - Handling topology and setting injection"
