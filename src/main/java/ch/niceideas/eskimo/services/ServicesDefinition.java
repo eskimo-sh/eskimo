@@ -240,6 +240,9 @@ public class ServicesDefinition implements InitializingBean {
                     // default is true
                     dependency.setMandatory (depMandatory == null || depMandatory);
 
+                    Boolean depRestart = depObj.has("restart") ? depObj.getBoolean("restart") : null;
+                    dependency.setRestart(depRestart == null || depRestart);
+
                     String conditionalDependency = depObj.has("conditional") ? depObj.getString("conditional") : null;
                     if (StringUtils.isNotBlank(conditionalDependency)) {
                         dependency.setConditional (conditionalDependency);

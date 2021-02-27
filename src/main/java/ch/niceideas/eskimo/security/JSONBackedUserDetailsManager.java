@@ -70,7 +70,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
     private static final Logger logger = Logger.getLogger(JSONBackedUserDetailsManager.class);
 
     // default password is "password"
-    private static final String DEFAULT_USER = "{ \"users\" : [ { \"username\" : \"admin\", \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\" } ] }";
+    private static final String DEFAULT_USER = "{ \"users\" : [ { \"username\" : \"admin\", \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\", \"role\": \"ADMIN\" } ] }";
 
     private final Map<String, MutableUser> users = new ConcurrentHashMap<>();
 
@@ -108,9 +108,11 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
                 String username = userObject.getString("username");
                 String password = userObject.getString("password");
+                String roleString = userObject.has("role") ? userObject.getString("role") : Role.USER.name();
+                Role role = Role.valueOf(roleString);
 
                 UserDetails user = new User(username, password, true, true,
-                        true, true, new ArrayList<GrantedAuthority>() {{ add (new SimpleGrantedAuthority("admin"));}});
+                        true, true, new ArrayList<>() {{ add (new SimpleGrantedAuthority(role.name()));}});
 
                 users.put(user.getUsername().toLowerCase(), new MutableUser(user));
             }
@@ -134,6 +136,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
             JSONObject userObject = new JSONObject(new HashMap<String, Object>(){{
                 put ("username", user.getUsername());
                 put ("password", user.getPassword());
+                put ("role", user.getAuthorities().stream().map(authority -> Role.valueOf(authority.getAuthority().toUpperCase())).findFirst().orElseThrow(IllegalStateException::new));
             }});
 
             usersArray.add(userObject);

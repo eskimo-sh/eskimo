@@ -57,6 +57,9 @@ public class Dependency {
     @Getter @Setter
     private boolean mandatory = true; // default is true
 
+    @Getter @Setter
+    private boolean restart = true; // default is true
+
     private String conditional = null;
 
     public boolean isMandatory(ConfigurationOwner wrapper) {
@@ -81,6 +84,7 @@ public class Dependency {
             put("masterService", masterService == null ? "" : masterService);
             put("numberOfMasters", numberOfMasters);
             put("mandatory", mandatory);
+            put("restart", restart);
             put("conditional", conditional);
         }});
     }

@@ -72,13 +72,6 @@ if [[ ! -d $MOUNT_POINT ]]; then
     mkdir -p $MOUNT_POINT
 fi
 
-
-# find out if gluster is available
-if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
-    echo "ERROR: No gluster master defined"
-    exit 5
-fi
-
 ls /dev/fuse > /dev/null 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Creating fuse device"

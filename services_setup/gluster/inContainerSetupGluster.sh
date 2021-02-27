@@ -40,7 +40,7 @@ set -e
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - Didn't find Self IP Address in eskimo_topology.sh"
-    exit -2
+    exit 1
 fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

@@ -49,12 +49,6 @@ echo " - Inject settings (spark-history-server)"
 echo " - Inject settings (spark-executor)"
 /usr/local/sbin/settingsInjector.sh spark-executor
 
-# find out if gluster is available
-if [[ -f /etc/eskimo_topology.sh && `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
-    echo "ERROR: No gluster master defined"
-    exit -20
-fi
-
 echo " - Start glusterMountCheckerPeriodic.sh script"
 /bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
 export GLUSTER_MOUNT_CHECKER_PID=$!

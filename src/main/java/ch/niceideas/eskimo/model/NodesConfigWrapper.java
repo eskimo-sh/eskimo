@@ -244,6 +244,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                     }
                 })
                 .filter(Objects::nonNull)
+                .sorted()
                 .collect(Collectors.toList());
     }
 
@@ -260,6 +261,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .filter(result -> result.getServiceName().equals(service))
                 .map(result -> result.getNodeNumber() == null ? -1 : result.getNodeNumber())
                 .filter (value -> value != -1)
+                .sorted()
                 .collect(Collectors.toList());
     }
 

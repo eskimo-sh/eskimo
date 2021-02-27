@@ -20,10 +20,6 @@
       "lines": "Cmluc3RhbGxhdGlvbiBvZiB6ZXBwZWxpbiBvbiAxOTIuMTY4LjEwLjE1CiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciB6ZXBwZWxpbk9wZXJhdGlvbnNNb25pdG9yaW5nU2VydmljZVRlc3QgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKQogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKIC0gRGVsZXRpbmcgZG9ja2VyIHRlbXBsYXRlIGltYWdlCi0tPiBEb25lIDogaW5zdGFsbGF0aW9uIG9mIHplcHBlbGluIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
       "lastLine": 9
     },
-    "restart_flink-worker_192-168-10-13": {
-      "lines": "CnJlc3RhcnQgb2YgZmxpbmstd29ya2VyIG9uIDE5Mi4xNjguMTAuMTMKLS0+IERvbmUgOiByZXN0YXJ0IG9mIGZsaW5rLXdvcmtlciBvbiAxOTIuMTY4LjEwLjEzCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
-      "lastLine": 4
-    },
     "restart_cerebro_marathon": {
       "lines": "CnJlc3RhcnQgb2YgY2VyZWJybyBvbiAobWFyYXRob24pCi0tPiBEb25lIDogcmVzdGFydCBvZiBjZXJlYnJvIG9uIChtYXJhdGhvbikKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
       "lastLine": 4
@@ -48,10 +44,6 @@
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1leGVjdXRvciBvbiAxOTIuMTY4LjEwLjE1CiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciBzcGFyay1leGVjdXRvck9wZXJhdGlvbnNNb25pdG9yaW5nU2VydmljZVRlc3QgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKQogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKIC0gRGVsZXRpbmcgZG9ja2VyIHRlbXBsYXRlIGltYWdlCi0tPiBEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWV4ZWN1dG9yIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
       "lastLine": 9
     },
-    "restart_flink-app-master_192-168-10-15": {
-      "lines": "CnJlc3RhcnQgb2YgZmxpbmstYXBwLW1hc3RlciBvbiAxOTIuMTY4LjEwLjE1Ci0tPiBEb25lIDogcmVzdGFydCBvZiBmbGluay1hcHAtbWFzdGVyIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
-      "lastLine": 4
-    },
     "installation_mesos-agent_192-168-10-15": {
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1hZ2VudCBvbiAxOTIuMTY4LjEwLjE1CiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKLS0+IERvbmUgOiBpbnN0YWxsYXRpb24gb2YgbWVzb3MtYWdlbnQgb24gMTkyLjE2OC4xMC4xNQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
       "lastLine": 7
@@ -71,10 +63,6 @@
     "installation_mesos-agent_192-168-10-13": {
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBtZXNvcy1hZ2VudCBvbiAxOTIuMTY4LjEwLjEzCiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKLS0+IERvbmUgOiBpbnN0YWxsYXRpb24gb2YgbWVzb3MtYWdlbnQgb24gMTkyLjE2OC4xMC4xMwotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
       "lastLine": 7
-    },
-    "restart_flink-worker_192-168-10-15": {
-      "lines": "CnJlc3RhcnQgb2YgZmxpbmstd29ya2VyIG9uIDE5Mi4xNjguMTAuMTUKLS0+IERvbmUgOiByZXN0YXJ0IG9mIGZsaW5rLXdvcmtlciBvbiAxOTIuMTY4LjEwLjE1Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
-      "lastLine": 4
     },
     "restart_kafka-manager_marathon": {
       "lines": "CnJlc3RhcnQgb2Yga2Fma2EtbWFuYWdlciBvbiAobWFyYXRob24pCi0tPiBEb25lIDogcmVzdGFydCBvZiBrYWZrYS1tYW5hZ2VyIG9uIChtYXJhdGhvbikKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
@@ -147,18 +135,6 @@
       "label": "restart of logstash on 192.168.10.13"
     },
     {
-      "operation": "restart_flink-worker_192-168-10-15",
-      "label": "restart of flink-worker on 192.168.10.15"
-    },
-    {
-      "operation": "restart_flink-worker_192-168-10-13",
-      "label": "restart of flink-worker on 192.168.10.13"
-    },
-    {
-      "operation": "restart_flink-app-master_192-168-10-15",
-      "label": "restart of flink-app-master on 192.168.10.15"
-    },
-    {
       "operation": "restart_cerebro_marathon",
       "label": "restart of cerebro on (marathon)"
     },
@@ -181,20 +157,17 @@
     "Check--Install_Base-System_192-168-10-13": "COMPLETE",
     "Check--Install_Base-System_192-168-10-15": "COMPLETE",
     "installation_zeppelin_192-168-10-15": "COMPLETE",
-    "restart_flink-worker_192-168-10-13": "COMPLETE",
     "restart_cerebro_marathon": "COMPLETE",
     "installation_mesos-master_192-168-10-15": "COMPLETE",
     "restart_kibana_marathon": "COMPLETE",
     "installation_spark-executor_192-168-10-13": "COMPLETE",
     "installation_marathon_192-168-10-15": "COMPLETE",
     "installation_spark-executor_192-168-10-15": "COMPLETE",
-    "restart_flink-app-master_192-168-10-15": "COMPLETE",
     "installation_mesos-agent_192-168-10-15": "COMPLETE",
     "installation_elasticsearch_192-168-10-13": "COMPLETE",
     "installation_spark-history-server_192-168-10-15": "COMPLETE",
     "installation_elasticsearch_192-168-10-15": "COMPLETE",
     "installation_mesos-agent_192-168-10-13": "COMPLETE",
-    "restart_flink-worker_192-168-10-15": "COMPLETE",
     "restart_kafka-manager_marathon": "COMPLETE",
     "restart_grafana_marathon": "COMPLETE"
   }

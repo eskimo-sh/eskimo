@@ -143,13 +143,7 @@ public class NodesConfigControllerTest {
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
-                "    \"restarts\": [\n" +
-                "      {\"marathon\": \"192.168.10.11\"},\n" +
-                "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
-                "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
-                "      {\"spark-history-server\": \"(marathon)\"},\n" +
-                "      {\"zeppelin\": \"(marathon)\"}\n" +
-                "    ],\n" +
+                "    \"restarts\": [{\"zeppelin\": \"(marathon)\"}],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
                 "      {\"gluster\": \"192.168.10.11\"},\n" +

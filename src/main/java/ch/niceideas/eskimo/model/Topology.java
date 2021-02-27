@@ -220,7 +220,7 @@ public class Topology {
 
             case FIRST_NODE:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
-                    String masterIp = findFirstOtherServiceIP(nodesConfig, dep.getMasterService(), otherMasters);
+                    String masterIp = findFirstOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
                     masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp, i);
                     if (StringUtils.isNotBlank(masterIp)) {
                         definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterIp);
@@ -242,7 +242,7 @@ public class Topology {
                     if (StringUtils.isNotBlank(uniqueServiceNbrString)) {
                         definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.replace(".", ""), node);
                     } else {
-                        String masterIp = findFirstServiceIP(nodesConfig, dep.getMasterService());
+                        String masterIp = findFirstServiceNode(nodesConfig, dep.getMasterService());
                         masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp);
                         if (StringUtils.isNotBlank(masterIp)) {
                             definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + node.replace(".", ""), masterIp);
@@ -253,7 +253,7 @@ public class Topology {
 
             case RANDOM:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
-                    String masterIp = findRandomOtherServiceIP(nodesConfig, dep.getMasterService(), otherMasters);
+                    String masterIp = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
                     masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp, i);
                     if (StringUtils.isNotBlank(masterIp)) {
                         definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterIp);
@@ -271,10 +271,10 @@ public class Topology {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
                 }
 
-                String masterIp = findRandomServiceIPAfter(nodesConfig, dep.getMasterService(), nodeNbr);
+                String masterIp = findRandomServiceNodeAfter(nodesConfig, dep.getMasterService(), nodeNbr);
 
                 if (dep.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME) && StringUtils.isBlank(masterIp)) {
-                    masterIp = findRandomOtherServiceIP(nodesConfig, dep.getMasterService(), otherMasters);
+                    masterIp = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
                 }
                 if (StringUtils.isNotBlank(masterIp)) {
                     masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp);
@@ -322,7 +322,7 @@ public class Topology {
     }
 
 
-    private String findFirstServiceIP(NodesConfigWrapper nodesConfig, String serviceName) throws NodesConfigurationException {
+    private String findFirstServiceNode(NodesConfigWrapper nodesConfig, String serviceName) throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
         for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
@@ -335,10 +335,10 @@ public class Topology {
             return null;
         }
 
-        return findNodeIp(nodesConfig, nodeNbr);
+        return findNodeNumberNode(nodesConfig, nodeNbr);
     }
 
-    private String findFirstOtherServiceIP(
+    private String findFirstOtherServiceNode(
             NodesConfigWrapper nodesConfig, String serviceName, Set<String> existingMasters)
             throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
@@ -354,12 +354,12 @@ public class Topology {
         if (nodeNbr == Integer.MAX_VALUE) {
             return null;
         }
-        return findNodeIp(nodesConfig, nodeNbr);
+        return findNodeNumberNode(nodesConfig, nodeNbr);
     }
 
-    private String findRandomOtherServiceIP(NodesConfigWrapper nodesConfig, String serviceName, Set<String> existingMasters) {
+    private String findRandomOtherServiceNode(NodesConfigWrapper nodesConfig, String serviceName, Set<String> existingMasters) {
 
-        // Try to find any other number running ElasticSearch
+        // Try to find any other node running service
         for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
             String otherNode = nodesConfig.getNodeAddress(otherNbr);
             if (!existingMasters.contains(otherNode)) {
@@ -370,7 +370,7 @@ public class Topology {
         return null;
     }
 
-    private String findRandomServiceIPAfter(NodesConfigWrapper nodesConfig, String serviceName, int currentNodeNumber)
+    private String findRandomServiceNodeAfter(NodesConfigWrapper nodesConfig, String serviceName, int currentNodeNumber)
             throws NodesConfigurationException {
         int masterNumber = -1;
 
@@ -383,14 +383,14 @@ public class Topology {
 
         if (masterNumber == -1) {
             Set<String> existingMasters = new HashSet<>();
-            existingMasters.add (findNodeIp(nodesConfig, currentNodeNumber));
-            return findFirstOtherServiceIP(nodesConfig, serviceName, existingMasters);
+            existingMasters.add (findNodeNumberNode(nodesConfig, currentNodeNumber));
+            return findFirstOtherServiceNode(nodesConfig, serviceName, existingMasters);
         } else {
-            return findNodeIp(nodesConfig, masterNumber);
+            return findNodeNumberNode(nodesConfig, masterNumber);
         }
     }
 
-    private String findNodeIp(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
+    private String findNodeNumberNode(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
         if (nodeNumber > -1) {
             // return IP address correspondoing to master number
             String node = nodesConfig.getNodeAddress(nodeNumber);

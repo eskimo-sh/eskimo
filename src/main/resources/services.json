@@ -16,7 +16,8 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "ntp",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "commands" : [
@@ -47,7 +48,8 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "additionalEnvironment": [ "SERVICE_NUMBER_1_BASED" ],
@@ -80,7 +82,8 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "prometheus",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "additionalEnvironment": [
@@ -140,7 +143,8 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "prometheus",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "editableSettings": [
@@ -196,16 +200,11 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "RANDOM_NODE_AFTER_OR_SAME",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": true
-      },
-      {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": true
       }
     ],
     "additionalEnvironment": [
@@ -309,7 +308,8 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "commands" : [
@@ -354,33 +354,38 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "mesos-master",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "___comment": "This dependency is required since mesos-agent is used to register marathon registry in /etc/host",
         "masterElectionStrategy": "RANDOM",
         "masterService": "marathon",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": true
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "___comment": "This makes spark-executor kind of mandatory when mesos is installed. We accept this for now.",
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "spark-executor",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "flink-worker",
         "numberOfMasters": 1,
-        "conditional": "flink-app-master"
+        "conditional": "flink-app-master",
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -462,19 +467,22 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "mesos-master",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "editableSettings": [
@@ -527,7 +535,8 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "additionalEnvironment": [ "SERVICE_NUMBER_0_BASED" ],
@@ -624,13 +633,15 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "kafka",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "commands" : [
@@ -675,13 +686,16 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
+        "__comment": "this is to enforce the presence of at least one spark-executor otherwise spark-history makes no sense.",
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "spark-executor",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": false
       }
     ],
     "commands" : [
@@ -712,19 +726,22 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "mesos-agent",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": false
       }
     ],
     "editableSettings": [
@@ -812,25 +829,29 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": true,
+        "restart": false
       },
       {
         "masterElectionStrategy": "RANDOM",
         "masterService": "mesos-agent",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": false
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "flink-app-master",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "editableSettings": [
@@ -902,19 +923,22 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "mesos-agent",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": false
       }
     ]
   },
@@ -937,13 +961,15 @@
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": false
       }
     ],
     "commands" : [
@@ -982,7 +1008,8 @@
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ]
   },
@@ -1125,7 +1152,8 @@
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       }
     ],
     "commands" : [
@@ -1186,43 +1214,50 @@
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "flink-app-master",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": true
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "logstash",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": true
       },
       {
         "masterElectionStrategy": "RANDOM",
         "masterService": "spark-executor",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "kafka",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": false
       }
     ],
     "editableSettings": [

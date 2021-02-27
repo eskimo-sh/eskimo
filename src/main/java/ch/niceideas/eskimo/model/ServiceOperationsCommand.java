@@ -135,7 +135,14 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         changedServices.addAll (retCommand.getUninstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
 
         Set<String> restartedServices = new HashSet<>();
-        changedServices.forEach(service -> restartedServices.addAll (servicesDefinition.getDependentServices(service)));
+        changedServices.forEach(service -> restartedServices.addAll (
+                servicesDefinition.getDependentServices(service).stream()
+                .filter(dependent -> {
+                    Dependency dep = servicesDefinition.getService(dependent).getDependency(servicesDefinition.getService(service)).orElseThrow(IllegalStateException::new);
+                    return dep.isRestart();
+                })
+                .collect(Collectors.toList())
+        ));
 
         // also add services simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().forEach(installStatusFlag -> {

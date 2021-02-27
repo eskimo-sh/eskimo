@@ -90,13 +90,6 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
     exit 7
 fi
 
-
-# find out if gluster is available
-if [[ `cat /etc/eskimo_topology.sh  | grep MASTER_GLUSTER` == "" ]]; then
-    echo "ERROR: No gluster master defined"
-    exit 8
-fi
-
 set +e
 
 function delete_gluster_lock_file() {

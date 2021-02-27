@@ -89,6 +89,3 @@ docker image rm eskimo:zeppelin_template
 
 sudo systemctl restart logstash
 sudo systemctl restart logstash
-sudo systemctl restart flink-app-master
-sudo systemctl restart flink-worker
-sudo systemctl restart flink-worker
