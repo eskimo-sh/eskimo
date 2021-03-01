@@ -167,6 +167,7 @@ But it breaks  the menu entry title overlay
     padding-top: 8px;
     padding-bottom: 8px;
 }
+/*
 #file-viewer-modal-dialog {
     width: 1000px;
     max-height: 100%;
@@ -183,6 +184,7 @@ But it breaks  the menu entry title overlay
     border: 0px none;
     overflow: visible;
 }
+*/
 .processing-error {
     color: red;
 }
@@ -1451,31 +1453,37 @@ td.operation-title{
     text-align: left;
 }
 
-.operations-log-modal-dialog {
+.operations-log-modal-dialog,
+.file-viewer-modal-dialog {
     width: 90%;
     height: 90%;
 }
 
-.operations-log-modal-content {
+.operations-log-modal-content,
+.file-viewer-modal-content {
     width: 100%;
     height: 100%;
     flex-direction: column;
     display: flex;
 }
 
-.operation-log-body {
+.operation-log-body,
+.file-viewer-body {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: auto;
 }
 
-.log-message {
+.log-message,
+.file-content {
     height: 100%;
     width: 100%;
 }
 
-.log-message-content {
+.log-message-content,
+.file-viewer-content {
     height: 100%;
     width: 100%;
     overflow: auto;
+    outline: none;
 }

@@ -59,19 +59,22 @@ Software.
         </div>
     </div>
 
-    <div id="file-viewer-modal" class="modal fade" role="dialog">
-        <div id="file-viewer-modal-dialog" class="modal-dialog">
+    <div id="file-viewer-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div id="file-viewer-modal-dialog" class="modal-dialog file-viewer-modal-dialog">
 
             <!-- Modal content-->
-            <div class="modal-content">
+            <div class="modal-content file-viewer-modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" id="file-manager-viewer-header-close">&times;</button>
                     <h4 class="modal-title" id="file-viewer-title">Viewing File : </h4>
                 </div>
-                <div id="file-viewer-body" class="modal-body">
+                <div id="file-viewer-body" class="modal-body file-viewer-body">
+                    <div class="col-md-12 file-content" id="file-content">
+                        <pre id="file-viewer-content" tabindex="1" class="file-viewer-content">(file content)</pre>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="file-manager-viewer-button-close">OK</button>
+                    <button type="button" class="btn btn-default" id="file-manager-viewer-button-close">Close</button>
                 </div>
             </div>
         </div>

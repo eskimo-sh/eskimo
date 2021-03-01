@@ -358,9 +358,15 @@ eskimo.FileManagers = function() {
 
                                 $("#file-viewer-title").html("Viewing File : " + data.fileName);
 
-                                $('#file-viewer-modal').modal("show");
+                                $('#file-viewer-modal').modal();
 
-                                $("#file-viewer-body").html("<pre>" + atob(data.fileContent) + "</pre>");
+                                /*
+                                $('#file-viewer-modal-dialog').keypress(function(ev) {
+                                   console.log (ev);
+                                });
+                                */
+
+                                $("#file-viewer-content").html(atob(data.fileContent));
                             }
 
                         } else {
