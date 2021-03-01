@@ -4,6 +4,9 @@ before_install: bash libs/install_libs.sh
 jdk:
   - openjdk11
 
+node_js:
+  - "10"
+
 addons:
   sonarcloud:
     organization: "eskimo-sh-sonarqube-key"

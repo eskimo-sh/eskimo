@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
 import org.junit.Assume;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +67,7 @@ public class CommonDevShellTest {
 
     }
 
-    @AfterAll
+    @AfterEach
     public void tearDownClass() throws Exception {
         if (StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));

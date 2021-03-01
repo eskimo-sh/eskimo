@@ -38,6 +38,7 @@ package ch.niceideas.eskimo.shell.setup;
 import ch.niceideas.common.utils.*;
 import org.junit.Assume;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +66,7 @@ public class CommonSetupShellTest {
 
     }
 
-    @AfterAll
+    @AfterEach
     public void tearDownClass() throws Exception {
         if (StringUtils.isNotBlank(jailPath)) {
             FileUtils.delete(new File(jailPath));
@@ -293,6 +294,8 @@ public class CommonSetupShellTest {
         // no error reported
         assertEquals (" - Deleting previous docker template for cerebro if exist\n" +
                 " - Importing latest docker template for cerebro\n" +
+                "   + Decompressing archive\n" +
+                "   + Docker loading archive\n" +
                 " - Killing any previous containers\n" +
                 " - Building docker container\n", result);
 
