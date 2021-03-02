@@ -154,10 +154,10 @@ set PATH=%MAVEN_HOME%\bin;%JAVA_HOME%\bin;%PATH%
 ==== Install maven dependency trilead-ssh2
 
 
-Eskimo used the library `trilead-ssh2` version `build-217-jenkins-16` which is not available in standard maven
+Eskimo used the library `trilead-ssh2` version `build-217-jenkins-27` which is not available in standard maven
 repositories. +
 This library is bundled with the eskimo sources in the folder `lib`. +
-One can installl it in his own local maven repository using the following command:
+One can install it in his own local maven repository using the following command:
 
 .Install _trilead-ssh2_ library
 ----
@@ -242,8 +242,8 @@ Then in the folder `bin` under the newly extracted eskimo binary distribution fo
 
 === Access eskimo
 
-With eskimo properly started using the above scripts, one can reach eskimo using http://machine_ip:9090. +
-The default port number is 9090. This can be changed in configuration file `eskimo.properties`.
+With eskimo properly started using the above scripts, one can reach eskimo using http://machine_ip:9191. +
+The default port number is 9191. This can be changed in configuration file `eskimo.properties`.
 
 *The default login / password credentials are _admin_ / _password_.*
 
