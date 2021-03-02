@@ -38,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class EskimoMainTest extends AbstractWebTest {
 
@@ -47,6 +48,8 @@ public class EskimoMainTest extends AbstractWebTest {
         loadScript(page, "hoe.js");
         loadScript(page, "eskimoMain.js");
         loadScript(page, "eskimoUtils.js");
+
+        js("window.eskimoFlavour = \"CE\";");
 
         // redefine constructor
         js("eskimo.Setup = function(){ this.initialize = function(){};  };");
@@ -190,6 +193,11 @@ public class EskimoMainTest extends AbstractWebTest {
                 "});");
 
         assertJavascriptEquals("false", "allEnabled");
+    }
+    
+    @Test
+    public void testMenuHidingNonAdmin() {
+        fail ("To Be Implemented");
     }
 
 }

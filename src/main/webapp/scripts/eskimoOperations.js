@@ -141,14 +141,15 @@ eskimo.Operations = function() {
     function updateGlobalMessages (globalMessages) {
         globalLastLine = globalMessages.lastLine;
         if (globalMessages.lines && globalMessages.lines != "") {
-            let previous = $("#operations-global-messages").html("");
+            let previous = $("#operations-global-messages").html().trim();
             if (previous == null || previous == "") {
-                $("#operations-global-messages").html(globalMessages);
+                $("#operations-global-messages").html(atob(globalMessages.lines));
             } else {
-                $("#operations-global-messages").html(previous + "<br>" + globalMessages.lines);
+                $("#operations-global-messages").html(previous + "<br>" + atob(globalMessages.lines));
             }
         }
     }
+    this.updateGlobalMessages = updateGlobalMessages;
 
     function updateMessages (labels, messages) {
         for (let i = 0; i < labels.length; i++) {
@@ -166,6 +167,7 @@ eskimo.Operations = function() {
             messagesStore[operation].messages += atob(messages[operation].lines);
         }
     }
+    this.updateMessages = updateMessages;
 
     function renderStatus (labels, status) {
         for (let i = 0; i < labels.length; i++) {
@@ -212,6 +214,7 @@ eskimo.Operations = function() {
             }
         }
     }
+    this.renderStatus = renderStatus;
 
     function renderLabels(labels) {
 
@@ -257,6 +260,7 @@ eskimo.Operations = function() {
             }
         }
     }
+    this.renderLabels = renderLabels;
 
     function fetchOperationStatus(callback) {
         $.ajax({

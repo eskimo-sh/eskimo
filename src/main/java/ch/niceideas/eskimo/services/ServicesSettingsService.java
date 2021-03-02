@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -82,6 +83,7 @@ public class ServicesSettingsService {
         this.nodesConfigurationService = nodesConfigurationService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
 
         servicesSettingsApplyLock.lock();
@@ -120,6 +122,7 @@ public class ServicesSettingsService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
             Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,

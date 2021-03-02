@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -188,7 +189,6 @@ public class SystemService {
         }
     }
 
-
     public void delegateApplyNodesConfig(ServiceOperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
         nodesConfigurationService.applyNodesConfig(command);
@@ -216,6 +216,7 @@ public class SystemService {
         });
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void stopService(String serviceName, String node) throws SystemException{
         applyServiceOperation(serviceName, node, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
@@ -227,6 +228,7 @@ public class SystemService {
         });
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void restartService(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Restarting", () -> {
             Service service = servicesDefinition.getService(serviceName);

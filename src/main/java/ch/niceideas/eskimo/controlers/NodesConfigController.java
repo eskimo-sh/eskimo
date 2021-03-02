@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -123,6 +124,7 @@ public class NodesConfigController extends AbstractOperationController {
 
     @PostMapping("/reinstall-nodes-config")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String reinstallNodesConfig(@RequestBody String reinstallModel, HttpSession session) {
 
         logger.info ("Got model : " + reinstallModel);
@@ -165,6 +167,7 @@ public class NodesConfigController extends AbstractOperationController {
 
     @PostMapping("/save-nodes-config")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String saveNodesConfig(@RequestBody String configAsString, HttpSession session) {
 
         logger.info ("Got config : " + configAsString);
@@ -195,6 +198,7 @@ public class NodesConfigController extends AbstractOperationController {
 
     @PostMapping("/apply-nodes-config")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String applyNodesConfig(HttpSession session) {
 
         try {

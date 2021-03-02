@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -89,6 +90,7 @@ public class ServicesSettingsController extends AbstractOperationController{
 
     @PostMapping("/save-services-settings")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String prepareSaveServicesSettings(@RequestBody String settingsFormAsString, HttpSession session) {
 
         logger.info("Got config : " + settingsFormAsString);
@@ -114,6 +116,7 @@ public class ServicesSettingsController extends AbstractOperationController{
 
     @PostMapping("/apply-services-settings")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String saveServicesSettings(HttpSession session) {
 
         try {

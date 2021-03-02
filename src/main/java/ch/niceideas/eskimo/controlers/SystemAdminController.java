@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -78,6 +79,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/interupt-processing")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String interruptProcessing() {
 
         try {
@@ -153,6 +155,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/stop-service")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isMarathon()) {
@@ -169,6 +172,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/restart-service")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         Service service = servicesDefinition.getService(serviceName);
@@ -197,6 +201,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/reinstall-service")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         try {

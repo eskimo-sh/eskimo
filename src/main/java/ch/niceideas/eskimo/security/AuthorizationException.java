@@ -32,53 +32,26 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.security;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.json.JSONObject;
+import ch.niceideas.common.exceptions.CommonBusinessException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+public class AuthorizationException extends CommonBusinessException {
 
-@Data
-public class UIConfig {
+    static final long serialVersionUID = -3123512211124219248L;
 
-    @EqualsAndHashCode.Exclude
-    private final Service service;
-
-    private String urlTemplate;
-    private Integer proxyTargetPort;
-    private int waitTime;
-    private String title;
-    private String requiredRole;
-
-    private boolean applyStandardProxyReplacements = true;
-    private String statusPageLinkTitle;
-    private final List<ProxyReplacement> proxyReplacements = new ArrayList<>();
-
-    public UIConfig (Service service) {
-        this.service = service;
+    public AuthorizationException() {
     }
 
-    public JSONObject toJSON () {
-        return new JSONObject(new HashMap<String, Object>() {{
-            put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
-            put("proxyContext", "./"+service.getName()+"/");
-            put("waitTime", waitTime);
-            put("title", title);
-            put("role", requiredRole);
-            put("unique", service.isUnique());
-        }});
+    public AuthorizationException(String message) {
+        super(message);
     }
 
-    public String getServiceName() {
-        return service.getName();
+    public AuthorizationException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public void addProxyReplacement(ProxyReplacement pr) {
-        proxyReplacements.add (pr);
+    public AuthorizationException(Throwable cause) {
+        super(cause);
     }
-
 }

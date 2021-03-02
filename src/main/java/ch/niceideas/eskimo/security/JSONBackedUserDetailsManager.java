@@ -47,7 +47,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -70,7 +69,19 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
     private static final Logger logger = Logger.getLogger(JSONBackedUserDetailsManager.class);
 
     // default password is "password"
-    private static final String DEFAULT_USER = "{ \"users\" : [ { \"username\" : \"admin\", \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\", \"role\": \"ADMIN\" } ] }";
+    private static final String DEFAULT_USER_FILE = "{ " +
+            "\"users\" : [ " +
+            "    { " +
+            "        \"username\" : \"admin\", " +
+            "        \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\", " +
+            "        \"role\": \"ADMIN\" " +
+            "    }, " +
+            "    { " +
+            "        \"username\" : \"user\", " +
+            "        \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\", " +
+            "        \"role\": \"USER\" " +
+            "    } " +
+            "] }";
 
     private final Map<String, MutableUser> users = new ConcurrentHashMap<>();
 
@@ -88,13 +99,13 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
         File configFile = new File(jsonFilePath);
         if (!configFile.exists()) {
-            FileUtils.writeFile(configFile, DEFAULT_USER);
+            FileUtils.writeFile(configFile, DEFAULT_USER_FILE);
         }
 
         String configContent = FileUtils.readFile(configFile);
         if (StringUtils.isBlank(configContent)) {
-            configContent = DEFAULT_USER;
-            FileUtils.writeFile(configFile, DEFAULT_USER);
+            configContent = DEFAULT_USER_FILE;
+            FileUtils.writeFile(configFile, DEFAULT_USER_FILE);
         }
 
         JsonWrapper usersConfig = new JsonWrapper(configContent);

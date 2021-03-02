@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -256,6 +257,7 @@ public class SetupService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
 
         logger.info("Got config : " + configAsString);
@@ -362,6 +364,7 @@ public class SetupService {
         return new Pair<>(lastVersionFile, lastFileVersion);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void prepareSetup (
             JsonWrapper setupConfig,
             Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos, Set<String> packageUpdate)
@@ -489,7 +492,7 @@ public class SetupService {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     public String applySetup(SetupCommand setupCommand) {
 
         boolean success = false;

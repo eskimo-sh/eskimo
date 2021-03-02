@@ -37,13 +37,21 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.eskimo.model.MasterStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import ch.niceideas.eskimo.security.AuthorizationException;
+import ch.niceideas.eskimo.security.SecurityHelper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -66,6 +74,9 @@ public class SystemStatusController {
     @Autowired
     protected OperationsMonitoringService operationsMonitoringService;
 
+    @Value("${build.version}")
+    private String buildVersion = "DEV-SNAPSHOT";
+
     /* For tests */
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
@@ -87,6 +98,27 @@ public class SystemStatusController {
     @ResponseBody
     public String getLastOperationResult() {
         return ReturnStatusHelper.createOKStatus(map -> map.put("success", operationsMonitoringService.getLastOperationSuccess()));
+    }
+
+    @GetMapping("/context")
+    @ResponseBody
+    public String getContext() {
+
+        try {
+            JsonWrapper retObject = new JsonWrapper(new JSONObject(new HashMap<>() {{
+                put("status", "OK");
+                put("version", buildVersion);
+                put("roles", new JSONArray(SecurityHelper.getuserRoles().stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toList())
+                ));
+            }}));
+
+            return retObject.getFormattedValue();
+
+        } catch (AuthorizationException e) {
+            return ReturnStatusHelper.createErrorStatus(e);
+        }
     }
 
     @GetMapping("/get-status")

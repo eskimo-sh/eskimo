@@ -117,6 +117,7 @@
       "proxyTargetPort" : 31300,
       "waitTime": 5000,
       "title" : "Grafana Monitoring",
+      "role" : "ADMIN",
       "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
       "proxyReplacements" : [
         {
@@ -188,6 +189,7 @@
       "urlTemplate": "./gluster/{NODE_ADDRESS}/egmi/app.html",
       "proxyTargetPort": 28901,
       "waitTime": 10000,
+      "role" : "ADMIN",
       "title": "Gluster Dashboard",
       "statusPageLinktitle": "Monitor Gluster volumes"
     },
@@ -260,6 +262,7 @@
     "ui": {
       "proxyTargetPort" : 5050,
       "waitTime": 6000,
+      "role" : "*",
       "title" : "Mesos Console",
       "statusPageLinktitle" : "Monitor Mesos Processes",
       "proxyReplacements" : [
@@ -347,6 +350,7 @@
       "icon" : "images/mesos-agent-icon.png"
     },
     "ui": {
+      "role" : "*",
       "proxyTargetPort" : 5051
     },
     "dependencies": [
@@ -451,6 +455,7 @@
     "ui": {
       "proxyTargetPort" : 28080,
       "waitTime": 6000,
+      "role" : "ADMIN",
       "title" : "Marathon",
       "statusPageLinktitle" : "Manage Marathon Services",
       "proxyReplacements" : [
@@ -625,6 +630,7 @@
     "ui": {
       "proxyTargetPort" : 31220,
       "waitTime": 6000,
+      "role" : "ADMIN",
       "title" : "Kafka manager",
       "statusPageLinktitle" : "Manage your kafka topics"
     },
@@ -671,6 +677,7 @@
     "ui": {
       "proxyTargetPort" : 31810,
       "waitTime": 5000,
+      "role" : "*",
       "title" : "Spark Console",
       "statusPageLinktitle" : "Monitor your Spark jobs",
       "proxyReplacements" : [
@@ -821,6 +828,7 @@
     "ui": {
       "proxyTargetPort" : 8081,
       "waitTime": 6000,
+      "role" : "*",
       "title" : "Flink App Master",
       "statusPageLinktitle" : "Manage and Monitor your Flink jobs"
     },
@@ -1000,6 +1008,7 @@
       "urlTemplate": "./cerebro/#/overview?host=Eskimo",
       "proxyTargetPort" : 31900,
       "waitTime": 5000,
+      "role" : "*",
       "title" : "Cerebro",
       "statusPageLinktitle" : "Manage your data in Elasticsearch"
     },
@@ -1121,6 +1130,7 @@
       "urlTemplate": "./kibana/app/kibana",
       "proxyTargetPort" : 31561,
       "waitTime": 8000,
+      "role" : "*",
       "title" : "Kibana",
       "applyStandardProxyReplacements": false,
       "statusPageLinktitle" : "Visualize your data in Elasticsearch",
@@ -1184,6 +1194,7 @@
     "ui": {
       "proxyTargetPort" : 38080,
       "waitTime": 8000,
+      "role" : "*",
       "title" : "Zeppelin",
       "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",
       "proxyReplacements" : [

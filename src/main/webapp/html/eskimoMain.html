@@ -39,7 +39,9 @@ Software.
             <img class="img-circle" alt="eskimo icon" src="images/eskimo-icon.png" style="width: 30px;">
         </a>
         <a href="#"> <span id="eskimoTitle">Eskimo Console</span></a>
-        <span class="hoe-sidebar-toggle"><a href="#"></a></span>
+        <div class="eskimo-version" id="eskimo-version">
+            (version)
+        </div>
     </div>
 
     <div class="hoe-right-header" hoe-color-type="header-bg8" hoe-position-type="relative" >
@@ -104,7 +106,7 @@ Software.
                 <ul class="nav panel-list" id="mainFolderMenu">
                     <li id="mainFolderMenuAnchor" class="nav-level">Eskimo Services</li>
 
-                    <li class="folder-menu-items disabled" id="folderMenuConsoles">
+                    <li class="folder-menu-items disabled" id="folderMenuConsoles" data-menu-role="ADMIN">
                         <a id="main-menu-show-consoles-link" href="#">
                             <span class="fa fa-terminal"></span>
                             <span class="menu-text">SSH Terminals</span>
@@ -125,25 +127,25 @@ Software.
                             <span class="menu-text">Status</span>
                         </a>
                     </li>
-                    <li class="config-menu-items disabled" id="menu-configure-setup">
+                    <li class="config-menu-items disabled" id="menu-configure-setup" data-menu-role="ADMIN">
                         <a id="main-menu-show-setup-link" href="#">
                             <span class="fa fa-check-square"></span>
                             <span class="menu-text">Setup</span>
                         </a>
                     </li>
-                    <li class="config-menu-items disabled">
+                    <li class="config-menu-items disabled" data-menu-role="ADMIN">
                         <a id="main-menu-show-services-settings-link" href="#">
                             <span class="fa fa-cog"></span>
                             <span class="menu-text">Configure Services</span>
                         </a>
                     </li>
-                    <li class="config-menu-items disabled">
+                    <li class="config-menu-items disabled" data-menu-role="ADMIN">
                         <a id="main-menu-show-nodes-config-link" href="#">
                             <span class="fa fa-cog"></span>
                             <span class="menu-text">Configure Eskimo Nodes</span>
                         </a>
                     </li>
-                    <li id="menu-marathon-configuration" class="config-menu-items disabled menu-hidden" style="display: none; visibility: hidden;">
+                    <li id="menu-marathon-configuration" class="config-menu-items disabled menu-hidden" style="display: none; visibility: hidden;" data-menu-role="ADMIN">
                         <a id="main-menu-show-marathon-config-link" href="#">
                             <span class="fa fa-cog"></span>
                             <span class="menu-text">Config. Marathon Services</span>

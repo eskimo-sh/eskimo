@@ -1487,3 +1487,14 @@ td.operation-title{
     overflow: auto;
     outline: none;
 }
+
+.eskimo-version {
+    position: relative;
+    top: 1px;
+    float: right;
+    right: 0px;
+    color: white;
+    font-size: x-small;
+    height: 20px;
+    width: 100px;
+}

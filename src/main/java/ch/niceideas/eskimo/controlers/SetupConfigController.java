@@ -44,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -119,6 +120,7 @@ public class SetupConfigController extends AbstractOperationController {
 
     @PostMapping("/save-setup")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String saveSetup(@RequestBody String configAsString, HttpSession session) {
 
         logger.info("Got config : " + configAsString);
@@ -145,6 +147,7 @@ public class SetupConfigController extends AbstractOperationController {
 
     @PostMapping("/apply-setup")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String applySetup(HttpSession session) {
 
         JSONObject checkObject = checkOperations("Unfortunately, changing setup configuration is not possible in DEMO mode.");

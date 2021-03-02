@@ -1,0 +1,30 @@
+[
+  {
+    "operation": "Installation_Topology-All-Nodes",
+    "label": "Installation of Topology (All Nodes) on marathon"
+  },
+  {
+    "operation": "installation_cerebro",
+    "label": "installation of cerebro on marathon"
+  },
+  {
+    "operation": "installation_grafana",
+    "label": "installation of grafana on marathon"
+  },
+  {
+    "operation": "installation_kafka-manager",
+    "label": "installation of kafka-manager on marathon"
+  },
+  {
+    "operation": "installation_kibana",
+    "label": "installation of kibana on marathon"
+  },
+  {
+    "operation": "installation_spark-history-server",
+    "label": "installation of spark-history-server on marathon"
+  },
+  {
+    "operation": "installation_zeppelin",
+    "label": "installation of zeppelin on marathon"
+  }
+]

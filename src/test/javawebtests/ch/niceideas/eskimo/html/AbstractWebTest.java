@@ -48,7 +48,9 @@ import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -99,7 +101,7 @@ public abstract class AbstractWebTest {
         return page.executeJavaScript (jsCode);
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpOnce() {
         if (isCoverageRun()) {
             main = new Main();
@@ -108,7 +110,7 @@ public abstract class AbstractWebTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownOnce() throws Exception {
         if (isCoverageRun()) {
             main.stop();
@@ -276,6 +278,7 @@ public abstract class AbstractWebTest {
         js("eskimoMain.isSetupLoaded = function() { return true; }");
         js("eskimoMain.serviceMenuClear = function() { return true; }");
         js("eskimoMain.windowResize = function() {  }");
+        js("eskimoMain.hasRole = function(role) { return true; }");
 
         js("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 

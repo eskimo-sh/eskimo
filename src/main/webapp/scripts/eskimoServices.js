@@ -162,6 +162,10 @@ eskimo.Services = function () {
             return false;
         }
 
+        if (!eskimoMain.hasRole (uiConfig.role)) {
+            return false;
+        }
+
         if (uiConfigsToRetry.length > 0 && alreadyInRetry(uiConfig)) {
             //console.log ("service " + service + " - is pending retry (B)");
             return false;
@@ -179,13 +183,16 @@ eskimo.Services = function () {
 
         let uiConfig = UI_SERVICES_CONFIG[service];
 
-        // reset to empty frame ...
-        $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
+        if (eskimoMain.hasRole (uiConfig.role)) {
 
-        // ... and back to URL
-        setTimeout(function () {
-            $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
-        });
+            // reset to empty frame ...
+            $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
+
+            // ... and back to URL
+            setTimeout(function () {
+                $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
+            });
+        }
     };
 
     function buildUrl(uiConfig, node) {
@@ -226,13 +233,16 @@ eskimo.Services = function () {
         let uiConfig = UI_SERVICES_CONFIG[service];
 
         let urlChanged = false;
-        if (uiConfig.actualUrl != null && uiConfig.actualUrl != "") {
-            let newUrl = buildUrl(uiConfig, node);
-            if (uiConfig.actualUrl != newUrl) {
+        if (eskimoMain.hasRole (uiConfig.role)) {
+
+            if (uiConfig.actualUrl != null && uiConfig.actualUrl != "") {
+                let newUrl = buildUrl(uiConfig, node);
+                if (uiConfig.actualUrl != newUrl) {
+                    urlChanged = true;
+                }
+            } else {
                 urlChanged = true;
             }
-        } else {
-            urlChanged = true;
         }
 
         return urlChanged;
@@ -379,6 +389,10 @@ eskimo.Services = function () {
             return;
         }
 
+        if (!eskimoMain.hasRole(uiConfig.role)) {
+            return false;
+        }
+
         //console.log ("Hiding " + service);
 
         /*
@@ -416,15 +430,17 @@ eskimo.Services = function () {
 
         if (uiConfig != null) {
 
-            if (found) {
+            if (eskimoMain.hasRole(uiConfig.role)) {
+                if (found) {
 
-                // handle iframe display
-                that.handleServiceDisplay(service, uiConfig, node, immediate);
+                    // handle iframe display
+                    that.handleServiceDisplay(service, uiConfig, node, immediate);
 
-            } else {
+                } else {
 
-                // handle iframe hiding
-                that.handleServiceHiding(service, uiConfig);
+                    // handle iframe hiding
+                    that.handleServiceHiding(service, uiConfig);
+                }
             }
         }
     }
@@ -438,20 +454,23 @@ eskimo.Services = function () {
 
             let uiConfig = UI_SERVICES_CONFIG[service];
 
-            let menuEntry = '' +
-                '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
-                '    <a id="services-menu_' + service + '" href="#">\n' +
-                '        <img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img>\n' +
-                '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
-                '    </a>\n' +
-                '</li>';
+            if (eskimoMain.hasRole(uiConfig.role)) {
 
-            $("#mainFolderMenuAnchor").after(menuEntry);
+                let menuEntry = '' +
+                    '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
+                    '    <a id="services-menu_' + service + '" href="#">\n' +
+                    '        <img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img>\n' +
+                    '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
+                    '    </a>\n' +
+                    '</li>';
 
-            $("#services-menu_" + service).click(function() {
-                let serviceName = this.id.substring("services-menu_".length);
-                showServiceIFrame(serviceName);
-            });
+                $("#mainFolderMenuAnchor").after(menuEntry);
+
+                $("#services-menu_" + service).click(function () {
+                    let serviceName = this.id.substring("services-menu_".length);
+                    showServiceIFrame(serviceName);
+                });
+            }
         }
 
         that.eskimoMain.menuResize();

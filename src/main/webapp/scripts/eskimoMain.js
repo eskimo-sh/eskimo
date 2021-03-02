@@ -68,8 +68,10 @@ eskimo.Main = function() {
 
     let menuHidingPos = 0;
 
+    let roles = [];
+
     this.doInitializeInternal = function() {
-        $("#eskimoTitle").html("Eskimo CE");
+        $("#eskimoTitle").html("Eskimo " + eskimoFlavour);
 
         // A. Create services
 
@@ -120,6 +122,9 @@ eskimo.Main = function() {
                 }
             }
         }
+
+        // fetch context
+        fetchContext();
 
         // C. Initialize services
 
@@ -236,6 +241,30 @@ eskimo.Main = function() {
         });
     };
 
+    function fetchContext  () {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            url: "context",
+            success: function (data, status, jqXHR) {
+
+                if (data.status == "OK") {
+
+                    roles = data.roles;
+                    disableAdminMenu();
+
+                    that.version = data.version;
+                    $("#eskimo-version").html(that.version);
+
+                } else {
+                    console.error(data.error);
+                }
+            },
+            error: errorHandler
+        });
+    }
+
     this.isSetupLoaded = function() {
         return setupLoaded;
     };
@@ -250,6 +279,32 @@ eskimo.Main = function() {
 
     this.setSetupDone = function() {
         setupDone = true;
+    };
+
+    function disableAdminMenu () {
+
+        $(".folder-menu-items, .config-menu-items").each(function() {
+            let menuRole = $(this).attr("data-menu-role");
+            //console.log (this.id, menuRole, that.hasRole(menuRole), $(this).hasClass("menu-hidden"));
+            if (menuRole != null && menuRole != "") {
+                if (!that.hasRole(menuRole) && !$(this).hasClass("menu-hidden")) {
+                    $(this).addClass ("menu-hidden");
+                    $(this).css ("display", "none");
+                }
+            }
+        });
+    }
+
+    this.hasRole = function (role) {
+        if (role == "*") {
+            return true;
+        }
+        for (let i = 0; i < roles.length; i++) {
+            if (roles[i] == role) {
+                return true;
+            }
+        }
+        return false;
     };
 
     function isOperationInProgress() {
@@ -313,13 +368,20 @@ eskimo.Main = function() {
     this.handleMarathonSubsystem = function (enableMarathon) {
         let menuMarathonConfig = $("#menu-marathon-configuration");
         if (enableMarathon) {
-            if (menuMarathonConfig.hasClass("menu-hidden")) {
-                menuMarathonConfig.css("visibility", "visible");
-                menuMarathonConfig.css("display", "inherit");
-                menuMarathonConfig.removeClass("menu-hidden")
 
-                // perhaps need to resize the menu ?
-                this.menuResize();
+            let menuRole = menuMarathonConfig.data("menu-role");
+
+            if (menuRole == null || menuRole == "" || that.hasRole(menuRole)) {
+
+                if (menuMarathonConfig.hasClass("menu-hidden")) {
+
+                    menuMarathonConfig.css("visibility", "visible");
+                    menuMarathonConfig.css("display", "inherit");
+                    menuMarathonConfig.removeClass("menu-hidden")
+
+                    // perhaps need to resize the menu ?
+                    this.menuResize();
+                }
             }
         } else {
             if (!menuMarathonConfig.hasClass("menu-hidden")) {

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -331,6 +332,7 @@ public class MarathonService {
         return new Pair<>(null, "notOK");
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws MarathonException {
 
         logger.info ("Starting Marathon Deployment Operations");
@@ -496,6 +498,7 @@ public class MarathonService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     void uninstallMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode) throws SystemException {
         String nodeIp = null;
         try {
@@ -522,7 +525,7 @@ public class MarathonService {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     void installMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
@@ -870,7 +873,8 @@ public class MarathonService {
         return log.toString();
     }
 
-    public void  stopServiceMarathon(Service service) throws SystemException, MarathonException{
+    @PreAuthorize("hasRole('ADMIN')")
+    public void stopServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> stopServiceMarathonInternal(service));
     }
@@ -910,6 +914,7 @@ public class MarathonService {
         return log.toString();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void restartServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> restartServiceMarathonInternal(service));

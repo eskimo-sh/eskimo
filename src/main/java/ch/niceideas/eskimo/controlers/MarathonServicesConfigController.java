@@ -46,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,6 +130,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @PostMapping("/save-marathon-services-config")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String saveMarathonServicesConfig(@RequestBody String configAsString, HttpSession session) {
 
         logger.info ("Got config : " + configAsString);
@@ -163,6 +165,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @PostMapping("/reinstall-marathon-services-config")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String reinstallMarathonServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
 
         logger.info ("Got model : " + reinstallModel);
@@ -210,6 +213,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @PostMapping("/apply-marathon-services-config")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String applyMarathonServicesConfig(HttpSession session) {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {

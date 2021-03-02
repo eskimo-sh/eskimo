@@ -179,6 +179,12 @@ public class ServicesDefinition implements InitializingBean {
                 uiConfig.setProxyTargetPort((Integer) servicesConfig.getValueForPath(serviceString+".ui.proxyTargetPort"));
                 uiConfig.setTitle((String) servicesConfig.getValueForPath(serviceString+".ui.title"));
 
+                String requiredRole = servicesConfig.getValueForPathAsString(serviceString+".ui.role");
+                if (StringUtils.isBlank(requiredRole)) {
+                    requiredRole = "*";
+                }
+                uiConfig.setRequiredRole(requiredRole);
+
                 if (servicesConfig.hasPath(serviceString+".ui.applyStandardProxyReplacements")) {
                     uiConfig.setApplyStandardProxyReplacements((Boolean)servicesConfig.getValueForPath(serviceString+".ui.applyStandardProxyReplacements"));
                 }

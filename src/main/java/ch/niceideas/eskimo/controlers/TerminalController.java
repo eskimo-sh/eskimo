@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +63,7 @@ public class TerminalController {
 
     @GetMapping("/terminal-remove")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String removeTerminal(@RequestParam("session") String sessionId) {
 
         try {
@@ -77,6 +79,7 @@ public class TerminalController {
 
     @PostMapping("/terminal")
     @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
     public String postUpdate(@RequestBody String terminalBody, HttpServletResponse resp) {
 
         try {
