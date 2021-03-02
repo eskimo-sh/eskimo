@@ -108,7 +108,7 @@ public class EskimoMainTest extends AbstractWebTest {
     @Test
     public void testShowOnlyContent() throws Exception {
 
-        js("eskimoMain.showOnlyContent('pending')");
+        js("eskimoMain.showOnlyContent('operations')");
 
         assertCssValue("#inner-content-status", "visibility", "hidden");
 
@@ -118,9 +118,9 @@ public class EskimoMainTest extends AbstractWebTest {
         assertCssValue("#inner-content-services-settings", "visibility", "hidden");
         assertCssValue("#inner-content-file-managers", "visibility", "hidden");
 
-        assertCssValue("#inner-content-pending", "visibility", "visible");
+        assertCssValue("#inner-content-operations", "visibility", "visible");
 
-        assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('pending')");
+        assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('operations')");
     }
 
     @Test
