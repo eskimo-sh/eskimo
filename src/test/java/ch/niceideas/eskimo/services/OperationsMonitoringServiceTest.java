@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
 import com.trilead.ssh2.Connection;
+import org.apache.log4j.Logger;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,10 +48,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OperationsMonitoringServiceTest extends AbstractSystemTest {
+
+    private static final Logger logger = Logger.getLogger(OperationsMonitoringServiceTest.class);
 
     private String testRunUUID = UUID.randomUUID().toString();
 
@@ -219,12 +225,139 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testInterruptionReporting() {
+    public void testInterruptionReporting() throws Exception {
+
+        final Object monitor = new Object();
+        final AtomicInteger waitCount = new AtomicInteger();
+
+        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8"));
+        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
+        configurationService.saveNodesConfig(nodesConfig);
+
+        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+                servicesDefinition,
+                nodeRangeResolver,
+                servicesInstallStatus,
+                nodesConfig
+        );
+
+        SSHCommandService sshCommandService = new SSHCommandService() {
+            @Override
+            public synchronized String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
+                return runSSHScript((String)null, script, throwsException);
+            }
+            @Override
+            public synchronized String runSSHScript(String node, String script, boolean throwsException) {
+                testSSHCommandScript.append(script).append("\n");
+                if (script.equals("echo OK")) {
+                    return "OK";
+                }
+                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                    return "debian";
+                }
+                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                    return "MemTotal:        9982656 kB";
+                }
+
+                synchronized (monitor) {
+                    try {
+                        waitCount.incrementAndGet();
+                        monitor.wait();
+                    } catch (InterruptedException e) {
+                        logger.error (e, e);
+                    }
+                }
+
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public synchronized String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+                return runSSHCommand((String)null, command);
+            }
+            @Override
+            public synchronized String runSSHCommand(String node, String command) {
+                testSSHCommandScript.append(command).append("\n");
+                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
+                    return "OK";
+                }
+
+                return testSSHCommandResultBuilder.toString();
+            }
+            @Override
+            public synchronized void copySCPFile(Connection connection, String filePath) {
+                // just do nothing
+            }
+            @Override
+            public synchronized void copySCPFile(String node, String filePath)  {
+                // just do nothing
+            }
+        };
+
+        systemService.setSshCommandService(sshCommandService);
+
+        memoryComputer.setSshCommandService(sshCommandService);
+
+        nodesConfigurationService.setSshCommandService(sshCommandService);
+
+        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
+            @Override
+            public void forceRecreateConnection(String node) {
+                // no Op
+            }
+            @Override
+            public Connection getPrivateConnection (String node) {
+                return null;
+            }
+            @Override
+            public Connection getSharedConnection (String node) {
+                return null;
+            }
+        });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    nodesConfigurationService.applyNodesConfig(command);
+                } catch (SystemException | ServiceDefinitionException | NodesConfigurationException e) {
+                    logger.error (e, e);
+                }
+            }
+        }).start();
+
+        AtomicInteger previousCount = new AtomicInteger();
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            if (waitCount.get() <= 0) {
+                return false;
+            }
+            if (waitCount.get() == previousCount.get()) {
+                return true;
+            }
+            previousCount.set(waitCount.get());
+            return false;
+        });
+
+        operationsMonitoringService.interruptProcessing();
+
+        synchronized (monitor) {
+            monitor.notifyAll();
+        }
+
+        OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
+        assertNotNull (operationsMonitoringStatus);
+
+        //System.err.println (operationsMonitoringStatus.getFormattedValue());
+
+        OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
+                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status-interrupted.json"), "UTF-8"));
+
+        //assertEquals (expectedStatus.getFormattedValue(), operationsMonitoringStatus.getFormattedValue());
+        assertTrue (expectedStatus.getJSONObject().similar(operationsMonitoringStatus.getJSONObject()));
 
         // same test as above but keep all operations pending (object.wait selectively / then object.notifyAll())
         // test that the operations selectively blocked are kept running and all the ones not started are cancelled
-
-        fail ("To Be Implemented");
     }
 
 

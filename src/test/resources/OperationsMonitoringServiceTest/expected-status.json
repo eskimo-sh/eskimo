@@ -1,4 +1,5 @@
 {
+  "result": "OK",
   "messages": {
     "restart_logstash_192-168-10-13": {
       "lines": "CnJlc3RhcnQgb2YgbG9nc3Rhc2ggb24gMTkyLjE2OC4xMC4xMwotLT4gRG9uZSA6IHJlc3RhcnQgb2YgbG9nc3Rhc2ggb24gMTkyLjE2OC4xMC4xMwotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",

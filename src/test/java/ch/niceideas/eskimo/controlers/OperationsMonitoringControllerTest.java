@@ -46,7 +46,6 @@ public class OperationsMonitoringControllerTest {
         });
 
         assertEquals ("{\n" +
-                "    \"result\": \"OK\",\n" +
                 "    \"messages\": {\n" +
                 "        \"test1\": {\n" +
                 "            \"lines\": \"VEVTVCB0ZXN0MQ==\",\n" +
