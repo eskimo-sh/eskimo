@@ -1498,3 +1498,8 @@ td.operation-title{
     height: 20px;
     width: 100px;
 }
+
+.operations-global-messages{
+    height: 35px;
+    padding-top: 8px;
+}

@@ -58,7 +58,14 @@ public class OperationsMonitoringService implements OperationsContext {
     }
 
     public OperationsMonitoringStatusWrapper getOperationsMonitoringStatus (Map<String, Integer> lastLinePerOp) {
+
+        if (operationList == null) {
+            return new OperationsMonitoringStatusWrapper("{\"status\": \"none\"}");
+        }
+
         return new OperationsMonitoringStatusWrapper(new JSONObject(new HashMap<String, Object>() {{
+
+            put ("result", "OK");
 
             put("labels", new JSONArray(new ArrayList<>() {{
                 for (OperationId opId : operationList) {

@@ -83,7 +83,7 @@ public class ServicesSettingsService {
         this.nodesConfigurationService = nodesConfigurationService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
 
         servicesSettingsApplyLock.lock();
@@ -122,7 +122,7 @@ public class ServicesSettingsService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
             Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,

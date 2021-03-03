@@ -38,6 +38,8 @@ Wants=network-online.target
 After=docker.service
 Requires=docker.service
 After=gluster.service
+After=var-lib-flink-data.mount
+After=var-lib-flink-completed_jobs.mount
 
 [Service]
 TimeoutStartSec=0

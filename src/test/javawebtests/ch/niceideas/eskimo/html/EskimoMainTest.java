@@ -196,8 +196,19 @@ public class EskimoMainTest extends AbstractWebTest {
     }
     
     @Test
-    public void testMenuHidingNonAdmin() {
-        fail ("To Be Implemented");
+    public void testMenuHidingNonAdmin() throws Exception {
+
+        js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
+
+        waitForElementIdInDOM("menu-container");
+
+        assertJavascriptEquals("list-item", "$('#folderMenuConsoles').css('display')");
+        assertJavascriptEquals("list-item", "$('#menu-configure-setup').css('display')");
+
+        js("eskimoMain.disableAdminMenu()");
+
+        assertJavascriptEquals("none", "$('#folderMenuConsoles').css('display')");
+        assertJavascriptEquals("none", "$('#menu-configure-setup').css('display')");
     }
 
 }

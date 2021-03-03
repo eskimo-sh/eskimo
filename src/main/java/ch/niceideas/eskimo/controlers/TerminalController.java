@@ -63,7 +63,7 @@ public class TerminalController {
 
     @GetMapping("/terminal-remove")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String removeTerminal(@RequestParam("session") String sessionId) {
 
         try {
@@ -79,7 +79,7 @@ public class TerminalController {
 
     @PostMapping("/terminal")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String postUpdate(@RequestBody String terminalBody, HttpServletResponse resp) {
 
         try {

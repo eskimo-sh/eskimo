@@ -79,7 +79,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/interupt-processing")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String interruptProcessing() {
 
         try {
@@ -155,7 +155,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/stop-service")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isMarathon()) {
@@ -172,7 +172,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/restart-service")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         Service service = servicesDefinition.getService(serviceName);
@@ -201,7 +201,7 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/reinstall-service")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         try {

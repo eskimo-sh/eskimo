@@ -294,6 +294,7 @@ eskimo.Main = function() {
             }
         });
     }
+    this.disableAdminMenu = disableAdminMenu;
 
     this.hasRole = function (role) {
         if (role == "*") {

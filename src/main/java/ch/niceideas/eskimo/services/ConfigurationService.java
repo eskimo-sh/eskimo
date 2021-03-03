@@ -84,7 +84,7 @@ public class ConfigurationService {
         this.servicesDefinition = servicesDefinition;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
         servicesConfigFileLock.lock();
         try {
@@ -157,7 +157,7 @@ public class ConfigurationService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
         nodesConfigFileLock.lock();
         try {
@@ -186,7 +186,7 @@ public class ConfigurationService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException {
         JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
 
@@ -217,7 +217,7 @@ public class ConfigurationService {
         return setupConfigJSON;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void saveSetupConfig(String configAsString) throws SetupException, FileException {
         File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
         FileUtils.writeFile(configFile, configAsString);
@@ -250,7 +250,7 @@ public class ConfigurationService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) throws FileException, SetupException {
         marathonServicesFileLock.lock();
         try {

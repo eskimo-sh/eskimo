@@ -141,6 +141,7 @@ eskimo.Operations = function() {
     function updateGlobalMessages (globalMessages) {
         globalLastLine = globalMessages.lastLine;
         if (globalMessages.lines && globalMessages.lines != "") {
+            $("#operations-global-messages").css("display", "block");
             let previous = $("#operations-global-messages").html().trim();
             if (previous == null || previous == "") {
                 $("#operations-global-messages").html(atob(globalMessages.lines));
@@ -287,7 +288,8 @@ eskimo.Operations = function() {
                     updateGlobalMessages (data.globalMessages);
 
                 } else {
-                    console.error("No data received");
+                    console.error("No data received / no operations in progress");
+                    updateGlobalMessages ({lastLine: 1, lines: btoa("No data received / no operations in progress")});
                 }
 
                 if (callback != null && typeof callback === "function") {

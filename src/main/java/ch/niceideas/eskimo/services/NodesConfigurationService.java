@@ -128,7 +128,7 @@ public class NodesConfigurationService {
         this.operationsMonitoringService = operationsMonitoringService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void applyNodesConfig(ServiceOperationsCommand command)
             throws SystemException, ServiceDefinitionException, NodesConfigurationException {
 

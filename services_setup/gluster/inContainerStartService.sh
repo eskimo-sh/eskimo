@@ -51,6 +51,9 @@ echo " - Starting service"
 /usr/sbin/glusterd -l /var/log/gluster/glusterfs.log -f /var/lib/gluster/glusterfs.VOLUME_FILE -N &
 GLUSTER_SERVICE=$!
 
+echo " - Giving 5 seconds to gluster to start properly before launching EGMI"
+sleep 5
+
 echo " - Starting EGMI backend"
 /usr/local/lib/egmi/bin/egmi.sh &
 EGMI_PID=$!

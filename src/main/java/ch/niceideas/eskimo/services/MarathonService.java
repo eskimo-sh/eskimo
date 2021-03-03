@@ -332,7 +332,7 @@ public class MarathonService {
         return new Pair<>(null, "notOK");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws MarathonException {
 
         logger.info ("Starting Marathon Deployment Operations");
@@ -498,7 +498,7 @@ public class MarathonService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     void uninstallMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode) throws SystemException {
         String nodeIp = null;
         try {
@@ -525,7 +525,7 @@ public class MarathonService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     void installMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
@@ -873,7 +873,7 @@ public class MarathonService {
         return log.toString();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void stopServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> stopServiceMarathonInternal(service));
@@ -914,7 +914,7 @@ public class MarathonService {
         return log.toString();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void restartServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> restartServiceMarathonInternal(service));

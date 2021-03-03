@@ -216,7 +216,7 @@ public class SystemService {
         });
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void stopService(String serviceName, String node) throws SystemException{
         applyServiceOperation(serviceName, node, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
@@ -228,7 +228,7 @@ public class SystemService {
         });
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void restartService(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Restarting", () -> {
             Service service = servicesDefinition.getService(serviceName);

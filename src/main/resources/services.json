@@ -117,7 +117,7 @@
       "proxyTargetPort" : 31300,
       "waitTime": 5000,
       "title" : "Grafana Monitoring",
-      "role" : "ADMIN",
+      "role" : "*",
       "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
       "proxyReplacements" : [
         {

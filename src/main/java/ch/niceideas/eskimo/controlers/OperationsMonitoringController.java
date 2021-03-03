@@ -79,8 +79,6 @@ public class OperationsMonitoringController extends AbstractInformationControlle
 
             OperationsMonitoringStatusWrapper status = operationsMonitoringService.getOperationsMonitoringStatus (lastLinesMap);
 
-            status.setValueForPath("result", "OK");
-
             return status.getFormattedValue();
 
         } catch (JSONException e) {

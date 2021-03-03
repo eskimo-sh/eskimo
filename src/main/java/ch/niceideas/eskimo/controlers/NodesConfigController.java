@@ -124,7 +124,7 @@ public class NodesConfigController extends AbstractOperationController {
 
     @PostMapping("/reinstall-nodes-config")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String reinstallNodesConfig(@RequestBody String reinstallModel, HttpSession session) {
 
         logger.info ("Got model : " + reinstallModel);
@@ -167,7 +167,7 @@ public class NodesConfigController extends AbstractOperationController {
 
     @PostMapping("/save-nodes-config")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String saveNodesConfig(@RequestBody String configAsString, HttpSession session) {
 
         logger.info ("Got config : " + configAsString);
@@ -198,7 +198,7 @@ public class NodesConfigController extends AbstractOperationController {
 
     @PostMapping("/apply-nodes-config")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String applyNodesConfig(HttpSession session) {
 
         try {

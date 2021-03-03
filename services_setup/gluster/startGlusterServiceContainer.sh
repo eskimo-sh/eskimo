@@ -64,8 +64,8 @@ nohup /usr/bin/docker run \
 #        -p 49152:50152 \
 #        -p 2049:2049 \
 
-echo " - Giving 5 seconds to container to start"
-sleep 5
+echo " - Giving 20 seconds to container to start as well as gluster and everything"
+sleep 20
 
 
 echo " - Finding docker run process PID"

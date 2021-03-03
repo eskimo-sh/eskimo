@@ -90,7 +90,7 @@ public class ServicesSettingsController extends AbstractOperationController{
 
     @PostMapping("/save-services-settings")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String prepareSaveServicesSettings(@RequestBody String settingsFormAsString, HttpSession session) {
 
         logger.info("Got config : " + settingsFormAsString);
@@ -116,7 +116,7 @@ public class ServicesSettingsController extends AbstractOperationController{
 
     @PostMapping("/apply-services-settings")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String saveServicesSettings(HttpSession session) {
 
         try {

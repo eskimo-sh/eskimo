@@ -257,7 +257,7 @@ public class SetupService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
 
         logger.info("Got config : " + configAsString);
@@ -364,7 +364,7 @@ public class SetupService {
         return new Pair<>(lastVersionFile, lastFileVersion);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void prepareSetup (
             JsonWrapper setupConfig,
             Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos, Set<String> packageUpdate)
@@ -492,7 +492,7 @@ public class SetupService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String applySetup(SetupCommand setupCommand) {
 
         boolean success = false;

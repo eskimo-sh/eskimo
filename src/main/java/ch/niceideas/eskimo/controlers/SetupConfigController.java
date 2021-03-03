@@ -120,7 +120,7 @@ public class SetupConfigController extends AbstractOperationController {
 
     @PostMapping("/save-setup")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String saveSetup(@RequestBody String configAsString, HttpSession session) {
 
         logger.info("Got config : " + configAsString);
@@ -147,7 +147,7 @@ public class SetupConfigController extends AbstractOperationController {
 
     @PostMapping("/apply-setup")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String applySetup(HttpSession session) {
 
         JSONObject checkObject = checkOperations("Unfortunately, changing setup configuration is not possible in DEMO mode.");

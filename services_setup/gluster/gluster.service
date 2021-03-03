@@ -58,7 +58,7 @@ PIDFile=/var/run/gluster/gluster.pid
 
 Restart=always
 StartLimitBurst=3
-StartLimitInterval=60
+StartLimitInterval=180
 
 StandardOutput=syslog
 StandardError=syslog

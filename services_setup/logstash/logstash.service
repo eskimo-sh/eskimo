@@ -39,6 +39,7 @@ Wants=network-online.target
 After=docker.service
 Requires=docker.service
 After=gluster.service
+After=var-lib-elasticsearch-logstash-data.mount
 
 [Service]
 TimeoutStartSec=180sec

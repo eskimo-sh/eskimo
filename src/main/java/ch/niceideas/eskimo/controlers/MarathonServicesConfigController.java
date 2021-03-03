@@ -130,7 +130,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @PostMapping("/save-marathon-services-config")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String saveMarathonServicesConfig(@RequestBody String configAsString, HttpSession session) {
 
         logger.info ("Got config : " + configAsString);
@@ -165,7 +165,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @PostMapping("/reinstall-marathon-services-config")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String reinstallMarathonServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
 
         logger.info ("Got model : " + reinstallModel);
@@ -213,7 +213,7 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @PostMapping("/apply-marathon-services-config")
     @ResponseBody
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String applyMarathonServicesConfig(HttpSession session) {
 
         if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
