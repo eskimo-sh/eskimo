@@ -33,12 +33,12 @@
       "lines": "CnJlc3RhcnQgb2Yga2liYW5hIG9uIChtYXJhdGhvbikKLS0+IERvbmUgOiByZXN0YXJ0IG9mIGtpYmFuYSBvbiAobWFyYXRob24pCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
       "lastLine": 4
     },
-    "installation_spark-executor_192-168-10-13": {
-      "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1leGVjdXRvciBvbiAxOTIuMTY4LjEwLjEzCiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciBzcGFyay1leGVjdXRvck9wZXJhdGlvbnNNb25pdG9yaW5nU2VydmljZVRlc3QgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKQogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKIC0gRGVsZXRpbmcgZG9ja2VyIHRlbXBsYXRlIGltYWdlCi0tPiBEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWV4ZWN1dG9yIG9uIDE5Mi4xNjguMTAuMTMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
-      "lastLine": 9
-    },
     "installation_marathon_192-168-10-15": {
       "lines": "Cmluc3RhbGxhdGlvbiBvZiBtYXJhdGhvbiBvbiAxOTIuMTY4LjEwLjE1CiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciBtYXJhdGhvbk9wZXJhdGlvbnNNb25pdG9yaW5nU2VydmljZVRlc3QgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKQogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKIC0gRGVsZXRpbmcgZG9ja2VyIHRlbXBsYXRlIGltYWdlCi0tPiBEb25lIDogaW5zdGFsbGF0aW9uIG9mIG1hcmF0aG9uIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
+      "lastLine": 9
+    },
+    "installation_spark-executor_192-168-10-13": {
+      "lines": "Cmluc3RhbGxhdGlvbiBvZiBzcGFyay1leGVjdXRvciBvbiAxOTIuMTY4LjEwLjEzCiAtIENyZWF0aW5nIGFyY2hpdmUgYW5kIGNvcHlpbmcgaXQgb3ZlcgogLSAobm8gY29udGFpbmVyIGZvdW5kIGZvciBzcGFyay1leGVjdXRvck9wZXJhdGlvbnNNb25pdG9yaW5nU2VydmljZVRlc3QgLSB3aWxsIGp1c3QgaW52b2tlIHNldHVwKQogLSBDYWxsaW5nIHNldHVwIHNjcmlwdAogLSBQZXJmb3JtaW5nIGNsZWFudXAKIC0gRGVsZXRpbmcgZG9ja2VyIHRlbXBsYXRlIGltYWdlCi0tPiBEb25lIDogaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWV4ZWN1dG9yIG9uIDE5Mi4xNjguMTAuMTMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
       "lastLine": 9
     },
     "installation_spark-executor_192-168-10-15": {
@@ -80,12 +80,12 @@
   },
   "labels": [
     {
-      "operation": "Check--Install_Base-System_192-168-10-15",
-      "label": "Check / Install of Base System on 192.168.10.15"
-    },
-    {
       "operation": "Check--Install_Base-System_192-168-10-13",
       "label": "Check / Install of Base System on 192.168.10.13"
+    },
+    {
+      "operation": "Check--Install_Base-System_192-168-10-15",
+      "label": "Check / Install of Base System on 192.168.10.15"
     },
     {
       "operation": "installation_elasticsearch_192-168-10-15",
@@ -161,8 +161,8 @@
     "restart_cerebro_marathon": "COMPLETE",
     "installation_mesos-master_192-168-10-15": "COMPLETE",
     "restart_kibana_marathon": "COMPLETE",
-    "installation_spark-executor_192-168-10-13": "COMPLETE",
     "installation_marathon_192-168-10-15": "COMPLETE",
+    "installation_spark-executor_192-168-10-13": "COMPLETE",
     "installation_spark-executor_192-168-10-15": "COMPLETE",
     "installation_mesos-agent_192-168-10-15": "COMPLETE",
     "installation_elasticsearch_192-168-10-13": "COMPLETE",

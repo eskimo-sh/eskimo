@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,8 +40,8 @@ public class OperationsMonitoringService implements OperationsContext {
 
     private List<? extends OperationId> operationList = null;
     private final MessagingManager globalMessages = new MessagingManager();
-    private final Map<OperationId, MessagingManager> operationLogs = new HashMap<>();
-    private final Map<OperationId, OperationStatus> operationStatus = new HashMap<>();
+    private final Map<OperationId, MessagingManager> operationLogs = new ConcurrentHashMap<>();
+    private final Map<OperationId, OperationStatus> operationStatus = new ConcurrentHashMap<>();
     private JSONOpCommand currentOperation = null;
 
     /* For tests */

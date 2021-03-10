@@ -59,11 +59,12 @@ sudo ln -s /var/log/gluster/egmi /usr/local/lib/egmi/logs
 echo " - Simlinking EGMI config to /usr/local/etc/egmi"
 sudo ln -s /usr/local/lib/egmi/conf /usr/local/etc/egmi
 
-echo " - Installing __force-remove-brick.sh"
+echo " - Installing EGMI management scripts to /usr/local/sbin/"
 cp /usr/local/lib/egmi/utils/gluster_container_helpers/* /usr/local/sbin/
 
-echo " - Setting up hostname in egmi.properties"
+echo " - Tweaking egmi.properties"
 sed -i s/"zookeeper.myId=localhost"/"zookeeper.myId=$SELF_IP_ADDRESS"/g /usr/local/lib/egmi/conf/egmi.properties
+sed -i s/"system.statusUpdatePeriodSeconds=30"/"system.statusUpdatePeriodSeconds=60"/g /usr/local/lib/egmi/conf/egmi.properties
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

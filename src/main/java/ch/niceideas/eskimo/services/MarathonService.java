@@ -349,8 +349,7 @@ public class MarathonService {
 
                 notificationService.addError("Marathon doesn't seem to be installed");
 
-                String message = "Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.\"";
-                operationsMonitoringService.addGlobalInfo(message);
+                String message = "Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.";
 
                 // special case : if some marathon services are getting uninstalled, and marathon is nowhere installed or anything, let's force flag them as uninstalled
                 try {
@@ -459,7 +458,7 @@ public class MarathonService {
             success = true;
         } catch (FileException | SetupException | SystemException | ServiceDefinitionException | NodesConfigurationException e) {
             logger.error (e, e);
-            operationsMonitoringService.addGlobalInfo("Marathon Services installation failed ! <br>" + e.getMessage());
+            operationsMonitoringService.addGlobalInfo("Marathon Services installation failed ! " + e.getMessage());
             notificationService.addError("Marathon Services installation failed !");
             throw new MarathonException(e);
         } finally {

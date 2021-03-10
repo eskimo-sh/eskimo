@@ -282,7 +282,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
         List<ServiceOperationId> allOpList = new ArrayList<>();
 
-        getAllNodes().forEach(node -> allOpList.add(new ServiceOperationId(CHECK_INSTALL_OP_TYPE, BASE_SYSTEM, node)));
+        context.getNodesConfig().getNodeAddresses().forEach(node -> allOpList.add(new ServiceOperationId(CHECK_INSTALL_OP_TYPE, BASE_SYSTEM, node)));
 
         getInstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
         getUninstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);

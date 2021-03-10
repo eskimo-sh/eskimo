@@ -33,11 +33,11 @@
       "lines": "",
       "lastLine": 0
     },
-    "installation_spark-executor_192-168-10-13": {
+    "installation_marathon_192-168-10-15": {
       "lines": "",
       "lastLine": 0
     },
-    "installation_marathon_192-168-10-15": {
+    "installation_spark-executor_192-168-10-13": {
       "lines": "",
       "lastLine": 0
     },
@@ -80,12 +80,12 @@
   },
   "labels": [
     {
-      "operation": "Check--Install_Base-System_192-168-10-15",
-      "label": "Check / Install of Base System on 192.168.10.15"
-    },
-    {
       "operation": "Check--Install_Base-System_192-168-10-13",
       "label": "Check / Install of Base System on 192.168.10.13"
+    },
+    {
+      "operation": "Check--Install_Base-System_192-168-10-15",
+      "label": "Check / Install of Base System on 192.168.10.15"
     },
     {
       "operation": "installation_elasticsearch_192-168-10-15",
@@ -161,8 +161,8 @@
     "restart_cerebro_marathon": "CANCELLED",
     "installation_mesos-master_192-168-10-15": "CANCELLED",
     "restart_kibana_marathon": "CANCELLED",
-    "installation_spark-executor_192-168-10-13": "CANCELLED",
     "installation_marathon_192-168-10-15": "CANCELLED",
+    "installation_spark-executor_192-168-10-13": "CANCELLED",
     "installation_spark-executor_192-168-10-15": "CANCELLED",
     "installation_mesos-agent_192-168-10-15": "CANCELLED",
     "installation_elasticsearch_192-168-10-13": "CANCELLED",

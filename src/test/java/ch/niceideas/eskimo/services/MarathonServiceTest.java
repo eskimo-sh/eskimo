@@ -215,7 +215,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         MarathonException exception = assertThrows(MarathonException.class, () -> marathonService.applyMarathonServicesConfig(command));
         assertNotNull(exception);
-        assertEquals("ch.niceideas.eskimo.services.SystemException: Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.\"", exception.getMessage());
+        assertEquals("ch.niceideas.eskimo.services.SystemException: Marathon doesn't seem to be installed. Marathon services configuration is saved but will need to be re-applied when marathon is available.", exception.getMessage());
 
         configurationService.saveServicesInstallationStatus(serviceInstallStatus);
 

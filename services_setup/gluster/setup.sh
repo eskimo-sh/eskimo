@@ -123,6 +123,9 @@ handle_topology_settings gluster gluster_install_log
 echo " - Copying commonGlusterFunctions.sh Script"
 docker_cp_script commonGlusterFunctions.sh sbin gluster gluster_install_log
 
+echo " - Copying inContainerStopService.sh"
+docker_cp_script inContainerStopService.sh sbin gluster gluster_install_log
+
 echo " - Committing changes to local template and exiting container gluster"
 commit_container gluster gluster_install_log
 

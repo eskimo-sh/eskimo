@@ -36,15 +36,10 @@
 
 set -e
 
-echo " - Loading Topology"
-. /etc/eskimo_topology.sh
 
-echo " - Configuring runtime properties in egmi.properties"
-export zookeeper_url=`echo $MASTER_ZOOKEEPER_1 | sed "s/,/:2181,/g"`
-export zookeeper_url=$zookeeper_url:2181
+if [[ ! -f /run/glusterd.pid ]]; then
+    echo "/run/glusterd.pid NOT FOUND !!"
+    exit 1
+fi
 
-
-sed -i s/"zookeeper.urls=ZOOKEEPER_URL:2181"/"zookeeper.urls=$zookeeper_url"/g /usr/local/lib/egmi/conf/egmi.properties
-
-# XXX to force slave mode, comment line above and uncomment the following
-# sed -i s/"master="/"master=false"/g /usr/local/lib/egmi/conf/egmi.properties
+/bin/kill 15 "$(cat /run/glusterd.pid)"
