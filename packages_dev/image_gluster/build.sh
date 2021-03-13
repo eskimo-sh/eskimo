@@ -65,6 +65,10 @@ echo " - Installing OpenJDK 11"
 docker exec -i gluster_template apt-get install -y openjdk-11-jdk > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" 3
 
+echo " - Installing cron"
+docker exec -i gluster_template apt-get install -y cron > /tmp/gluster_build_log 2>&1
+fail_if_error $? "/tmp/gluster_build_log" -2
+
 echo " - Installing GLuster dependencies"
 docker exec -i gluster_template apt-get install -y nfs-kernel-server nfs-common > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" 4

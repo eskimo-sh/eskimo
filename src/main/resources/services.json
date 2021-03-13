@@ -480,7 +480,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": false
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
@@ -741,7 +741,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": false
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
@@ -845,7 +845,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": false
+        "restart": true
       },
       {
         "masterElectionStrategy": "RANDOM",
@@ -939,7 +939,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": false
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE",
@@ -977,7 +977,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": false
+        "restart": true
       }
     ],
     "commands" : [
@@ -1247,7 +1247,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": false
+        "restart": true
       },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",

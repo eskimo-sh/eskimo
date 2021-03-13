@@ -143,7 +143,10 @@ public class NodesConfigControllerTest {
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
-                "    \"restarts\": [{\"zeppelin\": \"(marathon)\"}],\n" +
+                "    \"restarts\": [\n" +
+                "      {\"marathon\": \"192.168.10.11\"},\n" +
+                "      {\"zeppelin\": \"(marathon)\"}\n" +
+                "    ],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
                 "      {\"gluster\": \"192.168.10.11\"},\n" +

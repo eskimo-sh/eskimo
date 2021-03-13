@@ -154,11 +154,11 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
@@ -169,6 +169,35 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
                 "kafka-manager=(marathon), " +
                 "spark-history-server=(marathon), " +
                 "zeppelin=(marathon)"
+                , oc.getRestarts().stream()
+                        .map(operationId -> operationId.getService()+"="+operationId.getNode())
+                        .collect(Collectors.joining(", ")));
+    }
+
+    @Test
+    public void testRestartOnlySameNode() throws Exception {
+
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        savedServicesInstallStatus.getJSONObject().remove("gluster_installed_on_IP_192-168-10-11");
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+
+        assertEquals(1, oc.getInstallations().size());
+
+        assertEquals("gluster", oc.getInstallations().get(0).getService());
+        assertEquals("192.168.10.11", oc.getInstallations().get(0).getNode());
+
+        assertEquals(0, oc.getUninstallations().size());
+
+        assertEquals(4, oc.getRestarts().size());
+
+        assertEquals (
+                        "logstash=192.168.10.11, " +
+                        "marathon=192.168.10.11, " +
+                        "spark-executor=192.168.10.11, " +
+                        "zeppelin=(marathon)"
                 , oc.getRestarts().stream()
                         .map(operationId -> operationId.getService()+"="+operationId.getNode())
                         .collect(Collectors.joining(", ")));
@@ -293,11 +322,11 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
@@ -310,7 +339,6 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
                 "zeppelin=(marathon)", oc.getRestarts().stream()
                         .map(operationId -> operationId.getService()+"="+operationId.getNode())
                         .collect(Collectors.joining(", ")));
-
 
 
         // node vanished
@@ -346,14 +374,13 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals("spark-executor", oc2.getUninstallations().get(1).getService());
         assertEquals("192.168.10.11", oc2.getUninstallations().get(1).getNode());
 
-        assertEquals(14, oc2.getRestarts().size());
+        assertEquals(13, oc2.getRestarts().size());
 
         assertEquals (
                 "elasticsearch=192.168.10.11, " +
-                "elasticsearch=192.168.10.13, " +
-                "mesos-master=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
@@ -404,11 +431,11 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +
@@ -451,14 +478,13 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         assertEquals(0, oc2.getUninstallations().size());
 
-        assertEquals(14, oc2.getRestarts().size());
+        assertEquals(13, oc2.getRestarts().size());
 
         assertEquals (
                 "elasticsearch=192.168.10.11, " +
-                "elasticsearch=192.168.10.13, " +
-                "mesos-master=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "spark-executor=192.168.10.13, " +
@@ -511,11 +537,11 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals(15, oc.getRestarts().size());
 
         assertEquals (
-                "mesos-master=192.168.10.13, " +
                 "gluster=192.168.10.11, " +
                 "gluster=192.168.10.13, " +
                 "kafka=192.168.10.11, " +
                 "kafka=192.168.10.13, " +
+                "mesos-master=192.168.10.13, " +
                 "logstash=192.168.10.11, " +
                 "logstash=192.168.10.13, " +
                 "marathon=192.168.10.11, " +

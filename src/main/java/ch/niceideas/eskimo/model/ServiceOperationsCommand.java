@@ -62,7 +62,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private final ArrayList<ServiceOperationId> restarts = new ArrayList<>();
+    private List<ServiceOperationId> restarts = new ArrayList<>();
 
     public static ServiceOperationsCommand create (
             ServicesDefinition servicesDefinition,
@@ -134,47 +134,101 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         changedServices.addAll (retCommand.getInstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
         changedServices.addAll (retCommand.getUninstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
 
-        Set<String> restartedServices = new HashSet<>();
-        changedServices.forEach(service -> restartedServices.addAll (
+        //Set<String> restartedServices = new HashSet<>();
+        changedServices.forEach(service -> {
                 servicesDefinition.getDependentServices(service).stream()
-                .filter(dependent -> {
-                    Dependency dep = servicesDefinition.getService(dependent).getDependency(servicesDefinition.getService(service)).orElseThrow(IllegalStateException::new);
-                    return dep.isRestart();
-                })
-                .collect(Collectors.toList())
-        ));
+                        .filter(dependent -> {
+                            Service masterService = servicesDefinition.getService(service);
+                            Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
+                            return dep.isRestart();
+                        })
+                        .forEach(dependent -> {
+
+                            if (!servicesDefinition.getService(dependent).isMarathon()) {
+                                for (int nodeNumber : nodesConfig.getNodeNumbers(dependent)) {
+
+                                    String node = nodesConfig.getNodeAddress(nodeNumber);
+
+                                    Service masterService = servicesDefinition.getService(service);
+                                    Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
+
+                                    // if dependency is same node, only restart if service on same node is impacted
+                                    if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterService, node)) {
+                                        retCommand.addRestartIfNotInstalled(dependent, node);
+                                    }
+                                }
+
+                            } else {
+
+                                if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
+                                    retCommand.addRestartIfNotInstalled(dependent, MARATHON_FLAG);
+                                }
+                            }
+
+                        });
+        });
 
         // also add services simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().forEach(installStatusFlag -> {
             Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
             String installedService = Objects.requireNonNull(serviceAndNodePair).getKey();
+            String nodeName = Objects.requireNonNull(serviceAndNodePair).getValue();
+            String node = nodeName.replace("-", ".");
             String status = (String) servicesInstallStatus.getValueForPath(installStatusFlag);
             if (status.equals("restart")) {
-                restartedServices.add (installedService);
+                feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, node, installedService);
             }
         });
 
-        feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedServices);
+        //feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, (Set<String>) restartedServices);
+
+        // XXX need to sort again since I am not relying on feedInRestartService which was taking care of sorting
+        List<ServiceOperationId> restarts = retCommand.getRestarts();
+        restarts.sort((o1, o2) -> servicesDefinition.compareServices(o1.getService(), o2.getService()));
+        retCommand.setRestarts(restarts);
 
         return retCommand;
+    }
+
+    private static boolean isServiceImpactedOnSameNode(ServiceOperationsCommand retCommand, Service masterService, String node) {
+        return retCommand.getInstallations().stream()
+                .anyMatch (operationId -> operationId.getNode().equals(node) && operationId.getService().equals(masterService.getName()));
     }
 
     static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<String> restartedServices) {
         for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
 
-            if (!servicesDefinition.getService(restartedService).isMarathon()) {
-                for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
+            feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedService);
+        }
+    }
 
-                    String node = nodesConfig.getNodeAddress(nodeNumber);
+    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, String node, String restartedService) {
+        if (!servicesDefinition.getService(restartedService).isMarathon()) {
 
-                    retCommand.addRestartIfNotInstalled(restartedService, node);
-                }
+            retCommand.addRestartIfNotInstalled(restartedService, node);
 
-            } else {
+        } else {
 
-                if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
-                    retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
-                }
+            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
+                retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
+            }
+        }
+    }
+
+    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, String restartedService) {
+        if (!servicesDefinition.getService(restartedService).isMarathon()) {
+
+            for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
+
+                String node = nodesConfig.getNodeAddress(nodeNumber);
+
+                retCommand.addRestartIfNotInstalled(restartedService, node);
+            }
+
+        } else {
+
+            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
+                retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
             }
         }
     }
@@ -206,13 +260,18 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
     void addRestartIfNotInstalled(String service, String node) {
-        if (!getInstallations().contains(new ServiceOperationId ("installation", service, node))) {
+        if (   !getInstallations().contains(new ServiceOperationId ("installation", service, node))
+            && !getRestarts().contains(new ServiceOperationId ("restart", service, node))) {
             restarts.add(new ServiceOperationId ("restart", service, node));
         }
     }
 
     public List<ServiceOperationId> getRestarts() {
         return restarts;
+    }
+
+    private void setRestarts (List<ServiceOperationId> restarts) {
+        this.restarts = restarts;
     }
 
     public JSONObject toJSON () {

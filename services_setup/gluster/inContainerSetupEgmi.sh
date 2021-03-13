@@ -66,6 +66,32 @@ echo " - Tweaking egmi.properties"
 sed -i s/"zookeeper.myId=localhost"/"zookeeper.myId=$SELF_IP_ADDRESS"/g /usr/local/lib/egmi/conf/egmi.properties
 sed -i s/"system.statusUpdatePeriodSeconds=30"/"system.statusUpdatePeriodSeconds=60"/g /usr/local/lib/egmi/conf/egmi.properties
 
+echo " - HACK - creating and cron'ing a script that checks for deadlocks and force restarts container "
+
+echo "   + Creating script __periodic-check-deadlocks-hack.sh"
+cat > /tmp/__periodic-check-deadlocks-hack.sh <<- "EOF"
+#!/bin/bash
+
+echo `/bin/date +"%Y-%m-%d %H:%M:%S"`" - Checking for stacking of 'gluster volume status'" | /usr/bin/tee -a /var/log/gluster/__periodic-check-deadlocks-hack.log
+if [[ `/bin/ps -efl  | /bin/grep "gluster volume status all detail" | /bin/grep -v grep | /usr/bin/wc -l` -ge 3 ]]; then
+
+    echo `/bin/date +"%Y-%m-%d %H:%M:%S"`"    + Stacking detected !!!! Killing container" | /usr/bin/tee -a /var/log/gluster/__periodic-check-deadlocks-hack.log
+    /bin/kill -15 `cat /run/glusterd.pid`
+fi
+EOF
+
+sudo mv /tmp/__periodic-check-deadlocks-hack.sh /usr/local/sbin/__periodic-check-deadlocks-hack.sh
+sudo chmod 755 /usr/local/sbin/__periodic-check-deadlocks-hack.sh
+
+echo "   + Scheduling periodic execution of __periodic-check-deadlocks-hack.sh using crontab"
+echo "* * * * * bash /usr/local/sbin/__periodic-check-deadlocks-hack.sh" >> /tmp/crontab
+sudo crontab -u root /tmp/crontab
+
+echo " - Enabling and starting cron"
+sudo update-rc.d cron enable
+sudo bash -c "/etc/init.d/cron start >> /tmp/egmi-setup-log"
+
+
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"
