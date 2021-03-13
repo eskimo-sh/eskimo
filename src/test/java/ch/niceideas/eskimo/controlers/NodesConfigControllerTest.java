@@ -145,6 +145,7 @@ public class NodesConfigControllerTest {
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
                 "      {\"marathon\": \"192.168.10.11\"},\n" +
+                "      {\"spark-history-server\": \"(marathon)\"},\n" +
                 "      {\"zeppelin\": \"(marathon)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [],\n" +

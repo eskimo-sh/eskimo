@@ -697,6 +697,13 @@
         "restart": true
       },
       {
+        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false,
+        "restart": true
+      },
+      {
         "__comment": "this is to enforce the presence of at least one spark-executor otherwise spark-history makes no sense.",
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "spark-executor",
