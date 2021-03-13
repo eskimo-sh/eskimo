@@ -151,7 +151,7 @@ if [[ `sudo crontab -u root -l 2>/dev/null | grep clean-spark-executor-container
     echo " - Scheduling spark-executors containers cleaner"
     sudo rm -f /tmp/crontab
     sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
-    sudo bash -c "echo \"* * * * * bash /usr/local/sbin/clean-spark-executor-containers.sh >> /var/log/spark/clean-spark-executor-containers.log 2>&1\" >> /tmp/crontab"
+    sudo bash -c "echo \"* * * * * /bin/bash /usr/local/sbin/clean-spark-executor-containers.sh >> /var/log/spark/clean-spark-executor-containers.log 2>&1\" >> /tmp/crontab"
     sudo crontab -u root /tmp/crontab
 fi
 

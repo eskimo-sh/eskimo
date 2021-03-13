@@ -84,7 +84,7 @@ sudo mv /tmp/__periodic-check-deadlocks-hack.sh /usr/local/sbin/__periodic-check
 sudo chmod 755 /usr/local/sbin/__periodic-check-deadlocks-hack.sh
 
 echo "   + Scheduling periodic execution of __periodic-check-deadlocks-hack.sh using crontab"
-echo "* * * * * bash /usr/local/sbin/__periodic-check-deadlocks-hack.sh" >> /tmp/crontab
+echo "* * * * * /bin/bash /usr/local/sbin/__periodic-check-deadlocks-hack.sh" > /tmp/crontab
 sudo crontab -u root /tmp/crontab
 
 echo " - Enabling and starting cron"

@@ -47,6 +47,9 @@ for i in `find /var/run/gluster/vols/ -name '*.pid'`; do
     rm -f $i
 done
 
+echo " - Starting service cron"
+/etc/init.d/cron start
+
 echo " - Starting service"
 /usr/sbin/glusterd -l /var/log/gluster/glusterfs.log -f /var/lib/gluster/glusterfs.VOLUME_FILE -N &
 GLUSTER_SERVICE=$!

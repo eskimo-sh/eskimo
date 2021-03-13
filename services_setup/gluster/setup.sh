@@ -150,7 +150,7 @@ if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountChecker.sh` == "" 
     echo " - Scheduling periodic execution of glusterMountChecker.sh using crontab"
     sudo rm -f /tmp/crontab
     sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
-    sudo bash -c "echo \"* * * * * bash /usr/local/sbin/glusterMountChecker.sh\" >> /tmp/crontab"
+    sudo bash -c "echo \"* * * * * /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /tmp/crontab"
     sudo crontab -u root /tmp/crontab
 fi
 

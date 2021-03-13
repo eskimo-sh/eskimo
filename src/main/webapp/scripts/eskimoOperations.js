@@ -275,9 +275,6 @@ eskimo.Operations = function() {
                 //console.log(data);
 
                 if (data && data.result == "OK") {
-                    //console.log (atob(data.lines));
-
-                    console.log (data);
 
                     renderLabels (data.labels);
 
