@@ -191,12 +191,11 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         assertEquals(0, oc.getUninstallations().size());
 
-        assertEquals(4, oc.getRestarts().size());
+        assertEquals(3, oc.getRestarts().size());
 
         assertEquals (
                         "logstash=192.168.10.11, " +
                         "marathon=192.168.10.11, " +
-                        "spark-executor=192.168.10.11, " +
                         "zeppelin=(marathon)"
                 , oc.getRestarts().stream()
                         .map(operationId -> operationId.getService()+"="+operationId.getNode())

@@ -741,7 +741,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": true
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE",
@@ -939,7 +939,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
-        "restart": true
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE",
