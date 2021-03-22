@@ -257,6 +257,8 @@ eskimo.Main = function() {
                     that.version = data.version;
                     $("#eskimo-version").html(that.version);
 
+                    eskimoSystemStatus.scheduleInitializeStatusTableMenus();
+
                 } else {
                     console.error(data.error);
                 }

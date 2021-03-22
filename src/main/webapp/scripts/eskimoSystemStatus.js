@@ -49,6 +49,8 @@ eskimo.SystemStatus = function() {
 
     const that = this;
 
+    let initialized = false;
+
     const STATUS_UPDATE_INTERVAL = 4000;
 
     // initialized by backend
@@ -62,6 +64,40 @@ eskimo.SystemStatus = function() {
     let statusUpdateTimeoutHandler = null;
 
     let prevHidingMessageTimeout = null;
+
+    this.scheduleInitializeStatusTableMenus = function() {
+
+        if (initialized) {
+            this.initializeStatusTableMenus();
+        } else {
+            // retry after a while
+            setTimeout (that.scheduleInitializeStatusTableMenus, 400);
+        }
+    };
+
+    this.initializeStatusTableMenus = function () {
+        // initialize menus
+        let serviceMenuContent = '' +
+            (eskimoMain.hasRole("ADMIN") ? '' +
+                '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
+                '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
+                '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
+                '    <li class="divider"></li>' +
+                '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n' +
+                '    <li class="divider"></li>'
+                : '') +
+            '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n';
+
+        $('#serviceContextMenuTemplate').html(serviceMenuContent);
+
+        let nodeMenuContent = '' +
+            (eskimoMain.hasRole("ADMIN") ? '' +
+                '    <li><a id="terminal" tabindex="-1" href="#" title="Start Service"><i class="fa fa-terminal"></i> SSH Terminal</a></li>\n'
+                : '') +
+            '    <li><a id="file_manager" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-folder"></i> SFTP File Manager</a></li>\n';
+
+        $('#nodeContextMenuTemplate').html(nodeMenuContent);
+    };
 
     this.initialize = function () {
         // Initialize HTML Div from Template
@@ -95,27 +131,7 @@ eskimo.SystemStatus = function() {
                     that.eskimoNodesConfig.showNodesConfig();
                 });
 
-                // initialize menus
-                let serviceMenuContent = '' +
-                    (eskimoMain.hasRole("ADMIN") ? '' +
-                    '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
-                    '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
-                    '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
-                    '    <li class="divider"></li>'+
-                    '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n' +
-                    '    <li class="divider"></li>'
-                        : '') +
-                    '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n';
-
-                $('#serviceContextMenuTemplate').html(serviceMenuContent);
-
-                let nodeMenuContent = '' +
-                    (eskimoMain.hasRole("ADMIN") ? '' +
-                    '    <li><a id="terminal" tabindex="-1" href="#" title="Start Service"><i class="fa fa-terminal"></i> SSH Terminal</a></li>\n'
-                        : '') +
-                    '    <li><a id="file_manager" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-folder"></i> SFTP File Manager</a></li>\n';
-
-                $('#nodeContextMenuTemplate').html(nodeMenuContent);
+                initialized = true;
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);

@@ -1,9 +1,10 @@
 ﻿{
   "paragraphs": [
     {
-      "text": "%md\n\n## Spark Streaming and Kafka Integration Demo\n\n**In this example, we'll use two the spark streaming - actually rather the Spark SQL / Structured Streaming technology - to read some transactions from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic**\n\n*A first python program (A) will send transactions read them from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console*\n*Then a  second program (B) implemented using Spark Structured Streaming will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic*\n*The first program (A) finally takes care of dumping these results to the console*\n\n\n```\n            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Spark Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Spark                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n```\n\n\n**Important Notes - READ CAREFULLY** :\n\n* **Two sample notebooks must have been executed in prior to executing this one : the \"Logstash Demo\" and \"Spark Integration ES\", in this order**\n* **The kafka topics shall better be created in advance using the following commands on one node of the cluster where kafka is available:**\n\n```bash\necho \" -- Creating KAFKA topic berka-payments\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho \" -- Creating KAFKA topic berka-profiled-aggregate\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n```\n\n* *one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper*",
+      "text": "%md\n\n## Spark Streaming and Kafka Integration Demo\n\n**In this example, we'll use spark streaming - actually rather the Spark SQL / Structured Streaming technology - to read some _financial transactions data_ from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic**\n\n*A first python program (A) - paragraph 3 - will send transactions read from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console*\n*Then a  second program (B) - paragraph 5 - implemented using Spark Structured Streaming will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic*\n*The first program (A) finally takes care of dumping these results to the console*\n\n\n```\n            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Spark Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Spark                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n```\n\n\n**Important Notes - READ CAREFULLY** :\n\n* **Two sample notebooks must have been executed in prior to executing this one : the \"Logstash Demo\" and \"Spark Integration ES\", in this order**\n* **The kafka topics shall better be created in advance using the following commands on one node of the cluster where kafka is available:**\n\n```bash\necho \" -- Creating KAFKA topic berka-payments\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho \" -- Creating KAFKA topic berka-profiled-aggregate\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n```\n\n* *one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper*",
       "user": "anonymous",
-      "dateUpdated": "2019-12-29T23:57:43+0000",
+      "dateUpdated": "2021-03-21T02:56:14+0000",
+      "progress": 0,
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -31,26 +32,27 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "<div class=\"markdown-body\">\n<h2>Spark Streaming and Kafka Integration Demo</h2>\n<p><strong>In this example, we&rsquo;ll use two the spark streaming - actually rather the Spark SQL / Structured Streaming technology - to read some transactions from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic</strong></p>\n<p><em>A first python program (A) will send transactions read them from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console</em><br />\n<em>Then a  second program (B) implemented using Spark Structured Streaming will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic</em><br />\n<em>The first program (A) finally takes care of dumping these results to the console</em></p>\n<pre><code>            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Spark Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Spark                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n</code></pre>\n<p><strong>Important Notes - READ CAREFULLY</strong> :</p>\n<ul>\n<li><strong>Two sample notebooks must have been executed in prior to executing this one : the &ldquo;Logstash Demo&rdquo; and &ldquo;Spark Integration ES&rdquo;, in this order</strong></li>\n<li><strong>The kafka topics shall better be created in advance using the following commands on one node of the cluster where kafka is available:</strong></li>\n</ul>\n<pre><code class=\"language-bash\">echo &quot; -- Creating KAFKA topic berka-payments&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho &quot; -- Creating KAFKA topic berka-profiled-aggregate&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n</code></pre>\n<ul>\n<li><em>one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper</em></li>\n</ul>\n\n</div>"
+            "data": "<div class=\"markdown-body\">\n<h2>Spark Streaming and Kafka Integration Demo</h2>\n<p><strong>In this example, we&rsquo;ll use spark streaming - actually rather the Spark SQL / Structured Streaming technology - to read some <em>financial transactions data</em> from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic</strong></p>\n<p><em>A first python program (A) - paragraph 3 - will send transactions read from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console</em><br />\n<em>Then a  second program (B) - paragraph 5 - implemented using Spark Structured Streaming will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic</em><br />\n<em>The first program (A) finally takes care of dumping these results to the console</em></p>\n<pre><code>            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Spark Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Spark                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n</code></pre>\n<p><strong>Important Notes - READ CAREFULLY</strong> :</p>\n<ul>\n<li><strong>Two sample notebooks must have been executed in prior to executing this one : the &ldquo;Logstash Demo&rdquo; and &ldquo;Spark Integration ES&rdquo;, in this order</strong></li>\n<li><strong>The kafka topics shall better be created in advance using the following commands on one node of the cluster where kafka is available:</strong></li>\n</ul>\n<pre><code class=\"language-bash\">echo &quot; -- Creating KAFKA topic berka-payments&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho &quot; -- Creating KAFKA topic berka-profiled-aggregate&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n</code></pre>\n<ul>\n<li><em>one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper</em></li>\n</ul>\n\n</div>"
           }
         ]
       },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1575994158921_1992204415",
+      "jobName": "paragraph_1616236903098_1443030394",
       "id": "paragraph_1575994158921_1992204415",
-      "dateCreated": "2019-12-10T16:09:18+0000",
-      "dateStarted": "2019-12-29T23:57:43+0000",
-      "dateFinished": "2019-12-29T23:57:43+0000",
+      "dateCreated": "2021-03-20T10:41:43+0000",
       "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:3761"
+      "$$hashKey": "object:7480",
+      "dateFinished": "2021-03-21T02:56:17+0000",
+      "dateStarted": "2021-03-21T02:56:14+0000"
     },
     {
-      "text": "%md\n\n### A) First program : reading Data from berka-payments index and periodically sending it to kafka input topic while also dumping on the console whatever comes on the kafka output topic\n\nThis first python program generates the input transactions by reading them from ElasticCearch. It takes care of sending these input transactions to the input kafka topic and also to read the results from the kafka output topic and dump these results on the console.\n\n**Important Notes**:\n\n* **The dataset used from ElasticSearch is the dataset computed by the “Spark Integration ES” Demo notebook**\n* *The Kafka bootstrap server is extracted from the Eskimo topology (variable SELF_IP_ADDRESS gives external IP Address and then SELF_MASTER_KAFKA_XXX gives kafka server to use)*\n* **The constant `ELASTICSEARCH_SERVER` shall be redefined to point on one (or many) of your nodes running Kafka, respectively to one of your node running elasticsearch**\n",
+      "text": "%md\n\n### A) First program : reading Data from berka-payments index and periodically sending it to kafka input topic while also dumping on the console whatever comes on the kafka output topic\n\nThis first python program reads the input transaction data from ElasticCearch and sends them to the kafka topic used as input by the spark streaming program. It also takes care of reading the results from the kafka output topic and dump them results on the console.\n\n**Important Notes**:\n\n* **The dataset used from ElasticSearch is the dataset computed by the “Spark Integration ES” Demo notebook**\n* *The Kafka bootstrap server is extracted from the Eskimo topology (variable SELF_IP_ADDRESS gives external IP Address and then SELF_MASTER_KAFKA_XXX gives kafka server to use)*\n* **The constant `ELASTICSEARCH_SERVER` shall be redefined to point on one (or many) of your nodes running Kafka, respectively to one of your node running elasticsearch**\n",
       "user": "anonymous",
-      "dateUpdated": "2020-06-08T03:46:11+0000",
+      "dateUpdated": "2021-03-21T02:57:49+0000",
+      "progress": 0,
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -78,26 +80,29 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "<div class=\"markdown-body\">\n<h3>A) First program : reading Data from berka-payments index and periodically sending it to kafka input topic while also dumping on the console whatever comes on the kafka output topic</h3>\n<p>This first python program generates the input transactions by reading them from ElasticCearch. It takes care of sending these input transactions to the input kafka topic and also to read the results from the kafka output topic and dump these results on the console.</p>\n<p><strong>Important Notes</strong>:</p>\n<ul>\n<li><strong>The dataset used from ElasticSearch is the dataset computed by the “Spark Integration ES” Demo notebook</strong></li>\n<li><em>The Kafka bootstrap server is extracted from the Eskimo topology (variable SELF_IP_ADDRESS gives external IP Address and then SELF_MASTER_KAFKA_XXX gives kafka server to use)</em></li>\n<li><strong>The constant <code>ELASTICSEARCH_SERVER</code> shall be redefined to point on one (or many) of your nodes running Kafka, respectively to one of your node running elasticsearch</strong></li>\n</ul>\n\n</div>"
+            "data": "<div class=\"markdown-body\">\n<h3>A) First program : reading Data from berka-payments index and periodically sending it to kafka input topic while also dumping on the console whatever comes on the kafka output topic</h3>\n<p>This first python program reads the input transaction data from ElasticCearch and sends them to the kafka topic used as input by the spark streaming program. It also takes care of reading the results from the kafka output topic and dump them results on the console.</p>\n<p><strong>Important Notes</strong>:</p>\n<ul>\n<li><strong>The dataset used from ElasticSearch is the dataset computed by the “Spark Integration ES” Demo notebook</strong></li>\n<li><em>The Kafka bootstrap server is extracted from the Eskimo topology (variable SELF_IP_ADDRESS gives external IP Address and then SELF_MASTER_KAFKA_XXX gives kafka server to use)</em></li>\n<li><strong>The constant <code>ELASTICSEARCH_SERVER</code> shall be redefined to point on one (or many) of your nodes running Kafka, respectively to one of your node running elasticsearch</strong></li>\n</ul>\n\n</div>"
           }
         ]
       },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1575994130002_-702893878",
+      "jobName": "paragraph_1616236903098_1082288463",
       "id": "paragraph_1575994130002_-702893878",
-      "dateCreated": "2019-12-10T16:08:50+0000",
-      "dateStarted": "2020-06-08T03:45:58+0000",
-      "dateFinished": "2020-06-08T03:46:00+0000",
+      "dateCreated": "2021-03-20T10:41:43+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:3762"
+      "$$hashKey": "object:7481",
+      "dateFinished": "2021-03-21T02:57:49+0000",
+      "dateStarted": "2021-03-21T02:57:49+0000"
     },
     {
-      "text": "%python\n\nfrom elasticsearch import Elasticsearch\nimport time, requests, json, sys, threading\nfrom threading import Thread, Lock\nfrom kafka import KafkaProducer, KafkaConsumer\nfrom kafka.errors import KafkaError\nimport os\n\n# Extract SELF IP from Eskimo Topology (env var)\nselfIp = os.environ['SELF_IP_ADDRESS'].replace(\".\", \"\")\n\n# Extract KAFKA Master IP Address\nkafkaMasterIp = os.environ['SELF_MASTER_KAFKA_' + selfIp]\n\nKAFKA_BOOTSTRAP_SERVERS=[kafkaMasterIp + \":9092\"]\nELASTICSEARCH_SERVER=\"localhost\"\n\ndef connect_kafka_producer():\n    _producer = None\n    try:\n        _producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, api_version=(0, 10, 1))\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _producer\n\ndef connect_kafka_consumer():\n    _consumer = None\n    try:\n        _consumer = KafkaConsumer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n                         auto_offset_reset='latest',\n                         consumer_timeout_ms=3600000)\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _consumer\n\n\n# Cache reader class thread\nclass ReaderClass(threading.Thread):\n    def __init__(self):\n        threading.Thread.__init__(self)\n        self.event = threading.Event()\n        self.consumer = connect_kafka_consumer()\n        self.consumer.subscribe(['berka-payments-aggregate'])\n\n    def run(self):\n        for message in self.consumer:\n            if self.event.is_set():\n                if self.consumer is not None:\n                    self.consumer.close()\n                break\n            event = json.loads (message.value)\n            print (json.dumps (event))\n\n    def stop(self):\n        self.event.set()\n\ndef publish_message(producer_instance, topic_name, key, value):\n    try:\n        key_bytes = key.encode ('utf-8')\n        value_bytes = value.encode ('utf-8')\n        #print('sending')\n        producer_instance.send(topic_name, key=key_bytes, value=value_bytes)\n        #print('flushing')\n        producer_instance.flush()\n        #print('Message published successfully.')\n    except Exception as ex:\n        print('Exception in publishing message')\n        print ex  \n        sys.exit (-1);\n\n\nes = Elasticsearch([{'host': ELASTICSEARCH_SERVER, 'port': 9200}])\n\nkafka_producer = connect_kafka_producer()\n\n# Launch reader thread\nreader = ReaderClass()\nreader.start()\n\n\nres = es.search(index=\"berka-payments\", body={\"query\": {\"match_all\": {}}}, scroll='15m', search_type='query_then_fetch', size=10000)\n\nprint(\"%d documents found - %d fetchable\" % (res['hits']['total']['value'], len(res['hits']['hits'])) )\n\nsid = res['_scroll_id']\nscroll_size = res['hits']['total']['value']\n\ncounter = 0\nprint (\"Sending payments to kafka ...\")\n\n# Start scrolling\nwhile (scroll_size > 0):\n\n    page = es.scroll(scroll_id=sid, scroll='2m')\n\n    # Update the scroll ID\n    sid = page['_scroll_id']\n\n    # Get the number of results that we returned in the last scroll\n    scroll_size = len(page['hits']['hits'])\n\n    for cur in page[\"hits\"][\"hits\"]:\n        data = cur[\"_source\"]\n\n        publish_message(kafka_producer, 'berka-payments', data['trans_id'], json.dumps(data))\n\n        #print(\"(%s) - %s\" % (data['trans_id'], json.dumps(data)))\n\n        if counter % 10 == 0: \n            print (\"Sent %d payments. waiting 2 seconds\" % counter)\n            time.sleep(2) \n\n        counter = counter + 1 \n\nif kafka_producer is not None:\n    kafka_producer.close()\n    \ntime.sleep(8)     \n\nif reader is not None:\n    reader.stop()\n\n\n",
+      "text": "%python\n\nfrom elasticsearch import Elasticsearch\nimport time, requests, json, sys, threading\nfrom threading import Thread, Lock\nfrom kafka import KafkaProducer, KafkaConsumer\nfrom kafka.errors import KafkaError\nimport os, signal, sys\n\n# Extract SELF IP from Eskimo Topology (env var)\nselfIp = os.environ['SELF_IP_ADDRESS'].replace(\".\", \"\")\n\n# Extract KAFKA Master IP Address\nkafkaMasterIp = os.environ['SELF_MASTER_KAFKA_' + selfIp]\n\nKAFKA_BOOTSTRAP_SERVERS=[kafkaMasterIp + \":9092\"]\nELASTICSEARCH_SERVER=\"localhost\"\n\nrun = True\n\ndef handler(signum, frame):\n    print(\"Received Signal: %d\"%signum)\n    run = False\n    sys.exit (0);\n    \nsignal.signal(signal.SIGTERM, handler)\nsignal.signal(signal.SIGHUP, handler)\nsignal.signal(signal.SIGINT, handler)\n\ndef connect_kafka_producer():\n    _producer = None\n    try:\n        _producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS, api_version=(0, 10, 1))\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _producer\n\ndef connect_kafka_consumer():\n    _consumer = None\n    try:\n        _consumer = KafkaConsumer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n                         auto_offset_reset='latest',\n                         consumer_timeout_ms=3600000)\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _consumer\n\n\n# Cache reader class thread\nclass ReaderClass(threading.Thread):\n    def __init__(self):\n        threading.Thread.__init__(self)\n        self.event = threading.Event()\n        self.consumer = connect_kafka_consumer()\n        self.consumer.subscribe(['berka-payments-aggregate'])\n\n    def run(self):\n        for message in self.consumer:\n            if self.event.is_set():\n                if self.consumer is not None:\n                    self.consumer.close()\n                break\n            event = json.loads (message.value)\n            print (json.dumps (event))\n\n    def stop(self):\n        self.event.set()\n\ndef publish_message(producer_instance, topic_name, key, value):\n    try:\n        key_bytes = key.encode ('utf-8')\n        value_bytes = value.encode ('utf-8')\n        #print('sending')\n        producer_instance.send(topic_name, key=key_bytes, value=value_bytes)\n        #print('flushing')\n        producer_instance.flush()\n        #print('Message published successfully.')\n    except Exception as ex:\n        print('Exception in publishing message')\n        print ex  \n        sys.exit (-1);\n\n\nes = Elasticsearch([{'host': ELASTICSEARCH_SERVER, 'port': 9200}])\n\nkafka_producer = connect_kafka_producer()\n\n# Launch reader thread\nreader = ReaderClass()\nreader.start()\n\n\nres = es.search(index=\"berka-payments\", body={\"query\": {\"match_all\": {}}}, scroll='15m', search_type='query_then_fetch', size=10000)\n\nprint(\"%d documents found - %d fetchable\" % (res['hits']['total']['value'], len(res['hits']['hits'])) )\n\nsid = res['_scroll_id']\nscroll_size = res['hits']['total']['value']\n\ncounter = 0\nprint (\"Sending payments to kafka ...\")\n\n# Start scrolling\nwhile (scroll_size > 0 and run):\n\n    page = es.scroll(scroll_id=sid, scroll='2m')\n\n    # Update the scroll ID\n    sid = page['_scroll_id']\n\n    # Get the number of results that we returned in the last scroll\n    scroll_size = len(page['hits']['hits'])\n\n    for cur in page[\"hits\"][\"hits\"]:\n        \n        if not run:\n            sys.exit(0)\n        \n        data = cur[\"_source\"]\n\n        publish_message(kafka_producer, 'berka-payments', data['trans_id'], json.dumps(data))\n\n        #print(\"(%s) - %s\" % (data['trans_id'], json.dumps(data)))\n\n        if counter % 10 == 0: \n            print (\"Sent %d payments. waiting 2 seconds\" % counter)\n            time.sleep(2) \n\n        counter = counter + 1 \n\nif kafka_producer is not None:\n    kafka_producer.close()\n    \ntime.sleep(8)     \n\nif reader is not None:\n    reader.stop()\n\n\n",
       "user": "anonymous",
-      "dateUpdated": "2020-06-08T03:32:28+0000",
+      "dateUpdated": "2021-03-20T23:22:47+0000",
+      "progress": 0,
       "config": {
+        "lineNumbers": true,
+        "tableHide": false,
         "editorSetting": {
           "language": "python",
           "editOnDblClick": false,
@@ -111,9 +116,7 @@
         "title": false,
         "checkEmpty": true,
         "results": {},
-        "enabled": true,
-        "lineNumbers": true,
-        "tableHide": false
+        "enabled": true
       },
       "settings": {
         "params": {},
@@ -122,18 +125,19 @@
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1575994097569_-232881020",
+      "jobName": "paragraph_1616236903099_1884618622",
       "id": "paragraph_1575994097569_-232881020",
-      "dateCreated": "2019-12-10T16:08:17+0000",
-      "dateStarted": "2020-06-08T03:32:28+0000",
-      "dateFinished": "2020-06-08T03:32:43+0000",
+      "dateCreated": "2021-03-20T10:41:43+0000",
+      "dateStarted": "2021-03-20T23:22:47+0000",
+      "dateFinished": "2021-03-20T23:22:54+0000",
       "status": "ABORT",
-      "$$hashKey": "object:3763"
+      "$$hashKey": "object:7482"
     },
     {
       "text": "%md\n\n### B) Spark Streaming Program : reading from kafka input topic, computing aggregate and sending result to kafka output topic\n\nThis Spark SQL Structured Streaming programs reads some transactions from the Berka Dataset (resulting from the “Spark Integration ES” Demo notebook) from a kafka input topic as sent by the program A above. It then enriches them slightly and sends them back to a kafka output topic. The first program above then dumps them on the console.\n\n**Important Notes**:\n\n* *The Kafka bootstrap server is extracted from the Eskimo topology (variable SELF_IP_ADDRESS gives external IP Address and then SELF_MASTER_KAFKA_XXX gives kafka server to use)*\n* **The logs of the spark driver are available in the spark zeppelkin interpreter logs which you shall find in `/var/log/zeppelin/zeppelin-interpreter-spark-*.log` on the node executing zeppelin**\n* **CAUTION - SPARK STREAMING PROGRAM IS NOT PROPERLY TERMINATED BY ZEPPELIN !!! ONE NEEDS TO RESTART SPARK INTERPRETER TO ACTUALLY TERMINATE THE SPARK STREAMING PROCESS**\n\n*Other notes*:\n\n* In case you encounter an error such as *\"java.lang.IllegalStateException: Cannot start query with id 9c7acfc7-da52-4282-a012-3c3cbd8aa2dd as another query with same id is already active. Perhaps you are attempting to restart a query from checkpoint that is already active.\"* then you need to delete the *checkpoint* folder location, by default the folder `/var/lib/spark/data/checkpoints/spark_streaming_kafka_checkpointPath_berka` hardcoded hereunder",
       "user": "anonymous",
-      "dateUpdated": "2020-06-08T03:46:31+0000",
+      "dateUpdated": "2021-03-21T02:58:36+0000",
+      "progress": 0,
       "config": {
         "tableHide": false,
         "editorSetting": {
@@ -168,19 +172,21 @@
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1575994270617_-321954293",
+      "jobName": "paragraph_1616236903099_625902917",
       "id": "paragraph_1575994270617_-321954293",
-      "dateCreated": "2019-12-10T16:11:10+0000",
-      "dateStarted": "2020-06-08T03:46:31+0000",
-      "dateFinished": "2020-06-08T03:46:31+0000",
+      "dateCreated": "2021-03-20T10:41:43+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:3764"
+      "$$hashKey": "object:7483",
+      "dateFinished": "2021-03-21T02:58:36+0000",
+      "dateStarted": "2021-03-21T02:58:36+0000"
     },
     {
-      "text": "%pyspark\n\n\nfrom pyspark import SparkContext, SparkConf\nfrom pyspark.sql import SQLContext, SparkSession\nfrom pyspark.sql.types import *\nimport pyspark.sql.functions as F\nfrom pyspark.storagelevel import *\nimport math\nimport os\n\n# Extract SELF IP from Eskimo Topology (env var)\nselfIp = os.environ['SELF_IP_ADDRESS'].replace(\".\", \"\")\n\n# Extract KAFKA Master IP Address\nkafkaMasterIp = os.environ['SELF_MASTER_KAFKA_' + selfIp]\n\nKAFKA_BOOTSTRAP_SERVER=kafkaMasterIp + \":9092\"\n\n# Spark configuration \n# all these options can be given to the command line to spark-submit\n# (they would need to be prefixed by \"spark.\")\n#conf = SparkConf().setAppName(\"KafkaTest_Berka\")\n\n# Every time there is a shuffle, Spark needs to decide how many partitions will \n# the shuffle RDD have. \n# 2 times the amount of CPUS in the cluster is a good value (default is 200) \nNUM_PARTITIONS=2\n\n\n# Spark SQL Session \n#ss = SparkSession.builder \\\n#        .config(conf=conf) \\\n#        .getOrCreate()\n        \n# Zeppelin calls the spark session \"spark\n# ss is perhaps politically unsure but is really much more standard\nss = spark\n\nss.conf.set(\"spark.sql.shuffle.partitions\", NUM_PARTITIONS)\n\n\n# Query configuration only (cannot pass any ES conf here :-( )\nes_query_conf= { \n    \"pushdown\": True\n}\n\ndf = ss \\\n  .readStream \\\n  .format(\"kafka\") \\\n  .option(\"kafka.bootstrap.servers\", KAFKA_BOOTSTRAP_SERVER) \\\n  .option(\"subscribe\", \"berka-payments\") \\\n  .option(\"failOnDataLoss\", \"false\") \\\n  .load() \n\n\n# define shema \nschema = StructType([ \\\n    StructField(\"value_date\", StringType()), \\\n    StructField(\"disp_access_type\", StringType()), \\\n    StructField(\"account_frequency\", StringType()), \\\n    StructField(\"account_id\", StringType()), \\\n    StructField(\"region_name\", StringType()), \\\n    StructField(\"district_name\", StringType()), \\\n    StructField(\"@timestamp\", StringType()), \\\n    StructField(\"transaction_type\", StringType()), \\\n    StructField(\"client_birth_number\", StringType()), \\\n    StructField(\"amount\", StringType()), \\\n    StructField(\"disp_id\", StringType()), \\\n    StructField(\"beneficiary_bank\", StringType()), \\\n    StructField(\"k_symbol\", StringType()), \\\n    StructField(\"client_id\", StringType()), \\\n    StructField(\"client_district_id\", StringType()), \\\n    StructField(\"beneficiary_account\", StringType()), \\\n    StructField(\"operation\", StringType()), \\\n    StructField(\"balance\", StringType()), \\\n    StructField(\"trans_id\", StringType()), \\\n    StructField(\"account_district_id\", StringType())\n])\n\n# extract json\npayments_df = df.select(F.from_json(df.value.cast('string'), schema) \\\n        .alias(\"json\")) \\\n        .select (\"json.*\") \\\n        .withColumn(\"day_of_month\", F.dayofmonth(F.col('@timestamp'))) \\\n        .withColumn(\"day_of_week\", F.date_format(F.col('@timestamp'), 'EEEE')) \\\n        .repartition(NUM_PARTITIONS, \"client_id\") \\\n        .alias(\"payments_df\")\n        \n        \n# TODO do a little more\n        \n       \n\n\n\n# Create output DataFrame\nto_kafka_payments_df = payments_df \\\n        .select(F.col(\"trans_id\").cast(\"string\"), F.to_json(F.struct(\"*\"))) \\\n        .toDF(\"key\", \"value\") \n\n#payments_df \\\n#    .writeStream \\\n#    .trigger() \\\n#    .format(\"console\") \\\n#    .start() \\\n#    .awaitTermination() \n\n#continuous=\"1 second\"\n#processingTime='100 milliseconds'\n\n\n# Start streaming\nto_kafka_payments_df \\\n  .writeStream \\\n  .trigger(processingTime='100 milliseconds') \\\n  .format(\"kafka\") \\\n  .option(\"kafka.bootstrap.servers\", KAFKA_BOOTSTRAP_SERVER) \\\n  .option(\"topic\", \"berka-payments-aggregate\") \\\n  .option(\"checkpointLocation\", \"file:/var/lib/spark/data/checkpoints/spark_streaming_kafka_checkpointPath_berka3\") \\\n  .start() \\\n  .awaitTermination() \n\n\n# Write to ElasticSearch\n#payments_df.writeStream \\\n#   .trigger(processingTime='200 milliseconds') \\\n#   .format(\"org.elasticsearch.spark.sql\") \\\n#   .outputMode(\"append\") \\\n#   .option(\"checkpointLocation\", \"file:/tmp/spark_streaming_es_checkpointPath\") \\\n#   .start(\"berka-streaming-profiled-payments/doc\") \\\n#   .awaitTermination()\n\n\n# # (3) Collect result to the driver\n# payments_list = payments_df.collect()\n# \n# print (\"Printing 10 first results\")\n# for x in payments_list[0:20]:\n#     print x\n# \n# # Print count \n# print (\"Computed %s positions (from collected list)\") % len (payments_list)\n\n",
+      "text": "%pyspark\n\n\nfrom pyspark import SparkContext, SparkConf\nfrom pyspark.sql import SQLContext, SparkSession\nfrom pyspark.sql.types import *\nimport pyspark.sql.functions as F\nfrom pyspark.storagelevel import *\nimport math\nimport os\n\n# Extract SELF IP from Eskimo Topology (env var)\nselfIp = os.environ['SELF_IP_ADDRESS'].replace(\".\", \"\")\n\n# Extract KAFKA Master IP Address\nkafkaMasterIp = os.environ['SELF_MASTER_KAFKA_' + selfIp]\n\nKAFKA_BOOTSTRAP_SERVER=kafkaMasterIp + \":9092\"\n\n# Spark configuration \n# all these options can be given to the command line to spark-submit\n# (they would need to be prefixed by \"spark.\")\n#conf = SparkConf().setAppName(\"KafkaTest_Berka\")\n\n# Every time there is a shuffle, Spark needs to decide how many partitions will \n# the shuffle RDD have. \n# 2 times the amount of CPUS in the cluster is a good value (default is 200) \nNUM_PARTITIONS=2\n\n\n# Spark SQL Session \n#ss = SparkSession.builder \\\n#        .config(conf=conf) \\\n#        .getOrCreate()\n        \n# Zeppelin calls the spark session \"spark\n# ss is perhaps politically unsure but is really much more standard\nss = spark\n\nss.conf.set(\"spark.sql.shuffle.partitions\", NUM_PARTITIONS)\n\n\n# Query configuration only (cannot pass any ES conf here :-( )\nes_query_conf= { \n    \"pushdown\": True\n}\n\ndf = ss \\\n  .readStream \\\n  .format(\"kafka\") \\\n  .option(\"kafka.bootstrap.servers\", KAFKA_BOOTSTRAP_SERVER) \\\n  .option(\"subscribe\", \"berka-payments\") \\\n  .option(\"failOnDataLoss\", \"false\") \\\n  .load() \n\n\n# define shema \nschema = StructType([ \\\n    StructField(\"value_date\", StringType()), \\\n    StructField(\"disp_access_type\", StringType()), \\\n    StructField(\"account_frequency\", StringType()), \\\n    StructField(\"account_id\", StringType()), \\\n    StructField(\"region_name\", StringType()), \\\n    StructField(\"district_name\", StringType()), \\\n    StructField(\"@timestamp\", StringType()), \\\n    StructField(\"transaction_type\", StringType()), \\\n    StructField(\"client_birth_number\", StringType()), \\\n    StructField(\"amount\", StringType()), \\\n    StructField(\"disp_id\", StringType()), \\\n    StructField(\"beneficiary_bank\", StringType()), \\\n    StructField(\"k_symbol\", StringType()), \\\n    StructField(\"client_id\", StringType()), \\\n    StructField(\"client_district_id\", StringType()), \\\n    StructField(\"beneficiary_account\", StringType()), \\\n    StructField(\"operation\", StringType()), \\\n    StructField(\"balance\", StringType()), \\\n    StructField(\"trans_id\", StringType()), \\\n    StructField(\"account_district_id\", StringType())\n])\n\n# extract json\npayments_df = df.select(F.from_json(df.value.cast('string'), schema) \\\n        .alias(\"json\")) \\\n        .select (\"json.*\") \\\n        .withColumn(\"day_of_month\", F.dayofmonth(F.col('@timestamp'))) \\\n        .withColumn(\"day_of_week\", F.date_format(F.col('@timestamp'), 'EEEE')) \\\n        .repartition(NUM_PARTITIONS, \"client_id\") \\\n        .alias(\"payments_df\")\n        \n        \n# TODO do a little more\n        \n       \n\n\n\n# Create output DataFrame\nto_kafka_payments_df = payments_df \\\n        .select(F.col(\"trans_id\").cast(\"string\"), F.to_json(F.struct(\"*\"))) \\\n        .toDF(\"key\", \"value\") \n\n#payments_df \\\n#    .writeStream \\\n#    .trigger() \\\n#    .format(\"console\") \\\n#    .start() \\\n#    .awaitTermination() \n\n#continuous=\"1 second\"\n#processingTime='100 milliseconds'\n\n\n# Start streaming\nto_kafka_payments_df \\\n  .writeStream \\\n  .trigger(processingTime='100 milliseconds') \\\n  .format(\"kafka\") \\\n  .option(\"kafka.bootstrap.servers\", KAFKA_BOOTSTRAP_SERVER) \\\n  .option(\"topic\", \"berka-payments-aggregate\") \\\n  .option(\"checkpointLocation\", \"file:/var/lib/spark/data/checkpoints/spark_streaming_kafka_checkpointPath_berka4\") \\\n  .start() \\\n  .awaitTermination() \n\n\n# Write to ElasticSearch\n#payments_df.writeStream \\\n#   .trigger(processingTime='200 milliseconds') \\\n#   .format(\"org.elasticsearch.spark.sql\") \\\n#   .outputMode(\"append\") \\\n#   .option(\"checkpointLocation\", \"file:/tmp/spark_streaming_es_checkpointPath\") \\\n#   .start(\"berka-streaming-profiled-payments/doc\") \\\n#   .awaitTermination()\n\n\n# # (3) Collect result to the driver\n# payments_list = payments_df.collect()\n# \n# print (\"Printing 10 first results\")\n# for x in payments_list[0:20]:\n#     print x\n# \n# # Print count \n# print (\"Computed %s positions (from collected list)\") % len (payments_list)\n\n",
       "user": "anonymous",
-      "dateUpdated": "2020-06-08T03:31:17+0000",
+      "dateUpdated": "2021-03-20T22:56:14+0000",
+      "progress": 0,
       "config": {
+        "lineNumbers": true,
         "editorSetting": {
           "language": "python",
           "editOnDblClick": false,
@@ -194,8 +200,7 @@
         "title": false,
         "checkEmpty": true,
         "results": {},
-        "enabled": true,
-        "lineNumbers": true
+        "enabled": true
       },
       "settings": {
         "params": {},
@@ -204,19 +209,21 @@
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1575994043909_340690103",
+      "jobName": "paragraph_1616236903099_1908458737",
       "id": "paragraph_1575994043909_340690103",
-      "dateCreated": "2019-12-10T16:07:23+0000",
-      "dateStarted": "2020-06-08T03:31:17+0000",
-      "dateFinished": "2020-06-08T03:32:55+0000",
+      "dateCreated": "2021-03-20T10:41:43+0000",
+      "dateStarted": "2021-03-20T22:56:14+0000",
+      "dateFinished": "2021-03-20T22:59:43+0000",
       "status": "ABORT",
-      "$$hashKey": "object:3765"
+      "$$hashKey": "object:7484"
     },
     {
       "text": "%md\n\n#### Congrats ! You ran a spark streaming program\n",
       "user": "anonymous",
-      "dateUpdated": "2019-12-13T14:21:19+0000",
+      "dateUpdated": "2021-03-20T10:41:43+0000",
+      "progress": 0,
       "config": {
+        "tableHide": false,
         "editorSetting": {
           "language": "markdown",
           "editOnDblClick": true,
@@ -226,13 +233,12 @@
         "colWidth": 12,
         "editorMode": "ace/mode/markdown",
         "fontSize": 9,
-        "results": {},
-        "enabled": true,
         "editorHide": true,
-        "tableHide": false,
         "runOnSelectionChange": true,
         "title": false,
-        "checkEmpty": true
+        "checkEmpty": true,
+        "results": {},
+        "enabled": true
       },
       "settings": {
         "params": {},
@@ -250,19 +256,17 @@
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1576006593109_1487261689",
+      "jobName": "paragraph_1616236903099_1262250815",
       "id": "paragraph_1576006593109_1487261689",
-      "dateCreated": "2019-12-10T19:36:33+0000",
-      "dateStarted": "2019-12-13T14:21:19+0000",
-      "dateFinished": "2019-12-13T14:21:20+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:3766"
+      "dateCreated": "2021-03-20T10:41:43+0000",
+      "status": "READY",
+      "$$hashKey": "object:7485"
     }
   ],
   "name": "Spark Integration Kafka",
-  "id": "2EW78UWA7",
+  "id": "2G3Z82P7H",
   "defaultInterpreterGroup": "spark",
-  "version": "0.9.0-SNAPSHOT",
+  "version": "0.9.0",
   "noteParams": {},
   "noteForms": {},
   "angularObjects": {},

@@ -36,6 +36,9 @@
 Description=Mesos Agent
 After=network.target
 Wants=network.target
+After=docker.service
+Requires=docker.service
+After=gluster.service
 
 [Service]
 ExecStartPre=/usr/local/sbin/register-marathon-registry.sh

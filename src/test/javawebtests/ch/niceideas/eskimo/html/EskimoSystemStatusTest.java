@@ -149,19 +149,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testServiceMenuTemplate() {
-        assertJavascriptEquals("" +
-                "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
-                "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
-                "    <li><a id=\"restart\" tabindex=\"-1\" href=\"#\" title=\"Restart Service\"><i class=\"fa fa-refresh\"></i> Restart Service</a></li>\n" +
-                "    <li class=\"divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
-                "    <li class=\"divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
-                "",
-                "$('#serviceContextMenuTemplate').html()");
-    }
-
-    @Test
     public void testNodeMenuTemplate() {
+        js("eskimoSystemStatus.initializeStatusTableMenus()");
         assertJavascriptEquals("" +
                         "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
                         "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
@@ -172,6 +161,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     public void testClickServiceMenu() throws Exception {
 
         testRenderNodesStatusTable();
+
+        js("eskimoSystemStatus.initializeStatusTableMenus()");
 
         assertNotNull (page.querySelector("#status-node-table-body td.status-node-cell"));
 
@@ -194,6 +185,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     public void testClickNodeMenu() throws Exception {
 
         testRenderNodesStatusTable();
+
+        js("eskimoSystemStatus.initializeStatusTableMenus()");
 
         assertNotNull (page.querySelector("#status-node-table-body td.status-node-cell-intro"));
 
@@ -419,5 +412,28 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                 "192-168-10-11-192.168.10.11-cerebro-true-false\n" +
                 "192-168-10-11-192.168.10.11-kibana-true-false\n" +
                 "192-168-10-11-192.168.10.11-zeppelin-true-false\n", "window.serviceMenuServiceFoundHookCalls");
+    }
+
+    @Test
+    public void testInitializeStatusTableMenusAdmin() {
+        js("eskimoSystemStatus.initializeStatusTableMenus()");
+        assertJavascriptEquals("" +
+                        "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
+                        "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
+                        "    <li><a id=\"restart\" tabindex=\"-1\" href=\"#\" title=\"Restart Service\"><i class=\"fa fa-refresh\"></i> Restart Service</a></li>\n" +
+                        "    <li class=\"divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
+                        "    <li class=\"divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
+                        "",
+                "$('#serviceContextMenuTemplate').html()");
+    }
+
+    @Test
+    public void testInitializeStatusTableMenusUser() {
+        js("eskimoMain.hasRole = function(role) { return false; }");
+        js("eskimoSystemStatus.initializeStatusTableMenus()");
+        assertJavascriptEquals("" +
+                        "    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
+                        "",
+                "$('#serviceContextMenuTemplate').html()");
     }
 }

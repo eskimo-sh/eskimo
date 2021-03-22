@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -149,6 +148,14 @@ call_eskimo() {
         echo_date "Got result"
         cat eskimo-call-result
         exit 9
+    fi
+
+    # Specific zeppelin case :
+    if [[ $(cat eskimo-call-result | grep '"code":"ERROR"') != "" ]]; then
+        echo_date "Couldn't successfully call eskimo URL (zeppelin notebook): $URL"
+        echo_date "Got result"
+        cat eskimo-call-result
+        exit 10
     fi
 
     rm -Rf eskimo-call-result
@@ -389,7 +396,7 @@ install_eskimo() {
     vagrant ssh -c "sudo bash /usr/local/lib/$eskimo_folder/bin/utils/__install-eskimo-systemD-unit-file.sh -f" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Uploading packages distrib packages"
-    for i in $(find "$SCRIPT_DIR"/../../packages_distrib -name '*.tar.gz'); do
+    for i in $(find "$SCRIPT_DIR"/../../packages_distrib -maxdepth 1 -name '*.tar.gz'); do
         filename=$(basename $i)
         vagrant upload $i /usr/local/lib/$eskimo_folder/packages_distrib/$filename $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
     done
@@ -737,6 +744,118 @@ wait_all_services_up() {
     done
 }
 
+query_zeppelin_notebook () {
+    nb_path=$1
+    curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XGET http://$BOX_IP/zeppelin/api/notebook \
+            2> /dev/null |
+            jq -r " .body | .[] | select (.path == \"$nb_path\") | .id"
+}
+
+run_all_zeppelin_pararaphs () {
+    nb_path=$1
+    nb_id=`query_zeppelin_notebook "$nb_path"`
+
+    for i in `curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+
+        echo_date "  + running $i"
+        call_eskimo \
+            "zeppelin/api/notebook/run/$nb_id/$i"
+
+    done
+}
+
+clear_zeppelin_results () {
+    nb_path=$1
+    nb_id=`query_zeppelin_notebook "$nb_path"`
+
+    call_eskimo \
+        "zeppelin/api/notebook/$nb_id/clear" \
+        "" \
+        "PUT"
+}
+
+run_zeppelin_pararaph () {
+    nb_path=$1
+    par_nbr=$2
+    nb_id=`query_zeppelin_notebook "$nb_path"`
+
+    cnt=0
+    for i in `curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+
+        cnt=$((cnt + 1))
+
+        if [[ $cnt == $par_nbr ]]; then
+            echo_date "  + running $i"
+            call_eskimo \
+                "zeppelin/api/notebook/run/$nb_id/$i"
+            break
+        fi
+    done
+}
+
+start_zeppelin_pararaph () {
+    nb_path=$1
+    par_nbr=$2
+    nb_id=`query_zeppelin_notebook "$nb_path"`
+
+    cnt=0
+    for i in `curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+
+        cnt=$((cnt + 1))
+
+        if [[ $cnt == $par_nbr ]]; then
+            echo_date "  + running $i"
+            call_eskimo \
+                "zeppelin/api/notebook/job/$nb_id/$i"
+            break
+        fi
+    done
+}
+
+stop_zeppelin_pararaph () {
+    nb_path=$1
+    par_nbr=$2
+    nb_id=`query_zeppelin_notebook "$nb_path"`
+
+    cnt=0
+    for i in `curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+
+        cnt=$((cnt + 1))
+
+        if [[ $cnt == $par_nbr ]]; then
+            echo_date "  + stopping $i"
+
+            curl \
+                    -b $SCRIPT_DIR/cookies \
+                    -H 'Content-Type: application/json' \
+                    -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/$nb_id/$i \
+                    >> /tmp/integration-test.log 2>&1
+
+
+            break
+        fi
+    done
+}
+
 run_zeppelin_data_load() {
 
     # Now running logstash demo zeppelin paragraphs
@@ -764,28 +883,15 @@ run_zeppelin_data_load() {
     # Giving it a little more time to really start
     sleep 40
 
-    # Paragraph 1
-    echo_date " - ZEPPELIN logstash demo - paragraph 1"
-    call_eskimo \
-        "zeppelin/api/notebook/run/2EURNXTM1/paragraph_1592048236546_788859320"
+    echo_date " - ZEPPELIN logstash demo"
+    run_all_zeppelin_pararaphs "/Logstash Demo"
 
-    # Paragraph 2
-    echo_date " - ZEPPELIN logstash demo - paragraph 2"
-    call_eskimo \
-        "zeppelin/api/notebook/run/2EURNXTM1/paragraph_1573144840643_524948953"
-
-    # Paragraph 3
-    echo_date " - ZEPPELIN logstash demo - paragraph 3"
-    call_eskimo \
-        "zeppelin/api/notebook/run/2EURNXTM1/paragraph_1573145219945_2112967654"
 
     # Now running Spark ES demo zeppelin paragraphs
     # ----------------------------------------------------------------------------------------------------------------------
 
-    # Paragraph 1
-    echo_date " - ZEPPELIN Spark ES demo - paragraph 1"
-    call_eskimo \
-        "zeppelin/api/notebook/run/2FBRKBJYP/paragraph_1591581944840_1580489422"
+    echo_date " - ZEPPELIN Spark ES demo "
+    run_all_zeppelin_pararaphs "/Spark Integration ES"
 
     echo_date " - Waiting for mesos to unregister executor (not to compromise other tests)"
     for attempt in $(seq 1 30); do
@@ -805,6 +911,9 @@ run_zeppelin_data_load() {
             exit 41
         fi
     done
+}
+
+create_kafka_topics() {
 
     # creating required kafka topics
     # ----------------------------------------------------------------------------------------------------------------------
@@ -829,18 +938,13 @@ run_zeppelin_spark_kafka() {
 
     # Paragraph 2
     echo_date " - ZEPPELIN spark Kafka demo - start paragraph SPARK (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103"
+    start_zeppelin_pararaph "/Spark Integration Kafka" 5
 
     wait_for_executor_registered
     if [[ $? != 0 ]]; then
         set +e
 
-        curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103 \
-            >> /tmp/integration-test.log 2>&1
+        stop_zeppelin_pararaph "/Spark Integration Kafka" 5
 
         exit 31
     fi
@@ -850,8 +954,7 @@ run_zeppelin_spark_kafka() {
 
     # Paragraph 1
     echo_date " - ZEPPELIN spark Kafka demo - start paragraph python feeder (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994097569_-232881020"
+    start_zeppelin_pararaph "/Spark Integration Kafka" 3
 
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
@@ -865,17 +968,9 @@ run_zeppelin_spark_kafka() {
         set +e
 
         # stop both paragraphs
-        curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994097569_-232881020 \
-            >> /tmp/integration-test.log 2>&1
+        stop_zeppelin_pararaph "/Spark Integration Kafka" 3
 
-        curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103 \
-            >> /tmp/integration-test.log 2>&1
+        stop_zeppelin_pararaph "/Spark Integration Kafka" 5
 
         rm -f kafka-berka-payments-aggregate-results
 
@@ -885,34 +980,22 @@ run_zeppelin_spark_kafka() {
     rm -f kafka-berka-payments-aggregate-results
 
     echo_date " - ZEPPELIN spark Kafka demo - stop paragraph python feeder (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994097569_-232881020" \
-        "" \
-        "DELETE"
+    stop_zeppelin_pararaph "/Spark Integration Kafka" 3
 
     echo_date " - ZEPPELIN spark Kafka demo - stop paragraph SPARK (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994043909_340690103" \
-        "" \
-        "DELETE"
+    stop_zeppelin_pararaph "/Spark Integration Kafka" 5
 
     wait_for_executor_unregistered
 
     echo_date " - ZEPPELIN spark Kafka demo - Clearing paragraph results"
-    call_eskimo \
-        "zeppelin/api/notebook/2EW78UWA7/clear" \
-        "" \
-        "PUT"
+    clear_zeppelin_results "/Spark Integration Kafka"
 
     echo_date " - ZEPPELIN spark Kafka demo - Re-running text paragraph"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994158921_1992204415"
+    run_zeppelin_pararaph "/Spark Integration Kafka" 1
 
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994130002_-702893878"
+    run_zeppelin_pararaph "/Spark Integration Kafka" 2
 
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EW78UWA7/paragraph_1575994270617_-321954293"
+    run_zeppelin_pararaph "/Spark Integration Kafka" 4
 }
 
 run_zeppelin_flink_kafka() {
@@ -922,19 +1005,15 @@ run_zeppelin_flink_kafka() {
 
     # Paragraph 2
     echo_date " - ZEPPELIN flink Kafka demo - start paragraph FLINK (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155"
+
+    start_zeppelin_pararaph "/Flink Integration Kafka" 5
 
     wait_for_taskmanager_registered
     if [[ $? != 0 ]]; then
 
         set +e
 
-        curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155 \
-            >> /tmp/integration-test.log 2>&1
+        stop_zeppelin_pararaph "/Flink Integration Kafka" 5
 
         exit 31
     fi
@@ -944,8 +1023,7 @@ run_zeppelin_flink_kafka() {
 
     # Paragraph 1
     echo_date " - ZEPPELIN flink Kafka demo - start paragraph python feeder (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994097569_-232881020"
+    start_zeppelin_pararaph "/Flink Integration Kafka" 3
 
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
@@ -959,17 +1037,9 @@ run_zeppelin_flink_kafka() {
         set +e
 
         # stop both paragraphs
-        curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994097569_-232881020 \
-            >> /tmp/integration-test.log 2>&1
+        stop_zeppelin_pararaph "/Flink Integration Kafka" 3
 
-        curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155 \
-            >> /tmp/integration-test.log 2>&1
+        stop_zeppelin_pararaph "/Flink Integration Kafka" 5
 
         rm -f kafka-berka-payments-aggregate-results
 
@@ -979,34 +1049,22 @@ run_zeppelin_flink_kafka() {
     rm -f kafka-berka-payments-aggregate-results
 
     echo_date " - ZEPPELIN flink Kafka demo - stop paragraph python feeder (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994097569_-232881020" \
-        "" \
-        "DELETE"
+    stop_zeppelin_pararaph "/Flink Integration Kafka" 3
 
     echo_date " - ZEPPELIN flink Kafka demo - stop paragraph FLINK (async)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1576315842571_1475844155" \
-        "" \
-        "DELETE"
+    stop_zeppelin_pararaph "/Flink Integration Kafka" 5
 
     wait_for_taskmanager_unregistered
 
     echo_date " - ZEPPELIN flink Kafka demo - Clearing paragraph results"
-    call_eskimo \
-        "zeppelin/api/notebook/2EVQ4TGH9/clear" \
-        "" \
-        "PUT"
+    clear_zeppelin_results "/Flink Integration Kafka"
 
     echo_date " - ZEPPELIN flink Kafka demo - Re-running text paragraph"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994158921_1992204415"
+    run_zeppelin_pararaph "/Flink Integration Kafka" 1
 
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994130002_-702893878"
+    run_zeppelin_pararaph "/Flink Integration Kafka" 2
 
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EVQ4TGH9/paragraph_1575994270617_-321954293"
+    run_zeppelin_pararaph "/Flink Integration Kafka" 4
 }
 
 run_zeppelin_other_notes() {
@@ -1015,29 +1073,27 @@ run_zeppelin_other_notes() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - ZEPPELIN running Spark ML Demo (Regression)"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2EUQABDKD"
+    run_all_zeppelin_pararaphs "/Spark ML Demo (Regression)"
 
     wait_for_executor_unregistered
 
     echo_date " - ZEPPELIN running Flink Batch Demo"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2ESAF6TWT"
+    run_all_zeppelin_pararaphs "/Flink Batch Demo"
 
     wait_for_taskmanager_unregistered
 
     echo_date " - ZEPPELIN running Spark SQL Demo"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2ERSB4Z6P"
+    run_all_zeppelin_pararaphs "/Spark SQL Demo"
 
     wait_for_executor_unregistered
 
     echo_date " - ZEPPELIN running Spark RDD Demo"
-    call_eskimo \
-        "zeppelin/api/notebook/job/2ET3K8RBK"
+    run_all_zeppelin_pararaphs "/Spark RDD Demo"
 
     wait_for_executor_unregistered
 
+    echo_date "!! TODO KAFKA STREAMS NOTEBOOK TODO "
+    echo_date "!! TODO "
 }
 
 do_cleanup() {
@@ -1374,6 +1430,15 @@ check_for_virtualbox
 
 check_for_vagrant
 
+
+# FIXME remove me
+#    curl \
+#        -c $SCRIPT_DIR/cookies \
+#        -H 'Content-Type: application/x-www-form-urlencoded' \
+#        -XPOST http://$BOX_IP/login \
+#        -d 'username=admin&password=password' \
+#        >> /tmp/integration-test.log 2>&1
+
 if [[ -z $DONT_REBUILD ]]; then
     rebuild_eskimo
 fi
@@ -1394,6 +1459,8 @@ if [[ -z $REBUILD_ONLY ]]; then
 
     run_zeppelin_data_load
 
+    create_kafka_topics
+
     run_zeppelin_spark_kafka
 
     run_zeppelin_flink_kafka
@@ -1410,5 +1477,7 @@ fi
 if [[ $DEMO == "demo" ]]; then
     prepare_demo
 fi
+
+
 
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
