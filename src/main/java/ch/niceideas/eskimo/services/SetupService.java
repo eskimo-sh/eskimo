@@ -207,14 +207,18 @@ public class SetupService {
         try {
             configurationService.loadSetupConfig();
         } catch (FileException e) {
-            throw new SetupException ("Application is not initialized properly. File 'config.conf' cannot be read");
+            String error = "Application is not initialized properly. File 'config.conf' cannot be read";
+            logger.error (error);
+            throw new SetupException (error);
         }
 
         // 3. Ensure all services are downloaded / built
 
         File packagesDistribFolder = new File (packageDistributionPath);
         if (!packagesDistribFolder.exists()) {
-            throw new SetupException ("Packages dev scripts folder doesn't exist : " + packageDistributionPath);
+            String error = "Packages distribution folder doesn't exist : " + packageDistributionPath;
+            logger.error (error);
+            throw new SetupException (error);
         }
 
         Set<String> missingServices = new HashSet<>();

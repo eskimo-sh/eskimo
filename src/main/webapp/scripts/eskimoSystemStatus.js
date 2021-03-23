@@ -68,7 +68,7 @@ eskimo.SystemStatus = function() {
     this.scheduleInitializeStatusTableMenus = function() {
 
         if (initialized) {
-            this.initializeStatusTableMenus();
+            that.initializeStatusTableMenus();
         } else {
             // retry after a while
             setTimeout (that.scheduleInitializeStatusTableMenus, 400);

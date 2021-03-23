@@ -405,6 +405,7 @@ install_eskimo() {
     vagrant ssh -c "rm -Rf /home/vagrant/eskimo.tar.gz" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
     echo_date " - Reload systemD daemon"
+    vagrant ssh -c "sudo systemctl daemon-reload" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 }
 
 initial_setup_eskimo() {
