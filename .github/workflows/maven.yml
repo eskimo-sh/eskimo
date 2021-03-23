@@ -23,4 +23,7 @@ jobs:
     - name: Install dependencies
       run: ./libs/install_libs.sh
     - name: Build with Maven
-      run: mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=eskimo-sh_eskimo -Dsonar.organization=eskimo-sh-sonarqube-key -Dsonar.host.url=https://sonarcloud.io  -Dsonar.login=304c6182ba23fa108dd273b4b951ff76c6e0077a --file pom.xml
+      run: mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=eskimo-sh_eskimo -Dsonar.organization=eskimo-sh-sonarqube-key -Dsonar.host.url=https://sonarcloud.io  -Dsonar.login=$SONAR_TOKEN --file pom.xml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
