@@ -23,4 +23,4 @@ jobs:
     - name: Install dependencies
       run: ./libs/install_libs.sh
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=eskimo-sh_eskimo -Dsonar.organization=eskimo-sh-sonarqube-key -Dsonar.host.url=https://sonarcloud.io  -Dsonar.login="ET8lYJzM4rRrP7mMqMEcDpZkt7MY9bUIFitZ8hnfOFoMTqJywc8s/tMwpCRHSKk3H2sWsMQ6WiqOWSeVokJegIMeIzQ1430Bx80Drfa9sS3PNan5mDXDBngkggybqQPTzKfRLAHJlN4KIbJfE8xnWYVINl4K75wrelR6miDeUYDwRFUf6kHSyIOPtJo28n5bZEmH7LJdxFegun7guyxByRSFd9edTBqg+nu4HmwIlKYKpFqyZIKxdkYpFVL8im3jUTXbXiHbTq4n0rM2kgBABPGcrPvbn2EB+Lwk5BXUVIPz/IogPySZrjouS6DMmJdzq/AyRf9mhfF5AnDQZ4alI4f0PSF4smpERzOkN5FPi0sUR7CnWlaL9WcEnyIHRf4W02VHr+2EZlxULP/ygehu2wrAtti4xXFeSSAzbXMqHd4jsFKzQVa+MEoQbdeE2nvlw8HWObDR5oqHb+l2xOzQkJjULl9edFgqrmm3tZ73f+ogerN4oRij+sETvwqRnL687rfvc11FJYxYL4+x/hdoB9FfDGeQlMMhoLwDqpGE5TdMa/xSPntA/C4RzY7/Ear4oq3ROndAd7gJAtL41nsGLIw3CmuCl9rdkrmkg44Up4oAfbzcbvIwyO9XB/qY+lQRoVGZqdWeR0pkf16PQNzt0e7Q3/zQqhloDcFynlniT3A=" --file pom.xml
