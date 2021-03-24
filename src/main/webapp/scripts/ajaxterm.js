@@ -144,14 +144,14 @@ ajaxterm.Terminal=function(id,options) {
 		if(sending==0) {
 			sending=1;
 			sled.className='on';
-			var r=new XMLHttpRequest();
+			var r = new XMLHttpRequest();
 			var send="";
 			while(keybuf.length>0) {
 				send+=keybuf.pop();
 			}
 			var query=query1+send+"&t="+screenTimestamp;
             if (additionalQueryString)  query+='&'+additionalQueryString;
-			if(optGet.className=='on') {
+			if(optGet.className == 'on') {
 				r.open("GET",endpoint+"?"+query,true);
 				if(ie) {
 					r.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");

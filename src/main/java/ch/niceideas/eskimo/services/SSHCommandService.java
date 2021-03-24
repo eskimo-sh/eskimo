@@ -178,7 +178,12 @@ public class SSHCommandService {
                 throw new SSHCommandException(result);
             }
 
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException e) {
+            logger.error(e, e);
+            Thread.currentThread().interrupt();
+            throw new SSHCommandException(e);
+
+        } catch (IOException e) {
             logger.error(e, e);
             throw new SSHCommandException(e);
 

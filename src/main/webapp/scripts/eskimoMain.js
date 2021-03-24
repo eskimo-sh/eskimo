@@ -347,7 +347,7 @@ eskimo.Main = function() {
         if (!isOperationInProgress()) { // but frontend has no clue
             startOperationInProgress();
             operationInProgressOwner = true;
-            eskimoOperations.showOperations
+            eskimoOperations.showOperations();
         }
     }
     this.recoverOperationInProgress = recoverOperationInProgress;

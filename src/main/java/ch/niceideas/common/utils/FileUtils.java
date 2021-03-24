@@ -122,10 +122,11 @@ public class FileUtils {
      * @throws IOException if anything goes wrong
      */
     public static void copy(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
-
-        StreamUtils.copyThenClose(in, out);
+        try (InputStream in = new FileInputStream(src)) {
+            try (OutputStream out = new FileOutputStream(dst)) {
+                StreamUtils.copy(in, out);
+            }
+        }
     }
 
     /**

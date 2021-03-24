@@ -284,7 +284,7 @@ public class SetupService {
             // save config
 
             File privateKeyFile = new File(getConfigStoragePath() + "/privateKey");
-            FileUtils.writeFile(privateKeyFile, sshKeyContent.replaceAll("\r\n", "\n"));
+            FileUtils.writeFile(privateKeyFile, sshKeyContent.replace("\r\n", "\n"));
 
             if (!privateKeyFile.setExecutable(false, false)) {
                 logger.debug("Coudln't remove world executable flag from key file. Moving on.");

@@ -46,9 +46,6 @@ import java.util.Map;
 
 public class MasterStatusWrapper extends JsonWrapper implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(MasterStatusWrapper.class);
-
-
     public MasterStatusWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
     }

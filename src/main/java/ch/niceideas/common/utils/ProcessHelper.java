@@ -110,8 +110,13 @@ public class ProcessHelper {
 
             return outputBuilder.toString();
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error (e, e);
+            throw new ProcessHelperException (e.getMessage(), e);
+
+        } catch (InterruptedException e) {
+            logger.error (e, e);
+            Thread.currentThread().interrupt();
             throw new ProcessHelperException (e.getMessage(), e);
         }
     }

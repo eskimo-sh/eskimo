@@ -248,7 +248,7 @@ public class MasterService {
             statusUpdateLock.unlock();
             // reschedule
             if (statusRefreshScheduler != null) {
-                statusRefreshScheduler.schedule(this::updateStatus, statusUpdatePeriodSeconds * 10, TimeUnit.SECONDS);
+                statusRefreshScheduler.schedule(this::updateStatus, statusUpdatePeriodSeconds * 10L, TimeUnit.SECONDS);
             }
         }
     }

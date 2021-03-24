@@ -217,7 +217,7 @@ public class SystemAdminController extends AbstractOperationController {
             if (service.isMarathon()) {
                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
             } else {
-                nodeName = node.replaceAll("\\.", "-");
+                nodeName = node.replace(".", "-");
             }
 
             ServicesInstallStatusWrapper formerServicesInstallationStatus = configurationService.loadServicesInstallationStatus();

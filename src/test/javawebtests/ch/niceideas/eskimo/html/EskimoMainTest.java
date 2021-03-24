@@ -211,4 +211,19 @@ public class EskimoMainTest extends AbstractWebTest {
         assertJavascriptEquals("none", "$('#menu-configure-setup').css('display')");
     }
 
+    @Test
+    public void testInitHoe() throws Exception {
+
+        js("initHoe();");
+
+        assertJavascriptEquals("desktop", "$('#hoeapp-wrapper').attr ('hoe-device-type')");
+
+        page.getEnclosingWindow().setInnerHeight(600);
+        page.getEnclosingWindow().setInnerWidth(600);
+
+        js("window.dispatchEvent(new Event('resize'));");
+
+        assertJavascriptEquals("phone", "$('#hoeapp-wrapper').attr ('hoe-device-type')");
+
+    }
 }

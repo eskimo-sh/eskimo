@@ -121,7 +121,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         } else {
 
             String targetHost = proxyManagerService.extractHostFromPathInfo(servletRequest.getPathInfo());
-            return contextPathPrefix + serviceName + "/" + targetHost.replaceAll("\\.", "-");
+            return contextPathPrefix + serviceName + "/" + targetHost.replace(".", "-");
         }
     }
 
@@ -280,7 +280,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             if (config == null) {
                 throw new IllegalStateException("Asked for procy for service " + key + " - but none has been configured !");
             }
-            input = input.replaceAll(config.getNode()+":"+config.getLocalPort(), "/" + key);
+            input = input.replace(config.getNode()+":"+config.getLocalPort(), "/" + key);
         }
 
         return input;

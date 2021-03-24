@@ -10,7 +10,10 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class WebSocketProxyForwarder {
 
@@ -83,8 +86,14 @@ public class WebSocketProxyForwarder {
             clientSession.setTextMessageSizeLimit(MESSAGE_SIZE_LIMIT); // 10Mb
 
             return clientSession;
-        } catch (Exception e) {
+
+        } catch (URISyntaxException | ExecutionException | TimeoutException e) {
             logger.error (e, e);
+            throw new ProxyException(e);
+
+        } catch (InterruptedException e) {
+            logger.error (e, e);
+            Thread.currentThread().interrupt();
             throw new ProxyException(e);
         }
     }
