@@ -66,7 +66,7 @@ public class ServicesSettingsWrapper extends JsonWrapper implements Serializable
             put("settings", new JSONArray(allConfigurations));
         }});
 
-        return new ServicesSettingsWrapper(configObject.toString(2));
+        return new ServicesSettingsWrapper(configObject);
     }
 
     public ServicesSettingsWrapper(JSONObject json) {

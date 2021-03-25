@@ -135,11 +135,11 @@ public class EskimoMainTest extends AbstractWebTest {
 
         js("eskimoMain.showProgressbar()");
 
-        assertEquals ("visible", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals("visible", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
 
         js("eskimoMain.hideProgressbar()");
 
-        assertEquals ("hidden", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals("hidden", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
     }
 
     @Test
@@ -171,10 +171,10 @@ public class EskimoMainTest extends AbstractWebTest {
         js("" +
                 " $('.config-menu-items').each(function() {\n" +
                 "     if ($(this).attr('class') == 'config-menu-items') {\n" +
-                "         allDisabled=false;\n"+
+                "         allDisabled=false;\n" +
                 "     }\n" +
                 "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
-                "         allEnabled=false;\n"+
+                "         allEnabled=false;\n" +
                 "     }\n" +
                 "});");
 
@@ -188,13 +188,13 @@ public class EskimoMainTest extends AbstractWebTest {
         js("" +
                 " $('.config-menu-items').each(function() {\n" +
                 "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
-                "         allEnabled=false;\n"+
+                "         allEnabled=false;\n" +
                 "     }\n" +
                 "});");
 
         assertJavascriptEquals("false", "allEnabled");
     }
-    
+
     @Test
     public void testMenuHidingNonAdmin() throws Exception {
 
@@ -225,5 +225,20 @@ public class EskimoMainTest extends AbstractWebTest {
 
         assertJavascriptEquals("phone", "$('#hoeapp-wrapper').attr ('hoe-device-type')");
 
+    }
+
+    @Test
+    public void testFetchContext() throws Exception {
+        fail("To Be Implemented");
+    }
+
+    @Test
+    public void testHandleMarathonSubsystem() throws Exception {
+        fail("To Be Implemented");
+    }
+
+    @Test
+    public void testMenuUpAndDownServicesSettingsWrapper() throws Exception {
+        fail("To Be Implemented");
     }
 }

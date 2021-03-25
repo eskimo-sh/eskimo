@@ -150,13 +150,9 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
     }
 
     public String getFirstNodeName(String service) {
-        List<String> allNodes = getRootKeys().stream()
+        return getRootKeys().stream()
                 .filter(key -> key.startsWith(SERVICE_PREFIX + service + "_"))
                 .map(key -> key.substring( (SERVICE_PREFIX + service + "_").length()))
-                .collect(Collectors.toList());
-        if (allNodes.isEmpty()) {
-            return null;
-        }
-        return allNodes.get(0);
+                .findFirst().orElse(null);
     }
 }

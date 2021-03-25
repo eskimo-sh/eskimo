@@ -62,6 +62,7 @@ import java.util.List;
 public class ServicesProxyServlet extends ProxyServlet {
 
     private static final Logger logger = Logger.getLogger(ServicesProxyServlet.class);
+    public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
     private final ProxyManagerService proxyManagerService;
 
@@ -77,7 +78,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     @Override
     public void init() throws ServletException {
-        // I am removing the possibility to change these. A lot of these settings mess up wuite a lot the services
+        // I am removing the possibility to change these. A lot of these settings mess up with most services
         /*
         super.init();
         */
@@ -185,7 +186,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         HttpEntityEnclosingRequest eProxyRequest = new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
 
-        if ("application/x-www-form-urlencoded".equals(servletRequest.getContentType()) || getContentLengthOverride(servletRequest) == 0){
+        if (APPLICATION_X_WWW_FORM_URLENCODED.equals(servletRequest.getContentType()) || getContentLengthOverride(servletRequest) == 0){
             List<NameValuePair> formparams = new ArrayList<>();
             Enumeration<String> paramNames = servletRequest.getParameterNames();
             while (paramNames.hasMoreElements()) {

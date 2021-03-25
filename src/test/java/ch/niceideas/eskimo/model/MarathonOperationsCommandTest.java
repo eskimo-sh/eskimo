@@ -37,13 +37,18 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTest {
 
@@ -120,4 +125,15 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
                 .map(MarathonOperationsCommand.MarathonOperationId::getService)
                 .collect(Collectors.joining(",")));
     }
+
+    @Test
+    public void toJSON () {
+        fail ("To Be Implememted");
+    }
+
+    @Test
+    public void testGetAllOperationsInOrder() {
+        fail ("To Be Implememted");
+    }
+
 }

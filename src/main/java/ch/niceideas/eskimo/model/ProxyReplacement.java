@@ -35,9 +35,9 @@ public class ProxyReplacement {
     }
 
     String getResolved(String initial, String contextPath, String prefixPath) {
-        String effective = initial.replace("{PREFIX_PATH}", prefixPath);
-        effective = effective.replace("{CONTEXT_PATH}", contextPath);
-        return effective;
+        return initial
+                .replace("{PREFIX_PATH}", prefixPath)
+                .replace("{CONTEXT_PATH}", contextPath);
     }
 
 

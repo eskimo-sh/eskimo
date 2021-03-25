@@ -51,6 +51,10 @@ public class Topology {
     public static final String MASTER_PREFIX = "MASTER_";
     public static final String SELF_MASTER_PREFIX = "SELF_MASTER_";
     public static final String NODE_NBR_PREFIX = "NODE_NBR_";
+    public static final String ALL_NODES_LIST_PREFIX = "ALL_NODES_LIST_";
+    public static final String SERVICE_NUMBER_0_BASED = "SERVICE_NUMBER_0_BASED";
+    public static final String SERVICE_NUMBER_1_BASED = "SERVICE_NUMBER_1_BASED";
+    public static final String CONTEXT_PATH = "CONTEXT_PATH";
 
     private final Map<String, String> definedMasters = new HashMap<>();
     private final Map<String, Map<String, String>> additionalEnvironment = new HashMap<>();
@@ -137,7 +141,7 @@ public class Topology {
         for (String addEnv : service.getAdditionalEnvironment()) {
             Map<String, String> addEnvForService = additionalEnvironment.computeIfAbsent(service.getName(), k -> new HashMap<>());
 
-            if (addEnv.equals("SERVICE_NUMBER_0_BASED") || addEnv.equals("SERVICE_NUMBER_1_BASED")) {
+            if (addEnv.equals(SERVICE_NUMBER_0_BASED) || addEnv.equals(SERVICE_NUMBER_1_BASED)) {
 
                 servicesDefinition.executeInEnvironmentLock(persistentEnvironment -> {
 
@@ -147,7 +151,7 @@ public class Topology {
                     if (StringUtils.isBlank(varValue)) {
 
                         // we just start from 1  and increment it as long as that number is already taken
-                        int counter = addEnv.equals("SERVICE_NUMBER_1_BASED") ? 1 : 0;
+                        int counter = addEnv.equals(SERVICE_NUMBER_1_BASED) ? 1 : 0;
 
                         do {
                             boolean alreadyTaken = false;
@@ -173,9 +177,9 @@ public class Topology {
                     addEnvForService.put(variableName, varValue);
                 });
 
-            } else if (addEnv.startsWith("ALL_NODES_LIST_")) {
+            } else if (addEnv.startsWith(ALL_NODES_LIST_PREFIX)) {
 
-                String serviceToList = addEnv.substring("ALL_NODES_LIST_".length());
+                String serviceToList = addEnv.substring(ALL_NODES_LIST_PREFIX.length());
 
                 String varName = addEnv.replace("-", "_");
 
@@ -187,7 +191,7 @@ public class Topology {
                     addEnvForService.put(varName, allNodes);
                 }
 
-            } else if (addEnv.equals("CONTEXT_PATH")) {
+            } else if (addEnv.equals(CONTEXT_PATH)) {
 
                 if (StringUtils.isNotBlank(contextPath)) {
 
@@ -392,7 +396,7 @@ public class Topology {
 
     private String findNodeNumberNode(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
         if (nodeNumber > -1) {
-            // return IP address correspondoing to master number
+            // return IP address corresponding to master number
             String node = nodesConfig.getNodeAddress(nodeNumber);
             if (StringUtils.isBlank(node)) {
                 throw new NodesConfigurationException("Inconsistency : could not find IP of " + nodeNumber);

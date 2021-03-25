@@ -610,5 +610,14 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
                 .collect(Collectors.joining(", ")));
     }
 
+    @Test
+    public void toJSON () {
+        fail ("To Be Implememted");
+    }
+
+    @Test
+    public void testGetAllOperationsInOrder() {
+        fail ("To Be Implememted");
+    }
 
 }

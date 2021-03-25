@@ -78,7 +78,6 @@ public class Dependency {
     }
 
     public JSONObject toJSON () {
-
         return new JSONObject(new HashMap<String, Object>() {{
             put("mes", mes == null ? "" : mes.name());
             put("masterService", masterService == null ? "" : masterService);
