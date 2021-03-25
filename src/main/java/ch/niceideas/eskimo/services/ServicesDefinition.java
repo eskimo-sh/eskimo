@@ -522,7 +522,7 @@ public class ServicesDefinition implements InitializingBean {
                 .map(Service::getName).toArray(String[]::new);
     }
 
-    int compareServices(Service one, Service other) {
+    public int compareServices(Service one, Service other) {
 
         // marathon services are always last
         if (one.isMarathon() && !other.isMarathon()) {

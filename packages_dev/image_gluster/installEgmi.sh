@@ -94,16 +94,30 @@ sudo ln -s /usr/local/lib/egmi-$EGMI_VERSION /usr/local/lib/egmi
 
 
 echo " - Checking EGMI Installation"
+
+echo "   + temporary messing with config file"
+sudo cp /usr/local/lib/egmi/conf/egmi.properties /usr/local/lib/egmi/conf/egmi.properties.bak
+
+sed -i s/"zookeeper.urls=ZOOKEEPER_URL:2181"/"#zookeeper.urls=ZOOKEEPER_URL:2181"/g /usr/local/lib/egmi/conf/egmi.properties
+sed -i s/"master="/"master=true"/g /usr/local/lib/egmi/conf/egmi.properties
+sed -i s/"# target.predefined-ip-addresses"/"target.predefined-ip-addresses=127.0.0.1"/g /usr/local/lib/egmi/conf/egmi.properties
+
+
+echo "   + Starting EGMI"
 /usr/local/lib/egmi/bin/egmi.sh > /tmp/egmi_run_log 2>&1 &
 EXAMPLE_PID=$!
 fail_if_error $? "/tmp/egmi_run_log" -3
-sleep 10
+sleep 12
+
+echo "   + Checking EGMI startup"
 if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
     echo "EGMI process not started successfully !"
     cat /tmp/egmi_run_log
     exit 10
 fi
 
+echo "   + Restoring config file"
+sudo mv -f /usr/local/lib/egmi/conf/egmi.properties.bak /usr/local/lib/egmi/conf/egmi.properties
 
 sudo rm -Rf /tmp/egmi_setup
 returned_to_saved_dir

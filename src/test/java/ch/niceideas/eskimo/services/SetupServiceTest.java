@@ -206,7 +206,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 "#!/bin/bash\n" +
                 "echo $@\n");
 
-        SetupCommand setupCommand = SetupCommand.create(new JsonWrapper(setupConfig), setupService);
+        SetupCommand setupCommand = SetupCommand.create(new JsonWrapper(setupConfig), setupService, servicesDefinition);
         operationsMonitoringService.operationsStarted(setupCommand);
 
         setupService.buildPackage("cerebro");
@@ -259,7 +259,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         JsonWrapper setupConfigJson = new JsonWrapper(setupConfig);
         setupConfigJson.setValueForPath("setup-mesos-origin", "download");
         setupConfigJson.setValueForPath("setup-services-origin", "download");
-        SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService);
+        SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService, servicesDefinition);
         operationsMonitoringService.operationsStarted(setupCommand);
 
         setupService.downloadPackage("cerebro_0.8.4_1");
@@ -448,7 +448,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService));
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
         // no update (installed flink is latest version !)
         assertEquals(0, downloadPackageList.size());
@@ -505,7 +505,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService));
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
         // 13 updated packages
         assertEquals(13, downloadPackageList.size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
@@ -556,7 +556,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.setBuildVersion("1.0");
-        SetupCommand command = SetupCommand.create(setupConfigWrapper, setupService);
+        SetupCommand command = SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition);
 
         setupService.setBuildVersion("1.0-SNAPSHOT");
 
@@ -607,7 +607,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService));
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
         assertEquals(19, downloadPackageList.size());
         assertEquals(0, builtPackageList.size());
@@ -666,7 +666,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.setServicesDefinition(servicesDefinition);
 
-        setupService.applySetup(SetupCommand.create(new JsonWrapper(setupConfig), setupService));
+        setupService.applySetup(SetupCommand.create(new JsonWrapper(setupConfig), setupService, servicesDefinition));
 
         assertEquals(19, builtPackageList.size());
         assertEquals(0, downloadPackageList.size());

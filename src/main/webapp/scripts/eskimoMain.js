@@ -504,7 +504,7 @@ eskimo.Main = function() {
         });
 
         $("#menu-configure-setup").attr("class", "config-menu-items");
-        $("#menu-messages").attr("class", "config-menu-items");
+        $("#menu-operations").attr("class", "config-menu-items");
     };
 
     this.showSetupNotDone = function (message) {

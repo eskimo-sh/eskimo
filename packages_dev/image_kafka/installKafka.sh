@@ -46,7 +46,7 @@ if [ -z "$KAFKA_VERSION" ]; then
 fi
 if [ -z "$SCALA_VERSION" ]; then
     echo "Need to set SCALA_VERSION environment variable before calling this script !"
-    exit 1
+    exit 2
 fi
 
 saved_dir=`pwd`
@@ -61,10 +61,11 @@ mkdir -p /tmp/kafka_setup
 cd /tmp/kafka_setup
 
 echo " - Downloading kafka-$KAFKA_VERSION"
-wget https://www-eu.apache.org/dist/kafka/$KAFKA_VERSION/kafka_$SCALA_VERSION-$KAFKA_VERSION.tgz > /tmp/kafka_install_log 2>&1
+wget https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_$SCALA_VERSION-$KAFKA_VERSION.tgz > /tmp/kafka_install_log 2>&1
+
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad kafka-$KAFKA_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
-    exit -1
+    exit 3
     #wget http://niceideas.ch/mes/kafka-$KAFKA_VERSION.tar.gz >> /tmp/kafka_install_log 2>&1
     #fail_if_error $? "/tmp/kafka_install_log" -1
 fi

@@ -36,10 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -47,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
@@ -59,15 +57,16 @@ public class SetupCommand implements JSONOpCommand {
 
     private final String packageDownloadUrl;
 
-    private final Set<String> downloadPackages;
-    private final Set<String> buildPackage;
-    private final Set<String> downloadMesos;
-    private final Set<String> buildMesos;
-    private final Set<String> packageUpdates;
+    private final List<String> downloadPackages;
+    private final List<String> buildPackage;
+    private final List<String> downloadMesos;
+    private final List<String> buildMesos;
+    private final List<String> packageUpdates;
 
     public static SetupCommand create (
             JsonWrapper rawSetup,
-            SetupService setupService) throws SetupException {
+            SetupService setupService,
+            ServicesDefinition servicesDefinition) throws SetupException {
 
         Set<String> downloadPackages = new HashSet<>();
         Set<String> buildPackage = new HashSet<>();
@@ -78,15 +77,36 @@ public class SetupCommand implements JSONOpCommand {
         setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
 
         return new SetupCommand(rawSetup, setupService.getPackagesDownloadUrlRoot(),
-                downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
+                sortPackage (downloadPackages, servicesDefinition),
+                sortPackage (buildPackage, servicesDefinition),
+                sortMesosPackage (downloadMesos, servicesDefinition),
+                sortMesosPackage (buildMesos, servicesDefinition),
+                sortPackage (packageUpdates, servicesDefinition));
+    }
+
+    public static List<String> sortMesosPackage(Set<String> missingMesosPackages, ServicesDefinition servicesDefinition) {
+        List<String> sortedMesosPackages = new ArrayList<>(missingMesosPackages);
+        sortedMesosPackages.sort(String::compareTo);
+        return sortedMesosPackages;
+    }
+
+    public static List<String> sortPackage(Set<String> missingPackages, ServicesDefinition servicesDefinition) {
+        List<String> sortedServices = Arrays.stream(servicesDefinition.listAllServices())
+                .map(serviceName -> servicesDefinition.getService(serviceName))
+                .filter(service -> missingPackages.contains(service.getImageName()))
+                .sorted((one, other) -> servicesDefinition.compareServices(one, other))
+                .map(Service::getImageName)
+                .distinct()
+                .collect(Collectors.toList());
+        return sortedServices;
     }
 
     SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl,
-                 Set<String> downloadPackages,
-                 Set<String> buildPackage,
-                 Set<String> downloadMesos,
-                 Set<String> buildMesos,
-                 Set<String> packageUpdates) {
+                 List<String> downloadPackages,
+                 List<String> buildPackage,
+                 List<String> downloadMesos,
+                 List<String> buildMesos,
+                 List<String> packageUpdates) {
         this.rawSetup = rawSetup;
         this.packageDownloadUrl = packageDownloadUrl;
         this.downloadPackages = downloadPackages;

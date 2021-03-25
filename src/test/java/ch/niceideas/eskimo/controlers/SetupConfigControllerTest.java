@@ -19,9 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SetupConfigControllerTest {
 
     private SetupConfigController scc = new SetupConfigController();
+    private ServicesDefinition sd = new ServicesDefinition();
 
     @BeforeEach
-    public void testSetup() {
+    public void testSetup() throws Exception {
+        sd.afterPropertiesSet();
+
         scc.setNotificationService(new NotificationService());
 
         scc.setOperationsMonitoringService(new OperationsMonitoringService() {
@@ -185,7 +188,7 @@ public class SetupConfigControllerTest {
             @Override
             public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
                 JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
-                return SetupCommand.create(setupConfigJSON, this);
+                return SetupCommand.create(setupConfigJSON, this, sd);
             }
             @Override
             public void prepareSetup (

@@ -304,7 +304,7 @@ public class SetupService {
 
             configurationService.saveSetupConfig(configAsString);
 
-            return SetupCommand.create(setupConfigJSON, this);
+            return SetupCommand.create(setupConfigJSON, this, servicesDefinition);
 
         } catch (JSONException | FileException e) {
             logger.error(e, e);
@@ -526,13 +526,7 @@ public class SetupService {
 
             JsonWrapper packagesVersion = null;
 
-            List<String> sortedServices = Arrays.stream(servicesDefinition.listAllServices())
-                    .map(serviceName -> servicesDefinition.getService(serviceName))
-                    .filter(service -> missingPackages.contains(service.getImageName()))
-                    .sorted((one, other) -> servicesDefinition.compareServices(one, other))
-                    .map(Service::getImageName)
-                    .distinct()
-                    .collect(Collectors.toList());
+            List<String> sortedServices = SetupCommand.sortPackage(missingPackages, servicesDefinition);
 
             // this one cannot be added by services
             if (missingPackages.contains("base-eskimo")) {
@@ -566,8 +560,10 @@ public class SetupService {
 
             // 2. Then focus on mesos
 
-            Set<String> missingMesosPackages = new HashSet<>();
-            findMissingMesos(packagesDistribFolder, missingMesosPackages);
+            Set<String> missingMesosPackagesTemp = new HashSet<>();
+            findMissingMesos(packagesDistribFolder, missingMesosPackagesTemp);
+
+            List<String> missingMesosPackages = SetupCommand.sortMesosPackage(missingMesosPackagesTemp, servicesDefinition);
 
             String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
 

@@ -342,7 +342,7 @@ eskimo.SystemStatus = function() {
 
                 that.eskimoMain.showSetupNotDone(blocking ? "" : "Cannot show nodes status as long as initial setup is not completed");
 
-                // Still initialize the status update timeer (also used for notifications)
+                // Still initialize the status update timer (also used for notifications)
                 updateStatus(false);
 
             } else {
@@ -1163,7 +1163,7 @@ eskimo.SystemStatus = function() {
                     that.eskimoMain.handleSetupNotCompleted();
 
                     if (   !that.eskimoMain.isCurrentDisplayedService("setup")
-                        && !that.eskimoMain.isCurrentDisplayedService("pending")) {
+                        && !that.eskimoMain.isCurrentDisplayedService("operations")) { // don't move to setup if operations are being shown !
                         that.eskimoMain.showSetupNotDone();
                     }
 
