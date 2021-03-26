@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MessageLogger;
-import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
@@ -50,7 +49,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -160,6 +161,9 @@ public class SetupService {
     }
     void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
         this.operationsMonitoringService = operationsMonitoringService;
+    }
+    void setNotificationService (NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     void setStoragePathConfDir (String storagePathConfDir) {
@@ -376,7 +380,9 @@ public class SetupService {
 
         File packagesDistribFolder = new File (packageDistributionPath);
         if (!packagesDistribFolder.exists()) {
-            packagesDistribFolder.mkdirs();
+            if (!packagesDistribFolder.mkdirs()) {
+                throw new SetupException ("Failed to create directory " + packagesDistribFolder.getAbsolutePath());
+            }
         }
 
         JsonWrapper packagesVersion = null;
@@ -395,7 +401,7 @@ public class SetupService {
 
         } else {
 
-            if (applicationStatusService.isSnapshot(buildVersion)) {
+            if (ApplicationStatusService.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
@@ -414,7 +420,7 @@ public class SetupService {
         String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
         if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
-            if (applicationStatusService.isSnapshot(buildVersion)) {
+            if (ApplicationStatusService.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
@@ -433,7 +439,7 @@ public class SetupService {
         }
 
         // 3. Find out about upgrades
-        if (!applicationStatusService.isSnapshot(buildVersion)
+        if (!ApplicationStatusService.isSnapshot(buildVersion)
                 && StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG) // for services default is build
                 && packagesVersion != null) {
             Set<String> updates = new HashSet<>();
@@ -508,7 +514,9 @@ public class SetupService {
 
             File packagesDistribFolder = new File (packageDistributionPath);
             if (!packagesDistribFolder.exists()) {
-                packagesDistribFolder.mkdirs();
+                if (!packagesDistribFolder.mkdirs()) {
+                    throw new SetupException ("Failed to create directory " + packagesDistribFolder.getAbsolutePath());
+                }
             }
 
             // only build or download if not already done !!!
@@ -528,11 +536,6 @@ public class SetupService {
 
             List<String> sortedServices = SetupCommand.sortPackage(missingPackages, servicesDefinition);
 
-            // this one cannot be added by services
-            if (missingPackages.contains("base-eskimo")) {
-                sortedServices.add(0, "base-eskimo");
-            }
-
             if (!missingPackages.isEmpty()) {
                 if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
 
@@ -542,7 +545,7 @@ public class SetupService {
 
                 } else {
 
-                    if (applicationStatusService.isSnapshot(buildVersion)) {
+                    if (ApplicationStatusService.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
@@ -570,7 +573,7 @@ public class SetupService {
             if (!missingMesosPackages.isEmpty()) {
                 if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
 
-                    if (applicationStatusService.isSnapshot(buildVersion)) {
+                    if (ApplicationStatusService.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 

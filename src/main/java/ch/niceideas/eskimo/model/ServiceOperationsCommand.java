@@ -196,10 +196,9 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
     static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<String> restartedServices) {
-        for (String restartedService : restartedServices.stream().sorted(servicesDefinition::compareServices).collect(Collectors.toList())) {
-
-            feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedService);
-        }
+        restartedServices.stream()
+                .sorted(servicesDefinition::compareServices)
+                .forEach(serviceName -> feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, serviceName));
     }
 
     private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, String node, String restartedService) {

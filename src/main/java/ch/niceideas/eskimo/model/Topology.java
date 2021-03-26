@@ -432,9 +432,11 @@ public class Topology {
 
     public String getTopologyScript() {
         StringBuilder sb = new StringBuilder();
-        for (String master : definedMasters.keySet().stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList())) {
-            appendExport (sb, master, definedMasters.get(master));
-        }
+
+        definedMasters.keySet().stream()
+                .sorted(Comparator.naturalOrder())
+                .forEach(master -> appendExport (sb, master, definedMasters.get(master)));
+
         return sb.toString();
     }
 
@@ -461,13 +463,14 @@ public class Topology {
         }
 
         sb.append("\n#Additional Environment\n");
-        for (String serviceName : serviceNames.stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList())) {
-            if (additionalEnvironment.get(serviceName) != null) {
-                for (String additionalProp : additionalEnvironment.get(serviceName).keySet()) {
-                    appendExport (sb, additionalProp, additionalEnvironment.get(serviceName).get(additionalProp));
-                }
-            }
-        }
+        serviceNames.stream()
+                .sorted(Comparator.naturalOrder())
+                .filter(serviceName -> additionalEnvironment.get(serviceName) != null)
+                .forEach(serviceName -> {
+                    for (String additionalProp : additionalEnvironment.get(serviceName).keySet()) {
+                        appendExport (sb, additionalProp, additionalEnvironment.get(serviceName).get(additionalProp));
+                    }
+                });
 
         // Add self variable
         sb.append("\n#Self identification\n");
@@ -484,11 +487,9 @@ public class Topology {
         if (memorySettings != null && !memorySettings.isEmpty()) {
             sb.append("\n#Memory Management\n");
 
-            List<String> memoryList = memorySettings.keySet().stream().sorted().collect(Collectors.toList());
-            for (String service : memoryList) {
-
-                appendExport(sb, "MEMORY_"+service.toUpperCase().replace("-", "_"), ""+memorySettings.get(service));
-            }
+            memorySettings.keySet().stream()
+                    .sorted()
+                    .forEach(service -> appendExport(sb, "MEMORY_"+service.toUpperCase().replace("-", "_"), "" + memorySettings.get(service)));
         }
 
         return sb.toString();

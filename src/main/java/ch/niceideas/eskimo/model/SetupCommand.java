@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,7 @@ public class SetupCommand implements JSONOpCommand {
 
     public static final String TYPE_DOWNLOAD = "Download";
     public static final String TYPE_BUILD = "Build";
+    public static final String BASE_ESKIMO_PACKAGE = "base-eskimo";
     private final JsonWrapper rawSetup;
 
     private final String packageDownloadUrl;
@@ -91,14 +93,47 @@ public class SetupCommand implements JSONOpCommand {
     }
 
     public static List<String> sortPackage(Set<String> missingPackages, ServicesDefinition servicesDefinition) {
+
+        List<String> missingServices = missingPackages.stream()
+                .map (SetupCommand::getServiceName)
+                .collect(Collectors.toList());
+
         List<String> sortedServices = Arrays.stream(servicesDefinition.listAllServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
-                .filter(service -> missingPackages.contains(service.getImageName()))
-                .sorted((one, other) -> servicesDefinition.compareServices(one, other))
+                .filter(service -> missingServices.contains(service.getImageName()))
+                .sorted(servicesDefinition::compareServices)
                 .map(Service::getImageName)
                 .distinct()
                 .collect(Collectors.toList());
-        return sortedServices;
+
+        // this one cannot be added by services
+        if (missingServices.contains(BASE_ESKIMO_PACKAGE) && !sortedServices.contains(BASE_ESKIMO_PACKAGE)) {
+            sortedServices.add(0, BASE_ESKIMO_PACKAGE);
+        }
+
+        return sortedServices.stream()
+                .map (service -> getPackageName (missingPackages, service))
+                .collect(Collectors.toList());
+    }
+
+    private static String getPackageName (Set<String> missingPackages, String serviceName) {
+        if (missingPackages.contains(serviceName)) {
+            return serviceName;
+        }
+
+        return missingPackages.stream()
+                .filter(packageName -> packageName.contains(serviceName + "_"))
+                .findAny().orElseThrow(IllegalStateException::new);
+    }
+
+    private static String getServiceName (String packageName) {
+        if (StringUtils.isBlank(packageName)) {
+            return null;
+        }
+        if (!packageName.contains("_")) {
+            return packageName;
+        }
+        return packageName.substring(0, packageName.indexOf("_"));
     }
 
     SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl,

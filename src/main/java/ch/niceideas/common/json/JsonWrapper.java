@@ -110,7 +110,8 @@ public class JsonWrapper implements Serializable {
     public List<String> getRootKeys() {
         List<String> list = new ArrayList<>();
         json.keys().forEachRemaining(list::add);
-        return list.stream().sorted().collect(Collectors.toList());
+        list.sort(String::compareTo);
+        return list;
     }
 
     public void removeRootKey (String rootKey) {

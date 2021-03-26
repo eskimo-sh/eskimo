@@ -462,17 +462,14 @@ public class SystemService {
                     if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
 
                         try {
-//operationsMonitoringService.startOperation(operation);
                             operation.call(opToPerform, error);
                         } catch (Exception e) {
                             logger.error(e, e);
-                            logger.warn ("Storing error - " + e.getClass()+":"+e.getMessage());
+                            logger.warn("Storing error - " + e.getClass() + ":" + e.getMessage());
                             error.set(e);
-//operationsMonitoringService.operationError(operation, e.getMessage());
+
                             // actually killing the thread is perhaps not a good idea
                             //throw new PooledOperationException(e.getMessage());
-                        } finally {
-//operationsMonitoringService.endOperation(operation);
                         }
                     }
                 });

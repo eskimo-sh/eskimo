@@ -145,6 +145,7 @@ public class ServicesDefinition implements InitializingBean {
             }
 
             // find out if another service is already defined at same location
+            //noinspection ConstantConditions
             if (services.values().stream()
                     .filter(srv -> service.getSelectionLayoutCol() != -1)
                     .anyMatch(srv -> srv.getSelectionLayoutCol() == selectionLayoutCol && srv.getSelectionLayoutRow() == selectionLayoutRow)) {

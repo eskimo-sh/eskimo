@@ -68,9 +68,14 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private String mesosPackages = "mesos-debian,mesos-redhat,mesos-suse";
 
+    private ServicesDefinition sd = new ServicesDefinition();
+
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
+
+        sd.afterPropertiesSet();
+
         setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
         packagesVersionFile = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/eskimo_packages_versions.json"));
         FileUtils.delete(new File ("/tmp/setupConfigTest"));
@@ -93,6 +98,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setPackageDistributionPath(tempPackagesDistribPath.getCanonicalPath());
 
         setupService.setSystemService(systemService);
+        setupService.setServicesDefinition(sd);
 
         setupService.setPackagesToBuild(packagesToBuild);
         setupService.setMesosPackages(mesosPackages);
@@ -105,6 +111,8 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setBuildVersion("1.0");
 
         setupService.setOperationsMonitoringService(operationsMonitoringService);
+
+        setupService.setNotificationService(notificationService);
 
         return setupService;
     }
@@ -129,9 +137,8 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(new Pair<> ("1.8.1", "1"), version);
     }
 
-
     @Test
-    public void testSaveAndPrepareSetup() throws Exception {
+    public void testSaveAndPrepareSetup_build() throws Exception {
 
         SetupService setupService = createSetupService(new SetupService());
         setupService.setApplicationStatusService(applicationStatusService);
@@ -151,9 +158,60 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(3, command.getBuildMesos().size());
         assertEquals(16, command.getBuildPackage().size());
 
+        assertEquals("mesos-debian,mesos-redhat,mesos-suse", String.join(",", command.getBuildMesos()));
+        assertEquals("base-eskimo,elasticsearch,ntp,prometheus,zookeeper,gluster,kafka,mesos-master,logstash,flink,spark,cerebro,grafana,kibana,kafka-manager,zeppelin", String.join(",", command.getBuildPackage()));
+
         assertEquals(0, command.getDownloadMesos().size());
         assertEquals(0, command.getDownloadPackages().size());
+    }
 
+    @Test
+    public void testSaveAndPrepareSetup_download() throws Exception {
+
+        SetupService setupService = createSetupService(new SetupService() {
+            @Override
+            protected JsonWrapper loadRemotePackagesVersionFile() {
+                return new JsonWrapper(packagesVersionFile);
+            }
+            @Override
+            protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
+                destinationFile.createNewFile();
+                try {
+                    FileUtils.writeFile(destinationFile, "TEST DOWNLOADED CONTENT");
+                } catch (FileException e) {
+                    logger.debug (e, e);
+                    throw new IOException(e);
+                }
+            }
+        });
+        setupService.setApplicationStatusService(applicationStatusService);
+
+        setupService.setBuildVersion("1.0");
+
+        JsonWrapper initConfig = new JsonWrapper(setupConfig);
+        initConfig.setValueForPath("setup-mesos-origin", "download");
+        initConfig.setValueForPath("setup-services-origin", "download");
+
+        SetupCommand command = setupService.saveAndPrepareSetup(initConfig.getFormattedValue());
+
+        JsonWrapper setupConfigWrapper = new JsonWrapper(configurationService.loadSetupConfig());
+
+        assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
+        assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
+        assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
+        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-mesos-origin"));
+        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
+
+        assertNotNull(command);
+
+        assertEquals(0, command.getBuildMesos().size());
+        assertEquals(0, command.getBuildPackage().size());
+
+        assertEquals(3, command.getDownloadMesos().size());
+        assertEquals(16, command.getDownloadPackages().size());
+
+        assertEquals("mesos-debian_1.8.1_1,mesos-redhat_1.8.1_1,mesos-suse_1.8.1_1", String.join(",", command.getDownloadMesos()));
+        assertEquals("base-eskimo_0.2_1,elasticsearch_6.8.3_1,ntp_debian_09_stretch_1,prometheus_2.10.0_1,zookeeper_debian_09_stretch_1,gluster_debian_09_stretch_1,kafka_2.2.0_1,mesos-master_1.8.1_1,logstash_6.8.3_1,flink_1.9.1_1,spark_2.4.4_1,cerebro_0.8.4_1,grafana_6.3.3_1,kibana_6.8.3_1,kafka-manager_2.0.0.2_1,zeppelin_0.9.0_1", String.join(",", command.getDownloadPackages()));
     }
 
     @Test
@@ -644,15 +702,15 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         SetupService setupService = createSetupService(new SetupService() {
             @Override
-            protected void buildPackage(String image) throws SetupException {
+            protected void buildPackage(String image) {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) throws SetupException {
+            protected void downloadPackage(String fileName) {
                 downloadPackageList.add (fileName);
             }
             @Override
-            protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
+            protected JsonWrapper loadRemotePackagesVersionFile() {
                 return new JsonWrapper(packagesVersionFile);
             }
         });
