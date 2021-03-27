@@ -1,0 +1,96 @@
+{
+  "settings": {
+    "spark-executor": {"spark-defaults.conf": [
+      {
+        "value": "FIFO",
+        "key": "spark.scheduler.mode",
+        "oldValue": ""
+      },
+      {
+        "value": "500m",
+        "key": "spark.driver.memory",
+        "oldValue": ""
+      },
+      {
+        "value": "200s",
+        "key": "spark.dynamicAllocation.executorIdleTimeout",
+        "oldValue": "300s"
+      },
+      {
+        "value": "10",
+        "key": "spark.rpc.numRetries",
+        "oldValue": ""
+      },
+      {
+        "value": "400s",
+        "key": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
+        "oldValue": ""
+      },
+      {
+        "value": "[ESKIMO_DEFAULT]",
+        "key": "spark.executor.memory",
+        "oldValue": ""
+      },
+      {
+        "value": "",
+        "key": "spark.locality.wait",
+        "oldValue": "40s"
+      }
+    ]},
+    "elasticsearch": {"elasticsearch.yml": [{
+      "value": "",
+      "key": "bootstrap.memory_lock",
+      "oldValue": "true"
+    }]},
+    "grafana": {"defaults.ini": [
+      {
+        "value": "test",
+        "key": "admin_user",
+        "oldValue": ""
+      },
+      {
+        "value": "testpassword",
+        "key": "admin_password",
+        "oldValue": ""
+      }
+    ]},
+    "kafka": {"server.properties": [
+      {
+        "value": "10",
+        "key": "num.io.threads",
+        "oldValue": ""
+      },
+      {
+        "value": "5",
+        "key": "num.network.threads",
+        "oldValue": ""
+      },
+      {
+        "value": "",
+        "key": "socket.request.max.bytes",
+        "oldValue": "128857600"
+      },
+      {
+        "value": "",
+        "key": "socket.receive.buffer.bytes",
+        "oldValue": "204800"
+      },
+      {
+        "value": "",
+        "key": "num.partitions",
+        "oldValue": "3"
+      },
+      {
+        "value": "",
+        "key": "log.retention.hours",
+        "oldValue": "48"
+      }
+    ]}
+  },
+  "restarts": [
+    "elasticsearch",
+    "grafana",
+    "kafka",
+    "spark-executor"
+  ]
+}

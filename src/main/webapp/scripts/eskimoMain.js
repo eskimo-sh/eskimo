@@ -266,6 +266,7 @@ eskimo.Main = function() {
             error: errorHandler
         });
     }
+    this.fetchContext = fetchContext;
 
     this.isSetupLoaded = function() {
         return setupLoaded;
@@ -647,11 +648,15 @@ eskimo.Main = function() {
 
     function menuDown (e) {
 
-        let actualMenuHeight = $("#menu-container").height();
         let menuContainerHeight = $("#hoe-left-panel").height();
+        let actualMenuHeight = $("#menu-container").height();
+
+        console.log(menuContainerHeight, actualMenuHeight, menuHidingPos);
 
         // IF AND ONLY IF size is not sufficient for current menu site, THEN
         if (menuContainerHeight - 80 < actualMenuHeight) {
+
+            console.log ("OK");
 
             // hide first non-hidden li element from both menu
             // and increment menuHidingPos

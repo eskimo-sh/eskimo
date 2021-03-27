@@ -132,7 +132,7 @@ public class SetupService {
     public void setConfigStoragePathInternal(String configStoragePathInternal) {
         this.configStoragePathInternal = configStoragePathInternal;
     }
-    void setPackageDistributionPath(String packageDistributionPath) {
+    public void setPackageDistributionPath(String packageDistributionPath) {
         this.packageDistributionPath = packageDistributionPath;
     }
     void setPackagesToBuild (String packagesToBuild) {
@@ -153,7 +153,7 @@ public class SetupService {
     void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
         this.applicationStatusService = applicationStatusService;
     }
-    void setPackagesDevPathForTests (String packagesDevPathForTest) {
+    public void setPackagesDevPathForTests (String packagesDevPathForTest) {
         this.packagesDevPath = packagesDevPathForTest;
     }
     void setSystemOperationService (SystemOperationService systemOperationService) {

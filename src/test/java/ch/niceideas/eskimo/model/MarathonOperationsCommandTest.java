@@ -34,9 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
-import ch.niceideas.eskimo.services.StandardSetupHelpers;
-import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.services.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,12 +126,52 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
     @Test
     public void toJSON () {
-        fail ("To Be Implememted");
+
+        MarathonOperationsCommand moc = prepareFourOps();
+
+        assertEquals("{\n" +
+                "  \"uninstallations\": [\n" +
+                "    \"kafka-manager\",\n" +
+                "    \"zeppelin\"\n" +
+                "  ],\n" +
+                "  \"installations\": [\n" +
+                "    \"cerebro\",\n" +
+                "    \"kibana\"\n" +
+                "  ]\n" +
+                "}", moc.toJSON().toString(2));
+    }
+
+    private MarathonOperationsCommand prepareFourOps() {
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        savedServicesInstallStatus.getJSONObject().remove("cerebro_installed_on_IP_MARATHON_NODE");
+        savedServicesInstallStatus.getJSONObject().remove("kibana_installed_on_IP_MARATHON_NODE");
+
+        MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        marathonConfig.getJSONObject().remove("kafka-manager_install");
+        marathonConfig.getJSONObject().remove("zeppelin_install");
+
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() {
+                return StandardSetupHelpers.getStandard2NodesSystemStatus();
+            }
+        };
+
+        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
+
+        assertEquals(2, moc.getInstallations().size());
+        assertEquals(2, moc.getUninstallations().size());
+        return moc;
     }
 
     @Test
     public void testGetAllOperationsInOrder() {
-        fail ("To Be Implememted");
+
+        MarathonOperationsCommand moc = prepareFourOps();
+
+        List<MarathonOperationsCommand.MarathonOperationId> opInOrder = moc.getAllOperationsInOrder(null);
+
+        assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana,uninstallation_kafka-manager,uninstallation_zeppelin", opInOrder.stream().map(MarathonOperationsCommand.MarathonOperationId::toString).collect(Collectors.joining(",")));
     }
 
 }

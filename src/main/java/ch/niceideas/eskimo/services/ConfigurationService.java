@@ -77,7 +77,7 @@ public class ConfigurationService {
     private ServicesDefinition servicesDefinition;
 
     /* For tests */
-    void setSetupService(SetupService setupService) {
+    public void setSetupService(SetupService setupService) {
         this.setupService = setupService;
     }
     public void setServicesDefinition(ServicesDefinition servicesDefinition) {

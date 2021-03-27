@@ -79,7 +79,10 @@ public class EskimoMainTest extends AbstractWebTest {
                 "        }" +
                 "    };" +
                 "};");
-        js("eskimo.SystemStatus = function(){ this.initialize = function(){}; };");
+        js("eskimo.SystemStatus = function(){ " +
+                "    this.initialize = function(){}; " +
+                "    this.scheduleInitializeStatusTableMenus = function() {};" +
+                "};");
         js("eskimo.Consoles = function(){ this.initialize = function(){}; };");
         js("eskimo.Services = function(){" +
                 "   this.handleServiceHiding = function() {};" +
@@ -159,6 +162,7 @@ public class EskimoMainTest extends AbstractWebTest {
     @Test
     public void testHandleSetupCompletedAndNotCompleted() throws Exception {
 
+        page.getElementById("hoe-left-panel").remove(); // the test stuff messes with the page loading below (twice in dom)
         js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
         waitForElementIdInDOM("menu-container");
@@ -198,6 +202,7 @@ public class EskimoMainTest extends AbstractWebTest {
     @Test
     public void testMenuHidingNonAdmin() throws Exception {
 
+        page.getElementById("hoe-left-panel").remove(); // the test stuff messes with the page loading below (twice in dom)
         js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
         waitForElementIdInDOM("menu-container");
@@ -229,16 +234,59 @@ public class EskimoMainTest extends AbstractWebTest {
 
     @Test
     public void testFetchContext() throws Exception {
-        fail("To Be Implemented");
-    }
 
-    @Test
-    public void testHandleMarathonSubsystem() throws Exception {
-        fail("To Be Implemented");
+        js("$.ajax = function (callback) { callback.success ( {\n" +
+                "    \"version\": \"0.4-SNAPSHOT\",\n" +
+                "    \"roles\": [\"ADMIN\"],\n" +
+                "    \"status\": \"OK\"\n" +
+                "} ); }");
+
+        js("eskimoMain.fetchContext();");
+
+        assertJavascriptEquals("0.4-SNAPSHOT", "$('#eskimo-version').html()");
     }
 
     @Test
     public void testMenuUpAndDownServicesSettingsWrapper() throws Exception {
+
+        StringBuilder menuB = new StringBuilder();
+        for (int i = 0; i < 40; i++) {
+            menuB.append ("          <li id=\"" + (char) ('A' + i) + "\" class=\"config-menu-items\">" + (char) ('A' + i) + "</li>");
+        }
+
+        js("$('#mainFolderMenu').html('" +
+                "<li id=\"title\" class=\"nav-level\">title</li>" +
+                menuB +
+                "')");
+
+        assertJavascriptEquals("list-item", "$('#title').css('display')");
+
+        js("eskimoMain.menuDown()");
+
+        assertJavascriptEquals("none", "$('#title').css('display')");
+        assertJavascriptEquals("list-item", "$('#A').css('display')");
+
+        js("eskimoMain.menuDown()");
+        js("eskimoMain.menuDown()");
+
+        assertJavascriptEquals("none", "$('#title').css('display')");
+        assertJavascriptEquals("none", "$('#A').css('display')");
+        assertJavascriptEquals("none", "$('#B').css('display')");
+        assertJavascriptEquals("list-item", "$('#C').css('display')");
+
+        js("eskimoMain.menuUp()");
+        js("eskimoMain.menuUp()");
+
+        assertJavascriptEquals("none", "$('#title').css('display')");
+        assertJavascriptEquals("list-item", "$('#A').css('display')");
+
+        js("eskimoMain.menuUp()");
+
+        assertJavascriptEquals("list-item", "$('#title').css('display')");
+    }
+
+    @Test
+    public void testHandleMarathonSubsystem() throws Exception {
         fail("To Be Implemented");
     }
 }

@@ -52,7 +52,7 @@ public class ServicesInstallationSorter {
     private ServicesDefinition servicesDefinition;
 
     /** For tests only */
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
+    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
 

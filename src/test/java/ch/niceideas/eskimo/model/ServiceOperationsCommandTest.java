@@ -37,9 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
-import ch.niceideas.eskimo.services.NodeRangeResolver;
-import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import ch.niceideas.eskimo.services.*;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,20 +45,12 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest {
-
-    private NodeRangeResolver nrr;
-
-    @BeforeEach
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        nrr = new NodeRangeResolver();
-    }
 
     @Test
     public void testNoChanges() throws Exception {
@@ -121,16 +111,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
     @Test
     public void testRestartMany() throws Exception {
 
-        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
-
-
-        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("mesos-agent1");
-        nodesConfig.getJSONObject().remove("spark-executor1");
-        nodesConfig.setValueForPath("zookeeper", "1");
-
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = prepareFiveOps();
 
         assertEquals(2, oc.getInstallations().size());
 
@@ -611,13 +592,100 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
     }
 
     @Test
-    public void toJSON () {
-        fail ("To Be Implememted");
+    public void toJSON () throws Exception {
+
+        ServiceOperationsCommand oc = prepareFiveOps();
+
+        assertEquals ("{\n" +
+                "  \"restarts\": [\n" +
+                "    {\"gluster\": \"192.168.10.11\"},\n" +
+                "    {\"gluster\": \"192.168.10.13\"},\n" +
+                "    {\"kafka\": \"192.168.10.11\"},\n" +
+                "    {\"kafka\": \"192.168.10.13\"},\n" +
+                "    {\"mesos-master\": \"192.168.10.13\"},\n" +
+                "    {\"logstash\": \"192.168.10.11\"},\n" +
+                "    {\"logstash\": \"192.168.10.13\"},\n" +
+                "    {\"marathon\": \"192.168.10.11\"},\n" +
+                "    {\"spark-executor\": \"192.168.10.13\"},\n" +
+                "    {\"mesos-agent\": \"192.168.10.13\"},\n" +
+                "    {\"cerebro\": \"(marathon)\"},\n" +
+                "    {\"kibana\": \"(marathon)\"},\n" +
+                "    {\"kafka-manager\": \"(marathon)\"},\n" +
+                "    {\"spark-history-server\": \"(marathon)\"},\n" +
+                "    {\"zeppelin\": \"(marathon)\"}\n" +
+                "  ],\n" +
+                "  \"uninstallations\": [\n" +
+                "    {\"mesos-agent\": \"192.168.10.11\"},\n" +
+                "    {\"spark-executor\": \"192.168.10.11\"},\n" +
+                "    {\"zookeeper\": \"192.168.10.13\"}\n" +
+                "  ],\n" +
+                "  \"installations\": [\n" +
+                "    {\"zookeeper\": \"192.168.10.11\"},\n" +
+                "    {\"elasticsearch\": \"192.168.10.13\"}\n" +
+                "  ]\n" +
+                "}", oc.toJSON().toString(2));
+    }
+
+    private ServiceOperationsCommand prepareFiveOps() throws NodesConfigurationException {
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        savedServicesInstallStatus.getJSONObject().remove("elasticsearch_installed_on_IP_192-168-10-13");
+
+        // 1. some services are uninstalled from a node, one service is moved
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.getJSONObject().remove("mesos-agent1");
+        nodesConfig.getJSONObject().remove("spark-executor1");
+
+        nodesConfig.setValueForPath("zookeeper", "1");
+
+        return ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
     }
 
     @Test
-    public void testGetAllOperationsInOrder() {
-        fail ("To Be Implememted");
+    public void testGetAllOperationsInOrder() throws Exception {
+
+        ServiceOperationsCommand oc = prepareFiveOps();
+
+        List<ServiceOperationsCommand.ServiceOperationId> opsInOrder =  oc.getAllOperationsInOrder(new OperationsContext() {
+            @Override
+            public ServicesInstallationSorter getServicesInstallationSorter() {
+                ServicesInstallationSorter sis = new ServicesInstallationSorter();
+                sis.setServicesDefinition(def);
+                return sis;
+            }
+
+            @Override
+            public NodesConfigWrapper getNodesConfig() throws NodesConfigurationException {
+                NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+                nodesConfig.getJSONObject().remove("mesos-agent1");
+                nodesConfig.getJSONObject().remove("spark-executor1");
+                return nodesConfig;
+            }
+        });
+
+        assertEquals(
+                    "Check--Install_Base-System_192-168-10-11," +
+                    "Check--Install_Base-System_192-168-10-13," +
+                    "installation_elasticsearch_192-168-10-13," +
+                    "installation_zookeeper_192-168-10-11," +
+                    "uninstallation_mesos-agent_192-168-10-11," +
+                    "uninstallation_spark-executor_192-168-10-11," +
+                    "uninstallation_zookeeper_192-168-10-13," +
+                    "restart_mesos-master_192-168-10-13," +
+                    "restart_kafka_192-168-10-11," +
+                    "restart_kafka_192-168-10-13," +
+                    "restart_gluster_192-168-10-11," +
+                    "restart_gluster_192-168-10-13," +
+                    "restart_logstash_192-168-10-11," +
+                    "restart_logstash_192-168-10-13," +
+                    "restart_marathon_192-168-10-11," +
+                    "restart_spark-executor_192-168-10-13," +
+                    "restart_mesos-agent_192-168-10-13," +
+                    "restart_cerebro_marathon," +
+                    "restart_kibana_marathon," +
+                    "restart_kafka-manager_marathon," +
+                    "restart_spark-history-server_marathon," +
+                    "restart_zeppelin_marathon",
+                opsInOrder.stream().map(ServiceOperationsCommand.ServiceOperationId::toString).collect(Collectors.joining(",")));
     }
 
 }

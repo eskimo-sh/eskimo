@@ -49,6 +49,7 @@ public abstract class AbstractServicesDefinitionTest {
     public void setUp() throws Exception {
         def = new ServicesDefinition();
         def.setSetupService (setupService);
+        setupService.setServicesDefinition(def);
         def.afterPropertiesSet();
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }

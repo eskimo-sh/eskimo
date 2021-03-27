@@ -70,13 +70,13 @@ public class ServicesSettingsService {
     private final ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
 
     /* For tests */
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
+    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
-    void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
+    public void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
     }
-    void setConfigurationService (ConfigurationService configurationService) {
+    public void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {

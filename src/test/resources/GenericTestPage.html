@@ -4,81 +4,96 @@
 </head>
 <body>
 <div id="hoeapp-wrapper" class="hoe-hide-lpanel" hoe-device-type="desktop">
-<script>
+    <script>
 
-    function loadScript (target) {
-        console.log ("loading script : " + target);
-        var s = document.createElement("script");
-        s.type = "text/javascript";
-        s.src = target;
-        document.head.appendChild(s);
-    }
+        function loadScript(target) {
+            console.log("loading script : " + target);
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+            s.src = target;
+            document.head.appendChild(s);
+        }
 
-</script>
+    </script>
 
-<a href="#" onclick="eskimoMain.getNotifications().notificationsShown();" class="dropdown-toggle icon-circle" data-toggle="dropdown" >
-    <span class="fa fa-bell-o"></span>
-    <span id="new-notifications-count" class="badge badge-success"></span>
-</a>
-<ul id="notifications-container" class="dropdown-menu ">
-    <li class="hoe-submenu-label">
-        <h3><span id="notifications-count" class="bold">0</span> Notification(s) <a href="javascript:eskimoMain.getNotifications().clearNotifications();"><span style="color: #333333;">Clear</span></a></h3>
-    </li>
-</ul>
+    <a href="#" onclick="eskimoMain.getNotifications().notificationsShown();" class="dropdown-toggle icon-circle"
+       data-toggle="dropdown">
+        <span class="fa fa-bell-o"></span>
+        <span id="new-notifications-count" class="badge badge-success"></span>
+    </a>
+    <ul id="notifications-container" class="dropdown-menu ">
+        <li class="hoe-submenu-label">
+            <h3><span id="notifications-count" class="bold">0</span> Notification(s) <a
+                    href="javascript:eskimoMain.getNotifications().clearNotifications();"><span style="color: #333333;">Clear</span></a>
+            </h3>
+        </li>
+    </ul>
 
-<ul class="panel-list" id="mainFolderMenu">
-    <li id="mainFolderMenuAnchor">Eskimo Services</li>
-</ul>
+    <aside id="hoe-left-panel" hoe-position-type="absolute" style="height: 600px;">
+        <div class="left-panel-container">
+            <div id="menu-container" class="left-panel-menu-container">
+                <ul class="panel-list" id="mainFolderMenu">
+                    <li id="mainFolderMenuAnchor">Eskimo Services</li>
+                </ul>
+            </div>
+        </div>
+    </aside>
 
-<section id="main-content">
+    <div class="eskimo-version" id="eskimo-version">
+        (version)
+    </div>
 
-<!-- eskimoNodeStatus.html -->
-<div class="inner-content" id="inner-content-status"> </div>
+    <section id="main-content">
 
-<!-- eskimoConsoles.html -->
-<div class="inner-content" id="inner-content-consoles"></div>
+        <!-- eskimoNodeStatus.html -->
+        <div class="inner-content" id="inner-content-status"></div>
 
-<!-- eskimoOperations.html -->
-<div class="inner-content" id="inner-content-operations"> </div>
+        <!-- eskimoConsoles.html -->
+        <div class="inner-content" id="inner-content-consoles"></div>
 
-<!-- eskimoSetup.html -->
-<div class="inner-content" id="inner-content-setup" style="visibility: hidden; display: none;"></div>
+        <!-- eskimoOperations.html -->
+        <div class="inner-content" id="inner-content-operations"></div>
 
-<!-- eskimoServicesSettings.html -->
-<div class="inner-content" id="inner-content-services-settings" style="visibility: hidden; display: none;"></div>
+        <!-- eskimoSetup.html -->
+        <div class="inner-content" id="inner-content-setup" style="visibility: hidden; display: none;"></div>
 
-<!-- eskimoMarathonServicesConfig.html -->
-<div class="inner-content" id="inner-content-marathon-services-config" style="visibility: hidden; display: none;"></div>
+        <!-- eskimoServicesSettings.html -->
+        <div class="inner-content" id="inner-content-services-settings"
+             style="visibility: hidden; display: none;"></div>
 
-<!-- eskimoNodesConfig.html -->
-<div class="inner-content" id="inner-content-nodes" style="visibility: hidden; display: none;"></div>
+        <!-- eskimoMarathonServicesConfig.html -->
+        <div class="inner-content" id="inner-content-marathon-services-config"
+             style="visibility: hidden; display: none;"></div>
 
-<!-- eskimoFileManagers.html -->
-<div class="inner-content" id="inner-content-file-managers" style="visibility: hidden; display: none;"></div>
+        <!-- eskimoNodesConfig.html -->
+        <div class="inner-content" id="inner-content-nodes" style="visibility: hidden; display: none;"></div>
+
+        <!-- eskimoFileManagers.html -->
+        <div class="inner-content" id="inner-content-file-managers" style="visibility: hidden; display: none;"></div>
 
 
-<!-- modal dialog for services selection -->
-<div id="services-selection-modal-wrapper"></div>
+        <!-- modal dialog for services selection -->
+        <div id="services-selection-modal-wrapper"></div>
 
-<!-- modal dialog for services selection -->
-<div id="marathon-services-selection-modal-wrapper"></div>
+        <!-- modal dialog for services selection -->
+        <div id="marathon-services-selection-modal-wrapper"></div>
 
-<!-- modal dialog for operation confirmation -->
-<div id="operations-command-modal-wrapper"></div>
+        <!-- modal dialog for operation confirmation -->
+        <div id="operations-command-modal-wrapper"></div>
 
-<!-- modal dialog for marathon operation confirmation -->
-<div id="marathon-operations-command-modal-wrapper"></div>
+        <!-- modal dialog for marathon operation confirmation -->
+        <div id="marathon-operations-command-modal-wrapper"></div>
 
-<!-- modal dialog for settings operation confirmation -->
-<div id="settings-operations-command-modal-wrapper"></div>
+        <!-- modal dialog for settings operation confirmation -->
+        <div id="settings-operations-command-modal-wrapper"></div>
 
-<!-- modal dialog for setup confirmation -->
-<div id="setup-command-modal-wrapper"></div>
+        <!-- modal dialog for setup confirmation -->
+        <div id="setup-command-modal-wrapper"></div>
 
-<!-- modal dialog for about box -->
-<div id="about-modal-wrapper"></div>
+        <!-- modal dialog for about box -->
+        <div id="about-modal-wrapper"></div>
 
-</section>
+    </section>
 </div>
 </body>
 </html>
