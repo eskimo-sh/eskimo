@@ -95,7 +95,8 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
         ((HtmlDivision)page.getElementById("test-term")).type("a");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        Thread.sleep (2000);
         assertJavascriptEquals("./terminal?node=test", "window.xhrOpenedOn");
 
         assertJavascriptEquals("a", "$('.screen div:first-child').html()");

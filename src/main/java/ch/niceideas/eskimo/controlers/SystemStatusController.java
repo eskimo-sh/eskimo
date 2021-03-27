@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 public class SystemStatusController {
 
     private static final Logger logger = Logger.getLogger(SystemStatusController.class);
+    public static final String MASTERS = "masters";
 
     @Autowired
     private SetupService setupService;
@@ -141,8 +142,8 @@ public class SystemStatusController {
                 } else {
                     map.put("nodeServicesStatus", nodeServicesStatus.getJSONObject());
                 }
-                if (masterStatus.hasPath("masters")) {
-                    map.put("masters", masterStatus.getJSONObject().getJSONObject("masters"));
+                if (masterStatus.hasPath(MASTERS)) {
+                    map.put(MASTERS, masterStatus.getJSONObject().getJSONObject(MASTERS));
                 }
                 map.put("systemStatus", systemStatus.getJSONObject());
                 map.put("processingPending", operationsMonitoringService.isProcessingPending());
