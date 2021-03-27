@@ -66,8 +66,6 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
                 "            t.setShowPrevTab(function() { window.showPrevTabCalled = true;} );" +
                 "");
 
-        webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-
         js("window.XMLHttpRequest = function() {" +
                 "    this.open = function (method, url) {" +
                 "        window.xhrOpenedOn = url;" +
