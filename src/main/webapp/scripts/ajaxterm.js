@@ -415,7 +415,6 @@ ajaxterm.Terminal=function(id,options) {
             cpTextArea.value = "";
             div.focus();
         });
-
     }
 
     function doPaste(evt) {
