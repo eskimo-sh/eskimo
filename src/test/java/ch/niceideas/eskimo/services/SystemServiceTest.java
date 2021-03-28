@@ -225,7 +225,8 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         //System.out.println(expectedStatusWrapper.getFormattedValue());
 
-        assertTrue(expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()), systemStatus.getFormattedValue());
+        assertTrue(expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()),
+                "Expected : \n" + expectedStatusWrapper.getFormattedValue() + "\n\n but got \n: " + systemStatus.getFormattedValue());
     }
 
     @Test
