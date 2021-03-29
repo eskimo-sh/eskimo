@@ -132,34 +132,3 @@ function get_pool_ips() {
     hostnames_to_ips $hostnames
 }
 
-# This is used to dynamically elect a gluster node as a master in a consistent way accross node
-function get_gluster_master () {
-
-    # Inject topology
-    . /etc/eskimo_topology.sh
-
-    IFS=', ' read -r -a ALL_NODES <<< "$ALL_NODES_LIST_gluster"
-
-    while [[ ${#ALL_NODES[@]} -ge 1 ]]; do
-
-        CANDIDATE=${ALL_NODES[0]}
-
-        if [[ "$CANDIDATE" != "$SELF_IP_ADDRESS" ]]; then
-
-            ping -c 1 -W 5 $CANDIDATE > /tmp/ping_"$CANDIDATE".log 2>&1
-            if [[ $? == 0 ]] ; then
-                echo $CANDIDATE
-                export GLUSTER_MASTER=$CANDIDATE
-                return 0
-            fi
-
-        fi
-
-        # remove first element from array
-        ALL_NODES=("${ALL_NODES[@]:1}")
-    done
-
-    # If I reached this stage it means this node is eitehr the single one (single node cluster)
-    # or the single onne answering
-    echo $SELF_IP_ADDRESS
-}

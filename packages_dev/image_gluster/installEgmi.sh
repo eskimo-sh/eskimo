@@ -72,26 +72,30 @@ cd /tmp/egmi_setup
 
 if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
     echo " - Using local archive"
-    mv $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION.tar.gz
+    mv $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION-bin.tar.gz
 else
     echo " - Downloading archive egmi-$EGMI_VERSION"
-    # wget https://www-eu.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
-    echo " - TODO TO BE IMPLEMENTED"
-    exit 1
+    wget "https://github.com/eskimo-sh/egmi/releases/download/$EGMI_VERSION/egmi-"$EGMI_VERSION"-bin.tar.gz" > /tmp/egmi_install_log 2>&1
+    fail_if_error $? "/tmp/egmi_install_log" -1
 fi
 
 
 echo " - Extracting egmi-$EGMI_VERSION"
-tar -xvf egmi-$EGMI_VERSION.tar.gz > /tmp/egmi_install_log 2>&1
+tar -xvf egmi-$EGMI_VERSION-bin.tar.gz > /tmp/egmi_install_log 2>&1
 fail_if_error $? "/tmp/egmi_install_log" -2
 
+export EGMI_FOLDER=`ls -1 | grep -v tar.gz`
+
 echo " - Installing egmi"
-sudo chown root.staff -R egmi-$EGMI_VERSION
-sudo mv egmi-$EGMI_VERSION /usr/local/lib/egmi-$EGMI_VERSION
+sudo chown root.staff -R $EGMI_FOLDER
+sudo mv $EGMI_FOLDER /usr/local/lib/$EGMI_FOLDER
 
-echo " - symlinking /usr/local/lib/egmi/ to /usr/local/lib/egmi-$EGMI_VERSION"
-sudo ln -s /usr/local/lib/egmi-$EGMI_VERSION /usr/local/lib/egmi
+echo " - symlinking /usr/local/lib/egmi/ to /usr/local/lib/$EGMI_FOLDER"
+sudo ln -s /usr/local/lib/$EGMI_FOLDER /usr/local/lib/egmi
 
+echo " - Proceeding with EGMI Installation script"
+sudo bash /usr/local/lib/egmi/bin/utils/__install-egmi-systemD-unit-file.sh -fs > /tmp/egmi_install_log 2>&1
+fail_if_error $? "/tmp/egmi_install_log" -2
 
 echo " - Checking EGMI Installation"
 
