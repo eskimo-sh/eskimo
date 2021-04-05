@@ -95,13 +95,26 @@ Aside from the above, nothing is enforced and service developers can implement s
 
 ==== Gluster share mounts
 
-Services running through System mount gluster shares directly on the host machine through scripts operated with
-`ExecStartPre` directives of their respective SystemD unit files. Then the gluster shares they require is mounted in
-their runtime docker containers.
+Many Eskimo services can leverage on gluster to share data accross cluster nodes. +
+SystemD services rely on the host to mount gluster shares and then mount the share to the gluster containre from the
+host mount. +
+The way to do this is as follows:
 
-The same approach is impossible for marathon services since marathon cannot hook any command on the host machine in
-prior of the docker container start. For this reason, services operated by marathon mount gluster shares directly in
-their runtime docker containers.
+* The service `setup.sh` script calls the script `/usr/local/sbin/gluster_mount.sh [SHARE_NAME] [SHARE_PATH] [OWNER_USER]` +
+  This script will take care of registering the gluster mount with SystemD, fstab, etc.
+* The service SystemD unit file should define a dependency on the SystemD mount by usingf the following statements +
+  `After=gluster.service` +
+  `After=[SHARE_PATH_HYPHEN-SEPARATED].mount`
+
+Using the host to mount gluster shares is interesting since it enables Eskimo users to see the content of the gluster
+share using the Eskimo File Manager.
+
+The approach is very similar for marathon services, but not relying on SystemD which is not available from within
+containers. +
+So marathon services actually mount the gluster share directly from within the docker container. +
+The way to do this is as follows:
+
+* The container startup script calls the script `inContainerMountGluster.sh [SHARE_NAME] [SHARE_PATH] [OWNER_USER]`
 
 ==== OS System Users creation
 
@@ -207,7 +220,8 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [mandatory] giving the column nbr in status table
     "order": [0-X],
 
-    ## [mandatory] whether or not it has to be instaled on every node
+    ## [optional] whether or not it has to be instaled on every node
+    ## Default value is false.##
     "mandatory": [true,false],
 
     ## [unique] whether the service is a unique service (singpe instance) or multiple
@@ -219,9 +233,14 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [optional] name of the group to associate it in the status table
     "group" : "{group name}",
 
-    ## [mandatory] name of the service. miust be consistent with service under
+    ## [mandatory] name of the service. must be consistent with service under
     ## 'service_setup'
     "name" : "{service name},
+
+    ## [mandatory] name of the image. must be consistent with docker image name under
+    ## 'packages_dev'
+    ## Most of the time, this is the same as {service name}
+    "imageName" : "{image name},
 
     ## [mandatory] where to place the service in 'Service Selection Window'
     "selectionLayout" : {
@@ -270,7 +289,19 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [mandatory] the name of the menu entry
     "title" : "{menu name}",
 
-    ## [optional] Whether standard rewrite rules need to be applied to this service
+    ## [mandatory] the role that the logged in user needs to have to be able
+    ## to see and use the service (UI)
+    ## Possible values are :
+    ##  - "*" for any role (open access)
+    ## - "ADMIN" to limit usage to administrators
+    ## - "USER" to limit usage to users (makes little sense)
+    "role" : "[*|ADMIN|USER]",
+
+    ## [optional] the title to use for the link to the service on the status page
+    "statusPageLinktitle" : "{Link Title}",
+
+    ## [optional] Whether standard rewrite rules need to be applied to this
+    ## service
     ## (Standard rewrite rules are documented hereunder)
     ## (default is true)
     "applyStandardProxyReplacements": [true|false],
@@ -313,7 +344,11 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       "numberOfMasters": [1-x],
 
       ## whether that dependency is mandatory or not
-      "mandatory": [true,false],
+      "mandatory": [true|false],
+
+      ## whether or not the dependent service (parent JSON definition) should be
+      ## restarted in case an operation affects this service
+      "restart": [true|false],
     }
   ]
 

@@ -56,7 +56,7 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
 requirements_.
 * A *state of the art Big Data 2.0 platform*
 ** based on _Docker_, _Marathon_, _Mesos_ and _Systemd_
-** packaging _Gluster_, _Spark_, _Kafka_, _Flink_, _Nifi_ and _ElasticSearch_
+** packaging _Gluster_, _Spark_, _Kafka_, _Flink_ and _ElasticSearch_
 ** with all the administration and management consoles such as _Cerebro_, _Kibana_, _Zeppelin_, _Kafka-Manager_,
 _Grafana_ and _Prometheus_.
 * An _Administration Application_ aimed at drastically simplifying the *deployment, administration and operation* of

@@ -124,6 +124,9 @@ else
     fail_if_error $? "/tmp/zeppelin_install_log" -1
 fi
 
+echo " - Removing Angular version"
+rm -Rf /usr/local/lib/zeppelin/zeppelin-web-angular-*
+
 echo " - Registering test cleaning traps"
 export ZEPPELIN_PROC_ID=-1
 function check_stop_zeppelin(){

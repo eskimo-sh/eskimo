@@ -62,23 +62,29 @@ This document presents "1. The *Docker Images Development Framework*"
 
 == Docker Images Development Framework
 
-The Docker Images Development Framework provides tools and define standards to build the docker images deployed on the
+Eskimo manages services (e.g. Flink, Kafka, ElasticSearch, Kibana, etc.) as Docker containers. A docker container is
+the individual and single unit representing a service to be managed by Eskimo. +
+Docker containers packaging eskimo services should be most of the time downloaded from the Eskimo online package
+archive. But an administrator can very well decide to build his own versions of Eskimo Provides service containers or
+event develop his own service packages. +
+This is described in this section.
+
+The _Docker Images Development Framework_ provides tools and defines standards to build the docker images deployed on the
 eskimo cluster nodes.
 
-Eskimo is leveraging on docker to deploy services across the cluster ndes and to ensure independence from host
+Eskimo is leveraging on docker to deploy services across the cluster nodes and to ensure independence from host
 OSes and specificities as well as proper isolation between services.
 
-Docker images can be downloaded from internet (or the internal corporation network) or build locally on the machine
-running eskimo. +
-The later is achieved using the packages development framework which is presented in this guide.
+Again, Docker images can be downloaded from internet (or the internal corporation network) or build locally on the machine
+running eskimo.
 
 === Requirements
 
 In order for one to be able to either build the eskimo software components packages locally (or have eskimo building
 them locally), there are a few requirements:
 
-* Docker must be installed and available on the user local computer (or the eskimo host machine in case Eskimo builds
-them)
+* Docker must be installed and available on the user local computer or the eskimo host machine in case Eskimo builds
+them.
 * At least 10Gb of hard drive space on the partition hosting `/tmp` must be available.
 * At least 15Gb of hard drive space on the partition histing the eskimo installation folder must be available.
 
@@ -135,12 +141,12 @@ not available in apt repositories and installed using standard debian `apt-get i
 numbers should be created : `/usr/local/lib/x` pointing to `/usr/local/lib/x-version`.
 ** This simlink is pretty important. In the second stage, when installing services on eskimo cluster nodes, it is
 important that setup and installation scripts can be prevented from knowing about the version of the software
-component. Hence te important of that simlink.
+component. Hence the important of that simlink.
 * The presence of a single `build.sh` script is a requirement. That script is called by eskimo to build the package if
 it is not yet available (either built or downloaded)
-* A helper script `../common/common.sh` cane be linked in the new package build folder using
-`ln -s ../common/common.sh common.sh`. This common script provides various helpre to build the docker container, save
-it to the proper location after build, etc.
+* A helper script `../common/common.sh` can be linked in the new package build folder using
+`ln -s ../common/common.sh common.sh`. This common script provides various helper functions to build the docker
+container, save it to the proper location after build, etc.
 * The script performing the _in container installation_ of the software component X should be called `installX.sh`.
 * Software versions to be downloaded and extracted within docker images are coded _once and for all_ in the file
 `../common/common.sh`. This is actually a requirement since most of the time software version for common components such

@@ -46,6 +46,7 @@ echo " - Changing owner of important folders"
 chown -R spark /usr/local/lib/zeppelin/conf/
 #chown -R spark /usr/local/lib/zeppelin/webapps/
 chown -R spark /usr/local/lib/zeppelin/interpreter/
+chown -R spark /usr/local/lib/zeppelin/local-repo/
 chown spark /usr/local/lib/zeppelin/
 
 echo " - creating gluster log dir (for gluster mount checker)"
@@ -216,6 +217,46 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '/'\
 '          \"name\": \"shell.command.timeout.millisecs\",\n'\
 '          \"value\": \"1200000\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+
+echo " - Configuring Java Interpreter"
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'      \"interpreterGroup\": \[\n'\
+'        {\n'\
+'          \"name\": \"java\",\n'\
+'          \"class\": \"org.apache.zeppelin.java.JavaInterpreter\",\n'\
+'          \"defaultInterpreter\": true,\n'\
+'          \"editor\": {\n'\
+'            \"language\": \"java\",\n'\
+'            \"editOnDblClick\": false\n'\
+'          }\n'\
+'        }\n'\
+'      \],\n'\
+'      \"dependencies\": \[\],'\
+'/'\
+'      \"interpreterGroup\": \[\n'\
+'        {\n'\
+'          \"name\": \"java\",\n'\
+'          \"class\": \"org.apache.zeppelin.java.JavaInterpreter\",\n'\
+'          \"defaultInterpreter\": true,\n'\
+'          \"editor\": {\n'\
+'            \"language\": \"java\",\n'\
+'            \"editOnDblClick\": false\n'\
+'          }\n'\
+'        }\n'\
+'      \],\n'\
+'      \"dependencies\": \[\n'\
+'        {\n'\
+'          \"groupArtifactVersion\": \"org.apache.kafka:kafka-streams:2.4.1\",\n'\
+'          \"local\": false\n'\
+'        },\n'\
+'        {\n'\
+'          \"groupArtifactVersion\": \"org.apache.kafka:kafka-clients:2.4.1\",\n'\
+'          \"local\": false\n'\
+'        }\n'\
+'      \],'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 
