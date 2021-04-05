@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 # reinitializing log
@@ -74,28 +74,35 @@ echo " - Configuring host spark config part"
 . ./setupSparkCommon.sh
 if [[ $? != 0 ]]; then
     echo "Spark Common configuration part failed !"
-    exit -20
+    exit 10
 fi
 
 echo " - Configuring host flink config part"
 . ./setupFlinkCommon.sh
 if [[ $? != 0 ]]; then
     echo "FLink Common configuration part failed !"
-    exit -20
+    exit 11
+fi
+
+echo " - Configuring host kafka config part"
+. ./setupKafkaCommon.sh
+if [[ $? != 0 ]]; then
+    echo "Kafka Common configuration part failed !"
+    exit 11
 fi
 
 echo " - Configuring host ElasticSearch config part"
 . ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "ES Common configuration part failed !"
-    exit -20
+    exit 12
 fi
 
 echo " - Configuring host logstash config part"
 . ./setupLogstashCommon.sh
 if [[ $? != 0 ]]; then
     echo "Logstash Common configuration part failed !"
-    exit -20
+    exit 13
 fi
 
 
@@ -105,11 +112,11 @@ build_container zeppelin zeppelin zeppelin_install_log
 
 if [[ -z $TEST_MODE && ! -d /var/lib/spark/data ]]; then
     echo "Inconsistency: zeppelin setup is expecting var/lib/spark/data to be created by the spark executor setup (kind of a hack)"
-    exit -41
+    exit 21
 fi
 if [[ -z $TEST_MODE && ! -d /var/lib/spark/eventlog ]]; then
     echo "Inconsistency: zeppelin setup is expecting var/lib/spark/eventlog to be created by the spark executor setup (kind of a hack)"
-    exit -42
+    exit 22
 fi
 
 # I shouldn't be creating here anymore
@@ -140,30 +147,48 @@ fail_if_error $? "zeppelin_install_log" -2
 #docker exec -it zeppelin bash
 
 
-echo " - Configuring zeppelin container (config spark script)"
+echo " - Configuring zeppelin container - spark common part"
 docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
-        | tee -a zeppelin_install_log 2>&1
+        | tee zeppelin_install_log 2>&1
 if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat zeppelin_install_log
-    exit -100
+    exit 31
 fi
 
-echo " - Configuring zeppelin container (config flink script)"
+echo " - Configuring zeppelin container - flink common part"
 docker exec zeppelin bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
-        | tee -a zeppelin_install_log 2>&1
+        | tee zeppelin_install_log 2>&1
 if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat zeppelin_install_log
-    exit -100
+    exit 32
+fi
+
+echo " - Configuring zeppelin container - kafka common part"
+docker exec zeppelin bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id \
+        | tee zeppelin_install_log 2>&1
+if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
+    echo " - In container setup script ended up in error"
+    cat zeppelin_install_log
+    exit 33
+fi
+
+echo " - Configuring zeppelin container - kafka wrappers"
+docker exec zeppelin bash /scripts/inContainerSetupKafkaWrappers.sh  \
+        | tee zeppelin_install_log 2>&1
+if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
+    echo " - In container setup script ended up in error"
+    cat zeppelin_install_log
+    exit 33
 fi
 
 echo " - Configuring zeppelin container"
-docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee -a zeppelin_install_log 2>&1
+docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee zeppelin_install_log 2>&1
 if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat zeppelin_install_log
-    exit -101
+    exit 35
 fi
 
 #echo " - TODO"

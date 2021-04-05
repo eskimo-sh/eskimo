@@ -42,12 +42,12 @@ set -e
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -64,7 +64,7 @@ set -e
 echo " - Found user with ID $kafka_user_id"
 if [[ $kafka_user_id == "" ]]; then
     echo "Docker Kafka USER ID not found"
-    exit -2
+    exit 3
 fi
 
 
@@ -78,41 +78,6 @@ sudo ln -s /usr/local/lib/kafka/config /usr/local/etc/kafka
 echo " - Creating temporary folder for kafka"
 sudo mkdir -p /tmp/kafka-logs/
 sudo chown -R kafka /tmp/kafka-logs/
-
-
-echo " - Creating kafka binaries wrappres to /usr/local/bin"
-
-for i in `ls -1 /usr/local/lib/kafka/bin/connect*`; do
-    create_binary_wrapper $i /usr/local/bin/kafka-`basename $i`
-done
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-broker-api-versions.sh /usr/local/bin/kafka-broker-api-versions.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-console-consumer.sh /usr/local/bin/kafka-console-consumer.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-console-producer.sh /usr/local/bin/kafka-console-producer.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-consumer-groups.sh /usr/local/bin/kafka-consumer-groups.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-consumer-perf-test.sh /usr/local/bin/kafka-consumer-perf-test.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-delegation-tokens.sh /usr/local/bin/kafka-delegation-tokens.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-delete-records.sh /usr/local/bin/kafka-delete-records.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-dump-log.sh /usr/local/bin/kafka-dump-log.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-log-dirs.sh /usr/local/bin/kafka-log-dirs.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-producer-perf-test.sh /usr/local/bin/kafka-producer-perf-test.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-run-class.sh /usr/local/bin/kafka-run-class.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-topics.sh /usr/local/bin/kafka-topics.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-verifiable-consumer.sh /usr/local/bin/kafka-verifiable-consumer.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-verifiable-producer.sh /usr/local/bin/kafka-verifiable-producer.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/trogdor.sh /usr/local/bin/kafka-trogdor.sh
-
-
-echo " - Creating kafka system binaries wrappers to /usr/local/sbin"
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-acls.sh /usr/local/sbin/kafka-acls.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-configs.sh /usr/local/sbin/kafka-configs.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/sbin/kafka-server-start.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-server-stop.sh /usr/local/sbin/kafka-server-stop.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-configs.sh /usr/local/sbin/kafka-configs.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-mirror-maker.sh /usr/local/sbin/kafka-mirror-maker.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-preferred-replica-election.sh /usr/local/sbin/kafka-preferred-replica-election.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-reassign-partitions.sh /usr/local/sbin/kafka-reassign-partitions.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-replica-verification.sh /usr/local/sbin/kafka-replica-verification.sh
-create_binary_wrapper /usr/local/lib/kafka/bin/kafka-streams-application-reset.sh /usr/local/sbin/kafka-streams-application-reset.sh
 
 
 echo " - Adapting configuration in file server.properties"

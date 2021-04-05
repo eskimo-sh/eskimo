@@ -40,7 +40,7 @@ set -e
 KAFKA_USER_ID=$1
 if [[ $KAFKA_USER_ID == "" ]]; then
     echo " - Didn't get Kafka User ID as argument"
-    exit -2
+    exit 1
 fi
 
 
@@ -59,7 +59,7 @@ if [[ $kafka_user_id == "" ]]; then
     useradd -u $KAFKA_USER_ID kafka
 elif [[ $kafka_user_id != $KAFKA_USER_ID ]]; then
     echo "Docker Kafka USER ID is $kafka_user_id while requested USER ID is $KAFKA_USER_ID"
-    exit -2
+    exit 2
 fi
 
 echo " - Creating user kafka home directory"

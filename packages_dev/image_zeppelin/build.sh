@@ -89,6 +89,17 @@ if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS
 fi
 rm -f __installFlinkEff.sh
 
+
+echo " - Installing kafka"
+cp installKafka.sh __installKafkaEff.sh
+docker exec -i zeppelin_template bash /scripts/__installKafkaEff.sh | tee /tmp/zeppelin_build_log 2>&1
+if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/zeppelin_build_log
+    exit 102
+fi
+rm -f __installKafkaEff.sh
+
 echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
 docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -3

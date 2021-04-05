@@ -48,24 +48,24 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 3
 fi
 
 export BROKER_ID=`eval echo "\$"$(echo NODE_NBR_KAFKA_$SELF_IP_ADDRESS | tr -d .)`
 if [[ $BROKER_ID == "" ]]; then
     echo " - No broker ID found in topology for ip address $SELF_IP_ADDRESS"
-    exit -3
+    exit 4
 fi
 
 # reinitializing log
@@ -75,7 +75,7 @@ echo " - Configuring host kafka common part"
 . ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 5
 fi
 
 echo " - Building container kafka"
@@ -105,7 +105,15 @@ docker exec kafka bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | 
 if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat kafka_install_log
-    exit -100
+    exit 100
+fi
+
+echo " - Configuring kafka container (/)wrappers part)"
+docker exec kafka bash /scripts/inContainerSetupKafkaWrappers.sh  | tee kafka_install_log 2>&1
+if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
+    echo " - In container setup script ended up in error"
+    cat kafka_install_log
+    exit 101
 fi
 
 echo " - Configuring kafka container"
@@ -113,7 +121,7 @@ docker exec kafka bash /scripts/inContainerSetupKafka.sh  | tee kafka_install_lo
 if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat kafka_install_log
-    exit -100
+    exit 103
 fi
 
 #echo " - TODO"
