@@ -226,18 +226,20 @@ eskimo.Operations = function() {
         }
 
         let currentOpString = "";
-        $("#operations-table-body").children('tr').each(function () {
+        let $operationsTableBody = $("#operations-table-body");
+        $operationsTableBody.children('tr').each(function () {
             currentOpString += $(this).attr("id");
         });
 
         if (newOpString !== currentOpString) {
 
-            $("#operations-global-messages").html("");
-            $("#operations-global-messages").css("display", "none");
+            let $operationsGlobalMessages = $("#operations-global-messages");
+            $operationsGlobalMessages.html("");
+            $operationsGlobalMessages.css("display", "none");
 
             messagesStore = {};
 
-            $("#operations-table-body").html("");
+            $operationsTableBody.html("");
             for (let i = 0; i < labels.length; i++) {
 
                 let operation = labels[i].operation;
@@ -257,7 +259,7 @@ eskimo.Operations = function() {
                     "      </td>\n" +
                     "      </tr>";
 
-                $("#operations-table-body").append($(operationRow));
+                $operationsTableBody.append($(operationRow));
             }
         }
     }
@@ -323,6 +325,9 @@ eskimo.Operations = function() {
         pendingBarWrapper.css("visibility", "inherit");
         pendingBarWrapper.css("display", "block");
         */
+
+        $("#operations-table-body").html("");
+        $("#operations-global-messages").html("");
 
         $("#operations-title").html("<h3>Operations pending ....</h3>");
 

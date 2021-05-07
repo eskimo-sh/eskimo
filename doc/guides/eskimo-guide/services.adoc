@@ -106,17 +106,23 @@ https://www.gluster.org/
 ==== Gluster Infrastructure
 
 Eskimo approaches gluster shares management in a specific way. +
-Gluster runs from within a docker container and is isolated from the host operating system. Eskimo provides a set of
-scripts and tools to manipulated gluster shares.
+Gluster runs from within a docker container and is isolated from the host operating system.
+
+
+Eskimo then leverages on EGMI - https://github.com/eskimo-sh/egmi - Eskimo Gluster Management Interface - to managed and
+operate the gluster cluster.
 
 The architecture can be depicted as follows:
 
 image::pngs/gluster_infrastructure.png[800, 800, align="center"]
 
-Where:
+Please refer to the EGMI page on github linked above for further description of EGMI.
 
-* The command server and client are internal tools. Eskimo end users and administrators do not need to be aware of them
-* The script `gluster_mount.sh` takes care of everything and is intended for usage by end users.
+*Noteworthy details*:
+
+* EGMI within Eskimo requires all gluster shares used by Eskimo services to be configured in the property `target.volumes`
+of the configuration file (part) `egmi.properties` in the Eskimo services configuration file `services.json`. Refer to
+the services development guide for a presentation of that file.
 
 ==== Gluster shares management
 
@@ -150,14 +156,11 @@ Some notes regarding gluster usage within Eskimo:
 
 * Eskimo's pre-packaged services leverage on gluster for their data share need between marathon services and services
 running natively on node hosts and controlled by systemd. Gluster provides the abstraction of location of the filesystem
-for services deployed on the cluster by marathon.
+for services deployed on the cluster by Marathon.
 * Gluster mounts with fuse are pretty weak and not very tolerant to network issues. For this reason a watchdog runs
 periodically that fixes gluster mounts that might have been disconnected following a network cut or another network
 problem
 
-=== EGMI
-
-TODO Document EGMI
 
 === Elastic Logstash
 

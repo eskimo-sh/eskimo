@@ -785,6 +785,7 @@ clear_zeppelin_results () {
 run_zeppelin_pararaph () {
     nb_path=$1
     par_nbr=$2
+    params=$3
     nb_id=`query_zeppelin_notebook "$nb_path"`
 
     cnt=0
@@ -799,7 +800,34 @@ run_zeppelin_pararaph () {
         if [[ $cnt == $par_nbr ]]; then
             echo_date "  + running $i"
             call_eskimo \
-                "zeppelin/api/notebook/run/$nb_id/$i"
+                "zeppelin/api/notebook/run/$nb_id/$i" "$params"
+            break
+        fi
+    done
+}
+
+get_zeppelin_paragraph_status () {
+    nb_path=$1
+    par_nbr=$2
+    nb_id=`query_zeppelin_notebook "$nb_path"`
+
+    cnt=0
+    for i in `curl \
+            -b $SCRIPT_DIR/cookies \
+            -H 'Content-Type: application/json' \
+            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+
+        cnt=$((cnt + 1))
+
+        if [[ $cnt == $par_nbr ]]; then
+
+            curl \
+                -b $SCRIPT_DIR/cookies \
+                -H 'Content-Type: application/json' \
+                -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+                2> /dev/null | jq -r " .body | .paragraphs | .[] | select(.id==\"$i\") | .status "
+
             break
         fi
     done
@@ -959,7 +987,7 @@ run_zeppelin_spark_kafka() {
 
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server 172.17.0.1:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
+        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server $DOCKER_LOCAL:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
         $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
@@ -999,6 +1027,90 @@ run_zeppelin_spark_kafka() {
     run_zeppelin_pararaph "/Spark Integration Kafka" 4
 }
 
+run_zeppelin_kafka_streams() {
+
+    # Now running Kafka Streams demo zeppelin paragraphs
+    # ----------------------------------------------------------------------------------------------------------------------
+
+    # Paragraph 2
+    echo_date " - ZEPPELIN Kafka Streams demo - start paragraph Kafka Streams (async)"
+
+    start_zeppelin_pararaph "/Kafka Streams Demo" 3
+
+    # Give it a little time to start
+    sleep 8
+
+    # Check status
+    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 3` != "RUNNING" ]]; then
+
+        echo_date "Failed to start Kafka Streams Demo program"
+
+        set +e
+
+        stop_zeppelin_pararaph "/Kafka Streams Demo" 3
+
+        # This is actually the way to stop paragraph 3
+        run_zeppelin_pararaph "/Kafka Streams Demo" 5
+
+        exit 100
+    fi
+
+    # start paragraph 7
+    echo_date " - ZEPPELIN Kafka Streams demo - start console consummer"
+    start_zeppelin_pararaph "/Kafka Streams Demo" 7
+
+    # Give it a little time to start
+    sleep 5
+
+    # Check status
+    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 7` != "RUNNING" ]]; then
+
+        echo_date "Failed to start Kafka Streams Demo program - console consummer paragraph"
+
+        set +e
+
+        stop_zeppelin_pararaph "/Kafka Streams Demo" 3
+
+        # This is actually the way to stop paragraph 3
+        run_zeppelin_pararaph "/Kafka Streams Demo" 5
+
+        stop_zeppelin_pararaph "/Kafka Streams Demo" 7
+
+        exit 101
+    fi
+
+    # run paragraph 9
+    echo_date " - ZEPPELIN Kafka Streams demo - publish message"
+    run_zeppelin_pararaph "/Kafka Streams Demo" 9 '{"params" : { "input": "some additional text with some more words" }}'
+
+    # Give it a little time to run
+    sleep 5
+
+    # Now stop them all
+
+    # This is actually the way to stop paragraph 3
+    echo_date " - ZEPPELIN Kafka Streams demo - Stopping all paragraphs"
+    run_zeppelin_pararaph "/Kafka Streams Demo" 5
+
+    stop_zeppelin_pararaph "/Kafka Streams Demo" 7
+
+    # Now check results
+    echo_date " - ZEPPELIN Kafka Streams demo - Checking results"
+    vagrant ssh -c \
+        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server $DOCKER_LOCAL:9092 --topic streams-wordcount-output --timeout-ms 10000 --from-beginning --max-messages 100" \
+        $TARGET_MASTER_VM \
+        > streams-wordcount-output-results 2> /dev/null
+
+    if [[ $(wc -l streams-wordcount-output-results | cut -d ' ' -f 1) -lt 4 ]]; then
+        echo_date "Failed to fetch at least 4 word counts from result topic"
+        rm -f streams-wordcount-output-results
+        exit 102
+    fi
+
+    rm -f streams-wordcount-output-results
+
+}
+
 run_zeppelin_flink_kafka() {
 
     # Now running Flink Kafka demo zeppelin paragraphs
@@ -1028,7 +1140,7 @@ run_zeppelin_flink_kafka() {
 
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server 172.17.0.1:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
+        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server $DOCKER_LOCAL:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
         $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
@@ -1093,8 +1205,6 @@ run_zeppelin_other_notes() {
 
     wait_for_executor_unregistered
 
-    echo_date "!! TODO KAFKA STREAMS NOTEBOOK TODO "
-    echo_date "!! TODO "
 }
 
 do_cleanup() {
@@ -1384,6 +1494,7 @@ usage() {
 export EXPECTED_NBR_APPS_MARATHON=6
 
 export BOX_IP=192.168.10.41
+export DOCKER_LOCAL=172.17.0.1
 export TARGET_MASTER_VM="integration-test"
 
 sudo rm -Rf /tmp/integration-test.log
@@ -1465,6 +1576,8 @@ if [[ -z $REBUILD_ONLY ]]; then
     run_zeppelin_spark_kafka
 
     run_zeppelin_flink_kafka
+
+    run_zeppelin_kafka_streams
 
     run_zeppelin_other_notes
 

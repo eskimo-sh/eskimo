@@ -1,9 +1,52 @@
 ﻿{
   "paragraphs": [
     {
-      "text": "%md\n\n## 3. Kafka Streams Wordcount program\n\n*This paragrah launches the kafka streams Wordcount program itself*\nThe Zeppelin Java interpreter compiles the followin class and then executes its main method in its own JVM.\nThe name of the class is rewritten at compile time and a random class name is generated, which makes it unfortunately impossible to share static variables between paragraphs.\n",
+      "text": "%md\n\n## Kafka Streams Demo\n\n#### This notebook presents a sample Kafka Streams program\n\nThis example is self-contained and doesn't have any dependency on external data or other notebooks, just simple illustration purpose.\n\nThere are 4 programs in the paragraèhs below\n\n1. The Kafa Streams demo program itself (neverending)\n2. A simple program used to stop the Kafka Stream demo program\n3. A kafka consummer used to show the results of the Kafka Streams program demo\n3. A kafka producer used to send data to the Kakfa Streams program demo",
       "user": "anonymous",
-      "dateUpdated": "2021-04-04T10:00:30+0000",
+      "dateUpdated": "2021-05-07T08:33:30+0000",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h2>Kafka Streams Demo</h2>\n<h4>This notebook presents a sample Kafka Streams program</h4>\n<p>This example is self-contained and doesn&rsquo;t have any dependency on external data or other notebooks, just simple illustration purpose.</p>\n<p>There are 4 programs in the paragraèhs below</p>\n<ol>\n<li>The Kafa Streams demo program itself (neverending)</li>\n<li>A simple program used to stop the Kafka Stream demo program</li>\n<li>A kafka consummer used to show the results of the Kafka Streams program demo</li>\n<li>A kafka producer used to send data to the Kakfa Streams program demo</li>\n</ol>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1620376410333_854116278",
+      "id": "paragraph_1617634273765_1000408261",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "status": "READY",
+      "focus": true,
+      "$$hashKey": "object:3531"
+    },
+    {
+      "text": "%md\n\n## 1. Kafka Streams Wordcount program\n\n*This paragrah launches the kafka streams Wordcount program itself*\nThe Zeppelin Java interpreter compiles the followin class and then executes its main method in its own JVM.\nThe name of the class is rewritten at compile time and a random class name is generated, which makes it unfortunately impossible to share static variables between paragraphs.\n\n**One needs to use the program 2. Kill Kafka Streams program (with whole Java interpreter) three paragraph further to stop this program once it is running.** \n",
+      "user": "anonymous",
+      "dateUpdated": "2021-05-07T08:33:30+0000",
       "progress": 0,
       "config": {
         "tableHide": false,
@@ -28,27 +71,27 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "<div class=\"markdown-body\">\n<h2>3. Kafka Streams Wordcount program</h2>\n<p><em>This paragrah launches the kafka streams Wordcount program itself</em><br />\nThe Zeppelin Java interpreter compiles the followin class and then executes its main method in its own JVM.<br />\nThe name of the class is rewritten at compile time and a random class name is generated, which makes it unfortunately impossible to share static variables between paragraphs.</p>\n\n</div>"
+            "data": "<div class=\"markdown-body\">\n<h2>1. Kafka Streams Wordcount program</h2>\n<p><em>This paragrah launches the kafka streams Wordcount program itself</em><br />\nThe Zeppelin Java interpreter compiles the followin class and then executes its main method in its own JVM.<br />\nThe name of the class is rewritten at compile time and a random class name is generated, which makes it unfortunately impossible to share static variables between paragraphs.</p>\n<p><strong>One needs to use the program 2. Kill Kafka Streams program (with whole Java interpreter) three paragraph further to stop this program once it is running.</strong></p>\n\n</div>"
           }
         ]
       },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1617530430408_92579212",
+      "jobName": "paragraph_1620376410333_1256201188",
       "id": "paragraph_1611364116228_846877054",
-      "dateCreated": "2021-04-04T10:00:30+0000",
+      "dateCreated": "2021-05-07T08:33:30+0000",
       "status": "READY",
-      "focus": true,
-      "$$hashKey": "object:349"
+      "$$hashKey": "object:3532"
     },
     {
-      "text": "%java\n\n\nimport org.apache.kafka.common.serialization.Serdes;\nimport org.apache.kafka.streams.KafkaStreams;\nimport org.apache.kafka.streams.StreamsBuilder;\nimport org.apache.kafka.streams.StreamsConfig;\nimport org.apache.kafka.streams.kstream.KStream;\nimport org.apache.kafka.streams.kstream.KTable;\nimport org.apache.kafka.streams.kstream.Produced;\n\nimport java.io.File;\nimport java.io.IOException;\n\nimport java.util.concurrent.atomic.AtomicBoolean;\nimport java.util.Arrays;\nimport java.util.Properties;\nimport java.util.regex.Pattern;\n\n/**\n * Demonstrates, using the high-level KStream DSL, how to implement the WordCount program that\n * computes a simple word occurrence histogram from an input text. This example uses lambda\n * expressions and thus works with Java 8+ only.\n * <p>\n * In this example, the input stream reads from a topic named \"streams-plaintext-input\", where the values of\n * messages represent lines of text; and the histogram output is written to topic\n * \"streams-wordcount-output\", where each record is an updated count of a single word, i.e. {@code word (String) -> currentCount (Long)}.\n * <p>\n * Note: Before running this example you must 1) create the source topic (e.g. via {@code kafka-topics --create ...}),\n * then 2) start this example and 3) write some data to the source topic (e.g. via {@code kafka-console-producer}).\n * Otherwise you won't see any data arriving in the output topic.\n * <p>\n * <br>\n * HOW TO RUN THIS EXAMPLE\n * <p>\n * 1) Start Zookeeper and Kafka. Please refer to <a href='http://docs.confluent.io/current/quickstart.html#quickstart'>QuickStart</a>.\n * <p>\n * 2) Create the input and output topics used by this example.\n * <pre>\n * {@code\n * $ bin/kafka-topics --create --topic streams-plaintext-input \\\n *                    --zookeeper localhost:2181 --partitions 1 --replication-factor 1\n * $ bin/kafka-topics --create --topic streams-wordcount-output \\\n *                    --zookeeper localhost:2181 --partitions 1 --replication-factor 1\n * }</pre>\n * Note: The above commands are for the Confluent Platform. For Apache Kafka it should be {@code bin/kafka-topics.sh ...}.\n * <p>\n * 3) Start this example application either in your IDE or on the command line.\n * <p>\n * If via the command line please refer to <a href='https://github.com/confluentinc/kafka-streams-examples#packaging-and-running'>Packaging</a>.\n * Once packaged you can then run:\n * <pre>\n * {@code\n * $ java -cp target/kafka-streams-examples-6.0.1-standalone.jar io.confluent.examples.streams.WordCountLambdaExample\n * }\n * </pre>\n * 4) Write some input data to the source topic \"streams-plaintext-input\" (e.g. via {@code kafka-console-producer}).\n * The already running example application (step 3) will automatically process this input data and write the\n * results to the output topic \"streams-wordcount-output\".\n * <pre>\n * {@code\n * # Start the console producer. You can then enter input data by writing some line of text, followed by ENTER:\n * #\n * #   hello kafka streams<ENTER>\n * #   all streams lead to kafka<ENTER>\n * #   join kafka summit<ENTER>\n * #\n * # Every line you enter will become the value of a single Kafka message.\n * $ bin/kafka-console-producer --broker-list localhost:9092 --topic streams-plaintext-input\n * }</pre>\n * 5) Inspect the resulting data in the output topic, e.g. via {@code kafka-console-consumer}.\n * <pre>\n * {@code\n * $ bin/kafka-console-consumer --topic streams-wordcount-output --from-beginning \\\n *                              --bootstrap-server localhost:9092 \\\n *                              --property print.key=true \\\n *                              --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer\n * }</pre>\n * You should see output data\n */\npublic class WordCountLambdaExample {\n\n  static final String inputTopic = \"streams-plaintext-input\";\n  static final String outputTopic = \"streams-wordcount-output\";\n\n  /**\n   * The Streams application as a whole can be launched like any normal Java application that has a `main()` method.\n   */\n  public static void main(final String[] args) {\n  \n    final String bootstrapServers = \"192.168.10.31:9092\";\n    \n    File controlFile = new File (\"/tmp/kafka-streams-demo-control-file.marker\");\n    controlFile.delete();\n\n    // Configure the Streams application.\n    final Properties streamsConfiguration = getStreamsConfiguration(bootstrapServers);\n\n    // Define the processing topology of the Streams application.\n    final StreamsBuilder builder = new StreamsBuilder();\n    createWordCountStream(builder);\n    final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);\n\n    // Always (and unconditionally) clean local state prior to starting the processing topology.\n    // We opt for this unconditional call here because this will make it easier for you to play around with the example\n    // when resetting the application for doing a re-run (via the Application Reset Tool,\n    // http://docs.confluent.io/current/streams/developer-guide.html#application-reset-tool).\n    //\n    // The drawback of cleaning up local state prior is that your app must rebuilt its local state from scratch, which\n    // will take time and will require reading all the state-relevant data from the Kafka cluster over the network.\n    // Thus in a production scenario you typically do not want to clean up always as we do here but rather only when it\n    // is truly needed, i.e., only under certain conditions (e.g., the presence of a command line flag for your app).\n    // See `ApplicationResetExample.java` for a production-like example.\n    streams.cleanUp();\n\n    final AtomicBoolean cont = new AtomicBoolean(true);\n\n    // Add shutdown hook to respond to SIGTERM and gracefully close the Streams application.\n    Runtime.getRuntime().addShutdownHook(new Thread(() -> { \n            System.out.println (\"Running shutdown hook\");\n            cont.set (false);\n        }));\n\n    // Now run the processing topology via `start()` to begin processing its input data.\n    System.out.println (\"Starting Stream\");\n    streams.start();\n\n    \n    // ==> It runs in the Zeppelin executorinterpreter process for god's sake !\n    // How can I stop it ?\n    \n    \n    System.out.println(\"Kafka Streams Program launched. Use next pararaph to stop id\");\n    while (!controlFile.exists()) {\n      try {\n         Thread.sleep(1000);\n      } catch (Exception e) {\n         e.printStackTrace();\n      }\n    }\n    \n    System.out.println (\"Closing streams \");\n    streams.close(); \n    \n    System.out.println (\"Exiting ...\");\n  }\n\n  /**\n   * Configure the Streams application.\n   *\n   * Various Kafka Streams related settings are defined here such as the location of the target Kafka cluster to use.\n   * Additionally, you could also define Kafka Producer and Kafka Consumer settings when needed.\n   *\n   * @param bootstrapServers Kafka cluster address\n   * @return Properties getStreamsConfiguration\n   */\n  static Properties getStreamsConfiguration(final String bootstrapServers) {\n    final Properties streamsConfiguration = new Properties();\n    // Give the Streams application a unique name.  The name must be unique in the Kafka cluster\n    // against which the application is run.\n    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, \"wordcount-lambda-example\");\n    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, \"wordcount-lambda-example-client\");\n    // Where to find Kafka broker(s).\n    streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);\n    // Specify default (de)serializers for record keys and for record values.\n    streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());\n    streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());\n    // Records should be flushed every 10 seconds. This is less than the default\n    // in order to keep this example interactive.\n    streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 10 * 1000);\n    // For illustrative purposes we disable record caches.\n    streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);\n\n    // Use a temporary directory for storing state, which will be automatically removed after the test.\n    try {\n        File tempFir = File.createTempFile(\"test\", \"kafka\");\n        tempFir.delete();\n        tempFir.mkdirs();\n        streamsConfiguration.put(StreamsConfig.STATE_DIR_CONFIG, tempFir.getAbsolutePath());\n    } catch (IOException e) {\n       System.err.println (e.getMessage());\n       e.printStackTrace();\n    }\n\n    return streamsConfiguration;\n  }\n\n  /**\n   * Define the processing topology for Word Count.\n   *\n   * @param builder StreamsBuilder to use\n   */\n  static void createWordCountStream(final StreamsBuilder builder) {\n  \n    // Construct a `KStream` from the input topic \"streams-plaintext-input\", where message values\n    // represent lines of text (for the sake of this example, we ignore whatever may be stored\n    // in the message keys).  The default key and value serdes will be used.\n    final KStream<String, String> textLines = builder.stream(inputTopic);\n\n    final Pattern pattern = Pattern.compile(\"\\\\W+\", Pattern.UNICODE_CHARACTER_CLASS);\n\n    final KTable<String, Long> wordCounts = textLines\n      // Split each text line, by whitespace, into words.  The text lines are the record\n      // values, i.e. we can ignore whatever data is in the record keys and thus invoke\n      // `flatMapValues()` instead of the more generic `flatMap()`.\n      .flatMapValues(value -> Arrays.asList(pattern.split(value.toLowerCase())))\n      // Group the split data by word so that we can subsequently count the occurrences per word.\n      // This step re-keys (re-partitions) the input data, with the new record key being the words.\n      // Note: No need to specify explicit serdes because the resulting key and value types\n      // (String and String) match the application's default serdes.\n      .groupBy((keyIgnored, word) -> word)\n      // Count the occurrences of each word (record key).\n      .count();\n\n    // Write the `KTable<String, Long>` to the output topic.\n    wordCounts.toStream()\n        .to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));\n  }\n\n}",
+      "text": "%java\n\n\nimport org.apache.kafka.common.serialization.Serdes;\nimport org.apache.kafka.streams.KafkaStreams;\nimport org.apache.kafka.streams.StreamsBuilder;\nimport org.apache.kafka.streams.StreamsConfig;\nimport org.apache.kafka.streams.kstream.KStream;\nimport org.apache.kafka.streams.kstream.KTable;\nimport org.apache.kafka.streams.kstream.Produced;\n\nimport java.io.File;\nimport java.io.IOException;\n\nimport java.util.concurrent.atomic.AtomicBoolean;\nimport java.util.Arrays;\nimport java.util.Properties;\nimport java.util.regex.Pattern;\n\n/**\n * Demonstrates, using the high-level KStream DSL, how to implement the WordCount program that\n * computes a simple word occurrence histogram from an input text. This example uses lambda\n * expressions and thus works with Java 8+ only.\n * <p>\n * In this example, the input stream reads from a topic named \"streams-plaintext-input\", where the values of\n * messages represent lines of text; and the histogram output is written to topic\n * \"streams-wordcount-output\", where each record is an updated count of a single word, i.e. {@code word (String) -> currentCount (Long)}.\n * <p>\n * Note: Before running this example you must 1) create the source topic (e.g. via {@code kafka-topics --create ...}),\n * then 2) start this example and 3) write some data to the source topic (e.g. via {@code kafka-console-producer}).\n * Otherwise you won't see any data arriving in the output topic.\n * <p>\n * <br>\n * HOW TO RUN THIS EXAMPLE\n * <p>\n * 1) Start Zookeeper and Kafka. Please refer to <a href='http://docs.confluent.io/current/quickstart.html#quickstart'>QuickStart</a>.\n * <p>\n * 2) Create the input and output topics used by this example.\n * <pre>\n * {@code\n * $ bin/kafka-topics --create --topic streams-plaintext-input \\\n *                    --zookeeper localhost:2181 --partitions 1 --replication-factor 1\n * $ bin/kafka-topics --create --topic streams-wordcount-output \\\n *                    --zookeeper localhost:2181 --partitions 1 --replication-factor 1\n * }</pre>\n * Note: The above commands are for the Confluent Platform. For Apache Kafka it should be {@code bin/kafka-topics.sh ...}.\n * <p>\n * 3) Start this example application either in your IDE or on the command line.\n * <p>\n * If via the command line please refer to <a href='https://github.com/confluentinc/kafka-streams-examples#packaging-and-running'>Packaging</a>.\n * Once packaged you can then run:\n * <pre>\n * {@code\n * $ java -cp target/kafka-streams-examples-6.0.1-standalone.jar io.confluent.examples.streams.WordCountLambdaExample\n * }\n * </pre>\n * 4) Write some input data to the source topic \"streams-plaintext-input\" (e.g. via {@code kafka-console-producer}).\n * The already running example application (step 3) will automatically process this input data and write the\n * results to the output topic \"streams-wordcount-output\".\n * <pre>\n * {@code\n * # Start the console producer. You can then enter input data by writing some line of text, followed by ENTER:\n * #\n * #   hello kafka streams<ENTER>\n * #   all streams lead to kafka<ENTER>\n * #   join kafka summit<ENTER>\n * #\n * # Every line you enter will become the value of a single Kafka message.\n * $ bin/kafka-console-producer --broker-list localhost:9092 --topic streams-plaintext-input\n * }</pre>\n * 5) Inspect the resulting data in the output topic, e.g. via {@code kafka-console-consumer}.\n * <pre>\n * {@code\n * $ bin/kafka-console-consumer --topic streams-wordcount-output --from-beginning \\\n *                              --bootstrap-server localhost:9092 \\\n *                              --property print.key=true \\\n *                              --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer\n * }</pre>\n * You should see output data\n */\npublic class WordCountLambdaExample {\n\n  static final String inputTopic = \"streams-plaintext-input\";\n  static final String outputTopic = \"streams-wordcount-output\";\n\n  /**\n   * The Streams application as a whole can be launched like any normal Java application that has a `main()` method.\n   */\n  public static void main(final String[] args) {\n  \n    // Extract SELF IP from Eskimo Topology (env var)\n    final String selfIp = System.getenv(\"SELF_IP_ADDRESS\").replace(\".\", \"\");\n    \n    // Extract KAFKA Master IP Address\n    final String kafkaMasterIp = System.getenv(\"SELF_MASTER_KAFKA_\" + selfIp);\n\n    final String kafkaServer = kafkaMasterIp + \":9092\";\n    \n    final File controlFile = new File (\"/tmp/kafka-streams-demo-control-file.marker\");\n    try {\n        controlFile.createNewFile();\n    } catch (IOException e) {\n        e.printStackTrace();\n        return;\n    }\n\n    // Configure the Streams application.\n    final Properties streamsConfiguration = getStreamsConfiguration(kafkaServer);\n\n    // Define the processing topology of the Streams application.\n    final StreamsBuilder builder = new StreamsBuilder();\n    createWordCountStream(builder);\n    final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);\n\n    // Always (and unconditionally) clean local state prior to starting the processing topology.\n    // We opt for this unconditional call here because this will make it easier for you to play around with the example\n    // when resetting the application for doing a re-run (via the Application Reset Tool,\n    // http://docs.confluent.io/current/streams/developer-guide.html#application-reset-tool).\n    //\n    // The drawback of cleaning up local state prior is that your app must rebuilt its local state from scratch, which\n    // will take time and will require reading all the state-relevant data from the Kafka cluster over the network.\n    // Thus in a production scenario you typically do not want to clean up always as we do here but rather only when it\n    // is truly needed, i.e., only under certain conditions (e.g., the presence of a command line flag for your app).\n    // See `ApplicationResetExample.java` for a production-like example.\n    streams.cleanUp();\n\n    final AtomicBoolean cont = new AtomicBoolean(true);\n\n    // Add shutdown hook to respond to SIGTERM and gracefully close the Streams application.\n    Runtime.getRuntime().addShutdownHook(new Thread(() -> { \n            System.out.println (\"Running shutdown hook\");\n            cont.set (false);\n            controlFile.delete();\n        }));\n\n    // Now run the processing topology via `start()` to begin processing its input data.\n    System.out.println (\"Starting Stream\");\n    streams.start();\n\n    \n    // ==> It runs in the Zeppelin executorinterpreter process for god's sake !\n    // How can I stop it ?\n    \n    \n    System.out.println(\"Kafka Streams Program launched. Use next pararaph to stop id\");\n    while (controlFile.exists()) {\n      try {\n         Thread.sleep(1000);\n      } catch (Exception e) {\n         e.printStackTrace();\n      }\n    }\n    \n    System.out.println (\"Closing streams \");\n    streams.close(); \n    \n    System.out.println (\"Exiting ...\");\n  }\n\n  /**\n   * Configure the Streams application.\n   *\n   * Various Kafka Streams related settings are defined here such as the location of the target Kafka cluster to use.\n   * Additionally, you could also define Kafka Producer and Kafka Consumer settings when needed.\n   *\n   * @param bootstrapServers Kafka cluster address\n   * @return Properties getStreamsConfiguration\n   */\n  static Properties getStreamsConfiguration(final String bootstrapServers) {\n    final Properties streamsConfiguration = new Properties();\n    // Give the Streams application a unique name.  The name must be unique in the Kafka cluster\n    // against which the application is run.\n    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, \"wordcount-lambda-example\");\n    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, \"wordcount-lambda-example-client\");\n    // Where to find Kafka broker(s).\n    streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);\n    // Specify default (de)serializers for record keys and for record values.\n    streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());\n    streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());\n    // Records should be flushed every 10 seconds. This is less than the default\n    // in order to keep this example interactive.\n    streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 10 * 1000);\n    // For illustrative purposes we disable record caches.\n    streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);\n\n    // Use a temporary directory for storing state, which will be automatically removed after the test.\n    try {\n        File tempFir = File.createTempFile(\"test\", \"kafka\");\n        tempFir.delete();\n        tempFir.mkdirs();\n        streamsConfiguration.put(StreamsConfig.STATE_DIR_CONFIG, tempFir.getAbsolutePath());\n    } catch (IOException e) {\n       System.err.println (e.getMessage());\n       e.printStackTrace();\n    }\n\n    return streamsConfiguration;\n  }\n\n  /**\n   * Define the processing topology for Word Count.\n   *\n   * @param builder StreamsBuilder to use\n   */\n  static void createWordCountStream(final StreamsBuilder builder) {\n  \n    // Construct a `KStream` from the input topic \"streams-plaintext-input\", where message values\n    // represent lines of text (for the sake of this example, we ignore whatever may be stored\n    // in the message keys).  The default key and value serdes will be used.\n    final KStream<String, String> textLines = builder.stream(inputTopic);\n\n    final Pattern pattern = Pattern.compile(\"\\\\W+\", Pattern.UNICODE_CHARACTER_CLASS);\n\n    final KTable<String, Long> wordCounts = textLines\n      // Split each text line, by whitespace, into words.  The text lines are the record\n      // values, i.e. we can ignore whatever data is in the record keys and thus invoke\n      // `flatMapValues()` instead of the more generic `flatMap()`.\n      .flatMapValues(value -> Arrays.asList(pattern.split(value.toLowerCase())))\n      // Group the split data by word so that we can subsequently count the occurrences per word.\n      // This step re-keys (re-partitions) the input data, with the new record key being the words.\n      // Note: No need to specify explicit serdes because the resulting key and value types\n      // (String and String) match the application's default serdes.\n      .groupBy((keyIgnored, word) -> word)\n      // Count the occurrences of each word (record key).\n      .count();\n\n    // Write the `KTable<String, Long>` to the output topic.\n    wordCounts.toStream()\n        .to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));\n  }\n\n}",
       "user": "anonymous",
-      "dateUpdated": "2021-04-04T19:33:01+0000",
+      "dateUpdated": "2021-05-07T10:11:36+0000",
       "progress": 0,
       "config": {
         "lineNumbers": true,
+        "tableHide": false,
         "editorSetting": {
           "language": "java",
           "editOnDblClick": false
@@ -57,37 +100,27 @@
         "editorMode": "ace/mode/java",
         "fontSize": 9,
         "results": {},
-        "enabled": true,
-        "tableHide": false
+        "enabled": true
       },
       "settings": {
         "params": {},
         "forms": {}
       },
-      "results": {
-        "code": "SUCCESS",
-        "msg": [
-          {
-            "type": "TEXT",
-            "data": "Starting Stream\nKafka Streams Program launched. Use next pararaph to stop id\nClosing streams \nExiting ...\n"
-          }
-        ]
-      },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1617530430408_866262222",
+      "jobName": "paragraph_1620376410334_1762769858",
       "id": "paragraph_1611356509109_1466057483",
-      "dateCreated": "2021-04-04T10:00:30+0000",
-      "dateStarted": "2021-04-04T19:33:01+0000",
-      "dateFinished": "2021-04-04T19:33:19+0000",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "dateStarted": "2021-05-07T10:11:36+0000",
+      "dateFinished": "2021-05-07T10:12:46+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:350"
+      "$$hashKey": "object:3533"
     },
     {
-      "text": "%md\n\n## 4. Kill Kafka Streams program (with whole Java interpreter)\n\n*This last paragraph is used to stop the Kafka Streams program launched by the previous paragraph*\nUnfortunately, since programs run through the Java interpreter are executed in the interpreter JVM itself, and because the name of the class above is regenerated at compile time (which makes it impossible for instance to use status variables in another paragraph), an artifice needs to be found to stop it.\n*So here we're using a control file whose creation force stop the kafka stream program above*",
+      "text": "%md\n\n## 2. Kill Kafka Streams program (with whole Java interpreter)\n\n*This second paragraph is used to stop the Kafka Streams program launched by the previous paragraph*\nUnfortunately, since programs run through the Java interpreter are executed in the interpreter JVM itself, and because the name of the class above is regenerated at compile time (which makes it impossible for instance to use status variables in another paragraph), an artifice needs to be found to stop it.\n*So here we're using a control file whose deletion forces stop the kafka stream program above*",
       "user": "anonymous",
-      "dateUpdated": "2021-04-04T19:31:51+0000",
+      "dateUpdated": "2021-05-07T08:33:30+0000",
       "progress": 0,
       "config": {
         "tableHide": false,
@@ -112,25 +145,23 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "<div class=\"markdown-body\">\n<h2>4. Kill Kafka Streams program (with whole Java interpreter)</h2>\n<p><em>This last paragraph is used to stop the Kafka Streams program launched by the previous paragraph</em><br />\nUnfortunately, since programs run through the Java interpreter are executed in the interpreter JVM itself, and because the name of the class above is regenerated at compile time (which makes it impossible for instance to use status variables in another paragraph), an artifice needs to be found to stop it.<br />\n<em>So here we&rsquo;re using a control file whose creation force stop the kafka stream program above</em></p>\n\n</div>"
+            "data": "<div class=\"markdown-body\">\n<h2>2. Kill Kafka Streams program (with whole Java interpreter)</h2>\n<p><em>This second paragraph is used to stop the Kafka Streams program launched by the previous paragraph</em><br />\nUnfortunately, since programs run through the Java interpreter are executed in the interpreter JVM itself, and because the name of the class above is regenerated at compile time (which makes it impossible for instance to use status variables in another paragraph), an artifice needs to be found to stop it.<br />\n<em>So here we&rsquo;re using a control file whose deletion forces stop the kafka stream program above</em></p>\n\n</div>"
           }
         ]
       },
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1617530430409_1271462125",
+      "jobName": "paragraph_1620376410334_1914878232",
       "id": "paragraph_1611361560613_312017668",
-      "dateCreated": "2021-04-04T10:00:30+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:351",
-      "dateFinished": "2021-04-04T19:31:51+0000",
-      "dateStarted": "2021-04-04T19:31:51+0000"
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "status": "READY",
+      "$$hashKey": "object:3534"
     },
     {
-      "text": "%sh\n\ntouch /tmp/kafka-streams-demo-control-file.marker",
+      "text": "%sh\n\nrm -f /tmp/kafka-streams-demo-control-file.marker",
       "user": "anonymous",
-      "dateUpdated": "2021-04-04T19:33:18+0000",
+      "dateUpdated": "2021-05-07T10:12:46+0000",
       "progress": 0,
       "config": {
         "editorSetting": {
@@ -155,31 +186,74 @@
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1617530430409_1312434947",
+      "jobName": "paragraph_1620376410334_703217753",
       "id": "paragraph_1611359323481_865721653",
-      "dateCreated": "2021-04-04T10:00:30+0000",
-      "dateStarted": "2021-04-04T19:33:18+0000",
-      "dateFinished": "2021-04-04T19:33:18+0000",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "dateStarted": "2021-05-07T10:12:46+0000",
+      "dateFinished": "2021-05-07T10:12:46+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:352"
+      "$$hashKey": "object:3535"
     },
     {
-      "text": "%sh\n",
+      "text": "%md\n\n## 3. Display messages on kafka output topic using command line kafka consummer\n\nThis paragraph used the command line kafka consummer to display results of the Word Cound Kafka Streams sample program\n",
       "user": "anonymous",
-      "dateUpdated": "2021-04-04T19:08:51+0000",
+      "dateUpdated": "2021-05-07T08:33:30+0000",
       "progress": 0,
       "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
         "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
         "fontSize": 9,
-        "enabled": true,
+        "editorHide": true,
         "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h2>3. Display messages on kafka output topic using command line kafka consummer</h2>\n<p>This paragraph used the command line kafka consummer to display results of the Word Cound Kafka Streams sample program</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1620376410334_231869963",
+      "id": "paragraph_1617582291445_135662270",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "status": "READY",
+      "$$hashKey": "object:3536"
+    },
+    {
+      "text": "%sh\n\n# This is to make sure everything is properly killed when one cancels the paragraph\ntrap \"echo 'Killing shell and all children' && kill $(ps -o pid= --ppid $$)\" INT TERM HUP\n\n# Extract SELF IP from Eskimo Topology (env var)\nIP_TAMP=`echo $SELF_IP_ADDRESS | sed s/'\\.'//g`\n\n# Extract MASTER_KAFKA from Eskimo Topology\n\n# Make sure to start asynchronously otherwise the trapè can't kick in\n/usr/local/bin/kafka-console-consumer.sh --topic streams-wordcount-output \\\n        --bootstrap-server $MASTER_KAFKA:9092 \\\n        --property print.key=true \\\n        --timeout-ms 300000 \\\n        --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer &\nexport KAFKA_CONSUMER=$!\n#        --from-beginning \\        \n\n# Wait for the trap to kill it all\nwait $KAFKA_CONSUMER\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-05-07T10:12:18+0000",
+      "progress": 0,
+      "config": {
         "editorSetting": {
           "language": "sh",
           "editOnDblClick": false,
           "completionKey": "TAB",
           "completionSupport": false
         },
-        "editorMode": "ace/mode/sh"
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 9,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
       },
       "settings": {
         "params": {},
@@ -188,15 +262,135 @@
       "apps": [],
       "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
-      "jobName": "paragraph_1617563331838_177422865",
+      "jobName": "paragraph_1620376410334_2045487319",
       "id": "paragraph_1617563331838_177422865",
-      "dateCreated": "2021-04-04T19:08:51+0000",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "dateStarted": "2021-05-07T10:12:18+0000",
+      "dateFinished": "2021-05-07T10:12:36+0000",
+      "status": "ABORT",
+      "$$hashKey": "object:3537"
+    },
+    {
+      "text": "%md\n\n## 4. Send messages to kafka streams program using zeppelin variable\n\nThis paragraèh creates a text box where the user can input some text to be sent to the Word Cound Kafka Streams sample program.\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-05-07T08:33:30+0000",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h2>4. Send messages to kafka streams program using zeppelin variable</h2>\n<p>This paragraèh creates a text box where the user can input some text to be sent to the Word Cound Kafka Streams sample program.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1620376410334_2062714562",
+      "id": "paragraph_1617582302340_1699736754",
+      "dateCreated": "2021-05-07T08:33:30+0000",
       "status": "READY",
-      "$$hashKey": "object:353"
+      "$$hashKey": "object:3538"
+    },
+    {
+      "text": "%sh\n\n\n# Extract SELF IP from Eskimo Topology (env var)\nIP_TAMP=`echo $SELF_IP_ADDRESS | sed s/'\\.'//g`\n\n# Extract MASTER_KAFKA from Eskimo Topology\neval 'MASTER_KAFKA=$SELF_MASTER_KAFKA_'$IP_TAMP\n\n\necho ${input=text to send} | /usr/local/bin/kafka-console-producer.sh --sync --topic streams-plaintext-input --broker-list $MASTER_KAFKA:9092",
+      "user": "anonymous",
+      "dateUpdated": "2021-05-07T10:12:25+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 9,
+        "title": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "input": "some additional text with some more words"
+        },
+        "forms": {
+          "input": {
+            "type": "TextBox",
+            "name": "input",
+            "displayName": "input",
+            "defaultValue": "text to send",
+            "hidden": false,
+            "$$hashKey": "object:4723"
+          }
+        }
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1620376410334_1788060998",
+      "id": "paragraph_1617581265090_324373456",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "dateStarted": "2021-05-07T10:12:25+0000",
+      "dateFinished": "2021-05-07T10:12:29+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:3539"
+    },
+    {
+      "text": "%md\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-05-07T08:33:30+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1620376410334_1660030307",
+      "id": "paragraph_1617582313969_195352697",
+      "dateCreated": "2021-05-07T08:33:30+0000",
+      "status": "READY",
+      "$$hashKey": "object:3540"
     }
   ],
   "name": "Kafka Streams Demo",
-  "id": "2G46PH2CM",
+  "id": "2G6SV99R7",
   "defaultInterpreterGroup": "spark",
   "version": "0.9.0",
   "noteParams": {},

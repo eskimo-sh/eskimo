@@ -1503,3 +1503,14 @@ td.operation-title{
     height: 35px;
     padding-top: 8px;
 }
+
+.pending-link-operations{
+    width: 100%;
+    height: 20px;
+    text-align: center;
+    color: black;
+}
+
+.pending-link-operations a {
+    color: black;
+}

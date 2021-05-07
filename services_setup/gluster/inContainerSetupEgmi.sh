@@ -61,7 +61,7 @@ sudo ln -s /usr/local/lib/egmi/conf /usr/local/etc/egmi
 
 echo " - Tweaking egmi.properties"
 sed -i s/"zookeeper.myId=localhost"/"zookeeper.myId=$SELF_IP_ADDRESS"/g /usr/local/lib/egmi/conf/egmi.properties
-sed -i s/"system.statusUpdatePeriodSeconds=30"/"system.statusUpdatePeriodSeconds=60"/g /usr/local/lib/egmi/conf/egmi.properties
+#sed -i s/"system.statusUpdatePeriodSeconds=30"/"system.statusUpdatePeriodSeconds=60"/g /usr/local/lib/egmi/conf/egmi.properties
 
 echo " - HACK - creating and cron'ing a script that checks for deadlocks and force restarts container "
 

@@ -83,6 +83,9 @@ public class ZeppelinSetupTest extends AbstractSetupShellTest {
         copyFile(jailPath, "setupFlinkCommon.sh");
         copyFile(jailPath, "setupSparkCommon.sh");
         copyFile(jailPath, "setupLogstashCommon.sh");
+        copyFile(jailPath, "setupKafkaCommon.sh");
+        copyFile(jailPath, "inContainerSetupKafkaCommon.sh");
+        copyFile(jailPath, "inContainerSetupKafkaWrappers.sh");
         copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
         copyFile(jailPath, "inContainerSetupSparkCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
