@@ -197,7 +197,7 @@ Choose your services and let eskimo take care of everything.
 
 === Eskimo Architecture
 
-==== Techical Architecture
+==== Technical Architecture
 
 Eskimo's technical architecture can be illustrated as follows:
 
