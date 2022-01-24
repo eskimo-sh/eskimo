@@ -405,7 +405,7 @@ file. See <<user_file>>
 [[user_file]]
 === Access eskimo
 
-With eskimo properly started using the scripts in `bin` discussed above , one can reach eskimo using http://machine_ip:9191. +
+With eskimo properly started using the scripts in `bin` discussed above, one can reach eskimo using http://machine_ip:9191. +
 The default port number is 9191. This can be changed in configuration file `eskimo.properties`.
 
 *The default login / password credentials are _admin_ / _password_.*
@@ -421,7 +421,8 @@ The structure of this file is as follows;
   "users" : [
     {
       "username" : "admin",
-      "password" : "$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO"
+      "password" : "$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO",
+      "role": "ADMIN"
     }
   ]
 }
@@ -429,6 +430,13 @@ The structure of this file is as follows;
 
 The password is a `BCrypt` hash (11 rounds) of the actual password.
 
+The administrator can add as many different users to this file as required on the Eskimo platfoirm.
+
+Users can have either the `ADMIN` or `USER` role.
+
+* the `ADMIN` role enables full acces to every single feature of Eskimo
+* the `USER` role limits available functionalities to Data Science tools and prevents the user from making any change
+to the cluster configuration or influence runtime operations.
 
 [[user_configuration]]
 === First run and initial setup

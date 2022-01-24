@@ -149,6 +149,10 @@ The beauty of this script is that it takes care of everything:
 * Creating the volume in gluster if not already done
 * Registering the mount point in `/etc/fstab` and systemd for automatic remount
 
+This script is related to the mount part (the client part) on hosts OSes running on the Eskimo cluster.
+A similar script is provided to run from within container to mount gluster shares from within containers
+(as required for instance for marathon operated services) : `inContainerMountGluster.sh`. +
+EGMI takes care of the server part.
 
 ==== Gluster specificities within Eskimo
 
@@ -202,6 +206,13 @@ the node(s) running Zeppelin.
 * `-std_in /path/to/file` which is used to pass the given file as STDIN to the invoked logstash instance. This is
 unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
 supported yet.
+
+==== Gluster shares for Spark
+
+Nodes where logstash is installedautomatically have the following gluster share created and mounted:
+
+* `/var/lib/elasticsearch/logstash/data` which can be used to pass data to logstash instances or retrieve data from
+logstash instances.
 
 === ElasticSearch
 
@@ -397,7 +408,7 @@ with them. +
 Following shares are mounted within the Zeppelin container:
 
 * Logstash shared folder:
-** `/var/lib/logstash/data`
+** `/var/lib/elasticsearch/logstash/data`
 * Spark shares:
 ** `/var/lib/spark/data`
 ** `/var/lib/spark/eventlog`
@@ -522,6 +533,14 @@ Two sample notes must have been executed in prior to executing this one : the "L
 "Spark Integration ES", in this order.
 
 It uses the Flink interpreter from Zeppelin.
+
+===== Kafka Streams Demo
+
+This note shows how to implement a Kafka Streams Program using Zeppelin's java interpreter. +
+It does not require any other note executions.
+
+Multiple paragraphs are provided to read data from / send data to the kafka streams demo program as well as top it
+(since one can't use the _stop_ button to stop java program run by the java interpreter as of Zeppelin 0.9).
 
 ==== Zeppelin 0.9-SNAPSHOT bugs and workarounds
 
