@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -66,9 +67,32 @@ public class SettingsInjectorTest {
     public void beforeMethod() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
+    
+    public static String getCmdPathFileStr(String command) {
+        String rtn = null;
+        if (command != null) {
+            String[] sCmdExts = { "", ".com", ".exe", ".bat" };
+            StringTokenizer st = new StringTokenizer(System.getenv("PATH"), File.pathSeparator);
+            String path, sFile;
+            while (st.hasMoreTokens()) {
+                path = st.nextToken();
+                for (String sExt : sCmdExts) {
+                    sFile = path + File.separator + command + sExt;
+                    if (new File(sFile).isFile()) {
+                        rtn = sFile;
+                        break;
+                    }
+                }
+            }
+        }
+        return rtn;
+    }
 
     @BeforeEach
     public void setUp() throws Exception {
+    
+        // ensure presence of jq command !!!
+        assertTrue(getCmdPathFileStr("jq") != null, "'jq' command is found in path");
 
         // Create temp folder
         File tempFile = File.createTempFile("settings_injector_", "");
