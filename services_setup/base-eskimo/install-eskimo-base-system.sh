@@ -485,7 +485,7 @@ function install_k8s_debian_based() {
     fi
 
     echo "   + install kubectl"
-    sudo apt-get install -y kubectl > /tmp/install_k8s 2>&1
+    sudo apt-get install -y kubectl kubelet kubeadm > /tmp/install_k8s 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install kubernetes"
         cat /tmp/install_k8s 1>&2
@@ -501,13 +501,13 @@ function install_k8s_redhat_based () {
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
 enabled=1
-gpgcheck=1
-repo_gpgcheck=1
+gpgcheck=0
+repo_gpgcheck=0
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 
     echo "   + Installing kubernetes"
-    sudo yum install -y kubectl > /tmp/install_k8s 2>&1
+    sudo yum install -y kubectl kubelet kubeadm > /tmp/install_k8s 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install kubernetes"
         cat /tmp/install_k8s 1>&2

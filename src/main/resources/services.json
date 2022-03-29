@@ -205,7 +205,7 @@
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": false,
+        "mandatory": true,
         "restart": true
       }
     ],

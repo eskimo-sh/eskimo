@@ -51,6 +51,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     private String jsonNodesConfig = null;
     private String jsonMarathonConfig = null;
+    private String jsonMinimalConfig = null;
 
     private MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
 
@@ -59,6 +60,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         super.setUp();
         jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
         jsonMarathonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMarathonConfig.json"));
+        jsonMinimalConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMinimalConfig.json"));
     }
 
     @Test
@@ -77,6 +79,23 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertTrue (def.getService("kafka").hasDependency(def.getService("zookeeper")));
         assertTrue (def.getService("mesos-master").hasDependency(def.getService("zookeeper")));
         assertTrue (def.getService("zeppelin").hasDependency(def.getService("spark-executor")));
+    }
+
+    @Test
+    public void testMinimalExample() throws Exception {
+
+        Topology topology = def.getTopology(
+                new NodesConfigWrapper(jsonMinimalConfig),
+                MarathonServicesConfigWrapper.empty(),
+                "192.168.56.23");
+
+        assertEquals ("export MASTER_NTP_1=192.168.56.21\n" +
+                "export MASTER_PROMETHEUS_1=192.168.56.21\n" +
+                "export MASTER_ZOOKEEPER_1=192.168.56.21\n" +
+                "export SELF_MASTER_ELASTICSEARCH_1921685621=192.168.56.21\n" +
+                "export SELF_MASTER_ELASTICSEARCH_1921685622=192.168.56.22\n" +
+                "export SELF_MASTER_ELASTICSEARCH_1921685623=192.168.56.23\n" +
+                "", topology.getTopologyScript());
     }
 
     @Test

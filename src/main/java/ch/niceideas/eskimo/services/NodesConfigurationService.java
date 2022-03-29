@@ -32,6 +32,7 @@ public class NodesConfigurationService {
     public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
     public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
     public static final String USR_LOCAL_SBIN_GLUSTER_MOUNT_SH = "/usr/local/sbin/gluster_mount.sh";
+    public static final String ESKIMO_TOPOLOGY_SH = "/etc/eskimo_topology.sh";
 
     @Autowired
     private ServicesInstallationSorter servicesInstallationSorter;
@@ -341,8 +342,8 @@ public class NodesConfigurationService {
                 throw new SystemException(e);
             }
             sshCommandService.copySCPFile(connection, tempTopologyFile.getAbsolutePath());
-            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", tempTopologyFile.getName(), "/etc/eskimo_topology.sh"});
-            sshChmod755(connection, "/etc/eskimo_topology.sh");
+            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", tempTopologyFile.getName(), ESKIMO_TOPOLOGY_SH});
+            sshChmod755(connection, ESKIMO_TOPOLOGY_SH);
 
             ServicesSettingsWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
