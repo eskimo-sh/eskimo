@@ -94,6 +94,15 @@ sudo ln -s /usr/local/lib/kafka_$SCALA_VERSION-$KAFKA_VERSION /usr/local/lib/kaf
 echo " - Cleanup unused files"
 sudo rm -Rf /usr/local/lib/kafka/site-docs/*
 
+echo " - Checking Kafka Installation"
+/usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/lib/kafka/config/server.properties > /tmp/kafka_run_log 2>&1 &
+EXAMPLE_PID=$!
+fail_if_error $? "/tmp/kafka_run_log" -3
+sleep 5
+if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
+    echo "Kafka process not started successfully !"
+    exit 10
+fi
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

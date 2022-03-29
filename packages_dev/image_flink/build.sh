@@ -54,11 +54,11 @@ docker exec -i flink_template apt-get install -y openjdk-11-jdk > /tmp/flink_bui
 fail_if_error $? "/tmp/flink_build_log" -3
 
 echo " - Installing scala"
-docker exec -i flink_template apt-get install -y scala > /tmp/flink_build_log 2>&1
+docker exec -i flink_template bash -c ". /common/common.sh && install_scala" > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -4
 
 echo " - Installing python"
-docker exec -i flink_template apt-get -y install  python-dev python-six python-virtualenv python-pip > /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get -y install  python-dev python-six python-virtualenv python3-pip > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 #echo " - Installing python elasticsearch and kafka clients and other utilities"
@@ -72,7 +72,7 @@ docker exec -i flink_template update-alternatives --force --install /usr/bin/pyt
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing other python packages"
-docker exec -i flink_template pip install requests filelock > /tmp/flink_build_log 2>&1
+docker exec -i flink_template pip3 install requests filelock > /tmp/flink_build_log 2>&1
 
 echo " - Installing flink"
 docker exec -i flink_template bash /scripts/installFlink.sh | tee -a /tmp/flink_build_log 2>&1

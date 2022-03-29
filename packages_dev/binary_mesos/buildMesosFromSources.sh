@@ -131,7 +131,7 @@ if [[ `ps -e | grep $MESOS_MASTER_PROC_ID` == "" ]]; then
 fi
 
 echo " - Starting Mesos Agent"
-/usr/local/lib/mesos-$AMESOS_VERSION/sbin/mesos-agent  --master=127.0.0.1:5050 --no-systemd_enable_support --work_dir=/var/lib/mesos >> /tmp/mesos_agent_log 2>&1 &
+/usr/local/lib/mesos-$AMESOS_VERSION/sbin/mesos-agent  --master=127.0.0.1:5050 --no-systemd_enable_support --work_dir=/var/lib/mesos --launcher=posix >> /tmp/mesos_agent_log 2>&1 &
 export MESOS_AGENT_PROC_ID=$!
 
 echo " - Checking Mesos Agent startup"

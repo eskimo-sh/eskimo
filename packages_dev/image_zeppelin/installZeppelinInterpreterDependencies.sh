@@ -96,12 +96,12 @@ mvn dependency:copy-dependencies -Dmdep.copyPom=true -Dmdep.addParentPoms=true >
 fail_if_error $? "/tmp/zep_dep_install_log" -25
 
 echo " - Creating zeppelin local repo"
-mkdir /usr/local/lib/zeppelin-0.9.0-bin-all/local-repo
-chmod 755 /usr/local/lib/zeppelin-0.9.0-bin-all/local-repo
+mkdir /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo
+chmod 755 /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo
 
 echo " - Copying connectors with dependencies to flink distribution folder"
 cd ~/.m2/repository/
-cp -R * /usr/local/lib/zeppelin-0.9.0-bin-all/local-repo/
+cp -R * /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo/
 
 echo " - Cleaning"
 rm -Rf /tmp/zeppelin_setup_dep/

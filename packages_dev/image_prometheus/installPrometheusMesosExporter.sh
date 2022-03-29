@@ -68,6 +68,7 @@ export GOPATH=`pwd`
 go get github.com/mesos/mesos_exporter  > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to get mesos_exporter-$PROMETHEUS_MESOS_EXPORTER_VERSION from github."
+    cat /tmp/prometheus_install_log
     exit -1
 fi
 

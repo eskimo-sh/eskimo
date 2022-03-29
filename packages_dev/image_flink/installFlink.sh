@@ -107,25 +107,25 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.niceideas.flink</groupId>
-    <artifactId>connecorsDownloadProject</artifactId>
+    <artifactId>connectorsDownloadProject</artifactId>
     <version>$FLINK_VERSION</version>
     <packaging>jar</packaging>
     <name>minimal-pom</name>
     <url>http://maven.apache.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>1.11</java.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_2.11</artifactId>
+            <artifactId>flink-connector-kafka_$SCALA_VERSION</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR"_2.11</artifactId>
+            <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR"_$SCALA_VERSION</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
@@ -138,7 +138,9 @@ fail_if_error $? "/tmp/flink_install_log" -25
 
 echo " - Copying connectors with dependencies to flink distribution folder"
 cd target/dependency/
-cp * /tmp/flink_setup/flink-$FLINK_VERSION/lib/
+#cp * /tmp/flink_setup/flink-$FLINK_VERSION/lib/
+# omiting log4j-api
+find ./ ! -name 'log4j-api*' -exec cp -t /tmp/flink_setup/flink-$FLINK_VERSION/lib/ {} + 2>/dev/null
 
 echo " - Changing directory back to flink setup"
 cd /tmp/flink_setup

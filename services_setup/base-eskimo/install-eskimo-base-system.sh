@@ -190,7 +190,7 @@ function install_docker_debian_based() {
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gnupg-agent >/dev/null 2>&1
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gnupg2 >/dev/null 2>&1
 
-    echo "  - Add Docker’s official GPG key"
+    echo "  - Add Docker's official GPG key"
     export DOCKER_DEB_VERSION=$(lsb_release -cs)
     if [[ $DOCKER_DEB_VERSION == "bullseye" ]]; then
         echo "   + HACK reverting debian version to buster for docker (bullseye is not supported)"
@@ -236,7 +236,7 @@ function install_docker_debian_based() {
 
 function install_suse_mesos_dependencies() {
 
-    echo " - Installing other Mesos dependencies"
+    echo "  - Installing other Mesos dependencies"
     sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
@@ -248,7 +248,7 @@ function install_suse_mesos_dependencies() {
 
 function install_redhat_mesos_dependencies() {
 
-    echo " - Installing other Mesos dependencies"
+    echo "  - Installing other Mesos dependencies"
     sudo yum install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
@@ -352,7 +352,7 @@ if [[ -f "/etc/debian_version" ]]; then
 
 elif [[ -f "/etc/redhat-release" ]]; then
 
-    echo "  - updating apt package index"
+    echo "  - updating yum package index"
     sudo yum -y update >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -454,6 +454,226 @@ fi
 echo "  - Enabling docker"
 enable_docker
 
+
+function install_k8s_debian_based() {
+
+    echo "   + Download the Google Cloud public signing key"
+    sudo mkdir -p /usr/share/keyrings/
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg \
+          https://packages.cloud.google.com/apt/doc/apt-key.gpg > /tmp/install_k8s 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to download K3s key"
+        cat /tmp/install_k8s 1>&2
+        exit 92
+    fi
+
+    echo "   + Add the Kubernetes apt repository"
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" \
+            | sudo tee /etc/apt/sources.list.d/kubernetes.list > /tmp/install_k8s
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to add K3s key"
+        cat /tmp/install_k8s 1>&2
+        exit 93
+    fi
+
+    echo "   + Update apt package index with the new repository "
+    sudo apt-get update > /tmp/install_k8s 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to install kubernetes"
+        cat /tmp/install_k8s 1>&2
+        exit 94
+    fi
+
+    echo "   + install kubectl"
+    sudo apt-get install -y kubectl > /tmp/install_k8s 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to install kubernetes"
+        cat /tmp/install_k8s 1>&2
+        exit 95
+    fi
+}
+
+function install_k8s_redhat_based () {
+
+    echo "   + Add kubernetes repo"
+    cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo > /tmp/install_k8s 2>&1
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+
+    echo "   + Installing kubernetes"
+    sudo yum install -y kubectl > /tmp/install_k8s 2>&1
+    if [[ $? != 0 ]]; then
+        echoerr "Unable to install kubernetes"
+        cat /tmp/install_k8s 1>&2
+        exit 95
+    fi
+}
+
+function install_k8s_suse_based() {
+
+    return
+#    # become root
+#
+#    $ sudo -s
+#
+#    # install docker
+#
+#    $ zypper refresh
+#    $ zypper install docker
+#
+#    # configure sysctl for Kubernetes
+#
+#    $ cat <<EOF >> /etc/sysctl.conf
+#    net.ipv4.ip_forward=1
+#    net.ipv4.conf.all.forwarding=1
+#    net.bridge.bridge-nf-call-iptables=1
+#    EOF
+#
+#    # add Google repository for installing Kubernetes packages
+#    #$ zypper addrepo --type yum --gpgcheck-strict --refresh https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64 google-k8s
+#
+#    #or
+#
+#    $ cat <<EOF > /etc/zypp/repos.d/google-k8s.repo
+#    [google-k8s]
+#    name=google-k8s
+#    enabled=1
+#    autorefresh=1
+#    baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+#    type=rpm-md
+#    gpgcheck=1
+#    repo_gpgcheck=1
+#    pkg_gpgcheck=1
+#    EOF
+#
+#    # import Google repository keys
+#
+#    $ rpm --import https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+#    $ rpm --import https://packages.cloud.google.com/yum/doc/yum-key.gpg
+#    $ rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
+#
+#    # the following repository was needed only for GCP image
+#    # other images was able successfully install conntrack-tools using existing repository
+#
+#    $ zypper addrepo https://download.opensuse.org/repositories/security:netfilter/SLE_12/security:netfilter.repo conntrack
+#    $ zypper refresh conntrack
+#
+#    # conntrack presence is checked during kubeadm pre-flight checks
+#    # but zypper unable to find appropriate dependency for kubelet,
+#    # so let's install it manually
+#
+#    $ zypper install conntrack-tools
+#
+#    # refresh Google repository cache and check if we see several versions of Kubernetes packages to choose from
+#
+#    $ zypper refresh google-k8s
+#    $ zypper packages --repo google-k8s
+#
+#    # install latest available kubelet package
+#    # ignore conntrack dependency and install kubelet (Solution 2 in my case)
+#
+#    $ zypper install kubelet
+#
+#    # install kubeadm package. kubectl and cri-tools are installed as kubeadm dependency
+#
+#    $ zypper install kubeadm
+#
+#    # force docker to use systemd cgroup driver and overlay2 storage driver.
+#    # Check the links in the end of the answer for details.
+#    # BTW, kubelet would work even with default content of the file.
+#
+#    $ cat > /etc/docker/daemon.json <<EOF
+#    {
+#      "exec-opts": ["native.cgroupdriver=systemd"],
+#      "log-driver": "json-file",
+#      "log-opts": {
+#        "max-size": "100m"
+#      },
+#      "storage-driver": "overlay2"
+#    }
+#    EOF
+#
+#    # Not sure if it's necessary it was taken from the Kubernetes documentation
+#
+#    $ mkdir -p /etc/systemd/system/docker.service.d
+#
+#    # lets start and enable docker and kubelet services
+#
+#    $ systemctl start docker.service
+#    $ systemctl enable docker.service
+#    $ systemctl enable kubelet.service
+#
+#    # apply configured earlier sysctl settings.
+#    # net.bridge.bridge-nf-call-iptables becomes available after successfully starting
+#    # Docker service
+#
+#    $ sysctl -p
+#
+#    # Now it's time to initialize Kubernetes master node.
+#    # Ignore pre-flight checks for Vagrant box.
+#
+#    $ kubeadm init --pod-network-cidr=10.244.0.0/16
+#
+#    # prepare kubectl configuration to connect the cluster
+#
+#    $  mkdir -p $HOME/.kube
+#    $  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+#    $  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+#
+#    # Check if api-server responds to our requests.
+#    # At this moment it's fine to see master node in NotReady state.
+#
+#    $ kubectl get nodes
+#
+#    # Deploy Flannel network addon
+#
+#    $ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+#
+#    # remove taint from the master node.
+#    # It allows master node to run application pods.
+#    # At least one worker node is required if this step is skipped.
+#
+#    $ kubectl taint nodes --all node-role.kubernetes.io/master-
+#
+#    # run test pod to check if everything works fine
+#
+#    $ kubectl run nginx1 --image=nginx
+#
+#    # after some time... ~ 3-5 minutes
+#
+#    # check the pods' state
+#
+#    $ kubectl get pods -A -o wide
+
+}
+
+
+# Check if kubernetes is installed
+echo " - Installing kubernetes"
+if [[ -f "/etc/debian_version" ]]; then
+    install_k8s_debian_based
+
+elif [[ -f "/etc/redhat-release" ]]; then
+
+    install_k8s_redhat_based
+
+elif [[ -f "/etc/SUSE-brand" ]]; then
+
+    install_k8s_suse_based
+
+else
+
+    echo " - !! ERROR : Could not find any brand marker file "
+    echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
+    exit 104
+
+fi
 
 echo " - Disabling IPv6"
 

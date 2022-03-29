@@ -67,11 +67,19 @@ docker exec -i zeppelin_template apt-get install -y zip netcat sshpass > /tmp/ze
 fail_if_error $? "/tmp/zeppelin_build_log" -11
 
 echo " - Installing python"
-docker exec -i zeppelin_template apt-get -y install  python-dev python-six python-virtualenv python-pip cython > /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip cython3 > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -5
 
+echo " - Switching python default version to 3.x"
+docker exec -i zeppelin_template update-alternatives --force --install /usr/bin/python python /usr/bin/python2.7 1 > /tmp/zeppelin_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
+docker exec -i zeppelin_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.7 2 > /tmp/zeppelin_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
+
+
 echo " - Installing python packages for datascience"
-docker exec -i zeppelin_template pip install pandas scikit-learn matplotlib nltk plotly filelock py4j kafka-python > /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template apt-get -y install python3-sklearn python3-numpy python3-pandas python3-plotly python3-kafka python3-filelock python3-matplotlib python3-nltk > /tmp/zeppelin_build_log 2>&1
+#docker exec -i zeppelin_template pip3 install pandas numpy scikit-learn matplotlib nltk plotly filelock py4j kafka-python3 > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
 echo " - Installing GlusterFS client"
@@ -100,9 +108,9 @@ if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS
 fi
 rm -f __installKafkaEff.sh
 
-echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
-docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -3
+#echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
+#docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_build_log" -3
 
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then

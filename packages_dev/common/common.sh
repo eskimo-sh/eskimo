@@ -38,13 +38,13 @@
 export ESKIMO_VERSION=0.4
 export DEBIAN_VERSION=debian_10_buster
 
-export FLINK_VERSION=1.12.2
+export FLINK_VERSION=1.13.6
 export FLINK_HADOOP_VERSION=2.8.3-10.0
 
 export HADOOP_MAJOR_VERSION=2.8
 
-export SPARK_VERSION=2.4.7
-export SPARK_VERSION_MAJOR=2.4
+export SPARK_VERSION=3.2.1
+export SPARK_VERSION_MAJOR=3.2
 
 # CAUTION : This version number needs to be aligned with the expected mesos version defined in
 # /services_setup/base-eskimo/install-mesos.sh
@@ -56,17 +56,18 @@ export MARATHON_VERSION=1.10.17-c427ce965
 # from sources
 export MARATHON_VERSION_SOURCES_GITHUB=1.10.17
 
-export DOCKER_REGISTRY_VERSION=2.7.1+ds2-7+b2_amd64
+export DOCKER_REGISTRY_VERSION=2.7.1+ds2-7+b6_amd64
 
 export ES_VERSION=7.10.2
 export ES_VERSION_MAJOR=7
 
 export CEREBRO_VERSION=0.9.3
 
-export KAFKA_VERSION=2.4.1
+export KAFKA_VERSION=2.8.1
 export KAFKA_MANAGER_VERSION=3.0.0.5
 
-export SCALA_VERSION=2.11
+export SCALA_VERSION=2.12
+export SCALA_VERSION_FULL=2.12.2
 export SPARK_STREAMING_KAFKA_CON_VERSION=0-10
 export SPARK_STREAMING_KAFKA_CLIENT_VERSION=2.0.0
 export SPARK_UNUSED_VERSION=1.0.0
@@ -80,9 +81,9 @@ export PROMETHEUS_PUSHGATEWAY_VERSION=1.3.1
 export PROMETHEUS_MESOS_EXPORTER_VERSION=1.1.2
 
 # Zeppelin
-export ZEPPELIN_VERSION_FULL=0.9.0
-export ZEPPELIN_VERSION=0.9
-export ZEPPELIN_VERSION_SNAPSHOT=0.9.1-SNAPSHOT
+export ZEPPELIN_VERSION_FULL=0.10.1
+export ZEPPELIN_VERSION=0.10
+export ZEPPELIN_VERSION_SNAPSHOT=0.10.2-SNAPSHOT
 export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master (which is rarely working)
 
 
@@ -113,6 +114,23 @@ check_for_docker() {
     fi
 }
 
+function install_scala() {
+
+    cd /tmp
+
+    wget https://downloads.lightbend.com/scala/$SCALA_VERSION_FULL/scala-$SCALA_VERSION_FULL.deb
+    if [[ $? != 0 ]]; then
+        echo "Failed to download scala"
+        exit 10
+    fi
+
+    dpkg -i scala-$SCALA_VERSION_FULL.deb
+    if [[ $? != 0 ]]; then
+        echo "Failed to install scala"
+        exit 10
+    fi
+}
+
 # This function is used after proper building of a service image to close the image and save it
 # Arguments are:
 # - $1 the image name
@@ -125,7 +143,7 @@ function close_and_save_image() {
     fi
     IMAGE=$1
 
-	if [[ $2 == "" ]]; then
+      if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
         exit 3
     fi
@@ -136,7 +154,7 @@ function close_and_save_image() {
         exit 4
     fi
     VERSION=$3
-	
+    
     echo " - Cleaning apt cache"
     docker exec -i $IMAGE apt-get clean -q > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -2
@@ -159,7 +177,7 @@ function close_and_save_image() {
 
     # save base image
     echo " - Saving image ""$IMAGE"
-	if [[ -z $TEST_MODE ]]; then set -e; fi
+    if [[ -z $TEST_MODE ]]; then set -e; fi
     docker save eskimo:"$IMAGE" | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
     set +e
 
@@ -189,8 +207,8 @@ function build_image() {
         exit 2
     fi
     IMAGE=$1
-	
-	if [[ $2 == "" ]]; then
+    
+    if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
         exit 3
     fi

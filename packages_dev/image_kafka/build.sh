@@ -54,7 +54,7 @@ docker exec -i kafka_template apt-get install -y openjdk-11-jdk > /tmp/kafka_bui
 fail_if_error $? "/tmp/kafka_build_log" -3
 
 echo " - Installing scala"
-docker exec -i kafka_template apt-get install -y scala > /tmp/kafka_build_log 2>&1
+docker exec -i kafka_template bash -c ". /common/common.sh && install_scala" > /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -4
 
 #echo " - Installing python"
