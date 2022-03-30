@@ -77,6 +77,12 @@ nodes = [
   { :hostname => 'small-node4', :box => 'centos/7',  :ip => '192.168.56.74', :ram => 6000},
 ]
 
+# Ubuntu xenial requires :
+#sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+#sudo apt-get update
+#sudo apt-get install gcc-4.9
+#sudo apt-get upgrade libstdc++6
+
 # All Vagrant configuration is done here. The most common configuration
 # options are documented and commented below. For a complete reference,
 # please see the online documentation at vagrantup.com.

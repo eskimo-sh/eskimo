@@ -46,6 +46,11 @@ export HADOOP_MAJOR_VERSION=2.8
 export SPARK_VERSION=3.2.1
 export SPARK_VERSION_MAJOR=3.2
 
+export K8S_VERSION=1.23.5
+export CFSSL_VERSION=1.6.1
+export ETCD_VERSION=3.4.18
+export FLANNEL_VERSION=0.17.0
+
 # CAUTION : This version number needs to be aligned with the expected mesos version defined in
 # /services_setup/base-eskimo/install-mesos.sh
 export AMESOS_VERSION=1.11.0

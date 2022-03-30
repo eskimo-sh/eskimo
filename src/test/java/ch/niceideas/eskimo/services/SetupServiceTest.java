@@ -135,6 +135,14 @@ public class SetupServiceTest extends AbstractSystemTest {
         version = setupService.parseVersion("docker_template_mesos-master_1.8.1_1.tar.gz");
         assertNotNull(version);
         assertEquals(new Pair<> ("1.8.1", "1"), version);
+
+        version = setupService.parseVersion("eskimo_mesos-debian_1.11.0_1.tar.gz");
+        assertNotNull(version);
+        assertEquals(new Pair<> ("1.11.0", "1"), version);
+
+        version = setupService.parseVersion("eskimo_k8s_1.23.5_1.tar.gz");
+        assertNotNull(version);
+        assertEquals(new Pair<> ("1.23.5", "1"), version);
     }
 
     @Test

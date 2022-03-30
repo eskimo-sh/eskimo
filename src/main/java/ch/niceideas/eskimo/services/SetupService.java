@@ -77,7 +77,7 @@ public class SetupService {
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
     public static final String NO_DOWNLOAD_IN_SNAPSHOT_ERROR = "Downloading packages is not supported on development version (SNAPSHOT)";
 
-    private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+    private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z0-9\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
 
     @Autowired
     private NotificationService notificationService;
