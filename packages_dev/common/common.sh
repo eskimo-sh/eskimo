@@ -50,6 +50,9 @@ export K8S_VERSION=1.23.5
 export CFSSL_VERSION=1.6.1
 export ETCD_VERSION=3.4.18
 export FLANNEL_VERSION=0.17.0
+export K8S_DASHBOARD_VERSION=2.5.1
+export GOLANG_VERSION=1.17
+export FULL_GOLANG_DEBIAN_VERSION=1.17.8-1~bpo11+1
 
 # CAUTION : This version number needs to be aligned with the expected mesos version defined in
 # /services_setup/base-eskimo/install-mesos.sh
@@ -62,6 +65,7 @@ export MARATHON_VERSION=1.10.17-c427ce965
 export MARATHON_VERSION_SOURCES_GITHUB=1.10.17
 
 export DOCKER_REGISTRY_VERSION=2.7.1+ds2-7+b6_amd64
+export DOCKER_REGISTRY_VERSION_SHORT=2.7.1
 
 export ES_VERSION=7.10.2
 export ES_VERSION_MAJOR=7

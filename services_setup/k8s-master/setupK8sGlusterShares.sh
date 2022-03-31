@@ -36,5 +36,5 @@
 
 set -e
 
-# Handling /var/lib/marathon/docker_registry
-/usr/local/sbin/gluster_mount.sh marathon_registry /var/lib/marathon/docker_registry marathon
+# Handling /var/lib/kubernetes/docker_registry
+/usr/local/sbin/gluster_mount.sh kubernetes_registry /var/lib/kubernetes/docker_registry kubernetes

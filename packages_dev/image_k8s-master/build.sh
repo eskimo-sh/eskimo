@@ -40,35 +40,33 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "Building Grafana Image"
+echo "Building K8s-master Image"
 echo "--------------------------------------------------------------------------------"
 
 # reinitializing log
-rm -f /tmp/k8s-dashboard_build_log
+rm -f /tmp/k8s-master_build_log
 
-echo " - Building image grafana"
-build_image k8s-dashboard_template /tmp/k8s-dashboard_build_log
+echo " - Building image k8s-master"
+build_image k8s-master_template /tmp/k8s-master_build_log
 
-echo " - Installing dashboard dependencies"
-docker exec -i k8s-dashboard_template apt-get install -y adduser libfontconfig1 > /tmp/k8s-dashboard_build_log 2>&1
-fail_if_error $? "/tmp/k8s-dashboard_build_log" -5
+echo " - Installing OpenJDK 11"
+docker exec -i k8s-master_template apt-get install -y openjdk-11-jdk > /tmp/k8s-master_build_log 2>&1
 
-echo " - Installing k8s-dashboard"
-docker exec -i k8s-dashboard_template bash /scripts/installK8sDashboard.sh | tee -a /tmp/k8s-dashboard_build_log 2>&1
-if [[ `tail -n 1 /tmp/k8s-dashboard_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+echo " - Installing Docker Registry"
+docker exec -i k8s-master_template bash /scripts/installDockerRegistry.sh | tee /tmp/k8s-master_build_log 2>&1
+if [[ `tail -n 1 /tmp/k8s-master_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
-    cat /tmp/k8s-dashboard_build_log
+    cat /tmp/k8s-master_build_log
     exit 102
 fi
 
 #echo " - TODO"
-#docker exec -it k8s-dashboard_template bash
+#docker exec -it k8s-master_template bash
 
 
 echo " - Cleaning up image"
-docker exec -i k8s-dashboard_template apt-get remove -y git > /tmp/k8s-dashboard_build_log 2>&1
-docker exec -i k8s-dashboard_template apt-get -y auto-remove > /tmp/k8s-dashboard_build_log 2>&1
+docker exec -i k8s-master_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/k8s-master_build_log 2>&1
+docker exec -i k8s-master_template apt-get -y auto-remove >> /tmp/k8s-master_build_log 2>&1
 
-
-echo " - Closing and saving image grafana"
-close_and_save_image k8s-dashboard_template /tmp/k8s-dashboard_build_log $GRAFANA_VERSION
+echo " - Closing and saving image k8s-master"
+close_and_save_image k8s-master_template /tmp/k8s-master_build_log $DOCKER_REGISTRY_VERSION_SHORT

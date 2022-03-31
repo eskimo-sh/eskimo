@@ -34,31 +34,52 @@
 # Software.
 #
 
+set -e
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-sudo rm -Rf /tmp/k8s-dashboard_install_log
 
-echo "-- INSTALLING GRAFANA ----------------------------------------------------"
-
-if [ -z "$GRAFANA_VERSION" ]; then
-    echo "Need to set $GRAFANA_VERSION environment variable before calling this script !"
-    exit 1
+KUBERNETES_USER_ID=$1
+if [[ $KUBERNETES_USER_ID == "" ]]; then
+    echo " - Didn't get KUBERNETES User ID as argument"
+    exit -2
 fi
 
-saved_dir=`pwd`
-function returned_to_saved_dir() {
-     cd $saved_dir
-}
-trap returned_to_saved_dir 15
-trap returned_to_saved_dir EXIT
+# Loading topology
+. /etc/eskimo_topology.sh
 
-echo " - Changing to temp directory"
-mkdir -p /tmp/k8s-dashboard_setup
-cd /tmp/k8s-dashboard_setup
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit -1
+fi
 
-echo " - Downloading k8s-dashboard"
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit -2
+fi
+
+
+echo " - Creating kubernetes user (if not exist) in container"
+set +e
+kubernetes_user_id=`id -u kubernetes 2>/dev/null`
+set -e
+if [[ $kubernetes_user_id == "" ]]; then
+    useradd -u $KUBERNETES_USER_ID kubernetes
+elif [[ $kubernetes_user_id != $KUBERNETES_USER_ID ]]; then
+    echo "Docker KUBERNETES USER ID is $KUBERNETES_USER_ID while requested USER ID is $KUBERNETES_USER_ID"
+    exit -2
+fi
+
+echo " - Creating user kubernetes home directory"
+mkdir -p /home/kubernetes
+chown kubernetes /home/kubernetes
+
+echo " - Updating marathon registry config"
+sudo sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var\/lib\/kubernetes\/docker_registry"/g /etc/docker_registry/config.yml
+#rootdirectory: /var/lib/docker_registry
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo " - In container config SUCCESS"

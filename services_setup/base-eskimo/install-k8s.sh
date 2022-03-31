@@ -77,7 +77,7 @@ tar -zxf eskimo_k8s_$K8S_VERSION.tar.gz > /tmp/k8s_install_log 2>&1
 fail_if_error $? "/tmp/k8s_install_log" -2
 
 echo " - Removing any previous Kubernetes installation"
-sudo rm -Rf /usr/local/lib/k8s_$K8S_VERSION
+sudo rm -Rf /usr/local/lib/k8s-$K8S_VERSION
 sudo rm -Rf /usr/local/lib/k8s
 
 echo " - Installing Kubernetes"
@@ -128,16 +128,6 @@ for i in `ls -1 /usr/local/lib/k8s/kubernetes/server/bin/`; do
         sudo ln -s /usr/local/lib/k8s/kubernetes/server/bin/$i /usr/local/bin/$i
     fi
 done
-
-echo " - Create Kubernetes environment files"
-echo "   + TODO"
-# TODO
-
-echo " - Create SystemD unit files"
-echo "   + TODO"
-# TODO
-
-
 
 echo " - Create / update eskimo K8S version file"
 sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"

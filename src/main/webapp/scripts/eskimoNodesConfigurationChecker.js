@@ -33,7 +33,7 @@ Software.
 */
 
 
-const nodesConfigPropertyRE = /([a-zA-Z\-_]+)([0-9]*)/;
+const nodesConfigPropertyRE = /([a-zA-Z0-9\-_]*[a-zA-Z\-_]+)([0-9]*)/;
 const ipAddressCheck = /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)?/;
 
 const NODE_ID_FIELD = "node_id";

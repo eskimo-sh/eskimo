@@ -37,6 +37,8 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.NodesConfig = function() {
 
+    const SERVICE_NAME_REGEX = /([a-zA-Z0-9\-_]*[a-zA-Z\-_]+)([0-9]*)/;
+
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
     this.eskimoServicesSelection = null;
@@ -221,8 +223,6 @@ eskimo.NodesConfig = function() {
 
     this.renderNodesConfig = function (data) {
 
-        let re = /([a-zA-Z\-_]+)([0-9]*)/;
-
         // render nodes and range containers
         let nodeIds = [];
         for (let serviceConfig in data) {
@@ -248,7 +248,7 @@ eskimo.NodesConfig = function() {
             if (serviceConfig.indexOf(NODE_ID_FIELD) > -1) {
                 $("#" + serviceConfig).val(data[serviceConfig]);
 
-                let match = serviceConfig.match(re);
+                let match = serviceConfig.match(SERVICE_NAME_REGEX);
 
                 let nbr = match[2];
 
@@ -266,7 +266,7 @@ eskimo.NodesConfig = function() {
 
             if (serviceConfig.indexOf(NODE_ID_FIELD) == -1) {
 
-                let match = serviceConfig.match(re);
+                let match = serviceConfig.match(SERVICE_NAME_REGEX);
 
                 let serviceName = null;
                 let nbr = -1;
@@ -362,15 +362,13 @@ eskimo.NodesConfig = function() {
     function onServicesSelectedForNode (model, nodeNbr) {
         console.log (nodeNbr, model);
 
-        let re = /([a-zA-Z\-_]+)([0-9]*)/;
-
         // clear all boxes
         for (let i = 0; i < CONFIGURED_SERVICES.length; i++) {
             $('#'+CONFIGURED_SERVICES[i]+nodeNbr).get(0).checked = false;
         }
 
         for (let key in model) {
-            let match = key.match(re);
+            let match = key.match(SERVICE_NAME_REGEX);
 
             let serviceName = null;
             if (match[2] != null && match[2] != "") {

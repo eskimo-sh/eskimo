@@ -1,0 +1,5 @@
+Copy of POD with archive of images used in local
+https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
+=> so here the image is actually just the archive of both used images !
+use docker pull to get both images kubernetesui/metrics-scraper:v1.0.7 and kubernetesui/dashboard:v2.5.1
+then installation is about

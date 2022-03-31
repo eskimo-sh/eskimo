@@ -36,5 +36,22 @@
 
 set -e
 
-# Handling /var/lib/marathon/docker_registry
-/usr/local/sbin/gluster_mount.sh marathon_registry /var/lib/marathon/docker_registry marathon
+echo " - Injecting topology"
+. /usr/local/sbin/inContainerInjectTopology.sh
+
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector.sh config.yml
+
+echo " - Creating required directories (as config.yml)"
+mkdir -p /var/log/kubernetes/log
+
+mkdir -p /var/lib/kubernetes/tmp
+
+mkdir -p /var/log/kubernetes/docker_registry
+mkdir -p /var/lib/kubernetes/docker_registry
+
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector.sh kubernetes
+
+echo " - Starting Docker registry"
+docker-registry serve /etc/docker_registry/config.yml > /var/log/kubernetes/docker_registry/docker_registry.log

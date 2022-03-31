@@ -320,6 +320,8 @@ function create_common_system_users() {
     create_user_infrastructure flink 3305
 
     create_user_infrastructure marathon 3306
+
+    create_user_infrastructure kubernetes 3307
 }
 
 # System Installation

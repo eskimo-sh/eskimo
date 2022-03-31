@@ -105,6 +105,13 @@ public class ServicesDefinition implements InitializingBean {
             if (configOrder == null) {
                 throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " it not properly declaring 'order' config");
             }
+
+            // ensure there is not already a service defined with same order
+            if (services.values().stream()
+                            .anyMatch(s -> s.getConfigOrder() == configOrder)) {
+                throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defining order " + configOrder + " which is already used");
+            }
+
             service.setConfigOrder(configOrder);
 
             Boolean unique = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.unique");

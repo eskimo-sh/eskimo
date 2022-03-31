@@ -60,7 +60,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
 
     private static final Logger logger = Logger.getLogger(NodesConfigWrapper.class);
 
-    private static final Pattern nodesConfigPropertyRE = Pattern.compile("([a-zA-Z\\-_]+)([0-9]*)");
+    private static final Pattern nodesConfigPropertyRE = Pattern.compile("([a-zA-Z0-9\\-_]*[a-zA-Z\\-_]+)([0-9]*)");
 
     public static final String NODE_ID_FIELD = "node_id";
 

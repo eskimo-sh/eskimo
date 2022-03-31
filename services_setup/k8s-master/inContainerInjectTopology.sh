@@ -36,5 +36,15 @@
 
 set -e
 
-# Handling /var/lib/marathon/docker_registry
-/usr/local/sbin/gluster_mount.sh marathon_registry /var/lib/marathon/docker_registry marathon
+# silent
+#echo " - Loading Topology"
+. /etc/eskimo_topology.sh
+
+export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
+if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
+    echo " - No zookeeper master found in topology"
+    exit 2
+fi
+
+# nothing to do in any configuration file
+
