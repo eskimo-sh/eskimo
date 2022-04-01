@@ -145,7 +145,10 @@ public class Topology {
 
                 servicesDefinition.executeInEnvironmentLock(persistentEnvironment -> {
 
-                    String variableName = NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase()+"_"+node.replace(".", "");
+                    String variableName = NODE_NBR_PREFIX
+                            + service.getName().toUpperCase().toUpperCase().replace("-", "_")
+                            + "_"
+                            + node.replace(".", "");
 
                     String varValue = (String) persistentEnvironment.getValueForPath(variableName);
                     if (StringUtils.isBlank(varValue)) {
@@ -156,7 +159,7 @@ public class Topology {
                         do {
                             boolean alreadyTaken = false;
                             for (String key : persistentEnvironment.getRootKeys()) {
-                                if (key.startsWith(NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase() + "_")) {
+                                if (key.startsWith(NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase().replace("-", "_") + "_")) {
                                     int value = Integer.parseInt((String)persistentEnvironment.getValueForPath(key));
                                     if (value >= counter) {
                                         alreadyTaken = true;
@@ -184,11 +187,13 @@ public class Topology {
                 String varName = addEnv.replace("-", "_");
 
                 List<String> allNodeList = new ArrayList<>(nodesConfig.getAllNodeAddressesWithService(serviceToList));
-                Collections.sort(allNodeList);
+                Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
                 String allNodes = String.join(",", allNodeList.toArray(new String[0]));
 
                 if (StringUtils.isNotBlank(allNodes)) {
                     addEnvForService.put(varName, allNodes);
+                } else {
+                    logger.warn ("No nodes found for " + serviceToList);
                 }
 
             } else if (addEnv.equals(CONTEXT_PATH)) {

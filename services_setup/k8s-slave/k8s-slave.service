@@ -1,0 +1,18 @@
+[Unit]
+Description=Eskimo Kubernetes Slave Infrastructure
+Documentation=https://www.eskimo.sh
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+TimeoutStartSec=300sec
+RemainAfterExit=false
+ExecStart=/usr/local/sbin/runK8sSlave.sh
+RestartSec=5
+Restart=always
+StartLimitBurst=6
+StartLimitInterval=100
+
+[Install]
+WantedBy=multi-user.target

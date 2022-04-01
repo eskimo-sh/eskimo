@@ -244,6 +244,8 @@ function install_and_check_service_file() {
     sudo systemctl daemon-reload >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 25
 
+    if [[ -z "$NO_SLEEP" ]]; then sleep 2; fi # hacky hack - I get weird and unexplainable errors here sometimes.
+
     echo " - Checking Systemd file"
     if [[ `sudo systemctl status $CONTAINER | grep 'could not be found'` != "" ]]; then
         echo "$CONTAINER systemd file installation failed"
@@ -264,10 +266,12 @@ function install_and_check_service_file() {
     sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 29
 
-    echo " - Testing systemd startup - Make sure service is really running"
-    if [[ `systemctl show -p SubState $CONTAINER | grep exited` != "" ]]; then
-        echo "$CONTAINER service is actually not really running"
-        exit 30
+    if [[ $3 != "NO_CHECK" ]]; then
+        echo " - Testing systemd startup - Make sure service is really running"
+        if [[ `systemctl show -p SubState $CONTAINER | grep exited` != "" ]]; then
+            echo "$CONTAINER service is actually not really running"
+            exit 30
+        fi
     fi
 
     #echo " - Testing systemd startup - stopping $CONTAINER"

@@ -261,10 +261,37 @@
   },
 
 
+  "k8s-slave": {
+    "config": {
+      "order": 6,
+      "group" : "Kubernetes",
+      "name" : "Slave",
+      "selectionLayout" : { "row" : 5, "col" : 1},
+      "memory": "verylarge",
+      "logo" : "images/k8s-slave-logo.png",
+      "icon" : "images/k8s-slave-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "k8s-master",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      }
+    ],
+    "additionalEnvironment": [
+      "ALL_NODES_LIST_k8s-slave",
+      "SERVICE_NUMBER_1_BASED"
+    ]
+  },
+
+
+
   "mesos-master": {
     "config": {
       "imageName" : "mesos-master",
-      "order": 6,
+      "order": 7,
       "unique": true,
       "group" : "Mesos",
       "name" : "Master",
@@ -355,7 +382,7 @@
 
   "mesos-agent": {
     "config": {
-      "order": 7,
+      "order": 8,
       "group" : "Mesos",
       "name" : "Agent",
       "selectionLayout" : { "row" : 3, "col" : 1},
@@ -457,7 +484,7 @@
   "marathon" : {
     "config": {
       "imageName" : "marathon",
-      "order": 8,
+      "order": 9,
       "unique": true,
       "group": "Mesos",
       "name": "Marathon",
@@ -541,7 +568,7 @@
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 9,
+      "order": 10,
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -632,7 +659,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 10,
+      "order": 11,
       "marathon": true,
       "unique": true,
       "group" : "Kafka",
@@ -679,7 +706,7 @@
   "spark-history-server" : {
     "config": {
       "imageName" : "spark",
-      "order": 11,
+      "order": 12,
       "marathon": true,
       "unique": true,
       "group" : "Spark",
@@ -741,7 +768,7 @@
   "spark-executor" : {
     "config": {
       "imageName" : "spark",
-      "order": 12,
+      "order": 13,
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 3, "col" : 3},
@@ -837,7 +864,7 @@
   "flink-app-master" : {
     "config": {
       "imageName" : "flink",
-      "order": 13,
+      "order": 14,
       "unique": true,
       "group": "Flink",
       "name": "App Master",
@@ -939,7 +966,7 @@
   "flink-worker" : {
     "config": {
       "imageName" : "flink",
-      "order": 14,
+      "order": 15,
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "row": 4, "col": 3  },
@@ -977,7 +1004,7 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 15,
+      "order": 16,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 2, "col" : 3},
@@ -1016,7 +1043,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 16,
+      "order": 17,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1049,7 +1076,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 17,
+      "order": 18,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 1, "col" : 3},
@@ -1138,7 +1165,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 18,
+      "order": 19,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1202,7 +1229,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 19,
+      "order": 20,
       "marathon": true,
       "unique": true,
       "name" : "Zeppelin",

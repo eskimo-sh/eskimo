@@ -37,7 +37,8 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.ServicesSelection = function() {
 
-    const SERVICE_NAME_REGEX = /([a-zA-Z0-9\-_]*[a-zA-Z\-_]+)([0-9]*)-(choice)/;;
+    const SERVICE_CHOICE_REGEX = /([a-zA-Z0-9\-_]*[a-zA-Z\-_]+)([0-9]*)-(choice)/;;
+    const SERVICE_NAME_REGEX   = /([a-zA-Z0-9\-_]*[a-zA-Z\-_]+)([0-9]*)/;
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -180,9 +181,8 @@ eskimo.ServicesSelection = function() {
             let setupConfig = that.getCurrentNodesConfig();
 
             for (let key in setupConfig) {
-                //let re = /([a-zA-Z\-_]+)([0-9]+)/;
-                let re = /([a-zA-Z\-_]+)([0-9]*)/;
-                let match = key.match(re);
+
+                let match = key.match(SERVICE_NAME_REGEX);
 
                 let serviceName = null;
                 let nbr = -1;
@@ -270,7 +270,7 @@ eskimo.ServicesSelection = function() {
 
         //console.log (radioButton.id);
 
-        let match = this.id.match(SERVICE_NAME_REGEX);
+        let match = this.id.match(SERVICE_CHOICE_REGEX);
 
 
         console.log(this.id + " - " + match[1] + " - " + match[2] + " - " + match[3]);
