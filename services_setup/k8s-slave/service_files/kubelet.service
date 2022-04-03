@@ -34,43 +34,46 @@
 
 
 [Unit]
-Description=etcd Server
+Description=kubelet: The Kubernetes Node Agent
+Documentation=https://kubernetes.io/docs/concepts/overview/components/#kubelet https://kubernetes.io/docs/reference/generated/kubelet/
 After=network.target
 After=network-online.target
 Wants=network-online.target
+PartOf=k8s-slave.service
 
 [Service]
 Type=simple
 TimeoutStartSec=300sec
 RemainAfterExit=false
-User=kubernetes
-WorkingDirectory=/var/lib/etcd/
-ExecStart=/bin/bash -c ". /etc/k8s/etcd.env.sh && /usr/local/bin/etcd \
-  --name $ESKIMO_ETCD_NODE_NAME \
-  --initial-advertise-peer-urls $EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS \
-  --listen-peer-urls $EKIMO_ETCD_LISTEN_PEER_URLS \
-  --listen-client-urls $EKIMO_ETCD_LISTEN_CLIENT_URLS \
-  --advertise-client-urls $EKIMO_ETCD_ADVERTISE_CLIENT_URLS \
-  --initial-cluster-token $EKIMO_ETCD_INITIAL_CLUSTER_TOKEN \
-  --initial-cluster $EKIMO_ETCD_INITIAL_CLUSTER \
-  --initial-cluster-state $EKIMO_ETCD_INITIAL_CLUSTER_STATE \
-  --data-dir $EKIMO_ETCD_DATA_DIR"
+WorkingDirectory=/var/lib/kubelet
 
-# The day I enable HTTPS
-#  --cert-file $EKIMO_ETCD_CERT_FILE \
-#  --key-file $EKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$EKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $EKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$EKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$EKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$EKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$EKIMO_ETCD_PEER_TRUSTED_CA_FILE \
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
+
+ExecStart=/bin/bash -c ". /etc/k8s/kubelet.env.sh && /usr/local/bin/kubelet \
+  --address=$ESKIMO_KUBELET_ADDRESS \
+  --hostname-override=$ESKIMO_KUBELET_HOSTNAME \
+  --cluster-dns=$ESKIMO_CLUSTER_DNS \
+  --cluster-domain=$ESKIMO_CLUSTER_DNS_DOMAIN \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --tls-cert-file=$ESKIMO_KUBE_TLS_CERT_FILE \
+  --tls-private-key-file=$ESKIMO_KUBE_TLS_PRIVATE_KEY \
+  --client-ca-file=$ESKIMO_KUBE_CLIENT_CA_FILE \
+  --v=$ESKIMO_KUBE_LOG_LEVEL \
+  --cgroup-driver $KUBELET_CGROUP_DRIVER \
+  --fail-swap-on=$ESKIMO_KUBELET_FAIL_SWAP_ON \
+  --bootstrap-kubeconfig=$ESKIMO_BOOTSTRAP_KUBECONFIG \
+  --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG"
+
+#--port=$ESKIMO_KUBELET_PORT
 
 RestartSec=5
 LimitNOFILE=65536
 Restart=always
 StartLimitBurst=6
 StartLimitInterval=100
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
+RequiredBy=k8s-slave.service

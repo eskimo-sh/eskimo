@@ -37,7 +37,7 @@
 
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
     echo "Could not find /etc/eskimo_topology.sh"
-    exit -1
+    exit 1
 fi
 
 . /etc/eskimo_topology.sh
@@ -54,17 +54,19 @@ export EKIMO_ETCD_PORT=2379
 
 # IPs of master nodes
 # TODO
-export MASTER1_IP=$MASTER_K8S_MASTER
+export MASTER1_IP=$MASTER_K8S_MASTER_1
 #export MASTER2_IP="192.168.1.102"
 #export MASTER3_IP="192.168.1.103"
 
 # TLS Bootstrapping Token
 # $(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32;)
-export BOOTSTRAP_TOKEN=khFZp2U5yWIgcjl0UsWU-cmeh05PQHXB
+export BOOTSTRAP_TOKEN=1Qb_YYlsOFKa0q-4hur12yn_7urzYCRZ
 
 # Use unused netword ip range to define service ip and pod ip
 # (Service CIDR)
-export SERVICE_CIDR="10.254.0.0/16"
+#export SERVICE_CIDR="10.254.0.0/16"
+# TODO FIXME this should be computed dynamically from k8s nodes IPs
+export SERVICE_CIDR="192.168.56.0/24"
 
 # Pod Cluster CIDR
 export CLUSTER_CIDR="172.30.0.0/16"
@@ -85,16 +87,36 @@ done
 #export EKIMO_ETCD_ENDPOINTS="https://$ETCD1_IP:$EKIMO_ETCD_PORT,https://$ETCD2_IP:$EKIMO_ETCD_PORT,https://$ETCD3_IP:$EKIMO_ETCD_PORT"
 
 # flanneld etcd prefix
-export FLANNEL_EKIMO_ETCD_PREFIX="/kubernetes/network"
+export FLANNEL_ETCD_PREFIX="/eskimo/network"
 
 # kubernetes service IP (normarlly the first IP in SERVICE_CIDR)
-export CLUSTER_KUBERNETES_SVC_IP="10.254.0.1"
+#export CLUSTER_KUBERNETES_SVC_IP="10.254.0.1"
+export CLUSTER_KUBERNETES_SVC_IP="$MASTER_K8S_MASTER_1"
 
 #  DNS IP for the cluster (assigned from SERVICE_CIDR)
-export CLUSTER_DNS_SVC_IP="10.254.0.2"
+#export CLUSTER_DNS_SVC_IP="10.254.0.1"
+export CLUSTER_DNS_SVC_IP="$MASTER_K8S_MASTER_1"
 
 #  DNS domain name
 export CLUSTER_DNS_DOMAIN="cluster.eskimo"
 
 # MASTER API Server
-export MASTER_URL="k8s-api.virtual.eskimo"
+#export MASTER_URL="k8s-api.virtual.eskimo"
+export MASTER_URL="$MASTER_K8S_MASTER_1"
+
+export ESKIMO_KUBE_APISERVER="https://${MASTER_URL}:6443"
+
+# journal message level, 0 is debug, 2 is INFO
+export ESKIMO_KUBE_LOG_LEVEL="2"
+
+# logging to stderr means we get it in the systemd journal
+export ESKIMO_KUBE_LOGTOSTDERR="true"
+
+export ESKIMO_ALLOW_PRIVILEGED="true"
+
+# The certificates used by API server
+export ESKIMO_KUBE_TLS_CERT_FILE=/etc/k8s/ssl/kubernetes.pem
+
+export ESKIMO_KUBE_TLS_PRIVATE_KEY=/etc/k8s/ssl/kubernetes-key.pem
+
+export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/ssl/ca.pem

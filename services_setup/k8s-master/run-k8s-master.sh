@@ -36,7 +36,8 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=etcd
+REQUIRED_SERVICES=docker-registry,etcd
+# ,flannel
 
 while : ; do
 

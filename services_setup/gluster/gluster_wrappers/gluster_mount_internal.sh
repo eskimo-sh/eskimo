@@ -146,6 +146,7 @@ if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
     echo " - reloading systemd daemon"
     /bin/systemctl daemon-reload
 
+    sleep 2
 fi
 
 

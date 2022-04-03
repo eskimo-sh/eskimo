@@ -224,7 +224,7 @@
             "name": "target.volumes",
             "comment": "The volumes to be automagically managed by EGMI.",
             "defaultValue": "",
-            "value": "spark_eventlog,spark_data,flink_data,flink_completed_jobs,logstash_data,marathon_registry,kubernetes_registry"
+            "value": "spark_eventlog,spark_data,flink_data,flink_completed_jobs,logstash_data,marathon_registry,kubernetes_registry,kubernetes_ssl"
           }
         ]
       }
@@ -257,7 +257,16 @@
       "memory": "neglectable",
       "logo" : "images/k8s-master-logo.png",
       "icon" : "images/k8s-master-icon.png"
-    }
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false,
+        "restart": true
+      }
+    ]
   },
 
 
@@ -277,6 +286,13 @@
         "masterService": "k8s-master",
         "numberOfMasters": 1,
         "mandatory": true,
+        "restart": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false,
         "restart": true
       }
     ],

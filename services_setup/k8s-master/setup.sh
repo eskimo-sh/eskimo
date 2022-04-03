@@ -71,40 +71,58 @@ echo " - Creating kubernetes user (if not exist)"
 export kubernetes_user_id=`id -u kubernetes 2>> k8s-master_install_log`
 if [[ $kubernetes_user_id == "" ]]; then
     echo "User kubernetes should have been added by eskimo-base-system setup script"
-    exit -4
+    exit 4
 fi
-
-echo " - Registering kubernetes registry"
-# remove any previous definition
-sudo sed -i '/.* kubernetes.registry/d' /etc/hosts
-sudo bash -c "echo \"$MASTER_KUBERENETES_1 kubernetes.registry\" >> /etc/hosts"
-
 
 # Create shared dir
 echo " - Creating shared directory"
+echo " - Creating shared directory"
+if [[ ! -d /var/lib/kubernetes ]]; then
+    sudo mkdir -p /var/lib/kubernetes
+    sudo chmod -R 777 /var/lib/kubernetes
+    sudo chown -R kubernetes /var/lib/kubernetes
+fi
+if [[ ! -d /var/run/kubernetes ]]; then
+    sudo mkdir -p /var/run/kubernetes
+    sudo chown -R kubernetes /var/run/kubernetes
+fi
+if [[ ! -d /var/log/kubernetes ]]; then
+    sudo mkdir -p /var/log/kubernetes
+    sudo chmod -R 777 /var/log/kubernetes
+    sudo chown -R kubernetes /var/log/kubernetes
+fi
+
 sudo mkdir -p /var/log/kubernetes/log
 sudo chown kubernetes /var/log/kubernetes/log
 
 sudo mkdir -p /var/lib/kubernetes/tmp
 sudo chown -R kubernetes /var/lib/kubernetes
 
+
+echo " - Installing kubernetes docker registry"
+
+echo "   + Registering kubernetes registry"
+# remove any previous definition
+sudo sed -i '/.* kubernetes.registry/d' /etc/hosts
+sudo bash -c "echo \"$MASTER_KUBERENETES_1 kubernetes.registry\" >> /etc/hosts"
+
 sudo mkdir -p /var/log/kubernetes/docker_registry
 sudo chown -R kubernetes /var/log/kubernetes/docker_registry
 sudo mkdir -p /var/lib/kubernetes/docker_registry
 sudo chown -R kubernetes /var/lib/kubernetes/docker_registry
 
-echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
-sudo cp setupK8sGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
+echo "   + Installing setupKubernetesRegistryGlusterShares.sh to /usr/local/sbin"
+sudo cp setupKubernetesRegistryGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
 
-echo " - Building container kubernetes"
+echo "   + Building container k8s-registry"
 build_container k8s-registry k8s-master k8s-master_install_log
 
 #sudo mkdir -p /usr/local/etc/kubernetes
 #sudo chown -R kubernetes/usr/local/etc/kubernetes
 
 # create and start container
-echo " - Running docker container"
+echo "   + Running docker container"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
@@ -123,23 +141,67 @@ fail_if_error $? "k8s-master_install_log" -2
 # connect to container
 #docker exec -it kubernetes bash
 
-echo " - Configuring Registry in container"
+echo "   + Configuring Registry in container"
 docker exec k8s-registry bash /scripts/inContainerSetupRegistry.sh $kubernetes_user_id $SELF_IP_ADDRESS | tee -a k8s-master_install_log 2>&1
 if [[ `tail -n 1 k8s-master_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat k8s-master_install_log
-    exit -101
+    exit 101
 fi
 
 #echo " - TODO"
 #docker exec -it kubernetes TODO
 
-
-echo " - Handling topology and setting injection"
+echo "   + Handling topology and setting injection"
 handle_topology_settings k8s-registry k8s-master_install_log
 
-echo " - Committing changes to local template and exiting container kubernetes"
+echo "   + Committing changes to local template and exiting container kubernetes"
 commit_container k8s-registry k8s-master_install_log
+
+echo " - Linking /etc/k8s to /usr/local/lib/k8s/etc"
+if [[ ! -L /etc/k8s ]]; then
+    sudo ln -s /usr/local/lib/k8s/etc /etc/k8s
+fi
+
+echo " - Copying kubernetes env files to /etc/k8s"
+for i in `find ./etc_k8s -mindepth 1`; do
+    sudo cp $i /etc/k8s/
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /etc/k8s/$filename
+done
+
+echo " - Copying SystemD unit files to /lib/systemd/system"
+for i in `find ./service_files -mindepth 1`; do
+    sudo cp $i /lib/systemd/system/
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /lib/systemd/system/$filename
+done
+
+# TODO Indvidual kubernetes master components
+
+# Setup all individual services
+
+echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
+sudo cp setupK8sGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
+
+bash ./setup-kubectl.sh
+fail_if_error $? /dev/null 301
+
+bash ./setup-etcd.sh
+fail_if_error $? /dev/null 302
+
+bash ./setup-kubeapi.sh
+fail_if_error $? /dev/null 303
+
+
+echo " - Copying k8s-master process file to /usr/local/sbin"
+sudo cp run-k8s-master.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/run-k8s-master.sh
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file k8s-master k8s-master_install_log
+
+echo " - Running postinstallation confgurations"
+
+bash ./setup-kubectl.sh

@@ -90,16 +90,16 @@ sudo ln -s /usr/local/lib/k8s-$K8S_VERSION /usr/local/lib/k8s
 set -e
 
 echo " - Simlinking k8s config to /usr/local/etc/k8s"
-sudo mkdir -p /usr/local/etc/
-sudo mkdir -p /usr/local/lib/k8s/etc
-if [[ ! -f /usr/local/etc/k8s ]]; then
-    sudo ln -s /usr/local/lib/k8s/etc /usr/local/etc/k8s
+sudo mkdir -p /usr/local/etc/k8s
+if [[ ! -L /usr/local/lib/k8s/etc ]]; then
+    sudo ln -s /usr/local/etc/k8s /usr/local/lib/k8s/etc
 fi
 
 echo " - Simlinking K8s binaries to /usr/local/bin"
 
 echo "   + cfssl"
 sudo ln -s /usr/local/lib/k8s/cfssl/bin/cfssl /usr/local/bin/cfssl
+sudo ln -s /usr/local/lib/k8s/cfssl/bin/cfssljson /usr/local/bin/cfssljson
 
 echo "   + etcd"
 for i in `ls -1 /usr/local/lib/k8s/etcd/bin/`; do

@@ -237,7 +237,7 @@ function install_docker_debian_based() {
 function install_suse_mesos_dependencies() {
 
     echo "  - Installing other Mesos dependencies"
-    sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+    sudo zypper install -y binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
@@ -249,7 +249,7 @@ function install_suse_mesos_dependencies() {
 function install_redhat_mesos_dependencies() {
 
     echo "  - Installing other Mesos dependencies"
-    sudo yum install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+    sudo yum install -y binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
@@ -262,13 +262,41 @@ function install_debian_mesos_dependencies() {
 
     echo " - Installing other Mesos dependencies"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
-            libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/setup_log 2>&1
+            binutils libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/setup_log 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
         exit 51
     fi
 
+    # ubuntu fix glibc version
+    if [[ `uname -a | grep Ubuntu` != "" ]]; then
+        LIBSTDCPP=
+        if [[ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]]; then
+            LIBSTDCPP=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+        fi
+        if [[ -f /usr/lib64/libstdc++.so.6 ]]; then
+            LIBSTDCPP=/usr/lib64/libstdc++.so.6
+        fi
+
+        if [[ "$LIBSTDCPP" != "" ]]; then
+            echo "  - Checking libstdc++"
+
+            if [[ `! strings $LIBSTDCPP | grep GLIBCXX | grep 3.4.22` == "" ]]; then
+                sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test  >> /tmp/setup_log 2>&1
+                if [[ $? != 0 ]]; then cat /tmp/setup_log 1>&2; exit 101; fi
+
+                sudo apt-get -y update  >> /tmp/setup_log 2>&1
+                if [[ $? != 0 ]]; then cat /tmp/setup_log 1>&2; exit 101; fi
+
+                sudo apt-get -y install gcc-4.9 >> /tmp/setup_log 2>&1
+                if [[ $? != 0 ]]; then cat /tmp/setup_log 1>&2; exit 101; fi
+
+                sudo apt-get -y upgrade libstdc++6 >> /tmp/setup_log 2>&1
+                if [[ $? != 0 ]]; then cat /tmp/setup_log 1>&2; exit 101; fi
+            fi
+        fi
+    fi
 }
 
 function create_user_infrastructure() {
@@ -452,6 +480,7 @@ if [[ $? != 0 ]]; then
 
     fi
 fi
+
 
 echo "  - Enabling docker"
 enable_docker

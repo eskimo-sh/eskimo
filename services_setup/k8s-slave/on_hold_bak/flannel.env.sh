@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -33,44 +35,27 @@
 #
 
 
-[Unit]
-Description=etcd Server
-After=network.target
-After=network-online.target
-Wants=network-online.target
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
 
-[Service]
-Type=simple
-TimeoutStartSec=300sec
-RemainAfterExit=false
-User=kubernetes
-WorkingDirectory=/var/lib/etcd/
-ExecStart=/bin/bash -c ". /etc/k8s/etcd.env.sh && /usr/local/bin/etcd \
-  --name $ESKIMO_ETCD_NODE_NAME \
-  --initial-advertise-peer-urls $EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS \
-  --listen-peer-urls $EKIMO_ETCD_LISTEN_PEER_URLS \
-  --listen-client-urls $EKIMO_ETCD_LISTEN_CLIENT_URLS \
-  --advertise-client-urls $EKIMO_ETCD_ADVERTISE_CLIENT_URLS \
-  --initial-cluster-token $EKIMO_ETCD_INITIAL_CLUSTER_TOKEN \
-  --initial-cluster $EKIMO_ETCD_INITIAL_CLUSTER \
-  --initial-cluster-state $EKIMO_ETCD_INITIAL_CLUSTER_STATE \
-  --data-dir $EKIMO_ETCD_DATA_DIR"
+. /etc/k8s/env.sh
 
-# The day I enable HTTPS
-#  --cert-file $EKIMO_ETCD_CERT_FILE \
-#  --key-file $EKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$EKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $EKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$EKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$EKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$EKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$EKIMO_ETCD_PEER_TRUSTED_CA_FILE \
 
-RestartSec=5
-LimitNOFILE=65536
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
 
-[Install]
-WantedBy=multi-user.target
+export EKIMO_FLANNEL_ETCD_ENDPOINTS=$EKIMO_ETCD_ENDPOINTS
+echo "   + Using EKIMO_FLANNEL_ETCD_ENDPOINTS=$EKIMO_FLANNEL_ETCD_ENDPOINTS"
+
+# Directory prefix of flannel settings in etcd
+export ESKIMO_FLANNEL_ETCD_PREFIX="$FLANNEL_ETCD_PREFIX"
+echo "   + Using ESKIMO_FLANNEL_ETCD_PREFIX=$ESKIMO_FLANNEL_ETCD_PREFIX"
+
+export ESKIMO_FLANNEL_CA_FILE=/etc/k8s/ssl/ca.pem
+echo "   + Using ESKIMO_FLANNEL_CA_FILE=$ESKIMO_FLANNEL_CA_FILE"
+
+export ESKIMO_FLANNEL_CERT_FILE=/etc/k8s/ssl/flanneld.pem
+echo "   + Using ESKIMO_FLANNEL_CERT_FILE=$ESKIMO_FLANNEL_CERT_FILE"
+
+export ESKIMO_FLANNEL_KEY_FILE=/etc/k8s/ssl/flanneld-key.pem
+echo "   + Using ESKIMO_FLANNEL_KEY_FILE=$ESKIMO_FLANNEL_KEY_FILE"

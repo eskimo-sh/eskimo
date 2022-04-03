@@ -1,0 +1,57 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+After=etcd.service
+PartOf=k8s-master.service
+
+[Service]
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
+
+ExecStart=/bin/bash -c ". /etc/k8s/kubeapi.env.sh && /usr/local/bin/kube-apiserver \
+  --admission-control=$ESKIMO_KUBE_ADMISSION_CONTROL \
+  --advertise-address=$ESKIMO_KUBE_API_ADVERTISE_ADDRESS \
+  --bind-address=$ESKIMO_KUBE_API_BIND_ADDRESS \
+  --authorization-mode=$ESKIMO_KUBE_AUTHORIZATION_MODE \
+  --runtime-config=$ESKIMO_KUBE_RUNTIME_CONFIG \
+  --enable-bootstrap-token-auth \
+  --token-auth-file=$ESKIMO_KUBE_TOKEN_AUTH_FILE \
+      --service-cluster-ip-range=$ESKIMO_KUBE_SERVICE_ADDRESSES \
+  --service-node-port-range=$ESKIMO_KUBE_SERVICE_NODE_PORT_RANGE \
+  --service-account-key-file=$ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE \
+  --service-account-signing-key-file=$ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE \
+  --service-account-issuer=$ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER \
+  --tls-cert-file=$ESKIMO_KUBE_TLS_CERT_FILE \
+  --tls-private-key-file=$ESKIMO_KUBE_TLS_PRIVATE_KEY \
+  --client-ca-file=$ESKIMO_KUBE_CLIENT_CA_FILE \
+  --etcd-servers=$ESKIMO_KUBE_ETCD_SERVER \
+  --audit-log-maxage=$ESKIMO_KUBE_AUDIT_LOG_MAXAGE \
+  --audit-log-maxbackup=$ESKIMO_KUBE_AUDIT_LOG_MAXBACKUP \
+  --audit-log-maxsize=$ESKIMO_KUBE_AUDIT_LOG_MAXSIZE \
+  --audit-log-path=$ESKIMO_KUBE_AUDIT_LOG_PATH \
+  --audit-policy-file=$ESKIMO_KUBE_AUDIT_POLICY_FILE \
+  --v=$ESKIMO_KUBE_LOG_LEVEL \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --enable-swagger-ui=$ESKIMO_KUBE_ENABLE_SWAGGER_UI \
+  --allow-privileged=$ESKIMO_ALLOW_PRIVILEGED \
+  --event-ttl=$ESKIMO_KUBE_EVENT_TTL"
+
+# not using ssl for etcs for now
+#--etcd-cafile=$ESKIMO_KUBE_ETCD_CAFILE \
+#--etcd-certfile=$ESKIMO_KUBE_ETCD_CERTFILE \
+#--etcd-keyfile=$ESKIMO_KUBE_ETCD_KEYFILE \
+
+# this one is unsupprted as it seems
+#--kubelet-https=$ESKIMO_KUBE_KUBELET_HTTPS \
+
+Type=simple
+Restart=always
+StartLimitBurst=6
+StartLimitInterval=100
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=k8s-master.service

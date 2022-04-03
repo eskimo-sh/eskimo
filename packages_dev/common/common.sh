@@ -293,7 +293,7 @@ function create_binary_wrapper(){
 
     if [[ $1 == "" || $2 == "" ]]; then
         echo "target and wrapper have to be passed as argument of the create_binary_wrapper function"
-        exit -2
+        exit 2
     fi
     TARGET=$1
     WRAPPER=$2

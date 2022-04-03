@@ -64,13 +64,16 @@ echo " - Creating shared directory"
 if [[ ! -d /var/lib/kubernetes ]]; then
     sudo mkdir -p /var/lib/kubernetes
     sudo chmod -R 777 /var/lib/kubernetes
+    sudo chown -R kubernetes /var/lib/kubernetes
 fi
 if [[ ! -d /var/run/kubernetes ]]; then
     sudo mkdir -p /var/run/kubernetes
+    sudo chown -R kubernetes /var/run/kubernetes
 fi
 if [[ ! -d /var/log/kubernetes ]]; then
     sudo mkdir -p /var/log/kubernetes
     sudo chmod -R 777 /var/log/kubernetes
+    sudo chown -R kubernetes /var/log/kubernetes
 fi
 
 
@@ -88,7 +91,7 @@ sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
 # TODO Create Kubernetes environment and SystenD unit files
 
 echo " - Linking /etc/k8s to /usr/local/lib/k8s/etc"
-if [[ ! -f /etc/k8s ]]; then
+if [[ ! -L /etc/k8s ]]; then
     sudo ln -s /usr/local/lib/k8s/etc /etc/k8s
 fi
 
@@ -99,15 +102,6 @@ for i in `find ./etc_k8s -mindepth 1`; do
     sudo chmod 755 /etc/k8s/$filename
 done
 
-echo " - Creating /var/lib/etcd"
-sudo mkdir -p /var/lib/etcd
-sudo chown -R kubernetes /var/lib/etcd
-sudo chmod 700 /var/lib/etcd
-
-
-#TODO mkdir all folrders requires for etcd
-
-
 echo " - Copying SystemD unit files to /lib/systemd/system"
 for i in `find ./service_files -mindepth 1`; do
     sudo cp $i /lib/systemd/system/
@@ -116,10 +110,36 @@ for i in `find ./service_files -mindepth 1`; do
 done
 
 
+# Setup all individual services
+echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
+sudo cp setupK8sGlusterShares.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
+
+bash ./setup-kubectl.sh
+fail_if_error $? /dev/null 301
+
+bash ./setup-etcd.sh
+fail_if_error $? /dev/null 302
+
+# TODO Not for now, let's see if I really need that
+#bash ./setup-flannel.sh
+
+bash ./setup-kubelet.sh
+fail_if_error $? /dev/null 303
+
+
+TODO
+
+
+
+
+# TODO
+# ----------------------------------------------------------------------------------------------------------------------
+
 
 echo " - Copying k8s-slave process file to /usr/local/sbin"
-sudo cp runK8sSlave.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/runK8sSlave.sh
+sudo cp run-k8s-slave.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/run-k8s-slave.sh
 
 
 echo " - Create / update eskimo K8S version file"
@@ -137,6 +157,16 @@ if [[ -z $TEST_MODE && ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
     exit 21
 fi
 
-
 echo " - Installing and checking systemd service file"
 install_and_check_service_file k8s-slave k8s_install_log
+
+
+
+#ACZUALLY IT?S MORE COMPLICATED THAT THAN
+#- I need to start etcd (create partial function of install_and_check_service_file above for this)
+#- then configure flannel witin etcd
+#- then start flannel
+#- and finall start k8s.slave
+#(same in master)
+
+# TODO setup flannel

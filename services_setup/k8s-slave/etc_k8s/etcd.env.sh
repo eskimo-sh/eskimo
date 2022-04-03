@@ -37,7 +37,7 @@
 
 if [[ ! -f /etc/k8s/env.sh ]]; then
     echo "Could not find /etc/k8s/env.sh"
-    exit -1
+    exit 1
 fi
 
 . /etc/k8s/env.sh

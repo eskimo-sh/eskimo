@@ -1,0 +1,1 @@
+../../k8s-slave/etc_k8s/env.sh

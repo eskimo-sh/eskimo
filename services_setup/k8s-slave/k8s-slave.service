@@ -3,12 +3,16 @@ Description=Eskimo Kubernetes Slave Infrastructure
 Documentation=https://www.eskimo.sh
 Wants=network-online.target
 After=network-online.target
+Requires=etcd.service
+# TODO not for now
+#Requires=flannel.service
+
 
 [Service]
 Type=simple
 TimeoutStartSec=300sec
 RemainAfterExit=false
-ExecStart=/usr/local/sbin/runK8sSlave.sh
+ExecStart=/usr/local/sbin/run-k8s-slave.sh
 RestartSec=5
 Restart=always
 StartLimitBurst=6

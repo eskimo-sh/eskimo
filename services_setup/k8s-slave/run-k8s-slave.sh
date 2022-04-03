@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,45 +34,20 @@
 # Software.
 #
 
+echoerr() { echo "$@" 1>&2; }
 
-[Unit]
-Description=etcd Server
-After=network.target
-After=network-online.target
-Wants=network-online.target
+REQUIRED_SERVICES=etcd,kubelet
+# flannel,
 
-[Service]
-Type=simple
-TimeoutStartSec=300sec
-RemainAfterExit=false
-User=kubernetes
-WorkingDirectory=/var/lib/etcd/
-ExecStart=/bin/bash -c ". /etc/k8s/etcd.env.sh && /usr/local/bin/etcd \
-  --name $ESKIMO_ETCD_NODE_NAME \
-  --initial-advertise-peer-urls $EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS \
-  --listen-peer-urls $EKIMO_ETCD_LISTEN_PEER_URLS \
-  --listen-client-urls $EKIMO_ETCD_LISTEN_CLIENT_URLS \
-  --advertise-client-urls $EKIMO_ETCD_ADVERTISE_CLIENT_URLS \
-  --initial-cluster-token $EKIMO_ETCD_INITIAL_CLUSTER_TOKEN \
-  --initial-cluster $EKIMO_ETCD_INITIAL_CLUSTER \
-  --initial-cluster-state $EKIMO_ETCD_INITIAL_CLUSTER_STATE \
-  --data-dir $EKIMO_ETCD_DATA_DIR"
+while : ; do
 
-# The day I enable HTTPS
-#  --cert-file $EKIMO_ETCD_CERT_FILE \
-#  --key-file $EKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$EKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $EKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$EKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$EKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$EKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$EKIMO_ETCD_PEER_TRUSTED_CA_FILE \
+    sleep 10
 
-RestartSec=5
-LimitNOFILE=65536
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+    for i in ${REQUIRED_SERVICES//,/ }; do
+        if [[ `systemctl show -p SubState $i | grep exited` != "" ]]; then
+            echo "$i service is actually not really running"
+            exit 30
+        fi
+    done
 
-[Install]
-WantedBy=multi-user.target
+done

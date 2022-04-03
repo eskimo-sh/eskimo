@@ -226,18 +226,22 @@ function install_and_check_service_file() {
     fi
     export LOG_FILE=$2
 
-    if [[ -d /lib/systemd/system/ ]]; then
-        export systemd_units_dir=/lib/systemd/system/
-    elif [[ -d /usr/lib/systemd/system/ ]]; then
-        export systemd_units_dir=/usr/lib/systemd/system/
-    else
-        echo "Couldn't find systemd unit files directory"
-        exit 24
-    fi
+    if [[ `echo $3 | grep "SKIP_COPY"` == "" ]]; then
+        if [[ -d /lib/systemd/system/ ]]; then
+            export systemd_units_dir=/lib/systemd/system/
+        elif [[ -d /usr/lib/systemd/system/ ]]; then
+            export systemd_units_dir=/usr/lib/systemd/system/
+        else
+            echo "Couldn't find systemd unit files directory"
+            exit 24
+        fi
 
-    echo " - Copying $CONTAINER systemd file"
-    sudo cp $SCRIPT_DIR/$CONTAINER.service $systemd_units_dir
-    sudo chmod 644 $systemd_units_dir/$CONTAINER.service
+        echo " - Copying $CONTAINER systemd file"
+        sudo cp $SCRIPT_DIR/$CONTAINER.service $systemd_units_dir >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 25
+
+        sudo chmod 644 $systemd_units_dir/$CONTAINER.service
+    fi
 
     echo " - Reloading systemd config"
     if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi # hacky hack - I get weird and unexplainable errors here sometimes.
@@ -257,9 +261,15 @@ function install_and_check_service_file() {
         exit 27
     fi
 
-    echo " - Testing systemd startup - starting $CONTAINER"
-    sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" 28
+    if [[ `echo $3 | grep "RESTART"` == "" ]]; then
+        echo " - Testing systemd startup - starting $CONTAINER"
+        sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 28
+    else
+        echo " - Testing systemd startup - REstarting $CONTAINER"
+        sudo systemctl restart $CONTAINER >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 28
+    fi
 
     echo " - Testing systemd startup - Checking startup"
     if [[ -z "$NO_SLEEP" ]]; then sleep 12; fi
