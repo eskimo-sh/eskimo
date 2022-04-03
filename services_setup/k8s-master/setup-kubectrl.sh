@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,48 +34,75 @@
 # Software.
 #
 
+echoerr() { echo "$@" 1>&2; }
 
-[Unit]
-Description=kubelet: The Kubernetes Node Agent
-Documentation=https://kubernetes.io/docs/concepts/overview/components/#kubelet https://kubernetes.io/docs/reference/generated/kubelet/
-After=network.target
-After=network-online.target
-Wants=network-online.target
-PartOf=k8s-slave.service
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $SCRIPT_DIR/common.sh "$@"
 
-[Service]
-Type=simple
-TimeoutStartSec=300sec
-RemainAfterExit=false
-WorkingDirectory=/var/lib/kubelet
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
 
-# attempt to recreate  / remount gluster shares
-ExecStartPre=/bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
+# Loading topology
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
 
-ExecStart=/bin/bash -c ". /etc/k8s/kubelet.env.sh && /usr/local/bin/kubelet \
-  --address=$ESKIMO_KUBELET_ADDRESS \
-  --hostname-override=$ESKIMO_KUBELET_HOSTNAME \
-  --cluster-dns=$ESKIMO_CLUSTER_DNS \
-  --cluster-domain=$ESKIMO_CLUSTER_DNS_DOMAIN \
-  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
-  --tls-cert-file=$ESKIMO_KUBE_TLS_CERT_FILE \
-  --tls-private-key-file=$ESKIMO_KUBE_TLS_PRIVATE_KEY \
-  --client-ca-file=$ESKIMO_KUBE_CLIENT_CA_FILE \
-  --v=$ESKIMO_KUBE_LOG_LEVEL \
-  --cgroup-driver $ESKIMO_KUBELET_CGROUP_DRIVER \
-  --fail-swap-on=$ESKIMO_KUBELET_FAIL_SWAP_ON \
-  --bootstrap-kubeconfig=$ESKIMO_BOOTSTRAP_KUBECONFIG \
-  --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG"
+. /etc/k8s/env.sh
 
-#--port=$ESKIMO_KUBELET_PORT
+sudo rm -Rf /tmp/kubectrl_setup
+mkdir /tmp/kubectrl_setup
+cd /tmp/kubectrl_setup
 
-RestartSec=5
-LimitNOFILE=65536
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
-KillMode=process
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit 1
+fi
 
-[Install]
-WantedBy=multi-user.target
-RequiredBy=k8s-slave.service
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit 2
+fi
+
+
+set -e
+
+echo " - Creating / checking eskimo kubernetes Controller Manager config"
+
+if [[ ! -f /etc/k8s/kubectrl.kubeconfig ]]; then
+
+    echo "   + Configure the cluster parameters"
+    kubectl config set-cluster eskimo \
+      --certificate-authority=/etc/k8s/ssl/ca.pem \
+      --embed-certs=true \
+      --server=${ESKIMO_KUBE_APISERVER} \
+      --kubeconfig=kubectrl.kubeconfig
+
+    echo "   + Configure authentication parameters"
+    kubectl config set-credentials kubernetes \
+      --token=${BOOTSTRAP_TOKEN} \
+      --client-certificate=/etc/k8s/ssl/kubernetes.pem \
+      --client-key=/etc/k8s/ssl/kubernetes-key.pem \
+      --kubeconfig=kubectrl.kubeconfig
+
+    echo "   + Configure the context"
+    kubectl config set-context eskimo \
+      --cluster=eskimo \
+      --user=kubernetes \
+      --kubeconfig=kubectrl.kubeconfig
+
+    echo "   + Use the default context"
+    kubectl config use-context eskimo --kubeconfig=kubectrl.kubeconfig
+
+    sudo mv kubectrl.kubeconfig /etc/k8s/kubectrl.kubeconfig
+    sudo chown root /etc/k8s/kubectrl.kubeconfig
+    sudo chmod 755 /etc/k8s/kubectrl.kubeconfig
+
+fi
+
+echo "   + Installing and checking systemd service file"
+install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
+
+
+rm -Rf /tmp/kubectrl_setup

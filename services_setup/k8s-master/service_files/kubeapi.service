@@ -1,6 +1,6 @@
 [Unit]
 Description=Kubernetes API Server
-Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Documentation=https://www.eskimo.sh
 After=network.target
 After=etcd.service
 PartOf=k8s-master.service

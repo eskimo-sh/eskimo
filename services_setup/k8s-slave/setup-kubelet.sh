@@ -119,10 +119,6 @@ if [[ ! -f /etc/k8s/bootstrap.kubeconfig ]]; then
 
 fi
 
-# TODO all the rest
-
-# TODO
-
 
 set +e
 

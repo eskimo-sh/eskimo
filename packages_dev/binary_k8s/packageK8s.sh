@@ -96,12 +96,6 @@ chmod +x /usr/local/lib/k8s/cfssl/bin/cfssljson_"$CFSSL_VERSION"_linux_amd64
 ln -s cfssljson_"$CFSSL_VERSION"_linux_amd64 /usr/local/lib/k8s/cfssl/bin/cfssljson
 set +e
 
-
-
-
-https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssljson_1.6.1_linux_amd64
-
-
 echo " - Downloading etcd-v${ETCD_VERSION}-linux-amd64"
 wget https://github.com/etcd-io/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
@@ -117,7 +111,7 @@ tar xzvf /tmp/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz >> /tmp/k8s_install_log 2
 mkdir /usr/local/lib/k8s/etcd-v${ETCD_VERSION}
 ln -s etcd-v${ETCD_VERSION} /usr/local/lib/k8s/etcd
 mkdir /usr/local/lib/k8s/etcd/bin
-mv etcd-v3.4.18-linux-amd64/* /usr/local/lib/k8s/etcd/bin/
+mv etcd-v${ETCD_VERSION}-linux-amd64/* /usr/local/lib/k8s/etcd/bin/
 set +e
 
 
@@ -140,23 +134,23 @@ mv kubernetes/client/bin/* /usr/local/lib/k8s/kubernetes/client/bin/
 set +e
 
 
-echo " - Downloading flannel v$FLANNEL_VERSION"
-wget https://github.com/flannel-io/flannel/releases/download/v$FLANNEL_VERSION/flannel-v"$FLANNEL_VERSION"-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo " -> Failed to download flannel v$FLANNEL_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/flannel-v"$FLANNEL_VERSION"-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
-    fail_if_error $? "/tmp/k8s_install_log" -1
-fi
-
-echo " - Installing flannel v$FLANNEL_VERSION"
-
-set -e
-tar xvfz flannel-v0.17.0-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
-mkdir /usr/local/lib/k8s/flannel-v$FLANNEL_VERSION
-ln -s flannel-v$FLANNEL_VERSION /usr/local/lib/k8s/flannel
-mkdir -p /usr/local/lib/k8s/flannel/bin
-mv flanneld mk-docker-opts.sh README.md /usr/local/lib/k8s/flannel/bin/
-set +e
+#echo " - Downloading flannel v$FLANNEL_VERSION"
+#wget https://github.com/flannel-io/flannel/releases/download/v$FLANNEL_VERSION/flannel-v"$FLANNEL_VERSION"-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
+#if [[ $? != 0 ]]; then
+#    echo " -> Failed to download flannel v$FLANNEL_VERSION from https://github.com/. Trying to download from niceideas.ch"
+#    wget http://niceideas.ch/mes/flannel-v"$FLANNEL_VERSION"-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+#    fail_if_error $? "/tmp/k8s_install_log" -1
+#fi
+#
+#echo " - Installing flannel v$FLANNEL_VERSION"
+#
+#set -e
+#tar xvfz flannel-v0.17.0-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+#mkdir /usr/local/lib/k8s/flannel-v$FLANNEL_VERSION
+#ln -s flannel-v$FLANNEL_VERSION /usr/local/lib/k8s/flannel
+#mkdir -p /usr/local/lib/k8s/flannel/bin
+#mv flanneld mk-docker-opts.sh README.md /usr/local/lib/k8s/flannel/bin/
+#set +e
 
 
 echo " - Downloading kubernetes-server-linux-amd64 v$K8S_VERSION"

@@ -1,0 +1,13 @@
+
+
+# Get pending signing requests
+kubectl get csr
+
+# veryify components statuses
+kubectl get componentstatuses
+
+# List all resources supprted by kubectl get
+kubectl api-resources
+
+# List connected nodes
+kubectl get nodes

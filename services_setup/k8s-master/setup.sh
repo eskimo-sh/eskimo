@@ -194,6 +194,9 @@ fail_if_error $? /dev/null 302
 bash ./setup-kubeapi.sh
 fail_if_error $? /dev/null 303
 
+bash ./setup-kubectrl.sh
+fail_if_error $? /dev/null 304
+
 
 echo " - Copying k8s-master process file to /usr/local/sbin"
 sudo cp run-k8s-master.sh /usr/local/sbin/

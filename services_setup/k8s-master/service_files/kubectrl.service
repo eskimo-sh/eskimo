@@ -1,0 +1,37 @@
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://www.eskimo.sh
+After=network.target
+After=etcd.service
+After=kube.service
+PartOf=k8s-master.service
+
+[Service]
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
+
+ExecStart=/bin/bash -c ". /etc/k8s/kubectrl.env.sh && /usr/local/bin/kube-controller-manager \
+  --master=$ESKIMO_KUBE_CTRL_API_SERVER_MASTER \
+  --bind-address=$ESKIMO_KUBE_CTRL_BIND_ADDRESS \
+  --allocate-node-cidrs=$ESKIMO_KUBE_CTRL_ALLOCATE_NODE_CIDRS \
+  --service-cluster-ip-range=$ESKIMO_KUBE_CTRL_SERVICE_CLUSTER_IPD \
+  --cluster-cidr=$ESKIMO_KUBE_CTRL_CLUSTER_CIDR \
+  --cluster-signing-cert-file=$ESKIMO_KUBE_CTRL_CLUSTER_SIGNING_CERT_FILE \
+  --cluster-signing-key-file=$ESKIMO_KUBE_CTRL_CLUSTER_SIGNING_KEY_FILE \
+  --service-account-private-key-file=$ESKIMO_KUBE_CTRL_SERVICE_ACCOUNT_PRIVATE_KEY_FILE \
+  --root-ca-file=$ESKIMO_KUBE_CTRL_ROOT_CA_FILE \
+  --cluster-name=$ESKIMO_KUBE_CTRL_CLUSTER_NAME \
+  --leader-elect=$ESKIMO_KUBE_CTRL_LEADER_ELECT \
+  --kubeconfig=/etc/k8s/kubectrl.kubeconfig \
+  --v=$ESKIMO_KUBE_LOG_LEVEL"
+
+Type=simple
+Restart=always
+StartLimitBurst=6
+StartLimitInterval=100
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=k8s-master.service
