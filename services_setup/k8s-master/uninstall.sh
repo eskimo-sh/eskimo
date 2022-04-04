@@ -38,62 +38,36 @@ echoerr() { echo "$@" 1>&2; }
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# CHange current folder to script dir (important !)
+# Change current folder to script dir (important !)
 cd $SCRIPT_DIR
 
-if [[ ! -f /etc/k8s/env.sh ]]; then
-    echo "Could not find /etc/k8s/env.sh"
-    exit 1
+# Loading topology
+. /etc/eskimo_topology.sh
+
+echo " - Removing systemd unit files"
+if [[ -d /lib/systemd/system/ ]]; then
+    export systemd_units_dir=/lib/systemd/system/
+elif [[ -d /usr/lib/systemd/system/ ]]; then
+    export systemd_units_dir=/usr/lib/systemd/system/
+else
+    echo "Couldn't find systemd unit files directory"
+    exit 24
 fi
 
-. /etc/k8s/env.sh
-
-echo " - Creating / checking eskimo kubelet config"
-
-if [[ `/usr/local/bin/kubectl get clusterrolebinding kubelet-bootstrap | grep system:node-bootstrapper` == "" ]]; then
-
-    echo "   + Create cluster role system:node-bootstrapper in the cluster for kubelet-bootstrap"
-
-    kubectl create clusterrolebinding kubelet-bootstrap \
-     --clusterrole=system:node-bootstrapper \
-     --user=kubelet-bootstrap
+if [[ `echo $ALL_NODES_LIST_k8s_slave | grep $SELF_IP_ADDRESS` == "" ]]; then
+    sudo rm -Rf $systemd_units_dir/etcd.service
+    sudo systemctl stop etcd >> /dev/null 2>&1
 fi
 
-echo "   + create temp folder"
-tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-cd $tmp_dir
+sudo rm -Rf $systemd_units_dir/kubeapi.service
+sudo systemctl stop kubeapi >> /dev/null 2>&1
 
-echo "   + Configure the cluster parameters"
-kubectl config set-cluster eskimo \
-  --certificate-authority=/etc/k8s/ssl/ca.pem \
-  --embed-certs=true \
-  --server=${ESKIMO_KUBE_APISERVER} \
-  --kubeconfig=bootstrap.kubeconfig
+sudo rm -Rf $systemd_units_dir/kubectrl.service
+sudo systemctl stop kubectrl >> /dev/null 2>&1
 
-echo "   + Configure authentication parameters"
-kubectl config set-credentials kubelet-bootstrap \
-  --token=${BOOTSTRAP_TOKEN} \
-  --client-certificate=/etc/k8s/ssl/kubernetes.pem \
-  --client-key=/etc/k8s/ssl/kubernetes-key.pem \
-  --kubeconfig=bootstrap.kubeconfig
+sudo rm -Rf $systemd_units_dir/kubesched.service
+sudo systemctl stop kubesched >> /dev/null 2>&1
 
-echo "   + Configure the context"
-kubectl config set-context eskimo \
-  --cluster=eskimo \
-  --user=kubelet-bootstrap \
-  --kubeconfig=bootstrap.kubeconfig
-
-echo "   + Use the default context"
-kubectl config use-context eskimo --kubeconfig=bootstrap.kubeconfig
-
-echo "   + installing new configuration"
-sudo mv bootstrap.kubeconfig /etc/k8s/bootstrap.kubeconfig
-sudo chown root /etc/k8s/bootstrap.kubeconfig
-sudo chmod 755 /etc/k8s/bootstrap.kubeconfig
-
-echo "   + Deleting runtime configuration for recreation"
-rm -Rf /etc/k8s/kubelet.kubeconfig
-
-echo "   + removing temp folder"
-rm -Rf $tmp_dir
-
+sudo rm -Rf /etc/k8s/kubesched.env.sh
+sudo rm -Rf /etc/k8s/kubectrl.env.sh
+sudo rm -Rf /etc/k8s/kubeapi.env.sh

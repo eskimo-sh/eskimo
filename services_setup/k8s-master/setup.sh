@@ -185,6 +185,10 @@ for i in `find ./service_files -mindepth 1`; do
     sudo chmod 755 /lib/systemd/system/$filename
 done
 
+echo " - Creating eskimo_user file"
+export ESKIMO_USER=$USER
+sudo bash -c "echo $USER > /etc/eskimo_user"
+
 # TODO Indvidual kubernetes master components
 
 # Setup all individual services

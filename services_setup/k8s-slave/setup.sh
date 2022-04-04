@@ -117,6 +117,10 @@ for i in `find ./service_files -mindepth 1`; do
     sudo chmod 755 /lib/systemd/system/$filename
 done
 
+echo " - Creating eskimo_user file"
+export ESKIMO_USER=$USER
+sudo bash -c "echo $USER > /etc/eskimo_user"
+
 
 # Setup all individual services
 echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
@@ -126,17 +130,20 @@ sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
 bash ./setup-kubectl.sh
 fail_if_error $? /dev/null 301
 
-bash ./setup-etcd.sh
+bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 fail_if_error $? /dev/null 302
+
+bash ./setup-etcd.sh
+fail_if_error $? /dev/null 303
 
 # TODO Not for now, let's see if I really need that
 #bash ./setup-flannel.sh
 
 bash ./setup-kubelet.sh
-fail_if_error $? /dev/null 303
+fail_if_error $? /dev/null 304
 
 bash ./setup-kubeproxy.sh
-fail_if_error $? /dev/null 304
+fail_if_error $? /dev/null 305
 
 
 

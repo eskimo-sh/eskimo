@@ -37,7 +37,6 @@
 echoerr() { echo "$@" 1>&2; }
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $SCRIPT_DIR/common.sh "$@"
 
 # CHange current folder to script dir (important !)
 cd $SCRIPT_DIR
@@ -62,38 +61,46 @@ kubectl config set-cluster eskimo \
   --server=$ESKIMO_KUBE_APISERVER \
   --kubeconfig=temp.kubeconfig
 
+export ADMIN_USER=`cat /etc/eskimo_user`
+
 echo "   + Configure client side user and certificates"
-kubectl config set-credentials $USER \
-  --client-certificate=/etc/k8s/ssl/$USER.pem \
-  --client-key=/etc/k8s/ssl/$USER-key.pem \
+kubectl config set-credentials $ADMIN_USER \
+  --client-certificate=/etc/k8s/ssl/$ADMIN_USER.pem \
+  --client-key=/etc/k8s/ssl/$ADMIN_USER-key.pem \
   --token=$BOOTSTRAP_TOKEN \
   --kubeconfig=temp.kubeconfig
 
 echo "   + Create context"
 kubectl config set-context eskimo \
   --cluster=eskimo \
-  --user=$USER \
+  --user=$ADMIN_USER \
   --kubeconfig=temp.kubeconfig
 
 echo " - Set the context eskimo as default context"
 kubectl config use-context eskimo --kubeconfig=temp.kubeconfig
 
 echo "   + removing previous configuration"
-rm -f ~/.kube/config
+rm -f /home/$ADMIN_USER/.kube/config
 
 echo "   + installing new configuration"
-mkdir -p ~/.kube/
-mv temp.kubeconfig ~/.kube/config
-sudo cp ~/.kube/config /root/.kube/config
+mkdir -p /home/$ADMIN_USER/.kube/
+sudo chown $ADMIN_USER.$ADMIN_USER /home/$ADMIN_USER/.kube
+mv temp.kubeconfig /home/$ADMIN_USER/.kube/config
+sudo chown $ADMIN_USER.$ADMIN_USER /home/$ADMIN_USER/.kube/config
+
+sudo mkdir -p /root/.kube/
+sudo cp /home/$ADMIN_USER/.kube/config /root/.kube/config
+sudo chown root /root/.kube/config
 
 echo "   + Checking kube config file"
-if [[ ! -f ~/.kube/config ]]; then
-    echo "Couldn't find file ~/.kube/config"
+if [[ ! -f /home/$ADMIN_USER/.kube/config ]]; then
+    echo "Couldn't find file /home/"$ADMIN_USER"/.kube/config"
     exit 101
 fi
 
-if [[ `cat ~/.kube/config | grep "name: eskimo" | wc -l` -lt 2 ]]; then
-    echo "Missing config in file ~/.kube/config"
+kube_config_file=/home/$ADMIN_USER/.kube/config
+if [[ `cat $kube_config_file | grep "name: eskimo" | wc -l` -lt 2 ]]; then
+    echo "Missing config in file /home/"$ADMIN_USER"/.kube/config"
     exit 101
 fi
 
