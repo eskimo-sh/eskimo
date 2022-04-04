@@ -101,6 +101,8 @@ if [[ ! -f /etc/k8s/kubectrl.kubeconfig ]]; then
 
 fi
 
+set +e
+
 echo "   + Installing and checking systemd service file"
 install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
 

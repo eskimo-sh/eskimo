@@ -107,7 +107,7 @@ fi
 echo " - Installing etcd-v${ETCD_VERSION}-linux-amd64."
 
 set -e # failing on errors
-tar xzvf /tmp/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
+tar xzvf etcd-v${ETCD_VERSION}-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 mkdir /usr/local/lib/k8s/etcd-v${ETCD_VERSION}
 ln -s etcd-v${ETCD_VERSION} /usr/local/lib/k8s/etcd
 mkdir /usr/local/lib/k8s/etcd/bin
