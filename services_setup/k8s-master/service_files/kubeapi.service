@@ -17,7 +17,7 @@ ExecStart=/bin/bash -c ". /etc/k8s/kubeapi.env.sh && /usr/local/bin/kube-apiserv
   --runtime-config=$ESKIMO_KUBE_RUNTIME_CONFIG \
   --enable-bootstrap-token-auth \
   --token-auth-file=$ESKIMO_KUBE_TOKEN_AUTH_FILE \
-      --service-cluster-ip-range=$ESKIMO_KUBE_SERVICE_ADDRESSES \
+  --service-cluster-ip-range=$ESKIMO_KUBE_SERVICE_ADDRESSES \
   --service-node-port-range=$ESKIMO_KUBE_SERVICE_NODE_PORT_RANGE \
   --service-account-key-file=$ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE \
   --service-account-signing-key-file=$ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE \
@@ -47,8 +47,8 @@ ExecStart=/bin/bash -c ". /etc/k8s/kubeapi.env.sh && /usr/local/bin/kube-apiserv
 
 Type=simple
 Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+StartLimitBurst=4
+StartLimitInterval=120
 RestartSec=5
 LimitNOFILE=65536
 

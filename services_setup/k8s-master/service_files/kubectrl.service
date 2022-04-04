@@ -3,7 +3,7 @@ Description=Kubernetes Controller Manager
 Documentation=https://www.eskimo.sh
 After=network.target
 After=etcd.service
-After=kube.service
+After=kubeapi.service
 PartOf=k8s-master.service
 
 [Service]
@@ -27,7 +27,7 @@ ExecStart=/bin/bash -c ". /etc/k8s/kubectrl.env.sh && /usr/local/bin/kube-contro
 
 Type=simple
 Restart=always
-StartLimitBurst=6
+StartLimitBurst=4
 StartLimitInterval=100
 RestartSec=5
 LimitNOFILE=65536

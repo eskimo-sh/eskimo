@@ -266,8 +266,14 @@ function install_and_check_service_file() {
         sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 28
     else
-        echo " - Testing systemd startup - REstarting $CONTAINER"
-        sudo systemctl restart $CONTAINER >> $LOG_FILE 2>&1
+        echo " - Testing systemd startup - Stopping $CONTAINER before restart"
+        sudo systemctl stop $CONTAINER >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 28
+
+        if [[ -z "$NO_SLEEP" ]]; then sleep 2; fi # hacky hack - I get weird and unexplainable errors here sometimes.
+
+        echo " - Testing systemd startup - starting $CONTAINER"
+        sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 28
     fi
 

@@ -36,18 +36,75 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=docker-registry,etcd,kubeapi,kubectrl,bubesched
-# ,flannel
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $SCRIPT_DIR/common.sh "$@"
 
-while : ; do
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
 
-    sleep 10
+# Loading topology
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
 
-    for i in ${REQUIRED_SERVICES//,/ }; do
-        if [[ `systemctl show -p SubState $i | grep exited` != "" ]]; then
-            echo "$i service is actually not really running"
-            exit 30
-        fi
-    done
+. /etc/k8s/env.sh
 
-done
+sudo rm -Rf /tmp/kubesched_setup
+mkdir /tmp/kubesched_setup
+cd /tmp/kubesched_setup
+
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit 1
+fi
+
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit 2
+fi
+
+
+set -e
+
+echo " - Creating / checking eskimo kubernetes Scheduler config"
+
+if [[ ! -f /etc/k8s/kubesched.kubeconfig ]]; then
+
+    echo "   + Configure the cluster parameters"
+    kubectl config set-cluster eskimo \
+      --certificate-authority=/etc/k8s/ssl/ca.pem \
+      --embed-certs=true \
+      --server=${ESKIMO_KUBE_APISERVER} \
+      --kubeconfig=kubesched.kubeconfig
+
+    echo "   + Configure authentication parameters"
+    kubectl config set-credentials kubernetes \
+      --token=${BOOTSTRAP_TOKEN} \
+      --client-certificate=/etc/k8s/ssl/kubernetes.pem \
+      --client-key=/etc/k8s/ssl/kubernetes-key.pem \
+      --kubeconfig=kubesched.kubeconfig
+
+    echo "   + Configure the context"
+    kubectl config set-context eskimo \
+      --cluster=eskimo \
+      --user=kubernetes \
+      --kubeconfig=kubesched.kubeconfig
+
+    echo "   + Use the default context"
+    kubectl config use-context eskimo --kubeconfig=kubesched.kubeconfig
+
+    sudo mv kubesched.kubeconfig /etc/k8s/kubesched.kubeconfig
+    sudo chown root /etc/k8s/kubesched.kubeconfig
+    sudo chmod 755 /etc/k8s/kubesched.kubeconfig
+
+fi
+
+set +e
+
+echo "   + Installing and checking systemd service file"
+install_and_check_service_file kubesched k8s_install_log SKIP_COPY,RESTART
+
+
+rm -Rf /tmp/kubesched_setup
