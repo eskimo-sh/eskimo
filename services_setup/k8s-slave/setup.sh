@@ -127,8 +127,8 @@ fail_if_error $? /dev/null 302
 bash ./setup-kubelet.sh
 fail_if_error $? /dev/null 303
 
-
-TODO
+bash ./setup-kubeproxy.sh
+fail_if_error $? /dev/null 304
 
 
 

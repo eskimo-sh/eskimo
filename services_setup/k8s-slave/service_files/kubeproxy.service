@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -34,20 +32,39 @@
 # Software.
 #
 
-echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=docker-registry,etcd,kubeapi,kubectrl,bubesched
-# ,flannel
+[Unit]
+Description=kube-proxy: The Kubernetes Proxy Server
+Documentation=https://kubernetes.io/docs/concepts/overview/components/#kube-proxy https://kubernetes.io/docs/reference/generated/kube-proxy/
+After=network.target
+After=network-online.target
+Wants=network-online.target
+PartOf=k8s-slave.service
 
-while : ; do
+[Service]
+Type=simple
+TimeoutStartSec=300sec
+RemainAfterExit=false
+WorkingDirectory=/var/lib/kubeproxy
 
-    sleep 10
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
 
-    for i in ${REQUIRED_SERVICES//,/ }; do
-        if [[ `systemctl show -p SubState $i | grep exited` != "" ]]; then
-            echo "$i service is actually not really running. WIll crash run-k8s-master now !"
-            exit 30
-        fi
-    done
+ExecStart=/bin/bash -c ". /etc/k8s/kubeproxy.env.sh && /usr/local/bin/kube-proxy \
+  --bind-address=$ESKIMO_BIND_ADDRESS \
+  --hostname-override=$ESKIMO_HOST_NAME_OVERRIDE \
+  --cluster-cidr=$ESKIMO_CLUSTER_CIDR \
+  --kubeconfig=/etc/k8s/kubeproxy.kubeconfig \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --v=$ESKIMO_KUBE_LOG_LEVEL"
 
-done
+
+RestartSec=5
+LimitNOFILE=65536
+Restart=always
+StartLimitBurst=4
+StartLimitInterval=100
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=k8s-slave.service

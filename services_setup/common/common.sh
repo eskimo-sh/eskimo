@@ -277,7 +277,7 @@ function install_and_check_service_file() {
         fail_if_error $? "$LOG_FILE" 28
     fi
 
-    echo " - Testing systemd startup - Checking startup"
+    echo " - Testing systemd startup - Checking $CONTAINER startup"
     if [[ -z "$NO_SLEEP" ]]; then sleep 12; fi
     sudo systemctl status $CONTAINER >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 29

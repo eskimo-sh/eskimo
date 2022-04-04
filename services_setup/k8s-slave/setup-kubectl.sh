@@ -408,7 +408,6 @@ kubectl config set-cluster eskimo \
 echo "   + Configure client side user and certificates"
 kubectl config set-credentials $USER \
   --client-certificate=/etc/k8s/ssl/$USER.pem \
-  --embed-certs=true \
   --client-key=/etc/k8s/ssl/$USER-key.pem \
   --token=$BOOTSTRAP_TOKEN
 

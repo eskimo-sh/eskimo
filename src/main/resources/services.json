@@ -265,6 +265,13 @@
         "numberOfMasters": 1,
         "mandatory": false,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "k8s-master",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
       }
     ]
   },

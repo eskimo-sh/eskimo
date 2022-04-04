@@ -51,7 +51,11 @@ fi
 
 # The name of the node in the cluster
 export NODE_ID=`eval echo "\$"$(echo NODE_NBR_K8S_SLAVE_$SELF_IP_ADDRESS | tr -d .)`
-export ESKIMO_ETCD_NODE_NAME=node$NODE_ID
+if [[ $NODE_ID != "" ]]; then
+    export ESKIMO_ETCD_NODE_NAME=node$NODE_ID
+else
+    export ESKIMO_ETCD_NODE_NAME=node1
+fi
 echo "   + Using ESKIMO_ETCD_NODE_NAME=$ESKIMO_ETCD_NODE_NAME"
 
 # List of this member's peer URLs to advertise to the rest of the cluster
@@ -63,6 +67,11 @@ for i in ${ALL_NODES_LIST_k8s_slave//,/ }; do
         export EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS="$EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS,http://$i:2380"
     fi
 done
+# in case slaves are not yet installed
+if [[ "$EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS" == "" ]]; then
+    EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS="http://$SELF_IP_ADDRESS:2380"
+fi
+
 echo "   + Using EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS=$EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS"
 
 # This flag tells the etcd to accept incoming requests from its peers on the specified scheme://IP:port combinations.
@@ -97,6 +106,10 @@ for i in ${ALL_NODES_LIST_k8s_slave//,/ }; do
         export EKIMO_ETCD_INITIAL_CLUSTER="$EKIMO_ETCD_INITIAL_CLUSTER,node$NODE_ID=http://$i:2380"
     fi
 done
+# in case slaves are not yet installed
+if [[ "$EKIMO_ETCD_INITIAL_CLUSTER" == "" ]]; then
+    EKIMO_ETCD_INITIAL_CLUSTER="node1=http://$SELF_IP_ADDRESS:2380"
+fi
 
 #counter=1
 #for i in ${ALL_NODES_LIST_k8s_slave//,/ }; do

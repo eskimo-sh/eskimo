@@ -3,7 +3,7 @@ Description=Eskimo Kubernetes Master Infrastructure
 Documentation=https://www.eskimo.sh
 Wants=network-online.target
 After=network-online.target
-Requires=etcd.service
+Wants=etcd.service
 # TODO not for now
 #Requires=flannel.service
 

@@ -70,9 +70,8 @@ ExecStart=/bin/bash -c ". /etc/k8s/kubelet.env.sh && /usr/local/bin/kubelet \
 RestartSec=5
 LimitNOFILE=65536
 Restart=always
-StartLimitBurst=6
+StartLimitBurst=4
 StartLimitInterval=100
-KillMode=process
 
 [Install]
 WantedBy=multi-user.target

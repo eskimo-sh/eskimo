@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -34,20 +34,28 @@
 # Software.
 #
 
-echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=docker-registry,etcd,kubeapi,kubectrl,bubesched
-# ,flannel
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
 
-while : ; do
+. /etc/k8s/env.sh
 
-    sleep 10
 
-    for i in ${REQUIRED_SERVICES//,/ }; do
-        if [[ `systemctl show -p SubState $i | grep exited` != "" ]]; then
-            echo "$i service is actually not really running. WIll crash run-k8s-master now !"
-            exit 30
-        fi
-    done
+###
+# kubernetes kube-proxy config
+###
 
-done
+export ESKIMO_BIND_ADDRESS="$SELF_IP_ADDRESS"
+echo "   + Using ESKIMO_BIND_ADDRESS=$ESKIMO_BIND_ADDRESS"
+
+export ESKIMO_HOST_NAME_OVERRIDE="$SELF_IP_ADDRESS"
+echo "   + Using ESKIMO_HOST_NAME_OVERRIDE=$ESKIMO_HOST_NAME_OVERRIDE"
+
+export ESKIMO_CLUSTER_CIDR="$CLUSTER_CIDR"
+echo "   + Using ESKIMO_CLUSTER_CIDR=$ESKIMO_CLUSTER_CIDR"
+
+
+echo "   + Using ESKIMO_KUBE_LOG_LEVEL=$ESKIMO_KUBE_LOG_LEVEL"
+echo "   + Using ESKIMO_KUBE_LOGTOSTDERR=$ESKIMO_KUBE_LOGTOSTDERR"
