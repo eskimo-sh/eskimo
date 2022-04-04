@@ -11,6 +11,7 @@ Wants=etcd.service
 Type=simple
 TimeoutStartSec=300sec
 RemainAfterExit=false
+ExecStartPre=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 ExecStart=/usr/local/sbin/run-k8s-master.sh
 RestartSec=5
 Restart=always

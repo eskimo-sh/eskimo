@@ -170,6 +170,14 @@ for i in `find ./etc_k8s -mindepth 1`; do
     sudo chmod 755 /etc/k8s/$filename
 done
 
+echo " - Copying runtime configuration scripts to /etc/k8s/runtime_config"
+sudo mkdir -p /etc/k8s/runtime_config
+for i in `find ./runtime_config -mindepth 1`; do
+    sudo cp $i /etc/k8s/runtime_config/
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /etc/k8s/runtime_config/$filename
+done
+
 echo " - Copying SystemD unit files to /lib/systemd/system"
 for i in `find ./service_files -mindepth 1`; do
     sudo cp $i /lib/systemd/system/
@@ -188,17 +196,23 @@ sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
 bash ./setup-kubectl.sh
 fail_if_error $? /dev/null 301
 
-bash ./setup-etcd.sh
+bash ./setup-kubectl-master.sh
 fail_if_error $? /dev/null 302
 
-bash ./setup-kubeapi.sh
+bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 fail_if_error $? /dev/null 303
 
-bash ./setup-kubectrl.sh
+bash ./setup-etcd.sh
 fail_if_error $? /dev/null 304
 
-bash ./setup-kubesched.sh
+bash ./setup-kubeapi.sh
 fail_if_error $? /dev/null 305
+
+bash ./setup-kubectrl.sh
+fail_if_error $? /dev/null 306
+
+bash ./setup-kubesched.sh
+fail_if_error $? /dev/null 307
 
 
 echo " - Copying k8s-master process file to /usr/local/sbin"

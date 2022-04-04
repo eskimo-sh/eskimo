@@ -50,6 +50,8 @@ WorkingDirectory=/var/lib/kubeproxy
 # attempt to recreate  / remount gluster shares
 ExecStartPre=/bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
 
+ExecStartPre=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubeproxy.sh
+
 ExecStart=/bin/bash -c ". /etc/k8s/kubeproxy.env.sh && /usr/local/bin/kube-proxy \
   --bind-address=$ESKIMO_BIND_ADDRESS \
   --hostname-override=$ESKIMO_HOST_NAME_OVERRIDE \

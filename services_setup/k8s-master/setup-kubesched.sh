@@ -66,42 +66,6 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 
-set -e
-
-echo " - Creating / checking eskimo kubernetes Scheduler config"
-
-if [[ ! -f /etc/k8s/kubesched.kubeconfig ]]; then
-
-    echo "   + Configure the cluster parameters"
-    kubectl config set-cluster eskimo \
-      --certificate-authority=/etc/k8s/ssl/ca.pem \
-      --embed-certs=true \
-      --server=${ESKIMO_KUBE_APISERVER} \
-      --kubeconfig=kubesched.kubeconfig
-
-    echo "   + Configure authentication parameters"
-    kubectl config set-credentials kubernetes \
-      --token=${BOOTSTRAP_TOKEN} \
-      --client-certificate=/etc/k8s/ssl/kubernetes.pem \
-      --client-key=/etc/k8s/ssl/kubernetes-key.pem \
-      --kubeconfig=kubesched.kubeconfig
-
-    echo "   + Configure the context"
-    kubectl config set-context eskimo \
-      --cluster=eskimo \
-      --user=kubernetes \
-      --kubeconfig=kubesched.kubeconfig
-
-    echo "   + Use the default context"
-    kubectl config use-context eskimo --kubeconfig=kubesched.kubeconfig
-
-    sudo mv kubesched.kubeconfig /etc/k8s/kubesched.kubeconfig
-    sudo chown root /etc/k8s/kubesched.kubeconfig
-    sudo chmod 755 /etc/k8s/kubesched.kubeconfig
-
-fi
-
-set +e
 
 echo "   + Installing and checking systemd service file"
 install_and_check_service_file kubesched k8s_install_log SKIP_COPY,RESTART

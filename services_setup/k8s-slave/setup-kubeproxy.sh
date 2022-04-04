@@ -68,7 +68,7 @@ fi
 
 
 
-echo " - Installing / configuring / checking kubelet "
+echo " - Installing / configuring / checking kubeproxy "
 
 if [[ ! -d /var/lib/kubeproxy ]]; then
     echo "   + Creating /var/lib/kubeproxy"
@@ -123,45 +123,6 @@ if [[ ! -f /etc/k8s/ssl/kubeproxy.pem ]]; then
     sudo mv kubeproxy*csr* /etc/k8s/ssl/
     sudo chown kubernetes /etc/k8s/ssl/kubeproxy*csr*
 fi
-
-
-if [[ ! -f /etc/k8s/kubeproxy.kubeconfig ]]; then
-
-    echo "   + Configure the cluster parameters"
-    kubectl config set-cluster eskimo \
-      --certificate-authority=/etc/k8s/ssl/ca.pem \
-      --embed-certs=true \
-      --server=${ESKIMO_KUBE_APISERVER} \
-      --kubeconfig=kubeproxy.kubeconfig
-    
-    echo "   + Configure authentication parameters"
-    kubectl config set-credentials kubeproxy \
-      --client-certificate=/etc/k8s/ssl/kubeproxy.pem \
-      --client-key=/etc/k8s/ssl/kubeproxy-key.pem \
-      --kubeconfig=kubeproxy.kubeconfig
-    # --token=${BOOTSTRAP_TOKEN} \
-    
-    echo "   + Configure the context"
-    kubectl config set-context eskimo \
-      --cluster=eskimo \
-      --user=kubeproxy \
-      --kubeconfig=kubeproxy.kubeconfig
-    
-    echo "   + Use the default context"
-    kubectl config use-context eskimo --kubeconfig=kubeproxy.kubeconfig
-    
-
-    sudo mv kubeproxy.kubeconfig /etc/k8s/kubeproxy.kubeconfig
-    sudo chown root /etc/k8s/kubeproxy.kubeconfig
-    sudo chmod 755 /etc/k8s/kubeproxy.kubeconfig
-
-fi
-
-
-
-
-# TODO
-
 
 set +e
 

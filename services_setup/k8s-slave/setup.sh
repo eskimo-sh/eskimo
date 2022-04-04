@@ -102,6 +102,14 @@ for i in `find ./etc_k8s -mindepth 1`; do
     sudo chmod 755 /etc/k8s/$filename
 done
 
+echo " - Copying runtime configuration scripts to /etc/k8s/runtime_config"
+sudo mkdir -p /etc/k8s/runtime_config
+for i in `find ./runtime_config -mindepth 1`; do
+    sudo cp $i /etc/k8s/runtime_config/
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /etc/k8s/runtime_config/$filename
+done
+
 echo " - Copying SystemD unit files to /lib/systemd/system"
 for i in `find ./service_files -mindepth 1`; do
     sudo cp $i /lib/systemd/system/

@@ -42,7 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # CHange current folder to script dir (important !)
 cd $SCRIPT_DIR
 
-# Loading topology
 if [[ ! -f /etc/k8s/env.sh ]]; then
     echo "Could not find /etc/k8s/env.sh"
     exit 1
@@ -50,24 +49,41 @@ fi
 
 . /etc/k8s/env.sh
 
-sudo rm -Rf /tmp/kubectrl_setup
-mkdir /tmp/kubectrl_setup
-cd /tmp/kubectrl_setup
-
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit 1
-fi
-
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit 2
-fi
 
 
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
+echo " - Installing / configuring / checking kubeproxy "
 
+echo "   + create temp folder"
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+cd $tmp_dir
 
-rm -Rf /tmp/kubectrl_setup
+echo "   + Configure the cluster parameters"
+kubectl config set-cluster eskimo \
+  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --embed-certs=true \
+  --server=${ESKIMO_KUBE_APISERVER} \
+  --kubeconfig=kubeproxy.kubeconfig
+
+echo "   + Configure authentication parameters"
+kubectl config set-credentials kubeproxy \
+  --client-certificate=/etc/k8s/ssl/kubeproxy.pem \
+  --client-key=/etc/k8s/ssl/kubeproxy-key.pem \
+  --kubeconfig=kubeproxy.kubeconfig
+# --token=${BOOTSTRAP_TOKEN} \
+
+echo "   + Configure the context"
+kubectl config set-context eskimo \
+  --cluster=eskimo \
+  --user=kubeproxy \
+  --kubeconfig=kubeproxy.kubeconfig
+
+echo "   + Use the default context"
+kubectl config use-context eskimo --kubeconfig=kubeproxy.kubeconfig
+
+echo "   + installing new configuration"
+sudo mv kubeproxy.kubeconfig /etc/k8s/kubeproxy.kubeconfig
+sudo chown root /etc/k8s/kubeproxy.kubeconfig
+sudo chmod 755 /etc/k8s/kubeproxy.kubeconfig
+
+echo "   + removing temp folder"
+rm -Rf $tmp_dir

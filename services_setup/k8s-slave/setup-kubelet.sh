@@ -77,51 +77,6 @@ if [[ ! -d /var/lib/kubelet ]]; then
     sudo chmod 744 /var/lib/kubelet
 fi
 
-set -e
-
-if [[ `/usr/local/bin/kubectl get clusterrolebinding kubelet-bootstrap | grep system:node-bootstrapper` == "" ]]; then
-
-    echo "   + Create cluster role system:node-bootstrapper in the cluster for kubelet-bootstrap"
-
-    kubectl create clusterrolebinding kubelet-bootstrap \
-     --clusterrole=system:node-bootstrapper \
-     --user=kubelet-bootstrap
-fi
-
-if [[ ! -f /etc/k8s/bootstrap.kubeconfig ]]; then
-
-    echo "   + Configure the cluster parameters"
-    kubectl config set-cluster eskimo \
-      --certificate-authority=/etc/k8s/ssl/ca.pem \
-      --embed-certs=true \
-      --server=${ESKIMO_KUBE_APISERVER} \
-      --kubeconfig=bootstrap.kubeconfig
-
-    echo "   + Configure authentication parameters"
-    kubectl config set-credentials kubelet-bootstrap \
-      --token=${BOOTSTRAP_TOKEN} \
-      --client-certificate=/etc/k8s/ssl/kubernetes.pem \
-      --client-key=/etc/k8s/ssl/kubernetes-key.pem \
-      --kubeconfig=bootstrap.kubeconfig
-
-    echo "   + Configure the context"
-    kubectl config set-context eskimo \
-      --cluster=eskimo \
-      --user=kubelet-bootstrap \
-      --kubeconfig=bootstrap.kubeconfig
-
-    echo "   + Use the default context"
-    kubectl config use-context eskimo --kubeconfig=bootstrap.kubeconfig
-
-    sudo mv bootstrap.kubeconfig /etc/k8s/bootstrap.kubeconfig
-    sudo chown root /etc/k8s/bootstrap.kubeconfig
-    sudo chmod 755 /etc/k8s/bootstrap.kubeconfig
-
-fi
-
-
-set +e
-
 
 echo "   + Installing and checking systemd service file"
 install_and_check_service_file kubelet k8s_install_log SKIP_COPY,RESTART

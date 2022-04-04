@@ -9,6 +9,8 @@ PartOf=k8s-master.service
 
 [Service]
 
+ExecStartPre=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubesched.sh
+
 ExecStart=/bin/bash -c ". /etc/k8s/kubesched.env.sh && /usr/local/bin/kube-scheduler \
    --bind-address=$ESKIMO_KUBE_SCHED_BIND_ADDRESS \
    --master $ESKIMO_KUBE_SCHED_API_SERVER_MASTER \

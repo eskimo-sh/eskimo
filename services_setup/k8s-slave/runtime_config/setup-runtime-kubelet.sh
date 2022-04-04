@@ -42,7 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # CHange current folder to script dir (important !)
 cd $SCRIPT_DIR
 
-# Loading topology
 if [[ ! -f /etc/k8s/env.sh ]]; then
     echo "Could not find /etc/k8s/env.sh"
     exit 1
@@ -50,24 +49,49 @@ fi
 
 . /etc/k8s/env.sh
 
-sudo rm -Rf /tmp/kubectrl_setup
-mkdir /tmp/kubectrl_setup
-cd /tmp/kubectrl_setup
+echo " - Creating / checking eskimo kubelet config"
 
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit 1
+if [[ `/usr/local/bin/kubectl get clusterrolebinding kubelet-bootstrap | grep system:node-bootstrapper` == "" ]]; then
+
+    echo "   + Create cluster role system:node-bootstrapper in the cluster for kubelet-bootstrap"
+
+    kubectl create clusterrolebinding kubelet-bootstrap \
+     --clusterrole=system:node-bootstrapper \
+     --user=kubelet-bootstrap
 fi
 
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit 2
-fi
+echo "   + create temp folder"
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+cd $tmp_dir
 
+echo "   + Configure the cluster parameters"
+kubectl config set-cluster eskimo \
+  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --embed-certs=true \
+  --server=${ESKIMO_KUBE_APISERVER} \
+  --kubeconfig=bootstrap.kubeconfig
 
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
+echo "   + Configure authentication parameters"
+kubectl config set-credentials kubelet-bootstrap \
+  --token=${BOOTSTRAP_TOKEN} \
+  --client-certificate=/etc/k8s/ssl/kubernetes.pem \
+  --client-key=/etc/k8s/ssl/kubernetes-key.pem \
+  --kubeconfig=bootstrap.kubeconfig
 
+echo "   + Configure the context"
+kubectl config set-context eskimo \
+  --cluster=eskimo \
+  --user=kubelet-bootstrap \
+  --kubeconfig=bootstrap.kubeconfig
 
-rm -Rf /tmp/kubectrl_setup
+echo "   + Use the default context"
+kubectl config use-context eskimo --kubeconfig=bootstrap.kubeconfig
+
+echo "   + installing new configuration"
+sudo mv bootstrap.kubeconfig /etc/k8s/bootstrap.kubeconfig
+sudo chown root /etc/k8s/bootstrap.kubeconfig
+sudo chmod 755 /etc/k8s/bootstrap.kubeconfig
+
+echo "   + removing temp folder"
+rm -Rf $tmp_dir
+

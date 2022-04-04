@@ -42,7 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # CHange current folder to script dir (important !)
 cd $SCRIPT_DIR
 
-# Loading topology
 if [[ ! -f /etc/k8s/env.sh ]]; then
     echo "Could not find /etc/k8s/env.sh"
     exit 1
@@ -50,9 +49,9 @@ fi
 
 . /etc/k8s/env.sh
 
-sudo rm -Rf /tmp/kubectrl_setup
-mkdir /tmp/kubectrl_setup
-cd /tmp/kubectrl_setup
+sudo rm -Rf /tmp/kube_basemaster_setup
+mkdir /tmp/kube_basemaster_setup
+cd /tmp/kube_basemaster_setup
 
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
@@ -66,8 +65,71 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
+
+set -e
 
 
-rm -Rf /tmp/kubectrl_setup
+echo " - Creating / checking eskimo kubernetes base config"
+
+echo "   + Create and install kubernetes-csr.json"
+cat > kubernetes-csr.json <<EOF
+{
+  "CN": "kubernetes",
+  "hosts": [
+    "127.0.0.1",
+    "${SELF_IP_ADDRESS}",
+    "${MASTER_URL}",
+    "${CLUSTER_KUBERNETES_SVC_IP}",
+    "kubernetes",
+    "kubernetes.default",
+    "kubernetes.default.svc",
+    "kubernetes.default.svc.cluster",
+    "kubernetes.default.svc.cluster.local",
+    "eskimo",
+    "eskimo.default",
+    "eskimo.default.svc",
+    "eskimo.default.svc.cluster",
+    "eskimo.default.svc.cluster.local",
+    "eskimo.eskimo",
+    "eskimo.eskimo.svc",
+    "eskimo.eskimo.svc.cluster",
+    "eskimo.eskimo.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+   "names": [
+      {
+        "C": "SH",
+        "ST": "Eskimo",
+        "L": "Eskimo",
+        "O": "system:masters",
+        "OU": "System"
+      }
+    ]
+}
+EOF
+
+sudo mv kubernetes-csr.json /etc/k8s/ssl/kubernetes-csr.json
+sudo chown kubernetes /etc/k8s/ssl/kubernetes-csr.json
+sudo chmod 755 /etc/k8s/ssl/kubernetes-csr.json
+
+# Generate certificates
+echo "   + (Re-)Generate kubernetes certificates"
+
+sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/ssl/ca.pem \
+  -ca-key=/etc/k8s/ssl/ca-key.pem \
+  -config=/etc/k8s/ssl/ca-config.json \
+  -profile=kubernetes /etc/k8s/ssl/kubernetes-csr.json | cfssljson -bare kubernetes
+
+echo "   + (Re-)Install kubernetes certificates"
+sudo mv kubernetes*.pem /etc/k8s/ssl/
+sudo chown kubernetes /etc/k8s/ssl/kubernetes*.pem
+sudo mv kubernetes*csr* /etc/k8s/ssl/
+sudo chown kubernetes /etc/k8s/ssl/kubernetes*csr*
+
+
+set +e
+
+rm -Rf /tmp/kube_basemaster_setup

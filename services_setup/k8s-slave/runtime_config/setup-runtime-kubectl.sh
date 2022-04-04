@@ -42,7 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # CHange current folder to script dir (important !)
 cd $SCRIPT_DIR
 
-# Loading topology
 if [[ ! -f /etc/k8s/env.sh ]]; then
     echo "Could not find /etc/k8s/env.sh"
     exit 1
@@ -50,24 +49,53 @@ fi
 
 . /etc/k8s/env.sh
 
-sudo rm -Rf /tmp/kubectrl_setup
-mkdir /tmp/kubectrl_setup
-cd /tmp/kubectrl_setup
+echo " - Creating kube config file for user eskimo"
 
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit 1
+echo "   + create temp folder"
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+cd $tmp_dir
+
+echo "   + Configure the cluster and the certificates"
+kubectl config set-cluster eskimo \
+  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --embed-certs=true \
+  --server=$ESKIMO_KUBE_APISERVER \
+  --kubeconfig=temp.kubeconfig
+
+echo "   + Configure client side user and certificates"
+kubectl config set-credentials $USER \
+  --client-certificate=/etc/k8s/ssl/$USER.pem \
+  --client-key=/etc/k8s/ssl/$USER-key.pem \
+  --token=$BOOTSTRAP_TOKEN \
+  --kubeconfig=temp.kubeconfig
+
+echo "   + Create context"
+kubectl config set-context eskimo \
+  --cluster=eskimo \
+  --user=$USER \
+  --kubeconfig=temp.kubeconfig
+
+echo " - Set the context eskimo as default context"
+kubectl config use-context eskimo --kubeconfig=temp.kubeconfig
+
+echo "   + removing previous configuration"
+rm -f ~/.kube/config
+
+echo "   + installing new configuration"
+mkdir -p ~/.kube/
+mv temp.kubeconfig ~/.kube/config
+sudo cp ~/.kube/config /root/.kube/config
+
+echo "   + Checking kube config file"
+if [[ ! -f ~/.kube/config ]]; then
+    echo "Couldn't find file ~/.kube/config"
+    exit 101
 fi
 
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit 2
+if [[ `cat ~/.kube/config | grep "name: eskimo" | wc -l` -lt 2 ]]; then
+    echo "Missing config in file ~/.kube/config"
+    exit 101
 fi
 
-
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
-
-
-rm -Rf /tmp/kubectrl_setup
+echo "   + removing temp folder"
+rm -Rf $tmp_dir
