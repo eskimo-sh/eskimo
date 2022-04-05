@@ -14,6 +14,7 @@ TimeoutStartSec=300sec
 RemainAfterExit=false
 ExecStartPre=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 ExecStart=/usr/local/sbin/run-k8s-slave.sh
+ExecStartPost=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh
 RestartSec=5
 Restart=always
 StartLimitBurst=6

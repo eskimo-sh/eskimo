@@ -36,16 +36,14 @@
 
 export K8S_VERSION=1.23.5
 
+. /etc/eskimo_topology.sh
+
 function fail_if_error(){
     if [[ $1 != 0 ]]; then
         echo " -> failed !!"
         cat $2
         exit $3
     fi
-}
-
-function get_ip_address(){
-    export IP_ADDRESS="`cat /etc/network/interfaces | grep address | cut -d ' ' -f 8`"
 }
 
 # extract IP address
@@ -77,7 +75,8 @@ function get_ip_root() {
 }
 
 function get_ip_CIDR() {
-    ip_from_ifconfig=`/sbin/ifconfig | grep $SELF_IP_ADDRESS`
+    get_ip_address
+    ip_from_ifconfig=`/sbin/ifconfig | grep $IP_ADDRESS`
 
     if [[ `echo $ip_from_ifconfig | grep Mask:` != "" ]]; then
       netmask=`echo $ip_from_ifconfig  | sed 's/.*Mask:\(.*\)/\1/'`
@@ -164,12 +163,12 @@ for i in `ls -1 /usr/local/lib/k8s/kubernetes/client/bin/`; do
     fi
 done
 
-echo "   + Flannel"
-for i in `ls -1 /usr/local/lib/k8s/flannel/bin/`; do
-    if [[ ! -f /usr/local/bin/$i ]]; then
-        sudo ln -s /usr/local/lib/k8s/flannel/bin/$i /usr/local/bin/$i
-    fi
-done
+#echo "   + Flannel"
+#for i in `ls -1 /usr/local/lib/k8s/flannel/bin/`; do
+#    if [[ ! -f /usr/local/bin/$i ]]; then
+#        sudo ln -s /usr/local/lib/k8s/flannel/bin/$i /usr/local/bin/$i
+#    fi
+#done
 
 echo "   + Kubernetes server"
 for i in `ls -1 /usr/local/lib/k8s/kubernetes/server/bin/`; do
@@ -196,10 +195,10 @@ fi
 echo " - Creating network identifcation marker flags"
 
 export ip_CIDR=`get_ip_CIDR`
-sudo bash -c "echo $ip_CIDR" > /etc/eskimo_network_cidr
+sudo bash -c "echo $ip_CIDR > /etc/eskimo_network_cidr"
 
 export host_min=`get_host_min`
-sudo bash -c "echo $host_min" > /etc/eskimo_network_host_min
+sudo bash -c "echo $host_min > /etc/eskimo_network_host_min"
 
 echo " - Installation tests"
 echo "   + TODO"

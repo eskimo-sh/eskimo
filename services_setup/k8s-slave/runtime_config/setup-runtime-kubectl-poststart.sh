@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+#
+# This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+# well to this individual file than to the Eskimo Project as a whole.
+#
+# Copyright 2019 - 2021 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+# Author : eskimo.sh / https://www.eskimo.sh
+#
+# Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+# If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+# terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+# Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+# Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+# commercial license.
+#
+# Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Affero Public License for more details.
+#
+# You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+# see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA, 02110-1301 USA.
+#
+# You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+# commercial license is mandatory as soon as :
+# - you develop activities involving Eskimo without disclosing the source code of your own product, software,
+#   platform, use cases or scripts.
+# - you deploy eskimo as part of a commercial product, platform or software.
+# For more information, please contact eskimo.sh at https://www.eskimo.sh
+#
+# The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+# Software.
+#
+
+echoerr() { echo "$@" 1>&2; }
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
+
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
+
+. /etc/k8s/env.sh
+
+echo " - Postprocessing kube config file for user eskimo"
+
+echo "   + create temp folder"
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+cd $tmp_dir
+
+
+function delete_k8s_poststart_lock_file() {
+     rm -Rf /etc/k8s/k8s_poststart_management_lock
+}
+
+# From here we will be messing with gluster and hence we need to take a lock
+counter=0
+while [[ -f /etc/k8s/k8s_poststart_management_lock ]] ; do
+    echo "   + /etc/k8s/k8s_poststart_management_lock exist. waiting 2 secs ... "
+    sleep 2
+    let counter=counter+1
+    if [[ $counter -ge 15 ]]; then
+        echo " !!! Couldn't get /etc/k8s/k8s_poststart_management_lock in 30 seconds. crashing !"
+        exit 150
+    fi
+done
+
+touch /etc/k8s/k8s_poststart_management_lock
+
+trap delete_k8s_poststart_lock_file 15
+trap delete_k8s_poststart_lock_file EXIT
+
+set -e
+
+export ADMIN_USER=`cat /etc/eskimo_user`
+
+# Unfortunately, system doesn't pass me any environment variable, so I have to set them here
+# I am ensuring I run as root before messing with it
+if [[ `id -u` != 0 ]]; then
+    echo "This ExecStartPost script is intented to be executed as root"
+    exit 200
+fi
+
+export HOME=/root
+
+
+if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
+    echo "   + Creating serviceaccount-$ADMIN_USER"
+    kubectl create -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+fi
+
+if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
+    echo "   + Creating ClusterRoleBinding default-$ADMIN_USER"
+    kubectl create -f /etc/k8s/clusterrolebinding-default-$ADMIN_USER.yaml
+fi
+
+if [[ `kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER` == "" ]]; then
+    echo "   + Creating ClusterRoleBinding kubernetes-dashboard-$ADMIN_USER"
+    kubectl create -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
+fi
+
+echo "   + Getting secret"
+SECRET=`kubectl get sa/$ADMIN_USER -o jsonpath="{.secrets[0].name}"`
+
+# TODO
+# XXX note : to get the token to inject in e.g. the dashboard login, use :
+#kubectl get secret $SECRET -o go-template="{{.data.token | base64decode}}"
+#or even
+# kubectl get secret `kubectl get sa/$ADMIN_USER -o jsonpath="{.secrets[0].name}"` -o go-template="{{.data.token | base64decode}}"
+
+echo "   + Getting token"
+NEW_TOKEN=`kubectl describe secret $SECRET | grep token: | sed 's/token: *\(.*\)/\1/'`
+
+echo "   + Installing new token"
+sudo sed -i s/"token: .*"/"token: $NEW_TOKEN"/ /home/$ADMIN_USER/.kube/config
+sudo chown $ADMIN_USER.$ADMIN_USER /home/$ADMIN_USER/.kube/config
+
+echo "   + Copying kube config file to root"
+sudo cp /home/$ADMIN_USER/.kube/config /root/.kube/config
+sudo chown root.root /root/.kube/config
+
+
+delete_k8s_poststart_lock_file
+
+set +e
+
+
+echo "   + removing temp folder"
+rm -Rf $tmp_dir

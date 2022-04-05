@@ -235,6 +235,61 @@ if [[ ! -f /etc/k8s/ssl/$USER.pem ]]; then
     sudo mv `echo $USER`*csr* /etc/k8s/ssl/
 fi
 
+if [[ ! -f /etc/k8s/serviceaccount-$USER.yaml  ]]; then
+    echo "   + Creating /etc/k8s/serviceaccount-$USER.yaml"
+    cat > serviceaccount-$USER.yaml <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: $USER
+EOF
+
+    sudo mv serviceaccount-$USER.yaml /etc/k8s/serviceaccount-$USER.yaml
+fi
+
+
+if [[ ! -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$USER.yaml ]]; then
+    echo "   + Creating /etc/k8s/clusterrolebinding-kubernetes-dashboard-$USER.yaml"
+    cat > clusterrolebinding-kubernetes-dashboard-$USER.yaml <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-dashboard-$USER
+  namespace: kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: $USER
+  namespace: default
+EOF
+
+    sudo mv clusterrolebinding-kubernetes-dashboard-$USER.yaml /etc/k8s/clusterrolebinding-kubernetes-dashboard-$USER.yaml
+fi
+
+if [[ ! -f /etc/k8s/clusterrolebinding-default-$USER.yaml ]]; then
+    echo "   + Creating /etc/k8s/clusterrolebinding-default-$USER.yaml"
+    cat > clusterrolebinding-default-$USER.yaml <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: default-$USER
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: $USER
+  namespace: default
+EOF
+
+    sudo mv clusterrolebinding-default-$USER.yaml /etc/k8s/clusterrolebinding-default-$USER.yaml
+fi
+
 delete_ssl_lock_file
 
 set +e
