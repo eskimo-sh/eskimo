@@ -208,7 +208,7 @@ function install_docker_debian_based() {
     sudo add-apt-repository \
            "deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION \
            $DOCKER_DEB_VERSION \
-           stable" >>/tmp/install_docker 2>&1
+           stable" >> /tmp/install_docker 2>&1
 
     if [[ $? != 0 ]]; then
         echoerr "Unable to add docker repository"

@@ -122,17 +122,21 @@ export ESKIMO_KUBE_SERVICE_NODE_PORT_RANGE="30000-32766"
 echo "   + Using ESKIMO_KUBE_SERVICE_NODE_PORT_RANGE=$ESKIMO_KUBE_SERVICE_NODE_PORT_RANGE"
 
 # The default admission control policies
-export ESKIMO_KUBE_ADMISSION_CONTROL="NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota,DefaultStorageClass"
+export ESKIMO_KUBE_ADMISSION_CONTROL="NamespaceExists,NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,MutatingAdmissionWebhook"
 echo "   + Using ESKIMO_KUBE_ADMISSION_CONTROL=$ESKIMO_KUBE_ADMISSION_CONTROL"
 
 # ServiceAccount configs
-#export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/ssl/ca-key.pem"
 #export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/ssl/ca.pem"
-export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE=$ESKIMO_KUBE_CLIENT_CA_FILE
+# attempt to solve : [invalid bearer token, [invalid bearer token, square/go-jose: error in cryptographic primitive]]
+#export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE=$ESKIMO_KUBE_CLIENT_CA_FILE
+export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/ssl/kubernetes.pem"
 echo "   + Using ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE=$ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE"
 
-export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/ssl/ca-key.pem"
+#export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/ssl/ca-key.pem"
+export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/ssl/kubernetes-key.pem"
 echo "   + Using ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE=$ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE"
+
+
 
 export ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER=api
 echo "   + Using ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER=$ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER"

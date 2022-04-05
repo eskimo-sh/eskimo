@@ -71,6 +71,9 @@ set -e
 
 echo " - Creating / checking eskimo kubernetes base config"
 
+echo "   + getting min node"
+export MIN_NODE=`cat /etc/eskimo_network_host_min`
+
 echo "   + Create and install kubernetes-csr.json"
 cat > kubernetes-csr.json <<EOF
 {
@@ -78,6 +81,7 @@ cat > kubernetes-csr.json <<EOF
   "hosts": [
     "127.0.0.1",
     "${SELF_IP_ADDRESS}",
+    "${MIN_NODE}",
     "${MASTER_URL}",
     "${CLUSTER_KUBERNETES_SVC_IP}",
     "kubernetes",

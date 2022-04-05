@@ -48,6 +48,55 @@ function get_ip_address(){
     export IP_ADDRESS="`cat /etc/network/interfaces | grep address | cut -d ' ' -f 8`"
 }
 
+# extract IP address
+function get_ip_address(){
+    ip_from_ifconfig=`/sbin/ifconfig | grep $SELF_IP_ADDRESS`
+
+    if [[ `echo $ip_from_ifconfig | grep Mask:` != "" ]]; then
+      ip=`echo $ip_from_ifconfig  | sed 's/.*inet addr:\([0-9\.]*\).*/\1/'`
+    elif [[ `echo $ip_from_ifconfig | grep netmask` != "" ]]; then
+      ip=`echo $ip_from_ifconfig  | sed 's/.*inet \([0-9\.]*\).*/\1/'`
+    fi
+
+    export IP_ADDRESS=$ip
+}
+
+# compute CIDR suffix from network mask
+function mask2cdr () {
+    # Assumes there's no "255." after a non-255 byte in the mask
+    local x=${1##*255.}
+    set -- 0^^^128^192^224^240^248^252^254^ $(( (${#1} - ${#x})*2 )) ${x%%.*}
+    x=${1%%$3*}
+    echo $(( $2 + (${#x}/4) ))
+}
+
+function get_ip_root() {
+    get_ip_address
+    ip_root=`echo $IP_ADDRESS | sed 's/^\([0-9\.]*\)*[0-9]\{2\}/\1/'`
+    echo $ip_root
+}
+
+function get_ip_CIDR() {
+    ip_from_ifconfig=`/sbin/ifconfig | grep $SELF_IP_ADDRESS`
+
+    if [[ `echo $ip_from_ifconfig | grep Mask:` != "" ]]; then
+      netmask=`echo $ip_from_ifconfig  | sed 's/.*Mask:\(.*\)/\1/'`
+    elif [[ `echo $ip_from_ifconfig | grep netmask` != "" ]]; then
+      netmask=`echo $ip_from_ifconfig  | sed 's/.* netmask \([0-9\.]*\).*/\1/'`
+    fi
+    cdr=`mask2cdr $netmask`
+
+    ip_root=`get_ip_root`
+
+    echo "$ip_root"0/$cdr
+}
+
+function get_host_min() {
+    ip_root=`get_ip_root`
+    echo "$ip_root"1
+}
+
+
 
 echo "-- INSTALLING KUBERNETES ------------------------------------------------------"
 
@@ -143,6 +192,14 @@ if [[ -z $TEST_MODE && ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
     echo "/etc/eskimo_k8s_environment doesn't point to valid mesos version"
     exit 21
 fi
+
+echo " - Creating network identifcation marker flags"
+
+export ip_CIDR=`get_ip_CIDR`
+sudo bash -c "echo $ip_CIDR" > /etc/eskimo_network_cidr
+
+export host_min=`get_host_min`
+sudo bash -c "echo $host_min" > /etc/eskimo_network_host_min
 
 echo " - Installation tests"
 echo "   + TODO"

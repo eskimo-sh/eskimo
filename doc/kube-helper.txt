@@ -11,3 +11,21 @@ kubectl api-resources
 
 # List connected nodes
 kubectl get nodes
+
+# get the logs of a pod
+kubectl logs pod shell-demo
+
+# get pod from all namespaces
+kubectl get pod --all-namespaces
+
+# get a shell in a pod
+kubectl exec -it shell-demo -- bash
+
+# Find out where a pod is actually running
+kubectl get pod shell-demo -o wide
+
+# List pending deployments
+kubectl get deployment --all-namespaces -o wide
+
+# Delete deployment in specific namespace
+kubectl delete deployment -n kubernetes-dashboard dashboard-metrics-scraper

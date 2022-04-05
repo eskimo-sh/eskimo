@@ -66,7 +66,7 @@ export BOOTSTRAP_TOKEN=1Qb_YYlsOFKa0q-4hur12yn_7urzYCRZ
 # (Service CIDR)
 #export SERVICE_CIDR="10.254.0.0/16"
 # TODO FIXME this should be computed dynamically from k8s nodes IPs
-export SERVICE_CIDR="192.168.56.0/24"
+export SERVICE_CIDR=`cat /etc/eskimo_network_cidr`
 
 # Pod Cluster CIDR
 export CLUSTER_CIDR="172.30.0.0/16"

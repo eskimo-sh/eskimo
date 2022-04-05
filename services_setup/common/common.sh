@@ -444,11 +444,6 @@ function fail_if_error(){
     fi
 }
 
-# extract IP address
-function get_ip_address(){
-    export IP_ADDRESS="`/sbin/ifconfig  | grep inet | grep broadcast | cut -d ' ' -f 10`"
-}
-
 function preinstall_unmount_gluster_share () {
     if [[ `grep $1 /etc/mtab` != "" ]]; then
         echo " - preinstallation : need to unmount gluster share $1 before proceeding with installation"
@@ -463,4 +458,17 @@ function preinstall_unmount_gluster_share () {
             fi
         done
     fi
+}
+
+# extract IP address
+function get_ip_address(){
+    ip_from_ifconfig=`/sbin/ifconfig | grep $SELF_IP_ADDRESS`
+
+    if [[ `echo $ip_from_ifconfig | grep Mask:` != "" ]]; then
+      ip=`echo $ip_from_ifconfig  | sed 's/.*inet addr:\([0-9\.]*\).*/\1/'`
+    elif [[ `echo $ip_from_ifconfig | grep netmask` != "" ]]; then
+      ip=`echo $ip_from_ifconfig  | sed 's/.*inet \([0-9\.]*\).*/\1/'`
+    fi
+
+    export IP_ADDRESS=$ip
 }
