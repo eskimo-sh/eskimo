@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,45 +34,71 @@
 # Software.
 #
 
+echoerr() { echo "$@" 1>&2; }
 
-[Unit]
-Description=etcd Server
-After=network.target
-After=network-online.target
-Wants=network-online.target
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $SCRIPT_DIR/common.sh "$@"
 
-[Service]
-Type=simple
-TimeoutStartSec=300sec
-RemainAfterExit=false
-User=kubernetes
-WorkingDirectory=/var/lib/etcd/
-ExecStart=/bin/bash -c ". /etc/k8s/etcd.env.sh && /usr/local/bin/etcd \
-  --name $ESKIMO_ETCD_NODE_NAME \
-  --initial-advertise-peer-urls $EKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS \
-  --listen-peer-urls $EKIMO_ETCD_LISTEN_PEER_URLS \
-  --listen-client-urls $EKIMO_ETCD_LISTEN_CLIENT_URLS \
-  --advertise-client-urls $EKIMO_ETCD_ADVERTISE_CLIENT_URLS \
-  --initial-cluster-token $EKIMO_ETCD_INITIAL_CLUSTER_TOKEN \
-  --initial-cluster $EKIMO_ETCD_INITIAL_CLUSTER \
-  --initial-cluster-state $EKIMO_ETCD_INITIAL_CLUSTER_STATE \
-  --data-dir $EKIMO_ETCD_DATA_DIR"
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
 
-# The day I enable HTTPS
-#  --cert-file $EKIMO_ETCD_CERT_FILE \
-#  --key-file $EKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$EKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $EKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$EKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$EKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$EKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$EKIMO_ETCD_PEER_TRUSTED_CA_FILE \
+# Loading topology
+loadTopology
 
-RestartSec=5
-LimitNOFILE=65536
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit 1
+fi
 
-[Install]
-WantedBy=multi-user.target
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit 2
+fi
+
+
+# reinitializing log
+sudo rm -f etcd_install_log
+
+echo " - Creating shared directory"
+if [[ ! -d /var/lib/etcd ]]; then
+    sudo mkdir -p /var/lib/etcd
+    sudo chmod -R 700 /var/lib/etcd
+    sudo chown -R kubernetes /var/lib/etcd
+fi
+if [[ ! -d /var/run/etcd ]]; then
+    sudo mkdir -p /var/run/etcd
+    sudo chown -R kubernetes /var/run/etcd
+fi
+if [[ ! -d /var/log/etcd ]]; then
+    sudo mkdir -p /var/log/etcd
+    sudo chmod -R 777 /var/log/etcd
+    sudo chown -R kubernetes /var/log/etcd
+fi
+if [[ ! -d /etc/etcd ]]; then
+    sudo mkdir -p /etc/etcd
+    sudo chmod -R 777 /etc/etcd
+fi
+
+echo " - Linking /etc/etcd to /usr/local/lib/etcd/etc"
+if [[ ! -L /etc/etcd ]]; then
+    sudo ln -s /usr/local/etc/etcd /etc/etcd
+fi
+
+echo " - Installing etcd.env.sh"
+sudo cp etcd.env.sh /etc/etcd/
+sudo chmod 755 /etc/etcd/
+
+echo " - Installing and checking systemd service file"
+install_and_check_service_file etcd etcd_install_log
+
+
+
+#ACZUALLY IT?S MORE COMPLICATED THAT THAN
+#- I need to start etcd (create partial function of install_and_check_service_file above for this)
+#- then configure flannel witin etcd
+#- then start flannel
+#- and finall start k8s.slave
+#(same in master)
+
+# TODO setup flannel

@@ -54,11 +54,6 @@ else
     exit 24
 fi
 
-if [[ "$MASTER_K8S_MASTER_1" != "$SELF_IP_ADDRESS" ]]; then
-    sudo rm -Rf $systemd_units_dir/etcd.service
-    sudo systemctl stop etcd >> /dev/null 2>&1
-fi
-
 sudo rm -Rf $systemd_units_dir/kubeproxy.service
 sudo systemctl stop kubeproxy >> /dev/null 2>&1
 

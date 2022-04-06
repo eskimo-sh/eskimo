@@ -48,7 +48,10 @@ export SPARK_VERSION_MAJOR=3.2
 
 export K8S_VERSION=1.23.5
 export CFSSL_VERSION=1.6.1
-export ETCD_VERSION=3.4.18
+# KEEPING OLD VERSION OF ETCD since later ones have the problem of initial-cluster repeating last node for all keys
+# instead of taking the actual keys
+# export ETCD_VERSION=3.3.27
+export ETCD_VERSION=3.5.2
 export FLANNEL_VERSION=0.17.0
 export K8S_DASHBOARD_VERSION=2.5.1
 export GOLANG_VERSION=1.17

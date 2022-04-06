@@ -246,10 +246,36 @@
   },
 
 
+  "etcd": {
+    "config": {
+      "order": 5,
+      "group" : "Kubernetes",
+      "name" : "Etcd",
+      "selectionLayout" : { "row" : 6, "col" : 1},
+      "memory": "neglectable",
+      "logo" : "images/k8s-master-logo.png",
+      "icon" : "images/k8s-master-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false,
+        "restart": true
+      }
+    ],
+    "additionalEnvironment": [
+      "ALL_NODES_LIST_etcd",
+      "SERVICE_NUMBER_1_BASED"
+    ]
+  },
+
+
   "k8s-master": {
     "config": {
       "imageName" : "k8s-master",
-      "order": 5,
+      "order": 6,
       "unique": true,
       "group" : "Kubernetes",
       "name" : "Eskimo Master",
@@ -272,6 +298,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "etcd",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ]
   },
@@ -279,7 +312,7 @@
 
   "k8s-slave": {
     "config": {
-      "order": 6,
+      "order": 7,
       "group" : "Kubernetes",
       "name" : "Slave",
       "selectionLayout" : { "row" : 5, "col" : 1},
@@ -299,8 +332,15 @@
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false,
+        "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "etcd",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -314,7 +354,7 @@
   "mesos-master": {
     "config": {
       "imageName" : "mesos-master",
-      "order": 7,
+      "order": 8,
       "unique": true,
       "group" : "Mesos",
       "name" : "Master",
@@ -405,7 +445,7 @@
 
   "mesos-agent": {
     "config": {
-      "order": 8,
+      "order": 9,
       "group" : "Mesos",
       "name" : "Agent",
       "selectionLayout" : { "row" : 3, "col" : 1},
@@ -507,7 +547,7 @@
   "marathon" : {
     "config": {
       "imageName" : "marathon",
-      "order": 9,
+      "order": 10,
       "unique": true,
       "group": "Mesos",
       "name": "Marathon",
@@ -591,7 +631,7 @@
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 10,
+      "order": 11,
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -682,7 +722,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 11,
+      "order": 12,
       "marathon": true,
       "unique": true,
       "group" : "Kafka",
@@ -729,7 +769,7 @@
   "spark-history-server" : {
     "config": {
       "imageName" : "spark",
-      "order": 12,
+      "order": 13,
       "marathon": true,
       "unique": true,
       "group" : "Spark",
@@ -791,7 +831,7 @@
   "spark-executor" : {
     "config": {
       "imageName" : "spark",
-      "order": 13,
+      "order": 14,
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 3, "col" : 3},
@@ -887,7 +927,7 @@
   "flink-app-master" : {
     "config": {
       "imageName" : "flink",
-      "order": 14,
+      "order": 15,
       "unique": true,
       "group": "Flink",
       "name": "App Master",
@@ -989,7 +1029,7 @@
   "flink-worker" : {
     "config": {
       "imageName" : "flink",
-      "order": 15,
+      "order": 16,
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "row": 4, "col": 3  },
@@ -1027,7 +1067,7 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 16,
+      "order": 17,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 2, "col" : 3},
@@ -1066,7 +1106,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 17,
+      "order": 18,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1099,7 +1139,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 18,
+      "order": 19,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 1, "col" : 3},
@@ -1188,7 +1228,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 19,
+      "order": 20,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1252,7 +1292,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 20,
+      "order": 21,
       "marathon": true,
       "unique": true,
       "name" : "Zeppelin",

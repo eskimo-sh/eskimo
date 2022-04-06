@@ -54,11 +54,6 @@ else
     exit 24
 fi
 
-if [[ `echo $ALL_NODES_LIST_k8s_slave | grep $SELF_IP_ADDRESS` == "" ]]; then
-    sudo rm -Rf $systemd_units_dir/etcd.service
-    sudo systemctl stop etcd >> /dev/null 2>&1
-fi
-
 sudo rm -Rf $systemd_units_dir/kubeapi.service
 sudo systemctl stop kubeapi >> /dev/null 2>&1
 

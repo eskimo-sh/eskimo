@@ -143,6 +143,12 @@ if [[ ! -L /usr/local/lib/k8s/etc ]]; then
     sudo ln -s /usr/local/etc/k8s /usr/local/lib/k8s/etc
 fi
 
+echo " - Simlinking etcd config to /usr/local/etc/etcd"
+sudo mkdir -p /usr/local/etc/etcd
+if [[ ! -L /usr/local/lib/k8s/etcd_etc ]]; then
+    sudo ln -s /usr/local/etc/etcd /usr/local/lib/k8s/etcd_etc
+fi
+
 echo " - Simlinking K8s binaries to /usr/local/bin"
 
 echo "   + cfssl"

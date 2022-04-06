@@ -206,9 +206,6 @@ fail_if_error $? /dev/null 302
 bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 fail_if_error $? /dev/null 303
 
-bash ./setup-etcd.sh
-fail_if_error $? /dev/null 304
-
 bash ./setup-kubeapi.sh
 fail_if_error $? /dev/null 305
 

@@ -36,7 +36,7 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=docker-registry,etcd,kubeapi,kubectrl,bubesched
+REQUIRED_SERVICES=docker-registry,kubeapi,kubectrl,bubesched
 # ,flannel
 
 while : ; do

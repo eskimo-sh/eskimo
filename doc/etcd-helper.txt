@@ -1,0 +1,4 @@
+
+
+# Get top-level keys and values
+/usr/local/bin/etcdctl get / --prefix

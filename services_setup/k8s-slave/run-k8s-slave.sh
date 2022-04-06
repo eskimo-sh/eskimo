@@ -36,7 +36,7 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=etcd,kubelet
+REQUIRED_SERVICES=kubelet,kubeproxy
 # flannel,
 
 while : ; do
