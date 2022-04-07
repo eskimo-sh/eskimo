@@ -47,15 +47,15 @@ RemainAfterExit=false
 # Run ExecStartPre with root-permissions
 PermissionsStartOnly=true
 
-ExecStartPre=-/usr/bin/docker kill k8s-master
-ExecStartPre=-/usr/bin/docker rm -f k8s-master
+ExecStartPre=-/usr/bin/docker kill k8s-registry
+ExecStartPre=-/usr/bin/docker rm -f k8s-registry
 
 # attempt to recreate  / remount gluster shares
 ExecStartPre=/bin/bash /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
 
 ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment&& /usr/bin/docker run \
         -i \
-        --name kubernetes \
+        --name k8s-registry \
         --user kubernetes \
         --network host \
         -v /var/log/kubernetes:/var/log/kubernetes \
@@ -70,7 +70,7 @@ ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment&& /usr/bin/docker run \
 # Unfotunately "-network host" is requires since random ports are created to communicate with mesos.
 #          -p 5000:5000 \
 
-ExecStop=/usr/bin/docker stop k8s-master
+ExecStop=/usr/bin/docker stop k8s-registry
 
 Type=simple
 

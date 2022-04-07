@@ -77,15 +77,11 @@ if [[ ! -d /var/log/kubernetes ]]; then
 fi
 
 
-if [[ -f /usr/local/sbin/register-kubernetes-registry.sh ]]; then
-    echo " - Removing existing register-kubernetes-registry.sh (will be rewritten)"
-    sudo rm -f /usr/local/sbin/register-kubernetes-registry.sh
+if [[ ! -f /usr/local/sbin/register-kubernetes-registry.sh ]]; then
+    echo " - Copying register-kubernetes-registry.sh script"
+    sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
+    sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
 fi
-
-echo " - Copying register-kubernetes-registry.sh script"
-sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
-sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
-
 
 
 # TODO Create Kubernetes environment and SystenD unit files

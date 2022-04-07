@@ -52,7 +52,7 @@ echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 echo " - Creating directory cerebro"
@@ -83,7 +83,7 @@ docker exec cerebro bash /scripts/inContainerSetupESCommon.sh $elasticsearch_use
 if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat cerebro_install_log
-    exit -102
+    exit 102
 fi
 
 echo " - Configuring cerebro container"
@@ -91,7 +91,7 @@ docker exec cerebro bash /scripts/inContainerSetupCerebro.sh | tee cerebro_insta
 if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat cerebro_install_log
-    exit -100
+    exit 100
 fi
 
 echo " - Handling topology and setting injection"
@@ -105,7 +105,7 @@ echo " - Committing changes to local template and exiting container cerebro"
 commit_container cerebro cerebro_install_log
 
 
-echo " - Starting marathon deployment"
-deploy_marathon cerebro cerebro_install_log
+echo " - Starting Kubernetes deployment"
+deploy_kubernetes cerebro cerebro_install_log
 
 

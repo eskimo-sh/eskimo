@@ -134,6 +134,80 @@ function loadTopology() {
 # Arguments:
 # - $1 the name of the systemd service
 # - $2 the lof file to dump command outputs to
+function deploy_kubernetes() {
+
+    if [[ $1 == "" ]]; then
+        echo "Container needs to be passed in argument"
+        exit 2
+    fi
+    export CONTAINER=$1
+
+    if [[ $2 == "" ]]; then
+        echo "Log file path needs to be passed in argument"
+        exit 3
+    fi
+    export LOG_FILE=$2
+
+    echo " - Deploying $CONTAINER Service in docker registry for kubernetes"
+    docker tag eskimo:$CONTAINER kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
+    if [[ $? != 0 ]]; then
+        echo "   + Could not re-tag kubernetes container image for $CONTAINER"
+        exit 4
+    fi
+
+    docker push kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
+    if [[ $? != 0 ]]; then
+        echo "Image push in docker registry failed !"
+        exit 5
+    fi
+
+    echo " - removing local image"
+    docker image rm eskimo:$CONTAINER  >> $LOG_FILE 2>&1
+    if [[ $? != 0 ]]; then
+        echo "local image removal failed !"
+        exit 6
+    fi
+
+    if [[ ! -f $CONTAINER.k8s.yaml ]]; then
+        echo "Kubernetes deployment file $CONTAINER.k8s.yaml not found"
+        exit 16
+    fi
+
+    echo " - Removing any previously deployed $CONTAINER service from kubernetes"
+    /usr/local/bib/kubectl delete -f CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    if [[ $? != 0 ]]; then
+        if [[ `cat "$LOG_FILE"_kubernetes_deploy` != "" && `grep "not found" "$LOG_FILE"_kubernetes_deploy` == "" ]]; then
+            echo "   + Some elements were not found. Moving on ..."
+        else
+            echo "   + Could not delete deployment from kubernetes"
+            cat "$LOG_FILE"_kubernetes_deploy
+            exit 7
+        fi
+    fi
+
+    if [[ `grep "deleted" "$LOG_FILE"_kubernetes_deploy` != "" ]]; then
+        echo "   + Previous instance removed"
+        if [[ -z "$NO_SLEEP" ]]; then sleep 3; fi
+    fi
+
+    echo " - Deploying $CONTAINER service in kubernetes"
+    /usr/local/bib/kubectl apply -f CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    if [[ $? != 0 ]]; then
+        echo "   + Could not deploy $CONTAINER application in kubernetes"
+        cat "$LOG_FILE"_kubernetes_deploy
+        exit 8
+    fi
+
+
+    #-H "Authorization: token=$(dcos config show core.dcos_acs_token)" \
+}
+
+
+# Install container in registry and deploy it using marathon
+# Arguments:
+# - $1 the name of the systemd service
+# - $2 the lof file to dump command outputs to
+### Deprecated
 function deploy_marathon() {
 
     if [[ $1 == "" ]]; then

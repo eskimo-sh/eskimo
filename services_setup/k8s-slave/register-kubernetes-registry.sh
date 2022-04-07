@@ -37,7 +37,7 @@
 
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
     echo "Could not find /etc/eskimo_topology.sh"
-    exit -1
+    exit 1
 fi
 
 . /etc/eskimo_topology.sh
@@ -46,10 +46,10 @@ fi
 sed -i '/.* kubernetes.registry/d' /etc/hosts
 
 # register new host
-if [[ -z $MASTER_K8S-MASTER_1 ]]; then
+if [[ -z $MASTER_K8S_MASTER_1 ]]; then
     echo "WARNING : Could not find Kubernetes Eskimo master host"
 else
-    echo "$MASTER_K8S-MASTER_1 kubernetes.registry" >> /etc/hosts
+    echo "$MASTER_K8S_MASTER_1 kubernetes.registry" >> /etc/hosts
 fi
 
 

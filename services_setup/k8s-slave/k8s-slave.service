@@ -4,8 +4,6 @@ Documentation=https://www.eskimo.sh
 Wants=network-online.target
 After=network-online.target
 Wants=etcd.service
-# TODO not for now
-#Requires=flannel.service
 
 
 [Service]
@@ -13,6 +11,7 @@ Type=simple
 TimeoutStartSec=300sec
 RemainAfterExit=false
 ExecStartPre=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
+ExecStartPre=/usr/local/sbin/register-kubernetes-registry.sh
 ExecStart=/usr/local/sbin/run-k8s-slave.sh
 ExecStartPost=/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh
 RestartSec=5

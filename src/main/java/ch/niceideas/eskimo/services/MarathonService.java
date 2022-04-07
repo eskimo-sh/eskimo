@@ -572,7 +572,7 @@ public class MarathonService {
             // 5.2 run garbage collection to remove blobs
             ml.addInfo(" - Running garbage collection");
             sshCommandService.runSSHCommand(connection,
-                    "docker exec -i --user root marathon bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
+                    "docker exec -i --user root k8s-registry bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\"");
 
         } catch (ConnectionManagerException e) {
             throw new MarathonException (e);

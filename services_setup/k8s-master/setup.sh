@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 
@@ -67,7 +67,7 @@ sudo rm -f k8s-master_install_log
 # I need to make sure I'm doing this before attempting to recreate the directories
 #preinstall_unmount_gluster_share /var/lib/kubernetes/data
 
-echo " - Creating kubernetes user (if not exist)"
+echo " - Getting kubernetes user"
 export kubernetes_user_id=`id -u kubernetes 2>> k8s-master_install_log`
 if [[ $kubernetes_user_id == "" ]]; then
     echo "User kubernetes should have been added by eskimo-base-system setup script"
@@ -75,7 +75,6 @@ if [[ $kubernetes_user_id == "" ]]; then
 fi
 
 # Create shared dir
-echo " - Creating shared directory"
 echo " - Creating shared directory"
 if [[ ! -d /var/lib/kubernetes ]]; then
     sudo mkdir -p /var/lib/kubernetes
@@ -98,65 +97,6 @@ sudo chown kubernetes /var/log/kubernetes/log
 sudo mkdir -p /var/lib/kubernetes/tmp
 sudo chown -R kubernetes /var/lib/kubernetes
 
-
-echo " - Installing kubernetes docker registry"
-
-echo "   + Registering kubernetes registry"
-# remove any previous definition
-sudo sed -i '/.* kubernetes.registry/d' /etc/hosts
-sudo bash -c "echo \"$MASTER_KUBERENETES_1 kubernetes.registry\" >> /etc/hosts"
-
-sudo mkdir -p /var/log/kubernetes/docker_registry
-sudo chown -R kubernetes /var/log/kubernetes/docker_registry
-sudo mkdir -p /var/lib/kubernetes/docker_registry
-sudo chown -R kubernetes /var/lib/kubernetes/docker_registry
-
-echo "   + Installing setupKubernetesRegistryGlusterShares.sh to /usr/local/sbin"
-sudo cp setupKubernetesRegistryGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
-
-echo "   + Building container k8s-registry"
-build_container k8s-registry k8s-master k8s-master_install_log
-
-#sudo mkdir -p /usr/local/etc/kubernetes
-#sudo chown -R kubernetes/usr/local/etc/kubernetes
-
-# create and start container
-echo "   + Running docker container"
-docker run \
-        -v $PWD:/scripts \
-        -v $PWD/../common:/common \
-        -d --name k8s-registry \
-        -v /var/log/kubernetes:/var/log/kubernetes \
-        -v /var/run/kubernetes:/var/run/kubernetes \
-        -v /var/lib/kubernetes:/var/lib/kubernetes \
-        -v /var/lib/docker_registry:/var/lib/docker_registry \
-        -v /var/log/docker_registry:/var/log/docker_registry \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        -i \
-        -t eskimo:k8s-registry bash >> k8s-master_install_log 2>&1
-fail_if_error $? "k8s-master_install_log" -2
-
-
-# connect to container
-#docker exec -it kubernetes bash
-
-echo "   + Configuring Registry in container"
-docker exec k8s-registry bash /scripts/inContainerSetupRegistry.sh $kubernetes_user_id $SELF_IP_ADDRESS | tee -a k8s-master_install_log 2>&1
-if [[ `tail -n 1 k8s-master_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat k8s-master_install_log
-    exit 101
-fi
-
-#echo " - TODO"
-#docker exec -it kubernetes TODO
-
-echo "   + Handling topology and setting injection"
-handle_topology_settings k8s-registry k8s-master_install_log
-
-echo "   + Committing changes to local template and exiting container kubernetes"
-commit_container k8s-registry k8s-master_install_log
 
 echo " - Linking /etc/k8s to /usr/local/lib/k8s/etc"
 if [[ ! -L /etc/k8s ]]; then
@@ -197,14 +137,17 @@ echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
 sudo cp setupK8sGlusterShares.sh /usr/local/sbin/
 sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
 
-bash ./setup-kubectl.sh
+bash ./setup-k8s-registry.sh
 fail_if_error $? /dev/null 301
 
-bash ./setup-kubectl-master.sh
+bash ./setup-kubectl.sh
 fail_if_error $? /dev/null 302
 
-bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
+bash ./setup-kubectl-master.sh
 fail_if_error $? /dev/null 303
+
+bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
+fail_if_error $? /dev/null 304
 
 bash ./setup-kubeapi.sh
 fail_if_error $? /dev/null 305
@@ -222,7 +165,3 @@ sudo chmod 755 /usr/local/sbin/run-k8s-master.sh
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file k8s-master k8s-master_install_log
-
-echo " - Running postinstallation confgurations"
-
-bash ./setup-kubectl.sh

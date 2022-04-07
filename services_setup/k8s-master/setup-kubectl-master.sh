@@ -69,7 +69,7 @@ fi
 set -e
 
 
-echo " - Creating / checking eskimo kubernetes base config"
+echo " - Creating / checking eskimo kubernetes base config (master only)"
 
 echo "   + getting min node"
 export MIN_NODE=`cat /etc/eskimo_network_host_min`

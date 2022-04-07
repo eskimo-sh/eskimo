@@ -36,7 +36,7 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=docker-registry,kubeapi,kubectrl,bubesched
+REQUIRED_SERVICES=k8s-registry,kubeapi,kubectrl,kubesched
 # ,flannel
 
 while : ; do
@@ -44,7 +44,8 @@ while : ; do
     sleep 10
 
     for i in ${REQUIRED_SERVICES//,/ }; do
-        if [[ `systemctl show -p SubState $i | grep exited` != "" ]]; then
+        status=`systemctl show -p SubState $i`
+        if [[ `echo $status | grep exited` != "" || `echo $status | grep dead` != "" ]]; then
             echo "$i service is actually not really running. WIll crash run-k8s-master now !"
             exit 30
         fi

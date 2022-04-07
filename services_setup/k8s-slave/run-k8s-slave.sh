@@ -44,7 +44,8 @@ while : ; do
     sleep 10
 
     for i in ${REQUIRED_SERVICES//,/ }; do
-        if [[ `systemctl show -p SubState $i | grep exited` != "" ]]; then
+        status=`systemctl show -p SubState $i`
+        if [[ `echo $status | grep exited` != "" || `echo $status | grep dead` != "" ]]; then
             echo "$i service is actually not really running"
             exit 30
         fi

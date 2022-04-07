@@ -76,7 +76,7 @@ echo " - Creating user kubernetes home directory"
 mkdir -p /home/kubernetes
 chown kubernetes /home/kubernetes
 
-echo " - Updating marathon registry config"
+echo " - Updating kubernetes registry config"
 sudo sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var\/lib\/kubernetes\/docker_registry"/g /etc/docker_registry/config.yml
 #rootdirectory: /var/lib/docker_registry
 

@@ -1,0 +1,1 @@
+../k8s-slave/register-kubernetes-registry.sh
