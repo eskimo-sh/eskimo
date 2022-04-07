@@ -43,6 +43,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Deprecated /* To Be renamed */
 public class MarathonServicesConfigChecker {
 
     private static final Logger logger = Logger.getLogger(MarathonServicesConfigChecker.class);
@@ -71,8 +72,8 @@ public class MarathonServicesConfigChecker {
             // ensure only marathon services
             for (String serviceName : marathonConfig.getEnabledServices()) {
                 Service service = servicesDefinition.getService(serviceName);
-                if (!service.isMarathon()) {
-                    throw new MarathonServicesConfigException("Inconsistency found : service " + serviceName + " is not a marathon service");
+                if (!service.isMarathon() && !service.isKubernetes()) {
+                    throw new MarathonServicesConfigException("Inconsistency found : service " + serviceName + " is not a kubernetes service");
                 }
             }
 
@@ -87,6 +88,11 @@ public class MarathonServicesConfigChecker {
                     if (otherService.isMarathon()) {
                         throw new MarathonServicesConfigException(
                                 "Inconsistency found : Service " + serviceName + " is defining a dependency on a marathon service :  " +
+                                        dependency.getMasterService() + ", which is disallowed");
+                    }
+                    if (otherService.isKubernetes()) {
+                        throw new MarathonServicesConfigException(
+                                "Inconsistency found : Service " + serviceName + " is defining a dependency on a kubernetes service :  " +
                                         dependency.getMasterService() + ", which is disallowed");
                     }
 

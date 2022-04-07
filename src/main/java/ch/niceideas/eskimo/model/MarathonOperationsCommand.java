@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
+@Deprecated /* To be renamed */
 public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOperationsCommand.MarathonOperationId> implements Serializable {
 
     private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
@@ -98,6 +99,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
             try {
                 SystemStatusWrapper lastStatus = systemService.getStatus();
 
+                /* Deprecated. remove
                 String marathonNodeName = lastStatus.getFirstNodeName("marathon");
                 if (StringUtils.isBlank(marathonNodeName)) {
                     retCommand.setWarnings("Marathon is not available. The changes in marathon services configuration and " +
@@ -111,6 +113,23 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
                         retCommand.setWarnings("Marathon is not properly running. The changes in marathon services configuration and " +
                                 "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
                                 "marathon is available");
+                    }
+                }
+                */
+
+                String kubeNodeName = lastStatus.getFirstNodeName("k8s-master");
+                if (StringUtils.isBlank(kubeNodeName)) {
+                    retCommand.setWarnings("Kubernetes is not available. The changes in kubernetes services configuration and " +
+                            "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
+                            "Kubernetes Master is available");
+
+                } else {
+
+                    if (!lastStatus.isServiceOKOnNode("k8s-master", kubeNodeName)) {
+
+                        retCommand.setWarnings("Kubernetes is not properly running. The changes in kubernetes services configuration and " +
+                                "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
+                                "Kubernetes Master is available");
                     }
                 }
 

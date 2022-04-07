@@ -120,6 +120,9 @@ public class ServicesDefinition implements InitializingBean {
             Boolean marathon = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.marathon");
             service.setMarathon(marathon != null && marathon); // false by default
 
+            Boolean kubernetes = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.kubernetes");
+            service.setKubernetes(kubernetes != null && kubernetes); // false by default
+
             Boolean mandatory = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.mandatory");
             service.setMandatory(mandatory != null && mandatory);
 
@@ -311,6 +314,16 @@ public class ServicesDefinition implements InitializingBean {
                 service.addDependency(marathonDependency);
             }
 
+            // Kubernetes services have an implicit dependency on kubernetes
+            if (service.isKubernetes()) {
+                Dependency kubeDependency = new Dependency();
+                kubeDependency.setMes(MasterElectionStrategy.RANDOM);
+                kubeDependency.setMasterService("k8s-master");
+                kubeDependency.setNumberOfMasters(1);
+                kubeDependency.setMandatory(true);
+                service.addDependency(kubeDependency);
+            }
+
             if (servicesConfig.hasPath(serviceString+".additionalEnvironment")) {
                 JSONArray addEnvConf = servicesConfig.getSubJSONObject(serviceString).getJSONArray("additionalEnvironment");
                 for (int i = 0; i < addEnvConf.length(); i++) {
@@ -452,13 +465,14 @@ public class ServicesDefinition implements InitializingBean {
     public String[] listAllNodesServices() {
         return services.values().stream()
                 .filter(service -> !service.isMarathon())
+                .filter(service -> !service.isKubernetes())
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
     }
 
     public String[] listMultipleServices() {
         return services.values().stream()
-                .filter(it -> !it.isUnique() && !it.isMarathon())
+                .filter(it -> !it.isUnique() && !it.isMarathon() && !it.isKubernetes())
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
     }
@@ -475,14 +489,16 @@ public class ServicesDefinition implements InitializingBean {
         return services.values().stream()
                 .filter(Service::isUnique)
                 .filter(Service::isNotMarathon)
+                .filter(Service::isNotKubernetes)
                 .map(Service::getName)
                 .sorted()
                 .toArray(String[]::new);
     }
 
+    @Deprecated /* To be renamed */
     public String[] listMarathonServices() {
         return services.values().stream()
-                .filter(Service::isMarathon)
+                .filter(service -> service.isMarathon() || service.isKubernetes())
                 .map(Service::getName)
                 .sorted()
                 .toArray(String[]::new);
@@ -537,6 +553,14 @@ public class ServicesDefinition implements InitializingBean {
             return 1;
         }
         if (!one.isMarathon() && other.isMarathon()) {
+            return -1;
+        }
+
+        // kubernetes services are always last
+        if (one.isKubernetes() && !other.isKubernetes()) {
+            return 1;
+        }
+        if (!one.isKubernetes() && other.isKubernetes()) {
             return -1;
         }
 

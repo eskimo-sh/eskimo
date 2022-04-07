@@ -276,6 +276,9 @@ public class Topology {
                 if (service.isMarathon()) {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services");
                 }
+                if (service.isKubernetes()) {
+                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a RANDOM_NODE_AFTER dependency which is not supported for kubernetes services");
+                }
                 if (dep.getNumberOfMasters() > 1) {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
                 }
@@ -295,6 +298,9 @@ public class Topology {
             default:
                 if (service.isMarathon()) {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defines a SAME_NODE dependency which is not supported for marathon services");
+                }
+                if (service.isKubernetes()) {
+                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a SAME_NODE dependency which is not supported for kubernetes services");
                 }
                 // do nothing here. WIll be enforced by checker.
                 break;

@@ -71,6 +71,9 @@ public class NodesConfigurationService {
     private MarathonService marathonService;
 
     @Autowired
+    private KubernetesService kubernetesService;
+
+    @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
     @Value("${system.parallelismInstallThreadCount}")
@@ -484,6 +487,19 @@ public class NodesConfigurationService {
                         }
                     },
                     status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
+
+        } else if (servicesDefinition.getService(operationId.getService()).isKubernetes()) {
+
+            systemOperationService.applySystemOperation(operationId,
+                    ml -> {
+                        try {
+                            ml.addInfo(kubernetesService.restartServiceKubernetesInternal(servicesDefinition.getService(operationId.getService())));
+                        } catch (KubernetesException e) {
+                            logger.error (e, e);
+                            throw new SystemException (e);
+                        }
+                    },
+                    status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK") );
 
         } else {
             systemOperationService.applySystemOperation(operationId,

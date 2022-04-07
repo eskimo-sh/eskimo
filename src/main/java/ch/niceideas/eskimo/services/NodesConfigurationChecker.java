@@ -98,6 +98,12 @@ public class NodesConfigurationChecker {
                                         + " is defining a dependency on a marathon service :  "
                                         + dependency.getMasterService() + ", which is disallowed");
                     }
+                    if (otherService.isKubernetes()) {
+                        throw new NodesConfigurationException(
+                                "Inconsistency found : Service " + property.getServiceName()
+                                        + " is defining a dependency on a kubernetes service :  "
+                                        + dependency.getMasterService() + ", which is disallowed");
+                    }
 
                     // I want the dependency on same node if dependency is mandatory
                     if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)) {
@@ -212,6 +218,7 @@ public class NodesConfigurationChecker {
         }
     }
 
+    @Deprecated /* To be renamed */
     void checkNoMarathonServicesSelected(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
 
         // foolproof bug check : make sure no marathon service can be selected here
@@ -226,6 +233,10 @@ public class NodesConfigurationChecker {
                 if (service.isMarathon()) {
                     throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
                             + " is a marathon service which should not be selectable here.");
+                }
+                if (service.isKubernetes()) {
+                    throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
+                            + " is a kubernetes service which should not be selectable here.");
                 }
             }
         }

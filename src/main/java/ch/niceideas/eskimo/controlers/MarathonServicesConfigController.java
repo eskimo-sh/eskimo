@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 
+@Deprecated /* To be renamed */
 @Controller
 public class MarathonServicesConfigController extends AbstractOperationController {
 
@@ -67,6 +68,9 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
     @Autowired
     private MarathonService marathonService;
+
+    @Autowired
+    private KubernetesService kubernetesService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -87,6 +91,9 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     /* For tests */
     void setMarathonService(MarathonService marathonService) {
         this.marathonService = marathonService;
+    }
+    void setKubernetesService(KubernetesService kubernetesService) {
+        this.kubernetesService = kubernetesService;
     }
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
@@ -240,11 +247,14 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
 
             configurationService.saveMarathonServicesConfig(command.getRawConfig());
 
-            marathonService.applyMarathonServicesConfig(command);
+            // FIXME Deprecated
+            //marathonService.applyMarathonServicesConfig(command);
+
+            kubernetesService.applyServicesConfig(command);
 
             return ReturnStatusHelper.createOKStatus();
 
-        } catch (MarathonException e) {
+        } catch (/*MarathonException | */KubernetesException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createEncodedErrorStatus(e);
 

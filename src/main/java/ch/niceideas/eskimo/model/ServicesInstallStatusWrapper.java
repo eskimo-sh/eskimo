@@ -51,7 +51,10 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public static final String INSTALLED_ON_IP_FLAG = "_installed_on_IP_";
 
+    @Deprecated
     public static final String MARATHON_NODE = "MARATHON_NODE";
+
+    public static final String KUBERNETES_NODE = "KUBERNETES_NODE";
 
     private static final Logger logger = Logger.getLogger(ServicesInstallStatusWrapper.class);
 

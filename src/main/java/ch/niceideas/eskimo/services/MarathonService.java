@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Deprecated
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class MarathonService {
@@ -333,6 +334,7 @@ public class MarathonService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
+    @Deprecated
     public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws MarathonException {
 
         logger.info ("Starting Marathon Deployment Operations");
@@ -832,6 +834,7 @@ public class MarathonService {
         return resultBuilder.toString();
     }
 
+    @Deprecated
     public void startServiceMarathon(Service service) throws SystemException, MarathonException {
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Starting", () -> startServiceMarathonInternal(service));
@@ -872,12 +875,14 @@ public class MarathonService {
         return log.toString();
     }
 
+    @Deprecated
     @PreAuthorize("hasAuthority('ADMIN')")
     public void stopServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> stopServiceMarathonInternal(service));
     }
 
+    @Deprecated
     String stopServiceMarathonInternal(Service service) throws MarathonException {
 
         StringBuilder log = new StringBuilder();
@@ -914,11 +919,13 @@ public class MarathonService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
+    @Deprecated
     public void restartServiceMarathon(Service service) throws SystemException, MarathonException{
         ensureMarathonAvailability();
         systemService.applyServiceOperation(service.getName(), MARATHON_NODE, "Stopping", () -> restartServiceMarathonInternal(service));
     }
 
+    @Deprecated
     protected String restartServiceMarathonInternal(Service service) throws MarathonException {
         StringBuilder log = new StringBuilder();
 
@@ -966,4 +973,5 @@ public class MarathonService {
             throw new MarathonException("Could not stop service " + service + " in " + (MARATHON_UNINSTALL_SHUTDOWN_ATTEMPTS * 100 / 60) +  " seconds.");
         }
     }
+
 }

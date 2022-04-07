@@ -81,7 +81,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
         depD.setMasterService("service_c");
@@ -157,7 +157,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
         depD.setMasterService("service_c");
@@ -193,7 +193,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
         depD.setMasterService("service_c");
@@ -224,7 +224,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
         depD.setMasterService("service_c");
@@ -260,7 +260,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.RANDOM);
         depD.setMasterService("service_c");
@@ -296,7 +296,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.RANDOM);
         depD.setMasterService("service_c");
@@ -323,7 +323,7 @@ public abstract class AbstractServicesDefinitionTest {
 
         Service serviceD = new Service();
         serviceD.setName("service_d");
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         def.addService(serviceD);
     }
 
@@ -349,7 +349,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
         depD.setMasterService("service_c");
@@ -382,7 +382,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
         depD.setMasterService("service_c");

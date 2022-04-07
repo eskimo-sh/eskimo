@@ -232,6 +232,7 @@ public class ConfigurationService {
         return FileUtils.readFile(configFile);
     }
 
+    @Deprecated /* TO BE renamed */
     public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
         marathonServicesFileLock.lock();
         try {

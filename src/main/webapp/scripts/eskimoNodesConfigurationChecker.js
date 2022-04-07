@@ -234,7 +234,7 @@ function checkNoMarathonServicesSelected(nodesConfig, servicesConfiguration) {
             if (property.serviceName != NODE_ID_FIELD) {
                 let serviceConfig = servicesConfiguration[property.serviceName];
 
-                if (serviceConfig == null || serviceConfig.marathon) {
+                if (serviceConfig == null || serviceConfig.marathon || serviceConfig.kubernetes) {
                     throw "Inconsistency found : service " + property.serviceName
                             + " is either undefined or a marathon service which should not be selectable here."
                 }

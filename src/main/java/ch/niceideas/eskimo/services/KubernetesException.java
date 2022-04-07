@@ -32,57 +32,26 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.StringUtils;
-import org.json.JSONObject;
+import ch.niceideas.common.exceptions.CommonBusinessException;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.stream.Collectors;
+public class KubernetesException extends CommonBusinessException {
 
-@Deprecated /* To Be Renamed */
-public class MarathonServicesConfigWrapper extends JsonWrapper implements Serializable {
+    static final long serialVersionUID = -3875122119212229248L;
 
-    public static final String INSTALL_FLAG = "_install";
-
-    public MarathonServicesConfigWrapper(File statusFile) throws FileException {
-        super(FileUtils.readFile(statusFile));
+    public KubernetesException() {
     }
 
-    public static MarathonServicesConfigWrapper empty() {
-        return new MarathonServicesConfigWrapper("{}");
+    public KubernetesException(String message) {
+        super(message);
     }
 
-    public MarathonServicesConfigWrapper(JSONObject json) {
-        super(json);
+    public KubernetesException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public MarathonServicesConfigWrapper(Map<String, Object> map) {
-        super(new JSONObject(map));
+    public KubernetesException(Throwable cause) {
+        super(cause);
     }
-
-    public MarathonServicesConfigWrapper(String jsonString) {
-        super(jsonString);
-    }
-
-    public Collection<String> getEnabledServices() {
-        return getRootKeys().stream()
-                .filter(key -> key.contains(INSTALL_FLAG))
-                .filter(key -> getValueForPath(key).equals("on"))
-                .map(key -> key.substring(0, key.indexOf(INSTALL_FLAG)))
-                .collect(Collectors.toList());
-    }
-
-
-    public boolean isServiceInstallRequired( String service) {
-        return StringUtils.isNotBlank(getValueForPathAsString(service + INSTALL_FLAG))
-                && getValueForPath(service + INSTALL_FLAG).equals("on");
-    }
-
 }

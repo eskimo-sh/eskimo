@@ -56,7 +56,10 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
 
+    @Deprecated
     public static final String MARATHON_FLAG = "(marathon)";
+
+    public static final String KUBERNETES_FLAG = "(kubernetes)";
     public static final String CHECK_INSTALL_OP_TYPE = "Check / Install";
     public static final String BASE_SYSTEM = "Base System";
 
@@ -100,7 +103,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                 throw new IllegalStateException("Cann find service " + installedService + " in services definition");
             }
 
-            if (!service.isMarathon()) {
+            if (!service.isMarathon() && !service.isKubernetes()) {
 
                 String node = nodeName.replace("-", ".");
 
@@ -144,7 +147,18 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                         })
                         .forEach(dependent -> {
 
-                            if (!servicesDefinition.getService(dependent).isMarathon()) {
+                            if (servicesDefinition.getService(dependent).isMarathon()) {
+                                if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
+                                    retCommand.addRestartIfNotInstalled(dependent, MARATHON_FLAG);
+                                }
+
+                            } else if (servicesDefinition.getService(dependent).isKubernetes()) {
+                                if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
+                                    retCommand.addRestartIfNotInstalled(dependent, KUBERNETES_FLAG);
+                                }
+
+                            } else {
+
                                 for (int nodeNumber : nodesConfig.getNodeNumbers(dependent)) {
 
                                     String node = nodesConfig.getNodeAddress(nodeNumber);
@@ -156,12 +170,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                                     if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterService, node)) {
                                         retCommand.addRestartIfNotInstalled(dependent, node);
                                     }
-                                }
-
-                            } else {
-
-                                if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
-                                    retCommand.addRestartIfNotInstalled(dependent, MARATHON_FLAG);
                                 }
                             }
 
@@ -202,32 +210,34 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
     private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, String node, String restartedService) {
-        if (!servicesDefinition.getService(restartedService).isMarathon()) {
-
-            retCommand.addRestartIfNotInstalled(restartedService, node);
-
-        } else {
-
+        if (servicesDefinition.getService(restartedService).isMarathon()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
                 retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
             }
+        } else if (servicesDefinition.getService(restartedService).isKubernetes()) {
+            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
+                retCommand.addRestartIfNotInstalled(restartedService, KUBERNETES_FLAG);
+            }
+        } else {
+            retCommand.addRestartIfNotInstalled(restartedService, node);
         }
     }
 
     private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, String restartedService) {
-        if (!servicesDefinition.getService(restartedService).isMarathon()) {
-
+        if (servicesDefinition.getService(restartedService).isMarathon()) {
+            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
+                retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
+            }
+        } else if (servicesDefinition.getService(restartedService).isKubernetes()) {
+            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
+                retCommand.addRestartIfNotInstalled(restartedService, KUBERNETES_FLAG);
+            }
+        } else {
             for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
                 String node = nodesConfig.getNodeAddress(nodeNumber);
 
                 retCommand.addRestartIfNotInstalled(restartedService, node);
-            }
-
-        } else {
-
-            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
-                retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
             }
         }
     }

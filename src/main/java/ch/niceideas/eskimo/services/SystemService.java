@@ -197,8 +197,8 @@ public class SystemService {
     public void showJournal(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Showing journal of", () -> {
             Service service = servicesDefinition.getService(serviceName);
-            if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Showing marathon service journal for " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
+            if (service.isMarathon() || service.isKubernetes()) {
+                throw new UnsupportedOperationException("Showing kubernetes service journal for " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(node, "sudo journalctl -u " + serviceName);
             }
@@ -208,8 +208,8 @@ public class SystemService {
     public void startService(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Starting", () -> {
             Service service = servicesDefinition.getService(serviceName);
-            if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Starting marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
+            if (service.isMarathon() || service.isKubernetes()) {
+                throw new UnsupportedOperationException("Starting kubernetes service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(node, "sudo systemctl start " + serviceName);
             }
@@ -220,8 +220,8 @@ public class SystemService {
     public void stopService(String serviceName, String node) throws SystemException{
         applyServiceOperation(serviceName, node, "Stopping", () -> {
             Service service = servicesDefinition.getService(serviceName);
-            if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Stopping marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
+            if (service.isMarathon() || service.isKubernetes()) {
+                throw new UnsupportedOperationException("Stopping kubernetes service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(node, "sudo systemctl stop " + serviceName);
             }
@@ -232,8 +232,8 @@ public class SystemService {
     public void restartService(String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Restarting", () -> {
             Service service = servicesDefinition.getService(serviceName);
-            if (service.isMarathon()) {
-                throw new UnsupportedOperationException("Restarting marathon service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
+            if (service.isMarathon() || service.isKubernetes()) {
+                throw new UnsupportedOperationException("Restarting kubernetes service " + serviceName + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
                 return sshCommandService.runSSHCommand(node, "sudo systemctl restart " + serviceName);
             }

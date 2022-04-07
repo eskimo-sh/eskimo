@@ -1107,7 +1107,7 @@
     "config": {
       "imageName" : "cerebro",
       "order": 18,
-      "marathon": true,
+      "kubernetes": true,
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",

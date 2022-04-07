@@ -58,6 +58,9 @@ public class SystemAdminController extends AbstractOperationController {
     private MarathonService marathonService;
 
     @Autowired
+    private KubernetesService kubernetesService;
+
+    @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
@@ -94,6 +97,20 @@ public class SystemAdminController extends AbstractOperationController {
         }
     }
 
+    private String performKubernetesOperation(KubernetesOperation operation, String message) {
+
+        try {
+            operation.performOperation(kubernetesService);
+
+            return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
+
+        } catch (KubernetesException | SystemException e) {
+            logger.error(e, e);
+            return ReturnStatusHelper.createErrorStatus(e);
+        }
+    }
+
+    @Deprecated
     private String performMarathonOperation(MarathonOperation operation, String message) {
 
         try {
@@ -124,9 +141,15 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
+
         if (service.isMarathon()) {
             return performMarathonOperation(
                     marathonService -> marathonService.showJournalMarathon(service),
+                    "Successfully shown journal of " +  serviceName + ".");
+
+        } else if (service.isKubernetes()) {
+            return performKubernetesOperation(
+                    marathonService -> marathonService.showJournal(service),
                     "Successfully shown journal of " +  serviceName + ".");
 
         } else {
@@ -146,6 +169,11 @@ public class SystemAdminController extends AbstractOperationController {
                     marathonService -> marathonService.startServiceMarathon(service),
                     serviceName + " has been started successfuly on marathon.");
 
+        } else if (service.isKubernetes()) {
+            return performKubernetesOperation(
+                    kubernetesService -> kubernetesService.startService(service),
+                    serviceName + " has been started successfuly on kubernetes.");
+
         } else {
             return performSystemOperation(
                     sysService -> sysService.startService(serviceName, node),
@@ -162,6 +190,11 @@ public class SystemAdminController extends AbstractOperationController {
             return performMarathonOperation(
                     marathonService -> marathonService.stopServiceMarathon(service),
                     serviceName + " has been stopped successfuly on marathon.");
+
+        } else if (service.isKubernetes()) {
+            return performKubernetesOperation(
+                    kubernetesService -> kubernetesService.stopService(service),
+                    serviceName + " has been stopped successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
@@ -180,6 +213,11 @@ public class SystemAdminController extends AbstractOperationController {
             return performMarathonOperation(
                     marathonService -> marathonService.restartServiceMarathon(service),
                     serviceName + " has been restarted successfuly on marathon.");
+
+        } else if (service.isKubernetes()) {
+            return performKubernetesOperation(
+                    kubernetesService -> kubernetesService.restartService(service),
+                    serviceName + " has been restarted successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
@@ -216,6 +254,8 @@ public class SystemAdminController extends AbstractOperationController {
             String nodeName;
             if (service.isMarathon()) {
                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
+            } else if (service.isKubernetes()) {
+                nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
             } else {
                 nodeName = node.replace(".", "-");
             }
@@ -230,7 +270,7 @@ public class SystemAdminController extends AbstractOperationController {
 
             configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
 
-            if (service.isMarathon()) {
+            if (service.isMarathon() || service.isKubernetes()) {
 
                 MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
                 if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
@@ -240,9 +280,17 @@ public class SystemAdminController extends AbstractOperationController {
                 MarathonOperationsCommand operationsCommand = MarathonOperationsCommand.create(
                         servicesDefinition, systemService, newServicesInstallationStatus, marathonServicesConfig);
 
-                return performMarathonOperation(
-                        marathonService -> marathonService.applyMarathonServicesConfig(operationsCommand),
-                        serviceName + " has been reinstalled successfuly on marathon.");
+                if (service.isMarathon()) {
+                    return performMarathonOperation(
+                            marathonService -> marathonService.applyMarathonServicesConfig(operationsCommand),
+                            serviceName + " has been reinstalled successfully on marathon.");
+                }
+                // kubernetes
+                else {
+                    return performKubernetesOperation(
+                            kubernetesService -> kubernetesService.applyKubernetesServicesConfig(operationsCommand),
+                            serviceName + " has been reinstalled successfully on kubernetes.");
+                }
 
             } else {
 
@@ -269,8 +317,12 @@ public class SystemAdminController extends AbstractOperationController {
         void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException, MarathonException;
     }
 
+    @Deprecated
     private interface MarathonOperation {
         void performOperation (MarathonService marathonService) throws MarathonException, SystemException;
     }
 
+    private interface KubernetesOperation {
+        void performOperation (KubernetesService kubernetesService) throws KubernetesException, SystemException;
+    }
 }

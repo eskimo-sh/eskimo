@@ -53,8 +53,11 @@ eskimo.Main = function() {
     let eskimoNotifications = null;
     let eskimoServices = null;
     let eskimoServicesSelection = null;
+
+    /* @Deprecated To Be renamed */
     let eskimoMarathonServicesSelection = null;
     let eskimoMarathonServicesConfig = null;
+
     let eskimoServicesSettings = null;
     let eskimoFileManagers = null;
     let eskimoOperationsCommand = null;

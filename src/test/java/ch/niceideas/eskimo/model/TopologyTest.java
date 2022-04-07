@@ -556,7 +556,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
     }
 
     @Test
-    public void testMarathonServiceUnsupportedDependencies() throws Exception {
+    public void testKubernetesServiceUnsupportedDependencies() throws Exception {
 
         Service serviceA = new Service();
         serviceA.setName("service_a");
@@ -574,7 +574,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         Service serviceD = new Service();
         serviceD.setName("service_d");
 
-        serviceD.setMarathon(true);
+        serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.SAME_NODE);
         depD.setMasterService("service_b");

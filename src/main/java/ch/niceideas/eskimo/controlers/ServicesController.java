@@ -126,6 +126,7 @@ public class ServicesController {
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .filter(service -> !service.isMarathon())
+                    .filter(service -> !service.isKubernetes())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
             map.put("servicesConfigurations", new JSONObject(servicesConfigurations));
@@ -152,6 +153,7 @@ public class ServicesController {
 
     @GetMapping("/get-marathon-services")
     @ResponseBody
+    @Deprecated /* To Be renamed */
     public String getMarathonServices() {
         return ReturnStatusHelper.createOKStatus(map -> {
 
@@ -159,7 +161,7 @@ public class ServicesController {
 
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
-                    .filter(Service::isMarathon)
+                    .filter(service -> service.isMarathon() || service.isKubernetes())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
             map.put("marathonServices", new JSONArray(servicesDefinition.listMarathonServices()));
