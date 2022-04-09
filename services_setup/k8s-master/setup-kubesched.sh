@@ -66,9 +66,4 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 
-
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubesched k8s_install_log SKIP_COPY,RESTART
-
-
 rm -Rf /tmp/kubesched_setup

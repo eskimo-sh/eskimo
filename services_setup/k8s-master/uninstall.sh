@@ -44,25 +44,6 @@ cd $SCRIPT_DIR
 # Loading topology
 . /etc/eskimo_topology.sh
 
-echo " - Removing systemd unit files"
-if [[ -d /lib/systemd/system/ ]]; then
-    export systemd_units_dir=/lib/systemd/system/
-elif [[ -d /usr/lib/systemd/system/ ]]; then
-    export systemd_units_dir=/usr/lib/systemd/system/
-else
-    echo "Couldn't find systemd unit files directory"
-    exit 24
-fi
-
-sudo rm -Rf $systemd_units_dir/kubeapi.service
-sudo systemctl stop kubeapi >> /dev/null 2>&1
-
-sudo rm -Rf $systemd_units_dir/kubectrl.service
-sudo systemctl stop kubectrl >> /dev/null 2>&1
-
-sudo rm -Rf $systemd_units_dir/kubesched.service
-sudo systemctl stop kubesched >> /dev/null 2>&1
-
 sudo rm -Rf /etc/k8s/kubesched.env.sh
 sudo rm -Rf /etc/k8s/kubectrl.env.sh
 sudo rm -Rf /etc/k8s/kubeapi.env.sh

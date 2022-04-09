@@ -127,7 +127,4 @@ fi
 set +e
 
 
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubeproxy k8s_install_log SKIP_COPY,RESTART
-
 sudo rm -Rf /tmp/kubeproxy_setup

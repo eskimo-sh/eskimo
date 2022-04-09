@@ -36,19 +36,151 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=kubelet,kubeproxy
-# flannel,
 
+echo " - Starting K8s Eskimo Slave"
+
+function delete_k8s_slave_lock_file() {
+   # Not in gluster share !!!
+   rm -Rf /etc/k8s/k8s_slave_management_lock
+}
+
+# From here we will be messing with gluster and hence we need to take a lock
+counter=0
+while [[ -f /etc/k8s/k8s_slave_management_lock ]] ; do
+    echo "   + /etc/k8s/ssl/k8s_slave_management_lock exist. waiting 2 secs ... "
+    sleep 2
+    let counter=counter+1
+    if [[ $counter -ge 15 ]]; then
+        echo " !!! Couldn't get /etc/k8s/k8s_slave_management_lock in 30 seconds. crashing !"
+        exit 150
+    fi
+done
+
+echo "   + Taking startup lock"
+touch /etc/k8s/k8s_slave_management_lock
+
+trap delete_k8s_slave_lock_file 15
+trap delete_k8s_slave_lock_file EXIT
+
+echo "   + Mounting Kubernetes Eskimo Gluster shares"
+/usr/local/sbin/setupK8sGlusterShares.sh > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to mount gluster shares"
+    cat /tmp/start_k8s_slave.log 2>&1
+    exit 41
+fi
+
+echo "   + Setup runtime kubectl"
+/etc/k8s/runtime_config/setup-runtime-kubectl.sh  > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+     echo "   + Failed to setup runtme kubectl"
+     cat /tmp/start_k8s_slave.log 2>&1
+     exit 42
+fi
+
+echo "   + Register kubernetes registry"
+/usr/local/sbin/register-kubernetes-registry.sh  > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to register kubernetes registry"
+    cat /tmp/start_k8s_slave.log 2>&1
+    exit 43
+fi
+
+echo "   + Setup runtime kubelet"
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kubelet.sh  > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubelet"
+    cat /tmp/start_k8s_slave.log 2>&1
+    exit 45
+fi
+
+echo "   + Starting Kubelet"
+/bin/bash -c '. /etc/k8s/kubelet.env.sh && /usr/local/bin/kubelet \
+  --address=$ESKIMO_KUBELET_ADDRESS \
+  --hostname-override=$ESKIMO_KUBELET_HOSTNAME \
+  --cluster-dns=$ESKIMO_CLUSTER_DNS \
+  --cluster-domain=$ESKIMO_CLUSTER_DNS_DOMAIN \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --tls-cert-file=$ESKIMO_KUBE_TLS_CERT_FILE \
+  --tls-private-key-file=$ESKIMO_KUBE_TLS_PRIVATE_KEY \
+  --client-ca-file=$ESKIMO_KUBE_CLIENT_CA_FILE \
+  --v=$ESKIMO_KUBE_LOG_LEVEL \
+  --cgroup-driver $ESKIMO_KUBELET_CGROUP_DRIVER \
+  --fail-swap-on=$ESKIMO_KUBELET_FAIL_SWAP_ON \
+  --bootstrap-kubeconfig=$ESKIMO_BOOTSTRAP_KUBECONFIG \
+  --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG > /var/log/kubernetes/kubelet.log 2>&1' &
+kubelet_pid=$!
+
+#--port=$ESKIMO_KUBELET_PORT
+
+sleep 4
+if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
+    echo "   + Failed to start Kubernetes Kubelet"
+    cat /var/log/kubernetes/kubelet.log 2>&1
+    exit 46
+fi
+
+echo "   + Setup runtime kubeproxy"
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kubeproxy.sh  > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubeproxy"
+    cat /tmp/start_k8s_slave.log 2>&1
+    exit 47
+fi
+
+
+echo "   + Starting Kubeproxy"
+/bin/bash -c '. /etc/k8s/kubeproxy.env.sh && /usr/local/bin/kube-proxy \
+  --bind-address=$ESKIMO_BIND_ADDRESS \
+  --hostname-override=$ESKIMO_HOST_NAME_OVERRIDE \
+  --cluster-cidr=$ESKIMO_CLUSTER_CIDR \
+  --kubeconfig=/etc/k8s/kubeproxy.kubeconfig \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --v=$ESKIMO_KUBE_LOG_LEVEL > /var/log/kubernetes/kubeproxy.log 2>&1' &
+kubeproxy_pid=$!
+
+#--port=$ESKIMO_KUBELET_PORT
+
+sleep 4
+if [[ `ps -e | grep $kubeproxy_pid ` == "" ]]; then
+    echo "   + Failed to start Kubernetes Proxy"
+    cat /var/log/kubernetes/kubeproxy.log 2>&1
+    exit 48
+fi
+
+
+# Keep this one last
+echo "   + Setup runtime kubectl poststart"
+/etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubectrl poststart"
+    cat /tmp/start_k8s_slave.log 2>&1
+    exit 49
+fi
+
+
+
+echo "   + Deleting lock file"
+delete_k8s_slave_lock_file
+
+set -e
+
+echo "   + Entering monitoring loop"
 while : ; do
 
     sleep 10
 
-    for i in ${REQUIRED_SERVICES//,/ }; do
-        status=`systemctl show -p SubState $i`
-        if [[ `echo $status | grep exited` != "" || `echo $status | grep dead` != "" ]]; then
-            echo "$i service is actually not really running"
-            exit 30
-        fi
-    done
+    if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
+        echo "   + Failed to run Kubernetes Kubelet"
+        tail -n 50 /var/log/kubernetes/kubelet.log 2>&1
+        exit 44
+    fi
+
+    if [[ `ps -e | grep $kubeproxy_pid ` == "" ]]; then
+        echo "   + Failed to run Kubernetes Proxy"
+        cat /var/log/kubernetes/kubeproxy.log 2>&1
+        exit 48
+    fi
 
 done
+

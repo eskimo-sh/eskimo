@@ -36,19 +36,197 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-REQUIRED_SERVICES=k8s-registry,kubeapi,kubectrl,kubesched
-# ,flannel
+echo " - Starting K8s Eskimo Master"
 
+function delete_k8s_master_lock_file() {
+     rm -Rf /etc/k8s/ssl/k8s_master_management_lock
+}
+
+# From here we will be messing with gluster and hence we need to take a lock
+counter=0
+while [[ -f /etc/k8s/ssl/k8s_master_management_lock ]] ; do
+    echo "   + /etc/k8s/ssl/k8s_master_management_lock exist. waiting 2 secs ... "
+    sleep 2
+    let counter=counter+1
+    if [[ $counter -ge 15 ]]; then
+        echo " !!! Couldn't get /etc/k8s/ssl/k8s_master_management_lock in 30 seconds. crashing !"
+        exit 150
+    fi
+done
+
+echo "   + Taking startup lock"
+touch /etc/k8s/ssl/k8s_master_management_lock
+
+trap delete_k8s_master_lock_file 15
+trap delete_k8s_master_lock_file EXIT
+
+echo "   + Mounting Kubernetes Eskimo Gluster shares"
+/usr/local/sbin/setupK8sGlusterShares.sh > /tmp/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to mount gluster shares"
+    cat /tmp/start_k8s_master.log 2>&1
+    exit 41
+fi
+
+echo "   + Setup runtime kubectl"
+/etc/k8s/runtime_config/setup-runtime-kubectl.sh  > /tmp/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+     echo "   + Failed to setup runtme kubectl"
+     cat /tmp/start_k8s_master.log 2>&1
+     exit 42
+fi
+
+echo "   + Register kubernetes registry"
+/usr/local/sbin/register-kubernetes-registry.sh  > /tmp/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to register kubernetes registry"
+    cat /tmp/start_k8s_master.log 2>&1
+    exit 43
+fi
+
+
+echo "   + Starting kube-api server"
+/bin/bash -c '. /etc/k8s/kubeapi.env.sh && /usr/local/bin/kube-apiserver \
+  --admission-control=$ESKIMO_KUBE_ADMISSION_CONTROL \
+  --advertise-address=$ESKIMO_KUBE_API_ADVERTISE_ADDRESS \
+  --bind-address=$ESKIMO_KUBE_API_BIND_ADDRESS \
+  --authorization-mode=$ESKIMO_KUBE_AUTHORIZATION_MODE \
+  --runtime-config=$ESKIMO_KUBE_RUNTIME_CONFIG \
+  --enable-bootstrap-token-auth \
+  --token-auth-file=$ESKIMO_KUBE_TOKEN_AUTH_FILE \
+  --service-cluster-ip-range=$ESKIMO_KUBE_SERVICE_ADDRESSES \
+  --service-node-port-range=$ESKIMO_KUBE_SERVICE_NODE_PORT_RANGE \
+  --service-account-key-file=$ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE \
+  --service-account-signing-key-file=$ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE \
+  --service-account-issuer=$ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER \
+  --tls-cert-file=$ESKIMO_KUBE_TLS_CERT_FILE \
+  --tls-private-key-file=$ESKIMO_KUBE_TLS_PRIVATE_KEY \
+  --client-ca-file=$ESKIMO_KUBE_CLIENT_CA_FILE \
+  --etcd-servers=$ESKIMO_KUBE_ETCD_SERVER \
+  --audit-log-maxage=$ESKIMO_KUBE_AUDIT_LOG_MAXAGE \
+  --audit-log-maxbackup=$ESKIMO_KUBE_AUDIT_LOG_MAXBACKUP \
+  --audit-log-maxsize=$ESKIMO_KUBE_AUDIT_LOG_MAXSIZE \
+  --audit-log-path=$ESKIMO_KUBE_AUDIT_LOG_PATH \
+  --audit-policy-file=$ESKIMO_KUBE_AUDIT_POLICY_FILE \
+  --v=$ESKIMO_KUBE_LOG_LEVEL \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --enable-swagger-ui=$ESKIMO_KUBE_ENABLE_SWAGGER_UI \
+  --allow-privileged=$ESKIMO_ALLOW_PRIVILEGED \
+  --event-ttl=$ESKIMO_KUBE_EVENT_TTL > /var/log/kubernetes/kubeapi.log 2>&1' &
+kubeapi_pid=$!
+# not using ssl for etcs for now
+#--etcd-cafile=$ESKIMO_KUBE_ETCD_CAFILE \
+#--etcd-certfile=$ESKIMO_KUBE_ETCD_CERTFILE \
+#--etcd-keyfile=$ESKIMO_KUBE_ETCD_KEYFILE \
+
+# this one is unsupprted as it seems
+#--kubelet-https=$ESKIMO_KUBE_KUBELET_HTTPS \
+
+sleep 4
+if [[ `ps -e | grep $kubeapi_pid ` == "" ]]; then
+    echo "   + Failed to start Kubernetes API server"
+    cat /var/log/kubernetes/kubeapi.log 2>&1
+    exit 44
+fi
+
+
+echo "   + Setup runtime kubectrl"
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectrl.sh  > /tmp/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubectrl"
+    cat /tmp/start_k8s_master.log 2>&1
+    exit 45
+fi
+
+echo "   + Starting kube Controler Manager"
+/bin/bash -c '. /etc/k8s/kubectrl.env.sh && /usr/local/bin/kube-controller-manager \
+  --master=$ESKIMO_KUBE_CTRL_API_SERVER_MASTER \
+  --bind-address=$ESKIMO_KUBE_CTRL_BIND_ADDRESS \
+  --allocate-node-cidrs=$ESKIMO_KUBE_CTRL_ALLOCATE_NODE_CIDRS \
+  --service-cluster-ip-range=$ESKIMO_KUBE_CTRL_SERVICE_CLUSTER_IPD \
+  --cluster-cidr=$ESKIMO_KUBE_CTRL_CLUSTER_CIDR \
+  --cluster-signing-cert-file=$ESKIMO_KUBE_CTRL_CLUSTER_SIGNING_CERT_FILE \
+  --cluster-signing-key-file=$ESKIMO_KUBE_CTRL_CLUSTER_SIGNING_KEY_FILE \
+  --service-account-private-key-file=$ESKIMO_KUBE_CTRL_SERVICE_ACCOUNT_PRIVATE_KEY_FILE \
+  --root-ca-file=$ESKIMO_KUBE_CTRL_ROOT_CA_FILE \
+  --cluster-name=$ESKIMO_KUBE_CTRL_CLUSTER_NAME \
+  --leader-elect=$ESKIMO_KUBE_CTRL_LEADER_ELECT \
+  --kubeconfig=/etc/k8s/kubectrl.kubeconfig \
+  --v=$ESKIMO_KUBE_LOG_LEVEL > /var/log/kubernetes/kubectrl.log 2>&1' &
+kubectrl_pid=$!
+
+sleep 4
+if [[ `ps -e | grep $kubectrl_pid ` == "" ]]; then
+    echo "   + Failed to start Kubernetes Controller-Manager"
+    cat /var/log/kubernetes/kubectrl.log 2>&1
+    exit 46
+fi
+
+
+echo "   + Setup runtime kubesched"
+/etc/k8s/runtime_config/setup-runtime-kubesched.sh > /tmp/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubesched"
+    cat /tmp/start_k8s_master.log 2>&1
+    exit 47
+fi
+
+/bin/bash -c '. /etc/k8s/kubesched.env.sh && /usr/local/bin/kube-scheduler \
+   --bind-address=$ESKIMO_KUBE_SCHED_BIND_ADDRESS \
+   --master $ESKIMO_KUBE_SCHED_API_SERVER_MASTER \
+   --leader-elect=$ESKIMO_KUBE_SCHED_LEADER_ELECT \
+   --kubeconfig=/etc/k8s/kubesched.kubeconfig \
+   --v=$ESKIMO_KUBE_LOG_LEVEL > /var/log/kubernetes/kubesched.log 2>&1' &
+kubesched_pid=$!
+
+sleep 4
+if [[ `ps -e | grep $kubesched_pid ` == "" ]]; then
+    echo "   + Failed to start Kubernetes Scheduler"
+    cat /var/log/kubernetes/kubesched.log 2>&1
+    exit 48
+fi
+
+
+# Keep this one last
+echo "   + Setup runtime kubectl poststart"
+/etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh > /tmp/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubectrl poststart"
+    cat /tmp/start_k8s_master.log 2>&1
+    exit 49
+fi
+
+echo "   + Deleting lock file"
+delete_k8s_master_lock_file
+
+set -e
+
+echo "   + Entering monitoring loop"
 while : ; do
 
     sleep 10
 
-    for i in ${REQUIRED_SERVICES//,/ }; do
-        status=`systemctl show -p SubState $i`
-        if [[ `echo $status | grep exited` != "" || `echo $status | grep dead` != "" ]]; then
-            echo "$i service is actually not really running. WIll crash run-k8s-master now !"
-            exit 30
-        fi
-    done
+    if [[ `ps -e | grep $kubeapi_pid ` == "" ]]; then
+        echo "   + Failed to run Kubernetes API server"
+        tail -n 50 /var/log/kubernetes/kubeapi.log 2>&1
+        exit 44
+    fi
+
+    if [[ `ps -e | grep $kubectrl_pid ` == "" ]]; then
+        echo "   + Failed to run Kubernetes Controller-Manager"
+        tail -n 50 /var/log/kubernetes/kubectrl.log 2>&1
+        exit 46
+    fi
+
+    if [[ `ps -e | grep $kubesched_pid ` == "" ]]; then
+        echo "   + Failed to run Kubernetes Scheduler"
+        tail -n 50 /var/log/kubernetes/kubesched.log 2>&1
+        exit 49
+    fi
 
 done
+
+
+
+
+

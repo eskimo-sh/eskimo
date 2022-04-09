@@ -92,7 +92,7 @@ if [[ ! -d /var/log/kubernetes ]]; then
 fi
 
 sudo mkdir -p /var/log/kubernetes/log
-sudo chown kubernetes /var/log/kubernetes/log
+sudo chown -R kubernetes /var/log/kubernetes/
 
 sudo mkdir -p /var/lib/kubernetes/tmp
 sudo chown -R kubernetes /var/lib/kubernetes

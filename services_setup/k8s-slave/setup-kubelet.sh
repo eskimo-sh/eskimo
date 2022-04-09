@@ -78,7 +78,4 @@ if [[ ! -d /var/lib/kubelet ]]; then
 fi
 
 
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubelet k8s_install_log SKIP_COPY,RESTART
-
 sudo rm -Rf /tmp/kubelet_setup

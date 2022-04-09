@@ -106,13 +106,6 @@ for i in `find ./runtime_config -mindepth 1`; do
     sudo chmod 755 /etc/k8s/runtime_config/$filename
 done
 
-echo " - Copying SystemD unit files to /lib/systemd/system"
-for i in `find ./service_files -mindepth 1`; do
-    sudo cp $i /lib/systemd/system/
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /lib/systemd/system/$filename
-done
-
 echo " - Creating eskimo_user file"
 export ESKIMO_USER=$USER
 sudo bash -c "echo $USER > /etc/eskimo_user"
@@ -137,12 +130,6 @@ fail_if_error $? /dev/null 304
 
 bash ./setup-kubeproxy.sh
 fail_if_error $? /dev/null 305
-
-
-
-
-# TODO
-# ----------------------------------------------------------------------------------------------------------------------
 
 
 echo " - Copying k8s-slave process file to /usr/local/sbin"

@@ -65,9 +65,4 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
     exit 2
 fi
 
-
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubectrl k8s_install_log SKIP_COPY,RESTART
-
-
 rm -Rf /tmp/kubectrl_setup

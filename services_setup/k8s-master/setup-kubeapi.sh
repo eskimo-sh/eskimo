@@ -164,8 +164,5 @@ fi
 
 set +e
 
-echo "   + Installing and checking systemd service file"
-install_and_check_service_file kubeapi k8s_install_log SKIP_COPY,RESTART
-
 
 rm -Rf /tmp/kubeapi_setup
