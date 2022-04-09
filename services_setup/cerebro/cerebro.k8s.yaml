@@ -38,25 +38,20 @@ spec:
       #    type: RuntimeDefault
       containers:
         - name: cerebro
-          image: marathon.registry:5000/cerebro
+          image: kubernetes.registry:5000/cerebro
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9000
               protocol: TCP
-          args:
-            - --namespace=default
-            # Uncomment the following line to manually specify Kubernetes API server Host
-            # If not specified, Dashboard will attempt to auto discover the API server and connect
-            # to it. Uncomment only if the default does not work.
-            # - --apiserver-host=http://my-address:port
+          command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
             - name: var-log-elasticsearch
               mountPath: /var/log/elasticsearch
             - name: var-run-elasticsearch
               mountPath: /var/run/elasticsearch
-            - name: etc-eskimo_topology
+            - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
-            - name: etc-eskimo_services-settings
+            - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
           livenessProbe:
             httpGet:
@@ -68,8 +63,8 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
-            runAsUser: elasticsearch
-            runAsGroup: elasticsearch
+            runAsUser: 3301
+            runAsGroup: 3301
           resources:
             limits:
               cpu: "0.2"
@@ -86,11 +81,11 @@ spec:
           hostPath:
             path: /var/run/elasticsearch
             type: Directory
-        - name: etc-eskimo_topology
+        - name: etc-eskimo-topology
           hostPath:
             path: /etc/eskimo_topology.sh
             type: File
-        - name: etc-eskimo_services-settings
+        - name: etc-eskimo-services-settings
           hostPath:
             path: /etc/eskimo_services-settings.json
             type: File
