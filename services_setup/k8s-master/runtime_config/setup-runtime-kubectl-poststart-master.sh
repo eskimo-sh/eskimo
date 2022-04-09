@@ -90,11 +90,15 @@ fi
 export HOME=/root
 
 
-# Not recreating on slave
-if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
-    echo "   + Creating serviceaccount-$ADMIN_USER"
-    kubectl create -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+# recreating on master
+if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
+    echo "   + Deleting serviceaccount-$ADMIN_USER"
+    kubectl delete serviceaccount $ADMIN_USER
+    sleep 2
 fi
+
+echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"
+kubectl create -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
 
 if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
     echo "   + Creating ClusterRoleBinding default-$ADMIN_USER"

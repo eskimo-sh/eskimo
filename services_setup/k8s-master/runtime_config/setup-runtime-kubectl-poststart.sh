@@ -1,1 +1,0 @@
-../../k8s-slave/runtime_config/setup-runtime-kubectl-poststart.sh

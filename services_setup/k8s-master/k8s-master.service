@@ -9,12 +9,14 @@ Wants=etcd.service
 Type=simple
 TimeoutStartSec=300sec
 RemainAfterExit=false
-ExecStart=/bin/bash /usr/local/sbin/run-k8s-master.sh
+ExecStartPre=-/bin/bash /usr/local/sbin/stop-k8s-master.sh
+ExecStart=/bin/bash /usr/local/sbin/start-k8s-master.sh
+ExecStop=/bin/bash /usr/local/sbin/stop-k8s-master.sh
 LimitNOFILE=65536
 RestartSec=5
 Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+StartLimitBurst=3
+StartLimitInterval=120
 
 [Install]
 WantedBy=multi-user.target

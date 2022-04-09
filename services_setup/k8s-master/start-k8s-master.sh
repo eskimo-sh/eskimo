@@ -188,8 +188,8 @@ fi
 
 
 # Keep this one last
-echo "   + Setup runtime kubectl poststart"
-/etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh > /tmp/start_k8s_master.log 2>&1
+echo "   + Setup runtime kubectl poststart (MASTER)"
+/etc/k8s/runtime_config/setup-runtime-kubectl-poststart-master.sh > /tmp/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubectrl poststart"
     cat /tmp/start_k8s_master.log 2>&1

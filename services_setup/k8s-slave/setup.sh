@@ -133,8 +133,11 @@ fail_if_error $? /dev/null 305
 
 
 echo " - Copying k8s-slave process file to /usr/local/sbin"
-sudo cp run-k8s-slave.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/run-k8s-slave.sh
+sudo cp start-k8s-slave.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/start-k8s-slave.sh
+
+sudo cp stop-k8s-slave.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/stop-k8s-slave.sh
 
 
 echo " - Create / update eskimo K8S version file"

@@ -159,9 +159,12 @@ bash ./setup-kubesched.sh
 fail_if_error $? /dev/null 307
 
 
-echo " - Copying k8s-master process file to /usr/local/sbin"
-sudo cp run-k8s-master.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/run-k8s-master.sh
+echo " - Copying k8s-master process files to /usr/local/sbin"
+sudo cp start-k8s-master.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/start-k8s-master.sh
+
+sudo cp stop-k8s-master.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/stop-k8s-master.sh
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file k8s-master k8s-master_install_log

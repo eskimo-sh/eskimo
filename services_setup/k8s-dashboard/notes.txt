@@ -15,4 +15,5 @@ ssh vagrant@192.168.56.21 -L 8001:localhost:8001
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/pod?namespace=_all
 
 # get token with
+export PATH=/usr/local/bin:$PATH
 kubectl get secret `kubectl get sa/eskimo -o jsonpath="{.secrets[0].name}"` -o go-template="{{.data.token | base64decode}}"
