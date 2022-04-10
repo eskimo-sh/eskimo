@@ -42,7 +42,7 @@ echo " - Loading Topology"
 export ELASTICSEARCH_MASTER=`eval echo "\$"$(echo SELF_MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
 if [[ $ELASTICSEARCH_MASTER == "" ]]; then
     echo " - No ES master found in topology for $SELF_IP_ADDRESS"
-    exit -3
+    exit 3
 fi
 
 echo " - Adapting configuration in file application.conf"

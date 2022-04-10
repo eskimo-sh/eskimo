@@ -36,6 +36,9 @@
 
 set -e
 
+echo " - Chaging current directory to /usr/local/lib/cerebro/"
+cd /usr/local/lib/cerebro/
+
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
