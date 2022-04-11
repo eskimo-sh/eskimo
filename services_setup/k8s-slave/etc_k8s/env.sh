@@ -64,9 +64,10 @@ export BOOTSTRAP_TOKEN=1Qb_YYlsOFKa0q-4hur12yn_7urzYCRZ
 
 # Use unused netword ip range to define service ip and pod ip
 # (Service CIDR)
-#export SERVICE_CIDR="10.254.0.0/16"
+export SERVICE_CIDR="10.254.0.0/16"
+
 # TODO FIXME this should be computed dynamically from k8s nodes IPs
-export SERVICE_CIDR=`cat /etc/eskimo_network_cidr`
+#export SERVICE_CIDR=`cat /etc/eskimo_network_cidr`
 
 # Pod Cluster CIDR
 export CLUSTER_CIDR="172.30.0.0/16"
@@ -75,27 +76,27 @@ export CLUSTER_CIDR="172.30.0.0/16"
 export NODE_PORT_RANGE="30000-32766"
 
 # etcd cluster addresses
-export EKIMO_ETCD_ENDPOINTS=
+export ESKIMO_ETCD_ENDPOINTS=
 for i in ${ALL_NODES_LIST_k8s_slave//,/ }; do
     # call your procedure/other scripts here below
-    if [[ $EKIMO_ETCD_ENDPOINTS == "" ]]; then
-        export EKIMO_ETCD_ENDPOINTS="http://$i:$EKIMO_ETCD_PORT"
+    if [[ $ESKIMO_ETCD_ENDPOINTS == "" ]]; then
+        export ESKIMO_ETCD_ENDPOINTS="http://$i:$EKIMO_ETCD_PORT"
     else
-        export EKIMO_ETCD_ENDPOINTS="$EKIMO_ETCD_ENDPOINTS,http://$i:$EKIMO_ETCD_PORT"
+        export ESKIMO_ETCD_ENDPOINTS="$ESKIMO_ETCD_ENDPOINTS,http://$i:$EKIMO_ETCD_PORT"
     fi
 done
-#export EKIMO_ETCD_ENDPOINTS="https://$ETCD1_IP:$EKIMO_ETCD_PORT,https://$ETCD2_IP:$EKIMO_ETCD_PORT,https://$ETCD3_IP:$EKIMO_ETCD_PORT"
+#export ESKIMO_ETCD_ENDPOINTS="https://$ETCD1_IP:$EKIMO_ETCD_PORT,https://$ETCD2_IP:$EKIMO_ETCD_PORT,https://$ETCD3_IP:$EKIMO_ETCD_PORT"
 
 # flanneld etcd prefix
 export FLANNEL_ETCD_PREFIX="/eskimo/network"
 
-# kubernetes service IP (normarlly the first IP in SERVICE_CIDR)
-#export CLUSTER_KUBERNETES_SVC_IP="10.254.0.1"
-export CLUSTER_KUBERNETES_SVC_IP="$MASTER_K8S_MASTER_1"
+# kubernetes service IP (normally the first IP in SERVICE_CIDR)
+export CLUSTER_KUBERNETES_SVC_IP="10.254.0.1"
+#export CLUSTER_KUBERNETES_SVC_IP="$MASTER_K8S_MASTER_1"
 
 #  DNS IP for the cluster (assigned from SERVICE_CIDR)
-#export CLUSTER_DNS_SVC_IP="10.254.0.1"
-export CLUSTER_DNS_SVC_IP="$MASTER_K8S_MASTER_1"
+export CLUSTER_DNS_SVC_IP="10.254.0.2"
+#export CLUSTER_DNS_SVC_IP="$MASTER_K8S_MASTER_1"
 
 #  DNS domain name
 export CLUSTER_DNS_DOMAIN="cluster.eskimo"

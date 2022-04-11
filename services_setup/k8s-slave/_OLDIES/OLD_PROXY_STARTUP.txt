@@ -1,0 +1,18 @@
+echo "   + Setup runtime kubeproxy"
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kubeproxy.sh  > /tmp/start_k8s_slave.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to setup runtime kubeproxy"
+    cat /tmp/start_k8s_slave.log 2>&1
+    exit 47
+fi
+
+
+echo "   + Starting Kubeproxy"
+/bin/bash -c '. /etc/k8s/kubeproxy.env.sh && /usr/local/bin/kube-proxy \
+  --bind-address=$ESKIMO_BIND_ADDRESS \
+  --hostname-override=$ESKIMO_HOST_NAME_OVERRIDE \
+  --cluster-cidr=$ESKIMO_CLUSTER_CIDR \
+  --kubeconfig=/etc/k8s/kubeproxy.kubeconfig \
+  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
+  --v=$ESKIMO_KUBE_LOG_LEVEL > /var/log/kubernetes/kubeproxy.log 2>&1' &
+kubeproxy_pid=$!

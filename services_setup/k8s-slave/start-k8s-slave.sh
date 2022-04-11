@@ -108,6 +108,9 @@ echo "   + Starting Kubelet"
   --cgroup-driver $ESKIMO_KUBELET_CGROUP_DRIVER \
   --fail-swap-on=$ESKIMO_KUBELET_FAIL_SWAP_ON \
   --bootstrap-kubeconfig=$ESKIMO_BOOTSTRAP_KUBECONFIG \
+  --cni-bin-dir=$ESKIMO_KUBELET_NETWORK_PLUGIN_DIR \
+  --network-plugin=$ESKIMO_KUBELET_NETWORK_PLUGIN \
+  --cni-conf-dir=$ESKIMO_KUBELET_CNI_CONF_DIR \
   --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG > /var/log/kubernetes/kubelet.log 2>&1' &
 kubelet_pid=$!
 
@@ -120,31 +123,32 @@ if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
     exit 46
 fi
 
-echo "   + Setup runtime kubeproxy"
-/bin/bash /etc/k8s/runtime_config/setup-runtime-kubeproxy.sh  > /tmp/start_k8s_slave.log 2>&1
+echo "   + Setup runtime kuberouter"
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kuberouter.sh  > /tmp/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
-    echo "   + Failed to setup runtime kubeproxy"
+    echo "   + Failed to setup runtime kube-router"
     cat /tmp/start_k8s_slave.log 2>&1
     exit 47
 fi
 
 
-echo "   + Starting Kubeproxy"
-/bin/bash -c '. /etc/k8s/kubeproxy.env.sh && /usr/local/bin/kube-proxy \
-  --bind-address=$ESKIMO_BIND_ADDRESS \
-  --hostname-override=$ESKIMO_HOST_NAME_OVERRIDE \
-  --cluster-cidr=$ESKIMO_CLUSTER_CIDR \
-  --kubeconfig=/etc/k8s/kubeproxy.kubeconfig \
-  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
-  --v=$ESKIMO_KUBE_LOG_LEVEL > /var/log/kubernetes/kubeproxy.log 2>&1' &
-kubeproxy_pid=$!
+echo "   + Starting Kube-router"
+/bin/bash -c '. /etc/k8s/kuberouter.env.sh && /usr/local/bin/kube-router \
+  --master=$ESKIMO_KUBEROUTER_APISERVER \
+  --hostname-override=$ESKIMO_KUBEROUTER_HOST_NAME_OVERRIDE \
+  --kubeconfig=$ESKIMO_KUBEROUTER_KUBECONFIG \
+  --run-firewall=true \
+  --run-service-proxy=true \
+  --run-router=true \
+  > /var/log/kubernetes/kuberouter.log 2>&1' &
+kuberouter_pid=$!
 
 #--port=$ESKIMO_KUBELET_PORT
 
 sleep 4
-if [[ `ps -e | grep $kubeproxy_pid ` == "" ]]; then
-    echo "   + Failed to start Kubernetes Proxy"
-    cat /var/log/kubernetes/kubeproxy.log 2>&1
+if [[ `ps -e | grep $kuberouter_pid ` == "" ]]; then
+    echo "   + Failed to start Kubernetes Router"
+    cat /var/log/kubernetes/kuberouter.log 2>&1
     exit 48
 fi
 
@@ -176,9 +180,9 @@ while : ; do
         exit 44
     fi
 
-    if [[ `ps -e | grep $kubeproxy_pid ` == "" ]]; then
-        echo "   + Failed to run Kubernetes Proxy"
-        cat /var/log/kubernetes/kubeproxy.log 2>&1
+    if [[ `ps -e | grep $kuberouter_pid ` == "" ]]; then
+        echo "   + Failed to run Kubernetes Kube-Router"
+        cat /var/log/kubernetes/kuberouter.log 2>&1
         exit 48
     fi
 

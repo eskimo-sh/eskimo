@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,32 +34,55 @@
 # Software.
 #
 
+echoerr() { echo "$@" 1>&2; }
 
-[Unit]
-Description=Flanneld overlay network adressing
-After=network.target
-After=network-online.target
-Wants=network-online.target
-Before=docker.service
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-[Service]
-Type=simple
-TimeoutStartSec=300sec
-RemainAfterExit=false
-User=kubernetes
-ExecStart=/bin/bash -c ". /etc/k8s/flannel.env.sh && /usr/k8s/bin/flanneld \
-  -etcd-prefix=$FLANNEL_CERTS \
-  -etcd-endpoints=EKIMO_FLANNEL_ETCD_ENDPOINTS
-  -etcd-cafile=$ESKIMO_FLANNEL_CA_FILE \
-  -etcd-certfile=$ESKIMO_FLANNEL_CERT_FILE \
-  -etcd-keyfile=$ESKIMO_FLANNEL_KEY_FILE"
-ExecStartPost=/usr/k8s/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
 
-RestartSec=5
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
 
-[Install]
-WantedBy=multi-user.target
-RequiredBy=docker.service
+. /etc/k8s/env.sh
+
+
+
+echo " - Installing / configuring / checking kube-router "
+
+echo "   + create temp folder"
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+cd $tmp_dir
+
+echo "   + Configure the cluster parameters"
+kubectl config set-cluster eskimo \
+  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --embed-certs=true \
+  --server=${ESKIMO_KUBE_APISERVER} \
+  --kubeconfig=kuberouter.kubeconfig
+
+echo "   + Configure authentication parameters"
+kubectl config set-credentials kuberouter \
+  --client-certificate=/etc/k8s/ssl/kuberouter.pem \
+  --client-key=/etc/k8s/ssl/kuberouter-key.pem \
+  --kubeconfig=kuberouter.kubeconfig
+# --token=${BOOTSTRAP_TOKEN} \
+
+echo "   + Configure the context"
+kubectl config set-context eskimo \
+  --cluster=eskimo \
+  --user=kuberouter \
+  --kubeconfig=kuberouter.kubeconfig
+
+echo "   + Use the default context"
+kubectl config use-context eskimo --kubeconfig=kuberouter.kubeconfig
+
+echo "   + installing new configuration"
+sudo mv kuberouter.kubeconfig /etc/k8s/kuberouter.kubeconfig
+sudo chown root /etc/k8s/kuberouter.kubeconfig
+sudo chmod 755 /etc/k8s/kuberouter.kubeconfig
+
+echo "   + removing temp folder"
+rm -Rf $tmp_dir

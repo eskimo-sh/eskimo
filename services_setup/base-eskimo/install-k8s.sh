@@ -152,8 +152,12 @@ fi
 echo " - Simlinking K8s binaries to /usr/local/bin"
 
 echo "   + cfssl"
-sudo ln -s /usr/local/lib/k8s/cfssl/bin/cfssl /usr/local/bin/cfssl
-sudo ln -s /usr/local/lib/k8s/cfssl/bin/cfssljson /usr/local/bin/cfssljson
+if [[ ! -f /usr/local/bin/cfssl ]]; then
+    sudo ln -s /usr/local/lib/k8s/cfssl/bin/cfssl /usr/local/bin/cfssl
+fi
+if [[ ! -f /usr/local/bin/cfssljson ]]; then
+    sudo ln -s /usr/local/lib/k8s/cfssl/bin/cfssljson /usr/local/bin/cfssljson
+fi
 
 echo "   + etcd"
 for i in `ls -1 /usr/local/lib/k8s/etcd/bin/`; do
@@ -169,6 +173,7 @@ for i in `ls -1 /usr/local/lib/k8s/kubernetes/client/bin/`; do
     fi
 done
 
+# Deprecated
 #echo "   + Flannel"
 #for i in `ls -1 /usr/local/lib/k8s/flannel/bin/`; do
 #    if [[ ! -f /usr/local/bin/$i ]]; then
@@ -176,12 +181,26 @@ done
 #    fi
 #done
 
+echo "   + Kube-router"
+for i in `ls -1 /usr/local/lib/k8s/kube-router/bin/`; do
+    if [[ ! -f /usr/local/bin/$i ]]; then
+        sudo ln -s /usr/local/lib/k8s/kube-router/bin/$i /usr/local/bin/$i
+    fi
+done
+
 echo "   + Kubernetes server"
 for i in `ls -1 /usr/local/lib/k8s/kubernetes/server/bin/`; do
     if [[ ! -f /usr/local/bin/$i ]]; then
         sudo ln -s /usr/local/lib/k8s/kubernetes/server/bin/$i /usr/local/bin/$i
     fi
 done
+
+
+echo "   + Installing cni plugins"
+sudo mkdir -p /opt/cni/
+if [[ ! -f /opt/cni/bin ]]; then
+    sudo ln -s /usr/local/lib/k8s/cni-plugins /opt/cni/bin
+fi
 
 echo " - Create / update eskimo K8S version file"
 sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"
@@ -197,14 +216,6 @@ if [[ -z $TEST_MODE && ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
     echo "/etc/eskimo_k8s_environment doesn't point to valid mesos version"
     exit 21
 fi
-
-echo " - Creating network identifcation marker flags"
-
-export ip_CIDR=`get_ip_CIDR`
-sudo bash -c "echo $ip_CIDR > /etc/eskimo_network_cidr"
-
-export host_min=`get_host_min`
-sudo bash -c "echo $host_min > /etc/eskimo_network_host_min"
 
 echo " - Installation tests"
 echo "   + TODO"

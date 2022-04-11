@@ -34,48 +34,31 @@
 
 
 [Unit]
-Description=etcd Server
+Description=Flanneld overlay network adressing
 After=network.target
 After=network-online.target
 Wants=network-online.target
+Before=docker.service
 
 [Service]
 Type=simple
 TimeoutStartSec=300sec
 RemainAfterExit=false
 User=kubernetes
-WorkingDirectory=/var/lib/etcd/
-ExecStart=/bin/bash -c ". /etc/etcd/etcd.env.sh && /usr/local/bin/etcd \
-  --name $ESKIMO_ETCD_NODE_NAME \
-  --initial-advertise-peer-urls $ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS \
-  --listen-peer-urls $ESKIMO_ETCD_LISTEN_PEER_URLS \
-  --listen-client-urls $ESKIMO_ETCD_LISTEN_CLIENT_URLS \
-  --advertise-client-urls $ESKIMO_ETCD_ADVERTISE_CLIENT_URLS \
-  --initial-cluster-token $ESKIMO_ETCD_INITIAL_CLUSTER_TOKEN \
-  --initial-cluster $ESKIMO_ETCD_INITIAL_CLUSTER \
-  --initial-cluster-state $ESKIMO_ETCD_INITIAL_CLUSTER_STATE \
-  --data-dir $ESKIMO_ETCD_DATA_DIR"
+ExecStart=/bin/bash -c ". /etc/k8s/flannel.env.sh && echo /usr/local/bin/flanneld \
+  -etcd-prefix=$ESKIMO_FLANNEL_ETCD_PREFIX \
+  -etcd-endpoints=$ESKIMO_KUBE_ETCD_SERVER
+ExecStartPost=/usr/k8s/bin/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
 
-# Deprecated
-# required for flannel
-#  --enable-v2 \
-#  --experimental-enable-v2v3 $ESKIMO_FLANNEL_ETCD_PREFIX \
-
-# The day I enable HTTPS
-#  --cert-file $ESKIMO_ETCD_CERT_FILE \
-#  --key-file $ESKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$ESKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $ESKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$ESKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$ESKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$ESKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$ESKIMO_ETCD_PEER_TRUSTED_CA_FILE"
+#  -etcd-cafile=$ESKIMO_FLANNEL_CA_FILE \
+#  -etcd-certfile=$ESKIMO_FLANNEL_CERT_FILE \
+#  -etcd-keyfile=$ESKIMO_FLANNEL_KEY_FILE"
 
 RestartSec=5
-LimitNOFILE=65536
 Restart=always
 StartLimitBurst=6
 StartLimitInterval=100
 
 [Install]
 WantedBy=multi-user.target
+RequiredBy=docker.service

@@ -1,0 +1,22 @@
+
+
+
+
+
+
+export ESKIMO_KUBE_ETCD_SERVER="http://$SELF_IP_ADDRESS:$EKIMO_ETCD_PORT"
+echo "   + Using ESKIMO_KUBE_ETCD_SERVER=$ESKIMO_KUBE_ETCD_SERVER"
+
+
+# Directory prefix of flannel settings in etcd
+export ESKIMO_FLANNEL_ETCD_PREFIX="$FLANNEL_ETCD_PREFIX"
+echo "   + Using ESKIMO_FLANNEL_ETCD_PREFIX=$ESKIMO_FLANNEL_ETCD_PREFIX"
+
+export CLUSTER_CIDR="172.30.0.0/16"
+export ESKIMO_FLANNEL_CLUSTER_CIDR=$CLUSTER_CIDR
+echo "   + Using ESKIMO_FLANNEL_CLUSTER_CIDR=$ESKIMO_FLANNEL_CLUSTER_CIDR"
+
+
+etcdctl \
+  --endpoints=${ESKIMO_KUBE_ETCD_SERVER} \
+  set ${ESKIMO_FLANNEL_ETCD_PREFIX}/config '{"Network":"'${ESKIMO_FLANNEL_CLUSTER_CIDR}'", "SubnetLen": 24, "Backend": {"Type": "vxlan"}}'

@@ -238,7 +238,7 @@ function install_docker_debian_based() {
 function install_suse_mesos_dependencies() {
 
     echo "  - Installing other Mesos dependencies"
-    sudo zypper install -y binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+    sudo zypper install -y ipset binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
@@ -250,7 +250,7 @@ function install_suse_mesos_dependencies() {
 function install_redhat_mesos_dependencies() {
 
     echo "  - Installing other Mesos dependencies"
-    sudo yum install -y binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+    sudo yum install -y ipset binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2
@@ -263,7 +263,7 @@ function install_debian_mesos_dependencies() {
 
     echo " - Installing other Mesos dependencies"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
-            binutils libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/setup_log 2>&1
+            ipset binutils libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/setup_log 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install mesos dependencies"
         cat /tmp/setup_log 1>&2

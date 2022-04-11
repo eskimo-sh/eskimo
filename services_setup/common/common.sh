@@ -174,7 +174,7 @@ function deploy_kubernetes() {
     fi
 
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"
-    /usr/local/bin/kubectl delete -f CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    /usr/local/bin/kubectl delete -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         if [[ `cat "$LOG_FILE"_kubernetes_deploy` != "" && `grep "not found" "$LOG_FILE"_kubernetes_deploy` == "" ]]; then
             echo "   + Some elements were not found. Moving on ..."
@@ -191,7 +191,7 @@ function deploy_kubernetes() {
     fi
 
     echo " - Deploying $CONTAINER service in kubernetes"
-    /usr/local/bin/kubectl apply -f CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    /usr/local/bin/kubectl apply -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not deploy $CONTAINER application in kubernetes"
         cat "$LOG_FILE"_kubernetes_deploy

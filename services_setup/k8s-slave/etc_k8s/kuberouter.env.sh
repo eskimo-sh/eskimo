@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -33,49 +35,23 @@
 #
 
 
-[Unit]
-Description=etcd Server
-After=network.target
-After=network-online.target
-Wants=network-online.target
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
+    exit 1
+fi
 
-[Service]
-Type=simple
-TimeoutStartSec=300sec
-RemainAfterExit=false
-User=kubernetes
-WorkingDirectory=/var/lib/etcd/
-ExecStart=/bin/bash -c ". /etc/etcd/etcd.env.sh && /usr/local/bin/etcd \
-  --name $ESKIMO_ETCD_NODE_NAME \
-  --initial-advertise-peer-urls $ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS \
-  --listen-peer-urls $ESKIMO_ETCD_LISTEN_PEER_URLS \
-  --listen-client-urls $ESKIMO_ETCD_LISTEN_CLIENT_URLS \
-  --advertise-client-urls $ESKIMO_ETCD_ADVERTISE_CLIENT_URLS \
-  --initial-cluster-token $ESKIMO_ETCD_INITIAL_CLUSTER_TOKEN \
-  --initial-cluster $ESKIMO_ETCD_INITIAL_CLUSTER \
-  --initial-cluster-state $ESKIMO_ETCD_INITIAL_CLUSTER_STATE \
-  --data-dir $ESKIMO_ETCD_DATA_DIR"
+. /etc/k8s/env.sh
 
-# Deprecated
-# required for flannel
-#  --enable-v2 \
-#  --experimental-enable-v2v3 $ESKIMO_FLANNEL_ETCD_PREFIX \
 
-# The day I enable HTTPS
-#  --cert-file $ESKIMO_ETCD_CERT_FILE \
-#  --key-file $ESKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$ESKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $ESKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$ESKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$ESKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$ESKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$ESKIMO_ETCD_PEER_TRUSTED_CA_FILE"
+###
+# kubernetes kube-router config
+###
 
-RestartSec=5
-LimitNOFILE=65536
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+export ESKIMO_KUBEROUTER_APISERVER=$ESKIMO_KUBE_APISERVER
+echo "   + Using ESKIMO_KUBEROUTER_APISERVER=$ESKIMO_KUBEROUTER_APISERVER"
 
-[Install]
-WantedBy=multi-user.target
+export ESKIMO_KUBEROUTER_HOST_NAME_OVERRIDE="$SELF_IP_ADDRESS"
+echo "   + Using ESKIMO_KUBEROUTER_HOST_NAME_OVERRIDE=$ESKIMO_KUBEROUTER_HOST_NAME_OVERRIDE"
+
+export ESKIMO_KUBEROUTER_KUBECONFIG="/etc/k8s/kuberouter.kubeconfig"
+echo "   + Using ESKIMO_KUBEROUTER_KUBECONFIG=$ESKIMO_KUBEROUTER_KUBECONFIG"

@@ -35,6 +35,7 @@ spec:
       #securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
+      enableServiceLinks: false
       containers:
         - name: cerebro
           image: kubernetes.registry:5000/cerebro

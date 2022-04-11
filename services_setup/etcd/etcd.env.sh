@@ -160,3 +160,8 @@ echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER_STATE=$ESKIMO_ETCD_INITIAL_CLUSTER_
 
 export ESKIMO_ETCD_DATA_DIR="/var/lib/etcd"
 echo "   + Using ESKIMO_ETCD_DATA_DIR=$ESKIMO_ETCD_DATA_DIR"
+
+# Deprecated
+## flanneld etcd prefix
+#export ESKIMO_FLANNEL_ETCD_PREFIX="/eskimo/network"
+#echo "   + Using ESKIMO_FLANNEL_ETCD_PREFIX=$ESKIMO_FLANNEL_ETCD_PREFIX"

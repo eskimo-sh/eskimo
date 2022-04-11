@@ -1,0 +1,5 @@
+export PATH=/usr/local/bin:$PATH
+
+# Testing etcd V2 API
+ETCDCTL_API=2 etcdctl set /eskimo/network/config '{"Network":"172.30.0.0/16", "SubnetLen": 24, "Backend": {"Type": "vxlan"}}'
+ETCDCTL_API=2 etcdctl get /eskimo/network/config

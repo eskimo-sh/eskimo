@@ -42,6 +42,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # CHange current folder to script dir (important !)
 cd $SCRIPT_DIR
 
+# Loading topology
 if [[ ! -f /etc/k8s/env.sh ]]; then
     echo "Could not find /etc/k8s/env.sh"
     exit 1
@@ -49,9 +50,9 @@ fi
 
 . /etc/k8s/env.sh
 
-sudo rm -Rf /tmp/kube_basemaster_setup
-mkdir /tmp/kube_basemaster_setup
-cd /tmp/kube_basemaster_setup
+sudo rm -Rf /tmp/kuberouter_setup
+mkdir /tmp/kuberouter_setup
+cd /tmp/kuberouter_setup
 
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
@@ -66,36 +67,24 @@ fi
 
 
 
+
+echo " - Installing / configuring / checking kube-router "
+
+if [[ ! -d /var/lib/kuberouter ]]; then
+    echo "   + Creating /var/lib/kuberouter"
+    sudo mkdir -p /var/lib/kuberouter
+    sudo chown -R kubernetes /var/lib/kuberouter
+    sudo chmod 744 /var/lib/kuberouter
+fi
+
 set -e
 
-
-echo " - Creating / checking eskimo kubernetes base config (master only)"
-
-
-echo "   + Create and install kubernetes-csr.json"
-cat > kubernetes-csr.json <<EOF
+if [[ ! -f /etc/k8s/ssl/kuberouter-csr.json ]]; then
+    echo "   + Create and install kuberouter-csr.json"
+    cat > kuberouter-csr.json <<EOF
 {
-  "CN": "kubernetes",
-  "hosts": [
-    "127.0.0.1",
-    "${SELF_IP_ADDRESS}",
-    "${MASTER_URL}",
-    "${CLUSTER_KUBERNETES_SVC_IP}",
-    "kubernetes",
-    "kubernetes.default",
-    "kubernetes.default.svc",
-    "kubernetes.default.svc.cluster",
-    "kubernetes.default.svc.cluster.local",
-    "eskimo",
-    "eskimo.default",
-    "eskimo.default.svc",
-    "eskimo.default.svc.cluster",
-    "eskimo.default.svc.cluster.local",
-    "eskimo.eskimo",
-    "eskimo.eskimo.svc",
-    "eskimo.eskimo.svc.cluster",
-    "eskimo.eskimo.svc.cluster.local"
-  ],
+  "CN": "system:kuberouter",
+  "hosts": [],
   "key": {
     "algo": "rsa",
     "size": 2048
@@ -112,25 +101,51 @@ cat > kubernetes-csr.json <<EOF
 }
 EOF
 
-sudo mv kubernetes-csr.json /etc/k8s/ssl/kubernetes-csr.json
-sudo chown kubernetes /etc/k8s/ssl/kubernetes-csr.json
-sudo chmod 755 /etc/k8s/ssl/kubernetes-csr.json
+    sudo mv kuberouter-csr.json /etc/k8s/ssl/kuberouter-csr.json
+    sudo chown kubernetes /etc/k8s/ssl/kuberouter-csr.json
+    sudo chmod 755 /etc/k8s/ssl/kuberouter-csr.json
+fi
 
-# Generate certificates
-echo "   + (Re-)Generate kubernetes certificates"
 
-sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/ssl/ca.pem \
-  -ca-key=/etc/k8s/ssl/ca-key.pem \
-  -config=/etc/k8s/ssl/ca-config.json \
-  -profile=kubernetes /etc/k8s/ssl/kubernetes-csr.json | cfssljson -bare kubernetes
+if [[ ! -f /etc/k8s/ssl/kuberouter.pem ]]; then
 
-echo "   + (Re-)Install kubernetes certificates"
-sudo mv kubernetes*.pem /etc/k8s/ssl/
-sudo chown kubernetes /etc/k8s/ssl/kubernetes*.pem
-sudo mv kubernetes*csr* /etc/k8s/ssl/
-sudo chown kubernetes /etc/k8s/ssl/kubernetes*csr*
+    # Generate certificates
+    echo "   + Generate kubernetes certificates"
 
+    sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/ssl/ca.pem \
+      -ca-key=/etc/k8s/ssl/ca-key.pem \
+      -config=/etc/k8s/ssl/ca-config.json \
+      -profile=kubernetes /etc/k8s/ssl/kuberouter-csr.json | cfssljson -bare kuberouter
+
+    echo "   + Install kubernetes certificates"
+    sudo mv kuberouter*.pem /etc/k8s/ssl/
+    sudo chown kubernetes /etc/k8s/ssl/kuberouter*.pem
+    sudo mv kuberouter*csr* /etc/k8s/ssl/
+    sudo chown kubernetes /etc/k8s/ssl/kuberouter*csr*
+fi
+
+if [[ ! -f /etc/cni/net.d/10-kuberouter.conf ]]; then
+
+    echo "   + Create and install 10-kuberouter.conf"
+    cat > 10-kuberouter.conf <<EOF
+{
+    "cniVersion": "0.3.0",
+    "name":"eskimo",
+    "type":"bridge",
+    "bridge":"kube-bridge",
+    "isDefaultGateway":true,
+    "ipam": {
+        "type":"host-local"
+     }
+}
+EOF
+
+    sudo mkdir -p /etc/cni/net.d/
+    sudo mv 10-kuberouter.conf /etc/cni/net.d/10-kuberouter.conf
+    sudo chmod 755 /etc/cni/net.d/10-kuberouter.conf
+fi
 
 set +e
 
-rm -Rf /tmp/kube_basemaster_setup
+
+sudo rm -Rf /tmp/kuberouter_setup

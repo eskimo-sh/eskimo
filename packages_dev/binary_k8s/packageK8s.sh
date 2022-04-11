@@ -133,7 +133,7 @@ mkdir -p /usr/local/lib/k8s/kubernetes/client/bin
 mv kubernetes/client/bin/* /usr/local/lib/k8s/kubernetes/client/bin/
 set +e
 
-
+# Deprecated
 #echo " - Downloading flannel v$FLANNEL_VERSION"
 #wget https://github.com/flannel-io/flannel/releases/download/v$FLANNEL_VERSION/flannel-v"$FLANNEL_VERSION"-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 #if [[ $? != 0 ]]; then
@@ -141,6 +141,7 @@ set +e
 #    wget http://niceideas.ch/mes/flannel-v"$FLANNEL_VERSION"-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
 #    fail_if_error $? "/tmp/k8s_install_log" -1
 #fi
+
 #
 #echo " - Installing flannel v$FLANNEL_VERSION"
 #
@@ -151,6 +152,63 @@ set +e
 #mkdir -p /usr/local/lib/k8s/flannel/bin
 #mv flanneld mk-docker-opts.sh README.md /usr/local/lib/k8s/flannel/bin/
 #set +e
+#
+#
+#echo " - HACK - back-porting flannel 0.14 since all following versions have incompatibility with latest glibc"
+#wget https://github.com/cucker0/docker/raw/main/resources/flannel/flannel_v0.14.0/flanneld >> /tmp/k8s_install_log 2>&1
+#fail_if_error $? "/tmp/k8s_install_log" -1
+#
+#set -e
+#mv flanneld /usr/local/lib/k8s/flannel/bin/
+#chmod 755  /usr/local/lib/k8s/flannel/bin/flanneld
+#set +e
+
+
+#https://objects.githubusercontent.com/github-production-release-asset-2e65be/23059575/05b0a200-5f01-11eb-9d61-d2441ade97e7?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20220411%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220411T065139Z&X-Amz-Expires=300&X-Amz-Signature=15b9308fc0f80df0f194dac495228653edfe004920a309fcfc2988e79acaead4&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=23059575&response-content-disposition=attachment%3B%20filename%3Dweave&response-content-type=application%2Foctet-stream
+
+
+
+echo " - Downloading kube-router v$K8S_ROUTER_VERSION"
+wget https://github.com/cloudnativelabs/kube-router/releases/download/v$K8S_ROUTER_VERSION/kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz >> /tmp/k8s_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo " -> Failed to download kube-router v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    fail_if_error $? "/tmp/k8s_install_log" -1
+fi
+
+echo " - Installing kube-router v$K8S_ROUTER_VERSION"
+
+set -e
+tar xvfz kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+mkdir /usr/local/lib/k8s/kube-router-v$K8S_ROUTER_VERSION
+ln -s kube-router-v$K8S_ROUTER_VERSION /usr/local/lib/k8s/kube-router
+mkdir -p /usr/local/lib/k8s/kube-router/bin
+mv kube-router README.md /usr/local/lib/k8s/kube-router/bin
+set +e
+
+
+
+echo " - Downloading cni-plugins v$K8S_CNI_PLUGINS_VERSION"
+wget https://github.com/containernetworking/plugins/releases/download/v$K8S_CNI_PLUGINS_VERSION/cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz >> /tmp/k8s_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo " -> Failed to download kube-router v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    fail_if_error $? "/tmp/k8s_install_log" -1
+fi
+
+echo " - Installing cni-plugins v$K8S_CNI_PLUGINS_VERSION"
+set -e
+mkdir cni-plugins
+mv cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz cni-plugins/
+cd cni-plugins
+tar xvfz cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz >> /tmp/k8s_install_log 2>&1
+mkdir /usr/local/lib/k8s/cni-plugins-v$K8S_CNI_PLUGINS_VERSION
+ln -s cni-plugins-v$K8S_CNI_PLUGINS_VERSION /usr/local/lib/k8s/cni-plugins
+rm -f cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz
+mv * /usr/local/lib/k8s/cni-plugins
+cd ..
+set +e
+
 
 
 echo " - Downloading kubernetes-server-linux-amd64 v$K8S_VERSION"
