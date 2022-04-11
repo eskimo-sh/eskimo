@@ -17,10 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -180,6 +177,15 @@ public class KubernetesService {
 
     // FIXME
     void ensureKubernetesAvailability() throws KubernetesException {
+        // TODO
+        logger.warn("ensureKubernetesAvailability - To Be Implemented");
+    }
+
+    // FIXME
+    public void fetchKubernetesServicesStatus
+            (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
+            throws KubernetesException {
+
         // TODO
         logger.warn("ensureKubernetesAvailability - To Be Implemented");
     }

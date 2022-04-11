@@ -168,7 +168,9 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
+                /* Deprecated */
                 .filter(key -> !key.equals(MARATHON_NODE))
+                .filter(key -> !key.equals(KUBERNETES_NODE))
                 .map(key -> key.replace("-", "."))
                 .collect(Collectors.toSet());
     }

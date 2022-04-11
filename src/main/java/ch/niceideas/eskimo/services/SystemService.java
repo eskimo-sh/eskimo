@@ -71,7 +71,10 @@ public class SystemService {
 
     public static final String SERVICE_PREFIX = "Service ";
     public static final String SHOULD_NOT_HAPPEN_FROM_HERE = " should not happen from here.";
+
+    @Deprecated
     public static final String MARATHON_SERVICE_NAME = "marathon";
+    public static final String KUBERNETES_SERVICE_NAME = "k8s-master";
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -96,6 +99,9 @@ public class SystemService {
 
     @Autowired
     private MarathonService marathonService;
+
+    @Autowired
+    private KubernetesService kubernetesService;
 
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
@@ -367,6 +373,7 @@ public class SystemService {
                     logger.error(e, e);
                 }
 
+                /* Deprecated */
                 // fetch marathon services status
                 try {
                     marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallationStatus);
@@ -380,6 +387,24 @@ public class SystemService {
                         for (String service : servicesDefinition.listMarathonServices()) {
                             if (marathonService.shouldInstall(marathonConfig, service)) {
                                 statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + marathonNodeName, "KO");
+                            }
+                        }
+                    }
+                }
+
+                // fetch kubernetes services status
+                try {
+                    kubernetesService.fetchKubernetesServicesStatus(statusMap, servicesInstallationStatus);
+                } catch (KubernetesException e) {
+                    logger.debug(e, e);
+                    // workaround : flag all marathon services as KO on marathon node
+                    String kubeNode = servicesInstallationStatus.getFirstNode(KUBERNETES_SERVICE_NAME);
+                    if (StringUtils.isNotBlank(kubeNode)) {
+                        String kubeNodeName = kubeNode.replace(".", "-");
+                        MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+                        for (String service : servicesDefinition.listMarathonServices()) {
+                            if (marathonService.shouldInstall(marathonConfig, service)) {
+                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + kubeNodeName, "KO");
                             }
                         }
                     }
@@ -606,6 +631,7 @@ public class SystemService {
                     String nodeName = installationPairs.getValue();
                     String originalNodeName = nodeName;
 
+                    /* Deprecated */
                     // if service is a marathon service
                     if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)) {
 
@@ -627,6 +653,30 @@ public class SystemService {
                         if (StringUtils.isBlank(nodeName)) {
                             // if none, consider marathon node as DEFAULT node running service
                             nodeName = marathonNodeName;
+                        }
+                    }
+
+                    // if service is a kubernetes service
+                    if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)) {
+
+                        // if marathon is not available, don't do anything
+                        String kubeNodeName = systemStatus.getFirstNodeName(KUBERNETES_SERVICE_NAME);
+                        if (StringUtils.isBlank(kubeNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
+                            //notificationService.addError("Marathon inconsistency.");
+                            //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                            continue;
+                        }
+
+                        if (!systemStatus.isServiceOKOnNode(KUBERNETES_SERVICE_NAME, kubeNodeName)) {
+                            //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                            continue;
+                        }
+
+                        // get first node actually running service
+                        nodeName = systemStatus.getFirstNodeName(savedService);
+                        if (StringUtils.isBlank(nodeName)) {
+                            // if none, consider marathon node as DEFAULT node running service
+                            nodeName = kubeNodeName;
                         }
                     }
 

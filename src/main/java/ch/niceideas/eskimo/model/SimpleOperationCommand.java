@@ -52,11 +52,11 @@ public class SimpleOperationCommand implements JSONOpCommand {
         private final String node;
 
         public boolean isOnNode(String node) {
-            return node.equals(ServicesInstallStatusWrapper.MARATHON_NODE);
+            return node.equals(this.node);
         }
 
         public boolean isSameNode(OperationId other) {
-            return other.isOnNode(ServicesInstallStatusWrapper.MARATHON_NODE);
+            return other.isOnNode(this.node);
         }
 
         public String getMessage() {

@@ -217,8 +217,12 @@ public class NodesConfigurationService {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
                             String nodeName = restart.getNode().replace(".", "-");
+                            /* Deprecated */
                             if (restart.getNode().equals(ServiceOperationsCommand.MARATHON_FLAG)) {
                                 nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
+                            } else
+                                if (restart.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG)) {
+                                nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
                             }
                             servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
                         });

@@ -86,9 +86,16 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
             String installedService = serviceAndNodePair.getKey();
             String nodeName = serviceAndNodePair.getValue();
 
+            /* Deprecated */
             if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
                 // search it in config
                 && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
+
+                retCommand.addUninstallation(new MarathonOperationId ("uninstallation", installedService));
+            }
+            if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)
+                    // search it in config
+                    && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
 
                 retCommand.addUninstallation(new MarathonOperationId ("uninstallation", installedService));
             }
@@ -174,21 +181,28 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
 
     @Data
     @RequiredArgsConstructor
+    @Deprecated /* To Be renamed */
     public static class MarathonOperationId implements OperationId {
 
         private final String type;
         private final String service;
 
         public boolean isOnNode(String node) {
-            return node.equals(ServicesInstallStatusWrapper.MARATHON_NODE);
+            return  /* Deprecated */
+                    node.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
+                    ||
+                    node.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE);
         }
 
         public boolean isSameNode(OperationId other) {
-            return other.isOnNode(ServicesInstallStatusWrapper.MARATHON_NODE);
+            return  /* Deprecated */
+                    other.isOnNode(ServicesInstallStatusWrapper.MARATHON_NODE)
+                    ||
+                    other.isOnNode(ServicesInstallStatusWrapper.KUBERNETES_NODE);
         }
 
         public String getMessage() {
-            return type + " of " + getService() + " on marathon";
+            return type + " of " + getService() + " on kubernetes";
         }
 
         @Override
