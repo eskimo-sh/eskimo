@@ -77,7 +77,8 @@ echo "spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_spark /var/lib/spark" >> /
 
 echo " - Creating user spark home directory"
 mkdir -p /home/spark
-chown spark /home/spark
+mkdir -p /home/spark/.kube
+chown -R spark /home/spark
 
 
 echo " - Simlinking spark binaries to /usr/local/bin"
@@ -97,17 +98,14 @@ for i in `ls -1 /usr/local/lib/spark/sbin/stop*`; do
     create_binary_wrapper $i /usr/local/sbin/spark-`basename $i`
 done
 
-echo " - Symlinking some RHEL mesos dependencies "
-saved_dir=`pwd`
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-sudo ln -s libsasl2.so.2 libsasl2.so.3
-cd $saved_dir
-
-#echo " - Opening rights to logs folder to user spark"
-#sudo mkdir -p /usr/local/lib/spark/logs
-#sudo chmod -R 777 /usr/local/lib/spark/logs
+# Deprecated
+#echo " - Symlinking some RHEL mesos dependencies "
+#saved_dir=`pwd`
+#cd /usr/lib/x86_64-linux-gnu/
+#sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
+#sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
+#sudo ln -s libsasl2.so.2 libsasl2.so.3
+#cd $saved_dir
 
 echo " - Simlinking spark logs to /var/log/"
 sudo rm -Rf /usr/local/lib/spark/logs
@@ -123,11 +121,13 @@ sudo bash -c "echo -e \"\nexport SPARK_HOME=/usr/local/lib/spark/\" >> /etc/bash
 
 echo " - Creating spark environment file"
 sudo rm -Rf /usr/local/lib/spark/conf/spark-env.sh
-sudo bash -c "echo -e \"\n#point to your libmesos.so if you use Mesos \"  >> /usr/local/lib/spark/conf/spark-env.sh"
-sudo bash -c "echo -e \"export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+# Deprecated
+#sudo bash -c "echo -e \"\n#point to your libmesos.so if you use Mesos \"  >> /usr/local/lib/spark/conf/spark-env.sh"
+#sudo bash -c "echo -e \"export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 sudo bash -c "echo -e \"\n#Important configuration directories \"  >> /usr/local/lib/spark/conf/spark-env.sh"
 sudo bash -c "echo -e \"export SPARK_CONF_DIR=/usr/local/lib/spark/conf\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 sudo bash -c "echo -e \"export SPARK_LOG_DIR=/usr/local/lib/spark/logs\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+sudo bash -c "echo -e \"export KUBECONFIG=/home/spark/.kube/config\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 
 
 echo " - Creating spark default configuration file"
@@ -153,15 +153,17 @@ sudo bash -c "echo -e \"spark.rpc.numRetries=5\"  >> /usr/local/lib/spark/conf/s
 sudo bash -c "echo -e \"\n# Duration for an RPC ask operation to wait before retrying.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.rpc.retry.wait=5s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
-sudo bash -c "echo -e \"\n#Settings required for Spark driver distribution over mesos cluster (Cluster Mode through Mesos Dispatcher)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.mesos.executor.home=/usr/local/lib/spark/\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+# Deprecated
+#sudo bash -c "echo -e \"\n#Settings required for Spark driver distribution over mesos cluster (Cluster Mode through Mesos Dispatcher)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.mesos.executor.home=/usr/local/lib/spark/\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
-sudo bash -c "echo -e \"\n#If set to true, runs over Mesos clusters in coarse-grained sharing mode, \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"#where Spark acquires one long-lived Mesos task on each machine. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"#If set to false, runs over Mesos cluster in fine-grained sharing mode,\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"#where one Mesos task is created per Spark task.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"#(Fine grained mode is deprecated and one should consider dynamic allocation instead)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.mesos.coarse=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+# Deprecated
+#sudo bash -c "echo -e \"\n#If set to true, runs over Mesos clusters in coarse-grained sharing mode, \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"#where Spark acquires one long-lived Mesos task on each machine. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"#If set to false, runs over Mesos cluster in fine-grained sharing mode,\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"#where one Mesos task is created per Spark task.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"#(Fine grained mode is deprecated and one should consider dynamic allocation instead)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.mesos.coarse=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n#ElasticSearch setting (first node to be reached => can use localhost everywhere)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.es.nodes=localhost\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
@@ -186,23 +188,27 @@ sudo bash -c "echo -e \"spark.dynamicAllocation.executorIdleTimeout=200s\"  >> /
 sudo bash -c "echo -e \"spark.dynamicAllocation.cachedExecutorIdleTimeout=300s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Configuring spark shuffle service (required for dynamic allocation)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.shuffle.service.enabled=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.dynamicAllocation.shuffleTracking.enabled=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+# TODO This one neds to be made configuranle by the settingd editor mandatorily !!
+sudo bash -c "echo -e \"spark.dynamicAllocation.shuffleTracking.timeout=600s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Directory to use for scratch space in Spark, including map output files and RDDs that get stored on disk. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"# Spark Mesos Shuffle service and spark executors need to have acess to the same folder there cross containers. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"# Spark Mesos Shuffle service and spark executors need to have access to the same folder there cross containers. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.local.dir=/var/lib/spark/tmp/\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 
 echo " - Defining Eskimo Spark docker container"
 sudo bash -c "echo -e \"\n#Defining docker image to be used for spark executors\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.mesos.executor.docker.image=eskimo:spark-executor\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-executor\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 # TODO Honestly I am not sure that this works.
 # But since I have --net host in my container anyway I am not touching anything else
-sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.network=host\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-# This is not working
-#sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.rm=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.mesos.executor.docker.volumes=/var/log/spark:/var/log/spark:rw,/var/lib/spark:/var/lib/spark:rw\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
+#sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.network=host\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.options.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.options.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 echo " - Creating hive-site.xml configuration file"
 cat > /tmp/hive-site.xml <<- "EOF"

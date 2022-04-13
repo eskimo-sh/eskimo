@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#
+# Deprecated
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
 #

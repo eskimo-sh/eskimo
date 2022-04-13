@@ -144,6 +144,14 @@ echo "   + Copying kube config file to root"
 sudo cp /home/$ADMIN_USER/.kube/config /root/.kube/config
 sudo chown root.root /root/.kube/config
 
+echo "   + Copying kube config file to all eskimo users"
+for eskuser in `cat /etc/group | grep eskimoservices | cut -d ':' -f 4 | sed 's/,/ /g'`; do
+    sudo mkdir -p /home/$eskuser/.kube/
+    sudo chown $eskuser.$eskuser /home/$eskuser/.kube/
+    sudo cp /home/$ADMIN_USER/.kube/config /home/$eskuser/.kube/config
+    sudo chown $eskuser.$eskuser /home/$eskuser/.kube/config
+done
+
 
 delete_k8s_poststart_lock_file
 

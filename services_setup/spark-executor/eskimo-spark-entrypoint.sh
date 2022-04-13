@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Deprecated
+#
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
 #
@@ -36,17 +36,17 @@
 
 set -e
 
-# silent
-#echo " - Loading Topology"
-. /etc/eskimo_topology.sh
+# FIXME TODO mount gluster shares in container "$@"
 
-export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
-if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
-    echo " - No zookeeper master found in topology"
-    exit -3
+
+# Set some key environment variables
+export SPARK_HOME=/usr/local/lib/spark/
+
+# Load eskimo topolgy
+if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
+    # Injecting topoloy
+    . /usr/local/sbin/inContainerInjectTopology.sh
 fi
 
-# silent
-#echo " - Adapting configuration files and scripts"
-sed -i s/"XXX.XXX.XXX.XXX"/"$ZOOKEEPER_MASTER"/g /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
-
+# Call spark provided entrypoint
+bash /usr/local/lib/spark/kubernetes/dockerfiles/spark/entrypoint.sh "$@"

@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 # reinitializing log
@@ -73,7 +73,7 @@ echo " - Configuring host spark common part"
 . ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 echo " - Installing setupSparkGlusterShares.sh to /usr/local/sbin"
@@ -82,58 +82,60 @@ sudo chmod 755 /usr/local/sbin/setupSparkGlusterShares.sh
 
 
 
-# spark executor part
+# spark common template part
 # ----------------------------------------------------------------------------------------------------------------------
-echo " ---> Spark executor part ----------------------------------------------------"
+echo " ---> Spark common template part ----------------------------------------------------"
 
-echo " - Building docker container for spark executor"
-build_container spark-executor spark spark_executor_install_log
+echo " - Building docker container for spark"
+build_container spark spark spark_executor_install_log
 
 # create and start container
-echo " - Running docker container to configure spark executor"
+echo " - Running docker container to configure spark"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
         -d \
         -v /var/log/spark:/var/log/spark \
         -v /var/lib/spark:/var/lib/spark \
-        --name spark-executor \
+        --name spark \
         -i \
-        -t eskimo:spark-executor bash >> spark_executor_install_log 2>&1
+        -t eskimo:spark bash >> spark_executor_install_log 2>&1
 fail_if_error $? "spark_executor_install_log" -2
 
 # connect to container
 #docker exec -it spark bash
 
-echo " - Configuring spark-executor container (config script)"
-docker exec spark-executor bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
+echo " - Configuring spark container (config script)"
+docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
         | tee -a spark_executor_install_log 2>&1
 if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat spark_executor_install_log
-    exit -100
+    exit 100
 fi
 
-echo " - Configuring spark-executor container"
-docker exec spark-executor bash /scripts/inContainerSetupSpark.sh | tee -a spark_executor_install_log 2>&1
+echo " - Configuring spark container"
+docker exec spark bash /scripts/inContainerSetupSpark.sh | tee -a spark_executor_install_log 2>&1
 if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat spark_executor_install_log
-    exit -101
+    exit 101
 fi
 
 #echo " - TODO"
 #docker exec -it spark TODO/tmp/logstash_install_log
 
+echo " - Copying Spark entrypoint script"
+docker_cp_script eskimo-spark-entrypoint.sh sbin spark spark_executor_install_log
 
 echo " - Copying Topology Injection Script (common)"
-docker_cp_script inContainerInjectTopology.sh sbin spark-executor spark_executor_install_log
+docker_cp_script inContainerInjectTopology.sh sbin spark spark_executor_install_log
 
 echo " - Copying settingsInjector.sh Script"
-docker_cp_script settingsInjector.sh sbin spark-executor spark_executor_install_log
+docker_cp_script settingsInjector.sh sbin spark spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
-commit_container spark-executor spark_executor_install_log
+commit_container spark spark_executor_install_log
 
 echo " - Copying spark command line programs docker wrappers to /usr/local/bin"
 for i in `find ./spark_wrappers -mindepth 1`; do
@@ -142,80 +144,150 @@ for i in `find ./spark_wrappers -mindepth 1`; do
     sudo chmod 755 /usr/local/bin/$filename
 done
 
-echo " - Creating spark-executors containers cleaner"
-sudo bash -c 'echo "for i in \`docker ps -aq --no-trunc -f status=exited -f ancestor=eskimo:spark-executor\` ; do docker rm --force \$i; done" > /usr/local/sbin/clean-spark-executor-containers.sh'
-sudo chmod 755 /usr/local/sbin/clean-spark-executor-containers.sh
 
 
-if [[ `sudo crontab -u root -l 2>/dev/null | grep clean-spark-executor-containers.sh` == "" ]]; then
-    echo " - Scheduling spark-executors containers cleaner"
-    sudo rm -f /tmp/crontab
-    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
-    sudo bash -c "echo \"* * * * * /bin/bash /usr/local/sbin/clean-spark-executor-containers.sh >> /var/log/spark/clean-spark-executor-containers.log 2>&1\" >> /tmp/crontab"
-    sudo crontab -u root /tmp/crontab
-fi
+# FIXME
+# TODO temporary attempt
+
+    echo " - Deploying spark Service in docker registry for kubernetes"
+    docker tag eskimo:spark kubernetes.registry:5000/spark >> spark_executor_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "   + Could not re-tag kubernetes container image for spark"
+        exit 4
+    fi
+
+    docker push kubernetes.registry:5000/spark >> spark_executor_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "Image push in docker registry failed !"
+        exit 5
+    fi
 
 
-# spark mesos shuffle service part
+
+
+
+# spark executor part
 # ----------------------------------------------------------------------------------------------------------------------
-echo " ---> Spark mesos shuffle sevice part ----------------------------------------"
+echo " ---> Spark executor part ----------------------------------------------------"
 
-echo " - Building docker container for spark mesos shuffle service"
-build_container spark-mesos-shuffle-service spark spark_executor_install_log
+set -e
 
-# create and start container
-echo " - Running docker container to configure spark executor"
-docker run \
-        -v $PWD:/scripts \
-        -v $PWD/../common:/common \
-        -d \
-        -v /var/log/spark:/var/log/spark \
-        -v /var/lib/spark:/var/lib/spark \
-        --name spark-mesos-shuffle-service \
-        -i \
-        -t eskimo:spark-mesos-shuffle-service bash >> spark_executor_install_log 2>&1
-fail_if_error $? "spark_executor_install_log" -2
+echo " - Creating sub-setup dir for spark-executor"
+mkdir spark_executor_setup
 
-# connect to container
-#docker exec -it spark bash
+echo " - Copying specific docker file to spark-executor setup"
+cp Dockerfile.spark-executor spark_executor_setup/Dockerfile
 
-echo " - Configuring spark-mesos-shuffle-service container (config script)"
-docker exec spark-mesos-shuffle-service bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
-        | tee -a spark_executor_install_log 2>&1
-if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat spark_executor_install_log
-    exit -100
-fi
+echo " - Changing dir to spark-executor setup"
+cd spark_executor_setup/
 
-echo " - Configuring spark-mesos-shuffle-service container"
-docker exec spark-mesos-shuffle-service bash /scripts/inContainerSetupSparkMesosShuffleService.sh \
-        | tee -a spark_executor_install_log 2>&1
-if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat spark_executor_install_log
-    exit -101
-fi
+set +e
 
-#echo " - TODO"
-#docker exec -it spark TODO
+echo " - Building docker container for spark executor (specific)"
+build_container spark-executor spark spark_executor_install_log
 
-echo " - Copying Topology Injection Script (Common)"
-docker_cp_script inContainerInjectTopology.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+    echo " - Deploying spark executor in docker registry for kubernetes"
+    docker tag eskimo:spark-executor kubernetes.registry:5000/spark-executor >> spark_executor_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "   + Could not re-tag kubernetes container image for spark"
+        exit 4
+    fi
 
-echo " - Copying Topology Injection Script (Mesos Shuffle)"
-docker_cp_script inContainerInjectTopologyMesosShuffle.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+    docker push kubernetes.registry:5000/spark-executor >> spark_executor_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "Image push in docker registry failed !"
+        exit 5
+    fi
 
-echo " - Copying settingsInjector.sh Script"
-docker_cp_script settingsInjector.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+    echo " - removing local image for spark executor"
+    docker image rm eskimo:spark-executor  >> spark_executor_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "local image removal failed !"
+        exit 6
+    fi
 
-echo " - Copying Service Start Script"
-docker_cp_script inContainerStartMesosShuffleService.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+    echo " - removing local image for common part"
+    docker image rm eskimo:spark  >> spark_executor_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "local image removal failed !"
+        exit 6
+    fi
 
-echo " - Committing changes to local template and exiting container spark"
-commit_container spark-mesos-shuffle-service spark_executor_install_log
-
-
-echo " - Handling spark-executor systemd file (for spark-mesos-shuffle-service)"
-install_and_check_service_file spark-executor spark_executor_install_log
-
+#
+#echo " - Creating spark-executors containers cleaner"
+#sudo bash -c 'echo "for i in \`docker ps -aq --no-trunc -f status=exited -f ancestor=kubernetes.registry:5000/spark-executor\` ; do docker rm --force \$i; done" > /usr/local/sbin/clean-spark-executor-containers.sh'
+#sudo chmod 755 /usr/local/sbin/clean-spark-executor-containers.sh
+#
+#
+#if [[ `sudo crontab -u root -l 2>/dev/null | grep clean-spark-executor-containers.sh` == "" ]]; then
+#    echo " - Scheduling spark-executors containers cleaner"
+#    sudo rm -f /tmp/crontab
+#    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+#    sudo bash -c "echo \"* * * * * /bin/bash /usr/local/sbin/clean-spark-executor-containers.sh >> /var/log/spark/clean-spark-executor-containers.log 2>&1\" >> /tmp/crontab"
+#    sudo crontab -u root /tmp/crontab
+#fi
+#
+#
+## spark mesos shuffle service part
+## ----------------------------------------------------------------------------------------------------------------------
+#echo " ---> Spark mesos shuffle sevice part ----------------------------------------"
+#
+#echo " - Building docker container for spark mesos shuffle service"
+#build_container spark-mesos-shuffle-service spark spark_executor_install_log
+#
+## create and start container
+#echo " - Running docker container to configure spark executor"
+#docker run \
+#        -v $PWD:/scripts \
+#        -v $PWD/../common:/common \
+#        -d \
+#        -v /var/log/spark:/var/log/spark \
+#        -v /var/lib/spark:/var/lib/spark \
+#        --name spark-mesos-shuffle-service \
+#        -i \
+#        -t eskimo:spark-mesos-shuffle-service bash >> spark_executor_install_log 2>&1
+#fail_if_error $? "spark_executor_install_log" -2
+#
+## connect to container
+##docker exec -it spark bash
+#
+#echo " - Configuring spark-mesos-shuffle-service container (config script)"
+#docker exec spark-mesos-shuffle-service bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
+#        | tee -a spark_executor_install_log 2>&1
+#if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
+#    echo " - In container setup script ended up in error"
+#    cat spark_executor_install_log
+#    exit -100
+#fi
+#
+#echo " - Configuring spark-mesos-shuffle-service container"
+#docker exec spark-mesos-shuffle-service bash /scripts/inContainerSetupSparkMesosShuffleService.sh \
+#        | tee -a spark_executor_install_log 2>&1
+#if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
+#    echo " - In container setup script ended up in error"
+#    cat spark_executor_install_log
+#    exit -101
+#fi
+#
+##echo " - TODO"
+##docker exec -it spark TODO
+#
+#echo " - Copying Topology Injection Script (Common)"
+#docker_cp_script inContainerInjectTopology.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+#
+#echo " - Copying Topology Injection Script (Mesos Shuffle)"
+#docker_cp_script inContainerInjectTopologyMesosShuffle.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+#
+#echo " - Copying settingsInjector.sh Script"
+#docker_cp_script settingsInjector.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+#
+#echo " - Copying Service Start Script"
+#docker_cp_script inContainerStartMesosShuffleService.sh sbin spark-mesos-shuffle-service spark_executor_install_log
+#
+#echo " - Committing changes to local template and exiting container spark"
+#commit_container spark-mesos-shuffle-service spark_executor_install_log
+#
+#
+#echo " - Handling spark-executor systemd file (for spark-mesos-shuffle-service)"
+#install_and_check_service_file spark-executor spark_executor_install_log
+#

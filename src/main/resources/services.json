@@ -845,7 +845,7 @@
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": false
       },
       {
         "masterElectionStrategy": "SAME_NODE",
@@ -855,8 +855,8 @@
         "restart": false
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "mesos-agent",
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "k8s-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false

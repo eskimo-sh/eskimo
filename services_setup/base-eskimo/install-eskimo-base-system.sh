@@ -317,13 +317,16 @@ function create_user_infrastructure() {
     echo " - Creating user $USER_NAME (if not exist)"
     new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
     if [[ $new_user_id == "" ]]; then
-        sudo useradd -u $USER_ID $USER_NAME
+        sudo useradd -m -u $USER_ID $USER_NAME
         new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
         if [[ $new_user_id == "" ]]; then
             echo "Failed to add user $USER_NAME"
             exit 43
         fi
     fi
+
+    echo " - Adding user to group eskimoservices"
+    sudo usermod -a -G eskimoservices $USER_NAME
 
     echo " - Creating user system folders"
     sudo mkdir -p /var/lib/$USER_NAME
@@ -534,6 +537,9 @@ fi
 
 # Make sur some required packages are installed
 #echo "  - checking some key packages"
+
+echo "  - Create group eskimoservices"
+sudo /usr/bin/getent group eskimoservices 2>&1 > /dev/null || sudo /usr/sbin/groupadd eskimoservices
 
 echo "  - Creating common system users"
 create_common_system_users

@@ -102,19 +102,26 @@ for argument in "$@"; do
 done
 
 # last parameter is file to execute
-if [[ -d ${@:${#@}} ]]; then
-    export DIR=${@:${#@}}
+last_param=${@:${#@}}
+# Only if last param is not an option starting with "-"
+if [[ -d $last_param ]]; then
+    export LAST_ARG_DIR=$last_param
+    export FILENAME_ARG=""
 else
-    export DIR=`dirname ${@:${#@}}`
+    if [[ -f $last_param ]]; then
+        export LAST_ARG_DIR=`dirname $last_param`
+
+        # manipulating file path
+        export FILENAME_ARG=`realpath $last_param`
+        export LAST_ARG_DIR=`realpath $DIR`
+        set -- "${@:1:$(($#-1))}"
+    fi
 fi
 
-# manipulating file path
-export FILENAME_ARG=`realpath ${@:${#@}}`
-export DIR=`realpath $DIR`
-set -- "${@:1:$(($#-1))}"
-
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
+if [[ "$LAST_ARG_DIR" != "" ]]; then
+    if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$LAST_ARG_DIR:$LAST_ARG_DIR:slave"` == "" ]]; then
+        export DOCKER_VOLUMES_ARGS=" -v $LAST_ARG_DIR:$LAST_ARG_DIR:slave $DOCKER_VOLUMES_ARGS"
+    fi
 fi
 
 # Add standard folders if not already part of it
@@ -127,12 +134,16 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
+# Deprecated
 # Find of mesos for directory mount
-export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
+#export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
 
 # Find external IP for libprocess (mesos) configuration
 . /etc/eskimo_topology.sh
 
+export eskimo_user=`cat /etc/eskimo_user`
+
+echo " - Calling spark-submit with arguments" "$@" "$FILENAME_ARG"
 /usr/bin/docker run \
         -it \
         --rm \
@@ -140,12 +151,16 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         --user spark \
         -e LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS \
         $DOCKER_VOLUMES_ARGS \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
+        --mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config \
+        -v /etc/k8s/ssl:/etc/k8s/ssl:ro \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:spark-executor \
+        kubernetes.registry:5000/spark \
         /usr/local/bin/spark-submit "$@" $FILENAME_ARG
+
+# Deprecated
+#        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+#        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
 
 # -p 5000-5010:5000-5010 \

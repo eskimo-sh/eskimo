@@ -171,6 +171,7 @@ if [[ $? != 0 ]]; then
     exit 47
 fi
 
+echo "   + Starting Kube Scheduler"
 /bin/bash -c '. /etc/k8s/kubesched.env.sh && /usr/local/bin/kube-scheduler \
    --bind-address=$ESKIMO_KUBE_SCHED_BIND_ADDRESS \
    --master $ESKIMO_KUBE_SCHED_API_SERVER_MASTER \
@@ -194,6 +195,21 @@ if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubectrl poststart"
     cat /tmp/start_k8s_master.log 2>&1
     exit 49
+fi
+
+echo "   + Starting Kube Proxy (through kubectl)"
+/bin/bash --login -c '/usr/local/bin/kubectl proxy \
+    --address=0.0.0.0 \
+    --accept-hosts=.* \
+    --kubeconfig=/root/.kube/config \
+    > /var/log/kubernetes/kubectlproxy.log 2>&1' &
+kubectlproxy_pid=$!
+
+sleep 4
+if [[ `ps -e | grep $kubectlproxy_pid ` == "" ]]; then
+    echo "   + Failed to start Kube Proxy (through Kubectl)"
+    cat /var/log/kubernetes/kubectlproxy.log 2>&1
+    exit 50
 fi
 
 echo "   + Deleting lock file"
@@ -222,6 +238,12 @@ while : ; do
         echo "   + Failed to run Kubernetes Scheduler"
         tail -n 50 /var/log/kubernetes/kubesched.log 2>&1
         exit 49
+    fi
+
+    if [[ `ps -e | grep $kubectlproxy_pid ` == "" ]]; then
+        echo "   + Failed to run Kube Proxy (through Kubectl)"
+        cat /var/log/kubernetes/kubectlproxy.log 2>&1
+        exit 50
     fi
 
 done

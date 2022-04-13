@@ -40,17 +40,18 @@ set -e
 #echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
-export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
-if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
-    echo " - No zookeeper master found in topology"
+export KUBERNETES_API_MASTER=$MASTER_K8S_MASTER_1
+if [[ $KUBERNETES_API_MASTER == "" ]]; then
+    echo " - No Kubernetes API master found in topology"
     exit 3
 fi
 
 
 # silent
 #echo " - Adapting configuration files and scripts"
-bash -c "echo -e \"\n#Finding the mesos master through zookeeper\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-bash -c "echo -e \"spark.master=mesos://zk://$ZOOKEEPER_IP_ADDRESS:2181/mesos\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+bash -c "echo -e \"\n#Defining the kubernetes API master\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+bash -c "echo -e \"spark.kubernetes.driver.master=https://${KUBERNETES_API_MASTER}:6443\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+bash -c "echo -e \"spark.master=k8s://https://${KUBERNETES_API_MASTER}:6443\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 if [[ $MEMORY_SPARK_EXECUTOR != "" ]]; then
     bash -c "echo -e \"\n#Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
