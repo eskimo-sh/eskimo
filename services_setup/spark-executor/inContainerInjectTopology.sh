@@ -46,6 +46,10 @@ if [[ $KUBERNETES_API_MASTER == "" ]]; then
     exit 3
 fi
 
+echo " - Mounting spark gluster shares"
+echo "   + (Taking the opportunity to do it in inContainerInjectTopology.sh since it's used everywhere)"
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/spark/data spark
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
 
 # silent
 #echo " - Adapting configuration files and scripts"
@@ -59,12 +63,12 @@ if [[ $MEMORY_SPARK_EXECUTOR != "" ]]; then
 fi
 
 # replacing driver bind IP address at runtime
-sed -i s/"spark.driver.host=RUNTIME_IP_ADDRESS"/"spark.driver.host="$SELF_IP_ADDRESS""/g  /usr/local/lib/spark/conf/spark-defaults.conf
+#sed -i s/"spark.driver.host=RUNTIME_IP_ADDRESS"/"spark.driver.host="$SELF_IP_ADDRESS""/g  /usr/local/lib/spark/conf/spark-defaults.conf
 
-echo " - Updating spark environment file"
-bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
-bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
-bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+#echo " - Updating spark environment file"
+#bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
+#bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+#bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 
 echo " - Creating required directories (this is the only place I can do it)"
 sudo /bin/mkdir -p /var/lib/spark/tmp

@@ -76,11 +76,6 @@ if [[ $? != 0 ]]; then
     exit 20
 fi
 
-echo " - Installing setupSparkGlusterShares.sh to /usr/local/sbin"
-sudo cp setupSparkGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupSparkGlusterShares.sh
-
-
 
 # spark common template part
 # ----------------------------------------------------------------------------------------------------------------------
@@ -96,7 +91,6 @@ docker run \
         -v $PWD/../common:/common \
         -d \
         -v /var/log/spark:/var/log/spark \
-        -v /var/lib/spark:/var/lib/spark \
         --name spark \
         -i \
         -t eskimo:spark bash >> spark_executor_install_log 2>&1
@@ -133,6 +127,9 @@ docker_cp_script inContainerInjectTopology.sh sbin spark spark_executor_install_
 
 echo " - Copying settingsInjector.sh Script"
 docker_cp_script settingsInjector.sh sbin spark spark_executor_install_log
+
+echo " - Copying inContainerMountGluster.sh script"
+docker_cp_script inContainerMountGluster.sh sbin spark spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark spark_executor_install_log
@@ -227,67 +224,4 @@ build_container spark-executor spark spark_executor_install_log
 #    sudo crontab -u root /tmp/crontab
 #fi
 #
-#
-## spark mesos shuffle service part
-## ----------------------------------------------------------------------------------------------------------------------
-#echo " ---> Spark mesos shuffle sevice part ----------------------------------------"
-#
-#echo " - Building docker container for spark mesos shuffle service"
-#build_container spark-mesos-shuffle-service spark spark_executor_install_log
-#
-## create and start container
-#echo " - Running docker container to configure spark executor"
-#docker run \
-#        -v $PWD:/scripts \
-#        -v $PWD/../common:/common \
-#        -d \
-#        -v /var/log/spark:/var/log/spark \
-#        -v /var/lib/spark:/var/lib/spark \
-#        --name spark-mesos-shuffle-service \
-#        -i \
-#        -t eskimo:spark-mesos-shuffle-service bash >> spark_executor_install_log 2>&1
-#fail_if_error $? "spark_executor_install_log" -2
-#
-## connect to container
-##docker exec -it spark bash
-#
-#echo " - Configuring spark-mesos-shuffle-service container (config script)"
-#docker exec spark-mesos-shuffle-service bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
-#        | tee -a spark_executor_install_log 2>&1
-#if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
-#    echo " - In container setup script ended up in error"
-#    cat spark_executor_install_log
-#    exit -100
-#fi
-#
-#echo " - Configuring spark-mesos-shuffle-service container"
-#docker exec spark-mesos-shuffle-service bash /scripts/inContainerSetupSparkMesosShuffleService.sh \
-#        | tee -a spark_executor_install_log 2>&1
-#if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
-#    echo " - In container setup script ended up in error"
-#    cat spark_executor_install_log
-#    exit -101
-#fi
-#
-##echo " - TODO"
-##docker exec -it spark TODO
-#
-#echo " - Copying Topology Injection Script (Common)"
-#docker_cp_script inContainerInjectTopology.sh sbin spark-mesos-shuffle-service spark_executor_install_log
-#
-#echo " - Copying Topology Injection Script (Mesos Shuffle)"
-#docker_cp_script inContainerInjectTopologyMesosShuffle.sh sbin spark-mesos-shuffle-service spark_executor_install_log
-#
-#echo " - Copying settingsInjector.sh Script"
-#docker_cp_script settingsInjector.sh sbin spark-mesos-shuffle-service spark_executor_install_log
-#
-#echo " - Copying Service Start Script"
-#docker_cp_script inContainerStartMesosShuffleService.sh sbin spark-mesos-shuffle-service spark_executor_install_log
-#
-#echo " - Committing changes to local template and exiting container spark"
-#commit_container spark-mesos-shuffle-service spark_executor_install_log
-#
-#
-#echo " - Handling spark-executor systemd file (for spark-mesos-shuffle-service)"
-#install_and_check_service_file spark-executor spark_executor_install_log
 #

@@ -72,6 +72,11 @@ echo " - Installing GlusterFS client"
 docker exec -i spark_template apt-get -y install  glusterfs-client > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -10
 
+echo " - Installing other dependencies"
+docker exec -i spark_template apt-get -y install tini > /tmp/spark_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -10
+
+
 echo " - Installing spark"
 docker exec -i spark_template bash /scripts/installSpark.sh | tee /tmp/spark_build_log 2>&1
 if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then

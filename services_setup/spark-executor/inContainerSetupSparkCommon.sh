@@ -144,8 +144,12 @@ sudo bash -c "echo -e \"\n#Limiting the driver (client) memory\"  >> /usr/local/
 sudo bash -c "echo -e \"spark.driver.memory=800m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n#This seems to help spark messing with hostnames instead of adresses and really helps\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.driver.host=RUNTIME_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.driver.bindAddress=0.0.0.0\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+# FIXME change to 'cluster' to attempt to run spark driver in pod as well
+sudo bash -c "echo -e \"spark.submit.deployMode=client\" >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+#sudo bash -c "echo -e \"spark.driver.host=RUNTIME_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.driver.bindAddress=0.0.0.0\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Number of times to retry before an RPC task gives up. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"#An RPC task will run at most times of this number.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
@@ -200,15 +204,47 @@ sudo bash -c "echo -e \"spark.local.dir=/var/lib/spark/tmp/\"  >> /usr/local/lib
 echo " - Defining Eskimo Spark docker container"
 sudo bash -c "echo -e \"\n#Defining docker image to be used for spark executors\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-executor\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+sudo bash -c "echo -e \"spark.kubernetes.file.upload.path=/var/lib/spark/data\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.driver.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.authenticate.driver.serviceAccountName=eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
 # TODO Honestly I am not sure that this works.
 # But since I have --net host in my container anyway I am not touching anything else
 #sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.network=host\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.options.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.options.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.options.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.options.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.mount.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.options.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.mount.readOnly=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimoservicessettings.mount.path=/etc/eskimo_services-settings.json\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimoservicessettings.options.path=/etc/eskimo_services-settings.json\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimoservicessettings.mount.readOnly=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlogspark.mount.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlogspark.options.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlogspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlibspark.mount.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlibspark.options.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlibspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimotopology.mount.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimotopology.options.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimotopology.mount.readOnly=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
+sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimoservicessettings.mount.path=/etc/eskimo_services-settings.json\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimoservicessettings.options.path=/etc/eskimo_services-settings.json\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimoservicessettings.mount.readOnly=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 echo " - Creating hive-site.xml configuration file"
 cat > /tmp/hive-site.xml <<- "EOF"
@@ -227,6 +263,23 @@ cat > /tmp/hive-site.xml <<- "EOF"
 </configuration>
 EOF
 sudo mv /tmp/hive-site.xml /usr/local/lib/spark/conf/
+
+echo " - Creating spark-pod-template.yaml"
+cat > /tmp/spark-pod-template.yaml <<- "EOF"
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: spark
+    image: kubernetes.registry:5000/spark-executor
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+      runAsUser: 3302
+      runAsGroup: 3302
+EOF
+sudo mv /tmp/spark-pod-template.yaml /usr/local/lib/spark/conf/
+chmod 755 /usr/local/lib/spark/conf/
 
 
 echo " - Enabling spark to change configuration at runtime"

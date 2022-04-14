@@ -125,9 +125,6 @@ if [[ "$LAST_ARG_DIR" != "" ]]; then
 fi
 
 # Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/spark` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/spark:/var/lib/spark:shared $DOCKER_VOLUMES_ARGS"
-fi
 if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/spark` == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/log/spark:/var/log/spark:shared $DOCKER_VOLUMES_ARGS"
 fi
@@ -149,12 +146,13 @@ echo " - Calling spark-submit with arguments" "$@" "$FILENAME_ARG"
         --rm \
         --network host \
         --user spark \
+        --privileged \
         -e LIBPROCESS_ADVERTISE_IP=$SELF_IP_ADDRESS \
         $DOCKER_VOLUMES_ARGS \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         --mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config \
-        -v /etc/k8s/ssl:/etc/k8s/ssl:ro \
+        -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
         kubernetes.registry:5000/spark \
         /usr/local/bin/spark-submit "$@" $FILENAME_ARG

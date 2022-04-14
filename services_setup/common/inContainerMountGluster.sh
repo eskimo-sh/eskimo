@@ -90,10 +90,16 @@ mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
 if [[ $? != 0 ]]; then
     echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
     cat /tmp/mount_$VOLUME
+    cat /var/log/glusterfs/*
     exit 7
 fi
 
 # give it a little time to actually connect the transport (Hacky hack)
+# FIXME replace with
+# cat /etc/mtab | grep $MOUNT_POINT | grep gluster
+# sleep 1 before checking
+# Try 5 times
+# sleep 1 after again
 sleep 4
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then

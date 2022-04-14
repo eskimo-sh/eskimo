@@ -36,17 +36,19 @@
 
 set -e
 
-# FIXME TODO mount gluster shares in container "$@"
-
-
 # Set some key environment variables
+echo " - Setting key environment variables"
 export SPARK_HOME=/usr/local/lib/spark/
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 
 # Load eskimo topolgy
 if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
     # Injecting topoloy
     . /usr/local/sbin/inContainerInjectTopology.sh
 fi
+
+echo " - Changing current directory to /home/spark"
+cd /home/spark
 
 # Call spark provided entrypoint
 bash /usr/local/lib/spark/kubernetes/dockerfiles/spark/entrypoint.sh "$@"
