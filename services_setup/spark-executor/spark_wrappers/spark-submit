@@ -113,7 +113,7 @@ else
 
         # manipulating file path
         export FILENAME_ARG=`realpath $last_param`
-        export LAST_ARG_DIR=`realpath $DIR`
+        export LAST_ARG_DIR=`realpath $LAST_ARG_DIR`
         set -- "${@:1:$(($#-1))}"
     fi
 fi

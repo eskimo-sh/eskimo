@@ -48,10 +48,6 @@ if [ -z "$SPARK_VERSION" ]; then
     echo "Need to set SPARK_VERSION environment variable before calling this script !"
     exit 1
 fi
-if [ -z "$SCALA_VERSION" ]; then
-    echo "Need to set SCALA_VERSION environment variable before calling this script !"
-    exit 1
-fi
 
 saved_dir=`pwd`
 function returned_to_saved_dir() {
@@ -61,56 +57,35 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
-sudo rm -Rf /tmp/eshadoop_setup
+rm -Rf /tmp/eshadoop_setup
 mkdir -p /tmp/eshadoop_setup
 cd /tmp/eshadoop_setup
 
+echo " - Downloading elasticsearch-hadoop-$ES_VERSION"
+wget https://artifacts.elastic.co/downloads/elasticsearch-hadoop/elasticsearch-hadoop-$ES_VERSION.zip > /tmp/esh_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo " -> Failed to downolad elasticsearch-hadoop-$ES_VERSION from http://download.elastic.co/hadoop/. Trying to download from niceideas.ch"
+    exit 1
+    #wget http://niceideas.ch/mes/elasticsearch-hadoop-$ES_VERSION.zip >> /tmp/esh_install_log 2>&1
+    #fail_if_error $? "/tmp/esh_install_log" -1
+fi
 
-echo " - Creating a dummy pom.xml to proceed with downloading ES-Hadoop spark connector"
-echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
-         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">
-    <modelVersion>4.0.0</modelVersion>
-
-    <groupId>ch.niceideas.spark</groupId>
-    <artifactId>connectorsDownloadProject</artifactId>
-    <version>$SPARK_VERSION</version>
-    <packaging>jar</packaging>
-    <name>minimal-pom</name>
-    <url>http://maven.apache.org</url>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.11</java.version>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-spark-30_$SCALA_VERSION</artifactId>
-            <version>$ES_VERSION</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-</project>" > pom.xml
-
-echo " - Proceeding with download of connectors and dependencies"
-mvn dependency:copy-dependencies > /tmp/esh_install_log 2>&1
-fail_if_error $? "/tmp/esh_install_log" -25
-
-echo " - Copying connectors with dependencies to flink distribution folder"
-cd target/dependency/
-
+echo " - Extracting elasticsearch-hadoop-$ES_VERSION"
+unzip elasticsearch-hadoop-$ES_VERSION.zip > /tmp/spark_install_log 2>&1
+fail_if_error $? "/tmp/spark_install_log" -2
 
 echo " - Installing eshadoop spark (to spark jar folder)"
-sudo chown root.staff -R *
-sudo cp elasticsearch-spark-30_$SCALA_VERSION-$ES_VERSION.jar /usr/local/lib/spark-$SPARK_VERSION/jars/
+sudo chown root.staff -R elasticsearch-hadoop-$ES_VERSION
+sudo cp elasticsearch-hadoop-$ES_VERSION/dist/elasticsearch-spark-20_2.11-$ES_VERSION.jar /usr/local/lib/spark-$SPARK_VERSION/jars/
 if [[ $? != 0 ]]; then
-    echo " -> Failed to find jar elasticsearch-spark-30_$SCALA_VERSION-$ES_VERSION.jar - name must have change ..."
+    echo " -> Failed to find jar elasticsearch-spark-20_2.11-$ES_VERSION.jar - name must have change ..."
     exit 2
 fi
 
-
-sudo rm -Rf /tmp/eshadoop_setup
+sudo rm -Rf /tmp/spark_setup
 returned_to_saved_dir
+
+
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

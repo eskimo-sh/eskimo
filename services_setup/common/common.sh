@@ -254,7 +254,7 @@ function deploy_kubernetes() {
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"
     /usr/local/bin/kubectl delete -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
-        if [[ `cat "$LOG_FILE"_kubernetes_deploy` != "" && `grep "not found" "$LOG_FILE"_kubernetes_deploy` == "" ]]; then
+        if [[ `cat "$LOG_FILE"_kubernetes_deploy` != "" && `grep "not found" "$LOG_FILE"_kubernetes_deploy` != "" ]]; then
             echo "   + Some elements were not found. Moving on ..."
         else
             echo "   + Could not delete deployment from kubernetes"
