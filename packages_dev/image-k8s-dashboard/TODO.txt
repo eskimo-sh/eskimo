@@ -2,6 +2,7 @@
 
 
 
+
 Copy of POD with archive of images used in local
 https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
 => so here the image is actually just the archive of both used images !

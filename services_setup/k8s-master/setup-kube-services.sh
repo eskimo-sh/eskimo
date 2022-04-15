@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -34,22 +34,43 @@
 # Software.
 #
 
+echoerr() { echo "$@" 1>&2; }
 
-if [[ ! -f /etc/eskimo_topology.sh ]]; then
-    echo "Could not find /etc/eskimo_topology.sh"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $SCRIPT_DIR/common.sh "$@"
+
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
+
+# Loading topology
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
     exit 1
 fi
 
-. /etc/eskimo_topology.sh
+. /etc/k8s/env.sh
 
-# remove any previous definition
-sed -i '/.*kubernetes.registry/d' /etc/hosts
+sudo rm -Rf /tmp/kube_services_setup
+mkdir /tmp/kube_services_setup
+cd /tmp/kube_services_setup
 
-# register new host
-if [[ -z $MASTER_K8S_MASTER_1 ]]; then
-    echo "WARNING : Could not find Kubernetes Eskimo master host"
-else
-    echo "$MASTER_K8S_MASTER_1 kubernetes.registry" >> /etc/hosts
+# Defining topology variables
+if [[ $SELF_NODE_NUMBER == "" ]]; then
+    echo " - No Self Node Number found in topology"
+    exit 1
+fi
+
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
+    exit 2
 fi
 
 
+echo " - Deploying k8s.gcr.io/pause in registry"
+deploy_image_in_registry `ls -1 /usr/local/lib/k8s/images/k8s.gcr.io_pause*` k8s.gcr.io/pause
+
+echo " - Deploying coredns/coredns in registry"
+deploy_image_in_registry `ls -1 /usr/local/lib/k8s/images/coredns_coredns*` coredns/coredns
+
+
+rm -Rf /tmp/kube_services_setup

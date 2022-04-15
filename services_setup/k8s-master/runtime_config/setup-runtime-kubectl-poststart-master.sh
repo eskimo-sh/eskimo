@@ -87,8 +87,8 @@ if [[ `id -u` != 0 ]]; then
     exit 200
 fi
 
+# Making /root/.kube/config available
 export HOME=/root
-
 
 # recreating on master
 if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then

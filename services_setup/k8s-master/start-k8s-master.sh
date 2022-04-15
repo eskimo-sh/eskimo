@@ -61,26 +61,26 @@ trap delete_k8s_master_lock_file 15
 trap delete_k8s_master_lock_file EXIT
 
 echo "   + Mounting Kubernetes Eskimo Gluster shares"
-/usr/local/sbin/setupK8sGlusterShares.sh > /tmp/start_k8s_master.log 2>&1
+/usr/local/sbin/setupK8sGlusterShares.sh > /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to mount gluster shares"
-    cat /tmp/start_k8s_master.log 2>&1
+    cat /var/log/kubernetes/start_k8s_master.log 2>&1
     exit 41
 fi
 
 echo "   + Setup runtime kubectl"
-/etc/k8s/runtime_config/setup-runtime-kubectl.sh  > /tmp/start_k8s_master.log 2>&1
+/etc/k8s/runtime_config/setup-runtime-kubectl.sh  >> /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
      echo "   + Failed to setup runtme kubectl"
-     cat /tmp/start_k8s_master.log 2>&1
+     cat /var/log/kubernetes/start_k8s_master.log 2>&1
      exit 42
 fi
 
 echo "   + Register kubernetes registry"
-/usr/local/sbin/register-kubernetes-registry.sh  > /tmp/start_k8s_master.log 2>&1
+/usr/local/sbin/register-kubernetes-registry.sh  >> /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to register kubernetes registry"
-    cat /tmp/start_k8s_master.log 2>&1
+    cat /var/log/kubernetes/start_k8s_master.log 2>&1
     exit 43
 fi
 
@@ -131,10 +131,10 @@ fi
 
 
 echo "   + Setup runtime kubectrl"
-/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectrl.sh  > /tmp/start_k8s_master.log 2>&1
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kubectrl.sh  >> /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubectrl"
-    cat /tmp/start_k8s_master.log 2>&1
+    cat /var/log/kubernetes/start_k8s_master.log 2>&1
     exit 45
 fi
 
@@ -164,10 +164,10 @@ fi
 
 
 echo "   + Setup runtime kubesched"
-/etc/k8s/runtime_config/setup-runtime-kubesched.sh > /tmp/start_k8s_master.log 2>&1
+/etc/k8s/runtime_config/setup-runtime-kubesched.sh >> /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubesched"
-    cat /tmp/start_k8s_master.log 2>&1
+    cat /var/log/kubernetes/start_k8s_master.log 2>&1
     exit 47
 fi
 
@@ -190,10 +190,10 @@ fi
 
 # Keep this one last
 echo "   + Setup runtime kubectl poststart (MASTER)"
-/etc/k8s/runtime_config/setup-runtime-kubectl-poststart-master.sh > /tmp/start_k8s_master.log 2>&1
+/etc/k8s/runtime_config/setup-runtime-kubectl-poststart-master.sh >> /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubectrl poststart"
-    cat /tmp/start_k8s_master.log 2>&1
+    cat /var/log/kubernetes/start_k8s_master.log 2>&1
     exit 49
 fi
 
@@ -211,6 +211,16 @@ if [[ `ps -e | grep $kubectlproxy_pid ` == "" ]]; then
     cat /var/log/kubernetes/kubectlproxy.log 2>&1
     exit 50
 fi
+
+
+echo "   + Deploying Kubernetes services"
+/etc/k8s/runtime_config/setup-runtime-kube-services.sh >> /var/log/kubernetes/start_k8s_master.log 2>&1
+if [[ $? != 0 ]]; then
+    echo "   + Failed to deploy runtime kube services"
+    cat /var/log/kubernetes/start_k8s_master.log 2>&1
+    exit 49
+fi
+
 
 echo "   + Deleting lock file"
 delete_k8s_master_lock_file

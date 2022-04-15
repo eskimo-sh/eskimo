@@ -59,6 +59,8 @@ export K8S_CNI_PLUGINS_VERSION=1.1.1
 export K8S_DASHBOARD_VERSION=2.5.1
 export GOLANG_VERSION=1.17
 export FULL_GOLANG_DEBIAN_VERSION=1.17.8-1~bpo11+1
+export K8S_INFRA_IMAGE_PAUSE=3.6
+export K8S_INFRA_IMAGE_COREDNS=1.9.0
 
 # CAUTION : This version number needs to be aligned with the expected mesos version defined in
 # /services_setup/base-eskimo/install-mesos.sh

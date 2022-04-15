@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -34,22 +34,40 @@
 # Software.
 #
 
+echoerr() { echo "$@" 1>&2; }
 
-if [[ ! -f /etc/eskimo_topology.sh ]]; then
-    echo "Could not find /etc/eskimo_topology.sh"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# CHange current folder to script dir (important !)
+cd $SCRIPT_DIR
+
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
     exit 1
 fi
 
-. /etc/eskimo_topology.sh
-
-# remove any previous definition
-sed -i '/.*kubernetes.registry/d' /etc/hosts
-
-# register new host
-if [[ -z $MASTER_K8S_MASTER_1 ]]; then
-    echo "WARNING : Could not find Kubernetes Eskimo master host"
-else
-    echo "$MASTER_K8S_MASTER_1 kubernetes.registry" >> /etc/hosts
-fi
+. /etc/k8s/env.sh
 
 
+echo " - Deploying Kubernetes services"
+
+echo "   + create temp folder"
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+cd $tmp_dir
+
+# Making /root/.kube/config available
+export HOME=/root
+
+echo "   + Creating runtime core-dns file"
+/bin/cp -f /etc/k8s/services/core-dns.yaml /var/lib/kubernetes/core-dns.yaml
+
+echo "   + Injecting runtime properties"
+
+sed -i "s/CLUSTER_DNS_SVC_IP/$CLUSTER_DNS_SVC_IP/g" /var/lib/kubernetes/core-dns.yaml
+sed -i "s/CLUSTER_DNS_DOMAIN/$CLUSTER_DNS_DOMAIN/g" /var/lib/kubernetes/core-dns.yaml
+
+echo " - Deploying core-dns"
+kubectl apply -f /var/lib/kubernetes/core-dns.yaml
+
+echo "   + removing temp folder"
+rm -Rf $tmp_dir

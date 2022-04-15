@@ -125,6 +125,15 @@ for i in `find ./service_files -mindepth 1`; do
     sudo chmod 755 /lib/systemd/system/$filename
 done
 
+echo " - Copying K8s service files to /etc/k8s/services"
+sudo mkdir -p /etc/k8s/services
+for i in `find ./k8s-service_files -mindepth 1`; do
+    sudo cp $i /etc/k8s/services/
+    filename=`echo $i | cut -d '/' -f 3`
+    sudo chmod 755 /etc/k8s/services/$filename
+done
+
+
 echo " - Creating eskimo_user file"
 export ESKIMO_USER=$USER
 sudo bash -c "echo $USER > /etc/eskimo_user"
@@ -157,6 +166,9 @@ fail_if_error $? /dev/null 306
 
 bash ./setup-kubesched.sh
 fail_if_error $? /dev/null 307
+
+bash ./setup-kube-services.sh
+fail_if_error $? /dev/null 308
 
 
 echo " - Copying k8s-master process files to /usr/local/sbin"

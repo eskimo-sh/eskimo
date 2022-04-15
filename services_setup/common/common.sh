@@ -130,6 +130,84 @@ function loadTopology() {
     . /etc/eskimo_topology.sh
 }
 
+
+function deploy_image_in_registry() {
+
+    if [[ $1 == "" ]]; then
+        echo "Image archive full path needs to be passed in argument"
+        exit 81
+    fi
+    export IMAGE_FULL_PATH=$1
+
+    if [[ ! -f $IMAGE_FULL_PATH ]]; then
+        echo "File not found $IMAGE_FULL_PATH"
+        exit 3
+    fi
+    
+    if [[ $2 == "" ]]; then
+        echo "Image name needs to be passed in argument"
+        exit 82
+    fi
+    export IMAGE_NAME=$2
+
+    IMAGE_FILE=`basename $IMAGE_FULL_PATH`
+    IMAGE_TAR=`echo $IMAGE_FILE | sed 's/\.gz//'`
+    IMAGE_VERSION=`echo $IMAGE_FILE | cut -d ':' -f 2 | sed 's/\.tar\.gz//'`
+
+    echo "   + Copying $IMAGE_FULL_PATH to $PWD"
+    /bin/cp -f $IMAGE_FULL_PATH .
+
+    echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION if exist"
+    if [[ `docker images -q $IMAGE_NAME:$IMAGE_VERSION 2>/dev/null` != "" ]]; then
+        docker image rm $IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
+        fail_if_error $? "/tmp/kube_services_setup_log" 5
+    fi
+
+    echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION IN REPOSITORY if exist"
+    if [[ `docker images -q kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION 2>/dev/null` != "" ]]; then
+        docker image rm kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
+        fail_if_error $? "/tmp/kube_services_setup_log" 5
+    fi
+
+    echo "   + Importing latest docker template for $IMAGE_NAME:$IMAGE_VERSION"
+    gunzip -f $IMAGE_FILE > /tmp/kube_services_setup_log 2>&1
+    fail_if_error $? "/tmp/kube_services_setup_log" 5
+
+    echo "     - Docker loading archive"
+    docker load -i ./$IMAGE_TAR >> /tmp/kube_services_setup_log 2>&1
+    if [[ $? != 0 ]]; then
+        # dunno why but docker load is randomly failing from times to times
+        echo "   + Second attempt"
+        docker load -i ./$IMAGE_TAR >> /tmp/kube_services_setup_log 2>&1
+        fail_if_error $? "/tmp/kube_services_setup_log" 6
+    fi
+
+    echo "   + Tagging $IMAGE_NAME in docker registry for kubernetes AS LATEST"
+    docker tag $IMAGE_NAME:$IMAGE_VERSION kubernetes.registry:5000/$IMAGE_NAME:latest>> /tmp/kube_services_setup_log 2>&1
+    if [[ $? != 0 ]]; then
+        # try a second time
+        sleep 4
+        echo "   + second attempt"
+        docker tag $IMAGE_NAME:$IMAGE_VERSION kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
+        fail_if_error $? "/tmp/kube_services_setup_log" 7
+    fi
+
+    echo "   + Deploying $IMAGE_NAME in docker registry for kubernetes AS LATEST"
+    docker push kubernetes.registry:5000/$IMAGE_NAME:latest >> /tmp/kube_services_setup_log 2>&1
+    if [[ $? != 0 ]]; then
+        # try a second time
+        sleep 4
+        echo "   + second attempt"
+        docker push kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
+        fail_if_error $? "/tmp/kube_services_setup_log" 8
+    fi
+
+    echo "   + removing local image"
+    docker image rm $IMAGE_NAME:$IMAGE_VERSION   >> /tmp/kube_services_setup_log 2>&1
+    fail_if_error $? "/tmp/kube_services_setup_log" 9
+}
+
+
 # Install container in registry and deploy it using marathon
 # Arguments:
 # - $1 the name of the systemd service
@@ -376,6 +454,7 @@ function install_and_check_service_file() {
     #sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
     #fail_if_error $? "$LOG_FILE" -11
 }
+
 
 # Commit the container in the docker image and remove container
 # Arguments:

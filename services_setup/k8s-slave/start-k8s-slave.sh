@@ -63,34 +63,34 @@ trap delete_k8s_slave_lock_file 15
 trap delete_k8s_slave_lock_file EXIT
 
 echo "   + Mounting Kubernetes Eskimo Gluster shares"
-/usr/local/sbin/setupK8sGlusterShares.sh > /tmp/start_k8s_slave.log 2>&1
+/usr/local/sbin/setupK8sGlusterShares.sh > /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to mount gluster shares"
-    cat /tmp/start_k8s_slave.log 2>&1
+    cat /var/log/kubernetes/start_k8s_slave.log 2>&1
     exit 41
 fi
 
 echo "   + Setup runtime kubectl"
-/etc/k8s/runtime_config/setup-runtime-kubectl.sh  > /tmp/start_k8s_slave.log 2>&1
+/etc/k8s/runtime_config/setup-runtime-kubectl.sh  >> /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
      echo "   + Failed to setup runtme kubectl"
-     cat /tmp/start_k8s_slave.log 2>&1
+     cat /var/log/kubernetes/start_k8s_slave.log 2>&1
      exit 42
 fi
 
 echo "   + Register kubernetes registry"
-/usr/local/sbin/register-kubernetes-registry.sh  > /tmp/start_k8s_slave.log 2>&1
+/usr/local/sbin/register-kubernetes-registry.sh  >> /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to register kubernetes registry"
-    cat /tmp/start_k8s_slave.log 2>&1
+    cat /var/log/kubernetes/start_k8s_slave.log 2>&1
     exit 43
 fi
 
 echo "   + Setup runtime kubelet"
-/bin/bash /etc/k8s/runtime_config/setup-runtime-kubelet.sh  > /tmp/start_k8s_slave.log 2>&1
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kubelet.sh  >> /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubelet"
-    cat /tmp/start_k8s_slave.log 2>&1
+    cat /var/log/kubernetes/start_k8s_slave.log 2>&1
     exit 45
 fi
 
@@ -111,6 +111,7 @@ echo "   + Starting Kubelet"
   --cni-bin-dir=$ESKIMO_KUBELET_NETWORK_PLUGIN_DIR \
   --network-plugin=$ESKIMO_KUBELET_NETWORK_PLUGIN \
   --cni-conf-dir=$ESKIMO_KUBELET_CNI_CONF_DIR \
+  --pod-infra-container-image $ESKIMO_KUBELET_POD_INFRA_CONTAINER_IMAGE \
   --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG > /var/log/kubernetes/kubelet.log 2>&1' &
 kubelet_pid=$!
 
@@ -124,10 +125,10 @@ if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
 fi
 
 echo "   + Setup runtime kuberouter"
-/bin/bash /etc/k8s/runtime_config/setup-runtime-kuberouter.sh  > /tmp/start_k8s_slave.log 2>&1
+/bin/bash /etc/k8s/runtime_config/setup-runtime-kuberouter.sh  >> /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kube-router"
-    cat /tmp/start_k8s_slave.log 2>&1
+    cat /var/log/kubernetes/start_k8s_slave.log 2>&1
     exit 47
 fi
 
@@ -155,10 +156,10 @@ fi
 
 # Keep this one last
 echo "   + Setup runtime kubectl poststart"
-/etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh > /tmp/start_k8s_slave.log 2>&1
+/etc/k8s/runtime_config/setup-runtime-kubectl-poststart.sh >> /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to setup runtime kubectrl poststart"
-    cat /tmp/start_k8s_slave.log 2>&1
+    cat /var/log/kubernetes/start_k8s_slave.log 2>&1
     exit 49
 fi
 

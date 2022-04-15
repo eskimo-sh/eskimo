@@ -77,6 +77,8 @@ cp Dockerfile.debian /tmp/package-k8s/Dockerfile
 
 cd /tmp/package-k8s
 
+set +e
+
 export NO_BASE_IMAGE=true
 build_image package_k8s /tmp/package-k8s-log
 
@@ -96,32 +98,70 @@ build_image package_k8s /tmp/package-k8s-log
 
 echo " - Updating the appliance"
 docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq update" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -3
 
 echo " - Upgrading the appliance"
 docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -4
 
 #echo " - Installing OpenJDK 11"
 #docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-11-jdk" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -5
 
 echo " - Installing a few utility tools"
 docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils sudo procps" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -6
 
 #echo " - Installing build tools"
 #docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -7
 
 #echo " - Installing swapspace"
 #docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y swapspace" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -8
 
 #echo " - Installing python"
 #docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y python-dev python-six python-virtualenv python-pip" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -9
+
+
+echo " - Downloading required infrastructure containers for Kubernetes"
+
+echo "   + k8s.gcr.io/pause:$K8S_INFRA_IMAGE_PAUSE"
+docker pull k8s.gcr.io/pause:$K8S_INFRA_IMAGE_PAUSE > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -10
+
+docker save k8s.gcr.io/pause:$K8S_INFRA_IMAGE_PAUSE | gzip > /tmp/k8s.gcr.io_pause:$K8S_INFRA_IMAGE_PAUSE.tar.gz
+if [[ $? != 0 ]]; then
+    echo "failed to save image !"
+    exit 21
+fi
+
+echo "   + coredns/coredns:$K8S_INFRA_IMAGE_COREDNS"
+docker pull coredns/coredns:$K8S_INFRA_IMAGE_COREDNS > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -22
+
+docker save coredns/coredns:$K8S_INFRA_IMAGE_COREDNS | gzip > /tmp/coredns_coredns:$K8S_INFRA_IMAGE_COREDNS.tar.gz
+if [[ $? != 0 ]]; then
+    echo "failed to save image !"
+    exit 23
+fi
+
 
 echo " - Package Kubernetes"
 docker exec -i package_k8s bash -c "/scripts/packageK8s.sh"
+if [[ $? != 0 ]]; then
+    echo "failed !"
+    exit 11
+fi
 
 
 echo " - Copying K8s archive to shared folder"
 #docker exec -it package_k8s bash
 docker exec -i package_k8s bash -c "mv /usr/local/lib/k8s-$K8S_VERSION.tar.gz /scripts/" > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -12
+
+set -e
 
 if [[ -f "$SCRIPT_DIR/../../packages_distrib/eskimo_k8s-$K8S_VERSION.tar.gz" ]]; then
     echo " - renaming previous k8s-$K8S_VERSION.tar.gz"
@@ -137,3 +177,5 @@ echo " - Destroying Docker container"
 docker stop package_k8s
 
 docker container rm package_k8s
+
+set +e
