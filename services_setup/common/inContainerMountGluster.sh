@@ -37,8 +37,6 @@
 # This script is intended to be used from within a docker container when a gluster volume has to be mounted
 
 
-echo " - inContainerMountGluster.sh - will now mount $MOUNT_POINT"
-
 # checking arguments
 if [[ $1 == "" ]]; then
     echo "Expecting gluster volume as first argument"
@@ -57,6 +55,8 @@ if [[ $2 == "" ]]; then
     exit 3
 fi
 export OWNER=$3
+
+echo " - inContainerMountGluster.sh - will now mount $VOLUME to $MOUNT_POINT"
 
 echo "   + Loading topology"
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
@@ -94,13 +94,38 @@ if [[ $? != 0 ]]; then
     exit 7
 fi
 
-# give it a little time to actually connect the transport (Hacky hack)
-# FIXME replace with
-# cat /etc/mtab | grep $MOUNT_POINT | grep gluster
-# sleep 1 before checking
-# Try 5 times
-# sleep 1 after again
-sleep 4
+echo "   + Polling mtab for mount point appearance"
+cnt=0
+while : ; do
+    if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` != "" ]]; then
+        break
+    fi
+    sleep 1
+    let cnt=cnt+1
+    if [[ $cnt -gt 5 ]]; then
+        echo "Couldn't find $MOUNT_POINT in /etc/mtab in 5 seconds. Crashing !"
+        exit 8
+    fi
+done
+
+echo "   + Checking mount point availability"
+cnt=0
+test_file=file_test_$RANDOM
+while : ; do
+    touch $MOUNT_POINT/$test_file
+    result=$?
+    if [[ $result == 0 ]]; then
+        rm -f $MOUNT_POINT/$test_file
+        break
+    fi
+    sleep 1
+    let cnt=cnt+1
+    if [[ $cnt -gt 5 ]]; then
+        echo "Couldn't sucessfully test $MOUNT_POINT in 5 seconds. Crashing !"
+        exit 9
+    fi
+done
+
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
     echo "   + Changing owner of $MOUNT_POINT"
