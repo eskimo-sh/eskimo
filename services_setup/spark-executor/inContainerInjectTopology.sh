@@ -57,13 +57,23 @@ bash -c "echo -e \"\n#Defining the kubernetes API master\"  >> /usr/local/lib/sp
 bash -c "echo -e \"spark.kubernetes.driver.master=https://${KUBERNETES_API_MASTER}:6443\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 bash -c "echo -e \"spark.master=k8s://https://${KUBERNETES_API_MASTER}:6443\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
+if [[ `cat /etc/eskimo_topology.sh | grep ELASTICSEARCH` != "" ]]; then
+    bash -c "echo -e \"\n#ElasticSearch setting (first node to be reached => can use localhost everywhere)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    #sudo bash -c "echo -e \"spark.es.nodes=localhost\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.es.nodes=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.es.port=9200\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    #sudo bash -c "echo -e \"spark.es.nodes.data.only=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+fi
+
 if [[ $MEMORY_SPARK_EXECUTOR != "" ]]; then
     bash -c "echo -e \"\n#Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
     bash -c "echo -e \"spark.executor.memory=\"$MEMORY_SPARK_EXECUTOR\"m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 fi
 
-# replacing driver bind IP address at runtime
-#sed -i s/"spark.driver.host=RUNTIME_IP_ADDRESS"/"spark.driver.host="$SELF_IP_ADDRESS""/g  /usr/local/lib/spark/conf/spark-defaults.conf
+# defining driver bind IP address at runtime
+if [[ -z $DONT_MANAGE_IPS_AND_HOSTS ]]; then
+     bash -c "echo -e \"spark.driver.host=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+fi
 
 #echo " - Updating spark environment file"
 #bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"

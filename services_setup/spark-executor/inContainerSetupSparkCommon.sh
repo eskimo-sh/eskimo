@@ -143,8 +143,6 @@ sudo bash -c "echo -e \"spark.serializer=org.apache.spark.serializer.KryoSeriali
 sudo bash -c "echo -e \"\n#Limiting the driver (client) memory\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.driver.memory=800m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
-sudo bash -c "echo -e \"\n#This seems to help spark messing with hostnames instead of adresses and really helps\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
 # FIXME change to 'cluster' to attempt to run spark driver in pod as well
 sudo bash -c "echo -e \"spark.submit.deployMode=client\" >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
@@ -168,11 +166,6 @@ sudo bash -c "echo -e \"spark.rpc.retry.wait=5s\"  >> /usr/local/lib/spark/conf/
 #sudo bash -c "echo -e \"#where one Mesos task is created per Spark task.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 #sudo bash -c "echo -e \"#(Fine grained mode is deprecated and one should consider dynamic allocation instead)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 #sudo bash -c "echo -e \"spark.mesos.coarse=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-sudo bash -c "echo -e \"\n#ElasticSearch setting (first node to be reached => can use localhost everywhere)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.es.nodes=localhost\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.es.port=9200\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.es.nodes.data.only=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n#The scheduling mode between jobs submitted to the same SparkContext.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"#Can be FIFO or FAIR. FAIR Seem not to work well with mesos\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

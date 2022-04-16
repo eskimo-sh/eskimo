@@ -41,6 +41,12 @@ echo " - Setting key environment variables"
 export SPARK_HOME=/usr/local/lib/spark/
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 
+# If this container gets called by the spark framework, the first argument is either 'driver' or 'executor'
+# in this case, shouldn't mess with IP addresses definition, e.g. spark.driver.host
+if [[ $1 == 'driver' || $1 == 'executor' ]]; then
+    export DONT_MANAGE_IPS_AND_HOSTS=1
+fi
+
 # Load eskimo topolgy
 if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
     # Injecting topoloy
