@@ -58,11 +58,6 @@ fi
 echo " - Installing kubernetes docker registry"
 
 echo "   + Registering kubernetes registry"
-
-echo "   + Copying register-kubernetes-registry.sh script"
-sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
-sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
-
 sudo /usr/local/sbin/register-kubernetes-registry.sh
 
 sudo mkdir -p /var/log/kubernetes/docker_registry

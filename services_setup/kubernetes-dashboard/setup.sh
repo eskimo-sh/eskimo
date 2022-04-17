@@ -45,7 +45,7 @@ cd $SCRIPT_DIR
 # Loading topology
 loadTopology
 
-k8s_dashboard_archive=`ls -1 docker_template_k8s-dashboard_*.tar.gz`
+k8s_dashboard_archive=`ls -1 docker_template_kubernetes-dashboard*.tar.gz`
 if [[ ! -f $k8s_dashboard_archive ]]; then
     echo "Couldn't find k8s-dashboard archive"
     exit 1

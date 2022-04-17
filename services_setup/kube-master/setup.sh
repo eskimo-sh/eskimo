@@ -74,55 +74,8 @@ if [[ $kubernetes_user_id == "" ]]; then
     exit 4
 fi
 
-# Create shared dir
-echo " - Creating shared directory"
-if [[ ! -d /var/lib/kubernetes ]]; then
-    sudo mkdir -p /var/lib/kubernetes
-    sudo chmod -R 777 /var/lib/kubernetes
-    sudo chown -R kubernetes /var/lib/kubernetes
-fi
-if [[ ! -d /var/run/kubernetes ]]; then
-    sudo mkdir -p /var/run/kubernetes
-    sudo chown -R kubernetes /var/run/kubernetes
-fi
-if [[ ! -d /var/log/kubernetes ]]; then
-    sudo mkdir -p /var/log/kubernetes
-    sudo chmod -R 777 /var/log/kubernetes
-    sudo chown -R kubernetes /var/log/kubernetes
-fi
-
-sudo mkdir -p /var/log/kubernetes/log
-sudo chown -R kubernetes /var/log/kubernetes/
-
-sudo mkdir -p /var/lib/kubernetes/tmp
-sudo chown -R kubernetes /var/lib/kubernetes
-
-
-echo " - Linking /etc/k8s to /usr/local/lib/k8s/etc"
-if [[ ! -L /etc/k8s ]]; then
-    sudo ln -s /usr/local/lib/k8s/etc /etc/k8s
-fi
-
-echo " - Linking  /etc/kubernetes to /etc/k8s"
-if [[ ! -L /etc/k8s ]]; then
-    sudo ln -s /etc/k8s /etc/kubernetes/
-fi
-
-
-echo " - Copying kubernetes env files to /etc/k8s"
-for i in `find ./etc_k8s -mindepth 1`; do
-    sudo cp $i /etc/k8s/
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /etc/k8s/$filename
-done
-
-echo " - Copying runtime configuration scripts to /etc/k8s/runtime_config"
-sudo mkdir -p /etc/k8s/runtime_config
-for i in `find ./runtime_config -mindepth 1`; do
-    sudo cp $i /etc/k8s/runtime_config/
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /etc/k8s/runtime_config/$filename
-done
+bash ./setup-kube-common.sh
+fail_if_error $? /dev/null 101
 
 echo " - Copying SystemD unit files to /lib/systemd/system"
 for i in `find ./service_files -mindepth 1`; do
@@ -140,18 +93,7 @@ for i in `find ./k8s-service_files -mindepth 1`; do
 done
 
 
-echo " - Creating eskimo_user file"
-export ESKIMO_USER=$USER
-sudo bash -c "echo $USER > /etc/eskimo_user"
-
-# TODO Indvidual kubernetes master components
-
 # Setup all individual services
-
-echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
-sudo cp setupK8sGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
-
 bash ./setup-k8s-registry.sh
 fail_if_error $? /dev/null 301
 

@@ -351,279 +351,26 @@
 
 
 
-  "mesos-master": {
+  "kubernetes-dashboard" : {
     "config": {
-      "imageName" : "mesos-master",
+      "imageName" : "kubernetes-dashboard",
       "order": 8,
+      "kubernetes": true,
       "unique": true,
-      "group" : "Mesos",
-      "name" : "Master",
-      "selectionLayout" : { "row" : 2, "col" : 2},
-      "memory": "neglectable",
-      "logo" : "images/mesos-master-logo.png",
-      "icon" : "images/mesos-master-icon.png"
+      "group" : "Kubernetes",
+      "name" : "Dashboard",
+      "memory": "kube",
+      "logo" : "images/kube-master-logo.png",
+      "icon" : "images/kube-master-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 5050,
-      "waitTime": 6000,
+      "urlTemplate": "./cerebro/#/overview?host=Eskimo",
+      "proxyTargetPort" : 443,
+      "waitTime": 5000,
       "role" : "*",
-      "title" : "Mesos Console",
-      "statusPageLinktitle" : "Monitor Mesos Processes",
-      "proxyReplacements" : [
-        {
-          "type" : "PLAIN",
-          "source" : "'//' + leader_info.hostname + ':' + leader_info.port",
-          "target" : "'/{PREFIX_PATH}'"
-        },
-        {
-          "type": "PLAIN",
-          "source" : "/{{state.leader_info.hostname}}:{{state.leader_info.port}}",
-          "target" : "#/",
-          "__comment": "PREFIX PATH already added by standard proxy replacements (this is used for the left panel link)"
-        },
-        {
-          "type": "PLAIN",
-          "source" : "href=\"{{framework.webui_url}}\"",
-          "target" : "href=\"#\" onclick=\"javascript:alert('Framework WEB UI is not reachable from here through Eskimo proxy. Please use the Eskimo menu on the left to reach web application.'); event.preventDefault(); return false;\"",
-          "__comment": "Web UI is not reachable most of the time. Replacing with a warning for now. "
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "'//' + leader_info.hostname + ':' + leader_info.port",
-          "target" : "'/{PREFIX_PATH}'"
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "agentURLPrefix(agent, false)",
-          "target" : "'/{CONTEXT_PATH}mesos-agent/' + agent.hostname"
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "agentURLPrefix(agent, true)",
-          "target" : "'/{CONTEXT_PATH}mesos-agent/' + agent.hostname + '/' + agent.pid.substring(0, agent.pid.indexOf('@'))"
-        },
-        {
-          "type" : "PLAIN",
-          "urlPattern" : "controllers.js",
-          "source" : "return '';",
-          "target" : "return '/{PREFIX_PATH}';"
-        }
-      ]
-    },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      }
-    ],
-    "commands" : [
-      {
-        "id" : "show_info_log",
-        "name" : "Show INFO Logs",
-        "command": "cat /var/log/mesos/mesos-master.INFO | grep -v \"HTTP GET\" | grep -v \"Authorizing principal\"",
-        "icon": "fa-file"
-      },
-      {
-        "id" : "show_warn_log",
-        "name" : "Show WARN Logs",
-        "command": "cat /var/log/mesos/mesos-master.WARNING",
-        "icon": "fa-file"
-      },
-      {
-        "id" : "show_error_log",
-        "name" : "Show ERROR Logs",
-        "command": "cat /var/log/mesos/mesos-master.ERROR",
-        "icon": "fa-file"
-      }
-    ]
-  },
-
-
-
-  "mesos-agent": {
-    "config": {
-      "order": 9,
-      "group" : "Mesos",
-      "name" : "Agent",
-      "selectionLayout" : { "row" : 3, "col" : 1},
-      "memory": "verylarge",
-      "logo" : "images/mesos-agent-logo.png",
-      "icon" : "images/mesos-agent-icon.png"
-    },
-    "ui": {
-      "role" : "*",
-      "proxyTargetPort" : 5051
-    },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "mesos-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
-        "___comment": "This dependency is required since mesos-agent is used to register marathon registry in /etc/host",
-        "masterElectionStrategy": "RANDOM",
-        "masterService": "marathon",
-        "numberOfMasters": 1,
-        "mandatory": false,
-        "restart": true
-      },
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
-        "___comment": "This makes spark-executor kind of mandatory when mesos is installed. We accept this for now.",
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "spark-executor",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "flink-worker",
-        "numberOfMasters": 1,
-        "conditional": "flink-app-master",
-        "restart": false
-      }
-    ],
-    "additionalEnvironment": [
-      "ALL_NODES_LIST_mesos-agent"
-    ],
-    "editableSettings": [
-      {
-        "filename": "agent-resources-temporary-file.properties",
-        "filesystemService": "mesos",
-        "propertyType": "variable",
-        "propertyFormat": "{name}={value}",
-        "commentPrefix": "#",
-        "properties": [
-          {
-            "name": "cpu_additional",
-            "comment": "The number of additional CPUs to declare in mesos agent on every node running it.",
-            "defaultValue": "1"
-          },
-          {
-            "name": "ram_additional",
-            "comment": "The number of additional RAM (in MB) to declare in mesos agent on every node running it.",
-            "defaultValue": "1024"
-          }
-        ]
-      }
-    ],
-    "commands" : [
-      {
-        "id" : "show_info_log",
-        "name" : "Show INFO Logs",
-        "command": "cat /var/log/mesos/mesos-slave.INFO | grep -v \"HTTP GET\"",
-        "icon": "fa-file"
-      },
-      {
-        "id" : "show_warn_log",
-        "name" : "Show WARN Logs",
-        "command": "cat /var/log/mesos/mesos-slave.WARNING",
-        "icon": "fa-file"
-      },
-      {
-        "id" : "show_error_log",
-        "name" : "Show ERROR Logs",
-        "command": "cat /var/log/mesos/mesos-slave.ERROR",
-        "icon": "fa-file"
-      }
-    ]
-  },
-
-
-
-  "marathon" : {
-    "config": {
-      "imageName" : "marathon",
-      "order": 10,
-      "unique": true,
-      "group": "kube",
-      "name": "Marathon",
-      "selectionLayout": { "row" : 3, "col" : 2 },
-      "memory": "neglectable",
-      "logo" : "images/marathon-logo.png",
-      "icon" : "images/marathon-icon.png"
-    },
-    "ui": {
-      "proxyTargetPort" : 28080,
-      "waitTime": 6000,
-      "role" : "ADMIN",
-      "title" : "Marathon",
-      "statusPageLinktitle" : "Manage Marathon Services",
-      "proxyReplacements" : [
-        {
-          "comment": "for whatever reason, I need to to get rid of trailing slash",
-          "type" : "PLAIN",
-          "source" : "v2/apps/",
-          "target" : "v2/apps"
-        }
-      ]
-    },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": false,
-        "restart": true
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
-        "masterService": "mesos-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      }
-    ],
-    "editableSettings": [
-      {
-        "filename": "runtime_vars.conf",
-        "filesystemService": "marathon",
-        "propertyType": "variable",
-        "propertyFormat": "{name}={value}",
-        "commentPrefix": "#",
-        "properties": [
-          {
-            "name": "task_launch_timeout",
-            "comment": "The timeout in second to wait for a task to be launched successfuly before considering it failed. (Default : 420'000 milliseconds)",
-            "defaultValue": "420000"
-          }
-        ]
-      }
-    ],
-    "commands" : [
-      {
-        "id" : "show_log",
-        "name" : "Show Logs",
-        "command": "cat /var/log/marathon/marathon.log | grep -v \"GET /\"",
-        "icon": "fa-file"
-      },
-      {
-        "id" : "show_registry_log",
-        "name" : "Show Registry Logs",
-        "command": "cat /var/log/marathon/docker_registry/docker_registry.log",
-        "icon": "fa-file"
-      }
-    ]
+      "title" : "Kubernetes Dashboard",
+      "statusPageLinktitle" : "Manage Kubernetes Cluster"
+    }
   },
 
 
@@ -631,7 +378,7 @@
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 11,
+      "order": 9,
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -722,7 +469,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 12,
+      "order": 10,
       "marathon": true,
       "unique": true,
       "group" : "Kafka",
@@ -769,7 +516,7 @@
   "spark-history-server" : {
     "config": {
       "imageName" : "spark",
-      "order": 13,
+      "order": 11,
       "marathon": true,
       "unique": true,
       "group" : "Spark",
@@ -831,7 +578,7 @@
   "spark-executor" : {
     "config": {
       "imageName" : "spark",
-      "order": 14,
+      "order": 12,
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 3, "col" : 3},
@@ -887,7 +634,7 @@
           },
           {
             "name" :  "spark.scheduler.mode",
-            "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with mesos",
+            "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes",
             "defaultValue" : "FAIR"
           },
           {
@@ -912,14 +659,6 @@
           }
         ]
       }
-    ],
-    "commands" : [
-      {
-        "id" : "show_shuffle_log",
-        "name" : "Show Mesos Shuffle Logs",
-        "command": "sudo cat /var/log/spark/logs/`ls -t /var/log/spark/logs/ | grep MesosExternalShuffleService | head -n 1`",
-        "icon": "fa-file"
-      }
     ]
   },
 
@@ -927,7 +666,7 @@
   "flink-app-master" : {
     "config": {
       "imageName" : "flink",
-      "order": 15,
+      "order": 13,
       "unique": true,
       "group": "Flink",
       "name": "App Master",
@@ -960,7 +699,7 @@
       },
       {
         "masterElectionStrategy": "RANDOM",
-        "masterService": "mesos-agent",
+        "masterService": "kube-slave",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
@@ -1029,7 +768,7 @@
   "flink-worker" : {
     "config": {
       "imageName" : "flink",
-      "order": 16,
+      "order": 14,
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "row": 4, "col": 3  },
@@ -1054,7 +793,7 @@
       },
       {
         "masterElectionStrategy": "SAME_NODE",
-        "masterService": "mesos-agent",
+        "masterService": "kube-slave",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
@@ -1067,7 +806,7 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 17,
+      "order": 15,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 2, "col" : 3},
@@ -1106,7 +845,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 18,
+      "order": 16,
       "kubernetes": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1139,7 +878,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 19,
+      "order": 17,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "selectionLayout" : { "row" : 1, "col" : 3},
@@ -1228,7 +967,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 20,
+      "order": 18,
       "marathon": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1292,7 +1031,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 21,
+      "order": 19,
       "marathon": true,
       "unique": true,
       "name" : "Zeppelin",

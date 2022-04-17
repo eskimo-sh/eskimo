@@ -60,61 +60,11 @@ fi
 # reinitializing log
 sudo rm -f k8s_install_log
 
-echo " - Creating shared directory"
-if [[ ! -d /var/lib/kubernetes ]]; then
-    sudo mkdir -p /var/lib/kubernetes
-    sudo chmod -R 777 /var/lib/kubernetes
-    sudo chown -R kubernetes /var/lib/kubernetes
-fi
-if [[ ! -d /var/run/kubernetes ]]; then
-    sudo mkdir -p /var/run/kubernetes
-    sudo chown -R kubernetes /var/run/kubernetes
-fi
-if [[ ! -d /var/log/kubernetes ]]; then
-    sudo mkdir -p /var/log/kubernetes
-    sudo chmod -R 777 /var/log/kubernetes
-    sudo chown -R kubernetes /var/log/kubernetes
-fi
 
-echo " - Copying register-kubernetes-registry.sh script"
-sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
-sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
-
-echo " - Linking /etc/k8s to /usr/local/lib/k8s/etc"
-if [[ ! -L /etc/k8s ]]; then
-    sudo ln -s /usr/local/lib/k8s/etc /etc/k8s
-fi
-
-echo " - Linking  /etc/kubernetes to /etc/k8s"
-if [[ ! -L /etc/k8s ]]; then
-    sudo ln -s /etc/k8s /etc/kubernetes/
-fi
-
-echo " - Copying kubernetes env files to /etc/k8s"
-for i in `find ./etc_k8s -mindepth 1`; do
-    sudo cp $i /etc/k8s/
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /etc/k8s/$filename
-done
-
-echo " - Copying runtime configuration scripts to /etc/k8s/runtime_config"
-sudo mkdir -p /etc/k8s/runtime_config
-for i in `find ./runtime_config -mindepth 1`; do
-    sudo cp $i /etc/k8s/runtime_config/
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /etc/k8s/runtime_config/$filename
-done
-
-echo " - Creating eskimo_user file"
-export ESKIMO_USER=$USER
-sudo bash -c "echo $USER > /etc/eskimo_user"
-
+bash ./setup-kube-common.sh
+fail_if_error $? /dev/null 101
 
 # Setup all individual services
-echo " - Installing setupK8sGlusterShares.sh to /usr/local/sbin"
-sudo cp setupK8sGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupK8sGlusterShares.sh
-
 bash ./setup-kubectl.sh
 fail_if_error $? /dev/null 301
 
@@ -138,21 +88,6 @@ sudo chmod 755 /usr/local/sbin/start-kube-slave.sh
 sudo cp stop-kube-slave.sh /usr/local/sbin/
 sudo chmod 755 /usr/local/sbin/stop-kube-slave.sh
 
-
-echo " - Create / update eskimo K8S version file"
-sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"
-
-echo " - Checking eskimo KUBERNETES version file"
-if [[ -z $TEST_MODE && ! -f /etc/eskimo_k8s_environment ]]; then
-    echo "Could not create /etc/eskimo_k8s_environment"
-    exit 21
-fi
-. /etc/eskimo_k8s_environment
-
-if [[ -z $TEST_MODE && ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
-    echo "/etc/eskimo_k8s_environment doesn't point to valid Kubernetes version"
-    exit 21
-fi
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file kube-slave k8s_install_log

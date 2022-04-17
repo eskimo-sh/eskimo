@@ -154,8 +154,10 @@ function deploy_image_in_registry() {
     IMAGE_TAR=`echo $IMAGE_FILE | sed 's/\.gz//'`
     IMAGE_VERSION=`echo $IMAGE_FILE | cut -d ':' -f 2 | sed 's/\.tar\.gz//'`
 
-    echo "   + Copying $IMAGE_FULL_PATH to $PWD"
-    /bin/cp -f $IMAGE_FULL_PATH .
+    if [[ `echo "$IMAGE_FULL_PATH" | sed -n -e 's/^\(\/\).*/\1/p'` != "" ]]; then
+        echo "   + Copying $IMAGE_FULL_PATH to $PWD"
+        /bin/cp -f $IMAGE_FULL_PATH .
+    fi
 
     echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION if exist"
     if [[ `docker images -q $IMAGE_NAME:$IMAGE_VERSION 2>/dev/null` != "" ]]; then
@@ -227,7 +229,7 @@ function deploy_kubernetes() {
     export LOG_FILE=$2
 
     export FLAGS=""
-    if [[ $3 == "" ]]; then
+    if [[ $3 != "" ]]; then
         export FLAGS="$3"
     fi
 
