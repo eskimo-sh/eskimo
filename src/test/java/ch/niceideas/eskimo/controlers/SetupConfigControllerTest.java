@@ -225,7 +225,7 @@ public class SetupConfigControllerTest {
                     "\"ssh_username\":\"eskimo\"," +
                     "\"filename-ssh-key\":\"ssh_key\"," +
                     "\"content-ssh-key\":\"DUMMY\"," +
-                    "\"setup-mesos-origin\":\"download\"," +
+                    "\"setup-k8s-origin\":\"download\"," +
                     "\"setup-services-origin\":\"build\"}", session));
 
         assertEquals ("OK", scc.applySetup(session));

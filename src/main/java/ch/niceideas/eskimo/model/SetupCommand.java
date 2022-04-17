@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.*;
 import lombok.Data;
@@ -43,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,12 +79,12 @@ public class SetupCommand implements JSONOpCommand {
         return new SetupCommand(rawSetup, setupService.getPackagesDownloadUrlRoot(),
                 sortPackage (downloadPackages, servicesDefinition),
                 sortPackage (buildPackage, servicesDefinition),
-                sortMesosPackage (downloadMesos, servicesDefinition),
-                sortMesosPackage (buildMesos, servicesDefinition),
+                sortK8sPackage(downloadMesos, servicesDefinition),
+                sortK8sPackage(buildMesos, servicesDefinition),
                 sortPackage (packageUpdates, servicesDefinition));
     }
 
-    public static List<String> sortMesosPackage(Set<String> missingMesosPackages, ServicesDefinition servicesDefinition) {
+    public static List<String> sortK8sPackage(Set<String> missingMesosPackages, ServicesDefinition servicesDefinition) {
         List<String> sortedMesosPackages = new ArrayList<>(missingMesosPackages);
         sortedMesosPackages.sort(String::compareTo);
         return sortedMesosPackages;

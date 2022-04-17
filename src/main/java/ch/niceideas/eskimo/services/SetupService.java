@@ -71,7 +71,7 @@ public class SetupService {
     public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
     public static final String TEMP_DOWNLOAD_SUFFIX = "__temp_download";
     public static final String DOCKER_TEMPLATE_PREFIX = "docker_template_";
-    public static final String MESOS_PREFIX = "eskimo_";
+    public static final String K8S_PREFIX = "eskimo_";
     public static final String DOWNLOAD_FLAG = "download";
     public static final String BUILD_FLAG = "build";
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
@@ -109,10 +109,10 @@ public class SetupService {
     private String packagesDevPath = "./packages_dev";
 
     @Value("${setup.packagesToBuild}")
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,flink,zeppelin,marathon";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,k8s-master,k8s-dashboard,spark,flink,zeppelin,marathon";
 
-    @Value("${setup.mesosPackages}")
-    private String mesosPackages = "mesos-debian,mesos-redhat";
+    @Value("${setup.k8sPackages}")
+    private String k8sPackages = "k8s";
 
     @Value("${setup.packagesDownloadUrlRoot}")
     private String packagesDownloadUrlRoot = "https://niceideas.ch/eskimo/";
@@ -138,8 +138,8 @@ public class SetupService {
     void setPackagesToBuild (String packagesToBuild) {
         this.packagesToBuild = packagesToBuild;
     }
-    void setMesosPackages (String mesosPackages) {
-        this.mesosPackages = mesosPackages;
+    void setK8sPackages (String k8sPackages) {
+        this.k8sPackages = k8sPackages;
     }
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
@@ -229,8 +229,8 @@ public class SetupService {
 
         findMissingPackages(packagesDistribFolder, missingServices);
 
-        // 4. Ensure mesos is properly downloaded / built
-        findMissingMesos(packagesDistribFolder, missingServices);
+        // 4. Ensure kubernetes is properly downloaded / built
+        findMissingK8s(packagesDistribFolder, missingServices);
 
         if (!missingServices.isEmpty()) {
             List<String> missingServicesList = new ArrayList<>(missingServices);
@@ -239,15 +239,15 @@ public class SetupService {
         }
     }
 
-    void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
-        for (String mesosPackage : mesosPackages.split(",")) {
+    void findMissingK8s(File packagesDistribFolder, Set<String> missingServices) {
+        for (String k8sPackage : k8sPackages.split(",")) {
             if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
-                            file.getName().contains(mesosPackage)
+                            file.getName().contains(k8sPackage)
                                     && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX)
                                     && file.getName().endsWith(TAR_GZ_EXTENSION)
-                                    && file.getName().startsWith(MESOS_PREFIX) )) {
-                missingServices.add(mesosPackage);
+                                    && file.getName().startsWith(K8S_PREFIX) )) {
+                missingServices.add(k8sPackage);
             }
         }
     }
@@ -375,7 +375,7 @@ public class SetupService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public void prepareSetup (
             JsonWrapper setupConfig,
-            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos, Set<String> packageUpdate)
+            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadK8s, Set<String> buildK8s, Set<String> packageUpdate)
             throws SetupException {
 
         File packagesDistribFolder = new File (packageDistributionPath);
@@ -416,9 +416,9 @@ public class SetupService {
 
         }
 
-        // 2. Find out about missing mesos distrib
-        String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
-        if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
+        // 2. Find out about missing K8s distrib
+        String k8sOrigin = (String) setupConfig.getValueForPath("setup-k8s-origin");
+        if (StringUtils.isEmpty(k8sOrigin) || k8sOrigin.equals(DOWNLOAD_FLAG)) { // for K8s default is download
 
             if (ApplicationStatusService.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
@@ -430,12 +430,12 @@ public class SetupService {
 
             Set<String> missingServices = new HashSet<>();
 
-            findMissingMesos(packagesDistribFolder, missingServices);
+            findMissingK8s(packagesDistribFolder, missingServices);
 
-            fillInPackages(downloadMesos, packagesVersion, missingServices);
+            fillInPackages(downloadK8s, packagesVersion, missingServices);
 
         } else {
-            findMissingMesos(packagesDistribFolder, buildMesos);
+            findMissingK8s(packagesDistribFolder, buildK8s);
         }
 
         // 3. Find out about upgrades
@@ -561,17 +561,16 @@ public class SetupService {
                 }
             }
 
-            // 2. Then focus on mesos
+            // 2. Then focus on Kubernetes
+            Set<String> missingK8sPackagesTemp = new HashSet<>();
+            findMissingK8s(packagesDistribFolder, missingK8sPackagesTemp);
 
-            Set<String> missingMesosPackagesTemp = new HashSet<>();
-            findMissingMesos(packagesDistribFolder, missingMesosPackagesTemp);
+            List<String> missingK8sPackages = SetupCommand.sortK8sPackage(missingK8sPackagesTemp, servicesDefinition);
 
-            List<String> missingMesosPackages = SetupCommand.sortMesosPackage(missingMesosPackagesTemp, servicesDefinition);
+            String k8sOrigin = (String) setupConfig.getValueForPath("setup-k8s-origin");
 
-            String mesosOrigin = (String) setupConfig.getValueForPath("setup-mesos-origin");
-
-            if (!missingMesosPackages.isEmpty()) {
-                if (StringUtils.isEmpty(mesosOrigin) || mesosOrigin.equals(DOWNLOAD_FLAG)) { // for mesos default is download
+            if (!missingK8sPackages.isEmpty()) {
+                if (StringUtils.isEmpty(k8sOrigin) || k8sOrigin.equals(DOWNLOAD_FLAG)) { // for kube default is download
 
                     if (ApplicationStatusService.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
@@ -581,19 +580,19 @@ public class SetupService {
                         packagesVersion = loadRemotePackagesVersionFile();
                     }
 
-                    for (String mesosPackageName : missingMesosPackages) {
+                    for (String k8sPackageName : missingK8sPackages) {
 
-                        String softwareVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".software");
-                        String distributionVersion = (String) packagesVersion.getValueForPath(mesosPackageName + ".distribution");
+                        String softwareVersion = (String) packagesVersion.getValueForPath(k8sPackageName + ".software");
+                        String distributionVersion = (String) packagesVersion.getValueForPath(k8sPackageName + ".distribution");
 
-                        downloadPackage(MESOS_PREFIX + mesosPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                        downloadPackage(K8S_PREFIX + k8sPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
 
                 } else {
 
                     // call script
-                    for (String mesosPackageName : missingMesosPackages) {
-                        buildPackage(mesosPackageName);
+                    for (String k8sPackageName : missingK8sPackages) {
+                        buildPackage(k8sPackageName);
                     }
                 }
             }
@@ -725,7 +724,7 @@ public class SetupService {
     }
 
     protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
-        // download mesos using full java solution, no script (don't want dependency on system script for this)
+        // download k8s using full java solution, no script (don't want dependency on system script for this)
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream())) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
                 try (FileChannel fileChannel = fileOutputStream.getChannel()) {

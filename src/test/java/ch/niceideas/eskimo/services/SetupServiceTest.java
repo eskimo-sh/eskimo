@@ -64,9 +64,9 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private File tempPackagesDistribPath = null;
 
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,k8s-master,k8s-dashboad,spark,zeppelin";
 
-    private String mesosPackages = "mesos-debian,mesos-redhat,mesos-suse";
+    private String k8sPackages = "k8s";
 
     private ServicesDefinition sd = new ServicesDefinition();
 
@@ -101,7 +101,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setServicesDefinition(sd);
 
         setupService.setPackagesToBuild(packagesToBuild);
-        setupService.setMesosPackages(mesosPackages);
+        setupService.setK8sPackages(k8sPackages);
 
         setupService.setConfigurationService(configurationService);
         configurationService.setSetupService(setupService);
@@ -158,7 +158,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
         assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
-        assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-mesos-origin"));
+        assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-k8s-origin"));
         assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
 
         assertNotNull(command);
@@ -197,7 +197,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setBuildVersion("1.0");
 
         JsonWrapper initConfig = new JsonWrapper(setupConfig);
-        initConfig.setValueForPath("setup-mesos-origin", "download");
+        initConfig.setValueForPath("setup-k8s-origin", "download");
         initConfig.setValueForPath("setup-services-origin", "download");
 
         SetupCommand command = setupService.saveAndPrepareSetup(initConfig.getFormattedValue());
@@ -207,7 +207,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
         assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
-        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-mesos-origin"));
+        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-k8s-origin"));
         assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
 
         assertNotNull(command);
@@ -247,9 +247,9 @@ public class SetupServiceTest extends AbstractSystemTest {
                 "Following services are missing and need to be downloaded or built mesos-debian, mesos-redhat, mesos-suse",
                 exception.getMessage());
 
-        // Create mesos packages
-        for (String mesosPackage : mesosPackages.split(",")) {
-            FileUtils.writeFile(new File(tempPackagesDistribPath + "/eskimo_" + mesosPackage + "_1.8.1_1.tar.gz"), "DUMMY");
+        // Create Kubernetes packages
+        for (String k8sPackage : k8sPackages.split(",")) {
+            FileUtils.writeFile(new File(tempPackagesDistribPath + "/eskimo_" + k8sPackage + "_1.23_1.tar.gz"), "DUMMY");
         }
 
         // no exception expected anymore
@@ -323,7 +323,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setBuildVersion("1.0");
 
         JsonWrapper setupConfigJson = new JsonWrapper(setupConfig);
-        setupConfigJson.setValueForPath("setup-mesos-origin", "download");
+        setupConfigJson.setValueForPath("setup-k8s-origin", "download");
         setupConfigJson.setValueForPath("setup-services-origin", "download");
         SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService, servicesDefinition);
         operationsMonitoringService.operationsStarted(setupCommand);
@@ -417,7 +417,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(3, buildMesos.size());
 
         // 2. test download strategy
-        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         downloadPackages = new HashSet<>();
@@ -486,7 +486,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 // No-Op
             }
             @Override
-            void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
+            void findMissingK8s(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
@@ -502,7 +502,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.setPackagesToBuild("flink");
@@ -545,7 +545,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 // No-Op
             }
             @Override
-            void findMissingMesos(File packagesDistribFolder, Set<String> missingServices) {
+            void findMissingK8s(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
@@ -561,7 +561,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
@@ -618,7 +618,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.setBuildVersion("1.0");
@@ -663,7 +663,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-mesos-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.saveAndPrepareSetup(setupConfig);

@@ -108,6 +108,11 @@ eskimo.Setup = function() {
     };
 
     function switchDownloadBuild(target, data) {
+        if (    !$('#setup-'+target+'-origin-build').length
+             || !$('#setup-'+target+'-origin-download').length) {
+            console.log ("Couldn't find " + target + " in setup");
+            return;
+        }
         if (data.isSnapshot) {
             $('#setup-'+target+'-origin-build').get(0).checked = true;
             $('#setup-'+target+'-origin-download-label').addClass("disabled");
