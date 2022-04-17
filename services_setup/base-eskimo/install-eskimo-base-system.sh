@@ -365,6 +365,9 @@ rm -Rf /tmp/setup_log
 export LINUX_DISTRIBUTION=`awk -F= '/^NAME/{print $2}' /etc/os-release | cut -d ' ' -f 1 | tr -d \" | tr '[:upper:]' '[:lower:]'`
 echo "  - Linux distribution is $LINUX_DISTRIBUTION"
 
+sudo mkdir -p /var/lib/eskimo
+sudo chown $USER.$USER /var/lib/eskimo
+
 
 if [[ -f "/etc/debian_version" ]]; then
 

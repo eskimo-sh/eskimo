@@ -1,3 +1,4 @@
 docker_template_*
 eskimo_mesos*
 eskimo_k8s*
+eskimo_kube*

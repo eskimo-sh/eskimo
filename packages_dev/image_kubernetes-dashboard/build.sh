@@ -40,13 +40,13 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "Building K8s-dashboard Archive"
+echo "Building kubernetes-dashboard Archive"
 echo "--------------------------------------------------------------------------------"
 
 # reinitializing log
-rm -f /tmp/k8s-dashboard_build_log
+rm -f /tmp/kubernetes-dashboard_build_log
 
-mkdir -p /tmp/package-k8s-dashboard
+mkdir -p /tmp/package-kubernetes-dashboard
 saved_dir=`pwd`
 cleanup() {
     #rm -f Vagrantfile
@@ -58,15 +58,15 @@ trap cleanup 15
 trap cleanup EXIT
 
 
-cd /tmp/package-k8s-dashboard
+cd /tmp/package-kubernetes-dashboard
 
 
 
 echo " - Downloading required infrastructure containers for Kubernetes"
 
 echo "   + kubernetesui/dashboard:v$K8S_DASHBOARD_VERSION"
-docker pull kubernetesui/dashboard:v$K8S_DASHBOARD_VERSION > /tmp/package-k8s-dashboard-log 2>&1
-fail_if_error $? "package-k8s-dashboard-log" -10
+docker pull kubernetesui/dashboard:v$K8S_DASHBOARD_VERSION > /tmp/package-kubernetes-dashboard-log 2>&1
+fail_if_error $? "package-kubernetes-dashboard-log" -10
 
 docker save kubernetesui/dashboard:v$K8S_DASHBOARD_VERSION | gzip > ./kubernetesui_dashboard:v$K8S_DASHBOARD_VERSION.tar.gz
 if [[ $? != 0 ]]; then
@@ -75,8 +75,8 @@ if [[ $? != 0 ]]; then
 fi
 
 echo "   + kubernetesui/metrics-scraper:v$K8S_DASHBOARD_METRICS_SCRAPER_VERSION"
-docker pull kubernetesui/metrics-scraper:v$K8S_DASHBOARD_METRICS_SCRAPER_VERSION > /tmp/package-k8s-dashboard-log 2>&1
-fail_if_error $? "package-k8s-dashboard-log" -22
+docker pull kubernetesui/metrics-scraper:v$K8S_DASHBOARD_METRICS_SCRAPER_VERSION > /tmp/package-kubernetes-dashboard-log 2>&1
+fail_if_error $? "package-kubernetes-dashboard-log" -22
 
 docker save kubernetesui/metrics-scraper:v$K8S_DASHBOARD_METRICS_SCRAPER_VERSION | gzip > ./kubernetesui_metrics-scraper:v$K8S_DASHBOARD_METRICS_SCRAPER_VERSION.tar.gz
 if [[ $? != 0 ]]; then
@@ -85,18 +85,18 @@ if [[ $? != 0 ]]; then
 fi
 
 # save Archive
-echo " - Saving archive k8s-dashboard"
-tar cvfz $SCRIPT_DIR/../../packages_distrib/tmp_image_k8s-dashboard_TEMP.tar.gz * > /tmp/package-k8s-dashboard-log 2>&1
-fail_if_error $? "package-k8s-dashboard-log" -22
+echo " - Saving archive kubernetes-dashboard"
+tar cvfz $SCRIPT_DIR/../../packages_distrib/tmp_image_kubernetes-dashboard_TEMP.tar.gz * > /tmp/package-kubernetes-dashboard-log 2>&1
+fail_if_error $? "package-kubernetes-dashboard-log" -22
 
-echo " - versioning archive"
+echo " - versionning archive"
 for i in `seq 1 100`; do
-    if [[ ! -f "../../packages_distrib/docker_template_k8s-dashboard_""$K8S_DASHBOARD_VERSION""_$i.tar.gz" ]]; then
-        mv $SCRIPT_DIR/../../packages_distrib/tmp_image_k8s-dashboard_TEMP.tar.gz \
-           $SCRIPT_DIR/../../packages_distrib/docker_template_k8s-dashboard_"$K8S_DASHBOARD_VERSION"_$i.tar.gz
+    if [[ ! -f "../../packages_distrib/docker_template_kubernetes-dashboard_""$K8S_DASHBOARD_VERSION""_$i.tar.gz" ]]; then
+        mv $SCRIPT_DIR/../../packages_distrib/tmp_image_kubernetes-dashboard_TEMP.tar.gz \
+           $SCRIPT_DIR/../../packages_distrib/docker_template_kubernetes-dashboard_"$K8S_DASHBOARD_VERSION"_$i.tar.gz
         break;
     fi
 done
 
 echo " - cleanup"
-rm -Rf /tmp/package-k8s-dashboard
+rm -Rf /tmp/package-kubernetes-dashboard

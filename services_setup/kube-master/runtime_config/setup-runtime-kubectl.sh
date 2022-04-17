@@ -1,0 +1,1 @@
+../../kube-slave/runtime_config/setup-runtime-kubectl.sh

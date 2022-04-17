@@ -124,7 +124,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
                 }
                 */
 
-                String kubeNodeName = lastStatus.getFirstNodeName("k8s-master");
+                String kubeNodeName = lastStatus.getFirstNodeName(KubernetesService.KUBE_MASTER);
                 if (StringUtils.isBlank(kubeNodeName)) {
                     retCommand.setWarnings("Kubernetes is not available. The changes in kubernetes services configuration and " +
                             "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
@@ -132,7 +132,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
 
                 } else {
 
-                    if (!lastStatus.isServiceOKOnNode("k8s-master", kubeNodeName)) {
+                    if (!lastStatus.isServiceOKOnNode(KubernetesService.KUBE_MASTER, kubeNodeName)) {
 
                         retCommand.setWarnings("Kubernetes is not properly running. The changes in kubernetes services configuration and " +
                                 "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +

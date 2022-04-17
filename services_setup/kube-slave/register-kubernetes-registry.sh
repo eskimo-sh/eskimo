@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,55 +34,22 @@
 # Software.
 #
 
-[Unit]
-Description=Kubernetes Docker Registry
-Wants=network-online.target
-After=docker.service
-Requires=docker.service
-After=gluster.service
-PartOf=k8s-master.service
 
-[Service]
-TimeoutStartSec=0
-RemainAfterExit=false
+if [[ ! -f /etc/eskimo_topology.sh ]]; then
+    echo "Could not find /etc/eskimo_topology.sh"
+    exit 1
+fi
 
-# Run ExecStartPre with root-permissions
-PermissionsStartOnly=true
+. /etc/eskimo_topology.sh
 
-ExecStartPre=-/usr/bin/docker kill k8s-registry
-ExecStartPre=-/usr/bin/docker rm -f k8s-registry
+# remove any previous definition
+sed -i '/.*kubernetes.registry/d' /etc/hosts
 
-# attempt to recreate  / remount gluster shares
-ExecStartPre=/bin/bash /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
-
-ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment&& /usr/bin/docker run \
-        -i \
-        --name k8s-registry \
-        --user kubernetes \
-        --network host \
-        -v /var/log/kubernetes:/var/log/kubernetes \
-        -v /var/lib/kubernetes:/var/lib/kubernetes:rshared \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:k8s-registry \
-        /usr/local/sbin/inContainerStartService.sh"
+# register new host
+if [[ -z $MASTER_KUBE_MASTER_1 ]]; then
+    echo "WARNING : Could not find Kubernetes Eskimo master host"
+else
+    echo "$MASTER_KUBE_MASTER_1 kubernetes.registry" >> /etc/hosts
+fi
 
 
-# Unfotunately "-network host" is requires since random ports are created to communicate with mesos.
-#          -p 5000:5000 \
-
-ExecStop=/usr/bin/docker stop k8s-registry
-
-Type=simple
-
-Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
-
-StandardOutput=syslog
-StandardError=syslog
-
-[Install]
-WantedBy=multi-user.target
-RequiredBy=k8s-master.service

@@ -112,17 +112,17 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
-sudo rm -Rf /tmp/k8s_setup > /tmp/k8s_install_log 2>&1
-mkdir -p /tmp/k8s_setup
+sudo rm -Rf /tmp/kube_setup > /tmp/kube_install_log 2>&1
+mkdir -p /tmp/kube_setup
 
-mv eskimo_k8s_$K8S_VERSION*.tar.gz /tmp/k8s_setup/eskimo_k8s_$K8S_VERSION.tar.gz
+mv eskimo_kube_$K8S_VERSION*.tar.gz /tmp/kube_setup/eskimo_kube_$K8S_VERSION.tar.gz
 
-cd /tmp/k8s_setup
+cd /tmp/kube_setup
 
 
-echo " - Extracting k8s_$K8S_VERSION"
-tar -zxf eskimo_k8s_$K8S_VERSION.tar.gz > /tmp/k8s_install_log 2>&1
-fail_if_error $? "/tmp/k8s_install_log" -2
+echo " - Extracting kube_$K8S_VERSION"
+tar -zxf eskimo_kube_$K8S_VERSION.tar.gz > /tmp/kube_install_log 2>&1
+fail_if_error $? "/tmp/kube_install_log" -2
 
 echo " - Removing any previous Kubernetes installation"
 sudo rm -Rf /usr/local/lib/k8s-$K8S_VERSION
@@ -223,8 +223,8 @@ echo "   + TODO"
 
 echo " - Cleaning build folder"
 cd $saved_dir
-sudo rm -Rf /tmp/k8s_setup > /tmp/k8s_install_log 2>&1
-fail_if_error $? "/tmp/k8s_install_log" -10
+sudo rm -Rf /tmp/kube_setup > /tmp/kube_install_log 2>&1
+fail_if_error $? "/tmp/kube_install_log" -10
 
 
 returned_to_saved_dir

@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -34,22 +32,55 @@
 # Software.
 #
 
+[Unit]
+Description=Kubernetes Docker Registry
+Wants=network-online.target
+After=docker.service
+Requires=docker.service
+After=gluster.service
+PartOf=kube-master.service
 
-if [[ ! -f /etc/eskimo_topology.sh ]]; then
-    echo "Could not find /etc/eskimo_topology.sh"
-    exit 1
-fi
+[Service]
+TimeoutStartSec=0
+RemainAfterExit=false
 
-. /etc/eskimo_topology.sh
+# Run ExecStartPre with root-permissions
+PermissionsStartOnly=true
 
-# remove any previous definition
-sed -i '/.*kubernetes.registry/d' /etc/hosts
+ExecStartPre=-/usr/bin/docker kill k8s-registry
+ExecStartPre=-/usr/bin/docker rm -f k8s-registry
 
-# register new host
-if [[ -z $MASTER_K8S_MASTER_1 ]]; then
-    echo "WARNING : Could not find Kubernetes Eskimo master host"
-else
-    echo "$MASTER_K8S_MASTER_1 kubernetes.registry" >> /etc/hosts
-fi
+# attempt to recreate  / remount gluster shares
+ExecStartPre=/bin/bash /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
+
+ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment&& /usr/bin/docker run \
+        -i \
+        --name k8s-registry \
+        --user kubernetes \
+        --network host \
+        -v /var/log/kubernetes:/var/log/kubernetes \
+        -v /var/lib/kubernetes:/var/lib/kubernetes:rshared \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
+        -e NODE_NAME=$HOSTNAME \
+        eskimo:k8s-registry \
+        /usr/local/sbin/inContainerStartService.sh"
 
 
+# Unfotunately "-network host" is requires since random ports are created to communicate with mesos.
+#          -p 5000:5000 \
+
+ExecStop=/usr/bin/docker stop k8s-registry
+
+Type=simple
+
+Restart=always
+StartLimitBurst=6
+StartLimitInterval=100
+
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=kube-master.service

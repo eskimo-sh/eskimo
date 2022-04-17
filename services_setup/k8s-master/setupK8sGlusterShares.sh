@@ -1,1 +1,0 @@
-../k8s-slave/setupK8sGlusterShares.sh

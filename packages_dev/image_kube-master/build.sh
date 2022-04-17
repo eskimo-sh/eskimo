@@ -40,33 +40,33 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "Building K8s-master Image"
+echo "Building kube-master Image"
 echo "--------------------------------------------------------------------------------"
 
 # reinitializing log
-rm -f /tmp/k8s-master_build_log
+rm -f /tmp/kube-master_build_log
 
-echo " - Building image k8s-master"
-build_image k8s-master_template /tmp/k8s-master_build_log
+echo " - Building image kube-master"
+build_image kube-master_template /tmp/kube-master_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i k8s-master_template apt-get install -y openjdk-11-jdk > /tmp/k8s-master_build_log 2>&1
+docker exec -i kube-master_template apt-get install -y openjdk-11-jdk > /tmp/kube-master_build_log 2>&1
 
 echo " - Installing Docker Registry"
-docker exec -i k8s-master_template bash /scripts/installDockerRegistry.sh | tee /tmp/k8s-master_build_log 2>&1
-if [[ `tail -n 1 /tmp/k8s-master_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+docker exec -i kube-master_template bash /scripts/installDockerRegistry.sh | tee /tmp/kube-master_build_log 2>&1
+if [[ `tail -n 1 /tmp/kube-master_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
-    cat /tmp/k8s-master_build_log
+    cat /tmp/kube-master_build_log
     exit 102
 fi
 
 #echo " - TODO"
-#docker exec -it k8s-master_template bash
+#docker exec -it kube-master_template bash
 
 
 echo " - Cleaning up image"
-docker exec -i k8s-master_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/k8s-master_build_log 2>&1
-docker exec -i k8s-master_template apt-get -y auto-remove >> /tmp/k8s-master_build_log 2>&1
+docker exec -i kube-master_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/kube-master_build_log 2>&1
+docker exec -i kube-master_template apt-get -y auto-remove >> /tmp/kube-master_build_log 2>&1
 
-echo " - Closing and saving image k8s-master"
-close_and_save_image k8s-master_template /tmp/k8s-master_build_log $DOCKER_REGISTRY_VERSION_SHORT
+echo " - Closing and saving image kube-master"
+close_and_save_image kube-master_template /tmp/kube-master_build_log $DOCKER_REGISTRY_VERSION_SHORT

@@ -58,11 +58,10 @@ fi
 echo " - Installing kubernetes docker registry"
 
 echo "   + Registering kubernetes registry"
-if [[ ! -f /usr/local/sbin/register-kubernetes-registry.sh ]]; then
-    echo "   + Copying register-kubernetes-registry.sh script"
-    sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
-    sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
-fi
+
+echo "   + Copying register-kubernetes-registry.sh script"
+sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
+sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
 
 sudo /usr/local/sbin/register-kubernetes-registry.sh
 
@@ -76,7 +75,7 @@ sudo cp setupKubernetesRegistryGlusterShares.sh /usr/local/sbin/
 sudo chmod 755 /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
 
 echo "   + Building container k8s-registry"
-build_container k8s-registry k8s-master k8s-registry_install_log
+build_container k8s-registry kube-master k8s-registry_install_log
 
 #sudo mkdir -p /usr/local/etc/kubernetes
 #sudo chown -R kubernetes/usr/local/etc/kubernetes

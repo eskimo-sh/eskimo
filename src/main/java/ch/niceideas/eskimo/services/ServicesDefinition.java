@@ -318,7 +318,7 @@ public class ServicesDefinition implements InitializingBean {
             if (service.isKubernetes()) {
                 Dependency kubeDependency = new Dependency();
                 kubeDependency.setMes(MasterElectionStrategy.RANDOM);
-                kubeDependency.setMasterService("k8s-master");
+                kubeDependency.setMasterService(KubernetesService.KUBE_MASTER);
                 kubeDependency.setNumberOfMasters(1);
                 kubeDependency.setMandatory(true);
                 service.addDependency(kubeDependency);

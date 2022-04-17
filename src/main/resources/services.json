@@ -109,7 +109,7 @@
       "unique": true,
       "group" : "Monitoring",
       "name" : "Grafana",
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/grafana-logo.png",
       "icon" : "images/grafana-icon.png"
     },
@@ -253,8 +253,8 @@
       "name" : "Etcd",
       "selectionLayout" : { "row" : 6, "col" : 1},
       "memory": "neglectable",
-      "logo" : "images/k8s-master-logo.png",
-      "icon" : "images/k8s-master-icon.png"
+      "logo" : "images/kube-master-logo.png",
+      "icon" : "images/kube-master-icon.png"
     },
     "dependencies": [
       {
@@ -272,17 +272,17 @@
   },
 
 
-  "k8s-master": {
+  "kube-master": {
     "config": {
-      "imageName" : "k8s-master",
+      "imageName" : "kube-master",
       "order": 6,
       "unique": true,
       "group" : "Kubernetes",
-      "name" : "Eskimo Master",
+      "name" : "Master",
       "selectionLayout" : { "row" : 5, "col" : 2},
       "memory": "neglectable",
-      "logo" : "images/k8s-master-logo.png",
-      "icon" : "images/k8s-master-icon.png"
+      "logo" : "images/kube-master-logo.png",
+      "icon" : "images/kube-master-icon.png"
     },
     "dependencies": [
       {
@@ -294,7 +294,7 @@
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "k8s-master",
+        "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
@@ -310,20 +310,20 @@
   },
 
 
-  "k8s-slave": {
+  "kube-slave": {
     "config": {
       "order": 7,
       "group" : "Kubernetes",
       "name" : "Slave",
       "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "verylarge",
-      "logo" : "images/k8s-slave-logo.png",
-      "icon" : "images/k8s-slave-icon.png"
+      "logo" : "images/kube-slave-logo.png",
+      "icon" : "images/kube-slave-icon.png"
     },
     "dependencies": [
       {
         "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "k8s-master",
+        "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
@@ -344,7 +344,7 @@
       }
     ],
     "additionalEnvironment": [
-      "ALL_NODES_LIST_k8s-slave",
+      "ALL_NODES_LIST_kube-slave",
       "SERVICE_NUMBER_1_BASED"
     ]
   },
@@ -549,7 +549,7 @@
       "imageName" : "marathon",
       "order": 10,
       "unique": true,
-      "group": "Mesos",
+      "group": "kube",
       "name": "Marathon",
       "selectionLayout": { "row" : 3, "col" : 2 },
       "memory": "neglectable",
@@ -727,7 +727,7 @@
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/kafka-manager-logo.png",
       "icon" : "images/kafka-manager-icon.png"
     },
@@ -774,7 +774,7 @@
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/spark-history-server-logo.png",
       "icon" : "images/spark-history-server-icon.png"
     },
@@ -835,7 +835,7 @@
       "group" : "Spark",
       "name" : "Executor",
       "selectionLayout" : { "row" : 3, "col" : 3},
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/spark-executor-logo.png",
       "icon" : "images/spark-executor-icon.png"
     },
@@ -856,7 +856,7 @@
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "k8s-master",
+        "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
@@ -1033,7 +1033,7 @@
       "group": "Flink",
       "name": "Worker",
       "selectionLayout": { "row": 4, "col": 3  },
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/flink-worker-logo.png",
       "icon" : "images/flink-worker-icon.png"
     },
@@ -1111,7 +1111,7 @@
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/cerebro-logo.png",
       "icon" : "images/cerebro-icon.png"
     },
@@ -1233,7 +1233,7 @@
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
-      "memory": "mesos",
+      "memory": "kube",
       "logo" : "images/kibana-logo.png",
       "icon" : "images/kibana-icon.png"
     },
@@ -1296,7 +1296,7 @@
       "marathon": true,
       "unique": true,
       "name" : "Zeppelin",
-      "memory": "mesos",
+      "memory": "kube",
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional__commentedOut": ["spark-executor"],
       "logo" : "images/zeppelin-logo.png",

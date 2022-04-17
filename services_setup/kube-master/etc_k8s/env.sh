@@ -1,0 +1,1 @@
+../../kube-slave/etc_k8s/env.sh

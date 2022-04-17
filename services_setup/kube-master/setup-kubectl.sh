@@ -1,0 +1,1 @@
+../kube-slave/setup-kubectl.sh

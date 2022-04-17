@@ -74,7 +74,7 @@ public class NodesConfigWrapperTest extends AbstractServicesDefinitionTest {
                 "    \"prometheus1\": \"on\",\n" +
                 "    \"ntp3\": \"on\",\n" +
                 "    \"ntp2\": \"on\",\n" +
-                "    \"k8s-master\": \"1\"\n" +
+                "    \"kube-master\": \"1\"\n" +
                 "}");
 
         System.err.println (ncw.getAllNodeAddressesWithService("k8s-slave"));

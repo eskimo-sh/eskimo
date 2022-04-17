@@ -76,19 +76,18 @@ if [[ ! -d /var/log/kubernetes ]]; then
     sudo chown -R kubernetes /var/log/kubernetes
 fi
 
-
-if [[ ! -f /usr/local/sbin/register-kubernetes-registry.sh ]]; then
-    echo " - Copying register-kubernetes-registry.sh script"
-    sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
-    sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
-fi
-
-
-# TODO Create Kubernetes environment and SystenD unit files
+echo " - Copying register-kubernetes-registry.sh script"
+sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
+sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
 
 echo " - Linking /etc/k8s to /usr/local/lib/k8s/etc"
 if [[ ! -L /etc/k8s ]]; then
     sudo ln -s /usr/local/lib/k8s/etc /etc/k8s
+fi
+
+echo " - Linking  /etc/kubernetes to /etc/k8s"
+if [[ ! -L /etc/k8s ]]; then
+    sudo ln -s /etc/k8s /etc/kubernetes/
 fi
 
 echo " - Copying kubernetes env files to /etc/k8s"
@@ -132,12 +131,12 @@ bash ./setup-kuberouter.sh
 fail_if_error $? /dev/null 305
 
 
-echo " - Copying k8s-slave process file to /usr/local/sbin"
-sudo cp start-k8s-slave.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/start-k8s-slave.sh
+echo " - Copying kube-slave process file to /usr/local/sbin"
+sudo cp start-kube-slave.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/start-kube-slave.sh
 
-sudo cp stop-k8s-slave.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/stop-k8s-slave.sh
+sudo cp stop-kube-slave.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/stop-kube-slave.sh
 
 
 echo " - Create / update eskimo K8S version file"
@@ -156,5 +155,5 @@ if [[ -z $TEST_MODE && ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
 fi
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file k8s-slave k8s_install_log
+install_and_check_service_file kube-slave k8s_install_log
 

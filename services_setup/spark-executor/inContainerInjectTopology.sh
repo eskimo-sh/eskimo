@@ -40,7 +40,7 @@ set -e
 #echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
-export KUBERNETES_API_MASTER=$MASTER_K8S_MASTER_1
+export KUBERNETES_API_MASTER=$MASTER_KUBE_MASTER_1
 if [[ $KUBERNETES_API_MASTER == "" ]]; then
     echo " - No Kubernetes API master found in topology"
     exit 3

@@ -1,6 +1,5 @@
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
@@ -25,7 +24,7 @@ public class KubernetesService {
 
     private static final Logger logger = Logger.getLogger(KubernetesService.class);
 
-    public static final String K8S_MASTER = "k8s-master";
+    public static final String KUBE_MASTER = "kube-master";
     public static final String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
 
     @Autowired
@@ -202,7 +201,7 @@ public class KubernetesService {
             // Find out node running Kubernetes
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            String kubeMasterNode = servicesInstallStatus.getFirstNode(K8S_MASTER);
+            String kubeMasterNode = servicesInstallStatus.getFirstNode(KUBE_MASTER);
             if (StringUtils.isBlank(kubeMasterNode)) {
 
                 notificationService.addError("Kube Master doesn't seem to be installed");
@@ -212,7 +211,7 @@ public class KubernetesService {
                 // special case : if some Kubernetes services are getting uninstalled, and Kubernetes is nowhere installed or anything, let's force flag them as uninstalled
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
-                    String kubeMasterNodeName = lastStatus.getFirstNodeName(K8S_MASTER);
+                    String kubeMasterNodeName = lastStatus.getFirstNodeName(KUBE_MASTER);
                     if (StringUtils.isBlank(kubeMasterNodeName)) {
 
                         if (command.getUninstallations().size() > 0) {

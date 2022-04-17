@@ -201,7 +201,7 @@ public class NodesConfigurationService {
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                             operationsMonitoringService.addInfo(operation, "Checking / Installing Kubernetes");
                                             if (isMissingOnNode("k8s", node)) {
-                                                uploadK8s(node);
+                                                uploadKubernetes(node);
                                                 ml.addInfo(installK8s(node));
                                                 flagInstalledOnNode("k8s", node);
                                             }
@@ -318,7 +318,7 @@ public class NodesConfigurationService {
     }
 
     private String installK8s(String node) throws SSHCommandException {
-        return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-k8s.sh");
+        return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-kubernetes.sh");
     }
 
     void copyCommand (String source, String target, Connection connection) throws SSHCommandException {
@@ -430,17 +430,17 @@ public class NodesConfigurationService {
         }
     }
 
-    private void uploadK8s(String node) throws SSHCommandException, SystemException {
+    private void uploadKubernetes(String node) throws SSHCommandException, SystemException {
         Connection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
             File packageDistributionDir = new File (packageDistributionPath);
 
-            String k8sFileName = setupService.findLastPackageFile("_", "k8s");
-            File k8sDistrib = new File (packageDistributionDir, k8sFileName);
+            String kubeFileName = setupService.findLastPackageFile("_", "kube");
+            File kubeDistrib = new File (packageDistributionDir, kubeFileName);
 
-            sshCommandService.copySCPFile(connection, k8sDistrib.getAbsolutePath());
+            sshCommandService.copySCPFile(connection, kubeDistrib.getAbsolutePath());
 
         } catch (ConnectionManagerException e) {
             throw new SystemException(e);

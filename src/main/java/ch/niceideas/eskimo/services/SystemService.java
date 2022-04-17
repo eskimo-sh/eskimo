@@ -74,7 +74,7 @@ public class SystemService {
 
     @Deprecated
     public static final String MARATHON_SERVICE_NAME = "marathon";
-    public static final String KUBERNETES_SERVICE_NAME = "k8s-master";
+    public static final String KUBERNETES_SERVICE_NAME = KubernetesService.KUBE_MASTER;
 
     @Autowired
     private ProxyManagerService proxyManagerService;

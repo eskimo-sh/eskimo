@@ -103,6 +103,12 @@ if [[ ! -L /etc/k8s ]]; then
     sudo ln -s /usr/local/lib/k8s/etc /etc/k8s
 fi
 
+echo " - Linking  /etc/kubernetes to /etc/k8s"
+if [[ ! -L /etc/k8s ]]; then
+    sudo ln -s /etc/k8s /etc/kubernetes/
+fi
+
+
 echo " - Copying kubernetes env files to /etc/k8s"
 for i in `find ./etc_k8s -mindepth 1`; do
     sudo cp $i /etc/k8s/
@@ -171,12 +177,12 @@ bash ./setup-kube-services.sh
 fail_if_error $? /dev/null 308
 
 
-echo " - Copying k8s-master process files to /usr/local/sbin"
-sudo cp start-k8s-master.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/start-k8s-master.sh
+echo " - Copying kube-master process files to /usr/local/sbin"
+sudo cp start-kube-master.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/start-kube-master.sh
 
-sudo cp stop-k8s-master.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/stop-k8s-master.sh
+sudo cp stop-kube-master.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/stop-kube-master.sh
 
 echo " - Installing and checking systemd service file"
-install_and_check_service_file k8s-master k8s-master_install_log
+install_and_check_service_file kube-master k8s-master_install_log

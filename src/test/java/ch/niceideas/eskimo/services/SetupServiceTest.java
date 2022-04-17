@@ -64,9 +64,9 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private File tempPackagesDistribPath = null;
 
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,k8s-master,k8s-dashboad,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,kube-master,k8s-dashboad,spark,zeppelin";
 
-    private String k8sPackages = "k8s";
+    private String k8sPackages = "kube";
 
     private ServicesDefinition sd = new ServicesDefinition();
 
@@ -140,7 +140,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertNotNull(version);
         assertEquals(new Pair<> ("1.11.0", "1"), version);
 
-        version = setupService.parseVersion("eskimo_k8s_1.23.5_1.tar.gz");
+        version = setupService.parseVersion("eskimo_kube_1.23.5_1.tar.gz");
         assertNotNull(version);
         assertEquals(new Pair<> ("1.23.5", "1"), version);
     }
