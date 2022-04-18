@@ -119,8 +119,12 @@ public class NodesConfigurationService {
     void setProxyManagerService(ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
     }
+    @Deprecated
     void setMarathonService (MarathonService marathonService) {
         this.marathonService = marathonService;
+    }
+    void setKubernetesService (KubernetesService kubernetesService) {
+        this.kubernetesService = kubernetesService;
     }
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;

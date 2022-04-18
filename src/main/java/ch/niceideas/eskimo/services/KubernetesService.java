@@ -5,8 +5,11 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.utils.KubeStatusParser;
+import ch.niceideas.eskimo.utils.SystemStatusParser;
 import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -25,7 +28,9 @@ public class KubernetesService {
     private static final Logger logger = Logger.getLogger(KubernetesService.class);
 
     public static final String KUBE_MASTER = "kube-master";
+    public static final String KUBE_NA_FLAG = "MARATHON_NA";
     public static final String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
+    public static final String RUNNING_STATUS = "Running";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -56,6 +61,9 @@ public class KubernetesService {
 
     @Autowired
     private ProxyManagerService proxyManagerService;
+
+    @Autowired
+    private SSHCommandService sshCommandService;
 
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
@@ -96,6 +104,9 @@ public class KubernetesService {
     }
     void setProxyManagerService(ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
+    }
+    void setSshCommandService (SSHCommandService sshCommandService) {
+        this.sshCommandService = sshCommandService;
     }
 
     // FIXME
@@ -180,13 +191,88 @@ public class KubernetesService {
         logger.warn("ensureKubernetesAvailability - To Be Implemented");
     }
 
-    // FIXME
+    boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) {
+        if (marathonConfig != null) {
+            return marathonConfig.isServiceInstallRequired(service);
+        }
+        return false;
+    }
+
     public void fetchKubernetesServicesStatus
             (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
             throws KubernetesException {
 
-        // TODO
-        logger.warn("ensureKubernetesAvailability - To Be Implemented");
+        // 3.1 Node answers
+        try {
+
+            String kubeMasterNode = servicesInstallationStatus.getFirstNode(KUBE_MASTER);
+
+            String ping = null;
+            if (!StringUtils.isBlank(kubeMasterNode)) {
+
+                // find out if SSH connection to host can succeeed
+                try {
+                    ping = systemService.sendPing(kubeMasterNode);
+                } catch (SSHCommandException e) {
+                    logger.warn(e.getMessage());
+                    logger.debug(e, e);
+                }
+            }
+
+            // FIYME change politics, get kubectl status all at once and then below instead of calling for every service,
+            // get it from Kubectl result
+            KubeStatusParser parser = getKubeStatusParser();
+
+            MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+            for (String service : servicesDefinition.listMarathonServices()) {
+
+                // should service be installed on marathon ?
+                boolean shall = this.shouldInstall(marathonConfig, service);
+
+                Pair<String, String> nodeNameAndStatus = new Pair<>(KUBE_NA_FLAG, "NA");
+                if (parser != null) {
+                    nodeNameAndStatus = parser.getServiceRuntimeNode(service);
+                }
+
+                String nodeIp = nodeNameAndStatus.getKey();
+
+                // if marathon is not answering, we assume service is still installed if it has been installed before
+                // we identify it on marathon node then.
+                if (nodeIp != null && nodeIp.equals(KUBE_NA_FLAG)) {
+                    if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstNode(service))) {
+                        nodeIp = kubeMasterNode;
+                    } else {
+                        nodeIp = null;
+                    }
+                }
+
+                boolean installed = StringUtils.isNotBlank(nodeIp);
+                boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
+
+                String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
+
+                // uninstalled services are identified on the marathon node
+                if (StringUtils.isBlank(nodeName)) {
+                    if (StringUtils.isNotBlank(kubeMasterNode)) {
+                        nodeName = kubeMasterNode.replace(".", "-");
+                    } else {
+                        nodeName = servicesInstallationStatus.getFirstNodeName(KUBE_MASTER);
+                    }
+                    // last attempt, get it from theoretical perspective
+                    if (StringUtils.isBlank(nodeName)) {
+                        nodeName = configurationService.loadNodesConfig().getFirstNodeName(KUBE_MASTER);
+                    }
+                }
+
+                systemService.feedInServiceStatus (
+                        statusMap, servicesInstallationStatus, nodeIp, nodeName,
+                        ServicesInstallStatusWrapper.MARATHON_NODE,
+                        service, shall, installed, running);
+            }
+        } catch (JSONException | ConnectionManagerException | SystemException | SetupException  e) {
+            logger.error(e, e);
+            throw new KubernetesException(e.getMessage(), e);
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -353,15 +439,49 @@ public class KubernetesService {
         }
     }
 
-    private Pair<String,String> getServiceRuntimeNode(String service) throws KubernetesException {
-        return getAndWaitServiceRuntimeNode(service, 1);
+    private KubeStatusParser getKubeStatusParser() throws KubernetesException {
+
+        try {
+            ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
+
+            String kubeMasterNode = servicesInstallationStatus.getFirstNode(KUBE_MASTER);
+
+            String ping = null;
+            if (!StringUtils.isBlank(kubeMasterNode)) {
+
+                // find out if SSH connection to host can succeeed
+                try {
+                    ping = systemService.sendPing(kubeMasterNode);
+                } catch (SSHCommandException e) {
+                    logger.warn(e.getMessage());
+                    logger.debug(e, e);
+                }
+            }
+
+            if (StringUtils.isBlank(ping) || !ping.startsWith("OK")) {
+                return null;
+            }
+
+            String allPodStatus = sshCommandService.runSSHScript(kubeMasterNode,
+                    "/usr/local/bin/kubectl get pod --all-namespaces -o wide 2>/dev/null ", false);
+
+            String allServicesStatus = sshCommandService.runSSHScript(kubeMasterNode,
+                    "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null ", false);
+
+            return new KubeStatusParser(allPodStatus, allServicesStatus);
+
+        } catch (SSHCommandException | SetupException | FileException e) {
+            logger.error (e, e);
+            throw new KubernetesException(e);
+        }
     }
 
-    // FIXME
-    protected Pair<String, String> getAndWaitServiceRuntimeNode (String service, int numberOfAttempts) throws
-            KubernetesException  {
-        // FIXME TO Be Implemented
-        logger.warn ("getAndWaitServiceRuntimeNode - TODO TO Be Implemented");
-        return new Pair<>(null, "notOK");
+    private Pair<String,String> getServiceRuntimeNode(String service) throws KubernetesException {
+
+        KubeStatusParser parser = getKubeStatusParser();
+        if (parser == null) {
+            return new Pair<>(KUBE_NA_FLAG, "NA");
+        }
+        return parser.getServiceRuntimeNode (service);
     }
 }

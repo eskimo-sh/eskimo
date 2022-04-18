@@ -39,11 +39,6 @@ set -e
 echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
-# Here topology just defines the variable $ELASTICSEARCH_MASTER before starting the command server
-export ELASTICSEARCH_MASTER=`eval echo "\$"$(echo SELF_MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $ELASTICSEARCH_MASTER == "" ]]; then
-    echo " - No ES master found in topology for $SELF_IP_ADDRESS"
-    exit -3
-fi
+# Nothing to do for he moment
 
 

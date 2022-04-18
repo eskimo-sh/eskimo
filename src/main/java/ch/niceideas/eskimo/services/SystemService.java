@@ -158,8 +158,12 @@ public class SystemService {
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    @Deprecated
     void setMarathonService (MarathonService marathonService) {
         this.marathonService = marathonService;
+    }
+    void setKubernetesService (KubernetesService kubernetesService) {
+        this.kubernetesService = kubernetesService;
     }
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
@@ -397,13 +401,13 @@ public class SystemService {
                     kubernetesService.fetchKubernetesServicesStatus(statusMap, servicesInstallationStatus);
                 } catch (KubernetesException e) {
                     logger.debug(e, e);
-                    // workaround : flag all marathon services as KO on marathon node
+                    // workaround : flag all Kubeernetes services as KO on kube node
                     String kubeNode = servicesInstallationStatus.getFirstNode(KUBERNETES_SERVICE_NAME);
                     if (StringUtils.isNotBlank(kubeNode)) {
                         String kubeNodeName = kubeNode.replace(".", "-");
-                        MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+                        MarathonServicesConfigWrapper kubeConfig = configurationService.loadMarathonServicesConfig();
                         for (String service : servicesDefinition.listMarathonServices()) {
-                            if (marathonService.shouldInstall(marathonConfig, service)) {
+                            if (marathonService.shouldInstall(kubeConfig, service)) {
                                 statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + kubeNodeName, "KO");
                             }
                         }

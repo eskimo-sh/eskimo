@@ -816,13 +816,6 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
-        "masterService": "elasticsearch",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,

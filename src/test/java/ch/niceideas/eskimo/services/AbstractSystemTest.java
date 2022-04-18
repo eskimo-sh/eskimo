@@ -78,7 +78,10 @@ public abstract class AbstractSystemTest {
 
     protected ConfigurationService configurationService = null;
 
+    @Deprecated
     protected MarathonService marathonService = null;
+
+    protected KubernetesService kubernetesService = null;
 
     protected SSHCommandService sshCommandService = null;
 
@@ -262,6 +265,7 @@ public abstract class AbstractSystemTest {
             }
         };
 
+        /* Deprecated */
         marathonService = createMarathonService();
         marathonService.setServicesDefinition(servicesDefinition);
         marathonService.setConfigurationService (configurationService);
@@ -274,12 +278,25 @@ public abstract class AbstractSystemTest {
         marathonService.setConnectionManagerService (connectionManagerService);
         marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
+        kubernetesService = createKubernetesService();
+        kubernetesService.setServicesDefinition(servicesDefinition);
+        kubernetesService.setConfigurationService (configurationService);
+        kubernetesService.setSystemService(systemService);
+        kubernetesService.setSshCommandService(sshCommandService);
+        kubernetesService.setSystemOperationService(systemOperationService);
+        kubernetesService.setProxyManagerService(proxyManagerService);
+        kubernetesService.setMemoryComputer(memoryComputer);
+        kubernetesService.setNotificationService(notificationService);
+        kubernetesService.setConnectionManagerService (connectionManagerService);
+        kubernetesService.setOperationsMonitoringService(operationsMonitoringService);
+
         systemService.setNodeRangeResolver(nodeRangeResolver);
         systemService.setSetupService(setupService);
         systemService.setProxyManagerService(proxyManagerService);
         systemService.setSshCommandService(sshCommandService);
         systemService.setServicesDefinition(servicesDefinition);
         systemService.setMarathonService(marathonService);
+        systemService.setKubernetesService(kubernetesService);
         systemService.setNotificationService(notificationService);
         systemService.setConfigurationService(configurationService);
         systemService.setOperationsMonitoringService(operationsMonitoringService);
@@ -287,6 +304,7 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService = createNodesConfigurationService();
         nodesConfigurationService.setConfigurationService(configurationService);
         nodesConfigurationService.setMarathonService(marathonService);
+        nodesConfigurationService.setKubernetesService (kubernetesService);
         nodesConfigurationService.setMemoryComputer(memoryComputer);
         nodesConfigurationService.setNodeRangeResolver(nodeRangeResolver);
         nodesConfigurationService.setProxyManagerService(proxyManagerService);
@@ -332,12 +350,19 @@ public abstract class AbstractSystemTest {
         return new NodesConfigurationService();
     }
 
+    @Deprecated
     protected MarathonService createMarathonService() {
         return new MarathonService() {
             @Override
             protected String queryMarathon (String endpoint, String method) {
                 return "{}";
             }
+        };
+    }
+
+    protected KubernetesService createKubernetesService() {
+        return new KubernetesService() {
+            /* FIXME override kubectl command calling */
         };
     }
 
