@@ -52,6 +52,7 @@ public class Topology {
     public static final String SELF_MASTER_PREFIX = "SELF_MASTER_";
     public static final String NODE_NBR_PREFIX = "NODE_NBR_";
     public static final String ALL_NODES_LIST_PREFIX = "ALL_NODES_LIST_";
+    public static final String ALL_NODES_LIST = "ALL_NODES_LIST";
     public static final String SERVICE_NUMBER_0_BASED = "SERVICE_NUMBER_0_BASED";
     public static final String SERVICE_NUMBER_1_BASED = "SERVICE_NUMBER_1_BASED";
     public static final String CONTEXT_PATH = "CONTEXT_PATH";
@@ -492,6 +493,14 @@ public class Topology {
         appendExport(sb, "SELF_IP_ADDRESS", node);
 
         appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);
+
+        appendExport(sb, "ESKIMO_NODE_COUNT", ""+nodesConfig.getNodeAddresses().size());
+
+        List<String> allNodeList = new ArrayList<>(nodesConfig.getNodeAddresses());
+        Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
+        String allNodes = String.join(",", allNodeList.toArray(new String[0]));
+
+        appendExport(sb, ALL_NODES_LIST, allNodes);
 
         // memory management
         Map<String, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);

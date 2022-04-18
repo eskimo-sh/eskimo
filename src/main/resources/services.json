@@ -855,7 +855,7 @@
       "title" : "Cerebro",
       "statusPageLinktitle" : "Manage your data in Elasticsearch"
     },
-    "dependencies": [
+    "_____dependencies": [
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "elasticsearch",
@@ -872,9 +872,10 @@
     "config": {
       "imageName" : "elasticsearch",
       "order": 17,
+      "kubernetes": true,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
-      "selectionLayout" : { "row" : 1, "col" : 3},
+      "___selectionLayout" : { "row" : 1, "col" : 3},
       "memory": "large",
       "logo" : "images/elasticsearch-logo.png",
       "icon" : "images/elasticsearch-icon.png"

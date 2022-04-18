@@ -238,12 +238,14 @@ function deploy_kubernetes() {
         docker tag eskimo:$CONTAINER kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "   + Could not re-tag kubernetes container image for $CONTAINER"
+            cat $LOG_FILE
             exit 4
         fi
 
         docker push kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "Image push in docker registry failed !"
+            cat $LOG_FILE
             exit 5
         fi
 
@@ -251,6 +253,7 @@ function deploy_kubernetes() {
         docker image rm eskimo:$CONTAINER  >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "local image removal failed !"
+            cat $LOG_FILE
             exit 6
         fi
     fi
@@ -262,7 +265,7 @@ function deploy_kubernetes() {
 
     echo " - Saving Kube deployment file $CONTAINER.k8s.yml in /var/lib/eskimo/kube-services"
     mkdir -p /var/lib/eskimo/kube-services/
-    cp $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/
+    /bin/cp -f $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/
 
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"
     /usr/local/bin/kubectl delete -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1

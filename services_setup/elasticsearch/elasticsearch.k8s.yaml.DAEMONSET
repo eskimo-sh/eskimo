@@ -32,84 +32,92 @@
 # Software.
 #
 
-kind: Service
+
 apiVersion: v1
+kind: Service
 metadata:
+  name: elasticsearch
   labels:
-    k8s-app: cerebro
-  name: cerebro
-  namespace: default
+    service: elasticsearch
 spec:
+  clusterIP: None
   ports:
-    - port: 31900
-      targetPort: 9000
+    - port: 9200
+      name: serving
+    - port: 9300
+      name: node-to-node
   selector:
-    k8s-app: cerebro
+    service: elasticsearch
 
 ---
 
-kind: Deployment
 apiVersion: apps/v1
+kind: DaemonSet
 metadata:
-  labels:
-    k8s-app: cerebro
-  name: cerebro
+  name: elasticsearch
   namespace: default
+  labels:
+    k8s-app: elasticsearch
 spec:
-  replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: cerebro
+      name: elasticsearch
   template:
     metadata:
       labels:
-        k8s-app: cerebro
+        name: elasticsearch
     spec:
-      #securityContext:
-      #  seccompProfile:
-      #    type: RuntimeDefault
-      enableServiceLinks: false
+      tolerations:
+        # this toleration is to have the daemonset runnable on master nodes
+        # remove it if your masters can't run pods
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
       containers:
-        - name: cerebro
-          image: kubernetes.registry:5000/cerebro
-          imagePullPolicy: IfNotPresent
+        - name: elasticsearch
+          image: kubernetes.registry:5000/elasticsearch
+          resources:
+            limits:
+              memory: 2000Mi
+            requests:
+              cpu: 1
+              memory: 2000Mi
           ports:
-            - containerPort: 9000
-              protocol: TCP
+            - containerPort: 9200
+              name: http
+            - containerPort: 9300
+              name: tcp
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
             - name: var-log-elasticsearch
               mountPath: /var/log/elasticsearch
+            - name: var-lib-elasticsearch
+              mountPath: /var/lib/elasticsearch
             - name: var-run-elasticsearch
               mountPath: /var/run/elasticsearch
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /
-              port: 9000
-            initialDelaySeconds: 30
-            timeoutSeconds: 30
+          env:
+            - name: ESKIMO_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           securityContext:
-            allowPrivilegeEscalation: false
+            allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
             runAsUser: 3301
             runAsGroup: 3301
-          resources:
-            limits:
-              cpu: "0.2"
-              memory: "300Mi"
-            requests:
-              cpu: "0.2"
-              memory: "300Mi"
+      terminationGracePeriodSeconds: 60
       volumes:
         - name: var-log-elasticsearch
           hostPath:
             path: /var/log/elasticsearch
+            type: Directory
+        - name: var-lib-elasticsearch
+          hostPath:
+            path: /var/lib/elasticsearch
             type: Directory
         - name: var-run-elasticsearch
           hostPath:
@@ -123,10 +131,4 @@ spec:
           hostPath:
             path: /etc/eskimo_services-settings.json
             type: File
-      #hostNetwork: true
-      nodeSelector:
-        "kubernetes.io/os": linux
-      # Comment the following tolerations if app must not be deployed on master
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
+      hostNetwork: true
