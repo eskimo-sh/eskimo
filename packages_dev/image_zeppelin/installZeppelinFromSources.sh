@@ -66,11 +66,6 @@ if [ -z "$SCALA_VERSION" ]; then
     exit 1
 fi
 
-if [ -z "$HADOOP_MAJOR_VERSION" ]; then
-    echo "Need to set HADOOP_MAJOR_VERSION environment variable before calling this script !"
-    exit 1
-fi
-
 saved_dir=`pwd`
 function returned_to_saved_dir() {
      cd $saved_dir

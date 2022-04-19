@@ -96,7 +96,7 @@ echo "   + Using ES_MASTERS=$ES_MASTERS"
 sed -i s/"#discovery.zen.ping.unicast.hosts: \[\"host1\", \"host2\"\]"/"discovery.zen.ping.unicast.hosts: \[$ES_MASTERS\]"/g \
     /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
-# ES 7.x
+# ES 7.x / 8.x
 sed -i s/"#discovery.seed_hosts: \[\"host1\", \"host2\"\]"/"discovery.seed_hosts: \[$ES_MASTERS\]"/g \
     /usr/local/lib/elasticsearch/config/elasticsearch.yml
 sed -i s/"#cluster.initial_master_nodes: \[\"node-1\", \"node-2\"\]"/"cluster.initial_master_nodes: \[$ES_MASTERS\]"/g \
@@ -119,6 +119,12 @@ if [ $number_of_es_nodes -gt 2 ]; then
     # other variant
     sed -i s/"#gateway.recover_after_nodes: "/"gateway.recover_after_nodes: $number_of_master_nodes"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
+    # ES 8.x
+    if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
+          `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
+
+        echo "gateway.recover_after_data_nodes: $number_of_master_nodes" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    fi
 else
 
     echo " - Setting discovery.zen.minimum_master_nodes to 1"
@@ -133,6 +139,12 @@ else
     # other variant
     sed -i s/"#gateway.recover_after_nodes: "/"gateway.recover_after_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
+    # ES 8.x
+    if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
+          `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
+
+        echo "gateway.recover_after_data_nodes: $number_of_master_nodes" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml
+    fi
 fi
 
 #echo " - Addressing issue with multiple interfaces but only one global"

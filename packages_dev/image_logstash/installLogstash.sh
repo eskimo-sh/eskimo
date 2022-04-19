@@ -59,7 +59,7 @@ echo " - Downloading logstash-$ES_VERSION"
 wget https://artifacts.elastic.co/downloads/logstash/logstash-$ES_VERSION-linux-x86_64.tar.gz > /tmp/ls_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad logstash-$ES_VERSION from https://artifacts.elastic.co/downloads/. Trying to download from niceideas.ch"
-    exit -1
+    exit 1
     #wget http://niceideas.ch/mes/logstash-$ES_VERSION.tar.gz >> /tmp/ls_install_log 2>&1
     #fail_if_error $? "/tmp/ls_install_log" -1
 fi
@@ -80,6 +80,21 @@ sudo chmod -R 755 /usr/local/lib/logstash-$ES_VERSION/config/
 
 echo " - symlinking /usr/local/lib/logstash/ to /usr/local/lib/logstash-$ES_VERSION/"
 ln -s /usr/local/lib/logstash-$ES_VERSION /usr/local/lib/logstash
+
+echo " - Using logstash bundled JDK as OS JDK"
+mkdir -p /usr/lib/jvm/
+sudo chmod -R 755 /usr/local/lib/logstash/jdk/
+ln -s  /usr/local/lib/logstash/jdk /usr/lib/jvm/java-1.11
+
+echo "export PATH=/usr/lib/jvm/java-1.11/bin:$PATH" >> /etc/profile
+echo "export PATH=/usr/lib/jvm/java-1.11/bin:$PATH" >> /etc/bash.bashrc
+
+echo " - Testing logstash startup"
+echo "test" | /usr/local/lib/logstash/bin/logstash -e 'input { stdin { } } output { stdout {} }'  > /tmp/logstash_run_log 2>&1 &
+if [[ $? != 0 ]]; then
+    echo "Failed to run logstash"
+    cat /tmp/logstash_run_log
+fi
 
 sudo rm -Rf /tmp/ls_setup
 returned_to_saved_dir

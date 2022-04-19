@@ -41,7 +41,7 @@ export DEBIAN_VERSION=debian_10_buster
 export FLINK_VERSION=1.13.6
 export FLINK_HADOOP_VERSION=2.8.3-10.0
 
-export HADOOP_MAJOR_VERSION=2.8
+export HADOOP_MAJOR_VERSION=3.2
 
 export SPARK_VERSION=3.2.1
 export SPARK_VERSION_MAJOR=3.2
@@ -63,6 +63,7 @@ export K8S_INFRA_IMAGE_PAUSE=3.6
 export K8S_INFRA_IMAGE_COREDNS=1.9.0
 export K8S_DASHBOARD_VERSION=2.5.1
 export K8S_DASHBOARD_METRICS_SCRAPER_VERSION=1.0.7
+export K8S_CLIENT_JAVA_VERSION=5.7.4
 
 # CAUTION : This version number needs to be aligned with the expected mesos version defined in
 # /services_setup/base-eskimo/install-mesos.sh
@@ -77,8 +78,8 @@ export MARATHON_VERSION_SOURCES_GITHUB=1.10.17
 export DOCKER_REGISTRY_VERSION=2.7.1+ds2-7+b6_amd64
 export DOCKER_REGISTRY_VERSION_SHORT=2.7.1
 
-export ES_VERSION=7.17.2
-export ES_VERSION_MAJOR=7
+export ES_VERSION=8.1.2
+export ES_VERSION_MAJOR=8
 
 export CEREBRO_VERSION=0.9.3
 

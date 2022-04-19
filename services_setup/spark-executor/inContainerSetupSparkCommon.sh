@@ -270,6 +270,7 @@ spec:
       allowPrivilegeEscalation: true
       runAsUser: 3302
       runAsGroup: 3302
+  hostNetwork: true # Using host network to try to make co-local processing with ES work
 EOF
 sudo mv /tmp/spark-pod-template.yaml /usr/local/lib/spark/conf/
 chmod 755 /usr/local/lib/spark/conf/

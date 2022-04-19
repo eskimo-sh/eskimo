@@ -58,7 +58,7 @@ fi
 
 
 #echo " - TODO"
-#docker exec -it kibana bash
+#docker exec -it kibana_template bash
 
 echo " - Cleaning up image"
 docker exec -i kibana_template apt-get remove -y git >> /tmp/kibana_build_log 2>&1
