@@ -82,9 +82,25 @@ bash -c "echo -e \"\n# ------------------------------- Eskimo specific ---------
 
 echo " - Addressing issue with multiple interfaces but only one global"
 bash -c "echo -e \"\n# The following settings control the fault detection process\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
-bash -c "echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
-bash -c "echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
-bash -c "echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+
+# ES 8.x
+if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
+      `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
+    bash -c "echo \"discovery.find_peers_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"discovery.probe.connect_timeout: 80s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"discovery.request_peers_timeout: 5s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"cluster.fault_detection.follower_check.retry_count: 6\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"cluster.fault_detection.leader_check.retry_count: 6\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+
+    bash -c "echo -e \"\n#Disabling Security for now\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"xpack.security.enabled: false\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+
+else
+# ES 6.x / ES 7.x
+    bash -c "echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+    bash -c "echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+fi
 
 bash -c "echo -e \"\n# Esimo Default indices settings\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
 bash -c "echo -e \"\n# Set the number of shards (splits) of an index (5 by default):\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"

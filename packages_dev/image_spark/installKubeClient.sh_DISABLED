@@ -38,7 +38,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 
-echo "-- INSTALLING ES-HADOOP (Spark to ES connector) -------------------------------"
+echo "-- INSTALLING Kube Client --------------------------------------------------"
 
 if [ -z "$ES_VERSION" ]; then
     echo "Need to set ES_VERSION environment variable before calling this script !"
@@ -61,12 +61,12 @@ trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
 
 echo " - Changing to temp directory"
-sudo rm -Rf /tmp/eshadoop_setup
-mkdir -p /tmp/eshadoop_setup
-cd /tmp/eshadoop_setup
+sudo rm -Rf /tmp/kube_client_setup
+mkdir -p /tmp/kube_client_setup
+cd /tmp/kube_client_setup
 
 
-echo " - Creating a dummy pom.xml to proceed with downloading ES-Hadoop spark connector"
+echo " - Creating a dummy pom.xml to proceed with downloading Kubernetes client jars"
 echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
          xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">
@@ -84,32 +84,30 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-spark-30_$SCALA_VERSION</artifactId>
-            <version>$ES_VERSION</version>
-            <scope>provided</scope>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>$K8S_CLIENT_JAVA_VERSION</version>
         </dependency>
     </dependencies>
 </project>" > pom.xml
 
 echo " - Proceeding with download of connectors and dependencies"
-mvn dependency:copy-dependencies > /tmp/esh_install_log 2>&1
-fail_if_error $? "/tmp/esh_install_log" -25
+mvn dependency:copy-dependencies > /tmp/kube_client_install_log 2>&1
+fail_if_error $? "/tmp/kube_client_install_log" -25
 
 echo " - Copying connectors with dependencies to spark distribution folder"
 cd target/dependency/
 
+echo " - Installing kubernetes client to spark (to spark jar folder)"
+for i in `ls -1`; do
+    library=`echo $i | sed -n 's/\([a-zA-Z\-]*\).*/\1/p'`
+    spark_file=`ls -1 /usr/local/lib/spark/jars/$library* | head -n 1`
+    new_file=$i
+    sudo cp $i $spark_file
+done
 
-echo " - Installing eshadoop spark (to spark jar folder)"
-sudo chown root.staff -R *
-sudo cp elasticsearch-spark-30_$SCALA_VERSION-$ES_VERSION.jar /usr/local/lib/spark-$SPARK_VERSION/jars/
-if [[ $? != 0 ]]; then
-    echo " -> Failed to find jar elasticsearch-spark-30_$SCALA_VERSION-$ES_VERSION.jar - name must have change ..."
-    exit 2
-fi
 
-
-sudo rm -Rf /tmp/eshadoop_setup
+sudo rm -Rf /tmp/kube_client_setup
 returned_to_saved_dir
 
 

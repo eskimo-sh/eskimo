@@ -63,22 +63,22 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
 fail_if_error $? "/tmp/spark_install_log" -2
 
 echo " - Downloading spark-$SPARK_VERSION"
-wget https://downloads.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop2.7.tgz > /tmp/spark_install_log 2>&1
+wget https://downloads.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz > /tmp/spark_install_log 2>&1
 
 
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad spark-$SPARK_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/spark-$SPARK_VERSION-bin-hadoop2.7.tgz >> /tmp/spark_install_log 2>&1
+    wget http://niceideas.ch/mes/spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz >> /tmp/spark_install_log 2>&1
     fail_if_error $? "/tmp/spark_install_log" -1
 fi
 
 echo " - Extracting spark-$SPARK_VERSION"
-tar -xvf spark-$SPARK_VERSION-bin-hadoop2.7.tgz > /tmp/spark_install_log 2>&1
+tar -xvf spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz > /tmp/spark_install_log 2>&1
 fail_if_error $? "/tmp/spark_install_log" -2
 
 echo " - Installing spark"
-sudo chown root.staff -R spark-$SPARK_VERSION-bin-hadoop2.7
-sudo mv spark-$SPARK_VERSION-bin-hadoop2.7 /usr/local/lib/spark-$SPARK_VERSION
+sudo chown root.staff -R spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION
+sudo mv spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION /usr/local/lib/spark-$SPARK_VERSION
 
 echo " - symlinking /usr/local/lib/spark/ to /usr/local/lib/spark-$SPARK_VERSION"
 sudo ln -s /usr/local/lib/spark-$SPARK_VERSION /usr/local/lib/spark

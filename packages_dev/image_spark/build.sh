@@ -48,7 +48,7 @@ rm -f /tmp/spark_build_log
 echo " - Building image spark"
 build_image spark_template /tmp/spark_build_log
 
-echo " - Installing OpenJDK "
+echo " - Installing OpenJDK 11"
 docker exec -i spark_template apt-get install -y openjdk-11-jdk > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3
 
@@ -92,6 +92,14 @@ if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` 
     cat /tmp/spark_build_log
     exit 103
 fi
+
+#echo " - Installing Kubernetes client connector"
+#docker exec -i spark_template bash /scripts/installKubeClient.sh | tee  /tmp/spark_build_log 2>&1
+#if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+#    echo " - In container install script ended up in error"
+#    cat /tmp/spark_build_log
+#    exit 103
+#fi
 
 echo " - Installing Spark-Kafka connector"
 docker exec -i spark_template bash /scripts/installSparkKafkaConnector.sh  | tee /tmp/spark_build_log 2>&1

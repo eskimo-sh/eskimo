@@ -49,9 +49,9 @@ rm -f /tmp/logstash_build_log
 echo " - Building image logstash"
 build_image logstash_template /tmp/logstash_build_log
 
-echo " - Installing OpenJDK 11"
-docker exec -i logstash_template apt-get install -y openjdk-11-jdk > /tmp/logstash_build_log 2>&1
-fail_if_error $? "/tmp/logstash_build_log" -2
+#echo " - Installing OpenJDK 11"
+#docker exec -i logstash_template apt-get install -y openjdk-11-jdk > /tmp/logstash_build_log 2>&1
+#fail_if_error $? "/tmp/logstash_build_log" -2
 
 echo " - Installing ZIP"
 docker exec -i logstash_template apt-get install -y zip > /tmp/logstash_build_log 2>&1

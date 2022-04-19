@@ -65,7 +65,7 @@ if [[ $? != 0 ]]; then
     if [[ $? != 0 ]]; then
 
         echo " -> Failed to downolad elasticsearch-$ES_VERSION from https://artifacts.elastic.co/downloads/. Trying to download from niceideas.ch"
-        exit -1
+        exit 1
         #wget http://niceideas.ch/mes/elasticsearch-$ES_VERSION.tar.gz >> /tmp/es_install_log 2>&1
         #fail_if_error $? "/tmp/es_install_log" -1
     fi
@@ -92,9 +92,13 @@ chmod -R 777 /usr/local/lib/elasticsearch-$ES_VERSION/config/
 echo " - symlinking /usr/local/lib/elasticsearch/ to /usr/local/lib/elasticsearch-$ES_VERSION/"
 ln -s /usr/local/lib/elasticsearch-$ES_VERSION /usr/local/lib/elasticsearch
 
-echo " - replacing ElasticSearch bundled JDK by OS JDK"
-rm -Rf /usr/local/lib/elasticsearch/jdk
-ln -s /usr/lib/jvm/java-1.11.0-openjdk-amd64 /usr/local/lib/elasticsearch/jdk
+echo " - Using ElasticSearch bundled JDK as OS JDK"
+mkdir -p /usr/lib/jvm/
+sudo chmod -R 755 /usr/local/lib/elasticsearch/jdk
+ln -s  /usr/local/lib/elasticsearch/jdk /usr/lib/jvm/java-1.17
+
+echo "export PATH=/usr/lib/jvm/java-1.17/bin:$PATH" >> /etc/profile
+echo "export PATH=/usr/lib/jvm/java-1.17/bin:$PATH" >> /etc/bash.bashrc
 
 echo " - Registering test cleaning traps"
 export ES_PROC_ID=-1
@@ -120,7 +124,7 @@ echo " - Checking Elasticsearch startup"
 sleep 10
 if [[ `ps -e | grep $ES_PROC_ID` == "" ]]; then
     echo " !! Failed to start Elasticsearch !!"
-    exit -8
+    exit 10
 fi
 
 echo " - Stopping Elasticsearch"
@@ -133,6 +137,9 @@ export ES_PROC_ID=-1
 
 echo " - removing test user"
 userdel estest
+
+echo " - Cleanup "
+rm -Rf /usr/local/lib/elasticsearch-8.1.2/config/elasticsearch.keystore.tmp
 
 rm -Rf /tmp/es_setup
 returned_to_saved_dir

@@ -69,8 +69,8 @@ tar -xvf kibana-$ES_VERSION-linux-x86_64.tar.gz > /tmp/kb_install_log 2>&1
 fail_if_error $? "/tmp/kb_install_log" -2
 
 echo " - Installing Kibana"
-sudo chown root.staff -R kibana-$ES_VERSION-linux-x86_64
-sudo mv kibana-$ES_VERSION-linux-x86_64 /usr/local/lib/kibana-$ES_VERSION
+sudo chown root.staff -R kibana-$ES_VERSION
+sudo mv kibana-$ES_VERSION /usr/local/lib/kibana-$ES_VERSION
 sudo mkdir -p /usr/local/lib/kibana-$ES_VERSION/optimize/
 sudo chmod -R 777 /usr/local/lib/kibana-$ES_VERSION/optimize/
 sudo mkdir -p /usr/local/lib/kibana-$ES_VERSION/data
