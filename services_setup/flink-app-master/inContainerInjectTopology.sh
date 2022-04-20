@@ -43,7 +43,7 @@ set -e
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -2
+    exit 2
 fi
 
 bash -c "echo -e \"\n# Specyfing mesos master\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"

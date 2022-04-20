@@ -381,7 +381,7 @@ if [[ -f "/etc/debian_version" ]]; then
     fi
 
     echo "  - installing some required dependencies"
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install net-tools socat >> /tmp/setup_log 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install net-tools socat dnsmasq >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
     # ignore this one if it fails
@@ -394,7 +394,7 @@ elif [[ -f "/etc/redhat-release" ]]; then
     fail_if_error $? "/tmp/setup_log" -1
 
     echo "  - installing some required dependencies"
-    sudo yum install -y net-tools anacron socat >> /tmp/setup_log 2>&1
+    sudo yum install -y net-tools anacron socat dnsmasq >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
     echo "  - enabling crond"
@@ -411,7 +411,7 @@ elif [[ -f "/etc/SUSE-brand" ]]; then
     fail_if_error $? "/tmp/setup_log" -1
 
     echo "  - installing some required dependencies"
-    sudo zypper install -y net-tools cron >> /tmp/setup_log 2>&1
+    sudo zypper install -y net-tools cron socat dnsmasq >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
     echo "  - enabling cron"
