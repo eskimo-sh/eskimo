@@ -56,15 +56,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 
-@Deprecated /* To be renamed */
 @Controller
-public class MarathonServicesConfigController extends AbstractOperationController {
+public class KubernetesServicesConfigController extends AbstractOperationController {
 
-    private static final Logger logger = Logger.getLogger(MarathonServicesConfigController.class);
+    private static final Logger logger = Logger.getLogger(KubernetesServicesConfigController.class);
 
-    public static final String PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE = "PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE";
-    public static final String PENDING_MARATHON_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
-    public static final String NOMARATHON = "nomarathon";
+    public static final String PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE = "PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE";
+    public static final String PENDING_KUBERNETES_OPERATIONS_COMMAND = "PENDING_KUBERNETES_OPERATIONS_COMMAND";
+    public static final String NOKUBERNETES = "nokubernetes";
 
     @Autowired
     private MarathonService marathonService;
@@ -84,8 +83,8 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
     @Autowired
     private MarathonServicesConfigChecker marathonServicesConfigChecker;
 
-    @Value("${eskimo.enableMarathonSubsystem}")
-    private String enableMarathon = "true";
+    @Value("${eskimo.enableKubernetesSubsystem}")
+    private String enableKubernetes = "true";
 
 
     /* For tests */
@@ -108,12 +107,12 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
         this.marathonServicesConfigChecker = marathonServicesConfigChecker;
     }
 
-    @GetMapping("/load-marathon-services-config")
+    @GetMapping("/load-kubernetes-services-config")
     @ResponseBody
-    public String loadMarathonServicesConfig() {
+    public String loadKubernetesServicesConfig() {
 
-        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
+        if (StringUtils.isBlank(enableKubernetes) || !enableKubernetes.equals("true")) {
+            return ReturnStatusHelper.createClearStatus(NOKUBERNETES, operationsMonitoringService.isProcessingPending());
         }
 
         try {
@@ -135,15 +134,15 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
         }
     }
 
-    @PostMapping("/save-marathon-services-config")
+    @PostMapping("/save-kubernetes-services-config")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String saveMarathonServicesConfig(@RequestBody String configAsString, HttpSession session) {
+    public String saveKubernetesServicesConfig(@RequestBody String configAsString, HttpSession session) {
 
         logger.info ("Got config : " + configAsString);
 
-        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
+        if (StringUtils.isBlank(enableKubernetes) || !enableKubernetes.equals("true")) {
+            return ReturnStatusHelper.createClearStatus(NOKUBERNETES, operationsMonitoringService.isProcessingPending());
         }
 
         try {
@@ -159,26 +158,26 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
                     servicesDefinition, systemService, serviceInstallStatus, marathonServicesConfig);
 
             // store command and config in HTTP Session
-            session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
+            session.setAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND, command);
 
             return returnCommand (command);
 
         } catch (JSONException | SetupException | FileException | MarathonServicesConfigException e) {
             logger.error(e, e);
-            notificationService.addError("Marathon Services installation preparation failed !");
+            notificationService.addError("Kubernetes Services installation preparation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }
 
-    @PostMapping("/reinstall-marathon-services-config")
+    @PostMapping("/reinstall-kubernetes-services-config")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String reinstallMarathonServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
+    public String reinstallKubernetesServiceConfig(@RequestBody String reinstallModel, HttpSession session) {
 
         logger.info ("Got model : " + reinstallModel);
 
-        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
+        if (StringUtils.isBlank(enableKubernetes) || !enableKubernetes.equals("true")) {
+            return ReturnStatusHelper.createClearStatus(NOKUBERNETES, operationsMonitoringService.isProcessingPending());
         }
 
         try {
@@ -207,8 +206,8 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
                     servicesDefinition, systemService, newServicesInstallStatus, marathonServicesConfig);
 
             // store command and config in HTTP Session
-            session.setAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
-            session.setAttribute(PENDING_MARATHON_OPERATIONS_COMMAND, command);
+            session.setAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
+            session.setAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND, command);
 
             return returnCommand (command);
 
@@ -218,13 +217,13 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
         }
     }
 
-    @PostMapping("/apply-marathon-services-config")
+    @PostMapping("/apply-kubernetes-services-config")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String applyMarathonServicesConfig(HttpSession session) {
+    public String applyKubernetesServicesConfig(HttpSession session) {
 
-        if (StringUtils.isBlank(enableMarathon) || !enableMarathon.equals("true")) {
-            return ReturnStatusHelper.createClearStatus(NOMARATHON, operationsMonitoringService.isProcessingPending());
+        if (StringUtils.isBlank(enableKubernetes) || !enableKubernetes.equals("true")) {
+            return ReturnStatusHelper.createClearStatus(NOKUBERNETES, operationsMonitoringService.isProcessingPending());
         }
 
         try {
@@ -234,11 +233,11 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
                 return checkObject.toString(2);
             }
 
-            MarathonOperationsCommand command = (MarathonOperationsCommand) session.getAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
-            session.removeAttribute(PENDING_MARATHON_OPERATIONS_COMMAND);
+            MarathonOperationsCommand command = (MarathonOperationsCommand) session.getAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND);
+            session.removeAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND);
 
-            ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
-            session.removeAttribute(PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE);
+            ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE);
+            session.removeAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE);
 
             // newNodesStatus is null in case of marathon services config update (as opposed to forced reinstall)
             if (newServicesInstallationStatus != null) {
@@ -246,9 +245,6 @@ public class MarathonServicesConfigController extends AbstractOperationControlle
             }
 
             configurationService.saveMarathonServicesConfig(command.getRawConfig());
-
-            // FIXME Deprecated
-            //marathonService.applyMarathonServicesConfig(command);
 
             kubernetesService.applyServicesConfig(command);
 

@@ -498,10 +498,9 @@ public class ServicesDefinition implements InitializingBean {
                 .toArray(String[]::new);
     }
 
-    @Deprecated /* To be renamed */
-    public String[] listMarathonServices() {
+    public String[] listKubernetesServices() {
         return services.values().stream()
-                .filter(service -> service.isMarathon() || service.isKubernetes())
+                .filter(Service::isKubernetes)
                 .map(Service::getName)
                 .sorted()
                 .toArray(String[]::new);

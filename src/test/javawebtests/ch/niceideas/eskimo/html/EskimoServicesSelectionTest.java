@@ -74,7 +74,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         js("SERVICES_CONFIGURATION = " + jsonServices + ";");
         //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\"];");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"kubernetes\"];");
         js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -177,7 +177,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "\"mesos-master\":\"on\"," +
                 "\"logstash\":\"on\"," +
                 "\"mesos-agent\":\"on\"," +
-                "\"marathon\":\"on\"," +
+                "\"kubernetes\":\"on\"," +
                 "\"spark-executor\":\"on\"," +
                 "\"prometheus\":\"on\"," +
                 "\"flink-app-master\":\"on\"," +

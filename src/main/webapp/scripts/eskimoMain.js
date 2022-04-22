@@ -55,14 +55,14 @@ eskimo.Main = function() {
     let eskimoServicesSelection = null;
 
     /* @Deprecated To Be renamed */
-    let eskimoMarathonServicesSelection = null;
-    let eskimoMarathonServicesConfig = null;
+    let eskimoKubernetesServicesSelection = null;
+    let eskimoKubernetesServicesConfig = null;
 
     let eskimoServicesSettings = null;
     let eskimoFileManagers = null;
     let eskimoOperationsCommand = null;
     let eskimoSetupCommand = null;
-    let eskimoMarathonOperationsCommand = null;
+    let eskimoKubernetesOperationsCommand = null;
     let eskimoSettingsOperationsCommand = null;
     let eskimoAbout = null;
 
@@ -82,7 +82,7 @@ eskimo.Main = function() {
         eskimoNotifications = new eskimo.Notifications();
         eskimoOperations = new eskimo.Operations();
         eskimoOperationsCommand = new eskimo.OperationsCommand();
-        eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();
+        eskimoKubernetesOperationsCommand = new eskimo.KubernetesOperationsCommand();
         eskimoSetupCommand = new eskimo.SetupCommand();
         eskimoConsoles = new eskimo.Consoles();
         eskimoFileManagers = new eskimo.FileManagers();
@@ -91,8 +91,8 @@ eskimo.Main = function() {
         eskimoServicesSettings = new eskimo.ServicesSettings();
         eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();
         eskimoNodesConfig = new eskimo.NodesConfig();
-        eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();
-        eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();
+        eskimoKubernetesServicesConfig = new eskimo.KubernetesServicesConfig();
+        eskimoKubernetesServicesSelection = new eskimo.KubernetesServicesSelection();
         eskimoSystemStatus = new eskimo.SystemStatus();
         eskimoAbout = new eskimo.About();
 
@@ -106,13 +106,13 @@ eskimo.Main = function() {
             eskimoNotifications: eskimoNotifications,
             eskimoServices: eskimoServices,
             eskimoServicesSelection: eskimoServicesSelection,
-            eskimoMarathonServicesSelection: eskimoMarathonServicesSelection,
-            eskimoMarathonServicesConfig: eskimoMarathonServicesConfig,
+            eskimoKubernetesServicesSelection: eskimoKubernetesServicesSelection,
+            eskimoKubernetesServicesConfig: eskimoKubernetesServicesConfig,
             eskimoServicesSettings: eskimoServicesSettings,
             eskimoFileManagers: eskimoFileManagers,
             eskimoOperationsCommand: eskimoOperationsCommand,
             eskimoSetupCommand: eskimoSetupCommand,
-            eskimoMarathonOperationsCommand: eskimoMarathonOperationsCommand,
+            eskimoKubernetesOperationsCommand: eskimoKubernetesOperationsCommand,
             eskimoSettingsOperationsCommand: eskimoSettingsOperationsCommand,
             eskimoAbout: eskimoAbout,
             eskimoMain: this
@@ -142,7 +142,7 @@ eskimo.Main = function() {
         eskimoOperationsCommand.initialize();
         // (nothing)
 
-        eskimoMarathonOperationsCommand.initialize();
+        eskimoKubernetesOperationsCommand.initialize();
         // (nothing)
 
         eskimoSetupCommand.initialize();
@@ -176,10 +176,10 @@ eskimo.Main = function() {
         // - calls eskimoServices.initialize()
         // loadServiceDependencies -> list-config-services
 
-        eskimoMarathonServicesConfig.initialize();
-        // loadMarathonServices -> get-marathon-services
+        eskimoKubernetesServicesConfig.initialize();
+        // loadKubernetesServices -> get-kubernetes-services
 
-        eskimoMarathonServicesSelection.initialize();
+        eskimoKubernetesServicesSelection.initialize();
         // (nothing)
 
         eskimoSystemStatus.initialize();
@@ -221,7 +221,7 @@ eskimo.Main = function() {
         $("#main-menu-show-setup-link").click(eskimoSetup.showSetup);
         $("#main-menu-show-services-settings-link").click(eskimoServicesSettings.showServicesSettings);
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
-        $("#main-menu-show-marathon-config-link").click(eskimoMarathonServicesConfig.showMarathonServicesConfig);
+        $("#main-menu-show-kubernetes-config-link").click(eskimoKubernetesServicesConfig.showKubernetesServicesConfig);
         $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
         $("#main-menu-logout-link").click(function() {
             window.location = "logout";
@@ -372,29 +372,29 @@ eskimo.Main = function() {
         }
     };
 
-    this.handleMarathonSubsystem = function (enableMarathon) {
-        let menuMarathonConfig = $("#menu-marathon-configuration");
-        if (enableMarathon) {
+    this.handleKubernetesSubsystem = function (enableKubernetes) {
+        let menuKubernetesConfig = $("#menu-kubernetes-configuration");
+        if (enableKubernetes) {
 
-            let menuRole = menuMarathonConfig.data("menu-role");
+            let menuRole = menuKubernetesConfig.data("menu-role");
 
             if (menuRole == null || menuRole == "" || that.hasRole(menuRole)) {
 
-                if (menuMarathonConfig.hasClass("menu-hidden")) {
+                if (menuKubernetesConfig.hasClass("menu-hidden")) {
 
-                    menuMarathonConfig.css("visibility", "visible");
-                    menuMarathonConfig.css("display", "inherit");
-                    menuMarathonConfig.removeClass("menu-hidden")
+                    menuKubernetesConfig.css("visibility", "visible");
+                    menuKubernetesConfig.css("display", "inherit");
+                    menuKubernetesConfig.removeClass("menu-hidden")
 
                     // perhaps need to resize the menu ?
                     this.menuResize();
                 }
             }
         } else {
-            if (!menuMarathonConfig.hasClass("menu-hidden")) {
-                menuMarathonConfig.css("visibility", "hidden");
-                menuMarathonConfig.css("display", "none");
-                menuMarathonConfig.addClass("menu-hidden")
+            if (!menuKubernetesConfig.hasClass("menu-hidden")) {
+                menuKubernetesConfig.css("visibility", "hidden");
+                menuKubernetesConfig.css("display", "none");
+                menuKubernetesConfig.addClass("menu-hidden")
             }
         }
     };
@@ -548,14 +548,14 @@ eskimo.Main = function() {
     this.getServicesSelection = function() {
         return eskimoServicesSelection;
     };
-    this.getMarathonServicesSelection = function() {
-        return eskimoMarathonServicesSelection;
+    this.getKubernetesServicesSelection = function() {
+        return eskimoKubernetesServicesSelection;
     };
     this.getServicesSettings = function() {
         return eskimoServicesSettings;
     };
-    this.getMarathonServicesConfig = function() {
-        return eskimoMarathonServicesConfig;
+    this.getKubernetesServicesConfig = function() {
+        return eskimoKubernetesServicesConfig;
     };
     this.getFileManagers = function() {
         return eskimoFileManagers;
@@ -566,8 +566,8 @@ eskimo.Main = function() {
     this.getSetupCommand = function() {
         return eskimoSetupCommand;
     };
-    this.getMarathonOperationsCommand = function() {
-        return eskimoMarathonOperationsCommand;
+    this.getKubernetesOperationsCommand = function() {
+        return eskimoKubernetesOperationsCommand;
     };
     this.getSettingsOperationsCommand = function() {
         return eskimoSettingsOperationsCommand;

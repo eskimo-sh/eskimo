@@ -71,7 +71,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
         MarathonOperationsCommand retCommand = new MarathonOperationsCommand(rawMarathonServicesConfig);
 
         // 1. Find out about services that need to be installed
-        for (String service : servicesDefinition.listMarathonServices()) {
+        for (String service : servicesDefinition.listKubernetesServices()) {
             if (rawMarathonServicesConfig.isServiceInstallRequired(service)
                     && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
 

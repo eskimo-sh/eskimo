@@ -15,9 +15,9 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MarathonServicesConfigControllerTest {
+public class KubernetesServicesConfigControllerTest {
 
-    private MarathonServicesConfigController mscc = new MarathonServicesConfigController();
+    private KubernetesServicesConfigController mscc = new KubernetesServicesConfigController();
 
     @BeforeEach
     public void testSetup() {
@@ -68,7 +68,7 @@ public class MarathonServicesConfigControllerTest {
                 "    \"spark-history-server_install\": \"on\",\n" +
                 "    \"zeppelin_install\": \"on\",\n" +
                 "    \"kafka-manager_install\": \"on\"\n" +
-                "}").similar(new JSONObject (mscc.loadMarathonServicesConfig())));
+                "}").similar(new JSONObject (mscc.loadKubernetesServicesConfig())));
 
         mscc.setSetupService(new SetupService() {
             @Override
@@ -81,7 +81,7 @@ public class MarathonServicesConfigControllerTest {
                 "  \"clear\": \"setup\",\n" +
                 "  \"processingPending\": false,\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.loadMarathonServicesConfig());
+                "}", mscc.loadKubernetesServicesConfig());
 
         mscc.setSetupService(new SetupService() {
             @Override
@@ -100,7 +100,7 @@ public class MarathonServicesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
                 "  \"status\": \"KO\"\n" +
-                "}", mscc.loadMarathonServicesConfig());
+                "}", mscc.loadKubernetesServicesConfig());
     }
 
     @Test
@@ -154,9 +154,9 @@ public class MarathonServicesConfigControllerTest {
                 "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when marathon is available\"\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.reinstallMarathonServiceConfig("{\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
+                "}", mscc.reinstallKubernetesServiceConfig("{\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\"}", mscc.applyMarathonServicesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }
@@ -172,7 +172,7 @@ public class MarathonServicesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"messages\": \"Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.applyMarathonServicesConfig(session));
+                "}", mscc.applyKubernetesServicesConfig(session));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class MarathonServicesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.applyMarathonServicesConfig(session));
+                "}", mscc.applyKubernetesServicesConfig(session));
     }
 
     @Test
@@ -247,14 +247,14 @@ public class MarathonServicesConfigControllerTest {
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
                         "}",
-                mscc.saveMarathonServicesConfig("{" +
+                mscc.saveKubernetesServicesConfig("{" +
                 "\"cerebro_install\":\"on\"," +
                 "\"grafana_install\":\"on\"," +
                 "\"zeppelin_install\":\"on\"," +
                 "\"spark-history-server\":\"on\"," +
                 "\"kibana\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\"}", mscc.applyMarathonServicesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }

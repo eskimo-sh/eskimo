@@ -36,7 +36,7 @@ if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
 /* @Deprecated To Be renamed */
-eskimo.MarathonOperationsCommand = function() {
+eskimo.KubernetesOperationsCommand = function() {
 
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
@@ -46,13 +46,13 @@ eskimo.MarathonOperationsCommand = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#marathon-operations-command-modal-wrapper").load("html/eskimoMarathonOperationsCommand.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#kubernetes-operations-command-modal-wrapper").load("html/eskimoKubernetesOperationsCommand.html", function (responseTxt, statusTxt, jqXHR) {
 
             if (statusTxt == "success") {
 
-                $('#marathon-operations-command-header-cancel').click(cancelMarathonOperationsCommand);
-                $('#marathon-operations-command-button-cancel').click(cancelMarathonOperationsCommand);
-                $('#marathon-operations-command-button-validate').click(validateMarathonOperationsCommand);
+                $('#kubernetes-operations-command-header-cancel').click(cancelKubernetesOperationsCommand);
+                $('#kubernetes-operations-command-button-cancel').click(cancelKubernetesOperationsCommand);
+                $('#kubernetes-operations-command-button-validate').click(validateKubernetesOperationsCommand);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -75,7 +75,7 @@ eskimo.MarathonOperationsCommand = function() {
         let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
 
         // installations
-        commandDescription += "<strong>Marathon Services Installation</strong><br><br>";
+        commandDescription += "<strong>Kubernetes Services Installation</strong><br><br>";
 
         for (let i = 0; i < command.installations.length; i++) {
             commandDescription = renderOperation(command.installations[i], commandDescription);
@@ -84,7 +84,7 @@ eskimo.MarathonOperationsCommand = function() {
         commandDescription += "<br>";
 
         // uninstallations
-        commandDescription += "<strong>Marathon Services Uninstallation</strong><br><br>";
+        commandDescription += "<strong>Kubernetes Services Uninstallation</strong><br><br>";
 
         for (let i = 0; i < command.uninstallations.length; i++) {
             commandDescription = renderOperation(command.uninstallations[i], commandDescription);
@@ -114,16 +114,16 @@ eskimo.MarathonOperationsCommand = function() {
 
         }
 
-        $("#marathon-operations-command-body").html(commandDescription);
+        $("#kubernetes-operations-command-body").html(commandDescription);
 
-        $('#marathon-operations-command-modal').modal("show");
+        $('#kubernetes-operations-command-modal').modal("show");
 
         // re-enable button
-        $('#marathon-operations-command-button-validate').prop('disabled', false);
+        $('#kubernetes-operations-command-button-validate').prop('disabled', false);
     }
     this.showCommand = showCommand;
 
-    function validateMarathonOperationsCommand() {
+    function validateKubernetesOperationsCommand() {
 
         if (that.eskimoMain.isOperationInProgress()) {
             alert ("There is already some operations in progress on backend. Skipping.");
@@ -131,7 +131,7 @@ eskimo.MarathonOperationsCommand = function() {
         } else {
 
             // first thing : disable button to prevent double submit
-            $('#marathon-operations-command-button-validate').prop('disabled', true);
+            $('#kubernetes-operations-command-button-validate').prop('disabled', true);
 
             that.eskimoOperations.showOperations();
 
@@ -143,7 +143,7 @@ eskimo.MarathonOperationsCommand = function() {
                 dataType: "json",
                 timeout: 1000 * 3600,
                 contentType: "application/json; charset=utf-8",
-                url: "apply-marathon-services-config",
+                url: "apply-kubernetes-services-config",
                 success: function (data, status, jqXHR) {
 
                     // OK
@@ -164,12 +164,12 @@ eskimo.MarathonOperationsCommand = function() {
             });
         }
 
-        $('#marathon-operations-command-modal').modal("hide");
+        $('#kubernetes-operations-command-modal').modal("hide");
     }
-    this.validateMarathonOperationsCommand = validateMarathonOperationsCommand;
+    this.validateKubernetesOperationsCommand = validateKubernetesOperationsCommand;
 
-    function cancelMarathonOperationsCommand() {
-        $('#marathon-operations-command-modal').modal("hide");
+    function cancelKubernetesOperationsCommand() {
+        $('#kubernetes-operations-command-modal').modal("hide");
     }
-    this.cancelMarathonOperationsCommand = cancelMarathonOperationsCommand;
+    this.cancelKubernetesOperationsCommand = cancelKubernetesOperationsCommand;
 };

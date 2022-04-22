@@ -226,7 +226,7 @@ public class KubernetesService {
             KubeStatusParser parser = getKubeStatusParser();
 
             MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
-            for (String service : servicesDefinition.listMarathonServices()) {
+            for (String service : servicesDefinition.listKubernetesServices()) {
 
                 // should service be installed on kubernetes ?
                 boolean shall = this.shouldInstall(marathonConfig, service);

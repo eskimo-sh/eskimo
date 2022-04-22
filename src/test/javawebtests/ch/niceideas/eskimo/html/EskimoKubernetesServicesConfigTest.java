@@ -43,20 +43,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
+public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
-    private String expectedMarathonConfigTableContent = null;
-    private String expectedMarathonSelectionTableContent = null;
+    private String expectedKubernetesConfigTableContent = null;
+    private String expectedKubernetesSelectionTableContent = null;
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        expectedMarathonConfigTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesConfigTest/expectedMarathonConfigTableContent.html"));
-        expectedMarathonSelectionTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesConfigTest/expectedMarathonSelectionTableContent.html"));
+        expectedKubernetesConfigTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesConfigTest/expectedKubernetesConfigTableContent.html"));
+        expectedKubernetesSelectionTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesConfigTest/expectedKubernetesSelectionTableContent.html"));
 
         loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoMarathonServicesConfigChecker.js");
-        loadScript(page, "eskimoMarathonServicesConfig.js");
+        loadScript(page, "eskimoKubernetesServicesConfigChecker.js");
+        loadScript(page, "eskimoKubernetesServicesConfig.js");
 
         /*
         js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
@@ -67,16 +67,16 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         */
 
         // instantiate test object
-        js("eskimoMarathonServicesConfig = new eskimo.MarathonServicesConfig();");
-        js("eskimoMarathonServicesConfig.eskimoMain = eskimoMain;");
-        js("eskimoMarathonServicesConfig.eskimoMarathonServicesSelection = eskimoMarathonServicesSelection");
-        js("eskimoMarathonServicesConfig.eskimoMarathonOperationsCommand = eskimoMarathonOperationsCommand");
-        js("eskimoMarathonServicesConfig.eskimoNodesConfig = eskimoNodesConfig");
-        js("eskimoMarathonServicesConfig.initialize();");
+        js("eskimoKubernetesServicesConfig = new eskimo.KubernetesServicesConfig();");
+        js("eskimoKubernetesServicesConfig.eskimoMain = eskimoMain;");
+        js("eskimoKubernetesServicesConfig.eskimoKubernetesServicesSelection = eskimoKubernetesServicesSelection");
+        js("eskimoKubernetesServicesConfig.eskimoKubernetesOperationsCommand = eskimoKubernetesOperationsCommand");
+        js("eskimoKubernetesServicesConfig.eskimoNodesConfig = eskimoNodesConfig");
+        js("eskimoKubernetesServicesConfig.initialize();");
 
-        waitForElementIdInDOM("reset-marathon-servicesconfig");
+        waitForElementIdInDOM("reset-kubernetes-servicesconfig");
 
-        js("eskimoMarathonServicesConfig.setMarathonServicesForTest([\n" +
+        js("eskimoKubernetesServicesConfig.setKubernetesServicesForTest([\n" +
                 "    \"cerebro\",\n" +
                 "    \"grafana\",\n" +
                 "    \"kafka-manager\",\n" +
@@ -85,21 +85,21 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                 "    \"zeppelin\"\n" +
                 "  ]);");
 
-        js("$('#inner-content-marathon-services-config').css('display', 'inherit')");
-        js("$('#inner-content-marathon-services-config').css('visibility', 'visible')");
+        js("$('#inner-content-kubernetes-services-config').css('display', 'inherit')");
+        js("$('#inner-content-kubernetes-services-config').css('visibility', 'visible')");
     }
 
     @Test
-    public void testSaveMarathonServicesButtonClick() throws Exception {
+    public void testSaveKubernetesServicesButtonClick() throws Exception {
 
-        testRenderMarathonConfig();
+        testRenderKubernetesConfig();
 
-        js("function checkMarathonSetup (marathonConfig) {" +
-                "    console.log (marathonConfig);" +
-                "    window.savedMarathonConfig = JSON.stringify (marathonConfig);" +
+        js("function checkKubernetesSetup (kubernetesConfig) {" +
+                "    console.log (kubernetesConfig);" +
+                "    window.savedKubernetesConfig = JSON.stringify (kubernetesConfig);" +
                 "};");
 
-        page.getElementById("save-marathon-servicesbtn").click();
+        page.getElementById("save-kubernetes-servicesbtn").click();
 
         JSONObject expectedConfig = new JSONObject("" +
                 "{\"cerebro_install\":\"on\"," +
@@ -109,30 +109,30 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                 "\"spark-history-server_install\":\"on\"," +
                 "\"zeppelin_install\":\"on\"}");
 
-        JSONObject actualConfig = new JSONObject((String)js("window.savedMarathonConfig").getJavaScriptResult());
+        JSONObject actualConfig = new JSONObject((String)js("window.savedKubernetesConfig").getJavaScriptResult());
         assertTrue(expectedConfig.similar(actualConfig));
     }
 
     @Test
     public void testSelectAll() throws Exception {
 
-        testRenderMarathonConfig();
+        testRenderKubernetesConfig();
 
-        js("eskimoMarathonServicesConfig.selectAll()");
+        js("eskimoKubernetesServicesConfig.selectAll()");
 
         assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
 
-        js("eskimoMarathonServicesConfig.selectAll()");
+        js("eskimoKubernetesServicesConfig.selectAll()");
 
         assertEquals (true, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
 
-        js("eskimoMarathonServicesConfig.selectAll()");
+        js("eskimoKubernetesServicesConfig.selectAll()");
 
         assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
@@ -142,8 +142,8 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderMarathonConfig() throws Exception {
-        js("eskimoMarathonServicesConfig.renderMarathonConfig({\n" +
+    public void testRenderKubernetesConfig() throws Exception {
+        js("eskimoKubernetesServicesConfig.renderKubernetesConfig({\n" +
                 "    \"cerebro_install\": \"on\",\n" +
                 "    \"zeppelin_install\": \"on\",\n" +
                 "    \"kafka-manager_install\": \"on\",\n" +
@@ -152,35 +152,35 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                 "    \"grafana_install\": \"on\"\n" +
                 "})");
 
-        //System.err.println (page.getElementById("marathon-services-table-body").asXml());
+        //System.err.println (page.getElementById("kubernetes-services-table-body").asXml());
         assertEquals(
-                expectedMarathonConfigTableContent.replace("  ", ""),
-                page.getElementById("marathon-services-table-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+                expectedKubernetesConfigTableContent.replace("  ", ""),
+                page.getElementById("kubernetes-services-table-body").asXml().replace("  ", "").replace("\r\n", "\n"));
     }
 
     @Test
     public void testShowReinstallSelection() throws Exception {
 
-        testRenderMarathonConfig();
+        testRenderKubernetesConfig();
 
-        js("$('#main-content').append($('<div id=\"marathon-services-selection-body\"></div>'))");
+        js("$('#main-content').append($('<div id=\"kubernetes-services-selection-body\"></div>'))");
 
-        js("eskimoMarathonServicesConfig.showReinstallSelection()");
+        js("eskimoKubernetesServicesConfig.showReinstallSelection()");
 
-        //System.err.println (page.getElementById("marathon-services-selection-body").asXml());
+        //System.err.println (page.getElementById("kubernetes-services-selection-body").asXml());
         assertEquals(
-                expectedMarathonSelectionTableContent.replace("  ", ""),
-                page.getElementById("marathon-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+                expectedKubernetesSelectionTableContent.replace("  ", ""),
+                page.getElementById("kubernetes-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
     }
 
     @Test
-    public void testShowMarathonServicesConfig() throws Exception {
+    public void testShowKubernetesServicesConfig() throws Exception {
 
         // 1. setup not OK
         js("eskimoMain.isSetupDone = function () { return false; }");
         js("eskimoMain.showSetupNotDone = function () { window.setupNotDoneCalled = true; }");
 
-        js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
         assertJavascriptEquals("true", "window.setupNotDoneCalled");
 
         // 2. setup OK, operation in progress
@@ -189,7 +189,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("eskimoMain.showProgressbar = function () { window.showProgressBarCalled = true; }");
         js("$.ajax = function() {}");
 
-        js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
         assertJavascriptEquals("true", "window.showProgressBarCalled");
 
         // 3. data clear, setup
@@ -197,7 +197,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
         js("$.ajax = function(object) { object.success( { 'clear': 'setup'}); }");
         js("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
 
-        js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
         assertJavascriptEquals("true", "window.handleSetupNotCompletedCalled");
 
         // 4. data clear, missing
@@ -207,7 +207,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
 
         js("$.ajax = function(object) { object.success( { 'clear': 'missing'}); }");
 
-        js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
         assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
         assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
@@ -224,7 +224,7 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
                         "    \"grafana_install\": \"on\"\n" +
                         "} ); }");
 
-        js("eskimoMarathonServicesConfig.showMarathonServicesConfig()");
+        js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
         assertEquals (true, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
         assertEquals (true, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
@@ -233,26 +233,26 @@ public class EskimoMarathonServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testProceedWithMarathonInstallation() throws Exception  {
+    public void testProceedWithKubernetesInstallation() throws Exception  {
 
-        testRenderMarathonConfig();
+        testRenderKubernetesConfig();
 
         // 1. error
         js("console.error = function (error) { window.consoleError = error; };");
         js("$.ajax = function (object) { object.success ( { error: 'dGVzdEVycm9y' } );}");
 
-        js("eskimoMarathonServicesConfig.proceedWithMarathonInstallation ( { }, false);");
+        js("eskimoKubernetesServicesConfig.proceedWithKubernetesInstallation ( { }, false);");
 
         assertJavascriptEquals("testError", "window.consoleError");
 
         // 2. pass command
-        js("eskimoMarathonOperationsCommand.showCommand = function (command) {" +
+        js("eskimoKubernetesOperationsCommand.showCommand = function (command) {" +
                 "            window.command = command;" +
                 "        };");
 
         js("$.ajax = function (object) { object.success ( { command: 'testCommand' } );}");
 
-        js("eskimoMarathonServicesConfig.proceedWithMarathonInstallation ( { }, false);");
+        js("eskimoKubernetesServicesConfig.proceedWithKubernetesInstallation ( { }, false);");
 
         assertJavascriptEquals("testCommand", "window.command");
     }

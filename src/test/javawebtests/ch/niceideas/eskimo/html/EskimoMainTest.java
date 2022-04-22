@@ -90,10 +90,10 @@ public class EskimoMainTest extends AbstractWebTest {
                 "};");
         js("eskimo.ServicesSelection = function(){ this.initialize = function(){}; };");
         js("eskimo.ServicesSettings = function(){ this.initialize = function(){}; };");
-        js("eskimo.MarathonServicesConfig = function(){ this.initialize = function(){}; };");
-        js("eskimo.MarathonServicesSelection = function(){ this.initialize = function(){}; };");
+        js("eskimo.KubernetesServicesConfig = function(){ this.initialize = function(){}; };");
+        js("eskimo.KubernetesServicesSelection = function(){ this.initialize = function(){}; };");
         js("eskimo.OperationsCommand = function(){ this.initialize = function(){} ; };");
-        js("eskimo.MarathonOperationsCommand = function(){ this.initialize = function(){} ;};");
+        js("eskimo.KubernetesOperationsCommand = function(){ this.initialize = function(){} ;};");
         js("eskimo.SettingsOperationsCommand = function(){ this.initialize = function(){} ;};");
         js("eskimo.SetupCommand = function(){ this.initialize = function(){} ;};");
         js("eskimo.FileManagers = function(){ this.initialize = function(){} ;};");
@@ -287,7 +287,7 @@ public class EskimoMainTest extends AbstractWebTest {
 
     /*
     @Test
-    public void testHandleMarathonSubsystem() throws Exception {
+    public void testHandleKubernetesSubsystem() throws Exception {
         fail("To Be Implemented");
     }
     */

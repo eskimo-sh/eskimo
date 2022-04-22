@@ -710,7 +710,7 @@ eskimo.SystemStatus = function() {
 
         // D. General configuration
 
-        that.eskimoMain.handleMarathonSubsystem (systemStatus.enableMarathon);
+        that.eskimoMain.handleKubernetesSubsystem (systemStatus.enableKubernetes);
     };
 
     this.monitoringDashboardFrameTamper = function() {

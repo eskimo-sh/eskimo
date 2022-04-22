@@ -58,7 +58,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoNodesConfigurationChecker.js");
         loadScript(page, "eskimoNodesConfig.js");
 
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"marathon\" ];");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"kubernetes\" ];");
         js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -133,7 +133,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         JSONObject expectedResult = new JSONObject("{" +
                 "\"node_id1\":\"192.168.10.11\"," +
-                "\"marathon\":\"1\"," +
+                "\"kubernetes\":\"1\"," +
                 "\"ntp1\":\"on\"," +
                 "\"elasticsearch1\":\"on\"," +
                 "\"kafka1\":\"on\"," +

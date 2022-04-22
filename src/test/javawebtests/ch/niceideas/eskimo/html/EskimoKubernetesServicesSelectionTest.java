@@ -45,46 +45,46 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
+public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
     @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "bootstrap.js");
         loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoMarathonServicesSelection.js");
+        loadScript(page, "eskimoKubernetesServicesSelection.js");
 
-        js("eskimoMarathonServicesConfig = {};");
+        js("eskimoKubernetesServicesConfig = {};");
 
         // leaving zeppelin out intentionally
-        js("eskimoMarathonServicesConfig.getMarathonServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana']};");
+        js("eskimoKubernetesServicesConfig.getKubernetesServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana']};");
 
         // instantiate test object
-        js("eskimoMarathonServicesSelection = new eskimo.MarathonServicesSelection();");
-        js("eskimoMarathonServicesSelection.eskimoMarathonServicesConfig = eskimoMarathonServicesConfig;");
-        js("eskimoMarathonServicesSelection.initialize();");
+        js("eskimoKubernetesServicesSelection = new eskimo.KubernetesServicesSelection();");
+        js("eskimoKubernetesServicesSelection.eskimoKubernetesServicesConfig = eskimoKubernetesServicesConfig;");
+        js("eskimoKubernetesServicesSelection.initialize();");
 
-        waitForElementIdInDOM("marathon-services-selection-body");
+        waitForElementIdInDOM("kubernetes-services-selection-body");
 
-        String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonServicesSelectionTest/form.html"));
+        String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesSelectionTest/form.html"));
 
         js("INNER_FORM = '" + htmlForm.replace("\n", " ") + "';");
 
-        js("$('#marathon-services-selection-body').html(INNER_FORM);");
+        js("$('#kubernetes-services-selection-body').html(INNER_FORM);");
     }
 
     @Test
     public void testNominal() throws Exception {
 
         // this is just to ensure everything has been properly loaded by setup
-        assertNotNull (page.getElementById("select-all-marathon-services-button"));
+        assertNotNull (page.getElementById("select-all-kubernetes-services-button"));
 
-        js("eskimoMarathonServicesSelection.showMarathonServiceSelection()");
+        js("eskimoKubernetesServicesSelection.showKubernetesServiceSelection()");
 
-        await().atMost(1, TimeUnit.SECONDS).until(() -> js("$('#marathon-services-selection-modal').css('display')").getJavaScriptResult().toString().equals ("block"));
+        await().atMost(1, TimeUnit.SECONDS).until(() -> js("$('#kubernetes-services-selection-modal').css('display')").getJavaScriptResult().toString().equals ("block"));
 
-        assertCssValue("#marathon-services-selection-modal", "display", "block");
-        assertCssValue("#marathon-services-selection-modal", "visibility", "visible");
+        assertCssValue("#kubernetes-services-selection-modal", "display", "block");
+        assertCssValue("#kubernetes-services-selection-modal", "visibility", "visible");
     }
 
     @Test
@@ -92,13 +92,13 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
 
         testNominal();
 
-        js("eskimoMarathonServicesConfig.proceedWithReinstall = function (reinstallConfig) {" +
+        js("eskimoKubernetesServicesConfig.proceedWithReinstall = function (reinstallConfig) {" +
                 "    window.reinstallConfig = JSON.stringify (reinstallConfig);" +
                 "}");
 
         testSelectAll();
 
-        page.getElementById("marathon-services-select-button-validate").click();
+        page.getElementById("kubernetes-services-select-button-validate").click();
 
         JSONObject expectedResult = new JSONObject("{" +
                 "\"cerebro_reinstall\":\"on\"," +
@@ -114,7 +114,7 @@ public class EskimoMarathonServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testSelectAll() throws Exception {
 
-        js("eskimoMarathonServicesSelection.marathonServicesSelectionSelectAll();");
+        js("eskimoKubernetesServicesSelection.kubernetesServicesSelectionSelectAll();");
 
         assertTrue ((Boolean)js("$('#cerebro_reinstall').get(0).checked").getJavaScriptResult());
         assertTrue ((Boolean)js("$('#kibana_reinstall').get(0).checked").getJavaScriptResult());

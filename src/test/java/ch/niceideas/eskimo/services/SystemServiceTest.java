@@ -215,7 +215,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         //System.err.println(systemStatus.getFormattedValue());
 
         SystemStatusWrapper expectedStatusWrapper = new SystemStatusWrapper(expectedFullStatus);
-        for (String marathonService : servicesDefinition.listMarathonServices()) {
+        for (String marathonService : servicesDefinition.listKubernetesServices()) {
             String prevValue = expectedStatusWrapper.getValueForPathAsString(SystemStatusWrapper.SERVICE_PREFIX + marathonService + "_192-168-10-11");
             if (StringUtils.isNotBlank(prevValue) && prevValue.equals("OK")) {
                 expectedStatusWrapper.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + marathonService + "_192-168-10-11", "KO");

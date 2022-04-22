@@ -33,7 +33,7 @@ Software.
 */
 
 
-function checkMarathonSetup (marathonSetupConfig, servicesDependencies, successCallback) {
+function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, successCallback) {
 
     $.ajax({
         type: "GET",
@@ -42,7 +42,7 @@ function checkMarathonSetup (marathonSetupConfig, servicesDependencies, successC
         success: function (data, status, jqXHR) {
 
             try {
-                doCheckMarathonSetup (data, marathonSetupConfig, servicesDependencies);
+                doCheckKubernetesSetup (data, kubernetesSetupConfig, servicesDependencies);
 
                 if(successCallback && successCallback instanceof Function) {
                     successCallback();
@@ -61,13 +61,13 @@ function checkMarathonSetup (marathonSetupConfig, servicesDependencies, successC
     return true;
 }
 
-function doCheckMarathonSetup (nodesConfig, marathonSetupConfig, servicesDependencies) {
+function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDependencies) {
     if (!nodesConfig.clear) {
 
         // data is nodesConfig
 
         // check service dependencies
-        for (let key in marathonSetupConfig) {
+        for (let key in kubernetesSetupConfig) {
             let re = /([a-zA-Z\-]+)_install/;
 
             let matcher = key.match(re);
@@ -82,7 +82,7 @@ function doCheckMarathonSetup (nodesConfig, marathonSetupConfig, servicesDepende
                 // I want the dependency on same node
                 if (dependency.mes == "SAME_NODE") {
 
-                    throw "Inconsistency found : Service " + serviceName + " is a marathon service and defines a dependency SAME_NODE which is disallowed"
+                    throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency SAME_NODE which is disallowed"
                 }
 
                 // I want the dependency somewhere

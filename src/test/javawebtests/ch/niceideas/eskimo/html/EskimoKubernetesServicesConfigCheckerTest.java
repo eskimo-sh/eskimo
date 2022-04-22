@@ -46,15 +46,15 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
+public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
-    private static final Logger logger = Logger.getLogger(EskimoMarathonServicesConfigCheckerTest.class);
+    private static final Logger logger = Logger.getLogger(EskimoKubernetesServicesConfigCheckerTest.class);
 
     @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "eskimoNodesConfigurationChecker.js");
-        loadScript(page, "eskimoMarathonServicesConfigChecker.js");
+        loadScript(page, "eskimoKubernetesServicesConfigChecker.js");
 
         ServicesController sc = new ServicesController();
 
@@ -67,24 +67,24 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        js("function callCheckMarathonSetup(nodesConfig, marathonConfig) {\n" +
-                "   return doCheckMarathonSetup(nodesConfig, marathonConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
+        js("function callCheckKubernetesSetup(nodesConfig, kubernetesConfig) {\n" +
+                "   return doCheckKubernetesSetup(nodesConfig, kubernetesConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
                 "}");
     }
 
 
     @Test
-    public void testCheckMarathonSetupOK() throws Exception {
+    public void testCheckKubernetesSetupOK() throws Exception {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
-            put("marathon", "1");
+            put("kubernetes", "1");
             put("ntp1", "on");
             put("prometheus1", "on");
             put("elasticsearch1", "on");
         }});
 
-        JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("cerebro_installed", "on");
             put("kibana_install", "on");
             put("grafana_install", "on");
@@ -92,7 +92,7 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
 
         Exception error = null;
         try {
-            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
         } catch (Exception e) {
             error = e;
         }
@@ -106,16 +106,16 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
-                put("marathon", "1");
+                put("kubernetes", "1");
                 put("ntp1", "on");
                 put("prometheus1", "on");
             }});
 
-            JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("cerebro_installed", "on");
             }});
 
-            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -129,16 +129,16 @@ public class EskimoMarathonServicesConfigCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
-                put("marathon", "1");
+                put("kubernetes", "1");
                 put("prometheus1", "on");
                 put("elasticsearch1", "on");
             }});
 
-            JSONObject marathonConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("zeppelin_installed", "on");
             }});
 
-            js("callCheckMarathonSetup(" + nodesConfig.toString() + "," + marathonConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());

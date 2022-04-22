@@ -634,7 +634,7 @@ public class MarathonService {
             }
 
             MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
-            for (String service : servicesDefinition.listMarathonServices()) {
+            for (String service : servicesDefinition.listKubernetesServices()) {
 
                 // should service be installed on marathon ?
                 boolean shall = this.shouldInstall(marathonConfig, service);

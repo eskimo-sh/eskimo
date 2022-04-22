@@ -407,7 +407,7 @@ public class SystemService {
                     if (StringUtils.isNotBlank(kubeNode)) {
                         String kubeNodeName = kubeNode.replace(".", "-");
                         MarathonServicesConfigWrapper kubeConfig = configurationService.loadMarathonServicesConfig();
-                        for (String service : servicesDefinition.listMarathonServices()) {
+                        for (String service : servicesDefinition.listKubernetesServices()) {
                             if (marathonService.shouldInstall(kubeConfig, service)) {
                                 statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + kubeNodeName, "KO");
                             }

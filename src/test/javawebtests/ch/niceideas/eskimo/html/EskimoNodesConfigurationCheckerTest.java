@@ -73,7 +73,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        js("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"marathon\" ];");
+        js("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"kubernetes\" ];");
         js("var MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
         js("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -122,7 +122,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.10.12");
-            put("marathon", "2");
+            put("kubernetes", "2");
             put("elasticsearch1", "on");
             put("elasticsearch2", "on");
             put("kafka1", "on");
@@ -150,7 +150,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.10.12");
-            put("marathon", "2");
+            put("kubernetes", "2");
             put("elasticsearch1", "on");
             put("elasticsearch2", "on");
             put("kafka1", "on");
@@ -181,7 +181,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12-192.160.10.15");
-                put("marathon", "1");
+                put("kubernetes", "1");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -210,7 +210,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
-                put("marathon", "1");
+                put("kubernetes", "1");
                 put("elasticsearch1", "on");
                 put("kafka1", "on");
                 put("ntp1", "on");
@@ -232,7 +232,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12-192.160.10.15");
-                put("marathon", "2");
+                put("kubernetes", "2");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -257,7 +257,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Node 2 is a range an declares service marathon which is a unique service, hence forbidden on a range."));
+        assertTrue(exception.getMessage().startsWith("Node 2 is a range an declares service kubernetes which is a unique service, hence forbidden on a range."));
     }
 
     @Test
@@ -267,7 +267,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12");
-                put("marathon", "2");
+                put("kubernetes", "2");
                 put("elasticsearch1", "on");
                 put("elasticsearch2", "on");
                 put("kafka1", "on");
@@ -346,7 +346,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
-            put("marathon", "1");
+            put("kubernetes", "1");
             put("elasticsearch1", "on");
             put("ntp1", "on");
             put("kafka1", "on");
@@ -367,7 +367,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
-                put("marathon", "1");
+                put("kubernetes", "1");
                 put("elasticsearch1", "on");
                 put("ntp1", "on");
                 put("kafka1", "on");
@@ -396,7 +396,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("ntp", "1");
                 put("gluster", "1");
                 put("spark-executor1", "on");
-                put("marathon", "1");
+                put("kubernetes", "1");
                 put("zookeeper", "1");
             }});
 
@@ -533,7 +533,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
 
     @Test
-    public void testNoMarathonServiceCanBeSelected() throws Exception {
+    public void testNoKubernetesServiceCanBeSelected() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
@@ -556,7 +556,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : service cerebro is either undefined or a marathon service which should not be selectable here."));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : service cerebro is either undefined or a kubernetes service which should not be selectable here."));
     }
 
 

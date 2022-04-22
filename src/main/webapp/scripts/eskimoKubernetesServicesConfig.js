@@ -36,36 +36,36 @@ if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
 /* @Deprecated To Be renamed */
-eskimo.MarathonServicesConfig = function() {
+eskimo.KubernetesServicesConfig = function() {
 
     // will be injected from glue
     this.eskimoMain = null;
-    this.eskimoMarathonServicesSelection = null;
-    this.eskimoMarathonOperationsCommand = null;
+    this.eskimoKubernetesServicesSelection = null;
+    this.eskimoKubernetesOperationsCommand = null;
     this.eskimoNodesConfig = null;
 
     const that = this;
 
     // initialized by backend
-    let MARATHON_SERVICES = [];
+    let KUBERNETES_SERVICES = [];
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#inner-content-marathon-services-config").load("html/eskimoMarathonServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-kubernetes-services-config").load("html/eskimoKubernetesServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
 
             if (statusTxt == "success") {
 
-                $("#save-marathon-servicesbtn").click(function (e) {
+                $("#save-kubernetes-servicesbtn").click(function (e) {
 
-                    let setupConfig = $("form#marathon-servicesconfig").serializeObject();
+                    let setupConfig = $("form#kubernetes-servicesconfig").serializeObject();
 
                     console.log(setupConfig);
 
                     try {
-                        checkMarathonSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(),
+                        checkKubernetesSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(),
                             function () {
                                 // callback if setup is OK
-                                proceedWithMarathonInstallation(setupConfig);
+                                proceedWithKubernetesInstallation(setupConfig);
                             });
                     } catch (error) {
                         alert ("error : " + error);
@@ -75,25 +75,25 @@ eskimo.MarathonServicesConfig = function() {
                     return false;
                 });
 
-                $("#reinstall-marathon-servicesbtn").click(function (e) {
+                $("#reinstall-kubernetes-servicesbtn").click(function (e) {
                     showReinstallSelection();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#select-all-marathon-servicesconfig").click(function (e) {
+                $("#select-all-kubernetes-servicesconfig").click(function (e) {
                     selectAll();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#reset-marathon-servicesconfig").click(function (e) {
-                    showMarathonServicesConfig();
+                $("#reset-kubernetes-servicesconfig").click(function (e) {
+                    showKubernetesServicesConfig();
                     e.preventDefault();
                     return false;
                 });
 
-                loadMarathonServices();
+                loadKubernetesServices();
 
 
             } else if (statusTxt == "error") {
@@ -103,19 +103,19 @@ eskimo.MarathonServicesConfig = function() {
         });
     };
 
-    function loadMarathonServices() {
+    function loadKubernetesServices() {
         $.ajax({
             type: "GET",
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            url: "get-marathon-services",
+            url: "get-kubernetes-services",
             success: function (data, status, jqXHR) {
 
                 if (data.status == "OK") {
 
-                    MARATHON_SERVICES = data.marathonServices;
+                    KUBERNETES_SERVICES = data.kubernetesServices;
 
-                    //console.log (MARATHON_SERVICES);
+                    //console.log (KUBERNETES_SERVICES);
 
                 } else {
                     alert(data.error);
@@ -125,12 +125,12 @@ eskimo.MarathonServicesConfig = function() {
         });
     }
 
-    this.setMarathonServicesForTest = function(testServics) {
-        MARATHON_SERVICES = testServics;
+    this.setKubernetesServicesForTest = function(testServics) {
+        KUBERNETES_SERVICES = testServics;
     };
 
-    this.getMarathonServices = function() {
-        return MARATHON_SERVICES;
+    this.getKubernetesServices = function() {
+        return KUBERNETES_SERVICES;
     };
 
     function selectAll(){
@@ -138,51 +138,51 @@ eskimo.MarathonServicesConfig = function() {
         let allSelected = true;
 
         // are they all selected already
-        for (let i = 0; i < MARATHON_SERVICES.length; i++) {
-            if (!$('#' + MARATHON_SERVICES[i] + "_install").get(0).checked) {
+        for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
+            if (!$('#' + KUBERNETES_SERVICES[i] + "_install").get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
-        for (let i = 0; i < MARATHON_SERVICES.length; i++) {
-            $('#' + MARATHON_SERVICES[i] + "_install").get(0).checked = !allSelected;
+        for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
+            $('#' + KUBERNETES_SERVICES[i] + "_install").get(0).checked = !allSelected;
         }
     }
     this.selectAll = selectAll;
 
-    this.renderMarathonConfig = function (marathonConfig) {
+    this.renderKubernetesConfig = function (kubernetesConfig) {
 
-        let marathonServicesTableBody = $("#marathon-services-table-body");
+        let kubernetesServicesTableBody = $("#kubernetes-services-table-body");
 
-        for (let i = 0; i < MARATHON_SERVICES.length; i++) {
+        for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
 
-            let marathonServiceRow = '<tr>';
+            let kubernetesServiceRow = '<tr>';
 
-            marathonServiceRow += ''+
+            kubernetesServiceRow += ''+
                 '<td>' +
-                '<img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(MARATHON_SERVICES[i]) + '" />' +
+                '<img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(KUBERNETES_SERVICES[i]) + '" />' +
                 '</td>'+
                 '<td>'+
-                MARATHON_SERVICES[i]+
+                KUBERNETES_SERVICES[i]+
                 '</td>'+
                 '<td>' +
-                '    <input  type="checkbox" class="input-md" name="' + MARATHON_SERVICES[i] +'_install" id="'+MARATHON_SERVICES[i] +'_install"></input>' +
+                '    <input  type="checkbox" class="input-md" name="' + KUBERNETES_SERVICES[i] +'_install" id="'+KUBERNETES_SERVICES[i] +'_install"></input>' +
                 '</td>';
 
 
 
-            marathonServiceRow += '<tr>';
-            marathonServicesTableBody.append (marathonServiceRow);
+            kubernetesServiceRow += '<tr>';
+            kubernetesServicesTableBody.append (kubernetesServiceRow);
         }
 
-        if (marathonConfig) {
+        if (kubernetesConfig) {
 
-            for (let installFlag in marathonConfig) {
+            for (let installFlag in kubernetesConfig) {
                 let indexOfInstall = installFlag.indexOf("_install");
                 if (indexOfInstall > -1) {
                     let serviceName = installFlag.substring(0,indexOfInstall);
-                    let flag = marathonConfig[installFlag];
+                    let flag = kubernetesConfig[installFlag];
 
                     console.log (serviceName + " - " + flag);
 
@@ -197,23 +197,23 @@ eskimo.MarathonServicesConfig = function() {
 
     function showReinstallSelection() {
 
-        that.eskimoMarathonServicesSelection.showMarathonServiceSelection();
+        that.eskimoKubernetesServicesSelection.showKubernetesServiceSelection();
 
-        let marathonServicesSelectionHTML = $('#marathon-services-container-table').html();
-        marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/marathon\-services/g, "marathon-services-selection");
-        marathonServicesSelectionHTML = marathonServicesSelectionHTML.replace(/_install/g, "_reinstall");
+        let kubernetesServicesSelectionHTML = $('#kubernetes-services-container-table').html();
+        kubernetesServicesSelectionHTML = kubernetesServicesSelectionHTML.replace(/kubernetes\-services/g, "kubernetes-services-selection");
+        kubernetesServicesSelectionHTML = kubernetesServicesSelectionHTML.replace(/_install/g, "_reinstall");
 
-        $('#marathon-services-selection-body').html(
-            '<form id="marathon-servicesreinstall">' +
-            marathonServicesSelectionHTML +
+        $('#kubernetes-services-selection-body').html(
+            '<form id="kubernetes-servicesreinstall">' +
+            kubernetesServicesSelectionHTML +
             '</form>');
     }
     this.showReinstallSelection = showReinstallSelection;
 
-    function showMarathonServicesConfig () {
+    function showKubernetesServicesConfig () {
 
         if (!that.eskimoMain.isSetupDone()) {
-            that.eskimoMain.showSetupNotDone("Cannot configure marathon services as long as initial setup is not completed");
+            that.eskimoMain.showSetupNotDone("Cannot configure kubernetes services as long as initial setup is not completed");
             return;
         }
 
@@ -224,22 +224,22 @@ eskimo.MarathonServicesConfig = function() {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "load-marathon-services-config",
+            url: "load-kubernetes-services-config",
             success: function (data, status, jqXHR) {
 
                 console.log (data);
 
-                $("#marathon-services-table-body").html("");
+                $("#kubernetes-services-table-body").html("");
 
                 if (!data.clear) {
 
-                    that.renderMarathonConfig(data);
+                    that.renderKubernetesConfig(data);
                     //alert ("TODO");
 
                 } else if (data.clear == "missing") {
 
                     // render with no selections
-                    that.renderMarathonConfig();
+                    that.renderKubernetesConfig();
 
                 } else if (data.clear == "setup"){
 
@@ -252,11 +252,11 @@ eskimo.MarathonServicesConfig = function() {
             error: errorHandler
         });
 
-        that.eskimoMain.showOnlyContent("marathon-services-config");
+        that.eskimoMain.showOnlyContent("kubernetes-services-config");
     }
-    this.showMarathonServicesConfig = showMarathonServicesConfig;
+    this.showKubernetesServicesConfig = showKubernetesServicesConfig;
 
-    this.checkMarathonSetup = checkMarathonSetup;
+    this.checkKubernetesSetup = checkKubernetesSetup;
 
     this.proceedWithReinstall = function (reinstallConfig) {
 
@@ -269,10 +269,10 @@ eskimo.MarathonServicesConfig = function() {
             model[installKey] = reinstallConfig[reinstallKey];
         }
 
-        proceedWithMarathonInstallation (model, true);
+        proceedWithKubernetesInstallation (model, true);
     };
 
-    function proceedWithMarathonInstallation(model, reinstall) {
+    function proceedWithKubernetesInstallation(model, reinstall) {
 
         that.eskimoMain.showProgressbar();
 
@@ -282,7 +282,7 @@ eskimo.MarathonServicesConfig = function() {
             dataType: "json",
             timeout: 1000 * 120,
             contentType: "application/json; charset=utf-8",
-            url: reinstall ? "reinstall-marathon-services-config" : "save-marathon-services-config",
+            url: reinstall ? "reinstall-kubernetes-services-config" : "save-kubernetes-services-config",
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {
 
@@ -299,7 +299,7 @@ eskimo.MarathonServicesConfig = function() {
                     if (!data.command) {
                         alert ("Expected pending operations command but got none !");
                     } else {
-                        that.eskimoMarathonOperationsCommand.showCommand (data.command);
+                        that.eskimoKubernetesOperationsCommand.showCommand (data.command);
                     }
                 }
             },
@@ -310,5 +310,5 @@ eskimo.MarathonServicesConfig = function() {
             }
         });
     }
-    this.proceedWithMarathonInstallation = proceedWithMarathonInstallation;
+    this.proceedWithKubernetesInstallation = proceedWithKubernetesInstallation;
 };

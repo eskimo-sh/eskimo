@@ -39,34 +39,34 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class EskimoMarathonOperationsCommandTest extends AbstractWebTest {
+public class EskimoKubernetesOperationsCommandTest extends AbstractWebTest {
 
     @BeforeEach
     public void setUp() throws Exception {
 
         loadScript(page, "bootstrap.js");
 
-        loadScript(page, "eskimoMarathonOperationsCommand.js");
+        loadScript(page, "eskimoKubernetesOperationsCommand.js");
 
         // instantiate test object
-        js("eskimoMarathonOperationsCommand = new eskimo.MarathonOperationsCommand();");
-        js("eskimoMarathonOperationsCommand.eskimoMain = eskimoMain;");
-        js("eskimoMarathonOperationsCommand.eskimoOperations = eskimoOperations;");
-        js("eskimoMarathonOperationsCommand.initialize()");
+        js("eskimoKubernetesOperationsCommand = new eskimo.KubernetesOperationsCommand();");
+        js("eskimoKubernetesOperationsCommand.eskimoMain = eskimoMain;");
+        js("eskimoKubernetesOperationsCommand.eskimoOperations = eskimoOperations;");
+        js("eskimoKubernetesOperationsCommand.initialize()");
 
-        waitForElementIdInDOM("marathon-operations-command-body");
+        waitForElementIdInDOM("kubernetes-operations-command-body");
     }
 
     @Test
     public void testShowCommand() throws Exception {
 
-        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonOperationsCommandTest/command.json"));
+        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesOperationsCommandTest/command.json"));
 
-        js("eskimoMarathonOperationsCommand.showCommand("+command+".command)");
+        js("eskimoKubernetesOperationsCommand.showCommand("+command+".command)");
 
-        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoMarathonOperationsCommandTest/expectedResult.html"));
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesOperationsCommandTest/expectedResult.html"));
 
-        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#marathon-operations-command-body').html()");
+        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#kubernetes-operations-command-body').html()");
     }
 
     @Test
@@ -78,7 +78,7 @@ public class EskimoMarathonOperationsCommandTest extends AbstractWebTest {
 
         testShowCommand();
 
-        page.getElementById("marathon-operations-command-button-validate").click();
+        page.getElementById("kubernetes-operations-command-button-validate").click();
 
         assertJavascriptEquals("true", "window.stopOperationInProgressResult");
     }
@@ -88,11 +88,11 @@ public class EskimoMarathonOperationsCommandTest extends AbstractWebTest {
 
         testSubmit();
 
-        assertJavascriptEquals("true", "$('#marathon-operations-command-button-validate').prop('disabled')");
+        assertJavascriptEquals("true", "$('#kubernetes-operations-command-button-validate').prop('disabled')");
 
         testShowCommand();
 
-        assertJavascriptEquals("false", "$('#marathon-operations-command-button-validate').prop('disabled')");
+        assertJavascriptEquals("false", "$('#kubernetes-operations-command-button-validate').prop('disabled')");
     }
 }
 

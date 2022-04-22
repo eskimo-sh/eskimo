@@ -36,26 +36,26 @@ if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
 /* @Deprecated To Be renamed */
-eskimo.MarathonServicesSelection = function() {
+eskimo.KubernetesServicesSelection = function() {
 
     // will be injected eventually from constructorObject
-    this.eskimoMarathonServicesConfig = null;
+    this.eskimoKubernetesServicesConfig = null;
 
     const that = this;
 
     // Initialize HTML Div from Template
     this.initialize = function() {
-        $("#marathon-services-selection-modal-wrapper").load("html/eskimoMarathonServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#kubernetes-services-selection-modal-wrapper").load("html/eskimoKubernetesServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {
 
             if (statusTxt == "success") {
 
-                $("#marathon-services-select-header-cancel").click(cancelMarathonServicesSelection);
+                $("#kubernetes-services-select-header-cancel").click(cancelKubernetesServicesSelection);
 
-                $("#select-all-marathon-services-button").click(marathonServicesSelectionSelectAll);
+                $("#select-all-kubernetes-services-button").click(kubernetesServicesSelectionSelectAll);
 
-                $("#marathon-services-select-button-cancel").click(cancelMarathonServicesSelection);
+                $("#kubernetes-services-select-button-cancel").click(cancelKubernetesServicesSelection);
 
-                $("#marathon-services-select-button-validate").click(validateMarathonServicesSelection);
+                $("#kubernetes-services-select-button-validate").click(validateKubernetesServicesSelection);
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -63,44 +63,44 @@ eskimo.MarathonServicesSelection = function() {
         });
     };
 
-    function showMarathonServiceSelection() {
-        $('#marathon-services-selection-modal').modal("show");
+    function showKubernetesServiceSelection() {
+        $('#kubernetes-services-selection-modal').modal("show");
     }
-    this.showMarathonServiceSelection = showMarathonServiceSelection;
+    this.showKubernetesServiceSelection = showKubernetesServiceSelection;
 
-    function marathonServicesSelectionSelectAll() {
+    function kubernetesServicesSelectionSelectAll() {
 
         let allSelected = true;
 
-        let marathonServices = that.eskimoMarathonServicesConfig.getMarathonServices();
+        let kubernetesServices = that.eskimoKubernetesServicesConfig.getKubernetesServices();
 
         // are they all selected already
-        for (let i = 0; i < marathonServices.length; i++) {
-            if (!$('#' + marathonServices[i] + "_reinstall").get(0).checked) {
+        for (let i = 0; i < kubernetesServices.length; i++) {
+            if (!$('#' + kubernetesServices[i] + "_reinstall").get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
-        for (let i = 0; i < marathonServices.length; i++) {
-            $('#' + marathonServices[i] + "_reinstall").get(0).checked = !allSelected;
+        for (let i = 0; i < kubernetesServices.length; i++) {
+            $('#' + kubernetesServices[i] + "_reinstall").get(0).checked = !allSelected;
         }
     }
-    this.marathonServicesSelectionSelectAll = marathonServicesSelectionSelectAll;
+    this.kubernetesServicesSelectionSelectAll = kubernetesServicesSelectionSelectAll;
 
-    function cancelMarathonServicesSelection() {
-        $('#marathon-services-selection-modal').modal("hide");
+    function cancelKubernetesServicesSelection() {
+        $('#kubernetes-services-selection-modal').modal("hide");
     }
-    this.cancelMarathonServicesSelection = cancelMarathonServicesSelection;
+    this.cancelKubernetesServicesSelection = cancelKubernetesServicesSelection;
 
-    function validateMarathonServicesSelection() {
+    function validateKubernetesServicesSelection() {
 
-        $('#marathon-services-selection-modal').modal("hide");
+        $('#kubernetes-services-selection-modal').modal("hide");
 
-        let reinstallConfig = $("form#marathon-servicesreinstall").serializeObject();
+        let reinstallConfig = $("form#kubernetes-servicesreinstall").serializeObject();
 
-        that.eskimoMarathonServicesConfig.proceedWithReinstall (reinstallConfig);
+        that.eskimoKubernetesServicesConfig.proceedWithReinstall (reinstallConfig);
     }
-    this.validateMarathonServicesSelection = validateMarathonServicesSelection;
+    this.validateKubernetesServicesSelection = validateKubernetesServicesSelection;
 
 };

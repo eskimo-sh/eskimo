@@ -62,8 +62,8 @@ function checkNodesSetup (nodesConfig, uniqueServices, mandatoryServices, servic
     // foolproof bug check : make sure all ids are within node count
     checkIDSWithinNodeRanges(nodesConfig, nodeCount);
 
-    // foolproof bug check : make sure no marathon service can be selected here
-    checkNoMarathonServicesSelected(nodesConfig, servicesConfiguration);
+    // foolproof bug check : make sure no kubernetes service can be selected here
+    checkNoKubernetesServicesSelected(nodesConfig, servicesConfiguration);
 
     // enforce mandatory services
     enforceMandatoryServices(mandatoryServices, servicesConfiguration, nodeCount, nodesConfig);
@@ -223,9 +223,9 @@ function enforceMandatoryServices(mandatoryServices, servicesConfiguration, node
     }
 }
 
-function checkNoMarathonServicesSelected(nodesConfig, servicesConfiguration) {
+function checkNoKubernetesServicesSelected(nodesConfig, servicesConfiguration) {
 
-    // foolproof bug check : make sure no marathon service can be selected here
+    // foolproof bug check : make sure no kubernetes service can be selected here
     for (let key in nodesConfig) {
 
         let property = parseProperty(key);
@@ -234,9 +234,9 @@ function checkNoMarathonServicesSelected(nodesConfig, servicesConfiguration) {
             if (property.serviceName != NODE_ID_FIELD) {
                 let serviceConfig = servicesConfiguration[property.serviceName];
 
-                if (serviceConfig == null || serviceConfig.marathon || serviceConfig.kubernetes) {
+                if (serviceConfig == null || serviceConfig.kubernetes || serviceConfig.kubernetes) {
                     throw "Inconsistency found : service " + property.serviceName
-                            + " is either undefined or a marathon service which should not be selectable here."
+                            + " is either undefined or a kubernetes service which should not be selectable here."
                 }
             }
         }

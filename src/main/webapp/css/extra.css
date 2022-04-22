@@ -304,7 +304,7 @@ li.disabled a .menu-text {
 .operations-cell,
 .status-node-cell-empty,
 .status-node-cell-intro,
-#marathon-services-table-head > tr > td {
+#kubernetes-services-table-head > tr > td {
     padding: 2px 5px 2px 5px;
     text-align: center;
     vertical-align: middle;
@@ -332,7 +332,7 @@ li.disabled a .menu-text {
 .table > thead > tr > td.status-node-cell-intro,
 .table > thead > tr > td.operations-cell,
 .table > thead > tr > td.operations-cell-intro,
-#marathon-services-table-head > tr > td {
+#kubernetes-services-table-head > tr > td {
     background-color: #F2F2F2;
     font-weight: bold;
 }

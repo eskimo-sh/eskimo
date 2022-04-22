@@ -70,6 +70,14 @@ spec:
       labels:
         service: elasticsearch
     spec:
+      # Force all replicas on different nodes
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              service: elasticsearch
       tolerations:
         # this toleration is to have the daemonset runnable on master nodes
         # remove it if your masters can't run pods

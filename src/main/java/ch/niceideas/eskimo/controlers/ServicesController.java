@@ -151,21 +151,20 @@ public class ServicesController {
         });
     }
 
-    @GetMapping("/get-marathon-services")
+    @GetMapping("/get-kubernetes-services")
     @ResponseBody
-    @Deprecated /* To Be renamed */
-    public String getMarathonServices() {
+    public String getKubernetesServices() {
         return ReturnStatusHelper.createOKStatus(map -> {
 
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
-                    .filter(service -> service.isMarathon() || service.isKubernetes())
+                    .filter(Service::isKubernetes)
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
-            map.put("marathonServices", new JSONArray(servicesDefinition.listMarathonServices()));
-            map.put("marathonServicesConfigurations", new JSONObject(servicesConfigurations));
+            map.put("kubernetesServices", new JSONArray(servicesDefinition.listKubernetesServices()));
+            map.put("kubernetesServicesConfigurations", new JSONObject(servicesConfigurations));
         });
     }
 

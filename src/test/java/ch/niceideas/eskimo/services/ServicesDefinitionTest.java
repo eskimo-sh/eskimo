@@ -271,7 +271,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     @Test
     public void testListMarathonServices() throws Exception {
-        String[] marathonServices = def.listMarathonServices();
+        String[] marathonServices = def.listKubernetesServices();
 
         assertEquals(6, marathonServices.length);
 

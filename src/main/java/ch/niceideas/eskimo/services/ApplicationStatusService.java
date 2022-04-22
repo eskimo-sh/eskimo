@@ -80,8 +80,8 @@ public class ApplicationStatusService {
     @Value("${build.timestamp}")
     private String buildTimestamp = "LATEST DEV";
 
-    @Value("${eskimo.enableMarathonSubsystem}")
-    private String enableMarathon = "true";
+    @Value("${eskimo.enableKubernetesSubsystem}")
+    private String enableKubernetes = "true";
 
     private final ThreadLocal<SimpleDateFormat> localDateFormatter = new ThreadLocal<>();
 
@@ -146,7 +146,7 @@ public class ApplicationStatusService {
 
             systemStatus.setValueForPath("buildTimestamp", buildTimestamp);
 
-            systemStatus.setValueForPath("enableMarathon", StringUtils.isNotBlank(enableMarathon) && enableMarathon.equals("true"));
+            systemStatus.setValueForPath("enableKubernetes", StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true"));
 
             systemStatus.setValueForPath("isSnapshot", isSnapshot(buildVersion));
 
