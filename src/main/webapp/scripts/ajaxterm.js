@@ -151,6 +151,7 @@ ajaxterm.Terminal=function(id,options) {
 			}
 			var query=query1+send+"&t="+screenTimestamp;
             if (additionalQueryString)  query+='&'+additionalQueryString;
+console.log (query);
 			if(optGet.className == 'on') {
 				r.open("GET",endpoint+"?"+query,true);
 				if(ie) {
@@ -338,30 +339,32 @@ ajaxterm.Terminal=function(id,options) {
 			if (kc==9) k=String.fromCharCode(9);  // Tab
 			else if (kc==8) k=String.fromCharCode(127);  // Backspace
 			else if (kc==27) k=String.fromCharCode(27); // Escape
-			else if (kc==33) k="[5~";        // PgUp
-			else if (kc==34) k="[6~";   // PgDn
-			else if (kc==35) k="[4~";   // End
-			else if (kc==36) k="[1~";   // Home
-			else if (kc==37) k="[D";    // Left
-			else if (kc==38) k="[A";    // Up
-			else if (kc==39) k="[C";    // Right
-			else if (kc==40) k="[B";    // Down
-			else if (kc==45) k="[2~";   // Ins
-			else if (kc==46) k="[3~";   // Del
-			else if (kc==112) k="[[A";  // F1
-			else if (kc==113) k="[[B";  // F2
-			else if (kc==114) k="[[C";  // F3
-			else if (kc==115) k="[[D";  // F4
-			else if (kc==116) k="[[E";  // F5
-			else if (kc==117) k="[17~"; // F6
-			else if (kc==118) k="[18~"; // F7
-			else if (kc==119) k="[19~"; // F8
-			else if (kc==120) k="[20~"; // F9
-			else if (kc==121) k="[21~"; // F10
-			else if (kc==122) k="[23~"; // F11
-			else if (kc==123) k="[24~"; // F12
-			if (k.length) {
-				k=String.fromCharCode(27)+k;
+			else {
+				if (kc==33) k="[5~";        // PgUp
+				else if (kc==34) k="[6~";   // PgDn
+				else if (kc==35) k="[4~";   // End
+				else if (kc==36) k="[1~";   // Home
+				else if (kc==37) k="[D";    // Left
+				else if (kc==38) k="[A";    // Up
+				else if (kc==39) k="[C";    // Right
+				else if (kc==40) k="[B";    // Down
+				else if (kc==45) k="[2~";   // Ins
+				else if (kc==46) k="[3~";   // Del
+				else if (kc==112) k="[[A";  // F1
+				else if (kc==113) k="[[B";  // F2
+				else if (kc==114) k="[[C";  // F3
+				else if (kc==115) k="[[D";  // F4
+				else if (kc==116) k="[[E";  // F5
+				else if (kc==117) k="[17~"; // F6
+				else if (kc==118) k="[18~"; // F7
+				else if (kc==119) k="[19~"; // F8
+				else if (kc==120) k="[20~"; // F9
+				else if (kc==121) k="[21~"; // F10
+				else if (kc==122) k="[23~"; // F11
+				else if (kc==123) k="[24~"; // F12
+				if (k.length) {
+					k=String.fromCharCode(27)+k;
+				}
 			}
 		} else {
 			if (kc==8) {
@@ -375,6 +378,9 @@ ajaxterm.Terminal=function(id,options) {
 			if(k=="+") {
 				queue("%2B");
 			} else {
+
+console.log (escape(k));
+
 				queue(escape(k));
 			}
 		}
