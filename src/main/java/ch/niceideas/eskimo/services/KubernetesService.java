@@ -6,7 +6,6 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
-import ch.niceideas.eskimo.utils.SystemStatusParser;
 import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -30,7 +29,10 @@ public class KubernetesService {
     public static final String KUBE_MASTER = "kube-master";
     public static final String KUBE_NA_FLAG = "MARATHON_NA";
     public static final String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
-    public static final String RUNNING_STATUS = "Running";
+
+    public static final String STATUS_RUNNING = "Running";
+    public static final String STATUS_TERMINATING = "Terminating";
+    public static final String STATUS_CONTAINER_CREATING = "ContainerCreating";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -150,7 +152,7 @@ public class KubernetesService {
     void uninstallService(MarathonOperationsCommand.MarathonOperationId operation, String kubeMasterNode) throws SystemException {
         String nodeIp = null;
         try {
-            Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(operation.getService());
+            Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(servicesDefinition.getService(operation.getService()), kubeMasterNode);
             nodeIp = nodeNameAndStatus.getKey();
         } catch (KubernetesException e) {
             logger.warn (e.getMessage());
@@ -226,17 +228,17 @@ public class KubernetesService {
             MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
             for (String service : servicesDefinition.listMarathonServices()) {
 
-                // should service be installed on marathon ?
+                // should service be installed on kubernetes ?
                 boolean shall = this.shouldInstall(marathonConfig, service);
 
                 Pair<String, String> nodeNameAndStatus = new Pair<>(KUBE_NA_FLAG, "NA");
                 if (parser != null) {
-                    nodeNameAndStatus = parser.getServiceRuntimeNode(service);
+                    nodeNameAndStatus = parser.getServiceRuntimeNode(servicesDefinition.getService(service), kubeMasterNode);
                 }
 
                 String nodeIp = nodeNameAndStatus.getKey();
 
-                // if marathon is not answering, we assume service is still installed if it has been installed before
+                // if kubernetes is not answering, we assume service is still installed if it has been installed before
                 // we identify it on marathon node then.
                 if (nodeIp != null && nodeIp.equals(KUBE_NA_FLAG)) {
                     if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstNode(service))) {
@@ -247,27 +249,49 @@ public class KubernetesService {
                 }
 
                 boolean installed = StringUtils.isNotBlank(nodeIp);
-                boolean running = nodeNameAndStatus.getValue().equals(RUNNING_STATUS);
+                boolean running = nodeNameAndStatus.getValue().equalsIgnoreCase(STATUS_RUNNING);
 
                 String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
 
-                // uninstalled services are identified on the marathon node
-                if (StringUtils.isBlank(nodeName)) {
-                    if (StringUtils.isNotBlank(kubeMasterNode)) {
-                        nodeName = kubeMasterNode.replace(".", "-");
-                    } else {
-                        nodeName = servicesInstallationStatus.getFirstNodeName(KUBE_MASTER);
-                    }
-                    // last attempt, get it from theoretical perspective
+                // if there is any kind of problem, boild down to identify service on kube master
+                if (!installed || !running || servicesDefinition.getService(service).isRegistryOnly()) {
+
+                    // uninstalled services are identified on the marathon node
                     if (StringUtils.isBlank(nodeName)) {
-                        nodeName = configurationService.loadNodesConfig().getFirstNodeName(KUBE_MASTER);
+                        if (StringUtils.isNotBlank(kubeMasterNode)) {
+                            nodeName = kubeMasterNode.replace(".", "-");
+                        } else {
+                            nodeName = servicesInstallationStatus.getFirstNodeName(KUBE_MASTER);
+                        }
+                        // last attempt, get it from theoretical perspective
+                        if (StringUtils.isBlank(nodeName)) {
+                            nodeName = configurationService.loadNodesConfig().getFirstNodeName(KUBE_MASTER);
+                        }
                     }
+
+                    systemService.feedInServiceStatus(
+                            statusMap, servicesInstallationStatus, nodeIp, nodeName,
+                            ServicesInstallStatusWrapper.KUBERNETES_NODE,
+                            service, shall, installed, running);
                 }
 
-                systemService.feedInServiceStatus (
-                        statusMap, servicesInstallationStatus, nodeIp, nodeName,
-                        ServicesInstallStatusWrapper.MARATHON_NODE,
-                        service, shall, installed, running);
+                //otherwise show service running on nodes where it is running
+                else {
+
+                    List<Pair<String, String>> nodeNamesAndStatuses = parser.getServiceRuntimeNodes(service);
+
+                    for (Pair<String, String> rtNnodeNameAndStatus : nodeNamesAndStatuses) {
+                        String runtimeNodeIp = rtNnodeNameAndStatus.getKey();
+                        String runtimeNodeName = runtimeNodeIp.replace(".", "-");
+
+                        boolean runtimeRunning = rtNnodeNameAndStatus.getValue().equals(STATUS_RUNNING);
+
+                        systemService.feedInServiceStatus(
+                                statusMap, servicesInstallationStatus, runtimeNodeIp, runtimeNodeName,
+                                ServicesInstallStatusWrapper.KUBERNETES_NODE,
+                                service, shall, true, runtimeRunning);
+                    }
+                }
             }
         } catch (JSONException | ConnectionManagerException | SystemException | SetupException  e) {
             logger.error(e, e);
@@ -468,7 +492,10 @@ public class KubernetesService {
             String allServicesStatus = sshCommandService.runSSHScript(kubeMasterNode,
                     "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null ", false);
 
-            return new KubeStatusParser(allPodStatus, allServicesStatus);
+            String registryServices = sshCommandService.runSSHScript(kubeMasterNode,
+                    "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/", false);
+
+            return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices);
 
         } catch (SSHCommandException | SetupException | FileException e) {
             logger.error (e, e);
@@ -476,12 +503,12 @@ public class KubernetesService {
         }
     }
 
-    private Pair<String,String> getServiceRuntimeNode(String service) throws KubernetesException {
+    private Pair<String,String> getServiceRuntimeNode(Service service, String kubeIp) throws KubernetesException {
 
         KubeStatusParser parser = getKubeStatusParser();
         if (parser == null) {
             return new Pair<>(KUBE_NA_FLAG, "NA");
         }
-        return parser.getServiceRuntimeNode (service);
+        return parser.getServiceRuntimeNode (service, kubeIp);
     }
 }

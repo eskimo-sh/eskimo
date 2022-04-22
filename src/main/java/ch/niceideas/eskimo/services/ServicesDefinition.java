@@ -114,14 +114,17 @@ public class ServicesDefinition implements InitializingBean {
 
             service.setConfigOrder(configOrder);
 
-            Boolean unique = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.unique");
+            Boolean unique = (Boolean) servicesConfig.getValueForPath(serviceString+".config.unique");
             service.setUnique(unique != null && unique); // false by default
 
-            Boolean marathon = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.marathon");
+            Boolean marathon = (Boolean) servicesConfig.getValueForPath(serviceString+".config.marathon");
             service.setMarathon(marathon != null && marathon); // false by default
 
-            Boolean kubernetes = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.kubernetes");
+            Boolean kubernetes = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubernetes");
             service.setKubernetes(kubernetes != null && kubernetes); // false by default
+
+            Boolean registryOnly = (Boolean) servicesConfig.getValueForPath(serviceString+".config.registryOnly");
+            service.setRegistryOnly(registryOnly != null && registryOnly); // false by default
 
             Boolean mandatory = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.mandatory");
             service.setMandatory(mandatory != null && mandatory);

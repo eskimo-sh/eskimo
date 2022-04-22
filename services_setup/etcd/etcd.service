@@ -37,6 +37,7 @@
 Description=etcd Server
 After=network.target
 After=network-online.target
+After=eskimo-startup-checks.service
 Wants=network-online.target
 
 [Service]

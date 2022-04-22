@@ -40,6 +40,7 @@ Requires=docker.service
 After=gluster.service
 After=var-lib-spark-data.mount
 After=var-lib-spark-eventlog.mount
+After=eskimo-startup-checks.service
 
 [Service]
 TimeoutStartSec=180sec

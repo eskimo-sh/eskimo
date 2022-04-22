@@ -300,62 +300,6 @@ function install_debian_mesos_dependencies() {
     fi
 }
 
-function create_user_infrastructure() {
-
-    if [[ "$1" == "" ]]; then
-        echo "Expecting user name as first argument"
-        exit 41
-    fi
-    USER_NAME=$1
-
-    if [[ "$2" == "" ]]; then
-        echo "Expecting user ID as second argument"
-        exit 42
-    fi
-    USER_ID=$2
-
-    echo " - Creating user $USER_NAME (if not exist)"
-    new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
-    if [[ $new_user_id == "" ]]; then
-        sudo useradd -m -u $USER_ID $USER_NAME
-        new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
-        if [[ $new_user_id == "" ]]; then
-            echo "Failed to add user $USER_NAME"
-            exit 43
-        fi
-    fi
-
-    echo " - Adding user to group eskimoservices"
-    sudo usermod -a -G eskimoservices $USER_NAME
-
-    echo " - Creating user system folders"
-    sudo mkdir -p /var/lib/$USER_NAME
-    sudo chown -R $USER_NAME /var/lib/$USER_NAME
-
-    sudo mkdir -p /var/log/$USER_NAME
-    sudo chown -R $USER_NAME /var/log/$USER_NAME
-
-    sudo mkdir -p /var/run/$USER_NAME
-    sudo chown -R $USER_NAME /var/run/$USER_NAME
-}
-
-function create_common_system_users() {
-
-    create_user_infrastructure elasticsearch 3301
-
-    create_user_infrastructure spark 3302
-
-    create_user_infrastructure kafka 3303
-
-    create_user_infrastructure grafana 3304
-
-    create_user_infrastructure flink 3305
-
-    create_user_infrastructure marathon 3306
-
-    create_user_infrastructure kubernetes 3307
-}
-
 # System Installation
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -545,4 +489,98 @@ echo "  - Create group eskimoservices"
 sudo /usr/bin/getent group eskimoservices 2>&1 > /dev/null || sudo /usr/sbin/groupadd eskimoservices
 
 echo "  - Creating common system users"
-create_common_system_users
+
+cat > /tmp/eskimo-check-users.sh <<- "EOF"
+#!/usr/bin/env bash
+
+function create_user_infrastructure() {
+
+    if [[ "$1" == "" ]]; then
+        echo "Expecting user name as first argument"
+        exit 41
+    fi
+    USER_NAME=$1
+
+    if [[ "$2" == "" ]]; then
+        echo "Expecting user ID as second argument"
+        exit 42
+    fi
+    USER_ID=$2
+
+    echo " - Creating user $USER_NAME (if not exist)"
+    new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
+    if [[ $new_user_id == "" ]]; then
+        sudo useradd -m -u $USER_ID $USER_NAME
+        new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
+        if [[ $new_user_id == "" ]]; then
+            echo "Failed to add user $USER_NAME"
+            exit 43
+        fi
+    fi
+
+    echo " - Adding user to group eskimoservices"
+    if [[ `groups $USER_NAME | grep eskimoservices` == "" ]]; then
+        sudo usermod -a -G eskimoservices $USER_NAME
+    fi
+
+    echo " - Creating user system folders"
+    sudo mkdir -p /var/lib/$USER_NAME
+    sudo chown -R $USER_NAME /var/lib/$USER_NAME
+
+    sudo mkdir -p /var/log/$USER_NAME
+    sudo chown -R $USER_NAME /var/log/$USER_NAME
+
+    sudo mkdir -p /var/run/$USER_NAME
+    sudo chown -R $USER_NAME /var/run/$USER_NAME
+}
+
+
+create_user_infrastructure elasticsearch 3301
+
+create_user_infrastructure spark 3302
+
+create_user_infrastructure kafka 3303
+
+create_user_infrastructure grafana 3304
+
+create_user_infrastructure flink 3305
+
+create_user_infrastructure marathon 3306
+
+create_user_infrastructure kubernetes 3307
+
+EOF
+
+sudo mv /tmp/eskimo-check-users.sh /usr/local/sbin/eskimo-check-users.sh
+sudo chmod 754 /usr/local/sbin/eskimo-check-users.sh
+
+cat > /tmp/eskimo-startup-checks.service <<- "EOF"
+[Unit]
+Description=Eskimo Startup checks
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/eskimo-check-users.sh
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+if [[ -d /lib/systemd/system/ ]]; then
+    export systemd_units_dir=/lib/systemd/system/
+elif [[ -d /usr/lib/systemd/system/ ]]; then
+    export systemd_units_dir=/usr/lib/systemd/system/
+else
+    echo "Couldn't find systemd unit files directory"
+    exit 24
+fi
+
+set -e
+sudo cp /tmp/eskimo-startup-checks.service $systemd_units_dir
+sudo systemctl daemon-reload
+sudo systemctl start eskimo-startup-checks
+sudo systemctl enable eskimo-startup-checks
+set +e

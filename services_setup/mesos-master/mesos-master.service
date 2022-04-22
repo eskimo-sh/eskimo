@@ -37,6 +37,7 @@ Description=Mesos Master
 Wants=network-online.target
 After=docker.service
 Requires=docker.service
+After=eskimo-startup-checks.service
 
 [Service]
 TimeoutStartSec=0

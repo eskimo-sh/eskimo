@@ -61,8 +61,10 @@ public class Service {
 
     @Deprecated
     private boolean marathon = false;
+
     private boolean kubernetes = false;
     private boolean mandatory = false;
+    private boolean registryOnly = false;
 
     private ConditionalInstallation conditional = null;
 

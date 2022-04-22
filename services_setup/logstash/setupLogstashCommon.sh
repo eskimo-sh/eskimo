@@ -44,11 +44,11 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo " - Creating shared directory"
 sudo mkdir -p /var/lib/elasticsearch/logstash
 sudo mkdir -p /var/lib/elasticsearch/logstash/data
-sudo chown -R elasticsearch /var/lib/elasticsearch/logstash
+sudo chown -R elasticsearch /var/lib/elasticsearch
 sudo chmod -R 777 /var/lib/elasticsearch/logstash/data
 
 sudo mkdir -p /var/run/elasticsearch/logstash
-sudo chown -R elasticsearch /var/run/elasticsearch/logstash
+sudo chown -R elasticsearch /var/run/elasticsearch
 sudo mkdir -p /var/log/elasticsearch/logstash
-sudo chown -R elasticsearch /var/log/elasticsearch/logstash
+sudo chown -R elasticsearch /var/log/elasticsearch
 

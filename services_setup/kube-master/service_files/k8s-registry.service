@@ -38,6 +38,7 @@ Wants=network-online.target
 After=docker.service
 Requires=docker.service
 After=gluster.service
+After=eskimo-startup-checks.service
 PartOf=kube-master.service
 
 [Service]

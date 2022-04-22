@@ -57,9 +57,9 @@ fi
 
 echo " - Creating directory cerebro"
 sudo mkdir -p /var/run/elasticsearch/cerebro
-sudo chown -R elasticsearch /var/run/elasticsearch/cerebro
+sudo chown -R elasticsearch /var/run/elasticsearch
 sudo mkdir -p /var/log/elasticsearch/cerebro
-sudo chown -R elasticsearch /var/log/elasticsearch/cerebro
+sudo chown -R elasticsearch /var/log/elasticsearch
 
 # create and start container
 echo " - Running docker container"

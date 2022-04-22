@@ -581,6 +581,8 @@
       "order": 12,
       "group" : "Spark",
       "name" : "Executor",
+      "kubernetes": true,
+      "registryOnly": true,
       "selectionLayout" : { "row" : 3, "col" : 3},
       "memory": "kube",
       "logo" : "images/spark-executor-logo.png",
@@ -592,13 +594,6 @@
         "masterService": "zookeeper",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": false
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": false,
         "restart": false
       },
       {
@@ -820,6 +815,14 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
+        "restart": true
+      },
+      {
+        "__comment": "Need kube-slave to setup dnsmasq before starting logstash server container so it can reach ES service.",
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "kube-slave",
+        "numberOfMasters": 1,
+        "mandatory": true,
         "restart": true
       }
     ],

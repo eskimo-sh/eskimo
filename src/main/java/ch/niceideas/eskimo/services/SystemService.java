@@ -377,7 +377,7 @@ public class SystemService {
                     logger.error(e, e);
                 }
 
-                /* Deprecated */
+                /* Deprecated
                 // fetch marathon services status
                 try {
                     marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallationStatus);
@@ -395,6 +395,7 @@ public class SystemService {
                         }
                     }
                 }
+                */
 
                 // fetch kubernetes services status
                 try {
@@ -561,7 +562,7 @@ public class SystemService {
                     // check if service installed using SSH
                     String serviceStatus = parser.getServiceStatus(service);
                     boolean installed = !serviceStatus.equals("NA");
-                    boolean running = serviceStatus.equals("running");
+                    boolean running = serviceStatus.equalsIgnoreCase("running");
 
                     feedInServiceStatus (
                             statusMap, servicesInstallationStatus, node, nodeName, nodeName,
@@ -584,6 +585,13 @@ public class SystemService {
             boolean shall,
             boolean installed,
             boolean running) throws ConnectionManagerException {
+
+        if (StringUtils.isBlank(nodeName)) {
+            throw new IllegalArgumentException("nodeName can't be null");
+        }
+        if (StringUtils.isBlank(service)) {
+            throw new IllegalArgumentException("service can't be null");
+        }
 
         if (shall) {
             if (!installed) {
@@ -663,7 +671,7 @@ public class SystemService {
                     // if service is a kubernetes service
                     if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)) {
 
-                        // if marathon is not available, don't do anything
+                        // if kubernetes is not available, don't do anything
                         String kubeNodeName = systemStatus.getFirstNodeName(KUBERNETES_SERVICE_NAME);
                         if (StringUtils.isBlank(kubeNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
                             //notificationService.addError("Marathon inconsistency.");

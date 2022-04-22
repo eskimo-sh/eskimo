@@ -39,6 +39,7 @@ Wants=network.target
 After=docker.service
 Requires=docker.service
 After=gluster.service
+After=eskimo-startup-checks.service
 
 [Service]
 ExecStartPre=/usr/local/sbin/register-marathon-registry.sh
