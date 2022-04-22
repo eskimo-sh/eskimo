@@ -883,6 +883,22 @@
       "logo" : "images/elasticsearch-logo.png",
       "icon" : "images/elasticsearch-icon.png"
     },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      },
+      {
+        "masterElectionStrategy": "ALL_NODES",
+        "masterService": "kube-slave",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      }
+    ],
     "editableSettings": [
       {
         "filename": "elasticsearch.yml",

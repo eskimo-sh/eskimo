@@ -285,7 +285,7 @@ function deploy_kubernetes() {
     fi
 
     echo " - Deploying $CONTAINER service in kubernetes"
-    /usr/local/bin/kubectl apply -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    /bin/bash -c ". /etc/eskimo_topology.sh && /usr/bin/envsubst < $CONTAINER.k8s.yaml | /usr/local/bin/kubectl apply -f -" >> $LOG_FILE"_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not deploy $CONTAINER application in kubernetes"
         cat "$LOG_FILE"_kubernetes_deploy

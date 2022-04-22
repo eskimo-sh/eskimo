@@ -54,7 +54,7 @@ ExecStartPre=-/usr/bin/docker rm -f k8s-registry
 # attempt to recreate  / remount gluster shares
 ExecStartPre=/bin/bash /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
 
-ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment&& /usr/bin/docker run \
+ExecStart=/bin/bash -c ". /etc/eskimo_topology.sh && /usr/bin/docker run \
         -i \
         --name k8s-registry \
         --user kubernetes \

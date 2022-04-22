@@ -30,7 +30,6 @@ public class NodesConfigurationService {
     private static final Logger logger = Logger.getLogger(NodesConfigurationService.class);
 
     public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
-    public static final String USR_LOCAL_BIN_MESOS_CLI_SH = "/usr/local/bin/mesos-cli.sh";
     public static final String USR_LOCAL_SBIN_GLUSTER_MOUNT_SH = "/usr/local/sbin/gluster_mount.sh";
     public static final String ESKIMO_TOPOLOGY_SH = "/etc/eskimo_topology.sh";
 
@@ -194,15 +193,6 @@ public class NodesConfigurationService {
                                         }
 
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
-                                            operationsMonitoringService.addInfo(operation, "Checking / Installing Mesos");
-                                            if (isMissingOnNode("mesos", node)) {
-                                                uploadMesos(node);
-                                                ml.addInfo(installMesos(node));
-                                                flagInstalledOnNode("mesos", node);
-                                            }
-                                        }
-
-                                        if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                             operationsMonitoringService.addInfo(operation, "Checking / Installing Kubernetes");
                                             if (isMissingOnNode("k8s", node)) {
                                                 uploadKubernetes(node);
@@ -300,9 +290,6 @@ public class NodesConfigurationService {
             ml.addInfo(" - Copying jq program");
             copyCommand("jq-1.6-linux64", USR_LOCAL_BIN_JQ, connection);
 
-            ml.addInfo(" - Copying mesos-cli script");
-            copyCommand("mesos-cli.sh", USR_LOCAL_BIN_MESOS_CLI_SH, connection);
-
             ml.addInfo(" - Copying gluster-mount script");
             copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
 
@@ -314,11 +301,6 @@ public class NodesConfigurationService {
                 connection.close();
             }
         }
-    }
-
-    @Deprecated
-    private String installMesos(String node) throws SSHCommandException {
-        return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-mesos.sh");
     }
 
     private String installK8s(String node) throws SSHCommandException {
@@ -406,31 +388,6 @@ public class NodesConfigurationService {
         } catch (SSHCommandException e) {
             logger.error(e, e);
             throw new SystemException(e.getMessage(), e);
-        }
-    }
-
-    @Deprecated
-    private void uploadMesos(String node) throws SSHCommandException, SystemException {
-        Connection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(node);
-
-            String mesosFlavour = "mesos-" + getNodeFlavour(connection);
-
-            File packageDistributionDir = new File (packageDistributionPath);
-
-            String mesosFileName = setupService.findLastPackageFile("_", mesosFlavour);
-            File mesosDistrib = new File (packageDistributionDir, mesosFileName);
-
-            sshCommandService.copySCPFile(connection, mesosDistrib.getAbsolutePath());
-
-        } catch (ConnectionManagerException e) {
-            throw new SystemException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 

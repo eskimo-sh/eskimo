@@ -147,12 +147,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                         })
                         .forEach(dependent -> {
 
-                            if (servicesDefinition.getService(dependent).isMarathon()) {
-                                if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
-                                    retCommand.addRestartIfNotInstalled(dependent, MARATHON_FLAG);
-                                }
-
-                            } else if (servicesDefinition.getService(dependent).isKubernetes()) {
+                            if (servicesDefinition.getService(dependent).isKubernetes()) {
                                 if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
                                     retCommand.addRestartIfNotInstalled(dependent, KUBERNETES_FLAG);
                                 }

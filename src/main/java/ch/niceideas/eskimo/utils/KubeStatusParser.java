@@ -115,6 +115,7 @@ public class KubeStatusParser {
 
         List<Pair<String, String>> podNodesAndStatus = getPodNodesAndStatus(service.getName());
         String serviceIp = getServiceIp(service.getName());
+        boolean serviceFound = serviceStatuses.get(service.getName()) != null;
 
         // 0. registryOnlyservices are a specific case
         if (service.isRegistryOnly()) {
@@ -126,7 +127,8 @@ public class KubeStatusParser {
         }
 
         // 1. if at east one POD is running and service is OK, return running on kubeIp
-        if ((StringUtils.isNotBlank(serviceIp) || !service.isUnique())
+        if (serviceFound
+                && (StringUtils.isNotBlank(serviceIp) || !service.isUnique())
                 && podNodesAndStatus.size() > 0
                 && podNodesAndStatus.stream()
                     .map(Pair::getValue)
@@ -137,7 +139,7 @@ public class KubeStatusParser {
         }
 
         // 2. If neither any POD nor the service cannot be found, return new Pair<>(null, "NA");
-        if ((StringUtils.isBlank(serviceIp) && service.isUnique()) && podNodesAndStatus.size() <= 0) {
+        if (!serviceFound && podNodesAndStatus.size() <= 0) {
             return new Pair<>(null, "NA");
         }
 

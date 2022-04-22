@@ -61,7 +61,7 @@ metadata:
     service: elasticsearch
 spec:
   serviceName: elasticsearch
-  replicas: 3   # TODO replace by node number
+  replicas: $ESKIMO_NODE_COUNT
   selector:
     matchLabels:
       service: elasticsearch

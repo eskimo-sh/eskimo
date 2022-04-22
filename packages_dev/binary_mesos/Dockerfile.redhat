@@ -1,2 +1,0 @@
-FROM centos:centos7.8.2003
-MAINTAINER Eskimo <eskimo@niceideas.ch>
