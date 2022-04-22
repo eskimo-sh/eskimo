@@ -251,7 +251,7 @@
       "order": 5,
       "group" : "Kubernetes",
       "name" : "Etcd",
-      "selectionLayout" : { "row" : 6, "col" : 1},
+      "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/kube-master-logo.png",
       "icon" : "images/kube-master-icon.png"
@@ -315,7 +315,7 @@
       "order": 7,
       "group" : "Kubernetes",
       "name" : "Slave",
-      "selectionLayout" : { "row" : 5, "col" : 1},
+      "selectionLayout" : { "row" : 1, "col" : 3},
       "memory": "verylarge",
       "logo" : "images/kube-slave-logo.png",
       "icon" : "images/kube-slave-icon.png"

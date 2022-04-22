@@ -305,7 +305,7 @@ eskimo.ServicesSelection = function() {
 
         let newIn = '<form id="services-selection-form">';
 
-        for (let row = 1; row <= 10; row++) {
+        for (let row = 1; row <= 20; row++) {
 
             let oneFound = false;
             for (let col = 1; col <= 3; col++) {
@@ -316,7 +316,7 @@ eskimo.ServicesSelection = function() {
                 }
             }
             if (!oneFound) {
-                break; // done
+                continue; // done
             }
 
             let rowHTML =  '<div class="col-md-12"> ';
