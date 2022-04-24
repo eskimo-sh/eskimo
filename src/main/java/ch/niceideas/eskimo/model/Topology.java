@@ -105,7 +105,7 @@ public class Topology {
                     throw new NodesConfigurationException("Could not find any service definition matching " + result.getServiceName());
                 }
 
-                topology.defineMasters(service, result.getNodeNumber(), nodesConfig);
+                topology.defineMasters(servicesDefinition, service, result.getNodeNumber(), nodesConfig, marathonConfig);
 
                 topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getNodeNumber(), nodesConfig);
             }
@@ -121,7 +121,7 @@ public class Topology {
 
                     int currentNodeNumber = nodesConfig.getNodeNumber(currentNode);
 
-                    topology.defineMasters(service, currentNodeNumber, nodesConfig);
+                    topology.defineMasters(servicesDefinition, service, currentNodeNumber, nodesConfig, marathonConfig);
                 }
             }
 
@@ -213,14 +213,42 @@ public class Topology {
         }
     }
 
-    private void defineMasters(Service service, int nodeNbr, NodesConfigWrapper nodesConfig)
+    private void defineMasters(ServicesDefinition servicesDefinition, Service service, int nodeNbr, NodesConfigWrapper nodesConfig,
+                               MarathonServicesConfigWrapper marathonConfig)
             throws NodesConfigurationException, ServiceDefinitionException {
         for (Dependency dep : service.getDependencies()) {
-            defineMasters (dep, service, nodeNbr, nodesConfig);
+
+            Service masterService = servicesDefinition.getService(dep.getMasterService());
+            if (masterService.isKubernetes()) {
+
+                if (!service.isKubernetes()) {
+                    throw new ServiceDefinitionException ("Service " + service.getName()
+                            + " defines a dependency on a kube service " + masterService.getName() + " which is not supported.");
+                }
+
+                if (!marathonConfig.isServiceInstallRequired(masterService.getName())) {
+                    throw new ServiceDefinitionException ("Service " + service.getName()
+                            + " defines a dependency on another kube service " + masterService.getName() + " but that service is not going to be installed.");
+                }
+                // XXX Dependeny on Kube-master is enforced already, we're left with checking that the dependency definition is not crazy
+                switch (dep.getMes()) {
+                    case SAME_NODE_OR_RANDOM:
+                    case RANDOM_NODE_AFTER:
+                    case RANDOM_NODE_AFTER_OR_SAME:
+                    case SAME_NODE:
+                        throw new ServiceDefinitionException ("Service " + service.getName()
+                                + " defines a dependency on another kube service " + masterService.getName() + " if type " + dep.getMes() + " which is not suppored");
+                    default:
+                        break;
+                }
+            } else {
+                defineMasters (dep, service, nodeNbr, nodesConfig);
+            }
         }
 
     }
-    private void defineMasters(Dependency dep, Service service, int nodeNbr, NodesConfigWrapper nodesConfig)
+    private void defineMasters(Dependency dep, Service service, int nodeNbr,
+                    NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, NodesConfigurationException {
 
         Set<String> otherMasters = new HashSet<>();
@@ -276,7 +304,7 @@ public class Topology {
             case RANDOM_NODE_AFTER_OR_SAME:
                 if (service.isKubernetes()) {
                     throw new ServiceDefinitionException ("Service " + service.getName()
-                            + " defines a RANDOM_NODE_AFTER dependency on " + dep.getMasterService()+ ", which is not supported for kubernetes services");
+                            + " defines a " + dep.getMes() + " dependency on " + dep.getMasterService()+ ", which is not supported for kubernetes services");
                 }
                 if (dep.getNumberOfMasters() > 1) {
                     throw new ServiceDefinitionException ("Service " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
@@ -312,24 +340,22 @@ public class Topology {
     }
 
     private String handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp, int countOfMaster) throws NodesConfigurationException {
-        if (masterIp == null) {
-            if (!dep.isMandatory(nodesConfig)) {
-                // if none could be found, then well ... none could be found
-                masterIp = "";
-            } else {
-                throw new NodesConfigurationException("Dependency " + dep.getMasterService() + " for service " + service.getName() + " could not found occurence " + countOfMaster);
-            }
-        }
-        return masterIp;
+        return handleMissingMasterInternal (nodesConfig, dep, service, masterIp,
+                "Dependency " + dep.getMasterService() + " for service " + service.getName() + " could not found occurence " + countOfMaster);
     }
 
     private String handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp) throws NodesConfigurationException {
+        return handleMissingMasterInternal (nodesConfig, dep, service, masterIp,
+                "Dependency " + dep.getMasterService() + " for service" + service.getName() + " could not be found");
+    }
+
+    private String handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp, String message) throws NodesConfigurationException {
         if (masterIp == null) {
             if (!dep.isMandatory(nodesConfig)) {
                 // if none could be found, then well ... none could be found
                 masterIp = "";
             } else {
-                throw new NodesConfigurationException("Dependency " + dep.getMasterService() + " for service " + service.getName() + " could not be found");
+                throw new NodesConfigurationException(message);
             }
         }
         return masterIp;

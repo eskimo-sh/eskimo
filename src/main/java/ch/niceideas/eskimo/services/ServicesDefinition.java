@@ -548,15 +548,15 @@ public class ServicesDefinition implements InitializingBean {
                 .map(Service::getName).toArray(String[]::new);
     }
 
-    public int compareServices(Service one, Service other) {
+    public String[] listKubernetesServicesOrderedByDependencies() {
+        return services.values().stream()
+                .filter(Service::isKubernetes)
+                .sorted(this::compareServices)
+                .map(Service::getName)
+                .toArray(String[]::new);
+    }
 
-        // marathon services are always last
-        if (one.isMarathon() && !other.isMarathon()) {
-            return 1;
-        }
-        if (!one.isMarathon() && other.isMarathon()) {
-            return -1;
-        }
+    public int compareServices(Service one, Service other) {
 
         // kubernetes services are always last
         if (one.isKubernetes() && !other.isKubernetes()) {

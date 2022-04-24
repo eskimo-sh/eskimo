@@ -33,7 +33,7 @@ Software.
 */
 
 
-function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, successCallback) {
+function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kubernetesServices, successCallback) {
 
     $.ajax({
         type: "GET",
@@ -42,7 +42,7 @@ function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, succ
         success: function (data, status, jqXHR) {
 
             try {
-                doCheckKubernetesSetup (data, kubernetesSetupConfig, servicesDependencies);
+                doCheckKubernetesSetup (data, kubernetesSetupConfig, servicesDependencies, kubernetesServices);
 
                 if(successCallback && successCallback instanceof Function) {
                     successCallback();
@@ -61,7 +61,7 @@ function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, succ
     return true;
 }
 
-function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDependencies) {
+function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDependencies, kubernetesServices) {
     if (!nodesConfig.clear) {
 
         // data is nodesConfig
@@ -79,17 +79,38 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
             for (let i = 0; i < serviceDeps.length; i++) {
                 let dependency = serviceDeps[i];
 
-                // I want the dependency on same node
-                if (dependency.mes == "SAME_NODE") {
+                // All the following are unsupported for kubernetes service
+                if (dependency.mes == "SAME_NODE"
+                    || dependency.mes == "SAME_NODE_OR_RANDOM"
+                    || dependency.mes == "RANDOM_NODE_AFTER"
+                    || dependency.mes == "RANDOM_NODE_AFTER_OR_SAME") {
 
-                    throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency SAME_NODE which is disallowed"
+                    throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency "
+                            + dependency.mes + " on " + dependency.masterService + " which is disallowed";
                 }
 
                 // I want the dependency somewhere
                 else if (dependency.mandatory) {
 
-                    // ensure count of dependencies are available
-                    enforceMandatoryDependency(dependency, nodesConfig, null, serviceName);
+                    // if dependency is a kubernetes service
+                    if (kubernetesServices[dependency.masterService]) {
+                        if (dependency.numberOfMasters > 1) {
+                            throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency with master count "
+                                    +  dependency.numberOfMasters + " on " + dependency.masterService + " which is disallowed for kubernetes dependencies";
+                        }
+
+                        // make sure dependency is installed or going to be
+                        if (!kubernetesSetupConfig[dependency.masterService+"_install"]
+                            || kubernetesSetupConfig[dependency.masterService+"_install"] != "on") {
+                            throw "Inconsistency found : Service " + serviceName + " expects a installaton of  " + dependency.masterService +
+                                    ". But it's not going to be installed";
+                        }
+                    }
+                    // otherwise if dependency is a node service
+                    else {
+                        // ensure count of dependencies are available
+                        enforceMandatoryDependency(dependency, nodesConfig, null, serviceName);
+                    }
                 }
             }
         }

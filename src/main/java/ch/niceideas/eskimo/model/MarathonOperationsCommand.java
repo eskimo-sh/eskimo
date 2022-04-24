@@ -71,7 +71,7 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
         MarathonOperationsCommand retCommand = new MarathonOperationsCommand(rawMarathonServicesConfig);
 
         // 1. Find out about services that need to be installed
-        for (String service : servicesDefinition.listKubernetesServices()) {
+        for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
             if (rawMarathonServicesConfig.isServiceInstallRequired(service)
                     && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
 
@@ -105,24 +105,6 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
         if (retCommand.hasChanges()) {
             try {
                 SystemStatusWrapper lastStatus = systemService.getStatus();
-
-                /* Deprecated. remove
-                String marathonNodeName = lastStatus.getFirstNodeName("marathon");
-                if (StringUtils.isBlank(marathonNodeName)) {
-                    retCommand.setWarnings("Marathon is not available. The changes in marathon services configuration and " +
-                            "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
-                            "marathon is available");
-
-                } else {
-
-                    if (!lastStatus.isServiceOKOnNode("marathon", marathonNodeName)) {
-
-                        retCommand.setWarnings("Marathon is not properly running. The changes in marathon services configuration and " +
-                                "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
-                                "marathon is available");
-                    }
-                }
-                */
 
                 String kubeNodeName = lastStatus.getFirstNodeName(KubernetesService.KUBE_MASTER);
                 if (StringUtils.isBlank(kubeNodeName)) {

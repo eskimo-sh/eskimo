@@ -64,11 +64,14 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         sc.setServicesDefinition(sd);
 
         String servicesDependencies = sc.getServicesDependencies();
+        String kubernetesServiceConfig = sc.getKubernetesServices();
 
         js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
+        js("var KUBERNETES_SERVICES_CONFIG = " + kubernetesServiceConfig + ";");
+
         js("function callCheckKubernetesSetup(nodesConfig, kubernetesConfig) {\n" +
-                "   return doCheckKubernetesSetup(nodesConfig, kubernetesConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
+                "   return doCheckKubernetesSetup(nodesConfig, kubernetesConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies, KUBERNETES_SERVICES_CONFIG.kubernetesServicesConfigurations);\n" +
                 "}");
     }
 
@@ -78,14 +81,15 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
-            put("kubernetes", "1");
+            put("kube-master", "1");
+            put("kube-slave", "1");
             put("ntp1", "on");
             put("prometheus1", "on");
-            put("elasticsearch1", "on");
         }});
 
         JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("cerebro_installed", "on");
+            put("elasticsearch_install", "on");
+            put("cerebro_install", "on");
             put("kibana_install", "on");
             put("grafana_install", "on");
         }});
@@ -112,14 +116,34 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             }});
 
             JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("cerebro_installed", "on");
+                put("cerebro_install", "on");
             }});
 
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service cerebro expects 1 elasticsearch instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed"));
+    }
+
+    @Test
+    public void testSparkButNoKube() throws Exception {
+
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("ntp1", "on");
+            }});
+
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("spark-executor_install", "on");
+            }});
+
+            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-executor expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test
@@ -129,13 +153,14 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
-                put("kubernetes", "1");
                 put("prometheus1", "on");
-                put("elasticsearch1", "on");
+                put("kube-master1", "on");
+                put("kube-slave1", "on");
             }});
 
             JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("zeppelin_installed", "on");
+                put("elasticsearch_install", "on");
+                put("zeppelin_install", "on");
             }});
 
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
@@ -143,5 +168,28 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         logger.debug (exception.getMessage());
         assertTrue(exception.getMessage().startsWith("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
+    }
+
+    @Test
+    public void testZeppelinButNoElasticsearch() throws Exception {
+
+        ScriptException exception = assertThrows(ScriptException.class, () -> {
+            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("node_id1", "192.168.10.11");
+                put("ntp1", "on");
+                put("kube-master", "1");
+                put("prometheus1", "on");
+                put("zookeeper1", "on");
+            }});
+
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
+                put("zeppelin_install", "on");
+            }});
+
+            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
+        });
+
+        logger.debug (exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service zeppelin expects a installaton of  elasticsearch. But it's not going to be installed"));
     }
 }

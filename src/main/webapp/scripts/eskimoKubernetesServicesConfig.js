@@ -48,6 +48,7 @@ eskimo.KubernetesServicesConfig = function() {
 
     // initialized by backend
     let KUBERNETES_SERVICES = [];
+    let KUBERNETES_SERVICES_CONFIG = {};
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -62,7 +63,7 @@ eskimo.KubernetesServicesConfig = function() {
                     console.log(setupConfig);
 
                     try {
-                        checkKubernetesSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(),
+                        checkKubernetesSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(), KUBERNETES_SERVICES_CONFIG,
                             function () {
                                 // callback if setup is OK
                                 proceedWithKubernetesInstallation(setupConfig);
@@ -114,6 +115,7 @@ eskimo.KubernetesServicesConfig = function() {
                 if (data.status == "OK") {
 
                     KUBERNETES_SERVICES = data.kubernetesServices;
+                    KUBERNETES_SERVICES_CONFIG = data.kubernetesServicesConfigurations;
 
                     //console.log (KUBERNETES_SERVICES);
 
@@ -125,8 +127,11 @@ eskimo.KubernetesServicesConfig = function() {
         });
     }
 
-    this.setKubernetesServicesForTest = function(testServics) {
-        KUBERNETES_SERVICES = testServics;
+    this.setKubernetesServicesForTest = function(testServices) {
+        KUBERNETES_SERVICES = testServices;
+    };
+    this.setKubernetesServicesConfigForTest = function(testServicesConfig) {
+        KUBERNETES_SERVICES_CONFIG = testServicesConfig;
     };
 
     this.getKubernetesServices = function() {

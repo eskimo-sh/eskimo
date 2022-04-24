@@ -327,7 +327,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
+                "export SELF_NODE_NUMBER=1\n" +
+                "export ESKIMO_NODE_COUNT=3\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -339,7 +341,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
-                "export SELF_NODE_NUMBER=2\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 2));
+                "export SELF_NODE_NUMBER=2\n" +
+                "export ESKIMO_NODE_COUNT=3\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 2));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -349,7 +353,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.13\n" +
-                "export SELF_NODE_NUMBER=3\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export SELF_NODE_NUMBER=3\n" +
+                "export ESKIMO_NODE_COUNT=3\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
     }
 
     @Test
@@ -383,6 +389,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n" +
+                "export ESKIMO_NODE_COUNT=1\n" +
+                "export ALL_NODES_LIST=192.168.10.11\n" +
                 "\n" +
                 "#Memory Management\n" +
                 "export MEMORY_SERVICE_A=100\n" +
@@ -421,6 +429,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n" +
+                "export ESKIMO_NODE_COUNT=1\n" +
+                "export ALL_NODES_LIST=192.168.10.11\n" +
                 "\n" +
                 "#Memory Management\n" +
                 "export MEMORY_SERVICE_A=100\n" +
@@ -464,7 +474,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
+                "export SELF_NODE_NUMBER=1\n" +
+                "export ESKIMO_NODE_COUNT=5\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.12\n" +
@@ -474,7 +486,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.13\n" +
-                "export SELF_NODE_NUMBER=3\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export SELF_NODE_NUMBER=3\n" +
+                "export ESKIMO_NODE_COUNT=5\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
     }
 
     @Test
@@ -519,7 +533,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
-                "export SELF_NODE_NUMBER=2\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 2));
+                "export SELF_NODE_NUMBER=2\n" +
+                "export ESKIMO_NODE_COUNT=3\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 2));
 
         // now change topology and ensure node numbers for services A and C are unchanged
         nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
@@ -552,7 +568,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
-                "export SELF_NODE_NUMBER=3\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export SELF_NODE_NUMBER=3\n" +
+                "export ESKIMO_NODE_COUNT=5\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
     }
 
     @Test
@@ -595,14 +613,74 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
                 () -> Topology.create(nodesConfig, marathonServicesConfig,  def, null, "192.168.10.11"));
 
-        assertEquals("Service service_d defines a SAME_NODE dependency which is not supported for marathon services", exception.getMessage());
+        assertEquals("Service service_d defines a SAME_NODE dependency on service_b, which is not supported for kubernetes services", exception.getMessage());
 
         depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
 
         exception = assertThrows(ServiceDefinitionException.class,
                 () -> Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11"));
 
-        assertEquals("Service service_d defines a RANDOM_NODE_AFTER dependency which is not supported for marathon services", exception.getMessage());
+        assertEquals("Service service_d defines a RANDOM_NODE_AFTER dependency on service_b, which is not supported for kubernetes services", exception.getMessage());
+
+        depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
+
+        exception = assertThrows(ServiceDefinitionException.class,
+                () -> Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11"));
+
+        assertEquals("Service service_d defines a RANDOM_NODE_AFTER_OR_SAME dependency on service_b, which is not supported for kubernetes services", exception.getMessage());
+    }
+
+    @Test
+    public void testKubernetesOnKubernetesDependencies() throws Exception {
+
+        Service serviceA = new Service();
+        serviceA.setName("service_a");
+        def.addService(serviceA);
+
+        Service serviceB = new Service();
+        serviceB.setKubernetes(true);
+        serviceB.setName("service_b");
+        def.addService(serviceB);
+
+        Service serviceD = new Service();
+        serviceD.setName("service_d");
+
+        serviceD.setKubernetes(true);
+        Dependency depD = new Dependency();
+        depD.setMes(MasterElectionStrategy.RANDOM);
+        depD.setMasterService("service_b");
+        depD.setNumberOfMasters(1);
+        serviceD.addDependency (depD);
+        def.addService(serviceD);
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("node_id2", "192.168.10.12");
+            put("service_a2", "on");
+            put("node_id3", "192.168.10.13");
+        }});
+
+        MarathonServicesConfigWrapper marathonServicesConfig = createStandardMarathonConfig();
+
+        ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
+                () -> Topology.create(nodesConfig, marathonServicesConfig,  def, null, "192.168.10.11"));
+
+        assertEquals("Service service_d defines a dependency on another kube service service_b but that service is not going to be installed.", exception.getMessage());
+
+        marathonServicesConfig.setValueForPath("service_b_install", "on");
+
+        Topology topology = Topology.create(nodesConfig, marathonServicesConfig,  def, null, "192.168.10.11");
+
+        assertEquals ("#Topology\n" +
+                "\n" +
+                "#Additional Environment\n" +
+                "\n" +
+                "#Self identification\n" +
+                "export SELF_IP_ADDRESS=192.168.10.13\n" +
+                "export SELF_NODE_NUMBER=3\n" +
+                "export ESKIMO_NODE_COUNT=3\n" +
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
     }
 
     @Test

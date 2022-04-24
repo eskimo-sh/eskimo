@@ -142,8 +142,8 @@ function enforceMandatoryDependency(dependency, nodesConfig, nodeNbr, serviceNam
 
     if (actualCount < expectedCount) {
         throw "Inconsistency found : Service " + serviceName + " expects " + expectedCount
-        + " " + dependency.masterService + " instance(s). " +
-        "But only " + actualCount + " has been found !";
+                + " " + dependency.masterService + " instance(s). " +
+                "But only " + actualCount + " has been found !";
     }
 }
 

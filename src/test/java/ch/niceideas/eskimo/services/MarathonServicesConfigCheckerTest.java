@@ -41,6 +41,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -74,18 +75,18 @@ public class MarathonServicesConfigCheckerTest {
     }
 
     @Test
-    public void testCheckMarathonSetupOK() throws Exception {
+    public void testCheckKubernetesSetupOK() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
-            put("marathon", "1");
-            put("ntp1", "on");
+            put("kube-master", "1");
+            put("kube-slave", "1");
             put("prometheus1", "on");
-            put("elasticsearch1", "on");
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
         MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            put("elasticsearch_install", "on");
                 put("cerebro_installed", "on");
                 put("kibana_install", "on");
                 put("grafana_install", "on");
@@ -114,7 +115,30 @@ public class MarathonServicesConfigCheckerTest {
             marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
         });
 
-        assertEquals("Inconsistency found : Service cerebro expects 1 elasticsearch instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
+    }
+
+    @Test
+    public void testSparkButNoKube() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("ntp1", "on");
+            put("prometheus1", "on");
+
+        }});
+        configurationService.saveNodesConfig(nodesConfig);
+
+        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+
+            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+                put("spark-executor_install", "on");
+            }});
+
+            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+        });
+
+        assertEquals("Inconsistency found : Service spark-executor expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
@@ -124,7 +148,34 @@ public class MarathonServicesConfigCheckerTest {
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("prometheus1", "on");
-            put("elasticsearch1", "on");
+            put("kube-master1", "on");
+            put("kube-slave1", "on");
+
+        }});
+        configurationService.saveNodesConfig(nodesConfig);
+
+        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+
+            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+                put("elasticsearch_install", "on");
+                put("zeppelin_installed", "on");
+            }});
+
+            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+        });
+
+        assertEquals("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
+    }
+
+    @Test
+    public void testZeppelinButNoElasticsearch() throws Exception {
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            put("node_id1", "192.168.10.11");
+            put("ntp1", "on");
+            put("prometheus1", "on");
+            put("kube-master1", "on");
+            put("kube-slave1", "on");
 
         }});
         configurationService.saveNodesConfig(nodesConfig);
@@ -138,11 +189,11 @@ public class MarathonServicesConfigCheckerTest {
             marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
         });
 
-        assertEquals("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service zeppelin expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
     }
 
     @Test
-    public void testNonMarathonServiceCanBeSelected() throws Exception {
+    public void testNonKubernetesServiceCanBeSelected() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
@@ -162,7 +213,7 @@ public class MarathonServicesConfigCheckerTest {
             marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
         });
 
-        assertEquals("Inconsistency found : service zookeeper is not a marathon service", exception.getMessage());
+        assertEquals("Inconsistency found : service zookeeper is not a kubernetes service", exception.getMessage());
     }
 
 }

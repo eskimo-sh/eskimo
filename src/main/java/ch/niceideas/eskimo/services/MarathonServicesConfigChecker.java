@@ -72,7 +72,7 @@ public class MarathonServicesConfigChecker {
             // ensure only marathon services
             for (String serviceName : marathonConfig.getEnabledServices()) {
                 Service service = servicesDefinition.getService(serviceName);
-                if (!service.isMarathon() && !service.isKubernetes()) {
+                if (!service.isKubernetes()) {
                     throw new MarathonServicesConfigException("Inconsistency found : service " + serviceName + " is not a kubernetes service");
                 }
             }
@@ -84,35 +84,45 @@ public class MarathonServicesConfigChecker {
 
                 for (Dependency dependency : service.getDependencies()) {
 
-                    Service otherService = servicesDefinition.getService(dependency.getMasterService());
-                    if (otherService.isMarathon()) {
-                        throw new MarathonServicesConfigException(
-                                "Inconsistency found : Service " + serviceName + " is defining a dependency on a marathon service :  " +
-                                        dependency.getMasterService() + ", which is disallowed");
-                    }
-                    if (otherService.isKubernetes()) {
-                        throw new MarathonServicesConfigException(
-                                "Inconsistency found : Service " + serviceName + " is defining a dependency on a kubernetes service :  " +
-                                        dependency.getMasterService() + ", which is disallowed");
-                    }
-
-                    // I want the dependency on same node if dependency is mandatory
-                    if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)) {
+                    // All the following are unsupported for kubernetes service
+                    if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)
+                            || dependency.getMes().equals(MasterElectionStrategy.SAME_NODE_OR_RANDOM)
+                            || dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)
+                            || dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME)) {
 
                         throw new MarathonServicesConfigException(
-                                "Inconsistency found : Service " + serviceName + " is a marathon service and defines a dependency SAME_NODE which is disallowed");
+                                "Inconsistency found : Service " + serviceName + " is a marathon service and defines a dependency " + dependency.getMes()
+                                        + " on " + dependency.getMasterService() + " which is disallowed");
                     }
 
                     // I want the dependency somewhere
                     else if (dependency.isMandatory(nodesConfig)) {
 
-                        // ensure count of dependencies are available
-                        try {
-                            NodesConfigurationChecker.enforceMandatoryDependency(nodesConfig, serviceName, null, dependency);
-                        } catch (NodesConfigurationException e) {
-                            logger.debug (e, e);
-                            logger.warn (e.getMessage());
-                            throw new MarathonServicesConfigException(e.getMessage(), e);
+                        Service depService = servicesDefinition.getService(dependency.getMasterService());
+                        if (depService.isKubernetes()) {
+
+                            if (dependency.getNumberOfMasters() > 1) {
+                                throw new MarathonServicesConfigException("Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency with master count "
+                                        +  dependency.getNumberOfMasters() + " on " + dependency.getMasterService() + " which is disallowed for kubernetes dependencies");
+                            }
+
+                            // make sure dependency is installed or going to be
+                            if (!marathonConfig.isServiceInstallRequired(dependency.getMasterService())) {
+                                throw new MarathonServicesConfigException("Inconsistency found : Service " + serviceName + " expects a installaton of  " + dependency.getMasterService() +
+                                        ". But it's not going to be installed");
+                            }
+                        }
+
+                        else {
+                            // ensure count of dependencies are available
+
+                            try {
+                                NodesConfigurationChecker.enforceMandatoryDependency(nodesConfig, serviceName, null, dependency);
+                            } catch (NodesConfigurationException e) {
+                                logger.debug(e, e);
+                                logger.warn(e.getMessage());
+                                throw new MarathonServicesConfigException(e.getMessage(), e);
+                            }
                         }
                     }
                 }

@@ -105,8 +105,8 @@
     "config": {
       "imageName" : "grafana",
       "order": 3,
-      "marathon": true,
       "unique": true,
+      "kubernetes": true,
       "group" : "Monitoring",
       "name" : "Grafana",
       "memory": "kube",
@@ -224,7 +224,7 @@
             "name": "target.volumes",
             "comment": "The volumes to be automagically managed by EGMI.",
             "defaultValue": "",
-            "value": "spark_eventlog,spark_data,flink_data,flink_completed_jobs,logstash_data,marathon_registry,kubernetes_registry,kubernetes_ssl"
+            "value": "spark_eventlog,spark_data,flink_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_ssl"
           }
         ]
       }
@@ -470,7 +470,7 @@
     "config": {
       "imageName" : "kafka-manager",
       "order": 10,
-      "marathon": true,
+      "kubernetes": true,
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
@@ -517,7 +517,7 @@
     "config": {
       "imageName" : "spark",
       "order": 11,
-      "marathon": true,
+      "kubernetes": true,
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
@@ -589,13 +589,6 @@
       "icon" : "images/spark-executor-icon.png"
     },
     "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
-      },
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "kube-master",
@@ -693,8 +686,8 @@
         "restart": true
       },
       {
-        "masterElectionStrategy": "RANDOM",
-        "masterService": "kube-slave",
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
@@ -787,8 +780,8 @@
         "restart": false
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "kube-slave",
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
@@ -858,13 +851,13 @@
       "title" : "Cerebro",
       "statusPageLinktitle" : "Manage your data in Elasticsearch"
     },
-    "_____dependencies": [
+    "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": false
       }
     ]
   },
@@ -981,7 +974,7 @@
     "config": {
       "imageName" : "kibana",
       "order": 18,
-      "marathon": true,
+      "kubernetes": true,
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
@@ -1022,11 +1015,18 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "commands" : [
@@ -1045,8 +1045,8 @@
     "config": {
       "imageName" : "zeppelin",
       "order": 19,
-      "marathon": true,
       "unique": true,
+      "kubernetes": true,
       "name" : "Zeppelin",
       "memory": "kube",
       "____comment": "We need to know about the spark executor memory to set",
@@ -1090,7 +1090,7 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true,
@@ -1111,14 +1111,14 @@
         "restart": true
       },
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
         "restart": true
       },
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "logstash",
         "numberOfMasters": 1,
         "mandatory": false,
@@ -1132,7 +1132,7 @@
         "restart": false
       },
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "kafka",
         "numberOfMasters": 1,
         "mandatory": false,
