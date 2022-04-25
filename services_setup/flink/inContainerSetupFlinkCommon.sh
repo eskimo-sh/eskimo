@@ -227,7 +227,11 @@ sudo bash -c "echo -e \"kubernetes.config.file: /home/flink/.kube/config\"  >> /
 
 sudo bash -c "echo -e \"kubernetes.cluster-id: flink\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
+sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: flink.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
+sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
+sed -i s/"#rest.address: 0.0.0.0"/"rest.address: flink-rest.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
+sudo bash -c "echo -e \"taskmanager.rpc.port: 50100\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 # temporary debug logs
 #sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
 #        /usr/local/lib/flink/conf/log4j.properties

@@ -66,11 +66,12 @@ data:
         }
         prometheus :9153
         forward . /etc/resolv.conf
-        cache 30
-        loop
+        cache 30        
         reload
         loadbalance
     }
+
+#   loop
 ---
 apiVersion: apps/v1
 kind: Deployment

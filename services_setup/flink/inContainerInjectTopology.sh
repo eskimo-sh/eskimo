@@ -56,6 +56,8 @@ sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /
 bash -c "echo -e \"kubernetes.jobmanager.cpu: 0.2\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 bash -c "echo -e \"kubernetes.taskmanager.cpu: 0.5\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
+
+
 # The external address of the host on which the JobManager runs and can be
 # reached by the TaskManagers and any clients which want to connect
 #sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $MASTER_FLINK_APP_MASTER_1"/g /usr/local/lib/flink/conf/flink-conf.yaml
