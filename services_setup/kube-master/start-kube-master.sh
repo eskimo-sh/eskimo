@@ -221,16 +221,14 @@ if [[ $? != 0 ]]; then
     exit 49
 fi
 
+sleep 10
 
 echo "   + Deleting lock file"
 delete_k8s_master_lock_file
 
-set -e
-
-echo "   + Entering monitoring loop"
+echo "   + Entering monitoring / remediation loop"
+ping_cnt=0
 while : ; do
-
-    sleep 10
 
     if [[ `ps -e | grep $kubeapi_pid ` == "" ]]; then
         echo "   + Failed to run Kubernetes API server"
@@ -254,6 +252,85 @@ while : ; do
         echo "   + Failed to run Kube Proxy (through Kubectl)"
         cat /var/log/kubernetes/kubectlproxy.log 2>&1
         exit 50
+    fi
+
+    sleep 10
+
+    # ensure DNS is still working alright
+    #echo "   + Trying to ping kubernetes.default.svc.cluster.eskimo" # this is filling up logs
+    /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+    if [[ $? != 0 ]]; then
+
+        sleep 5
+
+        echo "   + Trying AGAIN to ping kubernetes.default.svc.cluster.eskimo"
+        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+        if [[ $? != 0 ]]; then
+
+            echo "   + Failed to ping kubernetes.default.svc.cluster.eskimo. First trying to restart Network Manager"
+
+            if [[ -d /lib/systemd/system/ ]]; then
+                export systemd_units_dir=/lib/systemd/system/
+            elif [[ -d /usr/lib/systemd/system/ ]]; then
+                export systemd_units_dir=/usr/lib/systemd/system/
+            else
+                echo "Couldn't find systemd unit files directory"
+                exit 51
+            fi
+
+            if [[ -f $systemd_units_dir/NetworkManager.service ]]; then
+                /bin/systemctl restart NetworkManager
+            else
+                /bin/systemctl restart dnsmasq
+            fi
+            if [[ $? != 0 ]]; then
+                echo "Failing to restart NetworkManager / dnsmasq"
+                exit 52
+            fi
+
+            sleep 2
+
+            echo "   + Trying YET AGAIN to ping kubernetes.default.svc.cluster.eskimo"
+            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+            if [[ $? != 0 ]]; then
+
+                echo "   + Failed to ping kubernetes.default.svc.cluster.eskimo. Trying to restart coredns"
+
+                echo "     - Deleting coredns deployment"
+                /bin/bash --login -c '/usr/local/bin/kubectl \
+                     delete -f /var/lib/kubernetes/core-dns.yaml \
+                    --kubeconfig=/root/.kube/config \
+                    > /var/log/kubernetes/start_k8s_master.log 2>&1'
+                if [[ $? != 0 ]]; then
+                    echo "       + Failed to undeploy coredns"
+                    exit 51
+                fi
+
+                echo "     - redeploy coredns deployment"
+                /bin/bash --login -c '/usr/local/bin/kubectl \
+                     apply -f /var/lib/kubernetes/core-dns.yaml \
+                    --kubeconfig=/root/.kube/config \
+                    > /var/log/kubernetes/start_k8s_master.log 2>&1'
+                if [[ $? != 0 ]]; then
+                    echo "       + Failed to re-deploy coredns"
+                    exit 52
+                fi
+
+                let ping_cnt=ping_cnt+1
+
+                echo "     - checking redeploy coredns looping"
+                if [[ $ping_cnt -gt 5 ]]; then
+                    echo "       + Redeployed coredns 5 times in a row. Crashing !"
+                    exit 53
+                fi
+            else
+                ping_cnt=0
+            fi
+        else
+            ping_cnt=0
+        fi
+    else
+        ping_cnt=0
     fi
 
 done
