@@ -81,7 +81,7 @@ sudo ln -s /var/log/flink/log /usr/local/lib/flink/log
 # The default directory used for storing the data files and meta data of checkpoints in a Flink supported
 # filesystem.
 # The storage path must be accessible from all participating processes/nodes(i.e. all TaskManagers and JobManagers).
-sed -i s/"# state.savepoints.dir: hdfs:\/\/namenode-host:port\/flink-checkpoints"/"state.savepoints.dir: file:\/\/\/var\/lib\/flink\/data\/savepoints"/g \
+sed -i s/"# state.savepoints.dir: hdfs:\/\/namenode-host:port\/flink-savepoints"/"state.savepoints.dir: file:\/\/\/var\/lib\/flink\/data\/savepoints"/g \
         /usr/local/lib/flink/conf/flink-conf.yaml
 
 # The default directory for savepoints.
