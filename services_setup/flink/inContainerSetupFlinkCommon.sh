@@ -42,7 +42,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 FLINK_USER_ID=$1
 if [[ $FLINK_USER_ID == "" ]]; then
     echo " - Didn't get FLINK User ID as argument"
-    exit -2
+    exit 1
 fi
 
 
@@ -56,11 +56,15 @@ if [[ $flink_user_id == "" ]]; then
     useradd -u $FLINK_USER_ID flink
 elif [[ $flink_user_id != $FLINK_USER_ID ]]; then
     echo "Docker FLINK USER ID is $flink_user_id while requested USER ID is $FLINK_USER_ID"
-    exit -2
+    exit 2
 fi
+
+echo " - Enabling flink user to mount gluster shares (sudo)"
+echo "flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" >> /etc/sudoers.d/flink
 
 echo " - Creating user flink home directory"
 mkdir -p /home/flink
+mkdir -p /home/spark/.kube
 chown flink /home/flink
 
 
@@ -96,26 +100,132 @@ sed -i s/"#historyserver.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"historyse
 # uncomment
 sed -i s/"#rest.port: 8081"/"rest.port: 8081"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
+echo " - Creating flink-pod-template.yaml"
+cat > /tmp/flink-pod-template.yaml <<- "EOF"
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: flink-main-container # this has to be this name !!!
+    image: kubernetes.registry:5000/flink-worker
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+      runAsUser: 3305
+      runAsGroup: 3305
+    volumeMounts:
+      - name: home-flink-kube
+        mountPath: /home/flink/.kube
+      - name: var-log-flink
+        mountPath: /var/log/flink
+      - name: var-run-flink
+        mountPath: /var/run/flink
+      - name: etc-eskimo-topology
+        mountPath: /etc/eskimo_topology.sh
+      - name: etc-eskimo-services-settings
+        mountPath: /etc/eskimo_services-settings.json
+      - name: etc-k8s
+        mountPath: /etc/k8s
+  volumes:
+    - name: home-flink-kube
+      hostPath:
+        path: /home/flink/.kube
+        type: Directory
+    - name: var-log-flink
+      hostPath:
+        path: /var/log/flink
+        type: Directory
+    - name: var-run-flink
+      hostPath:
+        path: /var/run/flink
+        type: Directory
+    - name: etc-eskimo-topology
+      hostPath:
+        path: /etc/eskimo_topology.sh
+        type: File
+    - name: etc-eskimo-services-settings
+      hostPath:
+        path: /etc/eskimo_services-settings.json
+        type: File
+    - name: etc-k8s
+      hostPath:
+        path: /etc/k8s
+        type: Directory
+  #hostNetwork: true
+EOF
+sudo mv /tmp/flink-pod-template.yaml /usr/local/lib/flink/conf/
+chmod 755 /usr/local/lib/flink/conf/
+
+
+echo " - Creating docker-entrypoint.sh"
+cat > /tmp/docker-entrypoint.sh <<- "EOF"
+#!/usr/bin/env bash
+
+args=("$@")
+
+if [ "$1" = "help" ]; then
+    printf "Usage: $(basename "$0") (operator|webhook)\n"
+    printf "    Or $(basename "$0") help\n\n"
+    exit 0
+elif [ "$1" = "operator" ]; then
+    echo "Starting Operator"
+
+    exec java -cp /$FLINK_KUBERNETES_SHADED_JAR:/$OPERATOR_JAR $LOG_CONFIG org.apache.flink.kubernetes.operator.FlinkOperator
+elif [ "$1" = "webhook" ]; then
+    echo "Starting Webhook"
+
+    # Adds the operator shaded jar on the classpath when the webhook starts
+    exec java -cp /$FLINK_KUBERNETES_SHADED_JAR:/$OPERATOR_JAR:/$WEBHOOK_JAR $LOG_CONFIG org.apache.flink.kubernetes.operator.admission.FlinkOperatorWebhook
+fi
+
+args=("${args[@]}")
+
+# Running command in pass-through mode
+exec "${args[@]}"
+EOF
+sudo mkdir -p /usr/local/lib/flink/kubernetes/
+sudo mv /tmp/docker-entrypoint.sh /usr/local/lib/flink/kubernetes/docker-entrypoint.sh
+chmod 755 /usr/local/lib/flink/kubernetes/
+
+
+#sudo bash -c "echo -e \"\n\n\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"# Eskimo Mesos Configuration part \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+#sudo bash -c "echo -e \"\n# setting containierization type \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.type: docker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+#sudo bash -c "echo -e \"\n# specifying image name \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.image.name: eskimo:flink-worker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+#sudo bash -c "echo -e \"\n# specifying FLINK_HOME (workaround for https://github.com/mesosphere/dcos-flink-service/issues/54) \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"mesos.resourcemanager.tasks.bootstrap-cmd: export FLINK_HOME=/usr/local/lib/flink/\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+#sudo bash -c "echo -e \"\n# A comma separated list of [host_path:]container_path[:RO|RW]. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"# This allows for mounting additional volumes into your container.. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/flink:/var/log/flink:RW,/var/lib/flink:/var/lib/flink:RW,/etc:/host_etc:RO\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+
 
 sudo bash -c "echo -e \"\n\n\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"# Eskimo Mesos Configuration part \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"# Eskimo Kubernetes Configuration part \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"\n# setting containierization type \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.type: docker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+# FIXME
+sudo bash -c "echo -e \"kubernetes.context: default\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.container.image: kubernetes.registry:5000/flink-worker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"\n# specifying image name \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.image.name: eskimo:flink-worker\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.jobmanager.replicas: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"\n# specifying FLINK_HOME (workaround for https://github.com/mesosphere/dcos-flink-service/issues/54) \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"mesos.resourcemanager.tasks.bootstrap-cmd: export FLINK_HOME=/usr/local/lib/flink/\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.pod-template-file: /usr/local/lib/flink/conf/flink-pod-template.yaml\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.pod-template-file.jobmanager: /usr/local/lib/flink/conf/flink-pod-template.yaml\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.pod-template-file.taskmanager: /usr/local/lib/flink/conf/flink-pod-template.yaml\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"\n# A comma separated list of [host_path:]container_path[:RO|RW]. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"# This allows for mounting additional volumes into your container.. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/flink:/var/log/flink:RW,/var/lib/flink:/var/lib/flink:RW,/etc:/host_etc:RO\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.config.file: /home/flink/.kube/config\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-
+sudo bash -c "echo -e \"kubernetes.cluster-id: flink\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 
 # temporary debug logs
@@ -136,6 +246,8 @@ sudo bash -c "echo -e \"mesos.resourcemanager.tasks.container.volumes: /var/log/
 #sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 
+echo " - Symlinking entrypoint to /docker-entrypoint.sh"
+sudo ln -s /usr/local/sbin/eskimo-flink-entrypoint.sh /docker-entrypoint.sh
 
 echo " - Enabling flink to change configuration at runtime"
 chown -R flink. "/usr/local/lib/flink/conf/"

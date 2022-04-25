@@ -61,6 +61,10 @@ echo " - Installing python"
 docker exec -i flink_template apt-get -y install  python-dev python-six python-virtualenv python3-pip > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
+echo " - Installing GlusterFS client"
+docker exec -i flink_template apt-get -y install  glusterfs-client > /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -10
+
 #echo " - Installing python elasticsearch and kafka clients and other utilities"
 #docker exec -i flink pip install elasticsearch kafka-python > /tmp/flink_build_log 2>&1
 #fail_if_error $? "/tmp/flink_build_log" -6

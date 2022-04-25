@@ -82,49 +82,54 @@ if [[ $? != 0 ]]; then
     fi
 fi
 
-echo "   + Registering gluster filesystem $VOLUME on $MOUNT_POINT"
-echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
-
-echo "   + Mounting $MOUNT_POINT"
-mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
-if [[ $? != 0 ]]; then
-    echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
-    cat /tmp/mount_$VOLUME
-    cat /var/log/glusterfs/*
-    exit 7
+if [[ `cat /etc/fstab | grep "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT"` == "" ]]; then
+    echo "   + Registering gluster filesystem $VOLUME on $MOUNT_POINT"
+    echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
 fi
 
-echo "   + Polling mtab for mount point appearance"
-cnt=0
-while : ; do
-    if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` != "" ]]; then
-        break
-    fi
-    sleep 1
-    let cnt=cnt+1
-    if [[ $cnt -gt 5 ]]; then
-        echo "Couldn't find $MOUNT_POINT in /etc/mtab in 5 seconds. Crashing !"
-        exit 8
-    fi
-done
+if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` == "" ]]; then
 
-echo "   + Checking mount point availability"
-cnt=0
-test_file=file_test_$RANDOM
-while : ; do
-    touch $MOUNT_POINT/$test_file
-    result=$?
-    if [[ $result == 0 ]]; then
-        rm -f $MOUNT_POINT/$test_file
-        break
+    echo "   + Mounting $MOUNT_POINT"
+    mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
+    if [[ $? != 0 ]]; then
+        echo "FAILED to mount gluster filesystem. Perhaps the container is not running as privileged ?"
+        cat /tmp/mount_$VOLUME
+        cat /var/log/glusterfs/*
+        exit 7
     fi
-    sleep 1
-    let cnt=cnt+1
-    if [[ $cnt -gt 5 ]]; then
-        echo "Couldn't sucessfully test $MOUNT_POINT in 5 seconds. Crashing !"
-        exit 9
-    fi
-done
+
+    echo "   + Polling mtab for mount point appearance"
+    cnt=0
+    while : ; do
+        if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` != "" ]]; then
+            break
+        fi
+        sleep 1
+        let cnt=cnt+1
+        if [[ $cnt -gt 5 ]]; then
+            echo "Couldn't find $MOUNT_POINT in /etc/mtab in 5 seconds. Crashing !"
+            exit 8
+        fi
+    done
+
+    echo "   + Checking mount point availability"
+    cnt=0
+    test_file=file_test_$RANDOM
+    while : ; do
+        touch $MOUNT_POINT/$test_file
+        result=$?
+        if [[ $result == 0 ]]; then
+            rm -f $MOUNT_POINT/$test_file
+            break
+        fi
+        sleep 1
+        let cnt=cnt+1
+        if [[ $cnt -gt 5 ]]; then
+            echo "Couldn't sucessfully test $MOUNT_POINT in 5 seconds. Crashing !"
+            exit 9
+        fi
+    done
+fi
 
 
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then

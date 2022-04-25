@@ -37,25 +37,6 @@
 # extract path arguments and create volume mount command part
 export DOCKER_VOLUMES_ARGS=""
 
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "-j" || $argument == "--jar" || $argument == "-l" || $argument == "--library" || $argument == "-d" || $argument == "--defaults" || $argument == "-e" || $argument == "--environment" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
-done
-
 # Add standard folders if not already part of it
 if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/flink` == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/lib/flink:/var/lib/flink:shared $DOCKER_VOLUMES_ARGS"
@@ -79,8 +60,10 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
+        --mount type=bind,source=/home/flink/.kube/config,target=/home/flink/.kube/config \
+        -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:flink-app-master \
-        /usr/local/bin/sql-client.sh "$@"
+        eskimo:flink \
+        /usr/local/bin/pyflink-shell.sh "$@"
 
 # -p 5000-5010:5000-5010 \

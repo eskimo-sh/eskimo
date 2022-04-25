@@ -49,7 +49,7 @@ for argument in "$@"; do
             export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
         fi
     fi
-    if [[ $argument == "-j" || $argument == "--jarfile" || $argument == "-p" || $argument == "--savepointPath" || $argument == "-s" || $argument == "--withSavepoint" ]]; then
+    if [[ $argument == "-j" || $argument == "--jar" || $argument == "-l" || $argument == "--library" || $argument == "-d" || $argument == "--defaults" || $argument == "-e" || $argument == "--environment" ]]; then
         export PROCESS_NEXT="1"
     else
         export PROCESS_NEXT="0"
@@ -79,8 +79,10 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
+        --mount type=bind,source=/home/flink/.kube/config,target=/home/flink/.kube/config \
+        -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:flink-app-master \
-        /usr/local/bin/flink "$@"
+        eskimo:flink \
+        /usr/local/bin/sql-client.sh "$@"
 
 # -p 5000-5010:5000-5010 \

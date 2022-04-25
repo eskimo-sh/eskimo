@@ -260,8 +260,8 @@ public class NodesConfigControllerTest {
                         "      {\"prometheus\": \"192.168.10.11\"},\n" +
                         "      {\"prometheus\": \"192.168.10.13\"},\n" +
                         "      {\"mesos-master\": \"192.168.10.11\"},\n" +
-                        "      {\"flink-worker\": \"192.168.10.11\"},\n" +
-                        "      {\"flink-worker\": \"192.168.10.13\"},\n" +
+                        "      {\"flink\": \"192.168.10.11\"},\n" +
+                        "      {\"flink\": \"192.168.10.13\"},\n" +
                         "      {\"flink-app-master\": \"192.168.10.11\"}\n" +
                         "    ]\n" +
                         "  },\n" +
@@ -273,7 +273,7 @@ public class NodesConfigControllerTest {
                 "\"mesos-master\":\"1\"," +
                 "\"zookeeper\":\"1\"," +
                 "\"elasticsearch1\":\"on\"," +
-                "\"flink-worker1\":\"on\"," +
+                "\"flink1\":\"on\"," +
                 "\"gluster1\":\"on\"," +
                 "\"kafka1\":\"on\"," +
                 "\"logstash1\":\"on\"," +
@@ -283,7 +283,7 @@ public class NodesConfigControllerTest {
                 "\"spark-executor1\":\"on\"," +
                 "\"node_id2\":\"192.168.10.13\"," +
                 "\"elasticsearch2\":\"on\"," +
-                "\"flink-worker2\":\"on\"," +
+                "\"flink2\":\"on\"," +
                 "\"gluster2\":\"on\"," +
                 "\"kafka2\":\"on\"," +
                 "\"logstash2\":\"on\"," +

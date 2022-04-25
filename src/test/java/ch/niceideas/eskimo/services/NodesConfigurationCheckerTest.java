@@ -443,7 +443,7 @@ public class NodesConfigurationCheckerTest {
                 put("mesos-master", "1");
                 put("flink-app-master", "1");
                 put("spark-executor1", "on");
-                //put("flink-worker1", "on");
+                //put("flink1", "on");
                 put("zookeeper", "1");
                 put("ntp1", "on");
                 put("gluster1", "on");

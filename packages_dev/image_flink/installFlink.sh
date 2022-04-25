@@ -50,6 +50,21 @@ if [ -z "$FLINK_VERSION" ]; then
     exit 1
 fi
 
+if [ -z "$SCALA_VERSION" ]; then
+    echo "Need to set SCALA_VERSION environment variable before calling this script !"
+    exit 1
+fi
+
+if [ -z "$FLINK_HADOOP_VERSION" ]; then
+    echo "Need to set FLINK_HADOOP_VERSION environment variable before calling this script !"
+    exit 1
+fi
+
+if [ -z "$ES_VERSION_MAJOR_FOR_FLINK" ]; then
+    echo "Need to set ES_VERSION_MAJOR_FOR_FLINK environment variable before calling this script !"
+    exit 1
+fi
+
 saved_dir=`pwd`
 function returned_to_saved_dir() {
      cd $saved_dir
@@ -98,7 +113,7 @@ mv flink-csv-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
 mv flink-json-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
 mv flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar flink-$FLINK_VERSION/lib/
 
-echo " - Creating a dummy pom.xml to proceed with downloading kafka and elasticsearch connectors"
+echo " - Creating a dummy pom.xml to proceed with downloading kafka, elasticsearch and kubernetes connectors"
 mkdir /tmp/flink_download_connectors
 cd /tmp/flink_download_connectors
 echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
@@ -125,12 +140,39 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR"_$SCALA_VERSION</artifactId>
+              <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"_$SCALA_VERSION</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>statefun-flink-harness</artifactId>
+            <version>$FLINK_STATEFUN_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-core_2.12</artifactId>
+            <version>$FLINK_ML_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-iteration_2.12</artifactId>
+            <version>$FLINK_ML_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-lib_2.12</artifactId>
+            <version>$FLINK_ML_VERSION</version>
+          </dependency>
     </dependencies>
 </project>" > pom.xml
+
+#        <dependency>
+#            <groupId>org.apache.flink</groupId>
+#            <artifactId>flink-kubernetes-operator</artifactId>
+#            <version>$FLINK_KUBE_OPERATOR_VERSION</version>
+#        </dependency>
+
 
 echo " - Proceeding with download of connectors and dependencies"
 mvn dependency:copy-dependencies > /tmp/flink_install_log 2>&1
@@ -166,6 +208,8 @@ sudo rm -Rf /tmp/flink_download_connectors
 sudo rm -Rf /tmp/flink_setup
 returned_to_saved_dir
 
+echo " - Cleaning up maven repository"
+sudo rm -Rf $HOME/.m2/repository
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

@@ -38,16 +38,25 @@ set -e
 
 # silent
 #echo " - Loading Topology"
-. /host_etc/eskimo_topology.sh
+. /etc/eskimo_topology.sh
 
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -2
+    exit 2
 fi
 
+echo " - Mounting flink gluster shares"
+echo "   + (Taking the opportunity to do it in inContainerInjectTopology.sh since it's used everywhere)"
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data flink
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/flink_completed_jobs flink
+
+
+# TODO need to be set through settings injector
+bash -c "echo -e \"kubernetes.jobmanager.cpu: 0.2\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+bash -c "echo -e \"kubernetes.taskmanager.cpu: 0.5\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 # The external address of the host on which the JobManager runs and can be
 # reached by the TaskManagers and any clients which want to connect
-sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $MASTER_FLINK_APP_MASTER_1"/g /usr/local/lib/flink/conf/flink-conf.yaml
+#sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $MASTER_FLINK_APP_MASTER_1"/g /usr/local/lib/flink/conf/flink-conf.yaml
 

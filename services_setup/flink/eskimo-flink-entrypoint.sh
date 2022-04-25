@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,59 +34,31 @@
 # Software.
 #
 
-[Unit]
-Description=Flink App master
-Wants=network-online.target
-After=docker.service
-Requires=docker.service
-After=gluster.service
-After=eskimo-startup-checks.service
-#After=var-lib-flink-data.mount
-#After=var-lib-félink-eventlog.mount
+set -e
 
-[Service]
-TimeoutStartSec=180sec
-RemainAfterExit=false
+# Set some key environment variables
+echo " - Setting key environment variables"
+export FLINK_HOME=/usr/local/lib/flink/
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 
-# Run ExecStartPre with root-permissions
-PermissionsStartOnly=true
+# If this container gets called by the spark framework, the first argument is either 'driver' or 'executor'
+# in this case, shouldn't mess with IP addresses definition, e.g. spark.driver.host
+if [[ $1 == 'driver' || $1 == 'executor' ]]; then
+    export DONT_MANAGE_IPS_AND_HOSTS=1
+fi
 
-ExecStartPre=-/usr/bin/docker kill flink-app-master
-ExecStartPre=-/usr/bin/docker rm -f flink-app-master
+# Load eskimo topolgy
+if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
+    # Injecting topoloy
+    . /usr/local/sbin/inContainerInjectTopology.sh
+fi
 
-# attempt to recreate  / remount gluster shares
-ExecStartPre=/bin/bash /usr/local/sbin/setupFlinkGlusterShares.sh
+echo " - Changing current directory to /home/flink"
+cd /home/flink
 
-ExecStart=/bin/bash -c ". /etc/eskimo_mesos_environment && /usr/bin/docker run \
-        -i \
-        --name flink-app-master \
-        --user flink \
-        --network host \
-        -v /var/log/flink:/var/log/flink \
-        -v /var/lib/flink:/var/lib/flink:rshared \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:flink-app-master \
-        /usr/local/sbin/inContainerStartService.sh"
+echo " - Making sure script calls flink executables and not wrappers !"
+export PATH=/usr/local/lib/flink/bin/:$PATH
 
-#        -p 6123:6123 \
-#        -p 6130:6130 \
-#        -p 8081:8081 \
-#        -p 8082:8082 \
-
-ExecStop=/usr/bin/docker stop flink-app-master
-
-Type=simple
-
-Restart=always
-StartLimitBurst=5
-StartLimitInterval=30
-
-StandardOutput=syslog
-StandardError=syslog
-
-[Install]
-WantedBy=multi-user.target
+# Call spark provided entrypoint
+echo " - Executing : /usr/local/lib/flink/kubernetes/docker-entrypoint.sh" "$@"
+bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@"

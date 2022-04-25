@@ -651,24 +651,17 @@
   },
 
 
-  "flink-app-master" : {
+
+  "flink" : {
     "config": {
       "imageName" : "flink",
       "order": 13,
-      "unique": true,
-      "group": "Flink",
-      "name": "App Master",
-      "selectionLayout": { "row": 4, "col": 2  },
-      "memory": "neglectable",
+      "name": "Flink",
+      "kubernetes": true,
+      "selectionLayout": { "row": 4, "col": 3  },
+      "memory": "kube",
       "logo" : "images/flink-app-master-logo.png",
       "icon" : "images/flink-app-master-icon.png"
-    },
-    "ui": {
-      "proxyTargetPort" : 8081,
-      "waitTime": 6000,
-      "role" : "*",
-      "title" : "Flink App Master",
-      "statusPageLinktitle" : "Manage and Monitor your Flink jobs"
     },
     "dependencies": [
       {
@@ -679,25 +672,11 @@
         "restart": true
       },
       {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
-      },
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "flink-app-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
       }
     ],
     "editableSettings": [
@@ -753,48 +732,10 @@
 
 
 
-  "flink-worker" : {
-    "config": {
-      "imageName" : "flink",
-      "order": 14,
-      "group": "Flink",
-      "name": "Worker",
-      "selectionLayout": { "row": 4, "col": 3  },
-      "memory": "kube",
-      "logo" : "images/flink-worker-logo.png",
-      "icon" : "images/flink-worker-icon.png"
-    },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
-        "numberOfMasters": 1,
-        "mandatory": false,
-        "restart": false
-      },
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "kube-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
-      }
-    ]
-  },
-
-
-
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 15,
+      "order": 14,
       "group" : "Elastic Stack",
       "name" : "Logstash",
       "selectionLayout" : { "row" : 2, "col" : 3},
@@ -834,7 +775,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 16,
+      "order": 15,
       "kubernetes": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -867,7 +808,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 17,
+      "order": 16,
       "kubernetes": true,
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
@@ -973,7 +914,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 18,
+      "order": 17,
       "kubernetes": true,
       "unique": true,
       "group" : "Elastic Stack",
@@ -1044,7 +985,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 19,
+      "order": 18,
       "unique": true,
       "kubernetes": true,
       "name" : "Zeppelin",

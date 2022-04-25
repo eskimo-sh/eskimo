@@ -34,34 +34,44 @@
 # Software.
 #
 
-# extract path arguments and create volume mount command part
-export DOCKER_VOLUMES_ARGS=""
+set -e
 
-# Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/flink` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/flink:/var/lib/flink:shared $DOCKER_VOLUMES_ARGS"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $SCRIPT_DIR/common.sh "$@"
+
+
+. /etc/eskimo_topology.sh
+
+if [[ $SELF_IP_ADDRESS == "" ]]; then
+    echo " - Didn't find Self IP Address in eskimo_topology.sh"
+    exit -2
 fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/flink` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/log/flink:/var/log/flink:shared $DOCKER_VOLUMES_ARGS"
-fi
-
-#echo $DOCKER_VOLUMES_ARGS
 
 
-export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
+echo " - Symlinking some RHEL mesos dependencies "
+saved_dir=`pwd`
+cd /usr/lib/x86_64-linux-gnu/
+sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
+sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
+sudo ln -s libsasl2.so.2 libsasl2.so.3
+cd $saved_dir
 
-/usr/bin/docker run \
-        -it \
-        --rm \
-        --network host \
-        --user flink \
-        $DOCKER_VOLUMES_ARGS \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
-        -e NODE_NAME=$HOSTNAME \
-        eskimo:flink-app-master \
-        /usr/local/bin/pyflink-shell.sh "$@"
 
-# -p 5000-5010:5000-5010 \
+
+# Setting Task manager IP to bind to
+#sudo bash -c "echo -e \"\n\n\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"# Specific Tack Manager part (Mesos worker controlled) \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+#sudo bash -c "echo -e \"\n# The address of the network interface that the TaskManager binds to. \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"# This option can be used to define explicitly a binding address.\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"# Because different TaskManagers need different values for this option, \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"# usually it is specified in an additional non-shared TaskManager-specific config file.\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#sudo bash -c "echo -e \"taskmanager.host: $SELF_IP_ADDRESS\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+
+# Caution : the in container setup script must mandatorily finish with this log"
+echo " - In container config SUCCESS"
+
+
