@@ -61,11 +61,17 @@ fi
 
 echo " - Enabling flink user to mount gluster shares (sudo)"
 echo "flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" >> /etc/sudoers.d/flink
+echo "flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/completed_jobs" >> /etc/sudoers.d/flink
+echo "flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/data" >> /etc/sudoers.d/flink
 
 echo " - Creating user flink home directory"
 mkdir -p /home/flink
 mkdir -p /home/spark/.kube
 chown flink /home/flink
+
+echo " - Presetting /usr/local/lib/flink/conf/ to flink"
+sudo chown -R flink. /usr/local/lib/flink/conf/
+sudo chmod -R 777 /usr/local/lib/flink/conf/
 
 
 echo " - Simlinking flink binaries to /usr/local/bin"
@@ -124,6 +130,8 @@ spec:
         mountPath: /etc/eskimo_topology.sh
       - name: etc-eskimo-services-settings
         mountPath: /etc/eskimo_services-settings.json
+      - name: kubectl
+        mountPath: /usr/local/bin/kubectl
       - name: etc-k8s
         mountPath: /etc/k8s
   volumes:
@@ -147,6 +155,10 @@ spec:
       hostPath:
         path: /etc/eskimo_services-settings.json
         type: File
+    - name: kubectl
+      hostPath:
+        path: /usr/local/bin/kubectl
+        type: File
     - name: etc-k8s
       hostPath:
         path: /etc/k8s
@@ -154,8 +166,6 @@ spec:
   #hostNetwork: true
 EOF
 sudo mv /tmp/flink-pod-template.yaml /usr/local/lib/flink/conf/
-chmod 755 /usr/local/lib/flink/conf/
-
 
 echo " - Creating docker-entrypoint.sh"
 cat > /tmp/docker-entrypoint.sh <<- "EOF"
@@ -231,6 +241,8 @@ sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: flink.defa
 sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
 sed -i s/"#rest.address: 0.0.0.0"/"rest.address: flink-rest.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
+sudo bash -c "echo -e \"blob.server.port: 6124\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
 sudo bash -c "echo -e \"taskmanager.rpc.port: 50100\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 # temporary debug logs
 #sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
@@ -249,12 +261,27 @@ sudo bash -c "echo -e \"taskmanager.rpc.port: 50100\"  >> /usr/local/lib/flink/c
 #sudo bash -c "echo -e \"\n# https://issues.apache.org/jira/browse/FLINK-14074 \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 #sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-
 echo " - Symlinking entrypoint to /docker-entrypoint.sh"
 sudo ln -s /usr/local/sbin/eskimo-flink-entrypoint.sh /docker-entrypoint.sh
 
 echo " - Enabling flink to change configuration at runtime"
-chown -R flink. "/usr/local/lib/flink/conf/"
+sudo chown -R flink. /usr/local/lib/flink/conf/
+sudo chmod -R 777 /usr/local/lib/flink/conf/
+
+echo " - Copying configuration over to host /var/lib/flink/config for kube configmaps "
+sudo mkdir -p /var/lib/flink/config
+sudo chown -R flink. /var/lib/flink/config
+
+cat /usr/local/lib/flink/conf/flink-conf.yaml | grep -v "^$" | grep -v "^#" > /var/lib/flink/config/flink-conf.yaml
+echo "kubernetes.internal.jobmanager.entrypoint.class: org.apache.flink.kubernetes.entrypoint.KubernetesSessionClusterEntrypoint" >> /var/lib/flink/config/flink-conf.yaml
+echo "execution.target: kubernetes-session" >> /var/lib/flink/config/flink-conf.yaml
+echo "internal.cluster.execution-mode: NORMAL" >> /var/lib/flink/config/flink-conf.yaml
+
+cp /usr/local/lib/flink/conf/log4j-console.properties /var/lib/flink/config/
+cp /usr/local/lib/flink/conf/logback-console.xml /var/lib/flink/config/
+
+cp /usr/local/lib/flink/conf/flink-pod-template.yaml /var/lib/flink/config/taskmanager-pod-template.yaml
+
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

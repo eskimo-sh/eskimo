@@ -187,5 +187,60 @@ while : ; do
         exit 48
     fi
 
+    # don't bother on master node, the master does it better
+    if [[ "$MASTER_KUBE_MASTER_1" != "$SELF_IP_ADDRESS" ]]; then
+
+        # ensure DNS is still working alright
+        #echo "   + Trying to ping kubernetes.default.svc.cluster.eskimo" # this is filling up logs
+        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+        if [[ $? != 0 ]]; then
+
+            sleep 5
+
+            echo "   + Trying AGAIN to ping kubernetes.default.svc.cluster.eskimo"
+            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+            if [[ $? != 0 ]]; then
+
+                echo "   + Failed to ping kubernetes.default.svc.cluster.eskimo. Trying to restart Network Manager"
+
+                if [[ -d /lib/systemd/system/ ]]; then
+                    export systemd_units_dir=/lib/systemd/system/
+                elif [[ -d /usr/lib/systemd/system/ ]]; then
+                    export systemd_units_dir=/usr/lib/systemd/system/
+                else
+                    echo "Couldn't find systemd unit files directory"
+                    exit 51
+                fi
+
+                if [[ -f $systemd_units_dir/NetworkManager.service ]]; then
+                    /bin/systemctl restart NetworkManager
+                else
+                    /bin/systemctl restart dnsmasq
+                fi
+                if [[ $? != 0 ]]; then
+                    echo "Failing to restart NetworkManager / dnsmasq"
+                    exit 52
+                fi
+
+                sleep 2
+
+                echo "   + Trying YET AGAIN to ping kubernetes.default.svc.cluster.eskimo"
+                /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+                if [[ $? != 0 ]]; then
+
+                    let ping_cnt=ping_cnt+1
+
+                else
+                    ping_cnt=0
+                fi
+            else
+                ping_cnt=0
+            fi
+        else
+            ping_cnt=0
+        fi
+
+    fi
+
 done
 

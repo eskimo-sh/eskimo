@@ -80,6 +80,7 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         --mount type=bind,source=/home/flink/.kube/config,target=/home/flink/.kube/config \
+        --mount type=bind,source=/usr/local/bin/kubectl,target=/usr/local/bin/kubectl \
         -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
         eskimo:flink \

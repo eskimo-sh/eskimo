@@ -210,11 +210,12 @@ function deploy_image_in_registry() {
 }
 
 
-# Install container in registry and deploy it using marathon
+# Install container in registry
 # Arguments:
-# - $1 the name of the systemd service
+# - $1 the name of the container image and service
 # - $2 the lof file to dump command outputs to
-function deploy_kubernetes() {
+# - $3 a set of runtime flags
+function deploy_registry() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
@@ -257,6 +258,32 @@ function deploy_kubernetes() {
             exit 6
         fi
     fi
+}
+
+
+# Install container in registry and deploy it using marathon
+# Arguments:
+# - $1 the name of the container image and service
+# - $2 the lof file to dump command outputs to
+# - $3 a set of runtime flags
+function deploy_kubernetes_only() {
+
+    if [[ $1 == "" ]]; then
+        echo "Container needs to be passed in argument"
+        exit 2
+    fi
+    export CONTAINER=$1
+
+    if [[ $2 == "" ]]; then
+        echo "Log file path needs to be passed in argument"
+        exit 3
+    fi
+    export LOG_FILE=$2
+
+    export FLAGS=""
+    if [[ $3 != "" ]]; then
+        export FLAGS="$3"
+    fi
 
     if [[ ! -f $CONTAINER.k8s.yaml ]]; then
         echo "Kubernetes deployment file $CONTAINER.k8s.yaml not found"
@@ -292,8 +319,36 @@ function deploy_kubernetes() {
         exit 8
     fi
 
+}
 
-    #-H "Authorization: token=$(dcos config show core.dcos_acs_token)" \
+
+# Install container in registry and deploy it in kubernetes
+# Arguments:
+# - $1 the name of the container image and service
+# - $2 the lof file to dump command outputs to
+# - $3 a set of runtime flags
+function deploy_kubernetes() {
+
+    if [[ $1 == "" ]]; then
+        echo "Container needs to be passed in argument"
+        exit 2
+    fi
+    export CONTAINER=$1
+
+    if [[ $2 == "" ]]; then
+        echo "Log file path needs to be passed in argument"
+        exit 3
+    fi
+    export LOG_FILE=$2
+
+    export FLAGS=""
+    if [[ $3 != "" ]]; then
+        export FLAGS="$3"
+    fi
+
+    deploy_registry "$@"
+
+    deploy_kubernetes_only "$@"
 }
 
 

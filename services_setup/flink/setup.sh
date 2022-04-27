@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number foundsetupCommon.sh in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 
@@ -74,7 +74,7 @@ echo " - Configuring host flink common part"
 . ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 echo " - Installing setupFlinkGlusterShares.sh to /usr/local/sbin"
@@ -112,7 +112,7 @@ docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
 if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat flink_install_log
-    exit -100
+    exit 100
 fi
 
 echo " - Configuring flink container"
@@ -120,7 +120,7 @@ docker exec flink bash /scripts/inContainerSetupFlinkWorker.sh  $SELF_IP_ADDRESS
 if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat flink_install_log
-    exit -101
+    exit 101
 fi
 
 #echo " - TODO"
@@ -187,31 +187,36 @@ echo " - Building docker container for flink worker (specific)"
 build_container flink-worker flink flink_worker_install_log
 
 echo " - Deploying flink worker in docker registry for kubernetes"
-docker tag eskimo:flink-worker kubernetes.registry:5000/flink-worker >> flink_worker_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo "   + Could not re-tag kubernetes container image for flink-worker"
-    exit 4
-fi
+deploy_registry flink-worker flink_worker_install_log
 
-docker push kubernetes.registry:5000/flink-worker >> flink_worker_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo "Image push in docker registry failed !"
-    exit 5
-fi
-
-echo " - removing local image for flink worker"
-docker image rm eskimo:flink-worker  >> flink_worker_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo "local image removal failed !"
-    exit 6
-fi
-
-echo " - removing local image for common part"
+echo " - Removing local image for common part"
 docker image rm eskimo:flink  >> flink_worker_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "local image removal failed !"
     exit 6
 fi
+
+cd ..
+
+echo " - Creating configmaps"
+
+echo "   + Deleting any previous specific configuration configmap for task managers"
+kubectl delete configmap flink-config-flink || true # nevermind errors here
+
+echo "   + Creating specific configuration configmap for task managers"
+kubectl create configmap flink-config-flink \
+        --from-file=/var/lib/flink/config/flink-conf.yaml \
+        --from-file=/var/lib/flink/config/log4j-console.properties \
+        --from-file=/var/lib/flink/config/logback-console.xml
+
+echo "   + Deleting any previous pod template configmap for task managers"
+kubectl delete configmap pod-template-flink || true # nevermind errors here
+
+echo "   + Creating pod template configmap for task managers"
+kubectl create configmap pod-template-flink --from-file=/var/lib/flink/config/taskmanager-pod-template.yaml
+
+echo " - Start kubernetes deployment"
+deploy_kubernetes_only flink flink_worker_install_log
 
 
 

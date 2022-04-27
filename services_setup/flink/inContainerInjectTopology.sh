@@ -49,7 +49,10 @@ fi
 echo " - Mounting flink gluster shares"
 echo "   + (Taking the opportunity to do it in inContainerInjectTopology.sh since it's used everywhere)"
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data flink
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/flink_completed_jobs flink
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs flink
+
+#sudo /bin/chmod 777 /var/lib/flink/completed_jobs
+#sudo /bin/chmod 777 /var/lib/flink/data
 
 
 # TODO need to be set through settings injector

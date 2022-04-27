@@ -65,13 +65,14 @@ data:
             ttl 30
         }
         prometheus :9153
-        forward . /etc/resolv.conf
+        forward . 8.8.8.8
         loop
         cache 30        
         reload
         loadbalance
     }
 
+# originally : forward . /etc/resolv.conf
 ---
 apiVersion: apps/v1
 kind: Deployment

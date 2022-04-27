@@ -179,24 +179,7 @@ echo " - Building docker container for spark executor (specific)"
 build_container spark-executor spark spark_executor_install_log
 
 echo " - Deploying spark executor in docker registry for kubernetes"
-docker tag eskimo:spark-executor kubernetes.registry:5000/spark-executor >> spark_executor_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo "   + Could not re-tag kubernetes container image for spark"
-    exit 4
-fi
-
-docker push kubernetes.registry:5000/spark-executor >> spark_executor_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo "Image push in docker registry failed !"
-    exit 5
-fi
-
-echo " - removing local image for spark executor"
-docker image rm eskimo:spark-executor  >> spark_executor_install_log 2>&1
-if [[ $? != 0 ]]; then
-    echo "local image removal failed !"
-    exit 6
-fi
+deploy_registry spark-executor spark_executor_install_log
 
 echo " - removing local image for common part"
 docker image rm eskimo:spark  >> spark_executor_install_log 2>&1
