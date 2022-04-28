@@ -473,9 +473,16 @@ public class ServicesDefinition implements InitializingBean {
                 .sorted().toArray(String[]::new);
     }
 
-    public String[] listMultipleServices() {
+    public String[] listMultipleServicesNonKubernetes() {
         return services.values().stream()
                 .filter(it -> !it.isUnique() && !it.isMarathon() && !it.isKubernetes())
+                .map(Service::getName)
+                .sorted().toArray(String[]::new);
+    }
+
+    public String[] listMultipleServices() {
+        return services.values().stream()
+                .filter(it -> !it.isUnique())
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
     }

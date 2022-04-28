@@ -412,12 +412,12 @@ public class ConnectionManagerService {
             }
         }
 
-        public boolean matches (String targetHost, int targetPort) {
-            return targetHost.equals(this.targetHost) && (targetPort == this.targetPort);
+        public boolean matches (String serviceName, String targetHost, int targetPort) {
+            return serviceName.matches(this.serviceName) && targetHost.equals(this.targetHost) && (targetPort == this.targetPort);
         }
 
         public boolean matches(ProxyTunnelConfig config) {
-            return matches(config.getNode(), config.getRemotePort());
+            return matches(config.getServiceName(), config.getNode(), config.getRemotePort());
         }
 
         public String getServiceName() {

@@ -145,7 +145,7 @@ public class ServicesController {
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 
             map.put("uniqueServices", new JSONArray(servicesDefinition.listUniqueServices()));
-            map.put("multipleServices", new JSONArray(servicesDefinition.listMultipleServices()));
+            map.put("multipleServices", new JSONArray(servicesDefinition.listMultipleServicesNonKubernetes()));
             map.put("mandatoryServices", new JSONArray(servicesDefinition.listMandatoryServices()));
             map.put("servicesConfigurations", new JSONObject(servicesConfigurations));
         });

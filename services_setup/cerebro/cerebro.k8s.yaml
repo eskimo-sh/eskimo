@@ -92,7 +92,7 @@ spec:
               scheme: HTTP
               path: /
               port: 9000
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             timeoutSeconds: 30
           securityContext:
             allowPrivilegeEscalation: false
@@ -101,11 +101,11 @@ spec:
             runAsGroup: 3301
           resources:
             limits:
-              cpu: "0.2"
-              memory: "300Mi"
+              cpu: "0.4"
+              memory: "400Mi"
             requests:
-              cpu: "0.2"
-              memory: "300Mi"
+              cpu: "0.4"
+              memory: "400Mi"
       volumes:
         - name: var-log-elasticsearch
           hostPath:

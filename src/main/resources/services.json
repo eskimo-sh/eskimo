@@ -364,8 +364,10 @@
       "icon" : "images/kube-master-icon.png"
     },
     "ui": {
-      "urlTemplate": "./cerebro/#/overview?host=Eskimo",
-      "proxyTargetPort" : 443,
+      "__comment_urlTemplate": "Going through Kubectl proxy.",
+      "urlTemplate": "kubernetes-dashboard/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/workloads?namespace=_all",
+      "__comment_proxyTargetPort": "Kubectl proxy target port",
+      "proxyTargetPort" : 8001,
       "waitTime": 5000,
       "role" : "*",
       "title" : "Kubernetes Dashboard",
@@ -663,6 +665,23 @@
       "logo" : "images/flink-app-master-logo.png",
       "icon" : "images/flink-app-master-icon.png"
     },
+    "ui": {
+      "__comment_urlTemplate": "Going through Kubectl proxy.",
+      "urlTemplate": "flink/{NODE_ADDRESS}/api/v1/namespaces/default/services/flink-rest:8081/proxy/#/overview",
+      "__comment_proxyTargetPort": "Kubectl proxy target port",
+      "proxyTargetPort" : 8001,
+      "waitTime": 5000,
+      "role" : "*",
+      "title" : "Flink Dashboard",
+      "statusPageLinktitle" : "Manage Flink Session"
+    },
+    "masterDetection": {
+      "strategy" : "LOG_FILE",
+      "logFile" : "/var/log/flink/flink-log-kubernetes-jobmanager.sh",
+      "grep": "Starting the resource manager.",
+      "timeStampExtractRexp" : "([0-9\\-]+ [0-9.:,]+).*",
+      "timeStampFormat" : "yyyy-MM-dd HH:mm:ss,SSS"
+    },
     "dependencies": [
       {
         "masterElectionStrategy": "FIRST_NODE",
@@ -785,8 +804,10 @@
       "icon" : "images/cerebro-icon.png"
     },
     "ui": {
-      "urlTemplate": "./cerebro/#/overview?host=Eskimo",
-      "proxyTargetPort" : 31900,
+      "__comment_urlTemplate": "Going through Kubectl proxy.",
+      "urlTemplate": "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Felasticsearch.default.svc.cluster.eskimo:9200",
+      "__comment_proxyTargetPort": "Kubectl proxy target port",
+      "proxyTargetPort" : 8001,
       "waitTime": 5000,
       "role" : "*",
       "title" : "Cerebro",

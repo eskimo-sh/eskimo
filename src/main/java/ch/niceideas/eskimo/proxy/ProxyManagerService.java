@@ -34,11 +34,11 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.services.ConnectionManagerException;
-import ch.niceideas.eskimo.services.ConnectionManagerService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.services.*;
 import org.apache.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +74,9 @@ public class ProxyManagerService {
     @Autowired
     private WebSocketProxyServer webSocketProxyServer;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     private final Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
     /** For tests */
@@ -85,6 +88,9 @@ public class ProxyManagerService {
     }
     public void setWebSocketProxyServer(WebSocketProxyServer webSocketProxyServer) {
         this.webSocketProxyServer = webSocketProxyServer;
+    }
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     public HttpHost getServerHost(String serviceId) {
@@ -131,24 +137,37 @@ public class ProxyManagerService {
                 .collect(Collectors.toList());
     }
 
-    public void updateServerForService(String serviceName, String node) throws ConnectionManagerException {
+    public void updateServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
 
             // need to make a distinction between unique and multiple services here !!
-            String serviceId = service.getServiceId(node);
+            String serviceId = service.getServiceId(runtimeNode);
+
+            String effNode = runtimeNode;
+            if (service.isKubernetes()) {
+                // Kubernetes services are redirected to kubernetes master node (running proxy service)
+                ServicesInstallStatusWrapper servicesInstallationStatus = null;
+                try {
+                    servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
+                } catch (FileException | SetupException e) {
+                    logger.error(e, e);
+                    throw new ConnectionManagerException(e.getMessage(), e);
+                }
+                effNode = servicesInstallationStatus.getFirstNode(KubernetesService.KUBE_MASTER);
+            }
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
-            if (prevConfig == null || !prevConfig.getNode().equals(node)) {
+            if (prevConfig == null || !prevConfig.getNode().equals(effNode)) {
 
                 // Handle host has changed !
-                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(serviceName, generateLocalPort(), node, service.getUiConfig().getProxyTargetPort());
+                ProxyTunnelConfig newConfig = new ProxyTunnelConfig(serviceName, generateLocalPort(), effNode, service.getUiConfig().getProxyTargetPort());
                 proxyTunnelConfigs.put(serviceId, newConfig);
 
                 if (prevConfig != null) {
                     logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to "
-                            + node + " and " + prevConfig.getNode() + " (dropping service)");
+                            + effNode + " and " + prevConfig.getNode() + " (dropping service)");
                     try {
                         connectionManagerService.recreateTunnels(prevConfig.getNode());
                     } catch (ConnectionManagerException e) {
@@ -156,10 +175,10 @@ public class ProxyManagerService {
                                 " - got " + e.getClass() + ":" + e.getMessage());
                     }
                 } else {
-                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to " + node);
+                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to " + effNode);
                 }
 
-                connectionManagerService.recreateTunnels (node);
+                connectionManagerService.recreateTunnels (effNode);
                 webSocketProxyServer.removeForwardersForService(serviceId); // just remove them, they will be recreated automagically
             }
         }

@@ -161,7 +161,6 @@ public class MasterService {
 
         List<Service> missingMasterServices = Arrays.stream(servicesDefinition.listMultipleServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
-                .filter(service -> !service.isUnique())
                 .filter(service -> service.getMasterDetection() != null)
                 .filter(service -> !serviceMasterNodes.containsKey(service.getName()))
                 .collect(Collectors.toList());
@@ -176,13 +175,19 @@ public class MasterService {
 
                 for (Service service : missingMasterServices) {
 
-                    // get any node where it's supposed to be install (always the same one)
-                    List<String> serviceNodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
+                    List<String> serviceNodes;
+                    if (service.isKubernetes()) {
+                        serviceNodes = nodesConfig.getAllNodeAddressesWithService(KubernetesService.KUBE_MASTER);
+                    } else {
+                        // get any node where it's supposed to be install (always the same one)
+                        serviceNodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
+                    }
+
                     if (!serviceNodes.isEmpty()) {
 
                         Collections.sort(serviceNodes);
-                        serviceMasterNodes.put (service.getName(), serviceNodes.get(0));
-                        serviceMasterTimestamps.put (service.getName(), new Date(Long.MIN_VALUE));
+                        serviceMasterNodes.put(service.getName(), serviceNodes.get(0));
+                        serviceMasterTimestamps.put(service.getName(), new Date(Long.MIN_VALUE));
                     }
                 }
             }
@@ -204,7 +209,6 @@ public class MasterService {
                 // 2. Browse all services that are multiple
                 List<Service> masterServices = Arrays.stream(servicesDefinition.listMultipleServices())
                         .map(serviceName -> servicesDefinition.getService(serviceName))
-                        .filter(service -> !service.isUnique())
                         .filter(service -> service.getMasterDetection() != null)
                         .collect(Collectors.toList());
 
@@ -216,7 +220,12 @@ public class MasterService {
                     MdStrategy strategy = masterDetection.getDetectionStrategy().getStrategy();
 
                     // 3. If service is installed on multiple node, attempt to detect master
-                    List<String> nodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
+                    List<String> nodes;
+                    if (service.isKubernetes()) {
+                        nodes = nodesConfig.getNodeAddresses();
+                    } else {
+                        nodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
+                    }
 
                     for (String node : nodes) {
 
@@ -235,7 +244,9 @@ public class MasterService {
                                 logger.debug(e, e);
                             }
                         } else {
-                            logger.warn ("Not checking if service " + service.getName() + " is master on " + node + " since service reports issues");
+                            if (!service.isKubernetes()) {
+                                logger.warn("Not checking if service " + service.getName() + " is master on " + node + " since service reports issues");
+                            }
                         }
                     }
                 }

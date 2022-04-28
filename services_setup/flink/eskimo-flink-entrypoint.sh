@@ -61,4 +61,5 @@ export PATH=/usr/local/lib/flink/bin/:$PATH
 
 # Call spark provided entrypoint
 echo " - Executing : /usr/local/lib/flink/kubernetes/docker-entrypoint.sh" "$@"
-bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@"
+last_arg="${@: -1}"
+bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@" | tee /var/log/flink/flink-log-$last_arg.log

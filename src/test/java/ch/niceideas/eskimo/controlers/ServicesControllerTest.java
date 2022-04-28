@@ -273,7 +273,7 @@ public class ServicesControllerTest {
                 return retService;
             }
             @Override
-            public String[] listMultipleServices() {
+            public String[] listMultipleServicesNonKubernetes() {
                 return new String[]{"A"};
             }
             @Override

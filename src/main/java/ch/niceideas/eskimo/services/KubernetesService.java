@@ -169,7 +169,6 @@ public class KubernetesService {
                 },
                 status -> status.removeInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE));
         if (nodeIp != null) {
-            // TODO This shold go through kube proxy, I might not need this nymore
             proxyManagerService.removeServerForService(operation.getService(), nodeIp);
         } else {
             logger.warn ("No previous IP could be found for service " + operation.getService());

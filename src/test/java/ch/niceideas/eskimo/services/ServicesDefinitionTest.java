@@ -309,7 +309,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @Test
     public void testListMultipleServices() throws Exception {
 
-        String[] orderedServices = def.listMultipleServices();
+        String[] orderedServices = def.listMultipleServicesNonKubernetes();
 
         assertEquals(9, orderedServices.length);
 
