@@ -166,7 +166,7 @@ public class NodesConfigurationService {
                 return;
             }
 
-            MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
             // Nodes setup
             systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
@@ -189,7 +189,7 @@ public class NodesConfigurationService {
                                         // topology
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                             operationsMonitoringService.addInfo(operation, "Installing Topology");
-                                            installTopologyAndSettings(nodesConfig, marathonServicesConfig, memoryModel, node);
+                                            installTopologyAndSettings(nodesConfig, kubeServicesConfig, memoryModel, node);
                                         }
 
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
@@ -325,7 +325,7 @@ public class NodesConfigurationService {
         }
     }
 
-    void installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, MemoryModel memoryModel, String node)
+    void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, MemoryModel memoryModel, String node)
             throws SystemException, SSHCommandException, IOException {
 
         Connection connection = null;
@@ -342,7 +342,7 @@ public class NodesConfigurationService {
             }
             try {
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
-                        .getTopology(nodesConfig, marathonConfig, node)
+                        .getTopology(nodesConfig, kubeServicesConfig, node)
                         .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (node)));
             } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
                 logger.error (e, e);

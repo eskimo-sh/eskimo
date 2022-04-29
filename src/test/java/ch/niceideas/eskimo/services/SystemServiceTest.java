@@ -161,8 +161,8 @@ public class SystemServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
@@ -299,8 +299,8 @@ public class SystemServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override

@@ -38,7 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -62,12 +62,12 @@ public class ConfigurationService {
 
     public static final String SERVICE_INSTALLATION_STATUS_PATH = "/service-install-status.json";
     public static final String SERVICES_SETTINGS_JSON_PATH = "/services-settings.json";
-    public static final String MARATHON_SERVICES_CONFIG_JSON = "/marathon-services-config.json";
+    public static final String KUBERNETES_SERVICES_CONFIG_JSON = "/kubernetes-services-config.json";
     public static final String CONFIG_JSON = "/config.json";
 
     private final ReentrantLock statusFileLock = new ReentrantLock();
     private final ReentrantLock nodesConfigFileLock = new ReentrantLock();
-    private final ReentrantLock marathonServicesFileLock = new ReentrantLock();
+    private final ReentrantLock kubernetesServicesFileLock = new ReentrantLock();
     private final ReentrantLock servicesConfigFileLock = new ReentrantLock();
 
     @Autowired
@@ -232,33 +232,32 @@ public class ConfigurationService {
         return FileUtils.readFile(configFile);
     }
 
-    @Deprecated /* TO BE renamed */
-    public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
-        marathonServicesFileLock.lock();
+    public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
+        kubernetesServicesFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File marathonServicesConfigFile = new File(configStoragePath + MARATHON_SERVICES_CONFIG_JSON);
-            if (!marathonServicesConfigFile.exists()) {
+            File kubernetesServicesConfigFile = new File(configStoragePath + KUBERNETES_SERVICES_CONFIG_JSON);
+            if (!kubernetesServicesConfigFile.exists()) {
                 return null;
             }
 
-            return new MarathonServicesConfigWrapper(FileUtils.readFile(marathonServicesConfigFile));
+            return new KubernetesServicesConfigWrapper(FileUtils.readFile(kubernetesServicesConfigFile));
         } catch (JSONException | FileException | SetupException e) {
             logger.error (e, e);
             throw new SystemException(e);
         } finally {
-            marathonServicesFileLock.unlock();
+            kubernetesServicesFileLock.unlock();
         }
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) throws FileException, SetupException {
-        marathonServicesFileLock.lock();
+    public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
+        kubernetesServicesFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + MARATHON_SERVICES_CONFIG_JSON), marathonServicesConfig.getFormattedValue());
+            FileUtils.writeFile(new File(configStoragePath + KUBERNETES_SERVICES_CONFIG_JSON), kubeServicesConfig.getFormattedValue());
         } finally {
-            marathonServicesFileLock.unlock();
+            kubernetesServicesFileLock.unlock();
         }
     }
 

@@ -106,6 +106,8 @@ for i in `ls -1`; do
     sudo cp $i $spark_file
 done
 
+echo " - Cleaning up maven repository"
+sudo rm -Rf $HOME/.m2/repository
 
 sudo rm -Rf /tmp/kube_client_setup
 returned_to_saved_dir

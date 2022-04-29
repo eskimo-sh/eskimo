@@ -1,1 +1,1 @@
-../flink-app-master/setupCommon.sh
+../flink/setupCommon.sh

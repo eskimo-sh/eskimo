@@ -66,7 +66,7 @@ echo "flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/data" >> /etc/sudoers
 
 echo " - Creating user flink home directory"
 mkdir -p /home/flink
-mkdir -p /home/spark/.kube
+mkdir -p /home/flink/.kube
 chown flink /home/flink
 
 echo " - Presetting /usr/local/lib/flink/conf/ to flink"

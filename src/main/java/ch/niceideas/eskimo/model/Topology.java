@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Topology {
 
@@ -88,7 +87,7 @@ public class Topology {
     }
 
     public static Topology create(
-            NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
+            NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
             ServicesDefinition servicesDefinition, String contextPath, String currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
 
@@ -105,14 +104,14 @@ public class Topology {
                     throw new NodesConfigurationException("Could not find any service definition matching " + result.getServiceName());
                 }
 
-                topology.defineMasters(servicesDefinition, service, result.getNodeNumber(), nodesConfig, marathonConfig);
+                topology.defineMasters(servicesDefinition, service, result.getNodeNumber(), nodesConfig, kubeServicesConfig);
 
                 topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getNodeNumber(), nodesConfig);
             }
 
             // Define master for marathon services
-            if (currentNode != null && marathonConfig != null) {
-                for (String key : marathonConfig.getEnabledServices()) {
+            if (currentNode != null && kubeServicesConfig != null) {
+                for (String key : kubeServicesConfig.getEnabledServices()) {
 
                     Service service = servicesDefinition.getService(key);
                     if (service == null) {
@@ -121,7 +120,7 @@ public class Topology {
 
                     int currentNodeNumber = nodesConfig.getNodeNumber(currentNode);
 
-                    topology.defineMasters(servicesDefinition, service, currentNodeNumber, nodesConfig, marathonConfig);
+                    topology.defineMasters(servicesDefinition, service, currentNodeNumber, nodesConfig, kubeServicesConfig);
                 }
             }
 
@@ -214,7 +213,7 @@ public class Topology {
     }
 
     private void defineMasters(ServicesDefinition servicesDefinition, Service service, int nodeNbr, NodesConfigWrapper nodesConfig,
-                               MarathonServicesConfigWrapper marathonConfig)
+                               KubernetesServicesConfigWrapper kubeServicesConfig)
             throws NodesConfigurationException, ServiceDefinitionException {
         for (Dependency dep : service.getDependencies()) {
 
@@ -226,7 +225,7 @@ public class Topology {
                             + " defines a dependency on a kube service " + masterService.getName() + " which is not supported.");
                 }
 
-                if (!marathonConfig.isServiceInstallRequired(masterService.getName())) {
+                if (!kubeServicesConfig.isServiceInstallRequired(masterService.getName())) {
                     throw new ServiceDefinitionException ("Service " + service.getName()
                             + " defines a dependency on another kube service " + masterService.getName() + " but that service is not going to be installed.");
                 }

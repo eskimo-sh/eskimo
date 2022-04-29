@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
@@ -70,14 +70,14 @@ public class ConfigurationServiceTest {
     @Test
     public void testLoadAndSaveMarathonServicesConfig() throws Exception {
 
-        MarathonServicesConfigWrapper mc = configurationService.loadMarathonServicesConfig();
-        assertNull(mc);
+        KubernetesServicesConfigWrapper ksc = configurationService.loadKubernetesServicesConfig();
+        assertNull(ksc);
 
-        mc = new MarathonServicesConfigWrapper("{\"test\": \"OK\"}");
-        configurationService.saveMarathonServicesConfig(mc);
+        ksc = new KubernetesServicesConfigWrapper("{\"test\": \"OK\"}");
+        configurationService.saveKubernetesServicesConfig(ksc);
 
-        MarathonServicesConfigWrapper mc2 = configurationService.loadMarathonServicesConfig();
-        assertTrue(mc.getJSONObject().similar(mc2.getJSONObject()));
+        KubernetesServicesConfigWrapper ksc2 = configurationService.loadKubernetesServicesConfig();
+        assertTrue(ksc.getJSONObject().similar(ksc2.getJSONObject()));
     }
 
     @Test

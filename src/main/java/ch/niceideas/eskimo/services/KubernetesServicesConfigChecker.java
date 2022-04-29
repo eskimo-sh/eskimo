@@ -43,10 +43,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Deprecated /* To Be renamed */
-public class MarathonServicesConfigChecker {
+public class KubernetesServicesConfigChecker {
 
-    private static final Logger logger = Logger.getLogger(MarathonServicesConfigChecker.class);
+    private static final Logger logger = Logger.getLogger(KubernetesServicesConfigChecker.class);
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -61,24 +60,24 @@ public class MarathonServicesConfigChecker {
         this.configurationService = configurationService;
     }
 
-    public void checkMarathonServicesSetup(MarathonServicesConfigWrapper marathonConfig) throws MarathonServicesConfigException {
+    public void checkKubernetesServicesSetup(KubernetesServicesConfigWrapper kubeServicesConfig) throws KubernetesServicesConfigException {
 
         try {
             NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
             if (nodesConfig == null) {
-                throw new MarathonServicesConfigException("Inconsistency found : No node configuration is found");
+                throw new KubernetesServicesConfigException("Inconsistency found : No node configuration is found");
             }
 
             // ensure only marathon services
-            for (String serviceName : marathonConfig.getEnabledServices()) {
+            for (String serviceName : kubeServicesConfig.getEnabledServices()) {
                 Service service = servicesDefinition.getService(serviceName);
                 if (!service.isKubernetes()) {
-                    throw new MarathonServicesConfigException("Inconsistency found : service " + serviceName + " is not a kubernetes service");
+                    throw new KubernetesServicesConfigException("Inconsistency found : service " + serviceName + " is not a kubernetes service");
                 }
             }
 
             // enforce dependencies
-            for (String serviceName : marathonConfig.getEnabledServices()) {
+            for (String serviceName : kubeServicesConfig.getEnabledServices()) {
 
                 Service service = servicesDefinition.getService(serviceName);
 
@@ -90,7 +89,7 @@ public class MarathonServicesConfigChecker {
                             || dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)
                             || dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME)) {
 
-                        throw new MarathonServicesConfigException(
+                        throw new KubernetesServicesConfigException(
                                 "Inconsistency found : Service " + serviceName + " is a marathon service and defines a dependency " + dependency.getMes()
                                         + " on " + dependency.getMasterService() + " which is disallowed");
                     }
@@ -102,13 +101,13 @@ public class MarathonServicesConfigChecker {
                         if (depService.isKubernetes()) {
 
                             if (dependency.getNumberOfMasters() > 1) {
-                                throw new MarathonServicesConfigException("Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency with master count "
+                                throw new KubernetesServicesConfigException("Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency with master count "
                                         +  dependency.getNumberOfMasters() + " on " + dependency.getMasterService() + " which is disallowed for kubernetes dependencies");
                             }
 
                             // make sure dependency is installed or going to be
-                            if (!marathonConfig.isServiceInstallRequired(dependency.getMasterService())) {
-                                throw new MarathonServicesConfigException("Inconsistency found : Service " + serviceName + " expects a installaton of  " + dependency.getMasterService() +
+                            if (!kubeServicesConfig.isServiceInstallRequired(dependency.getMasterService())) {
+                                throw new KubernetesServicesConfigException("Inconsistency found : Service " + serviceName + " expects a installaton of  " + dependency.getMasterService() +
                                         ". But it's not going to be installed");
                             }
                         }
@@ -121,7 +120,7 @@ public class MarathonServicesConfigChecker {
                             } catch (NodesConfigurationException e) {
                                 logger.debug(e, e);
                                 logger.warn(e.getMessage());
-                                throw new MarathonServicesConfigException(e.getMessage(), e);
+                                throw new KubernetesServicesConfigException(e.getMessage(), e);
                             }
                         }
                     }
@@ -129,7 +128,7 @@ public class MarathonServicesConfigChecker {
             }
         } catch (SystemException | SetupException e) {
             logger.error (e, e);
-            throw new MarathonServicesConfigException(e);
+            throw new KubernetesServicesConfigException(e);
         }
     }
 

@@ -270,15 +270,15 @@ public class SystemAdminController extends AbstractOperationController {
 
             configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
 
-            if (service.isMarathon() || service.isKubernetes()) {
+            if (service.isKubernetes()) {
 
-                MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
-                if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
+                KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+                if (kubeServicesConfig == null || kubeServicesConfig.isEmpty()) {
                     return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
                 }
 
-                MarathonOperationsCommand operationsCommand = MarathonOperationsCommand.create(
-                        servicesDefinition, systemService, newServicesInstallationStatus, marathonServicesConfig);
+                KubernetesOperationsCommand operationsCommand = KubernetesOperationsCommand.create(
+                        servicesDefinition, systemService, newServicesInstallationStatus, kubeServicesConfig);
 
                 if (service.isMarathon()) {
                     return performMarathonOperation(

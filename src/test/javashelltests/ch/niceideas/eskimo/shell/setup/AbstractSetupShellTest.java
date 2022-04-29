@@ -36,7 +36,7 @@
 package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.*;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
@@ -95,7 +95,7 @@ public abstract class AbstractSetupShellTest {
 
         // generate custom topology file
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
         ServicesDefinition def = new ServicesDefinition();
         SetupService setupService = new SetupService();
@@ -103,7 +103,7 @@ public abstract class AbstractSetupShellTest {
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 
-        Topology topology = Topology.create(nodesConfig, marathonServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);

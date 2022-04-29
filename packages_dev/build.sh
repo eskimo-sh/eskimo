@@ -48,7 +48,7 @@ echo_usage() {
       echo "    build.sh -h                    Display this help message."
       echo "    build.sh [-n] <package>        Build <package>."
       echo "        where package in [kube, <image>, all_images]"
-      echo "        and <image> any docker image such as eg, kafka, mesos-master, "
+      echo "        and <image> any docker image such as eg, kafka, kube-master, "
       echo "                                                 ntp, spark, etc."
       echo "        Options:"
       echo "          -n Don't rebuild if image is already built"

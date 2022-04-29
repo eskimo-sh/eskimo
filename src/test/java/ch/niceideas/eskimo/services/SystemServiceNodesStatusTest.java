@@ -35,10 +35,9 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
@@ -89,7 +88,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
-            public MarathonServicesConfigWrapper loadMarathonServicesConfig() {
+            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
                 return StandardSetupHelpers.getStandardMarathonConfig();
             }
         };

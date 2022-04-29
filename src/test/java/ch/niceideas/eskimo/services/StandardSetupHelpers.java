@@ -34,7 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
@@ -132,8 +132,8 @@ public class StandardSetupHelpers {
         }});
     }
 
-    public static MarathonServicesConfigWrapper getStandardMarathonConfig() {
-        return new MarathonServicesConfigWrapper (new HashMap<String, Object>() {{
+    public static KubernetesServicesConfigWrapper getStandardMarathonConfig() {
+        return new KubernetesServicesConfigWrapper(new HashMap<>() {{
             put("cerebro_install", "on");
             put("kibana_install", "on");
             put("spark-history-server_install", "on");

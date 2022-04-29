@@ -307,16 +307,6 @@ public class ServicesDefinition implements InitializingBean {
                 }
             }
 
-            // Marathon services have an implicit dependency on marathon
-            if (service.isMarathon()) {
-                Dependency marathonDependency = new Dependency();
-                marathonDependency.setMes(MasterElectionStrategy.RANDOM);
-                marathonDependency.setMasterService("marathon");
-                marathonDependency.setNumberOfMasters(1);
-                marathonDependency.setMandatory(true);
-                service.addDependency(marathonDependency);
-            }
-
             // Kubernetes services have an implicit dependency on kubernetes
             if (service.isKubernetes()) {
                 Dependency kubeDependency = new Dependency();
@@ -450,9 +440,9 @@ public class ServicesDefinition implements InitializingBean {
         return String.join(" ", listAllServices());
     }
 
-    public Topology getTopology(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig, String currentNode)
+    public Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, String currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
-        return Topology.create(nodesConfig, marathonConfig, this, configuredContextPath, currentNode);
+        return Topology.create(nodesConfig, kubeServicesConfig, this, configuredContextPath, currentNode);
     }
 
     public Service getService(String serviceName) {

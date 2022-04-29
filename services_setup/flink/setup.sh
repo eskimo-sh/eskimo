@@ -115,14 +115,6 @@ if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     exit 100
 fi
 
-echo " - Configuring flink container"
-docker exec flink bash /scripts/inContainerSetupFlinkWorker.sh  $SELF_IP_ADDRESS | tee -a flink_install_log 2>&1
-if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat flink_install_log
-    exit 101
-fi
-
 #echo " - TODO"
 #docker exec -it flink TODO/tmp/logstash_install_log
 

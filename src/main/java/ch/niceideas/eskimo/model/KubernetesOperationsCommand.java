@@ -52,30 +52,29 @@ import java.util.stream.Collectors;
 
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
-@Deprecated /* To be renamed */
-public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOperationsCommand.MarathonOperationId> implements Serializable {
+public class KubernetesOperationsCommand extends JSONInstallOpCommand<KubernetesOperationsCommand.KubernetesOperationId> implements Serializable {
 
-    private final MarathonServicesConfigWrapper rawMarathonServicesConfig;
+    private final KubernetesServicesConfigWrapper rawKubeServiceConfig;
 
     @Getter @Setter
     private String warnings = null;
 
     // Note : marathon dependent services not supported for now
 
-    public static MarathonOperationsCommand create (
+    public static KubernetesOperationsCommand create (
             ServicesDefinition servicesDefinition,
             SystemService systemService,
             ServicesInstallStatusWrapper servicesInstallStatus,
-            MarathonServicesConfigWrapper rawMarathonServicesConfig) {
+            KubernetesServicesConfigWrapper rawKubeServicesConfig) {
 
-        MarathonOperationsCommand retCommand = new MarathonOperationsCommand(rawMarathonServicesConfig);
+        KubernetesOperationsCommand retCommand = new KubernetesOperationsCommand(rawKubeServicesConfig);
 
         // 1. Find out about services that need to be installed
         for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
-            if (rawMarathonServicesConfig.isServiceInstallRequired(service)
+            if (rawKubeServicesConfig.isServiceInstallRequired(service)
                     && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
 
-                retCommand.addInstallation(new MarathonOperationId ("installation", service));
+                retCommand.addInstallation(new KubernetesOperationId("installation", service));
             }
         }
 
@@ -89,15 +88,15 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
             /* Deprecated */
             if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
                 // search it in config
-                && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
+                && !rawKubeServicesConfig.isServiceInstallRequired(installedService)) {
 
-                retCommand.addUninstallation(new MarathonOperationId ("uninstallation", installedService));
+                retCommand.addUninstallation(new KubernetesOperationId("uninstallation", installedService));
             }
             if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)
                     // search it in config
-                    && !rawMarathonServicesConfig.isServiceInstallRequired(installedService)) {
+                    && !rawKubeServicesConfig.isServiceInstallRequired(installedService)) {
 
-                retCommand.addUninstallation(new MarathonOperationId ("uninstallation", installedService));
+                retCommand.addUninstallation(new KubernetesOperationId("uninstallation", installedService));
             }
         }
 
@@ -133,27 +132,27 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
         return retCommand;
     }
 
-    MarathonOperationsCommand(MarathonServicesConfigWrapper rawMarathonServicesConfig) {
-        this.rawMarathonServicesConfig = rawMarathonServicesConfig;
+    KubernetesOperationsCommand(KubernetesServicesConfigWrapper rawKubeServiceConfig) {
+        this.rawKubeServiceConfig = rawKubeServiceConfig;
     }
 
-    public MarathonServicesConfigWrapper getRawConfig() {
-        return rawMarathonServicesConfig;
+    public KubernetesServicesConfigWrapper getRawConfig() {
+        return rawKubeServiceConfig;
     }
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("installations", new JSONArray(getInstallations().stream().map(MarathonOperationId::getService).collect(Collectors.toList())));
-            put("uninstallations", new JSONArray(getUninstallations().stream().map(MarathonOperationId::getService).collect(Collectors.toList())));
+            put("installations", new JSONArray(getInstallations().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
+            put("uninstallations", new JSONArray(getUninstallations().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
             put("warnings", warnings);
         }});
     }
 
-    public List<MarathonOperationId> getAllOperationsInOrder (OperationsContext context) {
+    public List<KubernetesOperationId> getAllOperationsInOrder (OperationsContext context) {
 
-        List<MarathonOperationId> allOpList = new ArrayList<>();
+        List<KubernetesOperationId> allOpList = new ArrayList<>();
 
-        allOpList.add(new MarathonOperationId("Installation", MarathonService.TOPOLOGY_ALL_NODES));
+        allOpList.add(new KubernetesOperationId("Installation", MarathonService.TOPOLOGY_ALL_NODES));
 
         allOpList.addAll(getInstallations());
         allOpList.addAll(getUninstallations());
@@ -163,24 +162,17 @@ public class MarathonOperationsCommand extends JSONInstallOpCommand<MarathonOper
 
     @Data
     @RequiredArgsConstructor
-    @Deprecated /* To Be renamed */
-    public static class MarathonOperationId implements OperationId {
+    public static class KubernetesOperationId implements OperationId {
 
         private final String type;
         private final String service;
 
         public boolean isOnNode(String node) {
-            return  /* Deprecated */
-                    node.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
-                    ||
-                    node.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE);
+            return  node.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE);
         }
 
         public boolean isSameNode(OperationId other) {
-            return  /* Deprecated */
-                    other.isOnNode(ServicesInstallStatusWrapper.MARATHON_NODE)
-                    ||
-                    other.isOnNode(ServicesInstallStatusWrapper.KUBERNETES_NODE);
+            return  other.isOnNode(ServicesInstallStatusWrapper.KUBERNETES_NODE);
         }
 
         public String getMessage() {

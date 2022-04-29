@@ -186,11 +186,11 @@ public class MarathonServiceTest extends AbstractSystemTest {
         serviceInstallStatus.removeInstallationFlag("zeppelin", "MARATHON_NODE");
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_MARATHON_NODE", "OK");
 
-        MarathonOperationsCommand command = MarathonOperationsCommand.create (
+        KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
                 servicesDefinition,
                 systemService,
                 serviceInstallStatus,
-                new MarathonServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"))
+                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"))
         );
 
         final List<String> installList = new LinkedList<>();
@@ -204,11 +204,11 @@ public class MarathonServiceTest extends AbstractSystemTest {
                 return request.getRequestLine().getUri();
             }
             @Override
-            void installMarathonService(MarathonOperationsCommand.MarathonOperationId operationId, String marathonNode) {
+            void installMarathonService(KubernetesOperationsCommand.KubernetesOperationId operationId, String marathonNode) {
                 installList.add (operationId.getService()+"-"+ marathonNode);
             }
             @Override
-            void uninstallMarathonService(MarathonOperationsCommand.MarathonOperationId operationId, String marathonNode) throws SystemException {
+            void uninstallMarathonService(KubernetesOperationsCommand.KubernetesOperationId operationId, String marathonNode) throws SystemException {
                 uninstallList.add (operationId.getService()+"-"+ marathonNode);
             }
         });
@@ -225,7 +225,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
 
         marathonService.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
-            void installTopologyAndSettings(NodesConfigWrapper nodesConfig, MarathonServicesConfigWrapper marathonConfig,
+            void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
                                               MemoryModel memoryModel, String ipAddress) {
                 // No-Op
             }
@@ -440,19 +440,19 @@ public class MarathonServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_MARATHON_NODE", "OK");
 
-        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"));
-        marathonConfig.setValueForPath("cerebro_install", "off");
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"));
+        kubeServicesConfig.setValueForPath("cerebro_install", "off");
 
-        MarathonOperationsCommand command = MarathonOperationsCommand.create (
+        KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
                 servicesDefinition,
                 systemService,
                 serviceInstallStatus,
-                marathonConfig
+                kubeServicesConfig
         );
 
         operationsMonitoringService.operationsStarted(command);
 
-        marathonService.uninstallMarathonService(new MarathonOperationsCommand.MarathonOperationId ("uninstallation", "cerebro"), "192.168.10.11");
+        marathonService.uninstallMarathonService(new KubernetesOperationsCommand.KubernetesOperationId("uninstallation", "cerebro"), "192.168.10.11");
 
         assertEquals(1, marathonApiCalls.size());
         assertEquals("http://localhost:12345/v2/apps/cerebro", marathonApiCalls.get(0));
@@ -494,16 +494,16 @@ public class MarathonServiceTest extends AbstractSystemTest {
         serviceInstallStatus.removeInstallationFlag("cerebro", "MARATHON_NODE");
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_MARATHON_NODE", "OK");
 
-        MarathonOperationsCommand command = MarathonOperationsCommand.create (
+        KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
                 servicesDefinition,
                 systemService,
                 serviceInstallStatus,
-                new MarathonServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"))
+                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MarathonServiceTest/marathon-services-config.json"), "UTF-8"))
         );
 
         operationsMonitoringService.operationsStarted(command);
 
-        marathonService.installMarathonService(new MarathonOperationsCommand.MarathonOperationId ("installation", "cerebro"), "192.168.10.11");
+        marathonService.installMarathonService(new KubernetesOperationsCommand.KubernetesOperationId("installation", "cerebro"), "192.168.10.11");
 
         // Just testing a few commands
         assertTrue(testSSHCommandScript.toString().contains("tar xfz /tmp/cerebro.tgz --directory=/tmp/"));
@@ -540,8 +540,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+        KubernetesServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveKubernetesServicesConfig(marathonServicesConfig);
 
         marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
 
@@ -581,8 +581,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+        KubernetesServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveKubernetesServicesConfig(marathonServicesConfig);
 
         marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
 
@@ -618,8 +618,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+        KubernetesServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveKubernetesServicesConfig(marathonServicesConfig);
 
         marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
 
@@ -675,8 +675,8 @@ public class MarathonServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        configurationService.saveMarathonServicesConfig(marathonServicesConfig);
+        KubernetesServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        configurationService.saveKubernetesServicesConfig(marathonServicesConfig);
 
         marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallStatus);
 
@@ -696,7 +696,7 @@ public class MarathonServiceTest extends AbstractSystemTest {
     @Test
     public void testShouldInstall () throws Exception {
 
-        MarathonServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper marathonServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "cerebro"));
         assertTrue (marathonService.shouldInstall(marathonServicesConfig, "kibana"));

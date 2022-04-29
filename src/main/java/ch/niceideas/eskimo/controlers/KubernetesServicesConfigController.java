@@ -36,8 +36,8 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.MarathonOperationsCommand;
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
@@ -81,7 +81,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
     private ServicesDefinition servicesDefinition;
 
     @Autowired
-    private MarathonServicesConfigChecker marathonServicesConfigChecker;
+    private KubernetesServicesConfigChecker kubernetesServicesConfigChecker;
 
     @Value("${eskimo.enableKubernetesSubsystem}")
     private String enableKubernetes = "true";
@@ -103,8 +103,8 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
-    void setMarathonServicesConfigChecker (MarathonServicesConfigChecker marathonServicesConfigChecker) {
-        this.marathonServicesConfigChecker = marathonServicesConfigChecker;
+    void setMarathonServicesConfigChecker (KubernetesServicesConfigChecker kubernetesServicesConfigChecker) {
+        this.kubernetesServicesConfigChecker = kubernetesServicesConfigChecker;
     }
 
     @GetMapping("/load-kubernetes-services-config")
@@ -117,11 +117,11 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
 
         try {
             setupService.ensureSetupCompleted();
-            MarathonServicesConfigWrapper msConfig = configurationService.loadMarathonServicesConfig();
-            if (msConfig == null || msConfig.isEmpty()) {
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+            if (kubeServicesConfig == null || kubeServicesConfig.isEmpty()) {
                 return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
             }
-            return msConfig.getFormattedValue();
+            return kubeServicesConfig.getFormattedValue();
 
         } catch (SystemException | JSONException e) {
             logger.error(e, e);
@@ -148,21 +148,21 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
         try {
 
             // first of all check nodes config
-            MarathonServicesConfigWrapper marathonServicesConfig = new MarathonServicesConfigWrapper(configAsString);
-            marathonServicesConfigChecker.checkMarathonServicesSetup(marathonServicesConfig);
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(configAsString);
+            kubernetesServicesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
 
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
             // Create OperationsCommand
-            MarathonOperationsCommand command = MarathonOperationsCommand.create(
-                    servicesDefinition, systemService, serviceInstallStatus, marathonServicesConfig);
+            KubernetesOperationsCommand command = KubernetesOperationsCommand.create(
+                    servicesDefinition, systemService, serviceInstallStatus, kubeServicesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND, command);
 
             return returnCommand (command);
 
-        } catch (JSONException | SetupException | FileException | MarathonServicesConfigException e) {
+        } catch (JSONException | SetupException | FileException | KubernetesServicesConfigException e) {
             logger.error(e, e);
             notificationService.addError("Kubernetes Services installation preparation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
@@ -185,7 +185,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
             ServicesInstallStatusWrapper newServicesInstallStatus = ServicesInstallStatusWrapper.empty();
 
-            MarathonServicesConfigWrapper reinstallModelConfig = new MarathonServicesConfigWrapper(reinstallModel);
+            KubernetesServicesConfigWrapper reinstallModelConfig = new KubernetesServicesConfigWrapper(reinstallModel);
 
             for (String serviceInstallStatusFlag : servicesInstallStatus.getInstalledServicesFlags()) {
 
@@ -196,14 +196,14 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
                 }
             }
 
-            MarathonServicesConfigWrapper marathonServicesConfig = configurationService.loadMarathonServicesConfig();
-            if (marathonServicesConfig == null || marathonServicesConfig.isEmpty()) {
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+            if (kubeServicesConfig == null || kubeServicesConfig.isEmpty()) {
                 return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
             }
 
             // Create OperationsCommand
-            MarathonOperationsCommand command = MarathonOperationsCommand.create(
-                    servicesDefinition, systemService, newServicesInstallStatus, marathonServicesConfig);
+            KubernetesOperationsCommand command = KubernetesOperationsCommand.create(
+                    servicesDefinition, systemService, newServicesInstallStatus, kubeServicesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
@@ -233,7 +233,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
                 return checkObject.toString(2);
             }
 
-            MarathonOperationsCommand command = (MarathonOperationsCommand) session.getAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND);
+            KubernetesOperationsCommand command = (KubernetesOperationsCommand) session.getAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND);
             session.removeAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND);
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE);
@@ -244,7 +244,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
                 configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
             }
 
-            configurationService.saveMarathonServicesConfig(command.getRawConfig());
+            configurationService.saveKubernetesServicesConfig(command.getRawConfig());
 
             kubernetesService.applyServicesConfig(command);
 

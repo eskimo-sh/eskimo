@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NodesConfigurationCheckerTest {
 
-    private NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
+    private final NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -58,7 +58,7 @@ public class NodesConfigurationCheckerTest {
     @Test
     public void testRangeOfIps() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11-192.168.10.15");
             put("ntp1", "on");
             put("gluster1", "on");

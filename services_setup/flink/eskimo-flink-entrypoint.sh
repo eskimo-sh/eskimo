@@ -59,7 +59,7 @@ cd /home/flink
 echo " - Making sure script calls flink executables and not wrappers !"
 export PATH=/usr/local/lib/flink/bin/:$PATH
 
-# Call spark provided entrypoint
+# Call flink provided entrypoint
 echo " - Executing : /usr/local/lib/flink/kubernetes/docker-entrypoint.sh" "$@"
 last_arg="${@: -1}"
-bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@" | tee /var/log/flink/flink-log-$last_arg.log
+bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@" | tee /var/log/flink/flink-log-`echo $last_arg | cut -d ' ' -f 1`.log

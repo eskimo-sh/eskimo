@@ -108,6 +108,8 @@ if [[ $? != 0 ]]; then
     exit 2
 fi
 
+echo " - Cleaning up maven repository"
+sudo rm -Rf $HOME/.m2/repository
 
 sudo rm -Rf /tmp/eshadoop_setup
 returned_to_saved_dir

@@ -1,1 +1,1 @@
-../flink-app-master/inContainerInjectTopology.sh
+../flink/inContainerInjectTopology.sh

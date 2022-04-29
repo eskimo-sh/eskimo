@@ -1,0 +1,20 @@
+- test flink with
+  docker run -it --user flink --network host \
+      --mount type=bind,source=/home/flink/.kube/config,target=/home/flink/.kube/config \
+      --mount type=bind,source=/usr/local/bin/kubectl,target=/usr/local/bin/kubectl \
+      -v /var/log/flink:/var/log/flink \
+      -v /var/lib/flink:/var/lib/flink \
+      --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+      -v /etc/k8s:/etc/k8s:ro \
+      kubernetes.registry:5000/flink bash
+  + then
+  /usr/local/lib/flink/bin/kubernetes-session.sh
+->    and then see what it's doing and reproduce the yaml file for deployment
+-> then get deployment with
+   kubectl get deployment test-flink -o yaml
+!!! CAUTION : I need to keep the container as close as possible to what is expected by flink to make it sure workers will
+    be working as well as
+
+- then test with :
+cd /usr/local/lib/flink/
+./bin/flink run ./examples/streaming/TopSpeedWindowing.jar

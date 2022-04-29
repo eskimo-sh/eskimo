@@ -86,7 +86,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         Topology topology = def.getTopology(
                 new NodesConfigWrapper(jsonMinimalConfig),
-                MarathonServicesConfigWrapper.empty(),
+                KubernetesServicesConfigWrapper.empty(),
                 "192.168.56.23");
 
         assertEquals ("export MASTER_NTP_1=192.168.56.21\n" +
@@ -103,7 +103,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         Topology topology = def.getTopology(
                 new NodesConfigWrapper(jsonNodesConfig),
-                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new KubernetesServicesConfigWrapper(jsonMarathonConfig),
                 "192.168.10.11");
 
         assertEquals (
@@ -127,7 +127,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         Topology topology = def.getTopology(
                 nodesConfig,
-                new MarathonServicesConfigWrapper(jsonMarathonConfig),
+                new KubernetesServicesConfigWrapper(jsonMarathonConfig),
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
@@ -173,7 +173,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("logstash1", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
             put("spark-history-server_install", "on");
             put("cerebro_install", "on");
             put("kibana_install", "on");
@@ -182,7 +182,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         Topology topology = def.getTopology(
                 nodesConfig,
-                marathonConfig,
+                kubeServicesConfig,
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
@@ -371,11 +371,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("prometheus2", "on");
         }});
 
-        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>());
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>());
 
         Topology topology = def.getTopology(
                 nrr.resolveRanges(nodesConfig),
-                marathonConfig,
+                kubeServicesConfig,
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +

@@ -35,20 +35,16 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.services.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTest {
+public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionTest {
 
     private SystemService systemService = new SystemService() {
 
@@ -65,12 +61,12 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, systemService, savedServicesInstallStatus, marathonConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, systemService, savedServicesInstallStatus, kubeServicesConfig);
 
-        assertEquals(0, moc.getInstallations().size());
-        assertEquals(0, moc.getUninstallations().size());
+        assertEquals(0, koc.getInstallations().size());
+        assertEquals(0, koc.getUninstallations().size());
     }
 
     @Test
@@ -79,7 +75,7 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_MARATHON_NODE");
 
-        MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
         SystemService ss = new SystemService() {
             @Override
@@ -88,13 +84,13 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
             }
         };
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss, savedServicesInstallStatus, kubeServicesConfig);
 
-        assertEquals(1, moc.getInstallations().size());
-        assertEquals(0, moc.getUninstallations().size());
+        assertEquals(1, koc.getInstallations().size());
+        assertEquals(0, koc.getUninstallations().size());
 
-        assertEquals ("kafka-manager", moc.getInstallations().stream()
-                .map(MarathonOperationsCommand.MarathonOperationId::getService)
+        assertEquals ("kafka-manager", koc.getInstallations().stream()
+                .map(KubernetesOperationsCommand.KubernetesOperationId::getService)
                 .collect(Collectors.joining(",")));
     }
 
@@ -103,8 +99,8 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        marathonConfig.getJSONObject().remove("kafka-manager_install");
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
 
         SystemService ss = new SystemService() {
             @Override
@@ -114,20 +110,20 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
         };
 
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss, savedServicesInstallStatus, kubeServicesConfig);
 
-        assertEquals(0, moc.getInstallations().size());
-        assertEquals(1, moc.getUninstallations().size());
+        assertEquals(0, koc.getInstallations().size());
+        assertEquals(1, koc.getUninstallations().size());
 
-        assertEquals ("kafka-manager", moc.getUninstallations().stream()
-                .map(MarathonOperationsCommand.MarathonOperationId::getService)
+        assertEquals ("kafka-manager", koc.getUninstallations().stream()
+                .map(KubernetesOperationsCommand.KubernetesOperationId::getService)
                 .collect(Collectors.joining(",")));
     }
 
     @Test
     public void toJSON () {
 
-        MarathonOperationsCommand moc = prepareFourOps();
+        KubernetesOperationsCommand moc = prepareFourOps();
 
         assertEquals("{\n" +
                 "  \"uninstallations\": [\n" +
@@ -141,14 +137,14 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
                 "}", moc.toJSON().toString(2));
     }
 
-    private MarathonOperationsCommand prepareFourOps() {
+    private KubernetesOperationsCommand prepareFourOps() {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("cerebro_installed_on_IP_MARATHON_NODE");
         savedServicesInstallStatus.getJSONObject().remove("kibana_installed_on_IP_MARATHON_NODE");
 
-        MarathonServicesConfigWrapper marathonConfig = StandardSetupHelpers.getStandardMarathonConfig();
-        marathonConfig.getJSONObject().remove("kafka-manager_install");
-        marathonConfig.getJSONObject().remove("zeppelin_install");
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
+        kubeServicesConfig.getJSONObject().remove("zeppelin_install");
 
         SystemService ss = new SystemService() {
             @Override
@@ -157,21 +153,21 @@ public class MarathonOperationsCommandTest extends AbstractServicesDefinitionTes
             }
         };
 
-        MarathonOperationsCommand moc = MarathonOperationsCommand.create(def, ss, savedServicesInstallStatus, marathonConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss, savedServicesInstallStatus, kubeServicesConfig);
 
-        assertEquals(2, moc.getInstallations().size());
-        assertEquals(2, moc.getUninstallations().size());
-        return moc;
+        assertEquals(2, koc.getInstallations().size());
+        assertEquals(2, koc.getUninstallations().size());
+        return koc;
     }
 
     @Test
     public void testGetAllOperationsInOrder() {
 
-        MarathonOperationsCommand moc = prepareFourOps();
+        KubernetesOperationsCommand moc = prepareFourOps();
 
-        List<MarathonOperationsCommand.MarathonOperationId> opInOrder = moc.getAllOperationsInOrder(null);
+        List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
 
-        assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana,uninstallation_kafka-manager,uninstallation_zeppelin", opInOrder.stream().map(MarathonOperationsCommand.MarathonOperationId::toString).collect(Collectors.joining(",")));
+        assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana,uninstallation_kafka-manager,uninstallation_zeppelin", opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining(",")));
     }
 
 }

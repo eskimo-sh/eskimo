@@ -1,1 +1,1 @@
-../flink-app-master/inContainerSetupFlinkCommon.sh
+../flink/inContainerSetupFlinkCommon.sh

@@ -662,8 +662,8 @@
       "kubernetes": true,
       "selectionLayout": { "row": 4, "col": 3  },
       "memory": "kube",
-      "logo" : "images/flink-app-master-logo.png",
-      "icon" : "images/flink-app-master-icon.png"
+      "logo" : "images/flink-logo.png",
+      "icon" : "images/flink-icon.png"
     },
     "ui": {
       "__comment_urlTemplate": "Going through Kubectl proxy.",

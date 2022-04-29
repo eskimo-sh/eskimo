@@ -32,7 +32,7 @@ public class KubernetesServicesConfigControllerTest {
 
         mscc.setConfigurationService(new ConfigurationService() {
             @Override
-            public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) {
+            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) {
                 // No-Op
             }
         });
@@ -57,7 +57,7 @@ public class KubernetesServicesConfigControllerTest {
 
         mscc.setConfigurationService(new ConfigurationService() {
             @Override
-            public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
+            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
                 return StandardSetupHelpers.getStandardMarathonConfig();
             }
         });
@@ -92,7 +92,7 @@ public class KubernetesServicesConfigControllerTest {
 
         mscc.setConfigurationService(new ConfigurationService() {
             @Override
-            public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
+            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
                 throw new SystemException("Test Error");
             }
         });
@@ -112,7 +112,7 @@ public class KubernetesServicesConfigControllerTest {
 
         mscc.setMarathonService(new MarathonService() {
             @Override
-            public void applyMarathonServicesConfig(MarathonOperationsCommand command) {
+            public void applyMarathonServicesConfig(KubernetesOperationsCommand command) {
                 // No Op
             }
         });
@@ -131,11 +131,11 @@ public class KubernetesServicesConfigControllerTest {
                 return StandardSetupHelpers.getStandard2NodesSetup();
             }
             @Override
-            public MarathonServicesConfigWrapper loadMarathonServicesConfig() throws SystemException  {
+            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
                 return StandardSetupHelpers.getStandardMarathonConfig();
             }
             @Override
-            public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) throws FileException, SetupException {
+            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
                 // No Op
             }
         });
@@ -203,7 +203,7 @@ public class KubernetesServicesConfigControllerTest {
 
         mscc.setMarathonService(new MarathonService() {
             @Override
-            public void applyMarathonServicesConfig(MarathonOperationsCommand command) {
+            public void applyMarathonServicesConfig(KubernetesOperationsCommand command) {
                 // No Op
             }
         });
@@ -214,7 +214,7 @@ public class KubernetesServicesConfigControllerTest {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
-            public void saveMarathonServicesConfig(MarathonServicesConfigWrapper marathonServicesConfig) throws FileException, SetupException {
+            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
                 // No Op
             }
             @Override
@@ -223,9 +223,9 @@ public class KubernetesServicesConfigControllerTest {
             }
         });
 
-        mscc.setMarathonServicesConfigChecker(new MarathonServicesConfigChecker() {
+        mscc.setMarathonServicesConfigChecker(new KubernetesServicesConfigChecker() {
             @Override
-            public void checkMarathonServicesSetup(MarathonServicesConfigWrapper marathonConfig) throws MarathonServicesConfigException {
+            public void checkKubernetesServicesSetup(KubernetesServicesConfigWrapper kubeServicesConfig) throws KubernetesServicesConfigException {
                 // No Op
             }
         });

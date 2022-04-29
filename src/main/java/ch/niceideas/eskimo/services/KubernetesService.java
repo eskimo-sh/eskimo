@@ -135,13 +135,13 @@ public class KubernetesService {
 
     // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void applyKubernetesServicesConfig(MarathonOperationsCommand operationsCommand) {
+    public void applyKubernetesServicesConfig(KubernetesOperationsCommand operationsCommand) {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
     // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
-    void installService(MarathonOperationsCommand.MarathonOperationId operation, String kubeMasterNode)
+    void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
                 logger -> proceedWithKubernetesServiceInstallation(logger, kubeMasterNode, operation.getService()),
@@ -149,7 +149,7 @@ public class KubernetesService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    void uninstallService(MarathonOperationsCommand.MarathonOperationId operation, String kubeMasterNode) throws SystemException {
+    void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException {
         String nodeIp = null;
         try {
             Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(servicesDefinition.getService(operation.getService()), kubeMasterNode);
@@ -192,9 +192,9 @@ public class KubernetesService {
         logger.warn("ensureKubernetesAvailability - To Be Implemented");
     }
 
-    boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) {
-        if (marathonConfig != null) {
-            return marathonConfig.isServiceInstallRequired(service);
+    boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service) {
+        if (kubeServicesConfig != null) {
+            return kubeServicesConfig.isServiceInstallRequired(service);
         }
         return false;
     }
@@ -224,11 +224,11 @@ public class KubernetesService {
             // get it from Kubectl result
             KubeStatusParser parser = getKubeStatusParser();
 
-            MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
             for (String service : servicesDefinition.listKubernetesServices()) {
 
                 // should service be installed on kubernetes ?
-                boolean shall = this.shouldInstall(marathonConfig, service);
+                boolean shall = this.shouldInstall(kubeServicesConfig, service);
 
                 Pair<String, String> nodeNameAndStatus = new Pair<>(KUBE_NA_FLAG, "NA");
                 if (parser != null) {
@@ -299,7 +299,7 @@ public class KubernetesService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void applyServicesConfig(MarathonOperationsCommand command) throws KubernetesException {
+    public void applyServicesConfig(KubernetesOperationsCommand command) throws KubernetesException {
 
         logger.info ("Starting Kubernetes Deployment Operations");
         boolean success = false;
@@ -326,7 +326,7 @@ public class KubernetesService {
                         if (command.getUninstallations().size() > 0) {
                             logger.warn("Uninstalled Kubernetes services will be flagged as uninstalled even though no operation can be performed in kubernetes.");
                             configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                                for (MarathonOperationsCommand.MarathonOperationId uninstalledMarathonService : command.getUninstallations()) {
+                                for (KubernetesOperationsCommand.KubernetesOperationId uninstalledMarathonService : command.getUninstallations()) {
                                     servicesInstallationStatus.removeInstallationFlag(uninstalledMarathonService.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE);
                                 }
                             });
@@ -380,7 +380,7 @@ public class KubernetesService {
             }
 
             // Nodes re-setup (topology)
-            systemOperationService.applySystemOperation(new MarathonOperationsCommand.MarathonOperationId("Installation", TOPOLOGY_ALL_NODES),
+            systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId("Installation", TOPOLOGY_ALL_NODES),
                     ml -> {
                         systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                                 (operation, error) -> {

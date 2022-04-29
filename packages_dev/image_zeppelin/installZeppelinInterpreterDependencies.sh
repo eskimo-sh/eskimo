@@ -103,7 +103,7 @@ echo " - Copying connectors with dependencies to flink distribution folder"
 cd ~/.m2/repository/
 cp -R * /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo/
 
-echo " - Cleaning"
+echo " - Cleaning up"
 rm -Rf /tmp/zeppelin_setup_dep/
 rm -Rf ~/.m2/
 

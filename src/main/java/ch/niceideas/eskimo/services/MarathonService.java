@@ -335,7 +335,7 @@ public class MarathonService {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Deprecated
-    public void applyMarathonServicesConfig(MarathonOperationsCommand command) throws MarathonException {
+    public void applyMarathonServicesConfig(KubernetesOperationsCommand command) throws MarathonException {
 
         logger.info ("Starting Marathon Deployment Operations");
         boolean success = false;
@@ -362,7 +362,7 @@ public class MarathonService {
                         if (command.getUninstallations().size() > 0) {
                             logger.warn("Uninstalled marathon services will be flagged as uninstalled even though no operation can be performed in marathon.");
                             configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                                for (MarathonOperationsCommand.MarathonOperationId uninstalledMarathonService : command.getUninstallations()) {
+                                for (KubernetesOperationsCommand.KubernetesOperationId uninstalledMarathonService : command.getUninstallations()) {
                                     servicesInstallationStatus.removeInstallationFlag(uninstalledMarathonService.getService(), ServicesInstallStatusWrapper.MARATHON_NODE);
                                 }
                             });
@@ -416,7 +416,7 @@ public class MarathonService {
             }
 
             // Nodes re-setup (topology)
-            systemOperationService.applySystemOperation(new MarathonOperationsCommand.MarathonOperationId("Installation", TOPOLOGY_ALL_NODES),
+            systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId("Installation", TOPOLOGY_ALL_NODES),
                     ml -> {
                     systemService.performPooledOperation (new ArrayList<> (liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
@@ -500,7 +500,7 @@ public class MarathonService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    void uninstallMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode) throws SystemException {
+    void uninstallMarathonService(KubernetesOperationsCommand.KubernetesOperationId operation, String marathonNode) throws SystemException {
         String nodeIp = null;
         try {
             Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(operation.getService());
@@ -527,7 +527,7 @@ public class MarathonService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    void installMarathonService(MarathonOperationsCommand.MarathonOperationId operation, String marathonNode)
+    void installMarathonService(KubernetesOperationsCommand.KubernetesOperationId operation, String marathonNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
                 logger -> proceedWithMarathonServiceInstallation(logger, marathonNode, operation.getService()),
@@ -633,11 +633,11 @@ public class MarathonService {
                 }
             }
 
-            MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
             for (String service : servicesDefinition.listKubernetesServices()) {
 
                 // should service be installed on marathon ?
-                boolean shall = this.shouldInstall(marathonConfig, service);
+                boolean shall = this.shouldInstall(kubeServicesConfig, service);
 
                 Pair<String, String> nodeNameAndStatus = new Pair<>(MARATHON_NA_FLAG, "NA");
                 if (StringUtils.isNotBlank(ping) && ping.startsWith("OK")) {
@@ -685,9 +685,9 @@ public class MarathonService {
         }
     }
 
-    boolean shouldInstall(MarathonServicesConfigWrapper marathonConfig, String service) {
-        if (marathonConfig != null) {
-            return marathonConfig.isServiceInstallRequired(service);
+    boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service) {
+        if (kubeServicesConfig != null) {
+            return kubeServicesConfig.isServiceInstallRequired(service);
         }
         return false;
     }

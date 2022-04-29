@@ -34,7 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.MarathonServicesConfigWrapper;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,9 +45,9 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MarathonServicesConfigCheckerTest {
+public class KubernetesServicesConfigCheckerTest {
 
-    private MarathonServicesConfigChecker marathonConfigChecker = new MarathonServicesConfigChecker();
+    private KubernetesServicesConfigChecker marathonConfigChecker = new KubernetesServicesConfigChecker();
     private ConfigurationService configurationService = new ConfigurationService();
     private SetupService setupService = new SetupService();
 
@@ -85,14 +85,14 @@ public class MarathonServicesConfigCheckerTest {
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
-        MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
             put("elasticsearch_install", "on");
                 put("cerebro_installed", "on");
                 put("kibana_install", "on");
                 put("grafana_install", "on");
         }});
 
-        marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+        marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
     }
 
     @Test
@@ -106,13 +106,13 @@ public class MarathonServicesConfigCheckerTest {
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
-        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
                 put("cerebro_installed", "on");
             }});
 
-            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
@@ -129,13 +129,13 @@ public class MarathonServicesConfigCheckerTest {
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
-        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
                 put("spark-executor_install", "on");
             }});
 
-            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service spark-executor expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
@@ -154,14 +154,14 @@ public class MarathonServicesConfigCheckerTest {
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
-        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
                 put("elasticsearch_install", "on");
                 put("zeppelin_installed", "on");
             }});
 
-            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
@@ -180,13 +180,13 @@ public class MarathonServicesConfigCheckerTest {
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
-        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
                 put("zeppelin_installed", "on");
             }});
 
-            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service zeppelin expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
@@ -204,13 +204,13 @@ public class MarathonServicesConfigCheckerTest {
         }});
         configurationService.saveNodesConfig(nodesConfig);
 
-        MarathonServicesConfigException exception = assertThrows(MarathonServicesConfigException.class, () -> {
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            MarathonServicesConfigWrapper marathonConfig = new MarathonServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
                 put("zookeeper_installed", "on");
             }});
 
-            marathonConfigChecker.checkMarathonServicesSetup(marathonConfig);
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : service zookeeper is not a kubernetes service", exception.getMessage());

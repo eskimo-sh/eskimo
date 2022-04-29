@@ -34,20 +34,10 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,7 +73,7 @@ public class MasterServiceTest extends AbstractSystemTest {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
-            public MarathonServicesConfigWrapper loadMarathonServicesConfig() {
+            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
                 return StandardSetupHelpers.getStandardMarathonConfig();
             }
         };
