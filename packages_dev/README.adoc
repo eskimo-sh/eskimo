@@ -344,7 +344,7 @@ It's content should be aligned with the following properties from the configurat
 == Copyright and License
 
 
-Eskimo is Copyright 2019 - 2021 eskimo.sh - All rights reserved. +
+Eskimo is Copyright 2019 - 2022 eskimo.sh - All rights reserved. +
 Author : https://www.eskimo.sh
 
 Eskimo is available under a dual licensing model : commercial and GNU AGPL. +

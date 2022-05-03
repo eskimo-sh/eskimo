@@ -4,7 +4,7 @@ REM
 REM This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 REM well to this individual file than to the Eskimo Project as a whole.
 REM
-REM Copyright 2019 - 2021 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+REM Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
 REM Author : eskimo.sh / https://www.eskimo.sh
 REM
 REM Eskimo is available under a dual licensing model : commercial and GNU AGPL.
