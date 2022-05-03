@@ -103,7 +103,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                 throw new IllegalStateException("Cann find service " + installedService + " in services definition");
             }
 
-            if (!service.isMarathon() && !service.isKubernetes()) {
+            if (!service.isKubernetes()) {
 
                 String node = nodeName.replace("-", ".");
 
@@ -205,11 +205,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
     private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, String node, String restartedService) {
-        if (servicesDefinition.getService(restartedService).isMarathon()) {
-            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
-                retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
-            }
-        } else if (servicesDefinition.getService(restartedService).isKubernetes()) {
+        if (servicesDefinition.getService(restartedService).isKubernetes()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
                 retCommand.addRestartIfNotInstalled(restartedService, KUBERNETES_FLAG);
             }
@@ -219,11 +215,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
     private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, String restartedService) {
-        if (servicesDefinition.getService(restartedService).isMarathon()) {
-            if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
-                retCommand.addRestartIfNotInstalled(restartedService, MARATHON_FLAG);
-            }
-        } else if (servicesDefinition.getService(restartedService).isKubernetes()) {
+        if (servicesDefinition.getService(restartedService).isKubernetes()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
                 retCommand.addRestartIfNotInstalled(restartedService, KUBERNETES_FLAG);
             }

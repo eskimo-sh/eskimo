@@ -62,12 +62,6 @@ if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     exit 3
 fi
 
-export BROKER_ID=`eval echo "\$"$(echo NODE_NBR_KAFKA_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $BROKER_ID == "" ]]; then
-    echo " - No broker ID found in topology for ip address $SELF_IP_ADDRESS"
-    exit 4
-fi
-
 # reinitializing log
 sudo rm -f kafka_install_log
 
@@ -140,5 +134,7 @@ for i in `find ./kafka_wrappers -mindepth 1`; do
     sudo chmod 755 /usr/local/bin/$filename
 done
 
-echo " - Installing and checking systemd service file"
-install_and_check_service_file kafka kafka_install_log
+
+echo " - Starting Kubernetes deployment"
+deploy_kubernetes kafka kafka_install_log
+

@@ -142,12 +142,7 @@ public class SystemAdminController extends AbstractOperationController {
     public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
 
-        if (service.isMarathon()) {
-            return performMarathonOperation(
-                    marathonService -> marathonService.showJournalMarathon(service),
-                    "Successfully shown journal of " +  serviceName + ".");
-
-        } else if (service.isKubernetes()) {
+        if (service.isKubernetes()) {
             return performKubernetesOperation(
                     marathonService -> marathonService.showJournal(service),
                     "Successfully shown journal of " +  serviceName + ".");
@@ -164,12 +159,7 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
-        if (service.isMarathon()) {
-            return performMarathonOperation(
-                    marathonService -> marathonService.startServiceMarathon(service),
-                    serviceName + " has been started successfuly on marathon.");
-
-        } else if (service.isKubernetes()) {
+        if (service.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.startService(service),
                     serviceName + " has been started successfuly on kubernetes.");
@@ -186,12 +176,7 @@ public class SystemAdminController extends AbstractOperationController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
-        if (service.isMarathon()) {
-            return performMarathonOperation(
-                    marathonService -> marathonService.stopServiceMarathon(service),
-                    serviceName + " has been stopped successfuly on marathon.");
-
-        } else if (service.isKubernetes()) {
+        if (service.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.stopService(service),
                     serviceName + " has been stopped successfuly on kubernetes.");
@@ -209,12 +194,7 @@ public class SystemAdminController extends AbstractOperationController {
     public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
 
         Service service = servicesDefinition.getService(serviceName);
-        if (service.isMarathon()) {
-            return performMarathonOperation(
-                    marathonService -> marathonService.restartServiceMarathon(service),
-                    serviceName + " has been restarted successfuly on marathon.");
-
-        } else if (service.isKubernetes()) {
+        if (service.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.restartService(service),
                     serviceName + " has been restarted successfuly on kubernetes.");
@@ -252,9 +232,7 @@ public class SystemAdminController extends AbstractOperationController {
             Service service = servicesDefinition.getService(serviceName);
 
             String nodeName;
-            if (service.isMarathon()) {
-                nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
-            } else if (service.isKubernetes()) {
+            if (service.isKubernetes()) {
                 nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
             } else {
                 nodeName = node.replace(".", "-");
@@ -280,17 +258,9 @@ public class SystemAdminController extends AbstractOperationController {
                 KubernetesOperationsCommand operationsCommand = KubernetesOperationsCommand.create(
                         servicesDefinition, systemService, newServicesInstallationStatus, kubeServicesConfig);
 
-                if (service.isMarathon()) {
-                    return performMarathonOperation(
-                            marathonService -> marathonService.applyMarathonServicesConfig(operationsCommand),
-                            serviceName + " has been reinstalled successfully on marathon.");
-                }
-                // kubernetes
-                else {
-                    return performKubernetesOperation(
-                            kubernetesService -> kubernetesService.applyKubernetesServicesConfig(operationsCommand),
-                            serviceName + " has been reinstalled successfully on kubernetes.");
-                }
+                return performKubernetesOperation(
+                        kubernetesService -> kubernetesService.applyKubernetesServicesConfig(operationsCommand),
+                        serviceName + " has been reinstalled successfully on kubernetes.");
 
             } else {
 

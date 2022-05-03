@@ -125,7 +125,6 @@ public class ServicesController {
 
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
-                    .filter(service -> !service.isMarathon())
                     .filter(service -> !service.isKubernetes())
                     .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
 

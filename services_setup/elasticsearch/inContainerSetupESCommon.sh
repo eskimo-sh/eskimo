@@ -65,5 +65,6 @@ mkdir -p /home/elasticsearch
 chown elasticsearch /home/elasticsearch
 
 
+
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

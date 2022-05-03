@@ -43,20 +43,31 @@ set -e
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -2
+    exit 2
 fi
 
-export BROKER_ID=`eval echo "\$"$(echo NODE_NBR_KAFKA_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $BROKER_ID == "" ]]; then
-    echo " - No broker ID found in topology for ip address $SELF_IP_ADDRESS"
-    exit -3
+
+if [[ "$ESKIMO_NODE_NAME" != "" ]]; then
+    export BROKER_ID=`echo $ESKIMO_NODE_NAME | cut -d '-' -f 2`
+    if [[ $BROKER_ID == "" ]]; then
+        echo " - No broker ID found could be exracted from $ESKIMO_NODE_NAME"
+        exit 3
+    fi
+
+    sed -i s/"broker.id=0"/"broker.id=$BROKER_ID"/g /usr/local/etc/kafka/server.properties
+
+    sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$ESKIMO_NODE_NAME.kafka.default.svc.cluster.eskimo:9092"/g /usr/local/etc/kafka/server.properties
+
+    echo "   + Using advertised.listeners=$ESKIMO_NODE_NAME.kafka.default.svc.cluster.eskimo"
 fi
 
 # silent
 #echo " - Adapting configuration in file server.properties"
-sed -i s/"broker.id=0"/"broker.id=$BROKER_ID"/g /usr/local/etc/kafka/server.properties
+
 sed -i s/"zookeeper.connect=localhost:2181"/"zookeeper.connect=$ZOOKEEPER_IP_ADDRESS:2181"/g /usr/local/etc/kafka/server.properties
-sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$SELF_IP_ADDRESS:9092"/g /usr/local/etc/kafka/server.properties
+
+#sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$SELF_IP_ADDRESS:9092"/g /usr/local/etc/kafka/server.properties
+
 
 if [[ $MEMORY_KAFKA != "" ]]; then
     #echo " - Applying eskimo memory settings from topology as KAFKA_HEAP_OPTS Environment variable"

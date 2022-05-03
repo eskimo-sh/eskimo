@@ -62,6 +62,9 @@ touch /etc/k8s/k8s_slave_management_lock
 trap delete_k8s_slave_lock_file 15
 trap delete_k8s_slave_lock_file EXIT
 
+echo "   + Sourcing kubernetes environment"
+. /etc/k8s/env.sh
+
 echo "   + Mounting Kubernetes Eskimo Gluster shares"
 /usr/local/sbin/setupK8sGlusterShares.sh > /var/log/kubernetes/start_k8s_slave.log 2>&1
 if [[ $? != 0 ]]; then
@@ -191,17 +194,22 @@ while : ; do
     if [[ "$MASTER_KUBE_MASTER_1" != "$SELF_IP_ADDRESS" ]]; then
 
         # ensure DNS is still working alright
-        #echo "   + Trying to ping kubernetes.default.svc.cluster.eskimo" # this is filling up logs
-        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+        #echo "   + Trying to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN" # this is filling up logs
+        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
         if [[ $? != 0 ]]; then
 
             sleep 5
 
-            echo "   + Trying AGAIN to ping kubernetes.default.svc.cluster.eskimo"
-            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+            echo "   + Previous ping failed. Trying AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
+            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
             if [[ $? != 0 ]]; then
 
-                echo "   + Failed to ping kubernetes.default.svc.cluster.eskimo. Trying to restart Network Manager"
+                echo "   + Failed to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN. Checking pod status"
+
+                FIXME Continue with a warning if pod is anything else than running !
+
+
+                echo "   + Trying to restart Network Manager"
 
                 if [[ -d /lib/systemd/system/ ]]; then
                     export systemd_units_dir=/lib/systemd/system/
@@ -224,8 +232,8 @@ while : ; do
 
                 sleep 2
 
-                echo "   + Trying YET AGAIN to ping kubernetes.default.svc.cluster.eskimo"
-                /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.cluster.eskimo > /var/log/kubernetes/start_k8s_master.log 2>&1
+                echo "   + Trying YET AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
+                /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
                 if [[ $? != 0 ]]; then
 
                     let ping_cnt=ping_cnt+1

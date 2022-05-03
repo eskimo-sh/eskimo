@@ -107,6 +107,12 @@
       "order": 3,
       "unique": true,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.3",
+          "ram": "400m"
+        }
+      },
       "group" : "Monitoring",
       "name" : "Grafana",
       "memory": "kube",
@@ -356,6 +362,12 @@
       "imageName" : "kubernetes-dashboard",
       "order": 8,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.3",
+          "ram": "500m"
+        }
+      },
       "unique": true,
       "group" : "Kubernetes",
       "name" : "Dashboard",
@@ -381,6 +393,13 @@
     "config": {
       "imageName" : "kafka",
       "order": 9,
+      "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "1",
+          "ram": "1g"
+        }
+      },
       "group" : "Kafka",
       "name" : "Broker",
       "selectionLayout" : { "row" : 5, "col" : 3},
@@ -397,7 +416,6 @@
         "restart": true
       }
     ],
-    "additionalEnvironment": [ "SERVICE_NUMBER_0_BASED" ],
     "editableSettings": [
       {
         "filename": "server.properties",
@@ -473,6 +491,12 @@
       "imageName" : "kafka-manager",
       "order": 10,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.3",
+          "ram": "400m"
+        }
+      },
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
@@ -520,6 +544,12 @@
       "imageName" : "spark",
       "order": 11,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.3",
+          "ram": "400m"
+        }
+      },
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
@@ -584,6 +614,12 @@
       "group" : "Spark",
       "name" : "Executor",
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "1",
+          "ram": "800m"
+        }
+      },
       "registryOnly": true,
       "selectionLayout" : { "row" : 3, "col" : 3},
       "memory": "kube",
@@ -660,6 +696,12 @@
       "order": 13,
       "name": "Flink",
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "1",
+          "ram": "1g"
+        }
+      },
       "selectionLayout": { "row": 4, "col": 3  },
       "memory": "kube",
       "logo" : "images/flink-logo.png",
@@ -677,7 +719,7 @@
     },
     "masterDetection": {
       "strategy" : "LOG_FILE",
-      "logFile" : "/var/log/flink/flink-log-kubernetes-jobmanager.sh",
+      "logFile" : "/var/log/flink/flink-log-kubernetes-jobmanager.sh.log",
       "grep": "Starting the resource manager.",
       "timeStampExtractRexp" : "([0-9\\-]+ [0-9.:,]+).*",
       "timeStampFormat" : "yyyy-MM-dd HH:mm:ss,SSS"
@@ -796,6 +838,12 @@
       "imageName" : "cerebro",
       "order": 15,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.3",
+          "ram": "400m"
+        }
+      },
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
@@ -831,6 +879,12 @@
       "imageName" : "elasticsearch",
       "order": 16,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "1",
+          "ram": "1g"
+        }
+      },
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
       "___selectionLayout" : { "row" : 1, "col" : 3},
@@ -839,13 +893,6 @@
       "icon" : "images/elasticsearch-icon.png"
     },
     "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "kube-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
       {
         "masterElectionStrategy": "ALL_NODES",
         "masterService": "kube-slave",
@@ -937,6 +984,12 @@
       "imageName" : "kibana",
       "order": 17,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.4",
+          "ram": "600m"
+        }
+      },
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
@@ -1009,6 +1062,12 @@
       "order": 18,
       "unique": true,
       "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "1",
+          "ram": "1g"
+        }
+      },
       "name" : "Zeppelin",
       "memory": "kube",
       "____comment": "We need to know about the spark executor memory to set",

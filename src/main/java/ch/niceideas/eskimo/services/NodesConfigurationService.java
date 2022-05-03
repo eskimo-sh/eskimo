@@ -440,20 +440,7 @@ public class NodesConfigurationService {
     void restartServiceForSystem(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
 
-        if (servicesDefinition.getService(operationId.getService()).isMarathon()) {
-
-            systemOperationService.applySystemOperation(operationId,
-                    ml -> {
-                        try {
-                            ml.addInfo(marathonService.restartServiceMarathonInternal(servicesDefinition.getService(operationId.getService())));
-                        } catch (MarathonException e) {
-                            logger.error (e, e);
-                            throw new SystemException (e);
-                        }
-                    },
-                    status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.MARATHON_NODE, "OK") );
-
-        } else if (servicesDefinition.getService(operationId.getService()).isKubernetes()) {
+        if (servicesDefinition.getService(operationId.getService()).isKubernetes()) {
 
             systemOperationService.applySystemOperation(operationId,
                     ml -> {

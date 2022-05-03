@@ -59,10 +59,9 @@ public class Service {
 
     private boolean unique = false;
 
-    @Deprecated
-    private boolean marathon = false;
-
     private boolean kubernetes = false;
+    private KubeConfig kubeConfig = null;
+
     private boolean mandatory = false;
     private boolean registryOnly = false;
 
@@ -103,11 +102,6 @@ public class Service {
                 .map(servicesDefinition::getService)
                 .forEach(service -> parts.addAndGet(service.getMemoryConsumptionSize().getNbrParts()));
         return parts.get();
-    }
-
-    @Deprecated
-    public boolean isNotMarathon() {
-        return !marathon;
     }
 
     public boolean isNotKubernetes() {
@@ -151,11 +145,12 @@ public class Service {
         return new JSONObject(new HashMap<String, Object>() {{
             put("name", getName());
             put("unique", isUnique());
-            /* Deprecated */
-            put("marathon", isMarathon());
             put("kubernetes", isKubernetes());
             put("mandatory", isMandatory());
             put("conditional", getConditional().name());
+            if (kubeConfig != null) {
+                put ("kubeConfig", kubeConfig.toJSON());
+            }
             put("configOrder", configOrder);
             put("title", (StringUtils.isNotBlank(getStatusGroup()) ? getStatusGroup() + " " : "") + getStatusName().replace("-", ""));
             put("row", getSelectionLayoutRow());

@@ -43,5 +43,5 @@ echo " - Creating kafka user (if not exist)"
 kafka_user_id=`id -u kafka 2>> kafka_install_log`
 if [[ $kafka_user_id == "" ]]; then
     echo "User kafka should have been added by eskimo-base-system setup script"
-    exit -4
+    exit 4
 fi

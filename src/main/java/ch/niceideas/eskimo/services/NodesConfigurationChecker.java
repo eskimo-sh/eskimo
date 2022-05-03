@@ -92,12 +92,6 @@ public class NodesConfigurationChecker {
                 for (Dependency dependency : service.getDependencies()) {
 
                     Service otherService = servicesDefinition.getService(dependency.getMasterService());
-                    if (otherService.isMarathon()) {
-                        throw new NodesConfigurationException(
-                                "Inconsistency found : Service " + property.getServiceName()
-                                        + " is defining a dependency on a marathon service :  "
-                                        + dependency.getMasterService() + ", which is disallowed");
-                    }
                     if (otherService.isKubernetes()) {
                         throw new NodesConfigurationException(
                                 "Inconsistency found : Service " + property.getServiceName()
@@ -230,10 +224,6 @@ public class NodesConfigurationChecker {
                     && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
 
                 Service service = servicesDefinition.getService(property.getServiceName());
-                if (service.isMarathon()) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
-                            + " is a marathon service which should not be selectable here.");
-                }
                 if (service.isKubernetes()) {
                     throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
                             + " is a kubernetes service which should not be selectable here.");

@@ -117,9 +117,6 @@ public class ServicesDefinition implements InitializingBean {
             Boolean unique = (Boolean) servicesConfig.getValueForPath(serviceString+".config.unique");
             service.setUnique(unique != null && unique); // false by default
 
-            Boolean marathon = (Boolean) servicesConfig.getValueForPath(serviceString+".config.marathon");
-            service.setMarathon(marathon != null && marathon); // false by default
-
             Boolean kubernetes = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubernetes");
             service.setKubernetes(kubernetes != null && kubernetes); // false by default
 
@@ -317,6 +314,27 @@ public class ServicesDefinition implements InitializingBean {
                 service.addDependency(kubeDependency);
             }
 
+            if (servicesConfig.hasPath(serviceString+".kubeConfig")) {
+
+                KubeConfig kubeConfig = new KubeConfig();
+
+                if (servicesConfig.hasPath(serviceString+".kubeConfig.request")) {
+
+                    KubeRequest request = new KubeRequest();
+
+                    String cpu = servicesConfig.getValueForPathAsString(serviceString+".kubeConfig.request.cpu");
+                    String ram = servicesConfig.getValueForPathAsString(serviceString+".kubeConfig.request.ram");
+
+                    request.setCpu(cpu);
+                    request.setRam(ram);
+
+                    kubeConfig.setRequest(request);
+                }
+
+                service.setKubeConfig (kubeConfig);
+
+            }
+
             if (servicesConfig.hasPath(serviceString+".additionalEnvironment")) {
                 JSONArray addEnvConf = servicesConfig.getSubJSONObject(serviceString).getJSONArray("additionalEnvironment");
                 for (int i = 0; i < addEnvConf.length(); i++) {
@@ -457,7 +475,6 @@ public class ServicesDefinition implements InitializingBean {
 
     public String[] listAllNodesServices() {
         return services.values().stream()
-                .filter(service -> !service.isMarathon())
                 .filter(service -> !service.isKubernetes())
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
@@ -465,7 +482,7 @@ public class ServicesDefinition implements InitializingBean {
 
     public String[] listMultipleServicesNonKubernetes() {
         return services.values().stream()
-                .filter(it -> !it.isUnique() && !it.isMarathon() && !it.isKubernetes())
+                .filter(it -> !it.isUnique() && !it.isKubernetes())
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
     }
@@ -488,7 +505,6 @@ public class ServicesDefinition implements InitializingBean {
     public String[] listUniqueServices() {
         return services.values().stream()
                 .filter(Service::isUnique)
-                .filter(Service::isNotMarathon)
                 .filter(Service::isNotKubernetes)
                 .map(Service::getName)
                 .sorted()
@@ -542,13 +558,14 @@ public class ServicesDefinition implements InitializingBean {
     public String[] listServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices)
-                .map(Service::getName).toArray(String[]::new);
+                .map(Service::getName)
+                .toArray(String[]::new);
     }
 
     public String[] listKubernetesServicesOrderedByDependencies() {
         return services.values().stream()
+                .sorted(this::compareServices) // dunno why, but if I sort after filtering, it's not working (copare not called)
                 .filter(Service::isKubernetes)
-                .sorted(this::compareServices)
                 .map(Service::getName)
                 .toArray(String[]::new);
     }

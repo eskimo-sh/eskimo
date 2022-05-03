@@ -156,6 +156,24 @@ eskimo.KubernetesServicesConfig = function() {
     }
     this.selectAll = selectAll;
 
+    this.onKubernetesServiceSelected = function (serviceName) {
+
+        $('#' + serviceName + '_cpu_setting').html(
+            '    <input style="width: 80px;" type="text" class="input-md" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu"></input>');
+
+        $('#' + serviceName + '_ram_setting').html(
+            '    <input style="width: 80px;" type="text" class="input-md" name="' + serviceName +'_ram" id="' + serviceName +'_ram"></input>');
+
+        // FIXME fill with either previously configured settings or default settings from service definition
+    };
+
+    this.onKubernetesServiceUnselected = function (serviceName) {
+
+        $('#' + serviceName + '_cpu_setting').html("");
+
+        $('#' + serviceName + '_ram_setting').html("");
+    };
+
     this.renderKubernetesConfig = function (kubernetesConfig) {
 
         let kubernetesServicesTableBody = $("#kubernetes-services-table-body");
@@ -171,14 +189,26 @@ eskimo.KubernetesServicesConfig = function() {
                 '<td>'+
                 KUBERNETES_SERVICES[i]+
                 '</td>'+
-                '<td>' +
+                '<td style="text-align: center;">' +
                 '    <input  type="checkbox" class="input-md" name="' + KUBERNETES_SERVICES[i] +'_install" id="'+KUBERNETES_SERVICES[i] +'_install"></input>' +
+                '</td>' +
+                '<td id="' + KUBERNETES_SERVICES[i] + '_cpu_setting" style="text-align: center;">' +
+                '</td>' +
+                '<td id="' + KUBERNETES_SERVICES[i] + '_ram_setting" style="text-align: center;">' +
                 '</td>';
-
 
 
             kubernetesServiceRow += '<tr>';
             kubernetesServicesTableBody.append (kubernetesServiceRow);
+
+            $('#' + KUBERNETES_SERVICES[i] +'_install').change (function() {
+                //alert(KUBERNETES_SERVICES[i] +'_install' + " - " + $('#' + KUBERNETES_SERVICES[i] +'_install').is(":checked"));
+                if ($('#' + KUBERNETES_SERVICES[i] +'_install').is(":checked")) {
+                    that.onKubernetesServiceSelected(KUBERNETES_SERVICES[i]);
+                } else {
+                    that.onKubernetesServiceUnselected(KUBERNETES_SERVICES[i]);
+                }
+            });
         }
 
         if (kubernetesConfig) {
@@ -193,6 +223,8 @@ eskimo.KubernetesServicesConfig = function() {
 
                     if (flag == "on") {
                         $('#' + serviceName + '_install').get(0).checked = true;
+
+                        that.onKubernetesServiceSelected(serviceName);
                     }
 
                 }

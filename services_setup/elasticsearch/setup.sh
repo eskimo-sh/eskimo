@@ -124,7 +124,7 @@ commit_container elasticsearch es_install_log
 #install_and_check_service_file elasticsearch es_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes elasticsearch cerebro_install_log
+deploy_kubernetes elasticsearch es_install_log
 
 
 
