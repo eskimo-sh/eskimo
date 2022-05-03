@@ -45,14 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
-    private String expectedKubernetesConfigTableContent = null;
-    private String expectedKubernetesSelectionTableContent = null;
-
     @BeforeEach
     public void setUp() throws Exception {
-
-        expectedKubernetesConfigTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesConfigTest/expectedKubernetesConfigTableContent.html"));
-        expectedKubernetesSelectionTableContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesConfigTest/expectedKubernetesSelectionTableContent.html"));
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoKubernetesServicesConfigChecker.js");
@@ -84,6 +78,15 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    \"spark-history-server\",\n" +
                 "    \"zeppelin\"\n" +
                 "  ]);");
+
+        js("eskimoKubernetesServicesConfig.setKubernetesServicesConfigForTest({\n" +
+                "    \"cerebro\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "    \"grafana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "    \"kafka-manager\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "    \"kibana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "    \"spark-history-server\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "    \"zeppelin\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "  });");
 
         js("$('#inner-content-kubernetes-services-config').css('display', 'inherit')");
         js("$('#inner-content-kubernetes-services-config').css('visibility', 'visible')");
@@ -152,10 +155,22 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    \"grafana_install\": \"on\"\n" +
                 "})");
 
-        //System.err.println (page.getElementById("kubernetes-services-table-body").asXml());
-        assertEquals(
-                expectedKubernetesConfigTableContent.replace("  ", ""),
-                page.getElementById("kubernetes-services-table-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+        assertTrue((boolean)js("$('#cerebro_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("$('#zeppelin_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("$('#kafka-manager_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("$('#kibana_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("$('#spark-history-server_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("$('#grafana_install').is(':checked')").getJavaScriptResult());
+
+        // just test a few
+        assertEquals("1", js("$('#cerebro_cpu').val()").getJavaScriptResult());
+        assertEquals("1G", js("$('#cerebro_ram').val()").getJavaScriptResult());
+
+        assertEquals("1", js("$('#kafka-manager_cpu').val()").getJavaScriptResult());
+        assertEquals("1G", js("$('#kafka-manager_ram').val()").getJavaScriptResult());
+
+        assertEquals("1", js("$('#grafana_cpu').val()").getJavaScriptResult());
+        assertEquals("1G", js("$('#grafana_ram').val()").getJavaScriptResult());
     }
 
     @Test
@@ -167,10 +182,14 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesConfig.showReinstallSelection()");
 
-        //System.err.println (page.getElementById("kubernetes-services-selection-body").asXml());
-        assertEquals(
-                expectedKubernetesSelectionTableContent.replace("  ", ""),
-                page.getElementById("kubernetes-services-selection-body").asXml().replace("  ", "").replace("\r\n", "\n"));
+        // on means nothing, it doesn't mean checkbox is checked, but it enables to validate the rendering is OK
+        assertEquals("on", js("$('#cerebro_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("$('#zeppelin_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("$('#kafka-manager_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("$('#kibana_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("$('#spark-history-server_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("$('#grafana_reinstall').val()").getJavaScriptResult());
+
     }
 
     @Test

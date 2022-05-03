@@ -164,7 +164,36 @@ eskimo.KubernetesServicesConfig = function() {
         $('#' + serviceName + '_ram_setting').html(
             '    <input style="width: 80px;" type="text" class="input-md" name="' + serviceName +'_ram" id="' + serviceName +'_ram"></input>');
 
+        let cpuSet = false;
+        let ramSet = false;
+
         // FIXME fill with either previously configured settings or default settings from service definition
+
+        // If no previously configured values have been found, take value from service definition
+        let serviceKubeConfig = KUBERNETES_SERVICES_CONFIG[serviceName].kubeConfig;
+        if (KUBERNETES_SERVICES_CONFIG[serviceName].kubeConfig) {
+            var request = serviceKubeConfig.request;
+            if (request) {
+                var cpuString = request.cpu;
+                if (!cpuSet && cpuString) {
+                    $('#' + serviceName + '_cpu').val (cpuString);
+                    cpuSet = true;
+                }
+                var ramString = request.ram;
+                if (!ramSet && ramString) {
+                    $('#' + serviceName + '_ram').val (ramString);
+                    ramSet = true;
+                }
+            }
+        }
+
+        // if node could be found there either, take hardcoded default values
+        if (!cpuSet) {
+            $('#' + serviceName + '_cpu').val ("1");
+        }
+        if (!ramSet) {
+            $('#' + serviceName + '_ram').val ("1G");
+        }
     };
 
     this.onKubernetesServiceUnselected = function (serviceName) {
@@ -239,11 +268,16 @@ eskimo.KubernetesServicesConfig = function() {
         let kubernetesServicesSelectionHTML = $('#kubernetes-services-container-table').html();
         kubernetesServicesSelectionHTML = kubernetesServicesSelectionHTML.replace(/kubernetes\-services/g, "kubernetes-services-selection");
         kubernetesServicesSelectionHTML = kubernetesServicesSelectionHTML.replace(/_install/g, "_reinstall");
+        kubernetesServicesSelectionHTML = kubernetesServicesSelectionHTML.replace(/Enabled on K8s/g, "Reinstall on K8s");
 
         $('#kubernetes-services-selection-body').html(
             '<form id="kubernetes-servicesreinstall">' +
             kubernetesServicesSelectionHTML +
             '</form>');
+
+        // removing both last columns
+        $("#kubernetes-services-selection-table").find('thead tr td:nth-child(5), tbody tr td:nth-child(5)').remove();
+        $("#kubernetes-services-selection-table").find('thead tr td:nth-child(4), tbody tr td:nth-child(4)').remove();
     }
     this.showReinstallSelection = showReinstallSelection;
 

@@ -35,7 +35,6 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.StringUtils;
 import lombok.Data;
 import org.json.JSONObject;
 

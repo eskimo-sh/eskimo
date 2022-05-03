@@ -314,16 +314,16 @@ public class ServicesDefinition implements InitializingBean {
                 service.addDependency(kubeDependency);
             }
 
-            if (servicesConfig.hasPath(serviceString+".kubeConfig")) {
+            if (servicesConfig.hasPath(serviceString+".config.kubeConfig")) {
 
                 KubeConfig kubeConfig = new KubeConfig();
 
-                if (servicesConfig.hasPath(serviceString+".kubeConfig.request")) {
+                if (servicesConfig.hasPath(serviceString+".config.kubeConfig.request")) {
 
                     KubeRequest request = new KubeRequest();
 
-                    String cpu = servicesConfig.getValueForPathAsString(serviceString+".kubeConfig.request.cpu");
-                    String ram = servicesConfig.getValueForPathAsString(serviceString+".kubeConfig.request.ram");
+                    String cpu = servicesConfig.getValueForPathAsString(serviceString+".config.kubeConfig.request.cpu");
+                    String ram = servicesConfig.getValueForPathAsString(serviceString+".config.kubeConfig.request.ram");
 
                     request.setCpu(cpu);
                     request.setRam(ram);

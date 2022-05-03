@@ -342,6 +342,14 @@ public abstract class AbstractWebTest {
 
         int attempt = 0;
         while (page.getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
+
+            /*
+            if (attempt > 20) {
+                System.err.println (page.asXml());
+                System.exit(-1);
+            }
+            */
+
             Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }

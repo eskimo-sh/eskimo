@@ -110,7 +110,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "0.3",
-          "ram": "400m"
+          "ram": "400M"
         }
       },
       "group" : "Monitoring",
@@ -365,7 +365,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "0.3",
-          "ram": "500m"
+          "ram": "500M"
         }
       },
       "unique": true,
@@ -397,7 +397,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "1",
-          "ram": "1g"
+          "ram": "1G"
         }
       },
       "group" : "Kafka",
@@ -494,7 +494,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "0.3",
-          "ram": "400m"
+          "ram": "400M"
         }
       },
       "unique": true,
@@ -547,7 +547,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "0.3",
-          "ram": "400m"
+          "ram": "400M"
         }
       },
       "unique": true,
@@ -617,7 +617,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "1",
-          "ram": "800m"
+          "ram": "800M"
         }
       },
       "registryOnly": true,
@@ -699,7 +699,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "1",
-          "ram": "1g"
+          "ram": "1G"
         }
       },
       "selectionLayout": { "row": 4, "col": 3  },
@@ -841,7 +841,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "0.3",
-          "ram": "400m"
+          "ram": "400M"
         }
       },
       "unique": true,
@@ -882,7 +882,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "1",
-          "ram": "1g"
+          "ram": "1G"
         }
       },
       "group" : "Elastic Stack",
@@ -987,7 +987,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "0.4",
-          "ram": "600m"
+          "ram": "600M"
         }
       },
       "unique": true,
@@ -1065,7 +1065,7 @@
       "kubeConfig": {
         "request": {
           "cpu": "1",
-          "ram": "1g"
+          "ram": "1G"
         }
       },
       "name" : "Zeppelin",
