@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -329,7 +330,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -343,7 +345,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
                 "export SELF_NODE_NUMBER=2\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 2));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 2));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -355,7 +358,13 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.13\n" +
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
+    }
+
+    @Test
+    public void testAdditionalEnvironmentWithKubeTopology() throws Exception {
+        fail ("To Be Implemented");
     }
 
     @Test
@@ -395,7 +404,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "#Memory Management\n" +
                 "export MEMORY_SERVICE_A=100\n" +
                 "export MEMORY_SERVICE_B=200\n" +
-                "export MEMORY_SERVICE_C=300\n", topology.getTopologyScriptForNode (nodesConfig, memoryModel, 1));
+                "export MEMORY_SERVICE_C=300\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), memoryModel, 1));
     }
 
 
@@ -435,7 +445,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "#Memory Management\n" +
                 "export MEMORY_SERVICE_A=100\n" +
                 "export MEMORY_SERVICE_B=200\n" +
-                "export MEMORY_SERVICE_C=300\n", topology.getTopologyScriptForNode (nodesConfig, memoryModel, 1));
+                "export MEMORY_SERVICE_C=300\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), memoryModel, 1));
     }
 
 
@@ -476,7 +487,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
                 "export SELF_NODE_NUMBER=1\n" +
                 "export ESKIMO_NODE_COUNT=5\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 1));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.12\n" +
@@ -488,7 +500,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.13\n" +
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=5\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
     }
 
     @Test
@@ -535,7 +548,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
                 "export SELF_NODE_NUMBER=2\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 2));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 2));
 
         // now change topology and ensure node numbers for services A and C are unchanged
         nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
@@ -570,7 +584,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.12\n" +
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=5\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
     }
 
     @Test
@@ -680,7 +695,8 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_IP_ADDRESS=192.168.10.13\n" +
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n", topology.getTopologyScriptForNode (nodesConfig, emptyModel, 3));
+                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
+                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
     }
 
     @Test

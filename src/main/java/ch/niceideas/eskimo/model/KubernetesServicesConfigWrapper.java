@@ -49,6 +49,8 @@ import java.util.stream.Collectors;
 public class KubernetesServicesConfigWrapper extends JsonWrapper implements Serializable {
 
     public static final String INSTALL_FLAG = "_install";
+    public static final String CPU_FLAG = "_cpu";
+    public static final String RAM_FLAG = "_ram";
 
     public KubernetesServicesConfigWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
@@ -78,10 +80,22 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
                 .collect(Collectors.toList());
     }
 
+    public String getCpuSetting(String service) {
+        return getValueForPathAsString(service + CPU_FLAG);
+    }
 
-    public boolean isServiceInstallRequired( String service) {
+    public String getRamSetting(String service) {
+        return getValueForPathAsString(service + RAM_FLAG);
+    }
+
+    public boolean isServiceInstallRequired(String service) {
         return StringUtils.isNotBlank(getValueForPathAsString(service + INSTALL_FLAG))
                 && getValueForPath(service + INSTALL_FLAG).equals("on");
     }
 
+    public boolean hasEnabledServices() {
+        return getRootKeys().stream()
+                .filter(key -> key.contains(INSTALL_FLAG))
+                .anyMatch(key -> getValueForPath(key).equals("on"));
+    }
 }

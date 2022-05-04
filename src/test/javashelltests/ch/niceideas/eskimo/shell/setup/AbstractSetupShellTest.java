@@ -105,7 +105,7 @@ public abstract class AbstractSetupShellTest {
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
-        FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, new MemoryModel(new HashMap<>()), 1));
+        FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, kubeServicesConfig, new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
         String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCaemlCaseServiceName()+"SetupShellTest/testFile.conf"));

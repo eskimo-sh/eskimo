@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class KubernetesServicesConfigChecker {
                 throw new KubernetesServicesConfigException("Inconsistency found : No node configuration is found");
             }
 
-            // ensure only marathon services
+            // ensure only kubernetes services
             for (String serviceName : kubeServicesConfig.getEnabledServices()) {
                 Service service = servicesDefinition.getService(serviceName);
                 if (!service.isKubernetes()) {
@@ -90,7 +91,7 @@ public class KubernetesServicesConfigChecker {
                             || dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME)) {
 
                         throw new KubernetesServicesConfigException(
-                                "Inconsistency found : Service " + serviceName + " is a marathon service and defines a dependency " + dependency.getMes()
+                                "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency " + dependency.getMes()
                                         + " on " + dependency.getMasterService() + " which is disallowed");
                     }
 
@@ -126,6 +127,42 @@ public class KubernetesServicesConfigChecker {
                     }
                 }
             }
+
+
+            for (String serviceName : servicesDefinition.listKubernetesServices()) {
+
+                boolean enabled = kubeServicesConfig.isServiceInstallRequired(serviceName);
+
+                String cpuSetting = kubeServicesConfig.getCpuSetting(serviceName);
+                if (StringUtils.isBlank(cpuSetting) && enabled) {
+                    throw new KubernetesServicesConfigException(
+                            "Inconsistency found : Kubernetes Service " + serviceName + " is enabled but misses CPU request setting");
+                }
+                if (StringUtils.isNotBlank(cpuSetting) && !enabled) {
+                    throw new KubernetesServicesConfigException(
+                            "Inconsistency found : Kubernetes Service " + serviceName + " is NOT enabled but defines a CPU request setting");
+                }
+
+                String ramSetting = kubeServicesConfig.getRamSetting(serviceName);
+                if (StringUtils.isBlank(ramSetting) && enabled) {
+                    throw new KubernetesServicesConfigException(
+                            "Inconsistency found : Kubernetes Service " + serviceName + " is enabled but misses RAM request setting");
+                }
+                if (StringUtils.isNotBlank(ramSetting) && !enabled) {
+                    throw new KubernetesServicesConfigException(
+                            "Inconsistency found : Kubernetes Service " + serviceName + " is NOT enabled but defines a RAM request setting");
+                }
+
+                if (StringUtils.isNotBlank(cpuSetting) && !KubeRequest.KUBE_REQUEST_CPU_RE.matcher(cpuSetting).matches()) {
+                    throw new KubernetesServicesConfigException("CPU definition for " + serviceName + " doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}");
+                }
+
+                if (StringUtils.isNotBlank(ramSetting) && !KubeRequest.KUBE_REQUEST_RAM_RE.matcher(ramSetting).matches()) {
+                    throw new KubernetesServicesConfigException("RAM definition for " + serviceName + " doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}");
+                }
+
+            }
+
         } catch (SystemException | SetupException e) {
             logger.error (e, e);
             throw new KubernetesServicesConfigException(e);

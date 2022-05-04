@@ -41,42 +41,53 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NodesConfigWrapperTest extends AbstractServicesDefinitionTest {
 
+    NodesConfigWrapper ncw = new NodesConfigWrapper("{\n" +
+            "    \"elasticsearch3\": \"on\",\n" +
+            "    \"elasticsearch1\": \"on\",\n" +
+            "    \"elasticsearch2\": \"on\",\n" +
+            "    \"node_id1\": \"192.168.56.21\",\n" +
+            "    \"node_id3\": \"192.168.56.23\",\n" +
+            "    \"node_id2\": \"192.168.56.22\",\n" +
+            "    \"kafka3\": \"on\",\n" +
+            "    \"logstash1\": \"on\",\n" +
+            "    \"kafka2\": \"on\",\n" +
+            "    \"logstash2\": \"on\",\n" +
+            "    \"logstash3\": \"on\",\n" +
+            "    \"kafka1\": \"on\",\n" +
+            "    \"gluster1\": \"on\",\n" +
+            "    \"gluster3\": \"on\",\n" +
+            "    \"gluster2\": \"on\",\n" +
+            "    \"k8s-slave3\": \"on\",\n" +
+            "    \"zookeeper\": \"1\",\n" +
+            "    \"k8s-slave2\": \"on\",\n" +
+            "    \"k8s-slave1\": \"on\",\n" +
+            "    \"ntp1\": \"on\",\n" +
+            "    \"prometheus3\": \"on\",\n" +
+            "    \"prometheus2\": \"on\",\n" +
+            "    \"prometheus1\": \"on\",\n" +
+            "    \"ntp3\": \"on\",\n" +
+            "    \"ntp2\": \"on\",\n" +
+            "    \"kube-master\": \"1\"\n" +
+            "}");
+
     @Test
     public void testGetAllNodeAddressesWithService() throws Exception {
-        NodesConfigWrapper ncw = new NodesConfigWrapper("{\n" +
-                "    \"elasticsearch3\": \"on\",\n" +
-                "    \"elasticsearch1\": \"on\",\n" +
-                "    \"elasticsearch2\": \"on\",\n" +
-                "    \"node_id1\": \"192.168.56.21\",\n" +
-                "    \"node_id3\": \"192.168.56.23\",\n" +
-                "    \"node_id2\": \"192.168.56.22\",\n" +
-                "    \"kafka3\": \"on\",\n" +
-                "    \"logstash1\": \"on\",\n" +
-                "    \"kafka2\": \"on\",\n" +
-                "    \"logstash2\": \"on\",\n" +
-                "    \"logstash3\": \"on\",\n" +
-                "    \"kafka1\": \"on\",\n" +
-                "    \"gluster1\": \"on\",\n" +
-                "    \"gluster3\": \"on\",\n" +
-                "    \"gluster2\": \"on\",\n" +
-                "    \"k8s-slave3\": \"on\",\n" +
-                "    \"zookeeper\": \"1\",\n" +
-                "    \"k8s-slave2\": \"on\",\n" +
-                "    \"k8s-slave1\": \"on\",\n" +
-                "    \"ntp1\": \"on\",\n" +
-                "    \"prometheus3\": \"on\",\n" +
-                "    \"prometheus2\": \"on\",\n" +
-                "    \"prometheus1\": \"on\",\n" +
-                "    \"ntp3\": \"on\",\n" +
-                "    \"ntp2\": \"on\",\n" +
-                "    \"kube-master\": \"1\"\n" +
-                "}");
-
         System.err.println (ncw.getAllNodeAddressesWithService("k8s-slave"));
+    }
+
+    @Test
+    public void testHasServiceConfigured() throws Exception {
+        assertTrue(ncw.hasServiceConfigured("kube-master"));
+        assertTrue(ncw.hasServiceConfigured("ntp"));
+        assertFalse(ncw.hasServiceConfigured("blablabla"));
+    }
+
+    @Test
+    public void testAllOtherMethods() throws Exception {
+        fail ("To Be Implemented");
     }
 }

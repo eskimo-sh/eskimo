@@ -475,7 +475,9 @@ public class Topology {
         return sb.toString();
     }
 
-    public String getTopologyScriptForNode(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException {
+    public String getTopologyScriptForNode(NodesConfigWrapper nodesConfig,
+                    KubernetesServicesConfigWrapper kubeConfig, MemoryModel memoryModel, int nodeNbr)
+                    throws NodesConfigurationException {
         StringBuilder sb = new StringBuilder();
         sb.append("#Topology\n");
         sb.append(getTopologyScript());
@@ -525,6 +527,23 @@ public class Topology {
 
         appendExport(sb, ALL_NODES_LIST, allNodes);
 
+        // Kubernetes Topology
+        if (nodesConfig.hasServiceConfigured(KubernetesService.KUBE_MASTER)
+                && kubeConfig.hasEnabledServices()
+                && nodesConfig.isServiceOnNode(KubernetesService.KUBE_MASTER, nodeNbr)) {
+            sb.append("\n#Kubernetes Topology\n");
+
+            for (String service : kubeConfig.getEnabledServices()) {
+
+                String cpuSetting = kubeConfig.getCpuSetting(service);
+                appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_CPU", cpuSetting);
+
+                String ramSetting = kubeConfig.getRamSetting(service);
+                appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_RAM", ramSetting);
+
+            }
+        }
+
         // memory management
         Map<String, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
         if (memorySettings != null && !memorySettings.isEmpty()) {
@@ -532,7 +551,8 @@ public class Topology {
 
             memorySettings.keySet().stream()
                     .sorted()
-                    .forEach(service -> appendExport(sb, "MEMORY_"+service.toUpperCase().replace("-", "_"), "" + memorySettings.get(service)));
+                    .forEach(service -> appendExport(sb,
+                            "MEMORY_" + service.toUpperCase().replace("-", "_"), "" + memorySettings.get(service)));
         }
 
         return sb.toString();

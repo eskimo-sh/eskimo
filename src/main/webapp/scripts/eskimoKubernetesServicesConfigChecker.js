@@ -33,6 +33,9 @@ Software.
 */
 
 
+let cpuCheckRE = /^[0-9\\.]+[m]{0,1}$/g;
+let ramCheckRE = /^[0-9\\.]+[EPTGMk]{0,1}$/g;
+
 function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kubernetesServices, successCallback) {
 
     $.ajax({
@@ -66,51 +69,98 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
 
         // data is nodesConfig
 
+        // collecting encountered servics
+        let encounteredService = [];
+
         // check service dependencies
         for (let key in kubernetesSetupConfig) {
             let re = /([a-zA-Z\-]+)_install/;
 
             let matcher = key.match(re);
 
-            let serviceName = matcher[1];
+            if (matcher != null) {
 
-            let serviceDeps = servicesDependencies[serviceName];
+                let serviceName = matcher[1];
+                encounteredService.push (serviceName);
 
-            for (let i = 0; i < serviceDeps.length; i++) {
-                let dependency = serviceDeps[i];
+                let serviceDeps = servicesDependencies[serviceName];
 
-                // All the following are unsupported for kubernetes service
-                if (dependency.mes == "SAME_NODE"
-                    || dependency.mes == "SAME_NODE_OR_RANDOM"
-                    || dependency.mes == "RANDOM_NODE_AFTER"
-                    || dependency.mes == "RANDOM_NODE_AFTER_OR_SAME") {
+                for (let i = 0; i < serviceDeps.length; i++) {
+                    let dependency = serviceDeps[i];
 
-                    throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency "
-                            + dependency.mes + " on " + dependency.masterService + " which is disallowed";
+                    // All the following are unsupported for kubernetes service
+                    if (dependency.mes == "SAME_NODE"
+                        || dependency.mes == "SAME_NODE_OR_RANDOM"
+                        || dependency.mes == "RANDOM_NODE_AFTER"
+                        || dependency.mes == "RANDOM_NODE_AFTER_OR_SAME") {
+
+                        throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency "
+                        + dependency.mes + " on " + dependency.masterService + " which is disallowed";
+                    }
+
+                    // I want the dependency somewhere
+                    else if (dependency.mandatory) {
+
+                        // if dependency is a kubernetes service
+                        if (kubernetesServices[dependency.masterService]) {
+                            if (dependency.numberOfMasters > 1) {
+                                throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency with master count "
+                                + dependency.numberOfMasters + " on " + dependency.masterService + " which is disallowed for kubernetes dependencies";
+                            }
+
+                            // make sure dependency is installed or going to be
+                            if (!kubernetesSetupConfig[dependency.masterService + "_install"]
+                                || kubernetesSetupConfig[dependency.masterService + "_install"] != "on") {
+                                throw "Inconsistency found : Service " + serviceName + " expects a installaton of  " + dependency.masterService +
+                                ". But it's not going to be installed";
+                            }
+                        }
+                        // otherwise if dependency is a node service
+                        else {
+                            // ensure count of dependencies are available
+                            enforceMandatoryDependency(dependency, nodesConfig, null, serviceName);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Now checking CPU definition
+        for (let key in kubernetesSetupConfig) {
+            let re = /([a-zA-Z\-]+)_cpu/;
+
+            let matcher = key.match(re);
+            if (matcher != null) {
+                let serviceName = matcher[1];
+
+                if (encounteredService.length <= 0 || !encounteredService.includes(serviceName)) {
+                    throw "Inconsistency found : Found a CPU definition for " + key +
+                            ". But corresponding service installation is not enabled";
                 }
 
-                // I want the dependency somewhere
-                else if (dependency.mandatory) {
+                let cpuDef = kubernetesSetupConfig [serviceName + "_cpu"];
+                if (cpuDef.match(cpuCheckRE) == null) {
+                    throw "CPU definition for " + key + " doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}";
+                }
+            }
+        }
 
-                    // if dependency is a kubernetes service
-                    if (kubernetesServices[dependency.masterService]) {
-                        if (dependency.numberOfMasters > 1) {
-                            throw "Inconsistency found : Service " + serviceName + " is a kubernetes service and defines a dependency with master count "
-                                    +  dependency.numberOfMasters + " on " + dependency.masterService + " which is disallowed for kubernetes dependencies";
-                        }
+        // Now checking RAM definition
+        for (let key in kubernetesSetupConfig) {
+            let re = /([a-zA-Z\-]+)_ram/;
 
-                        // make sure dependency is installed or going to be
-                        if (!kubernetesSetupConfig[dependency.masterService+"_install"]
-                            || kubernetesSetupConfig[dependency.masterService+"_install"] != "on") {
-                            throw "Inconsistency found : Service " + serviceName + " expects a installaton of  " + dependency.masterService +
-                                    ". But it's not going to be installed";
-                        }
-                    }
-                    // otherwise if dependency is a node service
-                    else {
-                        // ensure count of dependencies are available
-                        enforceMandatoryDependency(dependency, nodesConfig, null, serviceName);
-                    }
+            let matcher = key.match(re);
+            if (matcher != null) {
+                let serviceName = matcher[1];
+
+                if (encounteredService.length <= 0 || !encounteredService.includes(serviceName)) {
+                    throw "Inconsistency found : Found a RAM definition for " + key +
+                    ". But corresponding service installation is not enabled";
+                }
+
+                let ramDef = kubernetesSetupConfig [serviceName + "_ram"];
+                if (ramDef.match(ramCheckRE) == null) {
+                    throw "RAM definition for " + key + " doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}";
                 }
             }
         }

@@ -40,6 +40,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.SystemException;
 import org.apache.log4j.Logger;
@@ -84,10 +85,14 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         super(jsonString);
     }
 
+    public boolean isServiceOnNode(String serviceName, int nodeNbr) {
+        return getNodeNumbers(serviceName).contains(nodeNbr);
+    }
+
     public boolean hasServiceConfigured(String serviceName) {
         try {
             return this.keySet().stream()
-                    .anyMatch(serviceName::equals);
+                    .anyMatch(key -> key.startsWith (serviceName));
         } catch (JSONException e) {
             logger.debug (e, e);
             return false;

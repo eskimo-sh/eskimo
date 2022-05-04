@@ -343,7 +343,7 @@ public class NodesConfigurationService {
             try {
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
                         .getTopology(nodesConfig, kubeServicesConfig, node)
-                        .getTopologyScriptForNode(nodesConfig, memoryModel, nodesConfig.getNodeNumber (node)));
+                        .getTopologyScriptForNode(nodesConfig, kubeServicesConfig, memoryModel, nodesConfig.getNodeNumber (node)));
             } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
                 logger.error (e, e);
                 throw new SystemException(e);

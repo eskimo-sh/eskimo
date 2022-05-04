@@ -154,7 +154,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode(nodesConfig, emptyModel, 1));
+                "export SELF_NODE_NUMBER=1\n",
+                topology.getTopologyScriptForNode(nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
     }
 
     @Test
@@ -204,7 +205,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode(nodesConfig, emptyModel, 1));
+                "export SELF_NODE_NUMBER=1\n",
+                topology.getTopologyScriptForNode(nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
     }
 
     @Test
@@ -390,7 +392,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "\n" +
                 "#Self identification\n" +
                 "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n", topology.getTopologyScriptForNode(nrr.resolveRanges(nodesConfig), emptyModel, 1));
+                "export SELF_NODE_NUMBER=1\n",
+                topology.getTopologyScriptForNode(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
     }
 
     @Test

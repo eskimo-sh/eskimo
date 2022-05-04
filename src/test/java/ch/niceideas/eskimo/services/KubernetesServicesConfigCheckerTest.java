@@ -51,6 +51,31 @@ public class KubernetesServicesConfigCheckerTest {
     private ConfigurationService configurationService = new ConfigurationService();
     private SetupService setupService = new SetupService();
 
+    NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        put("node_id1", "192.168.10.11");
+        put("kube-master", "1");
+        put("kube-slave", "1");
+        put("prometheus1", "on");
+    }});
+
+    KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
+        put("elasticsearch_install", "on");
+        put("elasticsearch_cpu", "1");
+        put("elasticsearch_ram", "1G");
+
+        put("cerebro_install", "on");
+        put("cerebro_cpu", "1");
+        put("cerebro_ram", "1G");
+
+        put("kibana_install", "on");
+        put("kibana_cpu", "500m");
+        put("kibana_ram", "500M");
+
+        put("grafana_install", "on");
+        put("grafana_cpu", "1.5");
+        put("grafana_ram", "1G");
+    }});
+
     @BeforeEach
     public void setUp() throws Exception {
 
@@ -72,27 +97,6 @@ public class KubernetesServicesConfigCheckerTest {
         ServicesDefinition servicesDefinition = new ServicesDefinition();
         servicesDefinition.afterPropertiesSet();
         marathonConfigChecker.setServicesDefinition(servicesDefinition);
-    }
-
-    @Test
-    public void testCheckKubernetesSetupOK() throws Exception {
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("kube-master", "1");
-            put("kube-slave", "1");
-            put("prometheus1", "on");
-        }});
-        configurationService.saveNodesConfig(nodesConfig);
-
-        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
-            put("elasticsearch_install", "on");
-                put("cerebro_installed", "on");
-                put("kibana_install", "on");
-                put("grafana_install", "on");
-        }});
-
-        marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
     }
 
     @Test
@@ -216,4 +220,67 @@ public class KubernetesServicesConfigCheckerTest {
         assertEquals("Inconsistency found : service zookeeper is not a kubernetes service", exception.getMessage());
     }
 
+    @Test
+    public void testCheckKubernetesSetupOK() throws Exception {
+
+        configurationService.saveNodesConfig(nodesConfig);
+
+        marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingCpuSetting() throws Exception {
+
+        configurationService.saveNodesConfig(nodesConfig);
+
+        kubeServicesConfig.removeRootKey("cerebro_cpu");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+        });
+
+        assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses CPU request setting", exception.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingRamSetting() throws Exception {
+
+        configurationService.saveNodesConfig(nodesConfig);
+
+        kubeServicesConfig.removeRootKey("cerebro_ram");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+        });
+
+        assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses RAM request setting", exception.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingCpuWrong() throws Exception {
+
+        configurationService.saveNodesConfig(nodesConfig);
+
+        kubeServicesConfig.setValueForPath("cerebro_cpu", "1l");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+        });
+
+        assertEquals("CPU definition for cerebro doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}", exception.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingRamWrong() throws Exception {
+
+        configurationService.saveNodesConfig(nodesConfig);
+
+        kubeServicesConfig.setValueForPath("cerebro_ram", "100ui");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
+            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+        });
+
+        assertEquals("RAM definition for cerebro doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}", exception.getMessage());
+    }
 }
