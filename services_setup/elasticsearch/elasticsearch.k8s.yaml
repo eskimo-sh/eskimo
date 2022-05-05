@@ -88,11 +88,9 @@ spec:
         - name: elasticsearch
           image: kubernetes.registry:5000/elasticsearch
           resources:
-            limits:
-              memory: 2000Mi
             requests:
-              cpu: 1
-              memory: 2000Mi
+              cpu: "$ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM"
           ports:
             - containerPort: 9200
               name: http

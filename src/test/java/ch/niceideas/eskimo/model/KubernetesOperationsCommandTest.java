@@ -63,7 +63,8 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, systemService, savedServicesInstallStatus, kubeServicesConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, systemService,
+                KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(0, koc.getInstallations().size());
         assertEquals(0, koc.getUninstallations().size());
@@ -84,7 +85,8 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
             }
         };
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss, savedServicesInstallStatus, kubeServicesConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+                KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(1, koc.getInstallations().size());
         assertEquals(0, koc.getUninstallations().size());
@@ -110,7 +112,8 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         };
 
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss, savedServicesInstallStatus, kubeServicesConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+                KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(0, koc.getInstallations().size());
         assertEquals(1, koc.getUninstallations().size());
@@ -153,7 +156,8 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
             }
         };
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss, savedServicesInstallStatus, kubeServicesConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+                KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(2, koc.getInstallations().size());
         assertEquals(2, koc.getUninstallations().size());
@@ -168,6 +172,11 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
 
         assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana,uninstallation_kafka-manager,uninstallation_zeppelin", opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining(",")));
+    }
+
+    @Test
+    public void testRestarts() throws Exception {
+        fail ("To Be Implemented");
     }
 
 }

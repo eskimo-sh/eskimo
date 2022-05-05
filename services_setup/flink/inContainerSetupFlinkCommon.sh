@@ -106,66 +106,6 @@ sed -i s/"#historyserver.archive.fs.dir: hdfs:\/\/\/completed-jobs\/"/"historyse
 # uncomment
 sed -i s/"#rest.port: 8081"/"rest.port: 8081"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
-echo " - Creating flink-pod-template.yaml"
-cat > /tmp/flink-pod-template.yaml <<- "EOF"
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: flink-main-container # this has to be this name !!!
-    image: kubernetes.registry:5000/flink-worker
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
-      runAsUser: 3305
-      runAsGroup: 3305
-    volumeMounts:
-      - name: home-flink-kube
-        mountPath: /home/flink/.kube
-      - name: var-log-flink
-        mountPath: /var/log/flink
-      - name: var-run-flink
-        mountPath: /var/run/flink
-      - name: etc-eskimo-topology
-        mountPath: /etc/eskimo_topology.sh
-      - name: etc-eskimo-services-settings
-        mountPath: /etc/eskimo_services-settings.json
-      - name: kubectl
-        mountPath: /usr/local/bin/kubectl
-      - name: etc-k8s
-        mountPath: /etc/k8s
-  volumes:
-    - name: home-flink-kube
-      hostPath:
-        path: /home/flink/.kube
-        type: Directory
-    - name: var-log-flink
-      hostPath:
-        path: /var/log/flink
-        type: Directory
-    - name: var-run-flink
-      hostPath:
-        path: /var/run/flink
-        type: Directory
-    - name: etc-eskimo-topology
-      hostPath:
-        path: /etc/eskimo_topology.sh
-        type: File
-    - name: etc-eskimo-services-settings
-      hostPath:
-        path: /etc/eskimo_services-settings.json
-        type: File
-    - name: kubectl
-      hostPath:
-        path: /usr/local/bin/kubectl
-        type: File
-    - name: etc-k8s
-      hostPath:
-        path: /etc/k8s
-        type: Directory
-  #hostNetwork: true
-EOF
-sudo mv /tmp/flink-pod-template.yaml /usr/local/lib/flink/conf/
 
 echo " - Creating docker-entrypoint.sh"
 cat > /tmp/docker-entrypoint.sh <<- "EOF"
@@ -229,10 +169,6 @@ sudo bash -c "echo -e \"kubernetes.container.image: kubernetes.registry:5000/fli
 
 sudo bash -c "echo -e \"kubernetes.jobmanager.replicas: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"kubernetes.pod-template-file: /usr/local/lib/flink/conf/flink-pod-template.yaml\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"kubernetes.pod-template-file.jobmanager: /usr/local/lib/flink/conf/flink-pod-template.yaml\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"kubernetes.pod-template-file.taskmanager: /usr/local/lib/flink/conf/flink-pod-template.yaml\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-
 sudo bash -c "echo -e \"kubernetes.config.file: /home/flink/.kube/config\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 sudo bash -c "echo -e \"kubernetes.cluster-id: flink\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
@@ -280,7 +216,6 @@ echo "internal.cluster.execution-mode: NORMAL" >> /var/lib/flink/config/flink-co
 cp /usr/local/lib/flink/conf/log4j-console.properties /var/lib/flink/config/
 cp /usr/local/lib/flink/conf/logback-console.xml /var/lib/flink/config/
 
-cp /usr/local/lib/flink/conf/flink-pod-template.yaml /var/lib/flink/config/taskmanager-pod-template.yaml
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

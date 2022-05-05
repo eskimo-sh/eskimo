@@ -41,6 +41,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -54,16 +55,17 @@ import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperat
 
 public class KubernetesOperationsCommand extends JSONInstallOpCommand<KubernetesOperationsCommand.KubernetesOperationId> implements Serializable {
 
+    private static final Logger logger = Logger.getLogger(KubernetesOperationsCommand.class);
+
     private final KubernetesServicesConfigWrapper rawKubeServiceConfig;
 
     @Getter @Setter
     private String warnings = null;
 
-    // Note : marathon dependent services not supported for now
-
     public static KubernetesOperationsCommand create (
             ServicesDefinition servicesDefinition,
             SystemService systemService,
+            KubernetesServicesConfigWrapper previousConfig,
             ServicesInstallStatusWrapper servicesInstallStatus,
             KubernetesServicesConfigWrapper rawKubeServicesConfig) {
 
@@ -85,13 +87,6 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
             String installedService = serviceAndNodePair.getKey();
             String nodeName = serviceAndNodePair.getValue();
 
-            /* Deprecated */
-            if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)
-                // search it in config
-                && !rawKubeServicesConfig.isServiceInstallRequired(installedService)) {
-
-                retCommand.addUninstallation(new KubernetesOperationId("uninstallation", installedService));
-            }
             if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)
                     // search it in config
                     && !rawKubeServicesConfig.isServiceInstallRequired(installedService)) {
@@ -100,7 +95,18 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
             }
         }
 
-        // 3. If Marathon is not available, issue a warning in regards to what is going to happen
+        // 3. Find out about service that need to be restarted
+        for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
+            if (rawKubeServicesConfig.isServiceInstallRequired(service)
+                && !retCommand.getInstallations().contains(new KubernetesOperationId("installation", service))) {
+
+                if (rawKubeServicesConfig.isDifferentConfig (previousConfig, service)) {
+                    retCommand.addRestart(new KubernetesOperationId("restart", service));
+                }
+            }
+        }
+
+        // 3. If Kubernetes is not available, issue a warning in regards to what is going to happen
         if (retCommand.hasChanges()) {
             try {
                 SystemStatusWrapper lastStatus = systemService.getStatus();
@@ -123,7 +129,7 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
             } catch (SystemService.StatusExceptionWrapperException e) {
 
-                String warnings = "Couldn't get last marathon Service status to assess feasibility of marathon setup\n";
+                String warnings = "Couldn't get last Kubernetes Service status to assess feasibility of kubernetes setup\n";
                 warnings += e.getCause().getCause() + ":" + e.getCause().getMessage();
                 retCommand.setWarnings(warnings);
             }
@@ -144,6 +150,7 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         return new JSONObject(new HashMap<String, Object>() {{
             put("installations", new JSONArray(getInstallations().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
             put("uninstallations", new JSONArray(getUninstallations().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
+            put("restarts", new JSONArray(getRestarts().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
             put("warnings", warnings);
         }});
     }
@@ -152,10 +159,11 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
         List<KubernetesOperationId> allOpList = new ArrayList<>();
 
-        allOpList.add(new KubernetesOperationId("Installation", MarathonService.TOPOLOGY_ALL_NODES));
+        allOpList.add(new KubernetesOperationId("Installation", KubernetesService.TOPOLOGY_ALL_NODES));
 
         allOpList.addAll(getInstallations());
         allOpList.addAll(getUninstallations());
+        allOpList.addAll(getRestarts());
 
         return allOpList;
     }

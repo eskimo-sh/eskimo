@@ -64,6 +64,76 @@ spec:
 
 ---
 
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pod-template-flink
+  namespace: default
+data:
+  taskmanager-pod-template.yaml: |
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+      - name: flink-main-container # this has to be this name !!!
+        image: kubernetes.registry:5000/flink-worker
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+          runAsUser: 3305
+          runAsGroup: 3305
+        resources:
+          requests:
+            cpu: "$ESKIMO_KUBE_REQUEST_FLINK_CPU"
+            memory: "$ESKIMO_KUBE_REQUEST_FLINK_RAM"    
+        volumeMounts:
+          - name: home-flink-kube
+            mountPath: /home/flink/.kube
+          - name: var-log-flink
+            mountPath: /var/log/flink
+          - name: var-run-flink
+            mountPath: /var/run/flink
+          - name: etc-eskimo-topology
+            mountPath: /etc/eskimo_topology.sh
+          - name: etc-eskimo-services-settings
+            mountPath: /etc/eskimo_services-settings.json
+          - name: kubectl
+            mountPath: /usr/local/bin/kubectl
+          - name: etc-k8s
+            mountPath: /etc/k8s
+      volumes:
+        - name: home-flink-kube
+          hostPath:
+            path: /home/flink/.kube
+            type: Directory
+        - name: var-log-flink
+          hostPath:
+            path: /var/log/flink
+            type: Directory
+        - name: var-run-flink
+          hostPath:
+            path: /var/run/flink
+            type: Directory
+        - name: etc-eskimo-topology
+          hostPath:
+            path: /etc/eskimo_topology.sh
+            type: File
+        - name: etc-eskimo-services-settings
+          hostPath:
+            path: /etc/eskimo_services-settings.json
+            type: File
+        - name: kubectl
+          hostPath:
+            path: /usr/local/bin/kubectl
+            type: File
+        - name: etc-k8s
+          hostPath:
+            path: /etc/k8s
+            type: Directory
+
+
+---
+
 kind: Service
 apiVersion: v1
 metadata:
@@ -179,12 +249,9 @@ spec:
                   apiVersion: v1
                   fieldPath: status.podIP
           resources:
-            limits:
-              cpu: '1'
-              memory: 1600Mi
             requests:
-              cpu: '1'
-              memory: 1600Mi
+              cpu: "$ESKIMO_KUBE_REQUEST_FLINK_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_FLINK_RAM"
           volumeMounts:
             - name: home-flink-kube
               mountPath: /home/flink/.kube

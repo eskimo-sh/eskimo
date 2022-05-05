@@ -98,4 +98,39 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
                 .filter(key -> key.contains(INSTALL_FLAG))
                 .anyMatch(key -> getValueForPath(key).equals("on"));
     }
+
+    public boolean isDifferentConfig(KubernetesServicesConfigWrapper previousConfig, String service) {
+
+        String prevCpu = previousConfig.getCpuSetting(service);
+        String prevRam = previousConfig.getRamSetting(service);
+
+        String curCpu = getCpuSetting(service);
+        String curRam = getRamSetting(service);
+
+        if (StringUtils.isBlank(curCpu)) {
+            if (StringUtils.isNotBlank(prevCpu)) {
+                return true;
+            }
+        } else {
+            if (StringUtils.isBlank(prevCpu)) {
+                return true;
+            } else if (!prevCpu.equals(curCpu)) {
+                return true;
+            }
+        }
+
+        if (StringUtils.isBlank(curRam)) {
+            if (StringUtils.isNotBlank(prevRam)) {
+                return true;
+            }
+        } else {
+            if (StringUtils.isBlank(prevRam)) {
+                return true;
+            } else if (!prevRam.equals(curRam)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

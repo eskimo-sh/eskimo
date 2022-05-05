@@ -38,6 +38,8 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public abstract class JSONInstallOpCommand<T extends Serializable> implements JSONOpCommand {
 
@@ -47,6 +49,9 @@ public abstract class JSONInstallOpCommand<T extends Serializable> implements JS
     @Getter
     private final ArrayList<T> uninstallations = new ArrayList<>();
 
+    @Getter
+    private final ArrayList<T> restarts = new ArrayList<>();
+
     void addInstallation(T service) {
         installations.add(service);
     }
@@ -55,8 +60,16 @@ public abstract class JSONInstallOpCommand<T extends Serializable> implements JS
         uninstallations.add(service);
     }
 
+    void addRestart (T service) {
+        restarts.add (service);
+    }
+
     public boolean hasChanges() {
-        return !getInstallations().isEmpty() || !getUninstallations().isEmpty();
+        return !getInstallations().isEmpty() || !getUninstallations().isEmpty() || !getRestarts().isEmpty();
+    }
+
+    public void sortRestarts (Comparator<T> c) {
+        restarts.sort(c);
     }
 
 }

@@ -201,12 +201,6 @@ kubectl create configmap flink-config-flink \
         --from-file=/var/lib/flink/config/log4j-console.properties \
         --from-file=/var/lib/flink/config/logback-console.xml
 
-echo "   + Deleting any previous pod template configmap for task managers"
-kubectl delete configmap pod-template-flink || true # nevermind errors here
-
-echo "   + Creating pod template configmap for task managers"
-kubectl create configmap pod-template-flink --from-file=/var/lib/flink/config/taskmanager-pod-template.yaml
-
 echo " - Start kubernetes deployment"
 deploy_kubernetes_only flink flink_worker_install_log
 

@@ -92,8 +92,7 @@ eskimo.KubernetesOperationsCommand = function() {
 
         commandDescription += "<br>";
 
-        /*
-        // reinstallations
+        // restarts
         commandDescription += "<b>Services Restart</b><br><br>";
 
         for (let i = 0; i < command.restarts.length; i++) {
@@ -101,7 +100,6 @@ eskimo.KubernetesOperationsCommand = function() {
         }
 
         commandDescription += "<br>";
-        */
 
         if (command.warnings && command.warnings.trim() != "") {
 

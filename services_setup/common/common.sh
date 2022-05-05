@@ -308,7 +308,7 @@ function deploy_kubernetes_only() {
 
     if [[ `grep "deleted" "$LOG_FILE"_kubernetes_deploy` != "" ]]; then
         echo "   + Previous instance removed"
-        if [[ -z "$NO_SLEEP" ]]; then sleep 3; fi
+        if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
     fi
 
     echo " - Deploying $CONTAINER service in kubernetes"

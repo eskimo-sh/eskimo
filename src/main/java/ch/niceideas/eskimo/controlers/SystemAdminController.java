@@ -256,7 +256,7 @@ public class SystemAdminController extends AbstractOperationController {
                 }
 
                 KubernetesOperationsCommand operationsCommand = KubernetesOperationsCommand.create(
-                        servicesDefinition, systemService, newServicesInstallationStatus, kubeServicesConfig);
+                        servicesDefinition, systemService, kubeServicesConfig, newServicesInstallationStatus, kubeServicesConfig);
 
                 return performKubernetesOperation(
                         kubernetesService -> kubernetesService.applyKubernetesServicesConfig(operationsCommand),

@@ -38,6 +38,8 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 /* @Deprecated To Be renamed */
 eskimo.KubernetesServicesConfig = function() {
 
+    const INSTALL_FLAG = "_install";
+
     // will be injected from glue
     this.eskimoMain = null;
     this.eskimoKubernetesServicesSelection = null;
@@ -144,19 +146,19 @@ eskimo.KubernetesServicesConfig = function() {
 
         // are they all selected already
         for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
-            if (!$('#' + KUBERNETES_SERVICES[i] + "_install").get(0).checked) {
+            if (!$('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).get(0).checked) {
                 allSelected = false;
             }
         }
 
         // select all boxes
         for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
-            $('#' + KUBERNETES_SERVICES[i] + "_install").get(0).checked = !allSelected;
+            $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).get(0).checked = !allSelected;
         }
     }
     this.selectAll = selectAll;
 
-    this.onKubernetesServiceSelected = function (serviceName) {
+    this.onKubernetesServiceSelected = function (serviceName, kubernetesConfig) {
 
         $('#' + serviceName + '_cpu_setting').html(
             '    <input style="width: 80px;" type="text" class="input-md" pattern="[0-9\\.]+[m]{0,1}" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu"></input>');
@@ -167,19 +169,31 @@ eskimo.KubernetesServicesConfig = function() {
         let cpuSet = false;
         let ramSet = false;
 
-        // FIXME fill with either previously configured settings or default settings from service definition
+        // Trying to get previouly configured value
+        if (kubernetesConfig) {
+            let cpuConf = kubernetesConfig[serviceName + "_cpu"];
+            if (cpuConf) {
+                $('#' + serviceName + '_cpu').val (cpuConf);
+                cpuSet = true;
+            }
+            let ramConf = kubernetesConfig[serviceName + "_ram"];
+            if (ramConf) {
+                $('#' + serviceName + '_ram').val (ramConf);
+                ramSet = true;
+            }
+        }
 
         // If no previously configured values have been found, take value from service definition
         let serviceKubeConfig = KUBERNETES_SERVICES_CONFIG[serviceName].kubeConfig;
         if (KUBERNETES_SERVICES_CONFIG[serviceName].kubeConfig) {
-            var request = serviceKubeConfig.request;
+            let request = serviceKubeConfig.request;
             if (request) {
-                var cpuString = request.cpu;
+                let cpuString = request.cpu;
                 if (!cpuSet && cpuString) {
                     $('#' + serviceName + '_cpu').val (cpuString);
                     cpuSet = true;
                 }
-                var ramString = request.ram;
+                let ramString = request.ram;
                 if (!ramSet && ramString) {
                     $('#' + serviceName + '_ram').val (ramString);
                     ramSet = true;
@@ -219,7 +233,7 @@ eskimo.KubernetesServicesConfig = function() {
                 KUBERNETES_SERVICES[i]+
                 '</td>'+
                 '<td style="text-align: center;">' +
-                '    <input  type="checkbox" class="input-md" name="' + KUBERNETES_SERVICES[i] +'_install" id="'+KUBERNETES_SERVICES[i] +'_install"></input>' +
+                '    <input  type="checkbox" class="input-md" name="' + KUBERNETES_SERVICES[i] + INSTALL_FLAG + '" id="'+KUBERNETES_SERVICES[i] + INSTALL_FLAG + '"></input>' +
                 '</td>' +
                 '<td id="' + KUBERNETES_SERVICES[i] + '_cpu_setting" style="text-align: center;">' +
                 '</td>' +
@@ -230,9 +244,9 @@ eskimo.KubernetesServicesConfig = function() {
             kubernetesServiceRow += '<tr>';
             kubernetesServicesTableBody.append (kubernetesServiceRow);
 
-            $('#' + KUBERNETES_SERVICES[i] +'_install').change (function() {
-                //alert(KUBERNETES_SERVICES[i] +'_install' + " - " + $('#' + KUBERNETES_SERVICES[i] +'_install').is(":checked"));
-                if ($('#' + KUBERNETES_SERVICES[i] +'_install').is(":checked")) {
+            $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).change (function() {
+                //alert(KUBERNETES_SERVICES[i] + INSTALL_FLAG + " - " + $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).is(":checked"));
+                if ($('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).is(":checked")) {
                     that.onKubernetesServiceSelected(KUBERNETES_SERVICES[i]);
                 } else {
                     that.onKubernetesServiceUnselected(KUBERNETES_SERVICES[i]);
@@ -243,7 +257,7 @@ eskimo.KubernetesServicesConfig = function() {
         if (kubernetesConfig) {
 
             for (let installFlag in kubernetesConfig) {
-                let indexOfInstall = installFlag.indexOf("_install");
+                let indexOfInstall = installFlag.indexOf(INSTALL_FLAG);
                 if (indexOfInstall > -1) {
                     let serviceName = installFlag.substring(0,indexOfInstall);
                     let flag = kubernetesConfig[installFlag];
@@ -251,9 +265,9 @@ eskimo.KubernetesServicesConfig = function() {
                     console.log (serviceName + " - " + flag);
 
                     if (flag == "on") {
-                        $('#' + serviceName + '_install').get(0).checked = true;
+                        $('#' + serviceName + INSTALL_FLAG).get(0).checked = true;
 
-                        that.onKubernetesServiceSelected(serviceName);
+                        that.onKubernetesServiceSelected(serviceName, kubernetesConfig);
                     }
 
                 }
@@ -336,7 +350,7 @@ eskimo.KubernetesServicesConfig = function() {
 
         for (let reinstallKey in reinstallConfig) {
 
-            let installKey = reinstallKey.substring(0, reinstallKey.indexOf("_reinstall")) + "_install";
+            let installKey = reinstallKey.substring(0, reinstallKey.indexOf("_reinstall")) + INSTALL_FLAG;
             model[installKey] = reinstallConfig[reinstallKey];
         }
 

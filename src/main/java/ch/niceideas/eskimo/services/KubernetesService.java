@@ -133,10 +133,24 @@ public class KubernetesService {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
+
     // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyKubernetesServicesConfig(KubernetesOperationsCommand operationsCommand) {
         throw new UnsupportedOperationException("To Be Implemented");
+    }
+
+    void restartServiceForSystem(KubernetesOperationsCommand.KubernetesOperationId operationId) throws SystemException {
+        systemOperationService.applySystemOperation(operationId,
+                ml -> {
+                    try {
+                        ml.addInfo(restartServiceKubernetesInternal(servicesDefinition.getService(operationId.getService())));
+                    } catch (KubernetesException e) {
+                        logger.error (e, e);
+                        throw new SystemException (e);
+                    }
+                },
+                status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK") );
     }
 
     // FIXME
@@ -407,19 +421,9 @@ public class KubernetesService {
             systemService.performPooledOperation(command.getUninstallations(), 1, kubernetesOperationWaitTimoutSeconds,
                     (operation, error) -> uninstallService(operation, kubeMasterNode));
 
-            /*
             // restarts
-            for (List<Pair<String, String>> restarts : servicesInstallationSorter.orderOperations (command.getRestarts(), nodesConfig, deadIps)) {
-                performPooledOperation(restarts, parallelismInstallThreadCount, kubernetesOperationWaitTimoutSeconds,
-                        (operation, error) -> {
-                            String service = operation.getKey();
-                            String node = operation.getValue();
-                            if (liveIps.contains(node)) {
-                                restartServiceForSystem(service, node);
-                            }
-                        });
-            }
-            */
+            systemService.performPooledOperation(command.getRestarts(), 1, kubernetesOperationWaitTimoutSeconds,
+                    (operation, error) -> restartServiceForSystem(operation));
 
             success = true;
         } catch (FileException | SetupException | SystemException | ServiceDefinitionException | NodesConfigurationException e) {

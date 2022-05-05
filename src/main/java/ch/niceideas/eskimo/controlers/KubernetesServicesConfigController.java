@@ -155,14 +155,16 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
 
             // Create OperationsCommand
             KubernetesOperationsCommand command = KubernetesOperationsCommand.create(
-                    servicesDefinition, systemService, serviceInstallStatus, kubeServicesConfig);
+                    servicesDefinition, systemService,
+                    configurationService.loadKubernetesServicesConfig(),
+                    serviceInstallStatus, kubeServicesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_KUBERNETES_OPERATIONS_COMMAND, command);
 
             return returnCommand (command);
 
-        } catch (JSONException | SetupException | FileException | KubernetesServicesConfigException e) {
+        } catch (JSONException | SetupException | FileException | KubernetesServicesConfigException | SystemException e) {
             logger.error(e, e);
             notificationService.addError("Kubernetes Services installation preparation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
@@ -203,7 +205,9 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
 
             // Create OperationsCommand
             KubernetesOperationsCommand command = KubernetesOperationsCommand.create(
-                    servicesDefinition, systemService, newServicesInstallStatus, kubeServicesConfig);
+                    servicesDefinition, systemService,
+                    configurationService.loadKubernetesServicesConfig(),
+                    newServicesInstallStatus, kubeServicesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);

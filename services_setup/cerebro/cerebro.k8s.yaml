@@ -100,12 +100,9 @@ spec:
             runAsUser: 3301
             runAsGroup: 3301
           resources:
-            limits:
-              cpu: "0.4"
-              memory: "400Mi"
             requests:
-              cpu: "0.4"
-              memory: "400Mi"
+              cpu: "$ESKIMO_KUBE_REQUEST_CEREBRO_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_CEREBRO_RAM"
       volumes:
         - name: var-log-elasticsearch
           hostPath:

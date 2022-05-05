@@ -92,11 +92,9 @@ spec:
         - name: kafka
           image: kubernetes.registry:5000/kafka
           resources:
-            limits:
-              memory: 2000Mi
             requests:
-              cpu: 1
-              memory: 2000Mi
+              cpu: "$ESKIMO_KUBE_REQUEST_KAFKA_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_KAFKA_RAM"
           ports:
             - containerPort: 9200
               name: http

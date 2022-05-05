@@ -65,8 +65,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     private final NodesConfigWrapper rawNodesConfig;
 
-    private List<ServiceOperationId> restarts = new ArrayList<>();
-
     public static ServiceOperationsCommand create (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
@@ -186,9 +184,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         //feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, (Set<String>) restartedServices);
 
         // XXX need to sort again since I am not relying on feedInRestartService which was taking care of sorting
-        List<ServiceOperationId> restarts = retCommand.getRestarts();
-        restarts.sort((o1, o2) -> servicesDefinition.compareServices(o1.getService(), o2.getService()));
-        retCommand.setRestarts(restarts);
+        retCommand.getRestarts().sort((o1, o2) -> servicesDefinition.compareServices(o1.getService(), o2.getService()));
 
         return retCommand;
     }
@@ -258,23 +254,15 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     void addRestartIfNotInstalled(String service, String node) {
         if (   !getInstallations().contains(new ServiceOperationId ("installation", service, node))
             && !getRestarts().contains(new ServiceOperationId ("restart", service, node))) {
-            restarts.add(new ServiceOperationId ("restart", service, node));
+            addRestart(new ServiceOperationId ("restart", service, node));
         }
-    }
-
-    public List<ServiceOperationId> getRestarts() {
-        return restarts;
-    }
-
-    private void setRestarts (List<ServiceOperationId> restarts) {
-        this.restarts = restarts;
     }
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("installations", new JSONArray(toJsonList(getInstallations())));
             put("uninstallations", new JSONArray(toJsonList(getUninstallations())));
-            put("restarts", new JSONArray(toJsonList(restarts)));
+            put("restarts", new JSONArray(toJsonList(getRestarts())));
         }});
     }
 
@@ -300,7 +288,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         getUninstallations().stream()
                 .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
-        restarts.stream()
+        getRestarts().stream()
                 .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
 

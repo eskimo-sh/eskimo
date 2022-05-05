@@ -240,6 +240,10 @@ spec:
             readOnlyRootFilesystem: true
             runAsUser: 3307
             runAsGroup: 3307
+          resources:
+            requests:
+              cpu: "$ESKIMO_KUBE_REQUEST_KUBERNETES_DASHBOARD_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_KUBERNETES_DASHBOARD_RAM"
       volumes:
         - name: kubernetes-dashboard-certs
           secret:
@@ -315,6 +319,10 @@ spec:
             readOnlyRootFilesystem: true
             runAsUser: 3307
             runAsGroup: 3307
+          resources:
+            requests:
+              cpu: "$ESKIMO_KUBE_REQUEST_KUBERNETES_DASHBOARD_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_KUBERNETES_DASHBOARD_RAM"
       serviceAccountName: kubernetes-dashboard
       hostNetwork: true
       nodeSelector:
