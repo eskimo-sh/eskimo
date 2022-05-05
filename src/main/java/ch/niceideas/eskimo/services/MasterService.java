@@ -216,36 +216,44 @@ public class MasterService {
 
                 for (Service service : masterServices) {
 
-                    MasterDetection masterDetection = service.getMasterDetection();
-                    MdStrategy strategy = masterDetection.getDetectionStrategy().getStrategy();
+                    // If service is available on a single node in anyway, don't bother going to master election
+                    List<String> serviceNodes = lastStatus.getAllNodesForServiceRegardlessStatus(service.getName());
+                    if (serviceNodes.size() == 1) {
+                        handleMasterDetectedDate(service, serviceNodes.get(0), new Date());
 
-                    // 3. If service is installed on multiple node, attempt to detect master
-                    List<String> nodes;
-                    if (service.isKubernetes()) {
-                        nodes = nodesConfig.getNodeAddresses();
                     } else {
-                        nodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
-                    }
 
-                    for (String node : nodes) {
+                        MasterDetection masterDetection = service.getMasterDetection();
+                        MdStrategy strategy = masterDetection.getDetectionStrategy().getStrategy();
 
-                        if (lastStatus.isServiceOKOnNode(service.getName(), node)) {
-
-                            try {
-                                Date masterElectedDate = strategy.detectMaster(
-                                        service, node, masterDetection, this, sshCommandService, notificationService);
-
-                                if (masterElectedDate != null) {
-                                    handleMasterDetectedDate(service, node, masterElectedDate);
-                                }
-
-                            } catch (MasterDetectionException e) {
-                                logger.warn(e.getMessage());
-                                logger.debug(e, e);
-                            }
+                        // 3. If service is installed on multiple node, attempt to detect master
+                        List < String > nodes;
+                        if (service.isKubernetes()) {
+                            nodes = nodesConfig.getNodeAddresses();
                         } else {
-                            if (!service.isKubernetes()) {
-                                logger.warn("Not checking if service " + service.getName() + " is master on " + node + " since service reports issues");
+                            nodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
+                        }
+
+                        for (String node : nodes) {
+
+                            if (lastStatus.isServiceOKOnNode(service.getName(), node)) {
+
+                                try {
+                                    Date masterElectedDate = strategy.detectMaster(
+                                            service, node, masterDetection, this, sshCommandService, notificationService);
+
+                                    if (masterElectedDate != null) {
+                                        handleMasterDetectedDate(service, node, masterElectedDate);
+                                    }
+
+                                } catch (MasterDetectionException e) {
+                                    logger.warn(e.getMessage());
+                                    logger.debug(e, e);
+                                }
+                            } else {
+                                if (!service.isKubernetes()) {
+                                    logger.warn("Not checking if service " + service.getName() + " is master on " + node + " since service reports issues");
+                                }
                             }
                         }
                     }

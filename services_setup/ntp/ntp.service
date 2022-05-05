@@ -49,6 +49,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         -i \
         --name ntp \
         -p 123:123/udp \
+        -p 123:123/tcp \
         --cap-add SYS_RESOURCE \
         --cap-add SYS_TIME \
         -v /var/log/ntp:/var/log/ntp \

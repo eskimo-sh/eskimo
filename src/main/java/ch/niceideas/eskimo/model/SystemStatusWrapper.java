@@ -127,9 +127,16 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         }
     }
 
+    public List<String> getAllNodesForServiceRegardlessStatus (String service) {
+        return getRootKeys().stream()
+                .filter(key -> key.contains(SERVICE_PREFIX + service + "_"))
+                .map(key -> getNodeName(key))
+                .collect(Collectors.toList());
+    }
+
     public boolean isServiceOKOnNode(String serviceName, String node) {
-        String marathonStatus = getValueForPathAsString(SERVICE_PREFIX + serviceName  + "_" + node.replace(".", "-"));
-        return StringUtils.isNotBlank(marathonStatus) && marathonStatus.equals("OK");
+        String serviceStatus = getValueForPathAsString(SERVICE_PREFIX + serviceName  + "_" + node.replace(".", "-"));
+        return StringUtils.isNotBlank(serviceStatus) && serviceStatus.equals("OK");
     }
 
 

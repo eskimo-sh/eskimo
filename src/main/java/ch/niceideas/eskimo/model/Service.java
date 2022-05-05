@@ -37,6 +37,8 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,7 +52,9 @@ public class Service {
     private String name;
 
     private final List<Dependency> dependencies = new ArrayList<>();
+
     private final List<String> additionalEnvironment= new ArrayList<>();
+
     private final List<EditableSettings> editableSettings = new ArrayList<>();
 
     // configuration

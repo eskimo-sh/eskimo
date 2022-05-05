@@ -64,6 +64,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     }
 
     @Test
+    public void testServiceToStringNoStackOverflow() {
+        assertDoesNotThrow(() ->  def.getService("flink").toString());
+    }
+
+    @Test
     public void testAfterPropertiesSet() throws Exception {
         assertEquals (19, def.listAllServices().length);
     }

@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.eskimo.services.EditablePropertyType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 public class EditableSettings {
 
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private final Service service;
 
     private final String filename;
