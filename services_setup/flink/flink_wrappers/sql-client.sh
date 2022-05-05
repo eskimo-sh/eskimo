@@ -67,8 +67,6 @@ fi
 #echo $DOCKER_VOLUMES_ARGS
 
 
-export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
-
 /usr/bin/docker run \
         -it \
         --rm \
@@ -76,8 +74,6 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         --user flink \
         --privileged \
         $DOCKER_VOLUMES_ARGS \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         --mount type=bind,source=/home/flink/.kube/config,target=/home/flink/.kube/config \

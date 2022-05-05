@@ -56,6 +56,29 @@ for argument in "$@"; do
     fi
 done
 
+# last parameter is file to execute
+last_param=${@:${#@}}
+# Only if last param is not an option starting with "-"
+if [[ -d $last_param ]]; then
+    export LAST_ARG_DIR=$last_param
+    export FILENAME_ARG=""
+else
+    if [[ -f $last_param ]]; then
+        export LAST_ARG_DIR=`dirname $last_param`
+
+        # manipulating file path
+        export FILENAME_ARG=`realpath $last_param`
+        export LAST_ARG_DIR=`realpath $LAST_ARG_DIR`
+        set -- "${@:1:$(($#-1))}"
+    fi
+fi
+
+if [[ "$LAST_ARG_DIR" != "" ]]; then
+    if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$LAST_ARG_DIR:$LAST_ARG_DIR:slave"` == "" ]]; then
+        export DOCKER_VOLUMES_ARGS=" -v $LAST_ARG_DIR:$LAST_ARG_DIR:slave $DOCKER_VOLUMES_ARGS"
+    fi
+fi
+
 # Add standard folders if not already part of it
 if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/flink` == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/lib/flink:/var/lib/flink:shared $DOCKER_VOLUMES_ARGS"
@@ -66,9 +89,6 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-
-export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
-
 /usr/bin/docker run \
         -it \
         --rm \
@@ -76,8 +96,6 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         --user flink \
         --privileged \
         $DOCKER_VOLUMES_ARGS \
-        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         --mount type=bind,source=/home/flink/.kube/config,target=/home/flink/.kube/config \
@@ -85,6 +103,6 @@ export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | 
         -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
         kubernetes.registry:5000/flink \
-        /usr/local/bin/flink "$@"
+        /usr/local/bin/flink "$@" $FILENAME_ARG
 
 # -p 5000-5010:5000-5010 \

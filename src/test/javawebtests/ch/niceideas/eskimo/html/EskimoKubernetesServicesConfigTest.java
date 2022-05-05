@@ -105,12 +105,24 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         page.getElementById("save-kubernetes-servicesbtn").click();
 
         JSONObject expectedConfig = new JSONObject("" +
-                "{\"cerebro_install\":\"on\"," +
-                "\"grafana_install\":\"on\"," +
+                "{\"zeppelin_ram\":\"1G\"," +
+                "\"kibana_ram\":\"1G\"," +
+                "\"kafka-manager_ram\":\"1G\"," +
+                "\"cerebro_ram\":\"1G\"," +
                 "\"kafka-manager_install\":\"on\"," +
-                "\"kibana_install\":\"on\"," +
                 "\"spark-history-server_install\":\"on\"," +
-                "\"zeppelin_install\":\"on\"}");
+                "\"spark-history-server_ram\":\"1G\"," +
+                "\"kafka-manager_cpu\":\"1\"," +
+                "\"grafana_ram\":\"1G\"," +
+                "\"cerebro_install\":\"on\"," +
+                "\"spark-history-server_cpu\":\"1\"," +
+                "\"zeppelin_cpu\":\"1\"," +
+                "\"kibana_cpu\":\"1\"," +
+                "\"zeppelin_install\":\"on\"," +
+                "\"kibana_install\":\"on\"," +
+                "\"grafana_install\":\"on\"," +
+                "\"cerebro_cpu\":\"1\"," +
+                "\"grafana_cpu\":\"1\"}");
 
         JSONObject actualConfig = new JSONObject((String)js("window.savedKubernetesConfig").getJavaScriptResult());
         assertTrue(expectedConfig.similar(actualConfig));
