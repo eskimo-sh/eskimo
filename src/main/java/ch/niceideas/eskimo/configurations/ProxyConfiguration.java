@@ -123,7 +123,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebSocketProxyServer(proxyManagerService, servicesDefinition), Arrays.stream(servicesDefinition.listProxiedServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
-                .map(service -> "/ws/" + service.getName() + "/*")
+                .map(service -> "/ws/" + service.getName() + "/**")
                 .toArray(String[]::new));
     }
 

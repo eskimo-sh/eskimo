@@ -77,6 +77,8 @@ sed -i s/"#path.logs: \/path\/to\/logs"/"path.logs: \/usr\/local\/lib\/elasticse
 sed -i s/"#bootstrap.memory_lock: true"/"bootstrap.memory_lock: false"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 sed -i s/"#network.host: 192.168.0.1"/"network.host: 0.0.0.0"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
+sed -i s/"#action.destructive_requires_name: false"/"action.destructive_requires_name: false"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+
 echo " - Creating eskimo specific configurations"
 bash -c "echo -e \"\n# ------------------------------- Eskimo specific ------------------------------\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 

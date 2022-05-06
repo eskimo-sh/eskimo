@@ -219,7 +219,10 @@ public class MasterService {
                     // If service is available on a single node in anyway, don't bother going to master election
                     List<String> serviceNodes = lastStatus.getAllNodesForServiceRegardlessStatus(service.getName());
                     if (serviceNodes.size() == 1) {
-                        handleMasterDetectedDate(service, serviceNodes.get(0), new Date());
+
+                        serviceMasterTimestamps.put(service.getName(),
+                                new Date(System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L * 10L))); // 10 years ago
+                        serviceMasterNodes.put(service.getName(), serviceNodes.get(0));
 
                     } else {
 

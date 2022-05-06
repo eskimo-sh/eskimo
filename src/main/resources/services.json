@@ -1076,7 +1076,11 @@
       "icon" : "images/zeppelin-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 38080,
+
+      "__comment_urlTemplate": "Going through Kubectl proxy.",
+      "urlTemplate": "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/#/",
+      "__comment_proxyTargetPort": "Kubectl proxy target port",
+      "proxyTargetPort" : 8001,
       "waitTime": 8000,
       "role" : "*",
       "title" : "Zeppelin",
@@ -1085,7 +1089,7 @@
         {
           "type" : "PLAIN",
           "source" : "return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws",
-          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws/zeppelin/ws"
+          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws\" + e(location.pathname) + \"/ws"
         },
         {
           "type" : "PLAIN",
@@ -1114,15 +1118,8 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "flink-app-master",
-        "numberOfMasters": 1,
         "mandatory": false,
-        "restart": true
+        "restart": false
       },
       {
         "masterElectionStrategy": "FIRST_NODE",
@@ -1144,13 +1141,6 @@
         "numberOfMasters": 1,
         "mandatory": false,
         "restart": true
-      },
-      {
-        "masterElectionStrategy": "RANDOM",
-        "masterService": "spark-executor",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
       },
       {
         "masterElectionStrategy": "RANDOM",

@@ -71,19 +71,19 @@ fail_if_error $? "/tmp/zeppelin_install_log" -2
 rm -f zeppelin-$ZEPPELIN_VERSION*gz
 
 # Appply patches if any
-if [[ -d /patches ]]; then
-
-    echo " - Applying binary patches"
-    for i in `find /patches -name apply_patch.sh`; do
-        patch_dir=`dirname $i`
-        echo "   + Appyling $patch_dir"
-        cd $patch_dir
-        bash $i > /tmp/zep_patch.log
-        fail_if_error $? "/tmp/zep_patch.log" -1
-    done
-
-    cd /tmp/zeppelin_setup/
-fi
+#if [[ -d /patches ]]; then
+#
+#    echo " - Applying binary patches"
+#    for i in `find /patches -name apply_patch.sh`; do
+#        patch_dir=`dirname $i`
+#        echo "   + Appyling $patch_dir"
+#        cd $patch_dir
+#        bash $i > /tmp/zep_patch.log
+#        fail_if_error $? "/tmp/zep_patch.log" -1
+#    done
+#
+#    cd /tmp/zeppelin_setup/
+#fi
 
 
 echo " - Installing Zeppelin"

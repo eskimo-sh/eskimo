@@ -110,30 +110,14 @@ echo " - Building container zeppelin"
 build_container zeppelin zeppelin zeppelin_install_log
 
 
-if [[ -z $TEST_MODE && ! -d /var/lib/spark/data ]]; then
-    echo "Inconsistency: zeppelin setup is expecting var/lib/spark/data to be created by the spark executor setup (kind of a hack)"
-    exit 21
-fi
-if [[ -z $TEST_MODE && ! -d /var/lib/spark/eventlog ]]; then
-    echo "Inconsistency: zeppelin setup is expecting var/lib/spark/eventlog to be created by the spark executor setup (kind of a hack)"
-    exit 22
-fi
-
-# I shouldn't be creating here anymore
-#sudo mkdir -p /var/lib/spark/data/zeppelin/notebooks
-#sudo chown spark -R /var/lib/spark/data/zeppelin/
-
-#sudo mkdir -p /usr/local/etc/zeppelin
-#sudo chown -R zeppelin /usr/local/etc/zeppelin
-
 # create and start container
 echo " - Running docker container"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
         -d --name zeppelin \
-        -v /var/log/zeppelin:/var/log/zeppelin \
-        -v /var/run/zeppelin:/var/run/zeppelin \
+        -v /var/log/spark:/var/log/spark \
+        -v /var/run/spark:/var/run/spark \
         -v /var/lib/spark:/var/lib/spark:rshared \
         -v /usr/local/lib:/usr/local/host_lib:ro \
         -i \
@@ -216,15 +200,6 @@ docker_cp_script glusterMountChecker.sh sbin zeppelin zeppelin_install_log
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin zeppelin zeppelin_install_log
 
-if [[ -f /usr/local/bin/mesos-cli.sh ]]; then
-    echo " - Copying mesos-cli"
-    docker cp /usr/local/bin/mesos-cli.sh zeppelin:/usr/local/bin/mesos-cli.sh >> zeppelin_install_log 2>&1
-    fail_if_error $? "zeppelin_install_log" -20
-
-    docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/mesos-cli.sh" >> zeppelin_install_log 2>&1
-    fail_if_error $? "zeppelin_install_log" -21
-fi
-
 # if /usr/local/bin/logstash-cli is found, then copy it to container
 if [[ -f /usr/local/bin/logstash-cli ]]; then
 
@@ -258,7 +233,7 @@ commit_container zeppelin zeppelin_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon zeppelin zeppelin_install_log
+deploy_kubernetes zeppelin zeppelin_install_log
 
 
 

@@ -63,7 +63,7 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.niceideas.zeppelin</groupId>
-    <artifactId>connecorsDownloadProject</artifactId>
+    <artifactId>connectorsDownloadProject</artifactId>
     <version>$ZEPPELIN_VERSION_FULL</version>
     <packaging>jar</packaging>
     <name>minimal-pom</name>
@@ -75,7 +75,7 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
     <dependencies>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <artifactId>elasticsearch-rest-client</artifactId>
             <version>$ES_VERSION</version>
         </dependency>
         <dependency>

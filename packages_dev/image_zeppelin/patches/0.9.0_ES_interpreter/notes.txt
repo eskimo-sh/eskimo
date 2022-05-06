@@ -1,4 +1,0 @@
-
-
-This is basically a recompilation of HttpBaseClient.java with following patch required for ES 7.x
-sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java

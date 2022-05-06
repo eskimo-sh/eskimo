@@ -42,15 +42,14 @@ echo " - Loading Topology"
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 2
 fi
 
-export ESMASTER_IP_ADDRESS=`eval echo "\$"$(echo SELF_MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-if [[ $ESMASTER_IP_ADDRESS == "" ]]; then
-    echo " - No ES master found in topology for $SELF_IP_ADDRESS"
-    exit -3
+export KUBERNETES_API_MASTER=$MASTER_KUBE_MASTER_1
+if [[ $KUBERNETES_API_MASTER == "" ]]; then
+    echo " - No Kubernetes API master found in topology"
+    exit 3
 fi
-
 
 echo " - Adapting configuration files and scripts"
 
@@ -59,7 +58,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"localhost\",'\
 '/'\
 '          \"name\": \"elasticsearch.host\",\n'\
-'          \"value\": \"'"$ESMASTER_IP_ADDRESS"'\",'\
+'          \"value\": \"elasticsearch.default.svc.cluster.eskimo\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 # zeppelin pre-0.9-final
@@ -76,7 +75,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"local\[\*\]\",'\
 '/'\
 '          \"name\": \"spark.master\",\n'\
-'          \"value\": \"'"mesos:\/\/zk:\/\/$ZOOKEEPER_IP_ADDRESS:2181\/mesos"'\",'\
+'          \"value\": \"'"k8s:\/\/https:\/\/$KUBERNETES_API_MASTER:6443"'\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 sed -i -n '1h;1!H;${;g;s/'\
@@ -84,7 +83,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"\",'\
 '/'\
 '          \"name\": \"flink.execution.remote.host\",\n'\
-'          \"value\": \"'"$MASTER_FLINK_APP_MASTER_1"'\",'\
+'          \"value\": \"flink.default.svc.cluster.eskimo\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 

@@ -70,11 +70,12 @@ public class WebSocketProxyForwarder {
     }
 
     WebSocketSession createWebSocketClientSession() {
+        String targetWsUri = "(undefined yet)";
         try {
 
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig(serviceId);
 
-            String targetWsUri = WS_LOCALHOST_PREFIX + config.getLocalPort() + targetPath;
+            targetWsUri = WS_LOCALHOST_PREFIX + config.getLocalPort() + targetPath;
 
             WebSocketHttpHeaders headers = getWebSocketHttpHeaders(webSocketServerSession);
 
@@ -88,6 +89,7 @@ public class WebSocketProxyForwarder {
             return clientSession;
 
         } catch (URISyntaxException | ExecutionException | TimeoutException e) {
+            logger.error ("Caught " + e.getClass() + " - " + e.getMessage() + " while reaching " + targetWsUri);
             logger.error (e, e);
             throw new ProxyException(e);
 

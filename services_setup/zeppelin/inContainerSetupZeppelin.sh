@@ -74,14 +74,6 @@ bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /tmp/zeppelin_import_log\" >>
 chown spark /var/lib/spark
 
 
-echo " - Finding mesos"
-bash -c "echo AMESOS_VERSION=`find /usr/local/host_lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"mesos-*.*\" | cut -d '-' -f 2` > /run/zeppelin_mesos_environment"
-sleep 1
-. /run/zeppelin_mesos_environment
-ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION
-ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos
-
-
 echo " - Creating Zeppelin env file"
 cp /usr/local/lib/zeppelin/conf/zeppelin-env.sh.template /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
@@ -95,8 +87,6 @@ sudo sed -i s/"# export ZEPPELIN_LOCAL_IP"/"export ZEPPELIN_LOCAL_IP=0.0.0.0"/g 
 
 
 
-
-
 sudo sed -i s/"# export ZEPPELIN_LOG_DIR"/"export ZEPPELIN_LOG_DIR=\/var\/log\/spark\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 sudo sed -i s/"# export ZEPPELIN_PID_DIR"/"export ZEPPELIN_PID_DIR=\/var\/run\/spark\/zeppelin\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 sudo sed -i s/"# export ZEPPELIN_NOTEBOOK_DIR"/"export ZEPPELIN_NOTEBOOK_DIR=\/var\/lib\/spark\/data\/zeppelin\/notebooks\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
@@ -106,6 +96,9 @@ sudo sed -i s/"# export ZEPPELIN_IDENT_STRING"/"export ZEPPELIN_IDENT_STRING=esk
 sudo sed -i s/"# export SPARK_HOME"/"export SPARK_HOME=\/usr\/local\/lib\/spark\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
 sudo bash -c 'echo -e "\n\nexport FLINK_HOME=/usr/local/lib/flink/" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
+
+# Disabling zeppelin interpreter execution as kubernetes pods (ZEPPELIN_RUN_MODE=k8s)
+sudo bash -c 'echo -e "\n\nexport ZEPPELIN_RUN_MODE=local" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
 
 
 
