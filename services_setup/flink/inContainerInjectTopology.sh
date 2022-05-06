@@ -56,8 +56,8 @@ sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /
 
 
 # TODO need to be set through settings injector
-bash -c "echo -e \"kubernetes.jobmanager.cpu: 0.2\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-bash -c "echo -e \"kubernetes.taskmanager.cpu: 0.5\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#bash -c "echo -e \"kubernetes.jobmanager.cpu: 0.2\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+#bash -c "echo -e \"kubernetes.taskmanager.cpu: 0.5\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 
 

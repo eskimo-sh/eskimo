@@ -93,13 +93,6 @@ if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` 
     exit 103
 fi
 
-#echo " - Installing Kubernetes client connector"
-#docker exec -i spark_template bash /scripts/installKubeClient.sh | tee  /tmp/spark_build_log 2>&1
-#if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-#    echo " - In container install script ended up in error"
-#    cat /tmp/spark_build_log
-#    exit 103
-#fi
 
 echo " - Installing Spark-Kafka connector"
 docker exec -i spark_template bash /scripts/installSparkKafkaConnector.sh  | tee /tmp/spark_build_log 2>&1
@@ -111,7 +104,7 @@ fi
 
 
 #echo " - TODO"
-#docker exec -it spark_template bash
+docker exec -it spark_template bash
 
 
 echo " - Cleaning up image"

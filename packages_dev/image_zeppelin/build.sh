@@ -112,6 +112,10 @@ rm -f __installKafkaEff.sh
 #docker exec -i zeppelin_template apt-get install -y openjdk-8-jdk > /tmp/spark_build_log 2>&1
 #fail_if_error $? "/tmp/zeppelin_build_log" -3
 
+
+docker exec -it zeppelin_template bash
+
+
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
 

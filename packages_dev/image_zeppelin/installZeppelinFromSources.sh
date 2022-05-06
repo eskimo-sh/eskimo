@@ -120,16 +120,16 @@ cd zeppelin/
 su $USER_TO_USE -c "./dev/change_scala_version.sh $SCALA_VERSION"  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
-echo " - HACK - Fixing ElasticSearch interpreter"
-sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
+#echo " - HACK - Fixing ElasticSearch interpreter"
+#sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
 
-echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
+#echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
 
-echo " - Fixing Java interpreter"
-rm /etc/alternatives/java
-ln -s /usr/lib/jvm/java-8-openjdk-amd64/bin/java /etc/alternatives/java
+#echo " - Fixing Java interpreter"
+#rm /etc/alternatives/java
+#ln -s /usr/lib/jvm/java-8-openjdk-amd64/bin/java /etc/alternatives/java
 
 echo " - build zeppelin with all interpreters"
 for i in `seq 1 2`; do  # 2 attempts since sometimes download of packages fails

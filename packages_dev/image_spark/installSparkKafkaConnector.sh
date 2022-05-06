@@ -72,52 +72,51 @@ echo " - Changing to temp directory"
 mkdir -p /tmp/spark_streaming_kafka_deps
 cd /tmp/spark_streaming_kafka_deps
 
-# Dependencies I need :
-# (Note : obtained by :
-#   - /usr/local/bin/run-example --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.3 SparkPi and
-#   - /usr/local/bin/run-example --packages org.apache.spark:spark-streaming-kafka-0-10_2.11:2.4.3 SparkPi
-# )
-#https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.11/2.4.3/spark-sql-kafka-0-10_2.11-2.4.3.jar
-#https://repo1.maven.org/maven2/org/apache/spark/spark-streaming-kafka-0-10_2.11/2.4.3/spark-streaming-kafka-0-10_2.11-2.4.3.jar
-#https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/2.0.0/kafka-clients-2.0.0.jar
-#https://repo1.maven.org/maven2/org/spark-project/spark/unused/1.0.0/unused-1.0.0.jar
 
-# These are needed as well but already in /usr/local/lib/spark/jars as it seems:
-#https://repo1.maven.org/maven2/org/lz4/lz4-java/1.4.0/lz4-java-1.4.0.jar
-#https://repo1.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.7.3/snappy-java-1.1.7.3.jar
-#https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.16/slf4j-api-1.7.16.jar
+echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
+         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">
+    <modelVersion>4.0.0</modelVersion>
 
-# Rather hardcoded list of dependencies to be fetched for spark streaming !
-spark_streaming_dependencies="
-    https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-"$SPARK_STREAMING_KAFKA_CON_VERSION"_"$SCALA_VERSION"/$SPARK_VERSION/spark-sql-kafka-"$SPARK_STREAMING_KAFKA_CON_VERSION"_"$SCALA_VERSION"-$SPARK_VERSION.jar
-    https://repo1.maven.org/maven2/org/apache/spark/spark-streaming-kafka-"$SPARK_STREAMING_KAFKA_CON_VERSION"_"$SCALA_VERSION"/$SPARK_VERSION/spark-streaming-kafka-"$SPARK_STREAMING_KAFKA_CON_VERSION"_"$SCALA_VERSION"-$SPARK_VERSION.jar
-    https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/"$SPARK_STREAMING_KAFKA_CLIENT_VERSION"/kafka-clients-"$SPARK_STREAMING_KAFKA_CLIENT_VERSION".jar
-    https://repo1.maven.org/maven2/org/spark-project/spark/unused/"$SPARK_UNUSED_VERSION"/unused-"$SPARK_UNUSED_VERSION".jar"
+    <groupId>ch.niceideas.spark</groupId>
+    <artifactId>kafkaConnectorsDownloadProject</artifactId>
+    <version>$SPARK_VERSION</version>
+    <packaging>jar</packaging>
+    <name>minimal-pom</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.11</java.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-${SPARK_STREAMING_KAFKA_CON_VERSION}_${SCALA_VERSION}</artifactId>
+            <version>$SPARK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql-kafka-${SPARK_STREAMING_KAFKA_CON_VERSION}_${SCALA_VERSION}</artifactId>
+            <version>$SPARK_VERSION</version>
+        </dependency>
+    </dependencies>
+</project>" > pom.xml
 
 
-for i in $spark_streaming_dependencies; do
-    echo " - Downloading $i"
-    wget $i > /tmp/kafka_install_log 2>&1
-    if [[ $? != 0 ]]; then
-        echo " -> Failed to downolad $i"
-        exit -1
-    fi
-done
+echo " - Proceeding with download of connectors and dependencies"
+mvn dependency:copy-dependencies > /tmp/spark_kafka_install_log 2>&1
+fail_if_error $? "/tmp/spark_kafka_install_log" -25
 
-for i in `ls -1`; do
-    echo " - Installing $i"
-
-    sudo cp $i /usr/local/lib/spark/jars/
-    if [[ $? != 0 ]]; then
-        echo " -> Failed to install $i"
-        exit -2
-    fi
-done
+echo " - Copying connectors with dependencies to spark distribution folder"
+cd target/dependency/
+# omiting log4j-api
+find ./ ! -name 'log4j-api*' -exec cp -t /usr/local/lib/spark/jars/ {} + 2>/dev/null
 
 sudo rm -Rf /tmp/spark_streaming_kafka_deps
 returned_to_saved_dir
 
-
+echo " - Cleaning up maven repository"
+sudo rm -Rf $HOME/.m2/repository
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container install SUCCESS"

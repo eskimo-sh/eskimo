@@ -54,6 +54,6 @@ fi
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:kafka \
+        kubernetes.registry:5000/kafka \
         /usr/local/sbin/kafka-replica-verification.sh "$@"
 
