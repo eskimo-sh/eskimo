@@ -224,6 +224,10 @@ public class NodesConfigurationChecker {
                     && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
 
                 Service service = servicesDefinition.getService(property.getServiceName());
+                if (service == null) {
+                    throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
+                            + " doesn't exist in ServiceDefinition");
+                }
                 if (service.isKubernetes()) {
                     throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
                             + " is a kubernetes service which should not be selectable here.");

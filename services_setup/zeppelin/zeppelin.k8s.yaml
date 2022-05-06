@@ -84,6 +84,11 @@ spec:
             - containerPort: 38081
               protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           volumeMounts:
             - name: home-spark-kube
               mountPath: /home/spark/.kube

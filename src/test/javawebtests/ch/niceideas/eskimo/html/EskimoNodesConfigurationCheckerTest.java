@@ -73,8 +73,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        js("var UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"kubernetes\" ];");
-        js("var MULTIPLE_SERVICES = [\"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\"];");
+        js("var UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\" ];");
+        js("var MULTIPLE_SERVICES = [\"kube-slave\", \"prometheus\", \"gluster\", \"logstash\", \"etcd\"];");
         js("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -89,11 +89,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testRangeOfIps() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11-192.168.10.15");
+            put("node_id2", "192.168.10.16");
             put("ntp1", "on");
+            put("ntp2", "on");
+            put("zookeeper", "2");
             put("gluster1", "on");
+            put("gluster2", "on");
             put("prometheus1", "on");
+            put("prometheus2", "on");
         }});
 
         js ("callCheckNodeSetup(" + nodesConfig.toString() + ")");
@@ -103,7 +108,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testNotAnIpAddress() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "blabla");
                 put("ntp1", "on");
                 put("prometheus1", "on");
@@ -119,56 +124,22 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testCheckNodesSetupMultipleOK() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.10.12");
-            put("kubernetes", "2");
-            put("elasticsearch1", "on");
-            put("elasticsearch2", "on");
-            put("kafka1", "on");
-            put("kafka2", "on");
             put("ntp1", "on");
             put("ntp2", "on");
+            put("prometheus1", "on");
+            put("prometheus2", "on");
             put("gluster1", "on");
             put("gluster2", "on");
+            put("etcd1", "on");
+            put("etcd2", "on");
             put("logstash1", "on");
             put("logstash2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("mesos-master", "1");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("zookeeper", "1");
-        }});
-
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-    }
-
-    @Test
-    public void testCheckNodesSetupMultipleOKWithFlink() throws Exception {
-
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("node_id2", "192.168.10.12");
-            put("kubernetes", "2");
-            put("elasticsearch1", "on");
-            put("elasticsearch2", "on");
-            put("kafka1", "on");
-            put("kafka2", "on");
-            put("ntp1", "on");
-            put("ntp2", "on");
-            put("gluster1", "on");
-            put("gluster2", "on");
-            put("logstash1", "on");
-            put("logstash2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("mesos-master", "1");
-            put("flink-app-master", "2");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("flink-worker1", "on");
-            put("flink-worker2", "on");
+            put("kube-slave1", "on");
+            put("kube-slave2", "on");
+            put("kube-master", "1");
             put("zookeeper", "1");
         }});
 
@@ -178,27 +149,22 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testCheckNodesSetupMultipleOKWithRange() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12-192.160.10.15");
-                put("kubernetes", "1");
-                put("elasticsearch1", "on");
-                put("elasticsearch2", "on");
-                put("kafka1", "on");
-                put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
                 put("prometheus1", "on");
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
+                put("etcd1", "on");
+                put("etcd2", "on");
                 put("logstash1", "on");
                 put("logstash2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
+                put("kube-slave1", "on");
+                put("kube-slave2", "on");
+                put("kube-master", "1");
                 put("zookeeper", "1");
         }});
 
@@ -208,18 +174,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testCheckNodesSetupSingleOK() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("kubernetes", "1");
-                put("elasticsearch1", "on");
-                put("kafka1", "on");
-                put("ntp1", "on");
-                put("gluster1", "on");
-                put("logstash1", "on");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("zookeeper", "1");
+        JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
+            put("node_id1", "192.168.10.11");
+            put("etcd1", "on");
+            put("ntp1", "on");
+            put("gluster1", "on");
+            put("prometheus1", "on");
+            put("logstash1", "on");
+            put("kube-slave1", "on");
+            put("kube-master", "1");
+            put("zookeeper", "1");
         }});
 
         js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
@@ -229,58 +193,48 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testUniqueServiceOnRange() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12-192.160.10.15");
-                put("kubernetes", "2");
-                put("elasticsearch1", "on");
-                put("elasticsearch2", "on");
-                put("kafka1", "on");
-                put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
                 put("prometheus1", "on");
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
+                put("etcd1", "on");
+                put("etcd2", "on");
                 put("logstash1", "on");
                 put("logstash2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
-                put("zookeeper", "1");
+                put("kube-slave1", "on");
+                put("kube-slave2", "on");
+                put("kube-master", "1");
+                put("zookeeper", "2");
             }});
 
             js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Node 2 is a range an declares service kubernetes which is a unique service, hence forbidden on a range."));
+        assertTrue(exception.getMessage().startsWith("Node 2 is a range an declares service zookeeper which is a unique service, hence forbidden on a range."));
     }
 
     @Test
     public void testMissingGluster() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12");
-                put("kubernetes", "2");
-                put("elasticsearch1", "on");
-                put("elasticsearch2", "on");
-                put("kafka1", "on");
-                put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
+                put("etcd1", "on");
+                put("etcd2", "on");
                 put("logstash1", "on");
                 put("logstash2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
+                put("kube-slave1", "on");
+                put("kube-slave2", "on");
+                put("kube-master", "1");
                 put("zookeeper", "1");
             }});
 
@@ -295,7 +249,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testNoIPConfigured() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "");
             }});
 
@@ -310,7 +264,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testKeyGreaterThanNodeNumber() throws Exception {
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id2", "192.168.10.11");
             }});
 
@@ -322,39 +276,17 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testTwoSparkNodesAndNoGLuster() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("node_id2", "192.168.10.12");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
-                put("ntp1", "on");
-                put("ntp2", "on");
-            }});
-
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
-    }
-
-    @Test
     public void testGlusterNoMoreDisabledOnSingleNode() throws Exception {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("kubernetes", "1");
-            put("elasticsearch1", "on");
             put("ntp1", "on");
-            put("kafka1", "on");
+            put("prometheus1", "on");
             put("gluster1", "on");
             put("logstash1", "on");
-            put("mesos-agent1", "on");
-            put("mesos-master", "1");
-            put("spark-executor1", "on");
+            put("etcd1", "on");
+            put("kube-slave1", "on");
+            put("kube-master", "1");
             put("zookeeper", "1");
         }});
 
@@ -365,16 +297,14 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     public void testNoGlusterOnSingleNode() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                put("kubernetes", "1");
-                put("elasticsearch1", "on");
                 put("ntp1", "on");
-                put("kafka1", "on");
+                put("etcd1", "on");
+                put("prometheus1", "on");
                 put("logstash1", "on");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
+                put("kube-slave1", "on");
+                put("kube-master", "1");
                 put("zookeeper", "1");
             }});
 
@@ -387,167 +317,67 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSparkButNoMesosAgent() throws Exception {
+    public void testKubeSlaveButNoKubeMaster() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                put("mesos-master", "1");
-                put("ntp", "1");
-                put("gluster", "1");
-                put("spark-executor1", "on");
-                put("kubernetes", "1");
-                put("zookeeper", "1");
-            }});
-
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-executor was expecting a service mesos-agent on same node, but none were found !"));
-    }
-
-    @Test
-    public void testMesosAgentButNoMesosMaster() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                //put("mesos-master", "1");
-                put("spark-executor1", "on");
+                put("kube-slave1", "on");
+                //put("kube-master", "1");
                 put("zookeeper", "1");
                 put("ntp1", "on");
+                put("etcd1", "on");
                 put("gluster1", "on");
+                put("prometheus1", "on");
             }});
 
             js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent expects 1 mesos-master instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service kube-slave expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test
-    public void testMesosAgentButNoSparkExecutor() throws Exception {
+    public void testGlusterButNoZookeeper() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                //put("spark-executor1", "on");
-                put("zookeeper", "1");
+                put("kube-slave1", "on");
+                put("kube-master", "1");
                 put("ntp1", "on");
+                put("etcd1", "on");
                 put("gluster1", "on");
+                put("prometheus1", "on");
+                //put("zookeeper", "1");
             }});
 
             js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent was expecting a service spark-executor on same node, but none were found !"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service gluster expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
-
-    @Test
-    public void testMesosAgentFlinkAppMasterButNoFlinkWorker() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("flink-app-master", "1");
-                put("spark-executor1", "on");
-                //put("flink-worker1", "on");
-                put("zookeeper", "1");
-                put("ntp1", "on");
-                put("gluster1", "on");
-            }});
-
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent was expecting a service flink-worker on same node, but none were found !"));
-    }
-
-    @Test
-    public void testOnlyESIsOK() throws Exception {
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("elasticsearch1", "on");
-            put("ntp1", "on");
-            put("gluster1", "on");
-            put("prometheus1", "on");
-        }});
-
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-    }
-
-    @Test
-    public void testMesosMasterButNoZookeeper() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                put("ntp1", "on");
-                put("gluster", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-            }});
-
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service mesos-agent expects 1 zookeeper instance(s). But only 0 has been found !"));
-    }
-
-    @Test
-    public void testFlinkAndZookeeperSeparatedIsNowOK() throws Exception {
-
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("node_id2", "192.168.10.12");
-            put("ntp1", "on");
-            put("ntp2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
-            put("gluster1", "on");
-            put("gluster2", "on");
-            put("mesos-master", "1");
-            put("zookeeper", "1");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("flink-worker1", "on");
-            put("flink-worker2", "on");
-            put("flink-app-master", "2");
-        }});
-
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
-    }
-
 
     @Test
     public void testNoKubernetesServiceCanBeSelected() throws Exception {
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
+                put("etcd1", "on");
+                put("etcd2", "on");
+                put("kube-slave1", "on");
+                put("kube-slave2", "on");
                 put("prometheus1", "on");
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("mesos-master", "1");
+                put("kube-master", "1");
                 put("zookeeper", "1");
                 put("cerebro", "2");
             }});

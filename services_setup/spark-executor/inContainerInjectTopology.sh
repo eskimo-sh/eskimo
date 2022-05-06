@@ -52,7 +52,7 @@ sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_data /var/lib/sp
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/lib/spark/eventlog spark
 
 # silent
-#echo " - Adapting configuration files and scripts"
+echo " - Adapting configuration files and scripts"
 bash -c "echo -e \"\n#Defining the kubernetes API master\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 bash -c "echo -e \"spark.kubernetes.driver.master=https://${KUBERNETES_API_MASTER}:6443\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 bash -c "echo -e \"spark.master=k8s://https://${KUBERNETES_API_MASTER}:6443\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
@@ -73,8 +73,11 @@ fi
 
 # defining driver bind IP address at runtime
 if [[ -z $DONT_MANAGE_IPS_AND_HOSTS ]]; then
-     bash -c "echo -e \"spark.driver.host=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.driver.host=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.driver.bindAddress=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 fi
+
+bash -c "echo -e \"spark.kubernetes.executor.request.cores=$ESKIMO_KUBE_REQUEST_SPARK_EXECUTOR_CPU\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 #echo " - Updating spark environment file"
 #bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"

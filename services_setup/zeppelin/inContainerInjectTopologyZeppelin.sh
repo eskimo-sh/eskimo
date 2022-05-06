@@ -92,3 +92,7 @@ if [[ $MEMORY_ZEPPELIN != "" ]]; then
 
     sed -i s/"# export ZEPPELIN_MEM"/"export ZEPPELIN_MEM\"=-Xmx"$MEMORY_ZEPPELIN"m "/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 fi
+
+echo " - Overriding driver host in spark config"
+bash -c "echo -e \"spark.driver.host=$MY_POD_IP\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+bash -c "echo -e \"spark.driver.bindAddress=0.0.0.0\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

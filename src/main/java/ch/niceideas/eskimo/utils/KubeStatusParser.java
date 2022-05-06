@@ -6,8 +6,11 @@ import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.services.KubernetesService;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class KubeStatusParser {
+
+    final static Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z\\-]+(\\-[a-zA-Z0-9]+){1,2}");
 
     final String allPodStatus;
     final String allServicesStatus;
@@ -37,7 +40,10 @@ public class KubeStatusParser {
                 for (int i = 0; i < fields.length; i++) {
                     podMap.put (podHeader.get(i), fields[i]);
                 }
-                podStatuses.put (podMap.get("NAME"), podMap);
+                String podName = podMap.get("NAME");
+                if (POD_NAME_REXP.matcher(podName).matches()) {
+                    podStatuses.put(podName, podMap);
+                }
             }
         }
 

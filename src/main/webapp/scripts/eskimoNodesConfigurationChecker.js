@@ -234,7 +234,8 @@ function checkNoKubernetesServicesSelected(nodesConfig, servicesConfiguration) {
             if (property.serviceName != NODE_ID_FIELD) {
                 let serviceConfig = servicesConfiguration[property.serviceName];
 
-                if (serviceConfig == null || serviceConfig.kubernetes || serviceConfig.kubernetes) {
+                if (serviceConfig == null || serviceConfig.kubernetes) {
+                    console.log (servicesConfiguration);
                     throw "Inconsistency found : service " + property.serviceName
                             + " is either undefined or a kubernetes service which should not be selectable here."
                 }

@@ -60,9 +60,14 @@ public class NodesConfigurationCheckerTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11-192.168.10.15");
+            put("node_id2", "192.168.10.16");
             put("ntp1", "on");
+            put("ntp2", "on");
+            put("zookeeper", "2");
             put("gluster1", "on");
+            put("gluster2", "on");
             put("prometheus1", "on");
+            put("prometheus2", "on");
         }});
 
         nodeConfigChecker.checkNodesSetup(nodesConfig);
@@ -72,7 +77,7 @@ public class NodesConfigurationCheckerTest {
     public void testNotAnIpAddress() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "blabla");
                 put("ntp1", "on");
                 put("prometheus1", "on");
@@ -87,60 +92,22 @@ public class NodesConfigurationCheckerTest {
     @Test
     public void testCheckNodesSetupMultipleOK() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("node_id2", "192.168.10.12");
-                put("marathon", "2");
-                put("elasticsearch1", "on");
-                put("elasticsearch2", "on");
-                put("kafka1", "on");
-                put("kafka2", "on");
-                put("ntp1", "on");
-                put("ntp2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
-                put("gluster1", "on");
-                put("gluster2", "on");
-                put("logstash1", "on");
-                put("logstash2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
-                put("zookeeper", "1");
-        }});
-
-        nodeConfigChecker.checkNodesSetup(nodesConfig);
-    }
-
-    @Test
-    public void testCheckNodesSetupMultipleOKWithFlink() throws Exception {
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.10.12");
-            put("marathon", "2");
-            put("elasticsearch1", "on");
-            put("elasticsearch2", "on");
-            put("kafka1", "on");
-            put("kafka2", "on");
             put("ntp1", "on");
             put("ntp2", "on");
             put("prometheus1", "on");
             put("prometheus2", "on");
             put("gluster1", "on");
             put("gluster2", "on");
+            put("etcd1", "on");
+            put("etcd2", "on");
             put("logstash1", "on");
             put("logstash2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("mesos-master", "1");
-            put("flink-app-master", "2");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("flink-worker1", "on");
-            put("flink-worker2", "on");
+            put("kube-slave1", "on");
+            put("kube-slave2", "on");
+            put("kube-master", "1");
             put("zookeeper", "1");
         }});
 
@@ -150,27 +117,22 @@ public class NodesConfigurationCheckerTest {
     @Test
     public void testCheckNodesSetupMultipleOKWithRange() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12-192.160.10.15");
-                put("marathon", "1");
-                put("elasticsearch1", "on");
-                put("elasticsearch2", "on");
-                put("kafka1", "on");
-                put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
                 put("prometheus1", "on");
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
+                put("etcd1", "on");
+                put("etcd2", "on");
                 put("logstash1", "on");
                 put("logstash2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
+                put("kube-slave1", "on");
+                put("kube-slave2", "on");
+                put("kube-master", "1");
                 put("zookeeper", "1");
         }});
 
@@ -180,18 +142,15 @@ public class NodesConfigurationCheckerTest {
     @Test
     public void testCheckNodesSetupSingleOK() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                put("marathon", "1");
-                put("elasticsearch1", "on");
-                put("kafka1", "on");
+                put("etcd1", "on");
                 put("ntp1", "on");
                 put("gluster1", "on");
                 put("prometheus1", "on");
                 put("logstash1", "on");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
+                put("kube-slave1", "on");
+                put("kube-master", "1");
                 put("zookeeper", "1");
         }});
 
@@ -202,57 +161,47 @@ public class NodesConfigurationCheckerTest {
     public void testUniqueServiceOnRange() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                     put("node_id1", "192.168.10.11");
                     put("node_id2", "192.168.10.12-192.160.10.15");
-                    put("marathon", "2");
-                    put("elasticsearch1", "on");
-                    put("elasticsearch2", "on");
-                    put("kafka1", "on");
-                    put("kafka2", "on");
                     put("ntp1", "on");
                     put("ntp2", "on");
                     put("prometheus1", "on");
                     put("prometheus2", "on");
                     put("gluster1", "on");
                     put("gluster2", "on");
+                    put("etcd1", "on");
+                    put("etcd2", "on");
                     put("logstash1", "on");
                     put("logstash2", "on");
-                    put("mesos-agent1", "on");
-                    put("mesos-agent2", "on");
-                    put("mesos-master", "1");
-                    put("spark-executor1", "on");
-                    put("spark-executor2", "on");
-                    put("zookeeper", "1");
+                    put("kube-slave1", "on");
+                    put("kube-slave2", "on");
+                    put("kube-master", "1");
+                    put("zookeeper", "2");
             }});
 
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Node 2 is a range an declares service marathon which is a unique service, hence forbidden on a range.", exception.getMessage());
+        assertEquals("Node 2 is a range an declares service zookeeper which is a unique service, hence forbidden on a range.", exception.getMessage());
     }
 
     @Test
     public void testMissingGluster() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                     put("node_id1", "192.168.10.11");
                     put("node_id2", "192.168.10.12");
-                    put("marathon", "2");
-                    put("elasticsearch1", "on");
-                    put("elasticsearch2", "on");
-                    put("kafka1", "on");
-                    put("kafka2", "on");
                     put("ntp1", "on");
                     put("ntp2", "on");
+                    put("etcd1", "on");
+                    put("etcd2", "on");
                     put("logstash1", "on");
                     put("logstash2", "on");
-                    put("mesos-agent1", "on");
-                    put("mesos-agent2", "on");
-                    put("mesos-master", "1");
-                    put("spark-executor1", "on");
-                    put("spark-executor2", "on");
+                    put("kube-slave1", "on");
+                    put("kube-slave2", "on");
+                    put("kube-master", "1");
                     put("zookeeper", "1");
             }});
 
@@ -266,7 +215,7 @@ public class NodesConfigurationCheckerTest {
     public void testNoIPConfigured() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                     put("node_id1", "");
             }});
 
@@ -280,7 +229,7 @@ public class NodesConfigurationCheckerTest {
     public void testKeyGreaterThanNodeNumber() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                         put("node_id2", "192.168.10.11");
             }});
 
@@ -294,7 +243,7 @@ public class NodesConfigurationCheckerTest {
     public void testNoPrometheus() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                     put("node_id1", "192.168.10.11");
                     put("ntp1", "on");
                     put("gluster1", "on");
@@ -307,41 +256,17 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testTwoSparkNodesAndNoGLuster() throws Exception {
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                    put("node_id1", "192.168.10.11");
-                    put("node_id2", "192.168.10.12");
-                    put("ntp1", "on");
-                    put("ntp2", "on");
-                    put("prometheus1", "on");
-                    put("prometheus2", "on");
-                    put("spark-executor1", "on");
-                    put("spark-executor2", "on");
-            }});
-
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
-    }
-
-    @Test
     public void testGlusterNoMoreDisabledOnSingleNode() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("marathon", "1");
-            put("elasticsearch1", "on");
-            put("kafka1", "on");
             put("ntp1", "on");
             put("prometheus1", "on");
             put("gluster1", "on");
             put("logstash1", "on");
-            put("mesos-agent1", "on");
-            put("mesos-master", "1");
-            put("spark-executor1", "on");
+            put("etcd1", "on");
+            put("kube-slave1", "on");
+            put("kube-master", "1");
             put("zookeeper", "1");
         }});
 
@@ -351,57 +276,35 @@ public class NodesConfigurationCheckerTest {
     @Test
     public void testNoGlusterOnSingleNode() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("marathon", "1");
-            put("elasticsearch1", "on");
-            put("kafka1", "on");
-            put("ntp1", "on");
-            put("gluster1", "on");
-            put("prometheus1", "on");
-            put("logstash1", "on");
-            put("mesos-agent1", "on");
-            put("mesos-master", "1");
-            put("spark-executor1", "on");
-            put("zookeeper", "1");
-        }});
-
-        nodeConfigChecker.checkNodesSetup(nodesConfig);
-    }
-
-    @Test
-    public void testSparkButNoMesosAgent() throws Exception {
-
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                //put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("marathon", "1");
                 put("ntp1", "on");
-                put("gluster1", "on");
+                put("etcd1", "on");
                 put("prometheus1", "on");
+                put("logstash1", "on");
+                put("kube-slave1", "on");
+                put("kube-master", "1");
                 put("zookeeper", "1");
             }});
 
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Inconsistency found : Service spark-executor was expecting a service mesos-agent on same node, but none were found !", exception.getMessage());
+        assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
     }
 
     @Test
-    public void testMesosAgentButNoMesosMaster() throws Exception {
+    public void testKubeSlaveButNoKubeMaster() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                //put("mesos-master", "1");
-                put("spark-executor1", "on");
+                put("kube-slave1", "on");
+                //put("kube-master", "1");
                 put("zookeeper", "1");
                 put("ntp1", "on");
+                put("etcd1", "on");
                 put("gluster1", "on");
                 put("prometheus1", "on");
             }});
@@ -409,77 +312,19 @@ public class NodesConfigurationCheckerTest {
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Inconsistency found : Service mesos-agent expects 1 mesos-master instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service kube-slave expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
-    public void testMesosAgentButNoSparkExecutor() throws Exception {
+    public void testGlusterButNoZookeeper() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                //put("spark-executor1", "on");
-                put("zookeeper", "1");
+                put("kube-slave1", "on");
+                put("kube-master", "1");
                 put("ntp1", "on");
-                put("gluster1", "on");
-                put("prometheus1", "on");
-            }});
-
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : Service mesos-agent was expecting a service spark-executor on same node, but none were found !", exception.getMessage());
-    }
-
-    @Test
-    public void testMesosAgentFlinkAppMasterButNoFlinkWorker() throws Exception {
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("flink-app-master", "1");
-                put("spark-executor1", "on");
-                //put("flink1", "on");
-                put("zookeeper", "1");
-                put("ntp1", "on");
-                put("gluster1", "on");
-                put("prometheus1", "on");
-            }});
-
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : Service mesos-agent was expecting a service flink-worker on same node, but none were found !", exception.getMessage());
-    }
-
-    @Test
-    public void testOnlyESIsOK() throws Exception {
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("elasticsearch1", "on");
-            put("ntp1", "on");
-            put("gluster1", "on");
-            put("prometheus1", "on");
-        }});
-
-        nodeConfigChecker.checkNodesSetup(nodesConfig);
-    }
-
-    @Test
-    public void testMesosMasterButNoZookeeper() throws Exception {
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("mesos-agent1", "on");
-                put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("ntp1", "on");
+                put("etcd1", "on");
                 put("gluster1", "on");
                 put("prometheus1", "on");
                 //put("zookeeper", "1");
@@ -488,50 +333,26 @@ public class NodesConfigurationCheckerTest {
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Inconsistency found : Service mesos-agent expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service gluster expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
-    public void testFlinkAndZookeeperSeparatedIsNowOK() throws Exception {
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("node_id2", "192.168.10.12");
-            put("ntp1", "on");
-            put("ntp2", "on");
-            put("mesos-agent1", "on");
-            put("mesos-agent2", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
-            put("gluster1", "on");
-            put("gluster2", "on");
-            put("mesos-master", "1");
-            put("zookeeper", "1");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("flink-worker1", "on");
-            put("flink-worker2", "on");
-            put("flink-app-master", "2");
-        }});
-
-        nodeConfigChecker.checkNodesSetup(nodesConfig);
-    }
-
-    @Test
-    public void testNoMarathonServiceCanBeSelected() throws Exception {
+    public void testNoKubernetesServiceCanBeSelected() throws Exception {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("mesos-agent1", "on");
-                put("mesos-agent2", "on");
+                put("etcd1", "on");
+                put("etcd2", "on");
+                put("kube-slave1", "on");
+                put("kube-slave2", "on");
                 put("prometheus1", "on");
                 put("prometheus2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("mesos-master", "1");
+                put("kube-master", "1");
                 put("zookeeper", "1");
                 put("cerebro", "2");
             }});
@@ -540,7 +361,7 @@ public class NodesConfigurationCheckerTest {
 
         });
 
-        assertEquals("Inconsistency found : service cerebro is a marathon service which should not be selectable here.", exception.getMessage());
+        assertEquals("Inconsistency found : service cerebro is a kubernetes service which should not be selectable here.", exception.getMessage());
     }
 
 }

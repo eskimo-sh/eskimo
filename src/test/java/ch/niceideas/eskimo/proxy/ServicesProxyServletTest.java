@@ -34,10 +34,10 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.services.ConnectionManagerException;
-import ch.niceideas.eskimo.services.ConnectionManagerService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.services.*;
 import com.trilead.ssh2.Connection;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.HttpHeaders;
@@ -71,6 +71,12 @@ public class ServicesProxyServletTest {
         servlet = new ServicesProxyServlet(pms, sd, "");
         pms.setServicesDefinition(sd);
 
+        pms.setConfigurationService(new ConfigurationService() {
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        });
+
         pms.setConnectionManagerService(new ConnectionManagerService() {
             @Override
             protected void recreateTunnels(Connection connection, String node) throws ConnectionManagerException {
@@ -96,18 +102,18 @@ public class ServicesProxyServletTest {
                 new Class[] { HttpServletRequest.class },
                 (proxy, method, methodArgs) -> {
                     if (method.getName().equals("getRequestURI")) {
-                        return "/mesos-master/statistics";
+                        return "/cerebro/statistics";
                     } else if (method.getName().equals("getPathInfo")) {
-                        return "/mesos-master/statistics";
+                        return "/cerebro/statistics";
                     } else {
                         throw new UnsupportedOperationException(
                                 "Unsupported method: " + method.getName());
                     }
                 });
-        pms.updateServerForService("mesos-master", "192.168.10.11");
+        pms.updateServerForService("cerebro", "192.168.10.11");
 
         assertEquals ("http://localhost:"
-                + pms.getTunnelConfig("mesos-master").getLocalPort()
+                + pms.getTunnelConfig("cerebro").getLocalPort()
                 + "/",
                 servlet.getTargetUri(request));
     }
@@ -120,9 +126,9 @@ public class ServicesProxyServletTest {
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
                         case "getRequestURI":
-                            return "/mesos-master/statistics?server=192.168.10.13";
+                            return "/cerebro/statistics?server=192.168.10.13";
                         case "getPathInfo":
-                            return "/mesos-master/statistics";
+                            return "/cerebro/statistics";
                         case "getQueryString":
                             return "server=192.168.10.13";
                         default:
@@ -130,11 +136,11 @@ public class ServicesProxyServletTest {
                                     "Unsupported method: " + method.getName());
                     }
                 });
-        pms.updateServerForService("mesos-master", "192.168.10.11");
+        pms.updateServerForService("cerebro", "192.168.10.11");
 
         assertEquals("http://localhost:"
-                + pms.getTunnelConfig("mesos-master").getLocalPort()
-                + "/mesos-master/statistics?server=192.168.10.13",
+                + pms.getTunnelConfig("cerebro").getLocalPort()
+                + "/cerebro/statistics?server=192.168.10.13",
                 servlet.rewriteUrlFromRequest(request));
     }
 
@@ -146,11 +152,11 @@ public class ServicesProxyServletTest {
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
                         case "getRequestURI":
-                            return "/mesos-master/statistics?server=192.168.10.13";
+                            return "/cerebro/statistics?server=192.168.10.13";
                         case "getPathInfo":
-                            return "/mesos-master/statistics";
+                            return "/cerebro/statistics";
                         case "getRequestURL":
-                            return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                            return new StringBuffer("http://localhost:9090/cerebro/statistics");
                         case "getQueryString":
                             return "server=192.168.10.13";
                         case "getContextPath":
@@ -160,11 +166,11 @@ public class ServicesProxyServletTest {
                                     "Unsupported method: " + method.getName());
                     }
                 });
-        pms.updateServerForService("mesos-master", "192.168.10.11");
+        pms.updateServerForService("cerebro", "192.168.10.11");
 
-        assertEquals("http://localhost:9090/mesos-master/nodeStats/statistics=192.168.10.13",
+        assertEquals("http://localhost:9090/cerebro/nodeStats/statistics=192.168.10.13",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:" +
-                     pms.getTunnelConfig("mesos-master").getLocalPort() +
+                     pms.getTunnelConfig("cerebro").getLocalPort() +
                     "/nodeStats/statistics=192.168.10.13"));
     }
 
@@ -178,22 +184,6 @@ public class ServicesProxyServletTest {
         assertEquals("\n" +
                 " <a href='/test/test/toto.txt'>\n" +
                 "a/a>", result);
-    }
-
-    @Test
-    public void testMesosSpecificReplacements() throws Exception {
-
-        Service mesosMasterService = sd.getService("mesos-master");
-
-        String toReplace  = "return '//' + leader_info.hostname + ':' + leader_info.port;";
-        String result = servlet.performReplacements(mesosMasterService, "", "", "test/test", toReplace );
-        assertEquals("return '/test/test';", result);
-
-        toReplace = "    // time we are retrieving state), fallback to the current master.\n" +
-                "    return '';";
-        result = servlet.performReplacements(mesosMasterService, "controllers.js", "", "test/test", toReplace );
-        assertEquals("    // time we are retrieving state), fallback to the current master.\n" +
-                "    return '/test/test';", result);
     }
 
     @Test
@@ -247,7 +237,7 @@ public class ServicesProxyServletTest {
                 "        ,\n" +
                 "        this.getWebsocketUrl = function() {\n" +
                 "            var t = \"https:\" === location.protocol ? \"wss:\" : \"ws:\";\n" +
-                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws/zeppelin/ws\"\n" +
+                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname) + \"/ws\"\n" +
                 "        }\n" +
                 "        ,\n" +
                 "        this.getBase = function() {\n" +
@@ -302,11 +292,11 @@ public class ServicesProxyServletTest {
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
                         case "getRequestURI":
-                            return "/mesos-master/statistics?server=192.168.10.13";
+                            return "/cerebro/statistics?server=192.168.10.13";
                         case "getPathInfo":
-                            return "/mesos-master/statistics";
+                            return "/cerebro/statistics";
                         case "getRequestURL":
-                            return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                            return new StringBuffer("http://localhost:9090/cerebro/statistics");
                         case "getQueryString":
                             return "server=192.168.10.13";
                         case "getContextPath":
@@ -373,11 +363,11 @@ public class ServicesProxyServletTest {
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
                         case "getRequestURI":
-                            return "/mesos-master/statistics?server=192.168.10.13";
+                            return "/cerebro/statistics?server=192.168.10.13";
                         case "getPathInfo":
-                            return "/mesos-master/statistics";
+                            return "/cerebro/statistics";
                         case "getRequestURL":
-                            return new StringBuffer("http://localhost:9090/mesos-master/statistics");
+                            return new StringBuffer("http://localhost:9090/cerebro/statistics");
                         case "getQueryString":
                             return "server=192.168.10.13";
                         case "getContextPath":
@@ -404,8 +394,8 @@ public class ServicesProxyServletTest {
 
         servlet.copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
 
-        assertEquals ("src=\"/mesos-master/TEST ABC STRING", new String (responseOutputStream.toByteArray()));
+        assertEquals ("src=\"/cerebro/TEST ABC STRING", new String (responseOutputStream.toByteArray()));
 
-        assertEquals(34, headers.get(HttpHeaders.CONTENT_LENGTH));
+        assertEquals(29, headers.get(HttpHeaders.CONTENT_LENGTH));
     }
 }

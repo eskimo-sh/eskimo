@@ -38,6 +38,15 @@ public class KubeStatusParserTest {
             "spark-executor";
 
     @Test
+    public void testPodNameRexp() throws Exception {
+        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("elasticsearch-0").matches());
+        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kafka-2").matches());
+        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kubernetes-dashboard-7db6bbdf55-vhgcc").matches());
+        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("flink-5db698798f-nkj2p").matches());
+        assertFalse (KubeStatusParser.POD_NAME_REXP.matcher("zeppelin-spark-e8ca018099847d6d-exec-20").matches());
+    }
+
+    @Test
     public void testNominal() throws Exception {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices);
