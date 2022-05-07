@@ -109,6 +109,8 @@ export ZEPPELIN_VERSION=0.10
 export ZEPPELIN_VERSION_SNAPSHOT=0.10.2-SNAPSHOT
 export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master (which is rarely working)
 
+export OPENLOGIC_JDK_8_VERSION="8u262-b10"
+
 
 # This functions ensures that internet is available on host machine (the one running eskimo)
 # Internet is indeed required to download source packages for services.

@@ -83,7 +83,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"\",'\
 '/'\
 '          \"name\": \"flink.execution.remote.host\",\n'\
-'          \"value\": \"flink.default.svc.cluster.eskimo\",'\
+'          \"value\": \"flink-rest.default.svc.cluster.eskimo\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 

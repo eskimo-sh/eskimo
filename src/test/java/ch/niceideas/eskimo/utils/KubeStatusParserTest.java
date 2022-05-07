@@ -105,7 +105,7 @@ public class KubeStatusParserTest {
         Pair<String, String> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, "111.111.111.111");
         assertNotNull (srnES);
         assertEquals ("111.111.111.111", srnES.getKey());
-        assertEquals ("OK", srnES.getValue());
+        assertEquals ("Running", srnES.getValue());
 
         Service kubeDasboardSrv = new Service();
         kubeDasboardSrv.setName("kubernetes-dashboard");
@@ -113,7 +113,7 @@ public class KubeStatusParserTest {
         Pair<String, String> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, "111.111.111.111");
         assertNotNull (srnKubeDasboardSrv);
         assertEquals ("111.111.111.111", srnKubeDasboardSrv.getKey());
-        assertEquals ("OK", srnKubeDasboardSrv.getValue());
+        assertEquals ("Running", srnKubeDasboardSrv.getValue());
     }
 
 

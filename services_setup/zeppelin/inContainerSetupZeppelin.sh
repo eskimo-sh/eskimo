@@ -276,5 +276,18 @@ sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
 sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
 sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
 
+echo " - [HACK] tampering with interpreter.sh to force JDK 8 for flink interpreter"
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'if \[\[ "\${INTERPRETER_ID}" != \"flink\" \]\]; then\n'\
+'/'\
+'if \[\[ "${INTERPRETER_ID}" == \"flink\" \]\]; then\n'\
+'  export JAVA_HOME=\/usr\/local\/lib\/jvm\/openjdk-8\n'\
+'  export PATH=$JAVA_HOME\/bin:$PATH\n'\
+'fi\n'\
+'if \[\[ "${INTERPRETER_ID}" != \"flink\" \]\]; then\n'\
+'/g;p;}' /usr/local/lib/zeppelin/bin/interpreter.sh
+
+
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

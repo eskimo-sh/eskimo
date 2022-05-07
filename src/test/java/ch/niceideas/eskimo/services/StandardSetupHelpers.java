@@ -46,55 +46,44 @@ public class StandardSetupHelpers {
     public static NodesConfigWrapper getStandard2NodesSetup() {
         return new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
-            //put("cerebro", "1");
-            //put("kafka-manager", "1");
-            //put("kibana", "1");
-            put("elasticsearch1", "on");
             put("gluster1", "on");
-            put("kafka1", "on");
+            put("etcd1", "on");
             put("logstash1", "on");
-            put("mesos-agent1", "on");
+            put("kube-slave1", "on");
             put("ntp1", "on");
-            put("spark-executor1", "on");
+
             put("node_id2", "192.168.10.13");
-            put("mesos-master", "2");
-            put("marathon", "1");
-            //put("spark-history-server", "2");
-            //put("zeppelin", "2");
+            put("kube-master", "2");
             put("zookeeper", "2");
-            put("elasticsearch2", "on");
             put("gluster2", "on");
-            put("kafka2", "on");
+            put("etcd2", "on");
             put("logstash2", "on");
-            put("mesos-agent2", "on");
+            put("kube-slave2", "on");
             put("ntp2", "on");
-            put("spark-executor2", "on");
         }});
     }
 
     public static ServicesInstallStatusWrapper getStandard2NodesInstallStatus() {
         return new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
-            put("cerebro_installed_on_IP_MARATHON_NODE", "OK");
-            put("elasticsearch_installed_on_IP_192-168-10-11", "OK");
-            put("elasticsearch_installed_on_IP_192-168-10-13", "OK");
+            put("cerebro_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("elasticsearch_installed_on_IP_KUBERNETES_NODE", "OK");
             put("gluster_installed_on_IP_192-168-10-11", "OK");
             put("gluster_installed_on_IP_192-168-10-13", "OK");
-            put("kafka-manager_installed_on_IP_MARATHON_NODE", "OK");
-            put("kafka_installed_on_IP_192-168-10-11", "OK");
-            put("kafka_installed_on_IP_192-168-10-13", "OK");
-            put("kibana_installed_on_IP_MARATHON_NODE", "OK");
+            put("kafka-manager_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("kafka_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("kibana_installed_on_IP_KUBERNETES_NODE", "OK");
             put("logstash_installed_on_IP_192-168-10-11", "OK");
             put("logstash_installed_on_IP_192-168-10-13", "OK");
-            put("mesos-agent_installed_on_IP_192-168-10-11", "OK");
-            put("mesos-agent_installed_on_IP_192-168-10-13", "OK");
-            put("mesos-master_installed_on_IP_192-168-10-13", "OK");
-            put("marathon_installed_on_IP_192-168-10-11", "OK");
+            put("kube-slave_installed_on_IP_192-168-10-11", "OK");
+            put("kube-slave_installed_on_IP_192-168-10-13", "OK");
+            put("kube-master_installed_on_IP_192-168-10-13", "OK");
             put("ntp_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-13", "OK");
-            put("spark-executor_installed_on_IP_192-168-10-11", "OK");
-            put("spark-executor_installed_on_IP_192-168-10-13", "OK");
-            put("spark-history-server_installed_on_IP_MARATHON_NODE", "OK");
-            put("zeppelin_installed_on_IP_MARATHON_NODE", "OK");
+            put("etcd_installed_on_IP_192-168-10-11", "OK");
+            put("etcd_installed_on_IP_192-168-10-13", "OK");
+            put("spark-executor_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("spark-history-server_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("zeppelin_installed_on_IP_KUBERNETES_NODE", "OK");
             put("zookeeper_installed_on_IP_192-168-10-13", "OK");
         }});
     }
@@ -119,11 +108,13 @@ public class StandardSetupHelpers {
             put("service_kibana_192-168-10-11", "OK");
             put("service_logstash_192-168-10-11", "OK");
             put("service_logstash_192-168-10-13", "OK");
-            put("service_mesos-agent_192-168-10-11", "OK");
-            put("service_mesos-agent_192-168-10-13", "OK");
-            put("service_mesos-master_192-168-10-13", "OK");
+            put("service_kube-slave_192-168-10-11", "OK");
+            put("service_kube-slave_192-168-10-13", "OK");
+            put("service_kube-master_192-168-10-13", "OK");
             put("service_ntp_192-168-10-11", "OK");
             put("service_ntp_192-168-10-13", "OK");
+            put("service_etcd_192-168-10-11", "OK");
+            put("service_etcd_192-168-10-13", "OK");
             put("service_spark-executor_192-168-10-11", "OK");
             put("service_spark-executor_192-168-10-13", "OK");
             put("service_spark-history-server_192-168-10-13", "OK");

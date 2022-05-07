@@ -34,9 +34,9 @@
 
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.eskimo.services.ConnectionManagerException;
-import ch.niceideas.eskimo.services.ConnectionManagerService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.services.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,8 +60,14 @@ public class ProxyManagerServiceTest {
         sd.afterPropertiesSet();
         pms.setConnectionManagerService(new ConnectionManagerService() {
             @Override
-            public void recreateTunnels(String host) throws ConnectionManagerException {
+            public void recreateTunnels(String host) {
                 recreateTunnelsCalled.set(true);
+            }
+        });
+        pms.setConfigurationService(new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
         });
         pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
@@ -90,7 +96,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
-    public void testServerForServiceManagemement() throws Exception {
+    public void testServerForServiceManagemement_Kubernetes() throws Exception {
 
         assertFalse(recreateTunnelsCalled.get());
         assertFalse(removeForwardersCalled.get());
@@ -110,6 +116,33 @@ public class ProxyManagerServiceTest {
         assertFalse(removeForwardersCalled.get());
 
         pms.updateServerForService("kibana", "192.168.10.13");
+
+        // since kub service are redirected to poxy on kube master, no tunnel recreation should occur when service moves
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+    }
+
+    @Test
+    public void testServerForServiceManagemement() throws Exception {
+
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+
+        pms.updateServerForService("gluster", "192.168.10.11");
+
+        assertTrue(recreateTunnelsCalled.get());
+        assertTrue(removeForwardersCalled.get());
+
+        recreateTunnelsCalled.set(false);
+        removeForwardersCalled.set(false);
+
+        pms.updateServerForService("gluster", "192.168.10.11");
+
+        // should not have been recreated
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+
+        pms.updateServerForService("gluster", "192.168.10.13");
 
         assertTrue(recreateTunnelsCalled.get());
         assertTrue(removeForwardersCalled.get());

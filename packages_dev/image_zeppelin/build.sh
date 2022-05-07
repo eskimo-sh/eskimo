@@ -78,7 +78,7 @@ fail_if_error $? "/tmp/flink_build_log" -5
 
 
 echo " - Installing python packages for datascience"
-docker exec -i zeppelin_template apt-get -y install python3-sklearn python3-numpy python3-pandas python3-plotly python3-kafka python3-filelock python3-matplotlib python3-nltk > /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template apt-get -y install python3-sklearn python3-numpy python3-pandas python3-plotly python3-kafka python3-filelock python3-matplotlib python3-nltk python3-elasticsearch > /tmp/zeppelin_build_log 2>&1
 #docker exec -i zeppelin_template pip3 install pandas numpy scikit-learn matplotlib nltk plotly filelock py4j kafka-python3 > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/zeppelin_build_log" -12
 
@@ -113,7 +113,7 @@ rm -f __installKafkaEff.sh
 #fail_if_error $? "/tmp/zeppelin_build_log" -3
 
 
-docker exec -it zeppelin_template bash
+#docker exec -it zeppelin_template bash
 
 
 echo " - Installing zeppelin"
@@ -148,6 +148,14 @@ fi
 
 echo " - Installing zeppelin Interpreters Java dependencies"
 docker exec -i zeppelin_template bash /scripts/installZeppelinInterpreterDependencies.sh | tee /tmp/zeppelin_build_log 2>&1
+if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/zeppelin_build_log
+    exit 105
+fi
+
+echo " - Installing JDK 8 for flink interpreter"
+docker exec -i zeppelin_template bash /scripts/installJava8JDK.sh | tee /tmp/zeppelin_build_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/zeppelin_build_log

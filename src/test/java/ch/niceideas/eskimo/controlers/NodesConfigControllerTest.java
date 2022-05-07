@@ -62,24 +62,19 @@ public class NodesConfigControllerTest {
         });
 
         assertTrue (new JSONObject("{\n" +
-                "    \"mesos-master\": \"2\",\n" +
-                "    \"marathon\": \"1\",\n" +
+                "    \"etcd1\": \"on\",\n" +
                 "    \"zookeeper\": \"2\",\n" +
-                "    \"elasticsearch1\": \"on\",\n" +
-                "    \"elasticsearch2\": \"on\",\n" +
-                "    \"node_id2\": \"192.168.10.13\",\n" +
+                "    \"etcd2\": \"on\",\n" +
                 "    \"node_id1\": \"192.168.10.11\",\n" +
+                "    \"node_id2\": \"192.168.10.13\",\n" +
                 "    \"logstash1\": \"on\",\n" +
-                "    \"kafka2\": \"on\",\n" +
                 "    \"logstash2\": \"on\",\n" +
-                "    \"mesos-agent1\": \"on\",\n" +
-                "    \"mesos-agent2\": \"on\",\n" +
                 "    \"ntp1\": \"on\",\n" +
-                "    \"kafka1\": \"on\",\n" +
+                "    \"kube-master\": \"2\",\n" +
                 "    \"gluster1\": \"on\",\n" +
                 "    \"ntp2\": \"on\",\n" +
-                "    \"spark-executor1\": \"on\",\n" +
-                "    \"spark-executor2\": \"on\",\n" +
+                "    \"kube-slave1\": \"on\",\n" +
+                "    \"kube-slave2\": \"on\",\n" +
                 "    \"gluster2\": \"on\"\n" +
                 "}").similar(new JSONObject (ncc.loadNodesConfig())));
 
@@ -144,22 +139,24 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
-                "      {\"marathon\": \"192.168.10.11\"},\n" +
-                "      {\"spark-history-server\": \"(marathon)\"},\n" +
-                "      {\"zeppelin\": \"(marathon)\"}\n" +
+                "      {\"etcd\": \"192.168.10.11\"},\n" +
+                "      {\"etcd\": \"192.168.10.13\"},\n" +
+                "      {\"kube-master\": \"192.168.10.13\"},\n" +
+                "      {\"kube-slave\": \"192.168.10.11\"},\n" +
+                "      {\"kube-slave\": \"192.168.10.13\"},\n" +
+                "      {\"spark-history-server\": \"(kubernetes)\"},\n" +
+                "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
                 "      {\"gluster\": \"192.168.10.11\"},\n" +
                 "      {\"gluster\": \"192.168.10.13\"},\n" +
                 "      {\"logstash\": \"192.168.10.11\"},\n" +
-                "      {\"logstash\": \"192.168.10.13\"},\n" +
-                "      {\"spark-executor\": \"192.168.10.11\"},\n" +
-                "      {\"spark-executor\": \"192.168.10.13\"}\n" +
+                "      {\"logstash\": \"192.168.10.13\"}\n" +
                 "    ]\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ncc.reinstallNodesConfig("{\"gluster\":\"on\",\"spark-executor\":\"on\",\"logstash\":\"on\"}", session));
+                "}", ncc.reinstallNodesConfig("{\"gluster\":\"on\",\"logstash\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
@@ -238,59 +235,45 @@ public class NodesConfigControllerTest {
                         "    \"restarts\": [\n" +
                         "      {\"gluster\": \"192.168.10.11\"},\n" +
                         "      {\"gluster\": \"192.168.10.13\"},\n" +
-                        "      {\"kafka\": \"192.168.10.11\"},\n" +
-                        "      {\"kafka\": \"192.168.10.13\"},\n" +
-                        "      {\"spark-executor\": \"192.168.10.11\"},\n" +
-                        "      {\"spark-executor\": \"192.168.10.13\"},\n" +
-                        "      {\"mesos-agent\": \"192.168.10.11\"},\n" +
-                        "      {\"mesos-agent\": \"192.168.10.13\"},\n" +
-                        "      {\"cerebro\": \"(marathon)\"},\n" +
-                        "      {\"kibana\": \"(marathon)\"},\n" +
-                        "      {\"kafka-manager\": \"(marathon)\"},\n" +
-                        "      {\"spark-history-server\": \"(marathon)\"},\n" +
-                        "      {\"zeppelin\": \"(marathon)\"}\n" +
+                        "      {\"kube-slave\": \"192.168.10.11\"},\n" +
+                        "      {\"kube-slave\": \"192.168.10.13\"},\n" +
+                        "      {\"kafka\": \"(kubernetes)\"},\n" +
+                        "      {\"elasticsearch\": \"(kubernetes)\"},\n" +
+                        "      {\"cerebro\": \"(kubernetes)\"},\n" +
+                        "      {\"kafka-manager\": \"(kubernetes)\"},\n" +
+                        "      {\"spark-history-server\": \"(kubernetes)\"},\n" +
+                        "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                         "    ],\n" +
                         "    \"uninstallations\": [\n" +
-                        "      {\"marathon\": \"192.168.10.11\"},\n" +
-                        "      {\"mesos-master\": \"192.168.10.13\"},\n" +
+                        "      {\"kube-master\": \"192.168.10.13\"},\n" +
                         "      {\"zookeeper\": \"192.168.10.13\"}\n" +
                         "    ],\n" +
                         "    \"installations\": [\n" +
                         "      {\"zookeeper\": \"192.168.10.11\"},\n" +
                         "      {\"prometheus\": \"192.168.10.11\"},\n" +
                         "      {\"prometheus\": \"192.168.10.13\"},\n" +
-                        "      {\"mesos-master\": \"192.168.10.11\"},\n" +
-                        "      {\"flink\": \"192.168.10.11\"},\n" +
-                        "      {\"flink\": \"192.168.10.13\"},\n" +
-                        "      {\"flink-app-master\": \"192.168.10.11\"}\n" +
+                        "      {\"kube-master\": \"192.168.10.11\"}\n" +
                         "    ]\n" +
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
                         "}",
                 ncc.saveNodesConfig("" +
                 "{\"node_id1\":\"192.168.10.11\"," +
-                "\"flink-app-master\":\"1\"," +
-                "\"mesos-master\":\"1\"," +
+                "\"kube-master\":\"1\"," +
                 "\"zookeeper\":\"1\"," +
-                "\"elasticsearch1\":\"on\"," +
-                "\"flink1\":\"on\"," +
                 "\"gluster1\":\"on\"," +
-                "\"kafka1\":\"on\"," +
                 "\"logstash1\":\"on\"," +
-                "\"mesos-agent1\":\"on\"," +
+                "\"kube-slave1\":\"on\"," +
                 "\"ntp1\":\"on\"," +
+                "\"etcd1\":\"on\"," +
                 "\"prometheus1\":\"on\"," +
-                "\"spark-executor1\":\"on\"," +
                 "\"node_id2\":\"192.168.10.13\"," +
-                "\"elasticsearch2\":\"on\"," +
-                "\"flink2\":\"on\"," +
                 "\"gluster2\":\"on\"," +
-                "\"kafka2\":\"on\"," +
                 "\"logstash2\":\"on\"," +
-                "\"mesos-agent2\":\"on\"," +
+                "\"kube-slave2\":\"on\"," +
                 "\"ntp2\":\"on\"," +
-                "\"prometheus2\":\"on\"," +
-                "\"spark-executor2\":\"on\"}", session));
+                "\"etcd2\":\"on\"," +
+                "\"prometheus2\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
