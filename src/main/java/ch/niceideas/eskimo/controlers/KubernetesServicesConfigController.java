@@ -66,9 +66,6 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
     public static final String NOKUBERNETES = "nokubernetes";
 
     @Autowired
-    private MarathonService marathonService;
-
-    @Autowired
     private KubernetesService kubernetesService;
 
     @Autowired
@@ -88,9 +85,6 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
 
 
     /* For tests */
-    void setMarathonService(MarathonService marathonService) {
-        this.marathonService = marathonService;
-    }
     void setKubernetesService(KubernetesService kubernetesService) {
         this.kubernetesService = kubernetesService;
     }

@@ -110,9 +110,9 @@ public class KubernetesServicesConfigControllerTest {
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setMarathonService(new MarathonService() {
+        mscc.setKubernetesService(new KubernetesService() {
             @Override
-            public void applyMarathonServicesConfig(KubernetesOperationsCommand command) {
+            public void applyServicesConfig(KubernetesOperationsCommand command) {
                 // No Op
             }
         });
@@ -147,14 +147,15 @@ public class KubernetesServicesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"uninstallations\": [],\n" +
+                "    \"restarts\": [],\n" +
                 "    \"installations\": [\n" +
                 "      \"cerebro\",\n" +
                 "      \"zeppelin\"\n" +
                 "    ],\n" +
-                "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when marathon is available\"\n" +
+                "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.reinstallKubernetesServiceConfig("{\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
+                "}", mscc.reinstallKubernetesServiceConfig("{\"spark-executor_install\":\"on\",\"kafka_install\":\"on\",\"elasticsearch_install\":\"on\",\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));
 
@@ -195,31 +196,36 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testSaveNodesConfig() throws Exception {
+    public void testSaveKubernetesServicesConfig() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setMarathonService(new MarathonService() {
+        mscc.setKubernetesService(new KubernetesService() {
             @Override
-            public void applyMarathonServicesConfig(KubernetesOperationsCommand command) {
+            public void applyServicesConfig(KubernetesOperationsCommand command) {
                 // No Op
             }
         });
 
         mscc.setConfigurationService(new ConfigurationService() {
             @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }
             @Override
-            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
+            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) {
                 // No Op
             }
             @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
+            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
                 // No Op
+            }
+            @Override
+            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
+                // No Op
+                return null;
             }
         });
 
@@ -242,13 +248,17 @@ public class KubernetesServicesConfigControllerTest {
                         "      \"kibana\",\n" +
                         "      \"spark-history-server\"\n" +
                         "    ],\n" +
+                        "    \"restarts\": [],\n" +
                         "    \"installations\": [\"grafana\"],\n" +
-                        "    \"warnings\": \"Marathon is not available. The changes in marathon services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when marathon is available\"\n" +
+                        "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
                         "}",
                 mscc.saveKubernetesServicesConfig("{" +
                 "\"cerebro_install\":\"on\"," +
+                "\"elasticsearch_install\":\"on\"," +
+                "\"kafka_install\":\"on\"," +
+                "\"spark-executor_install\":\"on\"," +
                 "\"grafana_install\":\"on\"," +
                 "\"zeppelin_install\":\"on\"," +
                 "\"spark-history-server\":\"on\"," +

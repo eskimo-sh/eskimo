@@ -5,12 +5,14 @@ import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServicesControllerTest {
@@ -215,11 +217,11 @@ public class ServicesControllerTest {
             }
         });
 
-        assertEquals ("{\n" +
+        assertTrue (new JSONObject("{\n" +
                 "  \"servicesConfigurations\": {\n" +
                 "    \"A\": {\n" +
                 "      \"col\": -1,\n" +
-                "      \"marathon\": false,\n" +
+                "      \"kubernetes\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -230,7 +232,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"B\": {\n" +
                 "      \"col\": -1,\n" +
-                "      \"marathon\": false,\n" +
+                "      \"kubernetes\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -241,7 +243,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"C\": {\n" +
                 "      \"col\": -1,\n" +
-                "      \"marathon\": false,\n" +
+                "      \"kubernetes\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -252,7 +254,7 @@ public class ServicesControllerTest {
                 "    }\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sc.getServicesConfigurations());
+                "}").similar(new JSONObject(sc.getServicesConfigurations())));
     }
 
     @Test
@@ -286,7 +288,7 @@ public class ServicesControllerTest {
             }
         });
 
-        assertEquals ("{\n" +
+        assertTrue (new JSONObject("{\n" +
                 "  \"mandatoryServices\": [\n" +
                 "    \"A\",\n" +
                 "    \"B\"\n" +
@@ -296,7 +298,7 @@ public class ServicesControllerTest {
                 "  \"servicesConfigurations\": {\n" +
                 "    \"A\": {\n" +
                 "      \"col\": -1,\n" +
-                "      \"marathon\": false,\n" +
+                "      \"kubernetes\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -307,7 +309,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"B\": {\n" +
                 "      \"col\": -1,\n" +
-                "      \"marathon\": false,\n" +
+                "      \"kubernetes\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -318,7 +320,7 @@ public class ServicesControllerTest {
                 "    },\n" +
                 "    \"C\": {\n" +
                 "      \"col\": -1,\n" +
-                "      \"marathon\": false,\n" +
+                "      \"kubernetes\": false,\n" +
                 "      \"conditional\": \"NONE\",\n" +
                 "      \"configOrder\": -1,\n" +
                 "      \"unique\": false,\n" +
@@ -329,7 +331,7 @@ public class ServicesControllerTest {
                 "    }\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sc.listConfigServices());
+                "}").similar(new JSONObject(sc.listConfigServices())));
     }
 
 }

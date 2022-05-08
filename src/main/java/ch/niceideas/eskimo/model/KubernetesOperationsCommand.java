@@ -96,12 +96,14 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         }
 
         // 3. Find out about service that need to be restarted
-        for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
-            if (rawKubeServicesConfig.isServiceInstallRequired(service)
-                && !retCommand.getInstallations().contains(new KubernetesOperationId("installation", service))) {
+        if (previousConfig != null) {
+            for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
+                if (rawKubeServicesConfig.isServiceInstallRequired(service)
+                        && !retCommand.getInstallations().contains(new KubernetesOperationId("installation", service))) {
 
-                if (rawKubeServicesConfig.isDifferentConfig (previousConfig, service)) {
-                    retCommand.addRestart(new KubernetesOperationId("restart", service));
+                    if (rawKubeServicesConfig.isDifferentConfig(previousConfig, service)) {
+                        retCommand.addRestart(new KubernetesOperationId("restart", service));
+                    }
                 }
             }
         }

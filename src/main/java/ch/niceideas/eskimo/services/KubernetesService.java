@@ -134,13 +134,6 @@ public class KubernetesService {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
-
-    // FIXME
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void applyKubernetesServicesConfig(KubernetesOperationsCommand operationsCommand) {
-        throw new UnsupportedOperationException("To Be Implemented");
-    }
-
     void restartServiceForSystem(KubernetesOperationsCommand.KubernetesOperationId operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
                 ml -> {

@@ -259,7 +259,7 @@ public class SystemAdminController extends AbstractOperationController {
                         servicesDefinition, systemService, kubeServicesConfig, newServicesInstallationStatus, kubeServicesConfig);
 
                 return performKubernetesOperation(
-                        kubernetesService -> kubernetesService.applyKubernetesServicesConfig(operationsCommand),
+                        kubernetesService -> kubernetesService.applyServicesConfig(operationsCommand),
                         serviceName + " has been reinstalled successfully on kubernetes.");
 
             } else {
