@@ -27,6 +27,7 @@ public class KubernetesService {
     private static final Logger logger = Logger.getLogger(KubernetesService.class);
 
     public static final String KUBE_MASTER = "kube-master";
+    public static final String KUBE_SLAVE = "kube-slave";
     public static final String KUBE_NA_FLAG = "MARATHON_NA";
     public static final String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
 
