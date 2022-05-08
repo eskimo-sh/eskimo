@@ -71,7 +71,7 @@ public class SetupService {
     public static final String ESKIMO_PACKAGES_VERSIONS_JSON = "eskimo_packages_versions.json";
     public static final String TEMP_DOWNLOAD_SUFFIX = "__temp_download";
     public static final String DOCKER_TEMPLATE_PREFIX = "docker_template_";
-    public static final String K8S_PREFIX = "eskimo_";
+    public static final String KUBE_PREFIX = "eskimo_";
     public static final String DOWNLOAD_FLAG = "download";
     public static final String BUILD_FLAG = "build";
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
@@ -109,10 +109,10 @@ public class SetupService {
     private String packagesDevPath = "./packages_dev";
 
     @Value("${setup.packagesToBuild}")
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,k8s-master,k8s-dashboard,spark,flink,zeppelin,marathon";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,kube-master,kube-dashboard,spark,flink,zeppelin,marathon";
 
-    @Value("${setup.k8sPackages}")
-    private String k8sPackages = "k8s";
+    @Value("${setup.kubePackages}")
+    private String kubePackages = "kube";
 
     @Value("${setup.packagesDownloadUrlRoot}")
     private String packagesDownloadUrlRoot = "https://niceideas.ch/eskimo/";
@@ -138,8 +138,8 @@ public class SetupService {
     void setPackagesToBuild (String packagesToBuild) {
         this.packagesToBuild = packagesToBuild;
     }
-    void setK8sPackages (String k8sPackages) {
-        this.k8sPackages = k8sPackages;
+    void setKubePackages (String kubePackages) {
+        this.kubePackages = kubePackages;
     }
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
@@ -230,7 +230,7 @@ public class SetupService {
         findMissingPackages(packagesDistribFolder, missingServices);
 
         // 4. Ensure kubernetes is properly downloaded / built
-        findMissingK8s(packagesDistribFolder, missingServices);
+        findMissingKube(packagesDistribFolder, missingServices);
 
         if (!missingServices.isEmpty()) {
             List<String> missingServicesList = new ArrayList<>(missingServices);
@@ -239,15 +239,15 @@ public class SetupService {
         }
     }
 
-    void findMissingK8s(File packagesDistribFolder, Set<String> missingServices) {
-        for (String k8sPackage : k8sPackages.split(",")) {
+    void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
+        for (String kubePackage : kubePackages.split(",")) {
             if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
-                            file.getName().contains(k8sPackage)
+                            file.getName().contains(kubePackage)
                                     && !file.getName().contains(TEMP_DOWNLOAD_SUFFIX)
                                     && file.getName().endsWith(TAR_GZ_EXTENSION)
-                                    && file.getName().startsWith(K8S_PREFIX) )) {
-                missingServices.add(k8sPackage);
+                                    && file.getName().startsWith(KUBE_PREFIX) )) {
+                missingServices.add(kubePackage);
             }
         }
     }
@@ -375,7 +375,7 @@ public class SetupService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public void prepareSetup (
             JsonWrapper setupConfig,
-            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadK8s, Set<String> buildK8s, Set<String> packageUpdate)
+            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate)
             throws SetupException {
 
         File packagesDistribFolder = new File (packageDistributionPath);
@@ -416,9 +416,9 @@ public class SetupService {
 
         }
 
-        // 2. Find out about missing K8s distrib
-        String k8sOrigin = (String) setupConfig.getValueForPath("setup-k8s-origin");
-        if (StringUtils.isEmpty(k8sOrigin) || k8sOrigin.equals(DOWNLOAD_FLAG)) { // for K8s default is download
+        // 2. Find out about missing Kube distrib
+        String kubeOrigin = (String) setupConfig.getValueForPath("setup-kube-origin");
+        if (StringUtils.isEmpty(kubeOrigin) || kubeOrigin.equals(DOWNLOAD_FLAG)) { // for Kube default is download
 
             if (ApplicationStatusService.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
@@ -430,12 +430,12 @@ public class SetupService {
 
             Set<String> missingServices = new HashSet<>();
 
-            findMissingK8s(packagesDistribFolder, missingServices);
+            findMissingKube(packagesDistribFolder, missingServices);
 
-            fillInPackages(downloadK8s, packagesVersion, missingServices);
+            fillInPackages(downloadKube, packagesVersion, missingServices);
 
         } else {
-            findMissingK8s(packagesDistribFolder, buildK8s);
+            findMissingKube(packagesDistribFolder, buildKube);
         }
 
         // 3. Find out about upgrades
@@ -562,15 +562,15 @@ public class SetupService {
             }
 
             // 2. Then focus on Kubernetes
-            Set<String> missingK8sPackagesTemp = new HashSet<>();
-            findMissingK8s(packagesDistribFolder, missingK8sPackagesTemp);
+            Set<String> missingKubePackagesTemp = new HashSet<>();
+            findMissingKube(packagesDistribFolder, missingKubePackagesTemp);
 
-            List<String> missingK8sPackages = SetupCommand.sortK8sPackage(missingK8sPackagesTemp, servicesDefinition);
+            List<String> missingKubePackages = SetupCommand.sortKubePackage(missingKubePackagesTemp, servicesDefinition);
 
-            String k8sOrigin = (String) setupConfig.getValueForPath("setup-k8s-origin");
+            String kubeOrigin = (String) setupConfig.getValueForPath("setup-kube-origin");
 
-            if (!missingK8sPackages.isEmpty()) {
-                if (StringUtils.isEmpty(k8sOrigin) || k8sOrigin.equals(DOWNLOAD_FLAG)) { // for kube default is download
+            if (!missingKubePackages.isEmpty()) {
+                if (StringUtils.isEmpty(kubeOrigin) || kubeOrigin.equals(DOWNLOAD_FLAG)) { // for kube default is download
 
                     if (ApplicationStatusService.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
@@ -580,19 +580,19 @@ public class SetupService {
                         packagesVersion = loadRemotePackagesVersionFile();
                     }
 
-                    for (String k8sPackageName : missingK8sPackages) {
+                    for (String kubePackageName : missingKubePackages) {
 
-                        String softwareVersion = (String) packagesVersion.getValueForPath(k8sPackageName + ".software");
-                        String distributionVersion = (String) packagesVersion.getValueForPath(k8sPackageName + ".distribution");
+                        String softwareVersion = (String) packagesVersion.getValueForPath(kubePackageName + ".software");
+                        String distributionVersion = (String) packagesVersion.getValueForPath(kubePackageName + ".distribution");
 
-                        downloadPackage(K8S_PREFIX + k8sPackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                        downloadPackage(KUBE_PREFIX + kubePackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
 
                 } else {
 
                     // call script
-                    for (String k8sPackageName : missingK8sPackages) {
-                        buildPackage(k8sPackageName);
+                    for (String kubePackageName : missingKubePackages) {
+                        buildPackage(kubePackageName);
                     }
                 }
             }
@@ -724,7 +724,7 @@ public class SetupService {
     }
 
     protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
-        // download k8s using full java solution, no script (don't want dependency on system script for this)
+        // download kube using full java solution, no script (don't want dependency on system script for this)
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream())) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
                 try (FileChannel fileChannel = fileOutputStream.getChannel()) {

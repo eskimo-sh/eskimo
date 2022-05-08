@@ -75,7 +75,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
         js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"kubernetes\"];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-runtime\", \"gluster\", \"logstash\", \"flink-runtime\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -90,7 +90,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     public void testGetService() throws Exception {
 
         assertJavascriptEquals("ntp", "eskimoServicesSelection.getService(1, 1).name");
-        assertJavascriptEquals("spark-executor", "eskimoServicesSelection.getService(3, 3).name");
+        assertJavascriptEquals("spark-runtime", "eskimoServicesSelection.getService(3, 3).name");
 
     }
 
@@ -125,14 +125,14 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "  \"node_id1\": \"192.168.10.11\",\n" +
                 "  \"elasticsearch1\": \"on\",\n" +
                 "  \"flink-app-master\": \"1\",\n" +
-                "  \"flink-worker1\": \"on\",\n" +
+                "  \"flink-runtime1\": \"on\",\n" +
                 "  \"kafka1\": \"on\",\n" +
                 "  \"logstash1\": \"on\",\n" +
                 "  \"mesos-agent1\": \"on\",\n" +
                 "  \"mesos-master\": \"1\",\n" +
                 "  \"ntp1\": \"on\",\n" +
                 "  \"prometheus1\": \"on\",\n" +
-                "  \"spark-executor1\": \"on\",\n" +
+                "  \"spark-runtime1\": \"on\",\n" +
                 "  \"zookeeper\": \"1\"\n" +
                 "};" +
                 "}");
@@ -150,10 +150,10 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "\"mesos-master\":\"1\"," +
                 "\"logstash1\":\"on\"," +
                 "\"mesos-agent1\":\"on\"," +
-                "\"spark-executor1\":\"on\"," +
+                "\"spark-runtime1\":\"on\"," +
                 "\"prometheus1\":\"on\"," +
                 "\"flink-app-master\":\"1\"," +
-                "\"flink-worker1\":\"on\"," +
+                "\"flink-runtime1\":\"on\"," +
                 "\"kafka1\":\"on\"}", "JSON.stringify (result)");
     }
 
@@ -178,10 +178,10 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "\"logstash\":\"on\"," +
                 "\"mesos-agent\":\"on\"," +
                 "\"kubernetes\":\"on\"," +
-                "\"spark-executor\":\"on\"," +
+                "\"spark-runtime\":\"on\"," +
                 "\"prometheus\":\"on\"," +
                 "\"flink-app-master\":\"on\"," +
-                "\"flink-worker\":\"on\"," +
+                "\"flink-runtime\":\"on\"," +
                 "\"kafka\":\"on\"}", "JSON.stringify (result)");
     }
 }

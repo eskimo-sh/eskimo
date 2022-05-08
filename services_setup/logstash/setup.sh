@@ -51,31 +51,19 @@ sudo rm -f logstash_install_log
 
 # build
 
-# Initially this was a Hack for BTRFS support :
-#   - need to unmount gluster shares otherwise cp command goes nuts
-#   - https://github.com/moby/moby/issues/38252
-# But eventually I need to do this in anyway to make sure everything is preoperly re-installed
-# I need to make sure I'm doing this before attempting to recreate the directories
-preinstall_unmount_gluster_share /var/lib/elasticsearch/logstash/data
-
 echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 echo " - Configuring host logstash config part"
 . ./setupLogstashCommon.sh
 if [[ $? != 0 ]]; then
     echo "Logstash Common configuration part failed !"
-    exit -21
+    exit 21
 fi
-
-echo " - Installing setupLogstashGlusterShares.sh to /usr/local/sbin"
-sudo cp setupLogstashGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupLogstashGlusterShares.sh
-
 
 echo " - Building docker container for logstash"
 build_container logstash logstash logstash_install_log
@@ -112,7 +100,7 @@ docker exec logstash bash /scripts/inContainerSetupESCommon.sh $elasticsearch_us
 if [[ `tail -n 1 logstash_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat logstash_install_log
-    exit -102
+    exit 102
 fi
 
 echo " - Configuring logstash container"
@@ -120,8 +108,11 @@ docker exec logstash bash /scripts/inContainerSetupLogstash.sh | tee -a logstash
 if [[ `tail -n 1 logstash_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat logstash_install_log
-    exit -101
+    exit 101
 fi
+
+echo " - Copying inContainerMountGluster.sh script"
+docker_cp_script inContainerMountGluster.sh sbin logstash logstash_install_log
 
 #echo " - TODO"
 #docker exec -it logstash TODO
@@ -133,16 +124,5 @@ handle_topology_settings logstash logstash_install_log
 echo " - Committing changes to local template and exiting container logstash"
 commit_container logstash logstash_install_log
 
-echo " - Copying logstash command line programs docker wrappers to /usr/local/bin"
-for i in `find ./logstash_wrappers -mindepth 1`; do
-    sudo cp $i /usr/local/bin
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /usr/local/bin/$filename
-done
-
-echo " - Copy logstash remote client to /usr/local/bin"
-sudo cp command_server/logstash-cli /usr/local/bin
-sudo chmod 755 /usr/local/bin/logstash-cli
-
-echo " - Installing and checking systemd service file"
-install_and_check_service_file logstash logstash_install_log
+echo " - Starting Kubernetes deployment"
+deploy_kubernetes logstash logstash_install_log

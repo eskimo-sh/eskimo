@@ -92,9 +92,9 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         List<ServiceOperationsCommand.ServiceOperationId> group8 = orderedInstall.get(8);
         assertEquals(2, group8.size());
-        assertEquals("spark-executor", group8.get(0).getService());
+        assertEquals("spark-runtime", group8.get(0).getService());
         assertEquals("192.168.10.11", group8.get(0).getNode());
-        assertEquals("spark-executor", group8.get(1).getService());
+        assertEquals("spark-runtime", group8.get(1).getService());
         assertEquals("192.168.10.13", group8.get(1).getNode());
 
 

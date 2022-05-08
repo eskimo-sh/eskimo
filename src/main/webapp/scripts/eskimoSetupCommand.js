@@ -97,33 +97,33 @@ eskimo.SetupCommand = function() {
             }
         }
 
-        // Build of mesos
-        if (command.buildMesos != null && command.buildMesos.length > 0) {
+        // Build of kube
+        if (command.buildKube != null && command.buildKube.length > 0) {
 
-            commandDescription += '<br><br><strong>Mesos Packages are about to be built.</strong>' +
+            commandDescription += '<br><br><strong>Kube Packages are about to be built.</strong>' +
                 '<br>'+
-                'Building mesos happens in the folder "packages_dev" under the root folder of your eskimo installation<br>'+
-                'Mesos Packages are built using shell script and either vagrant or libvirt.<br>'+
+                'Building kube happens in the folder "packages_dev" under the root folder of your eskimo installation<br>'+
+                'Kube Packages are built using shell script and either vagrant or libvirt.<br>'+
                 '<strong>Building packages can take several hours.</strong><br>'+
-                '<strong>List of Mesos packages to be built</strong><br>';
+                '<strong>List of Kube packages to be built</strong><br>';
 
 
-            for (let i = 0; i < command.buildMesos.length; i++) {
-                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildMesos[i] + '</strong><br>';
+            for (let i = 0; i < command.buildKube.length; i++) {
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.buildKube[i] + '</strong><br>';
             }
         }
 
-        // Download of mesos
-        if (command.downloadMesos != null && command.downloadMesos.length > 0) {
+        // Download of kube
+        if (command.downloadKube != null && command.downloadKube.length > 0) {
 
-            commandDescription += '<br><br><strong>Mesos Packages are about to be downloaded from '+command.packageDownloadUrl+'.</strong>' +
+            commandDescription += '<br><br><strong>Kube Packages are about to be downloaded from '+command.packageDownloadUrl+'.</strong>' +
                 '<br>'+
-                'Downloading of mesos packages can take several dozen of minutes depending on your internet connection<br>'+
-                '<strong>List of Mesos packages to be downloaded</strong><br>';
+                'Downloading of kube packages can take several dozen of minutes depending on your internet connection<br>'+
+                '<strong>List of Kube packages to be downloaded</strong><br>';
 
 
-            for (let i = 0; i < command.downloadMesos.length; i++) {
-                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadMesos[i] + '</strong><br>';
+            for (let i = 0; i < command.downloadKube.length; i++) {
+                commandDescription += '<strong><i class="fa fa-arrow-right"></i>&nbsp;' + command.downloadKube[i] + '</strong><br>';
             }
         }
 

@@ -7,8 +7,8 @@
   "elasticsearch1": "on",
   "logstash1": "on",
   "kafka1": "on",
-  "spark-executor1": "on",
-  "flink-worker1": "on",
+  "spark-runtime1": "on",
+  "flink-runtime1": "on",
   "zookeeper" : "1",
   "kibana" : "1",
   "zeppelin" : "1"

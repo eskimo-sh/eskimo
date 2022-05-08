@@ -80,8 +80,8 @@ public class NodeRangeResolverTest {
                 put("mesos-agent1", "on");
                 put("mesos-agent2", "on");
                 put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
+                put("spark-runtime1", "on");
+                put("spark-runtime2", "on");
                 put("spark-history-server", "1");
                 put("zeppelin", "1");
                 put("zookeeper", "1");
@@ -116,8 +116,8 @@ public class NodeRangeResolverTest {
                 put("mesos-agent1", "on");
                 put("mesos-agent2", "on");
                 put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
+                put("spark-runtime1", "on");
+                put("spark-runtime2", "on");
                 put("spark-history-server", "1");
                 put("zeppelin", "1");
                 put("zookeeper", "1");
@@ -152,8 +152,8 @@ public class NodeRangeResolverTest {
                 put("mesos-agent1", "on");
                 put("mesos-agent2", "on");
                 put("mesos-master", "1");
-                put("spark-executor1", "on");
-                put("spark-executor2", "on");
+                put("spark-runtime1", "on");
+                put("spark-runtime2", "on");
                 put("spark-history-server", "1");
                 put("zeppelin", "1");
                 put("zookeeper", "1");
@@ -213,8 +213,8 @@ public class NodeRangeResolverTest {
             put("mesos-agent1", "on");
             put("mesos-agent2", "on");
             put("mesos-master", "1");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
+            put("spark-runtime1", "on");
+            put("spark-runtime2", "on");
             put("spark-history-server", "1");
             put("zeppelin", "1");
             put("zookeeper", "1");
@@ -260,10 +260,10 @@ public class NodeRangeResolverTest {
             put("prometheus2", "on");
             put("prometheus3", "on");
             put("prometheus4", "on");
-            put("spark-executor1", "on");
-            put("spark-executor2", "on");
-            put("spark-executor3", "on");
-            put("spark-executor4", "on");
+            put("spark-runtime1", "on");
+            put("spark-runtime2", "on");
+            put("spark-runtime3", "on");
+            put("spark-runtime4", "on");
             put("spark-history-server", "1");
             put("zeppelin", "1");
             put("zookeeper", "1");

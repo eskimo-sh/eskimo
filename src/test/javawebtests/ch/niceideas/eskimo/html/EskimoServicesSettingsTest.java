@@ -100,9 +100,9 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         assertJavascriptEquals ("3", "$('#kafka-num-partitions').val()");
 
-        assertJavascriptEquals ("", "$('#spark-executor-spark-rpc-numRetries').val()");
+        assertJavascriptEquals ("", "$('#spark-runtime-spark-rpc-numRetries').val()");
 
-        assertJavascriptEquals ("", "$('#spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()");
+        assertJavascriptEquals ("", "$('#spark-runtime-spark-dynamicAllocation-cachedExecutorIdleTimeout').val()");
     }
 
     @Test

@@ -42,5 +42,8 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh logstash
 
+echo " - Mounting logstash gluster shares"
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch
+
 echo " - Starting logstash remote server"
 /usr/local/sbin/logstash_remote.sh

@@ -155,7 +155,7 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.reinstallKubernetesServiceConfig("{\"spark-executor_install\":\"on\",\"kafka_install\":\"on\",\"elasticsearch_install\":\"on\",\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
+                "}", mscc.reinstallKubernetesServiceConfig("{\"spark-runtime_install\":\"on\",\"kafka_install\":\"on\",\"elasticsearch_install\":\"on\",\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));
 
@@ -258,7 +258,7 @@ public class KubernetesServicesConfigControllerTest {
                 "\"cerebro_install\":\"on\"," +
                 "\"elasticsearch_install\":\"on\"," +
                 "\"kafka_install\":\"on\"," +
-                "\"spark-executor_install\":\"on\"," +
+                "\"spark-runtime_install\":\"on\"," +
                 "\"grafana_install\":\"on\"," +
                 "\"zeppelin_install\":\"on\"," +
                 "\"spark-history-server\":\"on\"," +

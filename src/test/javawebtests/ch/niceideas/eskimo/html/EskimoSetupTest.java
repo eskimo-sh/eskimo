@@ -112,7 +112,7 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         js("eskimoSetup.handleSetup("+setupBuild+")");
 
-        assertJavascriptEquals("radio-inline disabled", "$('#setup-k8s-origin-download-label').attr('class')");
+        assertJavascriptEquals("radio-inline disabled", "$('#setup-kube-origin-download-label').attr('class')");
         assertJavascriptEquals("radio-inline disabled", "$('#setup-services-origin-download-label').attr('class')");
 
         JsonWrapper setupWrapper = new JsonWrapper(setupBuild);
@@ -120,7 +120,7 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         js("eskimoSetup.handleSetup("+setupWrapper.getFormattedValue()+")");
 
-        assertJavascriptEquals("radio-inline", "$('#setup-k8s-origin-download-label').attr('class')");
+        assertJavascriptEquals("radio-inline", "$('#setup-kube-origin-download-label').attr('class')");
         assertJavascriptEquals("radio-inline", "$('#setup-services-origin-download-label').attr('class')");
     }
 

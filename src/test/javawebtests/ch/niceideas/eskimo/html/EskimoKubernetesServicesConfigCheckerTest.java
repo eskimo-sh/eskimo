@@ -95,9 +95,9 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             "    \"kubernetes-dashboard_install\": \"on\",\n" +
             "    \"kubernetes-dashboard_cpu\": \"0.3\",\n" +
             "    \"kubernetes-dashboard_ram\": \"500M\",\n" +
-            "    \"spark-executor_install\": \"on\",\n" +
-            "    \"spark-executor_cpu\": \"1\",\n" +
-            "    \"spark-executor_ram\": \"800M\"\n" +
+            "    \"spark-runtime_install\": \"on\",\n" +
+            "    \"spark-runtime_cpu\": \"1\",\n" +
+            "    \"spark-runtime_ram\": \"800M\"\n" +
             "}");
 
     @BeforeEach
@@ -248,14 +248,14 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             }});
 
             JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("spark-executor_install", "on");
+                put("spark-runtime_install", "on");
             }});
 
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-executor expects 1 kube-master instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test

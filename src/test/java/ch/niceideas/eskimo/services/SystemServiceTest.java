@@ -285,7 +285,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
-        assertEquals("OK", statusMap.get("service_spark-executor_192-168-10-11"));
+        assertEquals("OK", statusMap.get("service_spark-runtime_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
     }
@@ -395,7 +395,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
         });
 
-        servicesInstallStatus.setValueForPath("spark-executor_installed_on_IP_192-168-10-11", "restart");
+        servicesInstallStatus.setValueForPath("spark-runtime_installed_on_IP_192-168-10-11", "restart");
         servicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "restart");
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
@@ -404,7 +404,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to marathon
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
-        assertEquals("restart", statusMap.get("service_spark-executor_192-168-10-11"));
+        assertEquals("restart", statusMap.get("service_spark-runtime_192-168-10-11"));
         assertEquals("restart", statusMap.get("service_gluster_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
     }
@@ -691,7 +691,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"marathon_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"spark-executor_installed_on_IP_192-168-10-11\": \"OK\"\n" +
+                "    \"spark-runtime_installed_on_IP_192-168-10-11\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -796,7 +796,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"marathon_installed_on_IP_192-168-10-11\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"spark-executor_installed_on_IP_192-168-10-11\": \"OK\"\n" +
+                "    \"spark-runtime_installed_on_IP_192-168-10-11\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 

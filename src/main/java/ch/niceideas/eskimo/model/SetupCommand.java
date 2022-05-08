@@ -59,8 +59,8 @@ public class SetupCommand implements JSONOpCommand {
 
     private final List<String> downloadPackages;
     private final List<String> buildPackage;
-    private final List<String> downloadMesos;
-    private final List<String> buildMesos;
+    private final List<String> downloadKube;
+    private final List<String> buildKube;
     private final List<String> packageUpdates;
 
     public static SetupCommand create (
@@ -70,24 +70,24 @@ public class SetupCommand implements JSONOpCommand {
 
         Set<String> downloadPackages = new HashSet<>();
         Set<String> buildPackage = new HashSet<>();
-        Set<String> downloadMesos = new HashSet<>();
-        Set<String> buildMesos = new HashSet<>();
+        Set<String> downloadKube = new HashSet<>();
+        Set<String> buildKube = new HashSet<>();
         Set<String> packageUpdates = new HashSet<>();
 
-        setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdates);
+        setupService.prepareSetup(rawSetup, downloadPackages, buildPackage, downloadKube, buildKube, packageUpdates);
 
         return new SetupCommand(rawSetup, setupService.getPackagesDownloadUrlRoot(),
                 sortPackage (downloadPackages, servicesDefinition),
                 sortPackage (buildPackage, servicesDefinition),
-                sortK8sPackage(downloadMesos, servicesDefinition),
-                sortK8sPackage(buildMesos, servicesDefinition),
+                sortKubePackage(downloadKube, servicesDefinition),
+                sortKubePackage(buildKube, servicesDefinition),
                 sortPackage (packageUpdates, servicesDefinition));
     }
 
-    public static List<String> sortK8sPackage(Set<String> missingMesosPackages, ServicesDefinition servicesDefinition) {
-        List<String> sortedMesosPackages = new ArrayList<>(missingMesosPackages);
-        sortedMesosPackages.sort(String::compareTo);
-        return sortedMesosPackages;
+    public static List<String> sortKubePackage(Set<String> missingKubePackages, ServicesDefinition servicesDefinition) {
+        List<String> sortedKubePackages = new ArrayList<>(missingKubePackages);
+        sortedKubePackages.sort(String::compareTo);
+        return sortedKubePackages;
     }
 
     public static List<String> sortPackage(Set<String> missingPackages, ServicesDefinition servicesDefinition) {
@@ -137,15 +137,15 @@ public class SetupCommand implements JSONOpCommand {
     SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl,
                  List<String> downloadPackages,
                  List<String> buildPackage,
-                 List<String> downloadMesos,
-                 List<String> buildMesos,
+                 List<String> downloadKube,
+                 List<String> buildKube,
                  List<String> packageUpdates) {
         this.rawSetup = rawSetup;
         this.packageDownloadUrl = packageDownloadUrl;
         this.downloadPackages = downloadPackages;
         this.buildPackage = buildPackage;
-        this.downloadMesos = downloadMesos;
-        this.buildMesos = buildMesos;
+        this.downloadKube = downloadKube;
+        this.buildKube = buildKube;
         this.packageUpdates = packageUpdates;
     }
 
@@ -154,10 +154,10 @@ public class SetupCommand implements JSONOpCommand {
             put("packageDownloadUrl", packageDownloadUrl);
             put("downloadPackages", new JSONArray(downloadPackages));
             put("buildPackage", new JSONArray(buildPackage));
-            put("downloadMesos", new JSONArray(downloadMesos));
-            put("buildMesos", new JSONArray(buildMesos));
+            put("downloadKube", new JSONArray(downloadKube));
+            put("buildKube", new JSONArray(buildKube));
             put("packageUpdates", new JSONArray(packageUpdates));
-            put("none", buildMesos.size() + downloadMesos.size() + buildPackage.size() + downloadPackages.size() + packageUpdates.size() <= 0);
+            put("none", buildKube.size() + downloadKube.size() + buildPackage.size() + downloadPackages.size() + packageUpdates.size() <= 0);
         }});
     }
 
@@ -165,8 +165,8 @@ public class SetupCommand implements JSONOpCommand {
     public boolean hasChanges() {
         return !downloadPackages.isEmpty()
                 || !buildPackage.isEmpty()
-                || !downloadMesos.isEmpty()
-                || !buildMesos.isEmpty()
+                || !downloadKube.isEmpty()
+                || !buildKube.isEmpty()
                 || !packageUpdates.isEmpty();
     }
 
@@ -183,11 +183,11 @@ public class SetupCommand implements JSONOpCommand {
                 .map (pack -> new SetupOperationId(TYPE_BUILD, pack))
                 .forEach(allOpList::add);
 
-        downloadMesos.stream()
+        downloadKube.stream()
                 .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
-        buildMesos.stream()
+        buildKube.stream()
                 .map (pack -> new SetupOperationId(TYPE_BUILD, pack))
                 .forEach(allOpList::add);
 

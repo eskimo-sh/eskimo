@@ -63,6 +63,8 @@ trap delete_k8s_master_lock_file EXIT
 echo "   + Sourcing kubernetes environment"
 . /etc/k8s/env.sh
 
+export HOME=/root
+
 echo "   + Mounting Kubernetes Eskimo Gluster shares"
 /usr/local/sbin/setupK8sGlusterShares.sh > /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
@@ -272,8 +274,11 @@ while : ; do
 
             echo "   + Failed to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN. Checking pod status"
 
-            FIXME Continue with a warning if pod is anything else than running !
-
+            coredns_status=`kubectl get pod -n kube-system -o custom-columns=NAME:metadata.name,STATUS:status.phase | grep coredns | sed 's/  */ /g' | cut -d ' ' -f 2`
+            if [[ "$coredns_status" != "" && "$coredns_status" != "Running" ]]; then
+                echo "! Coredns pod status is $coredns_status. Not attempting any resolution."
+                continue
+            fi
 
             echo "   + Trying to restart Network Manager"
 

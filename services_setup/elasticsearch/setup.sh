@@ -120,9 +120,6 @@ docker_cp_script inContainerInjectIndexSettings.sh sbin elasticsearch es_install
 echo " - Committing changes to local template and exiting container elasticsearch"
 commit_container elasticsearch es_install_log
 
-#echo " - Installing and checking systemd service file"
-#install_and_check_service_file elasticsearch es_install_log
-
 echo " - Starting Kubernetes deployment"
 deploy_kubernetes elasticsearch es_install_log
 

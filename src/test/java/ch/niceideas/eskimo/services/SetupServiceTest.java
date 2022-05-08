@@ -64,9 +64,9 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private File tempPackagesDistribPath = null;
 
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,kube-master,k8s-dashboad,spark,zeppelin";
+    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,kube-master,kubernetes-dashboard,spark,zeppelin";
 
-    private String k8sPackages = "kube";
+    private String kubePackages = "kube";
 
     private ServicesDefinition sd = new ServicesDefinition();
 
@@ -101,7 +101,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setServicesDefinition(sd);
 
         setupService.setPackagesToBuild(packagesToBuild);
-        setupService.setK8sPackages(k8sPackages);
+        setupService.setKubePackages(kubePackages);
 
         setupService.setConfigurationService(configurationService);
         configurationService.setSetupService(setupService);
@@ -132,11 +132,11 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertNotNull(version);
         assertEquals(new Pair<> ("6.8.3", "1"), version);
 
-        version = setupService.parseVersion("docker_template_mesos-master_1.8.1_1.tar.gz");
+        version = setupService.parseVersion("docker_template_kube-master_1.8.1_1.tar.gz");
         assertNotNull(version);
         assertEquals(new Pair<> ("1.8.1", "1"), version);
 
-        version = setupService.parseVersion("eskimo_mesos-debian_1.11.0_1.tar.gz");
+        version = setupService.parseVersion("eskimo_kube-debian_1.11.0_1.tar.gz");
         assertNotNull(version);
         assertEquals(new Pair<> ("1.11.0", "1"), version);
 
@@ -158,18 +158,18 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
         assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
-        assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-k8s-origin"));
+        assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-kube-origin"));
         assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
 
         assertNotNull(command);
 
-        assertEquals(3, command.getBuildMesos().size());
-        assertEquals(16, command.getBuildPackage().size());
+        assertEquals(1, command.getBuildKube().size());
+        assertEquals(17, command.getBuildPackage().size());
 
-        assertEquals("mesos-debian,mesos-redhat,mesos-suse", String.join(",", command.getBuildMesos()));
-        assertEquals("base-eskimo,elasticsearch,ntp,prometheus,zookeeper,gluster,kafka,mesos-master,logstash,flink,spark,cerebro,grafana,kibana,kafka-manager,zeppelin", String.join(",", command.getBuildPackage()));
+        assertEquals("kube", String.join(",", command.getBuildKube()));
+        assertEquals("base-eskimo,ntp,prometheus,zookeeper,gluster,kube-master,logstash,kubernetes-dashboard,elasticsearch,cerebro,grafana,kafka,spark,flink,kafka-manager,kibana,zeppelin", String.join(",", command.getBuildPackage()));
 
-        assertEquals(0, command.getDownloadMesos().size());
+        assertEquals(0, command.getDownloadKube().size());
         assertEquals(0, command.getDownloadPackages().size());
     }
 
@@ -197,7 +197,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setBuildVersion("1.0");
 
         JsonWrapper initConfig = new JsonWrapper(setupConfig);
-        initConfig.setValueForPath("setup-k8s-origin", "download");
+        initConfig.setValueForPath("setup-kube-origin", "download");
         initConfig.setValueForPath("setup-services-origin", "download");
 
         SetupCommand command = setupService.saveAndPrepareSetup(initConfig.getFormattedValue());
@@ -207,19 +207,19 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
         assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
-        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-k8s-origin"));
+        assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-kube-origin"));
         assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
 
         assertNotNull(command);
 
-        assertEquals(0, command.getBuildMesos().size());
+        assertEquals(0, command.getBuildKube().size());
         assertEquals(0, command.getBuildPackage().size());
 
-        assertEquals(3, command.getDownloadMesos().size());
-        assertEquals(16, command.getDownloadPackages().size());
+        assertEquals(1, command.getDownloadKube().size());
+        assertEquals(17, command.getDownloadPackages().size());
 
-        assertEquals("mesos-debian_1.8.1_1,mesos-redhat_1.8.1_1,mesos-suse_1.8.1_1", String.join(",", command.getDownloadMesos()));
-        assertEquals("base-eskimo_0.2_1,elasticsearch_6.8.3_1,ntp_debian_09_stretch_1,prometheus_2.10.0_1,zookeeper_debian_09_stretch_1,gluster_debian_09_stretch_1,kafka_2.2.0_1,mesos-master_1.8.1_1,logstash_6.8.3_1,flink_1.9.1_1,spark_2.4.4_1,cerebro_0.8.4_1,grafana_6.3.3_1,kibana_6.8.3_1,kafka-manager_2.0.0.2_1,zeppelin_0.9.0_1", String.join(",", command.getDownloadPackages()));
+        assertEquals("kube_1.23.5_1", String.join(",", command.getDownloadKube()));
+        assertEquals("base-eskimo_0.2_1,ntp_debian_09_stretch_1,prometheus_2.10.0_1,zookeeper_debian_09_stretch_1,gluster_debian_09_stretch_1,kube-master_1.8.1_1,logstash_6.8.3_1,kubernetes-dashboard_2.5.1_1,elasticsearch_6.8.3_1,cerebro_0.8.4_1,grafana_6.3.3_1,kafka_2.2.0_1,spark_2.4.4_1,flink_1.9.1_1,kafka-manager_2.0.0.2_1,kibana_6.8.3_1,zeppelin_0.9.0_1", String.join(",", command.getDownloadPackages()));
     }
 
     @Test
@@ -232,9 +232,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         SetupException exception = assertThrows(SetupException.class, setupService::ensureSetupCompleted);
         assertEquals(
-                "Following services are missing and need to be downloaded or built base-eskimo, cerebro, elasticsearch, " +
-                        "flink, gluster, grafana, kafka, kafka-manager, kibana, logstash, mesos-debian, " +
-                        "mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
+                "Following services are missing and need to be downloaded or built base-eskimo, cerebro, elasticsearch, flink, gluster, grafana, kafka, kafka-manager, kibana, kube, kube-master, kubernetes-dashboard, logstash, ntp, prometheus, spark, zeppelin, zookeeper",
                 exception.getMessage());
 
         // Create docker images packages
@@ -244,12 +242,12 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         exception = assertThrows(SetupException.class, setupService::ensureSetupCompleted);
         assertEquals(
-                "Following services are missing and need to be downloaded or built mesos-debian, mesos-redhat, mesos-suse",
+                "Following services are missing and need to be downloaded or built kube",
                 exception.getMessage());
 
         // Create Kubernetes packages
-        for (String k8sPackage : k8sPackages.split(",")) {
-            FileUtils.writeFile(new File(tempPackagesDistribPath + "/eskimo_" + k8sPackage + "_1.23_1.tar.gz"), "DUMMY");
+        for (String kubePackage : kubePackages.split(",")) {
+            FileUtils.writeFile(new File(tempPackagesDistribPath + "/eskimo_" + kubePackage + "_1.23_1.tar.gz"), "DUMMY");
         }
 
         // no exception expected anymore
@@ -323,7 +321,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setBuildVersion("1.0");
 
         JsonWrapper setupConfigJson = new JsonWrapper(setupConfig);
-        setupConfigJson.setValueForPath("setup-k8s-origin", "download");
+        setupConfigJson.setValueForPath("setup-kube-origin", "download");
         setupConfigJson.setValueForPath("setup-services-origin", "download");
         SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService, servicesDefinition);
         operationsMonitoringService.operationsStarted(setupCommand);
@@ -407,29 +405,29 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         Set<String> downloadPackages = new HashSet<>();
         Set<String> buildPackage = new HashSet<>();
-        Set<String> downloadMesos = new HashSet<>();
-        Set<String> buildMesos = new HashSet<>();
+        Set<String> downloadKube = new HashSet<>();
+        Set<String> buildKube = new HashSet<>();
         Set<String> packageUpdate = new HashSet<>();
 
-        setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
+        setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadKube, buildKube, packageUpdate);
 
-        assertEquals(16, buildPackage.size());
-        assertEquals(3, buildMesos.size());
+        assertEquals(17, buildPackage.size());
+        assertEquals(1, buildKube.size());
 
         // 2. test download strategy
-        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         downloadPackages = new HashSet<>();
         buildPackage = new HashSet<>();
-        downloadMesos = new HashSet<>();
-        buildMesos = new HashSet<>();
+        downloadKube = new HashSet<>();
+        buildKube = new HashSet<>();
         packageUpdate = new HashSet<>();
 
-        setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadMesos, buildMesos, packageUpdate);
+        setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadKube, buildKube, packageUpdate);
 
-        assertEquals(16, downloadPackages.size());
-        assertEquals(3, downloadMesos.size());
+        assertEquals(17, downloadPackages.size());
+        assertEquals(1, downloadKube.size());
     }
 
     @Test
@@ -486,7 +484,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 // No-Op
             }
             @Override
-            void findMissingK8s(File packagesDistribFolder, Set<String> missingServices) {
+            void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
@@ -502,7 +500,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.setPackagesToBuild("flink");
@@ -545,7 +543,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 // No-Op
             }
             @Override
-            void findMissingK8s(File packagesDistribFolder, Set<String> missingServices) {
+            void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
@@ -561,7 +559,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
@@ -574,24 +572,12 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
         // 13 updated packages
-        assertEquals(13, downloadPackageList.size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
+        assertEquals(14, downloadPackageList.size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
         assertEquals(0, builtPackageList.size());
 
         Collections.sort(downloadPackageList);
         assertEquals(
-                "docker_template_elasticsearch_6.8.3_1.tar.gz, " +
-                "docker_template_flink_1.9.1_1.tar.gz, " +
-                "docker_template_gluster_debian_09_stretch_1.tar.gz, " +
-                "docker_template_grafana_6.3.3_1.tar.gz, " +
-                "docker_template_kafka-manager_2.0.0.2_1.tar.gz, " +
-                "docker_template_kafka_2.2.0_1.tar.gz, " +
-                "docker_template_kibana_6.8.3_1.tar.gz, " +
-                "docker_template_logstash_6.8.3_1.tar.gz, " +
-                "docker_template_mesos-master_1.8.1_1.tar.gz, " +
-                "docker_template_ntp_debian_09_stretch_1.tar.gz, " +
-                "docker_template_prometheus_2.10.0_1.tar.gz, " +
-                "docker_template_spark_2.4.4_1.tar.gz, " +
-                "docker_template_zookeeper_debian_09_stretch_1.tar.gz",
+                "docker_template_elasticsearch_6.8.3_1.tar.gz, docker_template_flink_1.9.1_1.tar.gz, docker_template_gluster_debian_09_stretch_1.tar.gz, docker_template_grafana_6.3.3_1.tar.gz, docker_template_kafka-manager_2.0.0.2_1.tar.gz, docker_template_kafka_2.2.0_1.tar.gz, docker_template_kibana_6.8.3_1.tar.gz, docker_template_kube-master_1.8.1_1.tar.gz, docker_template_kubernetes-dashboard_2.5.1_1.tar.gz, docker_template_logstash_6.8.3_1.tar.gz, docker_template_ntp_debian_09_stretch_1.tar.gz, docker_template_prometheus_2.10.0_1.tar.gz, docker_template_spark_2.4.4_1.tar.gz, docker_template_zookeeper_debian_09_stretch_1.tar.gz",
             String.join(", ", downloadPackageList));
     }
 
@@ -618,7 +604,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.setBuildVersion("1.0");
@@ -663,7 +649,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         });
 
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
-        setupConfigWrapper.setValueForPath("setup-k8s-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
 
         setupService.saveAndPrepareSetup(setupConfig);
@@ -675,30 +661,12 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
-        assertEquals(19, downloadPackageList.size());
+        assertEquals(18, downloadPackageList.size());
         assertEquals(0, builtPackageList.size());
 
         Collections.sort(downloadPackageList);
         assertEquals(
-                    "docker_template_base-eskimo_0.2_1.tar.gz, " +
-                    "docker_template_cerebro_0.8.4_1.tar.gz, " +
-                    "docker_template_elasticsearch_6.8.3_1.tar.gz, " +
-                    "docker_template_flink_1.9.1_1.tar.gz, " +
-                    "docker_template_gluster_debian_09_stretch_1.tar.gz, " +
-                    "docker_template_grafana_6.3.3_1.tar.gz, " +
-                    "docker_template_kafka-manager_2.0.0.2_1.tar.gz, " +
-                    "docker_template_kafka_2.2.0_1.tar.gz, " +
-                    "docker_template_kibana_6.8.3_1.tar.gz, " +
-                    "docker_template_logstash_6.8.3_1.tar.gz, " +
-                    "docker_template_mesos-master_1.8.1_1.tar.gz, " +
-                    "docker_template_ntp_debian_09_stretch_1.tar.gz, " +
-                    "docker_template_prometheus_2.10.0_1.tar.gz, " +
-                    "docker_template_spark_2.4.4_1.tar.gz, " +
-                    "docker_template_zeppelin_0.9.0_1.tar.gz, " +
-                    "docker_template_zookeeper_debian_09_stretch_1.tar.gz, " +
-                    "eskimo_mesos-debian_1.8.1_1.tar.gz, " +
-                    "eskimo_mesos-redhat_1.8.1_1.tar.gz, " +
-                    "eskimo_mesos-suse_1.8.1_1.tar.gz",
+                    "docker_template_base-eskimo_0.2_1.tar.gz, docker_template_cerebro_0.8.4_1.tar.gz, docker_template_elasticsearch_6.8.3_1.tar.gz, docker_template_flink_1.9.1_1.tar.gz, docker_template_gluster_debian_09_stretch_1.tar.gz, docker_template_grafana_6.3.3_1.tar.gz, docker_template_kafka-manager_2.0.0.2_1.tar.gz, docker_template_kafka_2.2.0_1.tar.gz, docker_template_kibana_6.8.3_1.tar.gz, docker_template_kube-master_1.8.1_1.tar.gz, docker_template_kubernetes-dashboard_2.5.1_1.tar.gz, docker_template_logstash_6.8.3_1.tar.gz, docker_template_ntp_debian_09_stretch_1.tar.gz, docker_template_prometheus_2.10.0_1.tar.gz, docker_template_spark_2.4.4_1.tar.gz, docker_template_zeppelin_0.9.0_1.tar.gz, docker_template_zookeeper_debian_09_stretch_1.tar.gz, eskimo_kube_1.23.5_1.tar.gz",
                 String.join(", ", downloadPackageList));
     }
 
@@ -734,13 +702,14 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.applySetup(SetupCommand.create(new JsonWrapper(setupConfig), setupService, servicesDefinition));
 
-        assertEquals(19, builtPackageList.size());
+        assertEquals(18, builtPackageList.size());
         assertEquals(0, downloadPackageList.size());
 
         Collections.sort(builtPackageList);
         assertEquals(
-                    "base-eskimo, cerebro, elasticsearch, flink, gluster, grafana, kafka, kafka-manager, kibana, " +
-                    "logstash, mesos-debian, mesos-master, mesos-redhat, mesos-suse, ntp, prometheus, spark, zeppelin, zookeeper",
+                    "base-eskimo, cerebro, elasticsearch, flink, gluster, grafana, kafka, kafka-manager, " +
+                            "kibana, kube, kube-master, kubernetes-dashboard, logstash, ntp, prometheus, spark, " +
+                            "zeppelin, zookeeper",
                 String.join(", ", builtPackageList));
 
     }

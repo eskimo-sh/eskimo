@@ -5,7 +5,7 @@
     "service_kafka_192-168-10-11": "OK",
     "service_cerebro_192-168-10-11": "OK",
     "service_elasticsearch_192-168-10-11": "OK",
-    "service_flink-worker_192-168-10-11": "OK",
+    "service_flink-runtime_192-168-10-11": "OK",
     "service_spark-history-server_192-168-10-11": "OK",
     "service_flink-app-master_192-168-10-11": "OK",
     "service_mesos-agent_192-168-10-11": "OK",
@@ -16,7 +16,7 @@
     "node_alive_192-168-10-11": "OK",
     "service_mesos-master_192-168-10-11": "OK",
     "service_zeppelin_192-168-10-11": "OK",
-    "service_spark-executor_192-168-10-11": "OK",
+    "service_spark-runtime_192-168-10-11": "OK",
     "service_zookeeper_192-168-10-11": "OK",
     "service_logstash_192-168-10-11": "OK",
     "service_prometheus_192-168-10-11": "OK"

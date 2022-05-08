@@ -4,7 +4,7 @@
     "service_cerebro_192-168-10-11": "KO",
     "service_elasticsearch_192-168-10-11": "NA",
     "node_nbr_192-168-10-13": "2",
-    "service_spark-executor_192-168-10-13": "OK",
+    "service_spark-runtime_192-168-10-13": "OK",
     "service_elasticsearch_192-168-10-13": "NA",
     "service_ntp_192-168-10-11": "OK",
     "service_ntp_192-168-10-13": "OK",
@@ -24,7 +24,7 @@
     "service_grafana_192-168-10-11": "TD",
     "node_alive_192-168-10-11": "OK",
     "node_alive_192-168-10-13": "OK",
-    "service_spark-executor_192-168-10-11": "OK",
+    "service_spark-runtime_192-168-10-11": "OK",
     "service_kafka_192-168-10-13": "OK",
     "service_zookeeper_192-168-10-13": "NA",
     "service_kafka-manager_192-168-10-11": "KO"

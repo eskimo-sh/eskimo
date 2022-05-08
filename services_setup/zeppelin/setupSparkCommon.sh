@@ -1,1 +1,1 @@
-../spark-executor/setupCommon.sh
+../spark-runtime/setupCommon.sh

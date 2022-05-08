@@ -65,6 +65,10 @@ echo " - Installing required python packages"
 docker exec -i logstash_template pip install filelock furl > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -12
 
+echo " - Installing GlusterFS client"
+docker exec -i logstash_template apt-get -y install  glusterfs-client > /tmp/logstash_build_log 2>&1
+fail_if_error $? "/tmp/spark_build_log" -10
+
 echo " - Installing logstash"
 docker exec -i logstash_template bash /scripts/installLogstash.sh | tee /tmp/logstash_build_log 2>&1
 if [[ `tail -n 1 /tmp/logstash_build_log | grep " - In container install SUCCESS"` == "" ]]; then

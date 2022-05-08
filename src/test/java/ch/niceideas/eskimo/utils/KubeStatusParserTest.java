@@ -35,7 +35,7 @@ public class KubeStatusParserTest {
             "elasticsearch\n" +
             "k8s.gcr.io\n" +
             "spark\n" +
-            "spark-executor";
+            "spark-runtime";
 
     @Test
     public void testPodNameRexp() throws Exception {
@@ -74,7 +74,7 @@ public class KubeStatusParserTest {
                         "elasticsearch\n" +
                         "k8s.gcr.io\n" +
                         "spark\n" +
-                        "spark-executor\n",
+                        "spark-runtime\n",
                 parser.toString());
     }
 

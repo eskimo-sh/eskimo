@@ -213,19 +213,19 @@
     "title": "Kafka Broker",
     "mandatory": false
   },
-  "spark-executor": {
+  "spark-runtime": {
     "kubernetes": true,
     "col": 3,
     "conditional": "NONE",
     "configOrder": 12,
     "unique": false,
-    "name": "spark-executor",
-    "icon": "images/spark-executor-icon.png",
+    "name": "spark-runtime",
+    "icon": "images/spark-runtime-icon.png",
     "kubeConfig": {"request": {
       "cpu": "1",
       "ram": "800M"
     }},
-    "logo": "images/spark-executor-logo.png",
+    "logo": "images/spark-runtime-logo.png",
     "row": 3,
     "title": "Spark Executor",
     "mandatory": false

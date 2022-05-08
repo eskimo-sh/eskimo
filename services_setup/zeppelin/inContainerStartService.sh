@@ -58,8 +58,8 @@ sudo /bin/chown spark /var/run/spark/zeppelin
 echo " - Inject settings (Zeppelin)"
 /usr/local/sbin/settingsInjector.sh zeppelin
 
-echo " - Inject settings (spark-executor)"
-/usr/local/sbin/settingsInjector.sh spark-executor
+echo " - Inject settings (spark-runtime)"
+/usr/local/sbin/settingsInjector.sh spark-runtime
 
 echo " - Inject settings (flink-app-master)"
 /usr/local/sbin/settingsInjector.sh flink-app-master

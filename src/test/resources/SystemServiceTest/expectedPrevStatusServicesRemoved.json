@@ -15,8 +15,8 @@
     "mesos-master_installed_on_IP_192-168-10-13": "OK",
     "ntp_installed_on_IP_192-168-10-11": "OK",
     "ntp_installed_on_IP_192-168-10-13": "OK",
-    "spark-executor_installed_on_IP_192-168-10-11": "OK",
-    "spark-executor_installed_on_IP_192-168-10-13": "OK",
+    "spark-runtime_installed_on_IP_192-168-10-11": "OK",
+    "spark-runtime_installed_on_IP_192-168-10-13": "OK",
     "spark-history-server_installed_on_IP_MARATHON_NODE": "OK",
     "zeppelin_installed_on_IP_MARATHON_NODE": "OK",
     "zookeeper_installed_on_IP_192-168-10-13": "OK"

@@ -78,7 +78,7 @@ public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "flink-worker";
+        return "flink-runtime";
     }
 
     @Override

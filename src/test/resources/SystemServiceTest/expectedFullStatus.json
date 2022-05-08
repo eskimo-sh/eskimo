@@ -2,7 +2,7 @@
   "node_nbr_192-168-10-11": "1",
   "node_nbr_192-168-10-13": "2",
   "service_elasticsearch_192-168-10-11": "NA",
-  "service_spark-executor_192-168-10-13": "OK",
+  "service_spark-runtime_192-168-10-13": "OK",
   "service_cerebro_192-168-10-11": "OK",
   "service_elasticsearch_192-168-10-13": "NA",
   "service_marathon_192-168-10-11": "NA",
@@ -25,7 +25,7 @@
   "service_grafana_192-168-10-11": "TD",
   "node_alive_192-168-10-11": "OK",
   "node_alive_192-168-10-13": "OK",
-  "service_spark-executor_192-168-10-11": "OK",
+  "service_spark-runtime_192-168-10-11": "OK",
   "service_kafka_192-168-10-13": "OK",
   "service_zookeeper_192-168-10-13": "NA"
 }

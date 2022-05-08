@@ -24,8 +24,8 @@
   "prometheus1": "on",
   "prometheus2": "on",
   "prometheus3": "on",
-  "spark-executor2": "on",
-  "spark-executor3": "on",
+  "spark-runtime2": "on",
+  "spark-runtime3": "on",
   "spark-history-server": "1",
   "zeppelin": "1",
   "zookeeper": "1"

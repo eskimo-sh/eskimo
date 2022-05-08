@@ -80,7 +80,7 @@ public class PackageVersionGenerator {
             String fileName = packageFile.getName();
 
             if ((fileName.startsWith(SetupService.DOCKER_TEMPLATE_PREFIX)
-                    || fileName.startsWith(SetupService.K8S_PREFIX)
+                    || fileName.startsWith(SetupService.KUBE_PREFIX)
                 ) && fileName.endsWith("tar.gz")) {
 
                 String packageName;
@@ -90,8 +90,8 @@ public class PackageVersionGenerator {
                             fileName.indexOf("_", SetupService.DOCKER_TEMPLATE_PREFIX.length() + 1));
                 } else {
                     packageName = fileName.substring(
-                            SetupService.K8S_PREFIX.length(),
-                            fileName.indexOf("_", SetupService.K8S_PREFIX.length() + 1));
+                            SetupService.KUBE_PREFIX.length(),
+                            fileName.indexOf("_", SetupService.KUBE_PREFIX.length() + 1));
                 }
 
                 Pair<String,String> version = setupService.parseVersion(fileName);

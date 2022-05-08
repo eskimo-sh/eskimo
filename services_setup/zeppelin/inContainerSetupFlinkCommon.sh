@@ -1,1 +1,1 @@
-../flink/inContainerSetupFlinkCommon.sh
+../flink-runtime/inContainerSetupFlinkCommon.sh

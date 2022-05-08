@@ -46,8 +46,8 @@ echo " - Injecting topology (Spark History)"
 echo " - Inject settings (spark-history-server)"
 /usr/local/sbin/settingsInjector.sh spark-history-server
 
-echo " - Inject settings (spark-executor)"
-/usr/local/sbin/settingsInjector.sh spark-executor
+echo " - Inject settings (spark-runtime)"
+/usr/local/sbin/settingsInjector.sh spark-runtime
 
 echo " - Start glusterMountCheckerPeriodic.sh script"
 /bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &

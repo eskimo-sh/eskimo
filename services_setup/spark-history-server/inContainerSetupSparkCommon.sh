@@ -1,1 +1,1 @@
-../spark-executor/inContainerSetupSparkCommon.sh
+../spark-runtime/inContainerSetupSparkCommon.sh

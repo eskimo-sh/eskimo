@@ -156,7 +156,7 @@
                 "filename": "spark-defaults.conf",
                 "propertyFormat": "{name}={value}",
                 "commentPrefix": "#",
-                "service": "spark-executor",
+                "service": "spark-runtime",
                 "propertyType": "VARIABLE",
                 "filesystemService": "spark",
                 "properties": [
@@ -204,7 +204,7 @@
                     }
                 ]
             }],
-            "name": "spark-executor"
+            "name": "spark-runtime"
         },
         {
             "settings": [],

@@ -153,7 +153,7 @@ eskimo.Setup = function() {
             alert ("Couldn't get Eskimo version");
         }
 
-        switchDownloadBuild ("k8s", data);
+        switchDownloadBuild ("kube", data);
 
         switchDownloadBuild ("services", data);
 

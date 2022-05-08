@@ -72,7 +72,7 @@
       "mandatory": true,
       "group" : "Monitoring",
       "name" : "Prometheus",
-      "selectionLayout" : { "row" : 4, "col" : 1},
+      "selectionLayout" : { "row" : 3, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/prometheus-logo.png",
       "icon" : "images/prometheus-icon.png"
@@ -257,7 +257,7 @@
       "order": 5,
       "group" : "Kubernetes",
       "name" : "Etcd",
-      "selectionLayout" : { "row" : 5, "col" : 1},
+      "selectionLayout" : { "row" : 4, "col" : 1},
       "memory": "neglectable",
       "logo" : "images/kube-master-logo.png",
       "icon" : "images/kube-master-icon.png"
@@ -285,7 +285,7 @@
       "unique": true,
       "group" : "Kubernetes",
       "name" : "Master",
-      "selectionLayout" : { "row" : 5, "col" : 2},
+      "selectionLayout" : { "row" : 2, "col" : 2},
       "memory": "neglectable",
       "logo" : "images/kube-master-logo.png",
       "icon" : "images/kube-master-icon.png"
@@ -321,7 +321,7 @@
       "order": 7,
       "group" : "Kubernetes",
       "name" : "Slave",
-      "selectionLayout" : { "row" : 1, "col" : 3},
+      "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "verylarge",
       "logo" : "images/kube-slave-logo.png",
       "icon" : "images/kube-slave-icon.png"
@@ -402,7 +402,6 @@
       },
       "group" : "Kafka",
       "name" : "Broker",
-      "selectionLayout" : { "row" : 5, "col" : 3},
       "memory": "medium",
       "logo" : "images/kafka-logo.png",
       "icon" : "images/kafka-icon.png"
@@ -486,10 +485,27 @@
 
 
 
+  "kafka-cli" : {
+    "config": {
+      "order": 10,
+      "group": "Kafka",
+      "name": "Client",
+      "selectionLayout": {
+        "row": 2,
+        "col": 3
+      },
+      "memory": "neglectable",
+      "logo" : "images/kafka-logo.png",
+      "icon" : "images/kafka-icon.png"
+    }
+  },
+
+
+
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 10,
+      "order": 11,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -542,7 +558,7 @@
   "spark-history-server" : {
     "config": {
       "imageName" : "spark",
-      "order": 11,
+      "order": 12,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -589,7 +605,7 @@
       {
         "__comment": "this is to enforce the presence of at least one spark-executor otherwise spark-history makes no sense.",
         "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "spark-executor",
+        "masterService": "spark-runtime",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
@@ -607,12 +623,12 @@
 
 
 
-  "spark-executor" : {
+  "spark-runtime" : {
     "config": {
       "imageName" : "spark",
-      "order": 12,
+      "order": 13,
       "group" : "Spark",
-      "name" : "Executor",
+      "name" : "Runtime",
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -621,10 +637,9 @@
         }
       },
       "registryOnly": true,
-      "selectionLayout" : { "row" : 3, "col" : 3},
       "memory": "kube",
-      "logo" : "images/spark-executor-logo.png",
-      "icon" : "images/spark-executor-icon.png"
+      "logo" : "images/spark-runtime-logo.png",
+      "icon" : "images/spark-runtime-icon.png"
     },
     "dependencies": [
       {
@@ -690,11 +705,29 @@
 
 
 
-  "flink" : {
+  "spark-cli" : {
+    "config": {
+      "order": 14,
+      "group" : "Spark",
+      "name": "Client",
+      "selectionLayout": {
+        "row": 3,
+        "col": 3
+      },
+      "memory": "neglectable",
+      "logo" : "images/spark-runtime-logo.png",
+      "icon" : "images/spark-runtime-icon.png"
+    }
+  },
+
+
+
+  "flink-runtime" : {
     "config": {
       "imageName" : "flink",
-      "order": 13,
-      "name": "Flink",
+      "order": 15,
+      "group" : "Flink",
+      "name" : "Runtime",
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -702,7 +735,6 @@
           "ram": "1G"
         }
       },
-      "selectionLayout": { "row": 4, "col": 3  },
       "memory": "kube",
       "logo" : "images/flink-logo.png",
       "icon" : "images/flink-icon.png"
@@ -793,32 +825,48 @@
 
 
 
+  "flink-cli" : {
+    "config": {
+      "order": 16,
+      "group" : "Flink",
+      "name": "Client",
+      "selectionLayout": {
+        "row": 4,
+        "col": 3
+      },
+      "memory": "neglectable",
+      "logo" : "images/flink-logo.png",
+      "icon" : "images/flink-icon.png"
+    }
+  },
+
+
+
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 14,
+      "order": 17,
+      "kubernetes": true,
       "group" : "Elastic Stack",
       "name" : "Logstash",
-      "selectionLayout" : { "row" : 2, "col" : 3},
       "memory": "small",
       "logo" : "images/logstash-logo.png",
       "icon" : "images/logstash-icon.png"
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
         "restart": true
       },
       {
-        "__comment": "Need kube-slave to setup dnsmasq before starting logstash server container so it can reach ES service.",
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "kube-slave",
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": false
       }
     ],
     "commands" : [
@@ -833,10 +881,27 @@
 
 
 
+  "logstash-cli" : {
+    "config": {
+      "order": 18,
+      "group": "Elastic Stack",
+      "name": "LS Client",
+      "selectionLayout": {
+        "row": 1,
+        "col": 3
+      },
+      "memory": "neglectable",
+      "logo": "images/logstash-logo.png",
+      "icon": "images/logstash-icon.png"
+    }
+  },
+
+
+
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 15,
+      "order": 19,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -877,7 +942,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 16,
+      "order": 20,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -887,7 +952,6 @@
       },
       "group" : "Elastic Stack",
       "name" : "Elastic-Search",
-      "___selectionLayout" : { "row" : 1, "col" : 3},
       "memory": "large",
       "logo" : "images/elasticsearch-logo.png",
       "icon" : "images/elasticsearch-icon.png"
@@ -982,7 +1046,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 17,
+      "order": 21,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1059,7 +1123,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 18,
+      "order": 22,
       "unique": true,
       "kubernetes": true,
       "kubeConfig": {
@@ -1071,7 +1135,7 @@
       "name" : "Zeppelin",
       "memory": "kube",
       "____comment": "We need to know about the spark executor memory to set",
-      "memoryAdditional__commentedOut": ["spark-executor"],
+      "memoryAdditional__commentedOut": ["spark-runtime"],
       "logo" : "images/zeppelin-logo.png",
       "icon" : "images/zeppelin-icon.png"
     },

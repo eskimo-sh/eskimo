@@ -143,7 +143,7 @@ public class SettingsInjectorTest {
                     "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
                     "bash " +
                     settingsInjectorScriptFile.getCanonicalPath() +
-                    " spark-executor " +
+                    " spark-runtime " +
                     settingsFile.getCanonicalPath() +
                     " ; " +
                     "exit $?"}, true);

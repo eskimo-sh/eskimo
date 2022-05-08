@@ -48,12 +48,16 @@ elasticsearch_user_id=`id -u elasticsearch 2> /tmp/cerebro_install_log`
 set -e
 
 echo " - creating logstash required directory"
-sudo mkdir -p /var/lib/elasticsearch/logstash
 sudo mkdir -p /var/lib/elasticsearch/logstash/data
-sudo chmod -R 777 /var/lib/elasticsearch/logstash/data
+sudo chmod -R 777 /var/lib/elasticsearch/
+sudo chown elasticsearch. /var/lib/elasticsearch/
 
 sudo mkdir -p /var/run/elasticsearch/logstash
 sudo mkdir -p /var/log/elasticsearch/logstash
+
+echo " - Enabling elasticsearch user to mount gluster shares (sudo)"
+echo "elasticsearch  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" >> /etc/sudoers.d/elasticsearch
+
 
 echo " - creating logstash wrapper in /usr/local/bin"
 create_binary_wrapper /usr/local/lib/logstash/bin/logstash /usr/local/bin/logstash

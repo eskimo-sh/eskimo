@@ -50,8 +50,8 @@
     ],
     "group": ""
   },
-  "flink-worker": {
-    "name": "Worker",
+  "flink-runtime": {
+    "name": "Runtime",
     "unique": false,
     "commands": [],
     "group": "Flink"
@@ -236,7 +236,7 @@
     ],
     "group": "Kafka"
   },
-  "spark-executor": {
+  "spark-runtime": {
     "name": "Executor",
     "unique": false,
     "commands": [

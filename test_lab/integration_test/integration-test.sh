@@ -446,7 +446,7 @@ initial_setup_eskimo() {
     "ssh_username":"eskimo",
     "filename-ssh-key":"ssh_key",
     "content-ssh-key":"-----BEGIN OPENSSH PRIVATE KEY-----\r\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn\r\nNhAAAAAwEAAQAAAQEA3ojkjT6HoRjuoYjspClIdBOy8av1tYM2MV1UI9kHJBmxKangTU0G\r\nuM5s5iUNwUdhHffouomozeZvBt7XzrZrN5lO4dZzDAWc70KwmH1VteDfEaBmdp/ZEIjmvu\r\nslErY872U6x15S6kpHfLaIJ5n7e9aCKcxEQLVzhHU/ybOKtQQMlXl3VCe+p1vUF9q7cpLo\r\n+VFjMESNDOpsixhXAJ4n7VDA9XLd3T3vqev8eCxfPXhP9bFmW/hnhLHGSNEYT1WLYH+/xR\r\n1v/b64EiIwzOUK/3vpSP5EAO0wlORkhlEE2PVxf3w3wsmPvSLq4NCm/MFJxbK0T4a2S4qg\r\n1FexNiBfFwAAA8jwOZHB8DmRwQAAAAdzc2gtcnNhAAABAQDeiOSNPoehGO6hiOykKUh0E7\r\nLxq/W1gzYxXVQj2QckGbEpqeBNTQa4zmzmJQ3BR2Ed9+i6iajN5m8G3tfOtms3mU7h1nMM\r\nBZzvQrCYfVW14N8RoGZ2n9kQiOa+6yUStjzvZTrHXlLqSkd8tognmft71oIpzERAtXOEdT\r\n/Js4q1BAyVeXdUJ76nW9QX2rtykuj5UWMwRI0M6myLGFcAniftUMD1ct3dPe+p6/x4LF89\r\neE/1sWZb+GeEscZI0RhPVYtgf7/FHW/9vrgSIjDM5Qr/e+lI/kQA7TCU5GSGUQTY9XF/fD\r\nfCyY+9Iurg0Kb8wUnFsrRPhrZLiqDUV7E2IF8XAAAAAwEAAQAAAQAPfZP7SQkD68pgsDlY\r\nzA7hFaX1MLUv52xUT1zWCft3RdqRPeQBPYVkQ+pMsvOcKq3V+jXXFlIL0yiTX9vB5ezct+\r\n1HxzfG9HUSKqBEXSUkPf0JKxM22rWvcvgs/g1cmhbvyyomSqiW6ojDY6liqFNbMXlqE3AE\r\n2RyrccX48miLZRWHv3AidiBW16lDOQypDFJ7HFS+FMoPW5o0VitjqkPbE4FQd1etv7F39f\r\nxqdoJ9MHk9pNrl6GiTucTRN2ws064Qw/D40Ta9/Qk4KkShWq9l/TV1DOJzYCw17o1thNbV\r\nphRel1wxR0MbovorqyYH5h+i4Stu/5iox7MTBmEFm+ZhAAAAgHgug0Ins1wlsfjFjvCkRc\r\nLUxMZsUYr45QG8JFNd4XzACWalfyMXyMlxNH9VWk2ctx+i8zzcNXBw5HJzA4Zxy8BTFz1a\r\nEHrT6Uegzbeu37+XMOxnDBg1ssvRFK+XckYm6QcroCJA0jNOeSb3fJ7m91kT2aBwgoi0jd\r\nYjOEDsYzO/AAAAgQDxqk0cITmYa4qICUOb5pokUa7cFfzogmEzfsttkCe4fLR9ck3TpCjO\r\nB4Mc/LR97g8baP7PBvi0V3rnESF1fDnL5kTf19uVsJkBwVgPJwnmGL3azL8a0jXahJv5PA\r\ndH/099m3MB6YOS8MULx41Rx/4YfcqjszS3wNoBTQPz9FknKQAAAIEA67wYDIfDO2Qb0BqU\r\n4pl/IryTm/RfNBOzq8CF8NsaGH9ZPVdWaeUrLDQd4ZbpvdyoB9/3zrtH1mjm7sMtJRyEEr\r\nptDpKQU8fUKhIxc7XU0SOJrPEPfZDiO1i92WKglcQpJngyWvYlwWCeo83htVRnMFOlRQNn\r\nOaqn4JUMzm3VXD8AAAATYmFkdHJhc2hAYmFkYm9va25ldw==\r\n-----END OPENSSH PRIVATE KEY-----\r\n",
-    "setup-k8s-origin":"build",
+    "setup-kube-origin":"build",
     "setup-services-origin":"build"
     }'
 
@@ -499,12 +499,12 @@ setup_eskimo() {
     \"elasticsearch-index-refresh_interval\":\"\",
     \"elasticsearch-index-number_of_replicas\":\"\",
     \"elasticsearch-index-number_of_shards\":\"\",
-    \"flink-app-master-jobmanager-heap-size\":\"\",
-    \"flink-app-master-taskmanager-heap-size\":\"\",
-    \"flink-app-master-parallelism-default\":\"\",
-    \"flink-app-master-mesos-resourcemanager-tasks-cpus\":\"\",
-    \"flink-app-master-mesos-resourcemanager-tasks-mem\":\"\",
-    \"flink-app-master-taskmanager-numberOfTaskSlots\":\"\",
+    \"flink-runtime-jobmanager-heap-size\":\"\",
+    \"flink-runtime-taskmanager-heap-size\":\"\",
+    \"flink-runtime-parallelism-default\":\"\",
+    \"flink-runtime-mesos-resourcemanager-tasks-cpus\":\"\",
+    \"flink-runtime-mesos-resourcemanager-tasks-mem\":\"\",
+    \"flink-runtime-taskmanager-numberOfTaskSlots\":\"\",
     \"kafka-num-network-threads\":\"\",
     \"kafka-num-io-threads\":\"\",
     \"kafka-socket-send-buffer-bytes\":\"\",
@@ -515,14 +515,14 @@ setup_eskimo() {
     \"marathon-task_launch_timeout\":\"\",
     \"mesos-agent-cpu_additional\":\"\",
     \"mesos-agent-ram_additional\":\"$additional_RAM\",
-    \"spark-executor-spark-driver-memory\":\"\",
-    \"spark-executor-spark-rpc-numRetries\":\"\",
-    \"spark-executor-spark-rpc-retry-wait\":\"\",
-    \"spark-executor-spark-scheduler-mode\":\"\",
-    \"spark-executor-spark-locality-wait\":\"\",
-    \"spark-executor-spark-dynamicAllocation-executorIdleTimeout\":\"\",
-    \"spark-executor-spark-dynamicAllocation-cachedExecutorIdleTimeout\":\"\",
-    \"spark-executor-spark-executor-memory\":\"\"
+    \"spark-runtime-spark-driver-memory\":\"\",
+    \"spark-runtime-spark-rpc-numRetries\":\"\",
+    \"spark-runtime-spark-rpc-retry-wait\":\"\",
+    \"spark-runtime-spark-scheduler-mode\":\"\",
+    \"spark-runtime-spark-locality-wait\":\"\",
+    \"spark-runtime-spark-dynamicAllocation-executorIdleTimeout\":\"\",
+    \"spark-runtime-spark-dynamicAllocation-cachedExecutorIdleTimeout\":\"\",
+    \"spark-runtime-spark-executor-memory\":\"\"
     }"
 
     # Now need to apply command
@@ -545,14 +545,14 @@ setup_eskimo() {
         "mesos-master":"1",
         "zookeeper":"1",
         "elasticsearch1":"on",
-        "flink-worker1":"on",
+        "flink-runtime1":"on",
         "gluster1":"on",
         "kafka1":"on",
         "logstash1":"on",
         "mesos-agent1":"on",
         "ntp1":"on",
         "prometheus1":"on",
-        "spark-executor1":"on"
+        "spark-runtime1":"on"
         }'
     else
         call_eskimo \
@@ -570,10 +570,10 @@ setup_eskimo() {
         "elasticsearch2":"on",
         "elasticsearch3":"on",
         "elasticsearch4":"on",
-        "flink-worker1":"on",
-        "flink-worker2":"on",
-        "flink-worker3":"on",
-        "flink-worker4":"on",
+        "flink-runtime1":"on",
+        "flink-runtime2":"on",
+        "flink-runtime3":"on",
+        "flink-runtime4":"on",
         "gluster1":"on",
         "gluster2":"on",
         "gluster3":"on",
@@ -598,10 +598,10 @@ setup_eskimo() {
         "prometheus2":"on",
         "prometheus3":"on",
         "prometheus4":"on",
-        "spark-executor1":"on",
-        "spark-executor2":"on",
-        "spark-executor3":"on",
-        "spark-executor4":"on"
+        "spark-runtime1":"on",
+        "spark-runtime2":"on",
+        "spark-runtime3":"on",
+        "spark-runtime4":"on"
         }'
     fi
 
@@ -641,10 +641,10 @@ check_all_services_up() {
         for i in "service_marathon_172-17-0-1" \
             "service_mesos-agent_172-17-0-1" \
             "service_prometheus_172-17-0-1" \
-            "service_flink-worker_172-17-0-1" \
+            "service_flink-runtime_172-17-0-1" \
             "service_kibana_172-17-0-1" \
             "service_zookeeper_172-17-0-1" \
-            "service_spark-executor_172-17-0-1" \
+            "service_spark-runtime_172-17-0-1" \
             "service_mesos-master_172-17-0-1" \
             "service_zeppelin_172-17-0-1" \
             "service_spark-history-server_172-17-0-1" \
@@ -673,16 +673,16 @@ check_all_services_up() {
             "service_prometheus_192-168-10-52" \
             "service_prometheus_192-168-10-53" \
             "service_prometheus_192-168-10-54" \
-            "service_flink-worker_192-168-10-51" \
-            "service_flink-worker_192-168-10-52" \
-            "service_flink-worker_192-168-10-53" \
-            "service_flink-worker_192-168-10-54" \
+            "service_flink-runtime_192-168-10-51" \
+            "service_flink-runtime_192-168-10-52" \
+            "service_flink-runtime_192-168-10-53" \
+            "service_flink-runtime_192-168-10-54" \
             "service_kibana_" \
             "service_zookeeper_192-168-10-51" \
-            "service_spark-executor_192-168-10-51" \
-            "service_spark-executor_192-168-10-52" \
-            "service_spark-executor_192-168-10-53" \
-            "service_spark-executor_192-168-10-54" \
+            "service_spark-runtime_192-168-10-51" \
+            "service_spark-runtime_192-168-10-52" \
+            "service_spark-runtime_192-168-10-53" \
+            "service_spark-runtime_192-168-10-54" \
             "service_mesos-master_192-168-10-51" \
             "service_zeppelin_" \
             "service_spark-history-server_" \

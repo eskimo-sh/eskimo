@@ -83,7 +83,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         assertTrue (def.getService("kafka").hasDependency(def.getService("zookeeper")));
         assertTrue (def.getService("mesos-master").hasDependency(def.getService("zookeeper")));
-        assertTrue (def.getService("zeppelin").hasDependency(def.getService("spark-executor")));
+        assertTrue (def.getService("zeppelin").hasDependency(def.getService("spark-runtime")));
     }
 
     @Test
@@ -174,7 +174,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("mesos-agent1", "on");
             put("ntp", "1");
             put("elasticsearch1", "on");
-            put("spark-executor1", "on");
+            put("spark-runtime1", "on");
             put("kafka1", "on");
             put("logstash1", "on");
         }});
@@ -227,7 +227,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 || orderedServices[0].equals("gluster"));
 
         assertTrue (orderedServices[orderedServices.length - 1].equals("zeppelin")
-                || orderedServices[orderedServices.length - 1].equals("spark-executor"));
+                || orderedServices[orderedServices.length - 1].equals("spark-runtime"));
 
     }
 
@@ -250,9 +250,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "kafka",
                 "kafka-manager",
                 "spark-history-server",
-                "spark-executor",
-                "flink-app-master",
-                "flink-worker",
+                "spark-runtime",
+                "flink-runtime",
                 "logstash",
                 "cerebro",
                 "elasticsearch",
@@ -322,14 +321,14 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         assertArrayEquals(new String[] {
                 "elasticsearch",
-                "flink-worker",
+                "flink-runtime",
                 "gluster",
                 "kafka",
                 "logstash",
                 "mesos-agent",
                 "ntp",
                 "prometheus",
-                "spark-executor"
+                "spark-runtime"
         }, orderedServices);
     }
 
@@ -350,14 +349,13 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertArrayEquals(new String[] {
                 "zookeeper",
                 "gluster",
-                "flink-app-master",
-                "flink-worker",
+                "flink-runtime",
                 "kafka",
                 "kafka-manager",
                 "mesos-master",
                 "marathon",
                 "mesos-agent",
-                "spark-executor",
+                "spark-runtime",
                 "spark-history-server",
                 "zeppelin"
         }, zookeeperDep);
@@ -404,7 +402,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @Test
     public void testEditableConfiguration() throws Exception {
 
-        Service sparkService = def.getService("spark-executor");
+        Service sparkService = def.getService("spark-runtime");
         assertNotNull(sparkService);
 
         List<EditableSettings> confs = sparkService.getEditableSettings();

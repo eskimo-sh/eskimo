@@ -102,7 +102,7 @@ if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     exit 100
 fi
 
-echo " - Configuring kafka container (/)wrappers part)"
+echo " - Configuring kafka container (wrappers part)"
 docker exec kafka bash /scripts/inContainerSetupKafkaWrappers.sh  | tee kafka_install_log 2>&1
 if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
@@ -126,14 +126,6 @@ handle_topology_settings kafka kafka_install_log
 
 echo " - Committing changes to local template and exiting container kafka"
 commit_container kafka kafka_install_log
-
-echo " - Copying kafka command line programs docker wrappers to /usr/local/bin"
-for i in `find ./kafka_wrappers -mindepth 1`; do
-    sudo cp $i /usr/local/bin
-    filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /usr/local/bin/$filename
-done
-
 
 echo " - Starting Kubernetes deployment"
 deploy_kubernetes kafka kafka_install_log

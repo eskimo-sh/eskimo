@@ -37,11 +37,11 @@
       "lines": "",
       "lastLine": 0
     },
-    "installation_spark-executor_192-168-10-13": {
+    "installation_spark-runtime_192-168-10-13": {
       "lines": "",
       "lastLine": 0
     },
-    "installation_spark-executor_192-168-10-15": {
+    "installation_spark-runtime_192-168-10-15": {
       "lines": "",
       "lastLine": 0
     },
@@ -104,12 +104,12 @@
       "label": "installation of marathon on 192.168.10.15"
     },
     {
-      "operation": "installation_spark-executor_192-168-10-15",
-      "label": "installation of spark-executor on 192.168.10.15"
+      "operation": "installation_spark-runtime_192-168-10-15",
+      "label": "installation of spark-runtime on 192.168.10.15"
     },
     {
-      "operation": "installation_spark-executor_192-168-10-13",
-      "label": "installation of spark-executor on 192.168.10.13"
+      "operation": "installation_spark-runtime_192-168-10-13",
+      "label": "installation of spark-runtime on 192.168.10.13"
     },
     {
       "operation": "installation_mesos-agent_192-168-10-15",
@@ -162,8 +162,8 @@
     "installation_mesos-master_192-168-10-15": "CANCELLED",
     "restart_kibana_marathon": "CANCELLED",
     "installation_marathon_192-168-10-15": "CANCELLED",
-    "installation_spark-executor_192-168-10-13": "CANCELLED",
-    "installation_spark-executor_192-168-10-15": "CANCELLED",
+    "installation_spark-runtime_192-168-10-13": "CANCELLED",
+    "installation_spark-runtime_192-168-10-15": "CANCELLED",
     "installation_mesos-agent_192-168-10-15": "CANCELLED",
     "installation_elasticsearch_192-168-10-13": "CANCELLED",
     "installation_spark-history-server_192-168-10-15": "CANCELLED",

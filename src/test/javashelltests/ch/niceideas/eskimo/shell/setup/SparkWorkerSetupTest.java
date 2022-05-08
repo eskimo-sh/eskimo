@@ -72,7 +72,7 @@ public class SparkWorkerSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "spark-executor";
+        return "spark-runtime";
     }
 
     @Override

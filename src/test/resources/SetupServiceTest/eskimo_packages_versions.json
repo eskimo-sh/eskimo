@@ -39,8 +39,12 @@
     "software": "6.8.3",
     "distribution": "1"
   },
-  "mesos-master": {
+  "kube-master": {
     "software": "1.8.1",
+    "distribution": "1"
+  },
+  "kubernetes-dashboard": {
+    "software": "2.5.1",
     "distribution": "1"
   },
   "ntp": {
@@ -63,17 +67,8 @@
     "software": "debian_09_stretch",
     "distribution": "1"
   },
-  "mesos-redhat": {
-    "software": "1.8.1",
-    "distribution": "1"
-  },
-  "mesos-debian": {
-    "software": "1.8.1",
-    "distribution": "1"
-  },
-  "mesos-suse": {
-    "software": "1.8.1",
+  "kube": {
+    "software": "1.23.5",
     "distribution": "1"
   }
-
 }

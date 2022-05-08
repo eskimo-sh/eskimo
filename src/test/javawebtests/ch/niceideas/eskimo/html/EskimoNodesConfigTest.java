@@ -59,7 +59,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoNodesConfig.js");
 
         js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"kubernetes\" ];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-executor\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-runtime\", \"gluster\", \"logstash\", \"flink-runtime\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -105,11 +105,11 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // test a few nodes
         assertJavascriptEquals("1.0", "$('#ntp1:checked').length");
-        assertJavascriptEquals("1.0", "$('#spark-executor1:checked').length");
+        assertJavascriptEquals("1.0", "$('#spark-runtime1:checked').length");
         assertJavascriptEquals("1.0", "$('#logstash1:checked').length");
 
         assertJavascriptEquals("1.0", "$('#ntp2:checked').length");
-        assertJavascriptEquals("1.0", "$('#spark-executor2:checked').length");
+        assertJavascriptEquals("1.0", "$('#spark-runtime2:checked').length");
         assertJavascriptEquals("1.0", "$('#logstash2:checked').length");
 
         assertJavascriptEquals("0.0", "$('#zookeeper1:checked').length");
@@ -138,7 +138,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"elasticsearch1\":\"on\"," +
                 "\"kafka1\":\"on\"," +
                 "\"mesos-agent1\":\"on\"," +
-                "\"spark-executor1\":\"on\"," +
+                "\"spark-runtime1\":\"on\"," +
                 "\"gluster1\":\"on\"," +
                 "\"logstash1\":\"on\"," +
                 "\"node_id2\":\"192.168.10.13\"," +
@@ -148,7 +148,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"elasticsearch2\":\"on\"," +
                 "\"kafka2\":\"on\"," +
                 "\"mesos-agent2\":\"on\"," +
-                "\"spark-executor2\":\"on\"," +
+                "\"spark-runtime2\":\"on\"," +
                 "\"gluster2\":\"on\"," +
                 "\"logstash2\":\"on\"}");
 
@@ -203,7 +203,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         js("eskimoNodesConfig.onServicesSelectedForNode({\n" +
                 "\"elasticsearch2\": \"on\",\n" +
-                "\"flink-worker2\": \"on\",\n" +
+                "\"flink-runtime2\": \"on\",\n" +
                 "\"flink-app-master\": \"2\",\n" +
                 "\"gluster2\": \"on\",\n" +
                 "\"kafka2\": \"on\",\n" +
@@ -211,7 +211,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"mesos-agent2\": \"on\",\n" +
                 "\"ntp2\": \"on\",\n" +
                 "\"prometheus2\": \"on\",\n" +
-                "\"spark-executor2\": \"on\"\n" +
+                "\"spark-runtime2\": \"on\"\n" +
                 "}, 2)");
 
         assertJavascriptEquals("1.0", "$('#prometheus2:checked').length");
@@ -264,8 +264,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertNotNull (page.getElementById("elasticsearch1"));
         assertTagName ("elasticsearch1", "input");
 
-        assertNotNull (page.getElementById("spark-executor1"));
-        assertTagName ("spark-executor1", "input");
+        assertNotNull (page.getElementById("spark-runtime1"));
+        assertTagName ("spark-runtime1", "input");
 
         assertNotNull (page.getElementById("kafka1"));
         assertTagName ("kafka1", "input");

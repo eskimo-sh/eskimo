@@ -136,13 +136,13 @@ public class KubernetesServicesConfigCheckerTest {
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
-                put("spark-executor_install", "on");
+                put("spark-runtime_install", "on");
             }});
 
             marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
-        assertEquals("Inconsistency found : Service spark-executor expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test

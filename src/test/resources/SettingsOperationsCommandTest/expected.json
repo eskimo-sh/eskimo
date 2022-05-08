@@ -1,6 +1,6 @@
 {
   "settings": {
-    "spark-executor": {"spark-defaults.conf": [
+    "spark-runtime": {"spark-defaults.conf": [
       {
         "value": "FIFO",
         "key": "spark.scheduler.mode",
@@ -91,6 +91,6 @@
     "elasticsearch",
     "grafana",
     "kafka",
-    "spark-executor"
+    "spark-runtime"
   ]
 }

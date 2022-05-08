@@ -19,9 +19,9 @@
   "mesos-agent2": "on",
   "mesos-agent3": "on",
   "mesos-master": "1",
-  "spark-executor1": "on",
-  "spark-executor2": "on",
-  "spark-executor3": "on",
+  "spark-runtime1": "on",
+  "spark-runtime2": "on",
+  "spark-runtime3": "on",
   "zookeeper": "1",
   "marathon": "1"
 }

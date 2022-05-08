@@ -11,8 +11,8 @@
       {"logstash": "192.168.10.11"},
       {"kafka-manager": "192.168.10.11"},
       {"spark-history-server": "192.168.10.11"},
-      {"spark-executor": "192.168.10.11"},
-      {"flink-worker": "192.168.10.11"}
+      {"spark-runtime": "192.168.10.11"},
+      {"flink-runtime": "192.168.10.11"}
     ],
     "uninstallations": [
       {"flink-app-master": "192.168.10.11"},
@@ -30,8 +30,8 @@
       {"mesos-agent": "192.168.10.12"},
       {"logstash": "192.168.10.12"},
       {"flink-app-master": "192.168.10.12"},
-      {"spark-executor": "192.168.10.12"},
-      {"flink-worker": "192.168.10.12"},
+      {"spark-runtime": "192.168.10.12"},
+      {"flink-runtime": "192.168.10.12"},
       {"zeppelin": "192.168.10.12"}
     ]
   },

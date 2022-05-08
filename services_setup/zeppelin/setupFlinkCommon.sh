@@ -1,1 +1,1 @@
-../flink/setupCommon.sh
+../flink-runtime/setupCommon.sh
