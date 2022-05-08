@@ -1,9 +1,9 @@
 {
   "paragraphs": [
     {
-      "text": "%md\n\n## Flink Streaming and Kafka Integration Demo\n\n**In this example, we'll use the Flink technology in streaming mode- to read some transactions from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic**\n\n*A first python program (A) - paragraph 3 - will send transactions read them from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console*\n*Then a  second program (B) - paragraph 5 - implemented using Flink will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic*\n*The first program (A) finally takes care of dumping these results to the console*\n\n\n```\n            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Flink Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Flink                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n```\n\n**Important Notes - READ CAREFULLY** :\n\n* **Two sample notebooks must have been executed in prior to executing this one : the \"Logstash Demo\" and \"Spark Integration ES\", in this order**\n* **The kafka topics shall better be created in advance using the following commands on one node of the cluster where kafka is available:**\n\n```bash\necho \" -- Creating KAFKA topic berka-payments\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho \" -- Creating KAFKA topic berka-profiled-aggregate\"\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n```\n\n* *one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper*",
+      "text": "%md\n\n## Flink Streaming and Kafka Integration Demo\n\n**In this example, we'll use the Flink technology in streaming mode- to read some transactions from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic**\n\n*A first python program (A) - paragraph 3 - will send transactions read them from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console*\n*Then a  second program (B) - paragraph 5 - implemented using Flink will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic*\n*The first program (A) finally takes care of dumping these results to the console*\n\n\n```\n            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Flink Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Flink                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n```\n\n**Important Notes - READ CAREFULLY** :\n\n* **Two sample notebooks must have been executed in prior to executing this one : the \"Logstash Demo\" and \"Spark Integration ES\", in this order**",
       "user": "anonymous",
-      "dateUpdated": "2022-05-06T07:42:59+0000",
+      "dateUpdated": "2022-05-08T15:13:53+0000",
       "progress": 0,
       "config": {
         "tableHide": false,
@@ -32,7 +32,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "<div class=\"markdown-body\">\n<h2>Flink Streaming and Kafka Integration Demo</h2>\n<p><strong>In this example, we&rsquo;ll use the Flink technology in streaming mode- to read some transactions from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic</strong></p>\n<p><em>A first python program (A) - paragraph 3 - will send transactions read them from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console</em><br />\n<em>Then a  second program (B) - paragraph 5 - implemented using Flink will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic</em><br />\n<em>The first program (A) finally takes care of dumping these results to the console</em></p>\n<pre><code>            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Flink Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Flink                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n</code></pre>\n<p><strong>Important Notes - READ CAREFULLY</strong> :</p>\n<ul>\n<li><strong>Two sample notebooks must have been executed in prior to executing this one : the &ldquo;Logstash Demo&rdquo; and &ldquo;Spark Integration ES&rdquo;, in this order</strong></li>\n<li><strong>The kafka topics shall better be created in advance using the following commands on one node of the cluster where kafka is available:</strong></li>\n</ul>\n<pre><code class=\"language-bash\">echo &quot; -- Creating KAFKA topic berka-payments&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments\n\n\necho &quot; -- Creating KAFKA topic berka-profiled-aggregate&quot;\n/usr/local/bin/kafka-topics.sh \\\n    --create \\\n    --replication-factor 1 \\\n    --partitions 4 \\\n    --zookeeper {{ZOOKEEPER_SERVER}}:2181 \\\n    --topic berka-payments-aggregate\n</code></pre>\n<ul>\n<li><em>one needs to change the marker {{ZOOKEEPER_SERVER}} with the IP of the node running Zookeeper</em></li>\n</ul>\n\n</div>"
+            "data": "<div class=\"markdown-body\">\n<h2>Flink Streaming and Kafka Integration Demo</h2>\n<p><strong>In this example, we&rsquo;ll use the Flink technology in streaming mode- to read some transactions from the Berka Dataset from a kafka input topic, enrich them a little and write them to a kafka output topic</strong></p>\n<p><em>A first python program (A) - paragraph 3 - will send transactions read them from ElasticSearch to the input kafka topic. In addition, It will also read the result from the kafka output topic and dump these results on the console</em><br />\n<em>Then a  second program (B) - paragraph 5 - implemented using Flink will enrich these transactions read from the input kafka topic and send the result back to the output kafka topic</em><br />\n<em>The first program (A) finally takes care of dumping these results to the console</em></p>\n<pre><code>            ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓       ┏━━━━┓     ┏━━━━━━━━━━━━━━━━━━━━━┓\n            ┃                     ┃       ┃ I  ┃     ┃                     ┃       ┃ O  ┃     ┃                     ┃\n┏━━━━┓      ┃      Program A      ┃       ┃ N  ┃     ┃     Program B       ┃       ┃ U  ┃     ┃      Program A      ┃\n┃ ES ┃─────▶┃    Populate kafka   ┃──────▶┃ P  ┃────▶┃   Flink Streaming   ┃──────▶┃ T  ┃────▶┃   Dump on console   ┃\n┗━━━━┛      ┃     Input topic     ┃       ┃ U  ┃     ┃                     ┃       ┃ P  ┃     ┃                     ┃\n            ┃                     ┃       ┃ T  ┃     ┃                     ┃       ┃ .  ┃     ┃                     ┃\n            ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛       ┗━━━━┛     ┗━━━━━━━━━━━━━━━━━━━━━┛\nIndex:              Python                Topic:             Flink                  Topic:\nberka-payments       Job             berka-payments          Job           berka-payments-aggregate\n</code></pre>\n<p><strong>Important Notes - READ CAREFULLY</strong> :</p>\n<ul>\n<li><strong>Two sample notebooks must have been executed in prior to executing this one : the &ldquo;Logstash Demo&rdquo; and &ldquo;Spark Integration ES&rdquo;, in this order</strong></li>\n</ul>\n\n</div>"
           }
         ]
       },
@@ -42,9 +42,93 @@
       "jobName": "paragraph_1651822979040_522575533",
       "id": "paragraph_1575994158921_1992204415",
       "dateCreated": "2022-05-06T07:42:59+0000",
-      "status": "READY",
+      "dateStarted": "2022-05-08T15:13:53+0000",
+      "dateFinished": "2022-05-08T15:13:53+0000",
+      "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:19297"
+      "$$hashKey": "object:9589"
+    },
+    {
+      "text": "%md\n\n### Prerequisite) Run following paragraph to create potentially missing kafka topics",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-08T15:14:00+0000",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h3>Prerequisite) Run following paragraph to create potentially missing kafka topics</h3>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1652022836200_516990260",
+      "id": "paragraph_1652022836200_516990260",
+      "dateCreated": "2022-05-08T15:13:56+0000",
+      "dateStarted": "2022-05-08T15:14:00+0000",
+      "dateFinished": "2022-05-08T15:14:00+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:9590"
+    },
+    {
+      "text": "%sh\n\n. /etc/eskimo_topology.sh\n\nif [[ `kafka-topics.sh --zookeeper $MASTER_ZOOKEEPER_1:2181 --describe | grep -E \"Topic: berka-payments[^-]+\"` == \"\" ]]; then\n\n    kafka-topics.sh \\\n        --create \\\n        --replication-factor 1 \\\n        --partitions 4 \\\n        --zookeeper $MASTER_ZOOKEEPER_1:2181 \\\n        --topic berka-payments\nfi\n\nif [[ `kafka-topics.sh --zookeeper $MASTER_ZOOKEEPER_1:2181 --describe | grep -E \"Topic: berka-payments-aggregate[^-]+\"` == \"\" ]]; then\n\n    kafka-topics.sh \\\n        --create \\\n        --replication-factor 1 \\\n        --partitions 4 \\\n        --zookeeper $MASTER_ZOOKEEPER_1:2181 \\\n        --topic berka-payments-aggregate\nfi\n",
+      "user": "anonymous",
+      "dateUpdated": "2022-05-08T15:14:19+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1652022857796_671061265",
+      "id": "paragraph_1652022857796_671061265",
+      "dateCreated": "2022-05-08T15:14:17+0000",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:10160",
+      "dateFinished": "2022-05-08T15:14:24+0000",
+      "dateStarted": "2022-05-08T15:14:19+0000",
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      }
     },
     {
       "text": "%md\n\n### A) First program : reading Data from berka-payments index and periodically sending it to kafka input topic while also dumping on the console whatever comes on the kafka output topic\n\nThis first python program generates the input transactions by reading them from ElasticSearch. It takes care of sending these input transactions to the input kafka topic and also to read the results from the kafka output topic and dump these results on the console.\n\n**Important Notes**:\n\n* **The dataset used from ElasticSearch is the dataset computed by the “Spark Integration ES” Demo notebook**\n",
@@ -91,7 +175,7 @@
       "dateStarted": "2022-05-07T22:03:31+0000",
       "dateFinished": "2022-05-07T22:03:31+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:19298"
+      "$$hashKey": "object:9591"
     },
     {
       "text": "%python\n\nfrom elasticsearch import Elasticsearch\nimport time, requests, json, sys, threading\nfrom threading import Thread, Lock\nfrom kafka import KafkaProducer, KafkaConsumer\nfrom kafka.errors import KafkaError\nimport os, signal, sys\n\nKAFKA_BOOTSTRAP_SERVER = [\"kafka.default.svc.cluster.eskimo:9092\"]\n\nELASTICSEARCH_SERVER=\"elasticsearch.default.svc.cluster.eskimo\"\n\nrun = True\n\ndef handler(signum, frame):\n  print(\"Received Signal: %d\"%signum)\n  run = False\n  sys.exit (0);\n\ndef connect_kafka_producer():\n    _producer = None\n    try:\n        _producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER, api_version=(0, 10, 1))\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _producer\n\ndef connect_kafka_consumer():\n    _consumer = None\n    try:\n        _consumer = KafkaConsumer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,\n                         auto_offset_reset='latest',\n                         consumer_timeout_ms=3600000)\n    except Exception as ex:\n        print('Exception while connecting Kafka')\n        print(ex)\n        sys.exit (-1);\n    finally:\n        return _consumer\n\n\n# Cache reader class thread\nclass ReaderClass(threading.Thread):\n    def __init__(self):\n        threading.Thread.__init__(self)\n        self.event = threading.Event()\n        self.consumer = connect_kafka_consumer()\n        self.consumer.subscribe(['berka-payments-aggregate'])\n\n    def run(self):\n        for message in self.consumer:\n            if self.event.is_set():\n                if self.consumer is not None:\n                    self.consumer.close()\n                break\n            event = json.loads (message.value)\n            print (json.dumps (event))\n\n    def stop(self):\n        self.event.set()\n\ndef publish_message(producer_instance, topic_name, key, value):\n    try:\n        key_bytes = key.encode ('utf-8')\n        value_bytes = value.encode ('utf-8')\n        #print('sending')\n        producer_instance.send(topic_name, key=key_bytes, value=value_bytes)\n        #print('flushing')\n        producer_instance.flush()\n        #print('Message published successfully.')\n    except Exception as ex:\n        print('Exception in publishing message')\n        print (ex)\n        sys.exit (-1);\n\n\nes = Elasticsearch([{'host': ELASTICSEARCH_SERVER, 'port': 9200}])\n\nkafka_producer = connect_kafka_producer()\n\n# Launch reader thread\nreader = ReaderClass()\nreader.start()\n\n\nres = es.search(index=\"berka-payments\", body={\"query\": {\"match_all\": {}}}, scroll='15m', search_type='query_then_fetch', size=10000)\n\nprint(\"%d documents found - %d fetchable\" % (res['hits']['total']['value'], len(res['hits']['hits'])) )\n\nsid = res['_scroll_id']\nscroll_size = res['hits']['total']['value']\n\ncounter = 0\nprint (\"Sending payments to kafka ...\")\n\n# Start scrolling\nwhile (scroll_size > 0 and run):\n\n    page = es.scroll(scroll_id=sid, scroll='2m')\n\n    # Update the scroll ID\n    sid = page['_scroll_id']\n\n    # Get the number of results that we returned in the last scroll\n    scroll_size = len(page['hits']['hits'])\n\n    for cur in page[\"hits\"][\"hits\"]:\n        \n        if not run:\n            sys.exit(0)\n            \n        data = cur[\"_source\"]\n\n        publish_message(kafka_producer, 'berka-payments', data['trans_id'], json.dumps(data))\n\n        #print(\"(%s) - %s\" % (data['trans_id'], json.dumps(data)))\n\n        if counter % 10 == 0: \n            print (\"Sent %d payments. waiting 2 seconds\" % counter)\n            time.sleep(2) \n\n        counter = counter + 1 \n\nif kafka_producer is not None:\n    kafka_producer.close()\n    \ntime.sleep(8)     \n\nif reader is not None:\n    reader.stop()\n\n\n",
@@ -129,7 +213,7 @@
       "dateStarted": "2022-05-07T22:00:17+0000",
       "dateFinished": "2022-05-07T22:01:17+0000",
       "status": "ABORT",
-      "$$hashKey": "object:19299"
+      "$$hashKey": "object:9592"
     },
     {
       "text": "%md\n\n### B) Flink Streaming Program : reading from kafka input topic, computing aggregate and sending result to kafka output topic\n\nThis Flink Streaming programs reads some transactions from the Berka Dataset (resulting from the “Spark Integration ES” Demo notebook) from a kafka input topic as sent by the program A above. It then enriches them slightly and sends them back to a kafka output topic. The program above then dumps the resulting (enriched) transactions to the console.\n\n\n",
@@ -176,7 +260,7 @@
       "dateStarted": "2022-05-07T22:02:56+0000",
       "dateFinished": "2022-05-07T22:02:58+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:19300"
+      "$$hashKey": "object:9593"
     },
     {
       "text": "%flink\n\nimport org.apache.flink.streaming.api.functions.sink.PrintSinkFunction\nimport org.apache.flink.api.java.utils.ParameterTool\nimport org.apache.flink.api.common.functions._\nimport org.apache.flink.api.common.typeinfo.TypeInformation\nimport org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaProducer}\nimport org.apache.flink.streaming.util.serialization.SerializationSchema\nimport org.apache.flink.formats.json.JsonNodeDeserializationSchema\nimport scala.collection.JavaConverters.asScalaIteratorConverter\nimport java.util.Properties\nimport org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode\nimport java.beans.Transient\n\nclass ObjectNodeSerSchema extends SerializationSchema[ObjectNode] with Serializable {\n    override def serialize(t: ObjectNode): Array[Byte] = t.toString().getBytes(\"UTF-8\")   \n}\n\n\nvar kafkaServer = \"kafka.default.svc.cluster.eskimo:9092\"\n\nval properties = new Properties()\nproperties.setProperty(\"bootstrap.servers\", kafkaServer)\nproperties.setProperty(\"group.id\", \"test\")\n\n@Transient lazy val timestampParseFormat = new java.text.SimpleDateFormat(\"yyyy-MM-dd'T'HH:mm:ssZ\")\n// 1997-10-10T00:00:00+0000\n\n@Transient lazy val dayOfWeekFormat = new java.text.SimpleDateFormat(\"E\")\n@Transient lazy val dayOfMonthFormat = new java.text.SimpleDateFormat(\"dd\")\n\nimplicit val typeInfoObjectNode = TypeInformation.of(classOf[org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode])\nimplicit val typeInfoString = TypeInformation.of(classOf[String])\n\n\nclass AddDayOfWeek extends RichMapFunction[ObjectNode, ObjectNode] with Serializable {\n    def map(node: ObjectNode) : ObjectNode = {\n        val timestampDate = timestampParseFormat.parse(node.get(\"@timestamp\").asText())\n        node.put(\"day_of_week\", dayOfWeekFormat.format(timestampDate))\n        return node\n    }\n}\n\nclass AddDayOfMonth extends RichMapFunction[ObjectNode, ObjectNode] with Serializable {\n    def map(node: ObjectNode) : ObjectNode = {\n        val timestampDate = timestampParseFormat.parse(node.get(\"@timestamp\").asText())\n        node.put(\"day_of_month\", dayOfMonthFormat.format(timestampDate))\n        return node\n    }    \n}\n\nsenv.setParallelism(1);\n\n                    \nsenv.addSource(new FlinkKafkaConsumer(\n        \"berka-payments\", \n        new JsonNodeDeserializationSchema(), \n        properties))\n    .map(new AddDayOfWeek())\n    .map(new AddDayOfMonth())\n    .addSink(new FlinkKafkaProducer[ObjectNode](\n        kafkaServer,    \n        \"berka-payments-aggregate\", \n        new ObjectNodeSerSchema()) )\n//            .print()\n\n\nsenv.execute(\"Berka Payment Transformation\")\n\n\n",
@@ -215,7 +299,7 @@
       "dateStarted": "2022-05-07T22:04:07+0000",
       "dateFinished": "2022-05-07T22:04:55+0000",
       "status": "ABORT",
-      "$$hashKey": "object:19301"
+      "$$hashKey": "object:9594"
     },
     {
       "text": "%md\n\n#### Congrats ! You ran a flink streaming program reading from and writing to kafka\n",
@@ -260,7 +344,7 @@
       "id": "paragraph_1576006593109_1487261689",
       "dateCreated": "2022-05-06T07:42:59+0000",
       "status": "READY",
-      "$$hashKey": "object:19302"
+      "$$hashKey": "object:9595"
     }
   ],
   "name": "Flink Integration Kafka",

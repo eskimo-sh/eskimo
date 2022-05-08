@@ -282,26 +282,4 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         assertTrue(exception.getMessage().startsWith("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
 
-    @Test
-    public void testZeppelinButNoElasticsearch() throws Exception {
-
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("node_id1", "192.168.10.11");
-                put("ntp1", "on");
-                put("kube-master", "1");
-                put("prometheus1", "on");
-                put("zookeeper1", "on");
-            }});
-
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
-                put("zeppelin_install", "on");
-            }});
-
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
-        });
-
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service zeppelin expects a installaton of  elasticsearch. But it's not going to be installed"));
-    }
 }

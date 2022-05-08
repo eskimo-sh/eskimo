@@ -172,31 +172,6 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testZeppelinButNoElasticsearch() throws Exception {
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
-            put("node_id1", "192.168.10.11");
-            put("ntp1", "on");
-            put("prometheus1", "on");
-            put("kube-master1", "on");
-            put("kube-slave1", "on");
-
-        }});
-        configurationService.saveNodesConfig(nodesConfig);
-
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-
-            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
-                put("zeppelin_installed", "on");
-            }});
-
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
-        });
-
-        assertEquals("Inconsistency found : Service zeppelin expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
-    }
-
-    @Test
     public void testNonKubernetesServiceCanBeSelected() throws Exception {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
