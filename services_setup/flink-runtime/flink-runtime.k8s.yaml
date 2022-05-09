@@ -207,7 +207,7 @@ spec:
             type: Directory
         - name: flink-config-volume
           configMap:
-            name: flink-runtime-config-flink
+            name: flink-config-flink-runtime
             items:
               - key: logback-console.xml
                 path: logback-console.xml

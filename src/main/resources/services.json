@@ -536,11 +536,11 @@
         "restart": true
       },
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "kafka",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": false
       }
     ],
     "commands" : [
@@ -588,13 +588,6 @@
       ]
     },
     "dependencies": [
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
       {
         "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
         "masterService": "gluster",
@@ -736,12 +729,12 @@
         }
       },
       "memory": "kube",
-      "logo" : "images/flink-logo.png",
-      "icon" : "images/flink-icon.png"
+      "logo" : "images/flink-runtime-logo.png",
+      "icon" : "images/flink-runtime-icon.png"
     },
     "ui": {
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "flink/{NODE_ADDRESS}/api/v1/namespaces/default/services/flink-rest:8081/proxy/#/overview",
+      "urlTemplate": "flink-runtime/{NODE_ADDRESS}/api/v1/namespaces/default/services/flink-runtime-rest:8081/proxy/#/overview",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,

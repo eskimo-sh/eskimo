@@ -71,36 +71,36 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
     def do_GET(self):
-        LOG.info('Got GET request: %s (UNSUPPORTED)', self.path)
+        LOG.info('- Got GET request: %s (UNSUPPORTED)', self.path)
 
         self._set_error_headers()
         self.wfile.write("GET requests are not supported by logstash command server")
 
     def do_POST(self):
-        LOG.info('Got POST request: %s', self.path)
+        LOG.info('- Got POST request: %s', self.path)
 
         f = furl(self.path)
         fullArgs = self.rfile.read(int(self.headers['Content-Length']))
 
         if 'stdin_file' in self.headers:
             stdin_file = self.headers['stdin_file']
+            command_line = "/usr/local/sbin/call_logstash.sh --std_in {0} {1} ".format(stdin_file, fullArgs)
         else:
             stdin_file = None
+            command_line = "/usr/local/sbin/call_logstash.sh {0} ".format(fullArgs)
 
-        command_line = "/usr/local/lib/logstash/bin/logstash {0} ".format(fullArgs)
-        LOG.info('Command Line : %s', command_line)
+        LOG.info('- Command Line : %s', command_line)
 
         # execute command
         try:
             # stdout = subprocess.PIPE lets you redirect the output
-            if stdin_file == None or stdin_file == "":
-                res = subprocess.Popen(command_line.strip().split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            else:
-                infile = open(stdin_file)
-                res = subprocess.Popen(command_line.strip().split(), stdin=infile, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            LOG.info('   + Calling process')
+            res = subprocess.Popen(command_line.strip().split(), bufsize=40000000, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
+            LOG.info('   + Waiting for completion')
             res.wait() # wait for process to finish; this also sets the returncode variable inside 'res'
 
+            LOG.info('   + Completed!')
             if res.returncode != 0:
                 LOG.error("os.wait:exit status != 0\n")
                 self.send_response(500)
@@ -112,9 +112,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             # access the output from stdout
+            LOG.info('   + Reading output')
             result = res.stdout.read()
 
-            LOG.info ("result is \n : %s", result)
+            LOG.info (" - result is \n : %s", result)
             #print ("after read: {}".format(result))
 
             # Send the html message

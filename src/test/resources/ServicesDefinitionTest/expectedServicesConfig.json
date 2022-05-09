@@ -24,7 +24,7 @@
     {
       "name": "spark.scheduler.mode",
       "defaultValue": "FAIR",
-      "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with mesos"
+      "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes"
     },
     {
       "name": "spark.locality.wait",

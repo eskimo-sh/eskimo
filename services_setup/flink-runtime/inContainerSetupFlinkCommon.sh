@@ -151,9 +151,9 @@ sudo bash -c "echo -e \"kubernetes.jobmanager.replicas: 1\"  >> /usr/local/lib/f
 
 sudo bash -c "echo -e \"kubernetes.config.file: /home/flink/.kube/config\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sudo bash -c "echo -e \"kubernetes.cluster-id: flink\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.cluster-id: flink-runtime\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: flink-runtime-rest.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
+sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: flink-runtime.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
 sed -i s/"#rest.bind-address: 0.0.0.0"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
 sed -i s/"#rest.address: 0.0.0.0"/"rest.address: flink-runtime-rest.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
 

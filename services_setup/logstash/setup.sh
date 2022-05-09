@@ -75,7 +75,7 @@ docker run \
         -v $PWD/../common:/common \
         -d \
         -v /var/log/elasticsearch:/var/log/elasticsearch \
-        -v /var/lib/elasticsearch:/var/lib/elasticsearch \
+        -v /var/run/elasticsearch:/var/run/elasticsearch \
         --name logstash \
         -i \
         -t eskimo:logstash bash >> logstash_install_log 2>&1

@@ -74,5 +74,12 @@ sudo rm -Rf /usr/local/lib/logstash/data/
 sudo ln -s /var/lib/elasticsearch/logstash /usr/local/lib/logstash/data
 
 
+
+echo " - Adapting logstash configuration logstash.yaml"
+
+# disabling api by default
+sed -i s/"# api.enabled: true"/"api.enabled: false"/g /usr/local/lib/logstash/config/logstash.yml
+
+
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

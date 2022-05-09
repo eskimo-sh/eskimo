@@ -52,12 +52,6 @@ for argument in "$@"; do
     fi
 done
 
-
-if [[ $LOGSTASH_HOST == "" ]]; then
-    echo "Mandatory argument -target_host HOST is missing"
-    exit -2
-fi
-
 echo "--------------------------------------------------------------------------------"
 echo "This is a client command to a remote logstash running in a docker container."
 echo "This is not the actual logstash command"

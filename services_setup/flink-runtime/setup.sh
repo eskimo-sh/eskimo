@@ -186,10 +186,10 @@ cd ..
 echo " - Creating configmaps"
 
 echo "   + Deleting any previous specific configuration configmap for task managers"
-kubectl delete configmap flink-runtime-config-flink || true # nevermind errors here
+kubectl delete configmap flink-config-flink-runtime || true # nevermind errors here
 
 echo "   + Creating specific configuration configmap for task managers"
-kubectl create configmap flink-runtime-config-flink \
+kubectl create configmap flink-config-flink-runtime \
         --from-file=/var/lib/flink/config/flink-conf.yaml \
         --from-file=/var/lib/flink/config/log4j-console.properties \
         --from-file=/var/lib/flink/config/logback-console.xml

@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     private String jsonNodesConfig = null;
-    private String jsonMarathonConfig = null;
+    private String jsonKubernetesConfig = null;
     private String jsonMinimalConfig = null;
 
     private MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
@@ -59,31 +59,30 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     public void setUp() throws Exception {
         super.setUp();
         jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
-        jsonMarathonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMarathonConfig.json"));
+        jsonKubernetesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"));
         jsonMinimalConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMinimalConfig.json"));
     }
 
     @Test
     public void testServiceToStringNoStackOverflow() {
-        assertDoesNotThrow(() ->  def.getService("flink").toString());
+        assertDoesNotThrow(() ->  def.getService("flink-runtime").toString());
     }
 
     @Test
     public void testAfterPropertiesSet() throws Exception {
-        assertEquals (19, def.listAllServices().length);
+        assertEquals (23, def.listAllServices().length);
     }
 
     @Test
     public void testServiceHasDependency() {
 
         assertFalse (def.getService("ntp").hasDependency(def.getService("zeppelin")));
-        assertFalse (def.getService("gluster").hasDependency(def.getService("mesos-master")));
+        assertFalse (def.getService("gluster").hasDependency(def.getService("kube-master")));
         assertFalse (def.getService("zookeeper").hasDependency(def.getService("spark-history-server")));
         assertFalse (def.getService("zookeeper").hasDependency(def.getService("kafka")));
 
         assertTrue (def.getService("kafka").hasDependency(def.getService("zookeeper")));
-        assertTrue (def.getService("mesos-master").hasDependency(def.getService("zookeeper")));
-        assertTrue (def.getService("zeppelin").hasDependency(def.getService("spark-runtime")));
+        assertTrue (def.getService("kube-slave").hasDependency(def.getService("kube-master")));
     }
 
     @Test
@@ -97,9 +96,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertEquals ("export MASTER_NTP_1=192.168.56.21\n" +
                 "export MASTER_PROMETHEUS_1=192.168.56.21\n" +
                 "export MASTER_ZOOKEEPER_1=192.168.56.21\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921685621=192.168.56.21\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921685622=192.168.56.22\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921685623=192.168.56.23\n" +
                 "", topology.getTopologyScript());
     }
 
@@ -108,21 +104,15 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         Topology topology = def.getTopology(
                 new NodesConfigWrapper(jsonNodesConfig),
-                new KubernetesServicesConfigWrapper(jsonMarathonConfig),
+                new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
                 "192.168.10.11");
 
         assertEquals (
-                "export MASTER_MARATHON_1=192.168.10.11\n" +
-                        "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
+                "export MASTER_GLUSTER_1=192.168.10.11\n" +
+                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
                         "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
                         "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                        "export SELF_MASTER_ELASTICSEARCH_1921681011=192.168.10.11\n" +
-                        "export SELF_MASTER_ELASTICSEARCH_1921681012=192.168.10.12\n" +
-                        "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
-                        "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
-                        "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
-                        "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
+                        "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
     }
 
     @Test
@@ -132,34 +122,35 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         Topology topology = def.getTopology(
                 nodesConfig,
-                new KubernetesServicesConfigWrapper(jsonMarathonConfig),
+                new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_MARATHON_1=192.168.10.11\n" +
-                "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
-                "export MASTER_NTP_1=192.168.10.11\n" +
-                "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
-                "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921681012=192.168.10.12\n" +
-                "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
-                "\n" +
-                "#Additional Environment\n" +
-                "export ALL_NODES_LIST_elasticsearch=192.168.10.11,192.168.10.12,192.168.10.13\n" +
-                "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.12\n" +
-                "export NODE_NBR_KAFKA_1921681011=0\n" +
-                "export NODE_NBR_KAFKA_1921681012=1\n" +
-                "export NODE_NBR_KAFKA_1921681013=2\n" +
-                "export ALL_NODES_LIST_mesos_agent=192.168.10.11,192.168.10.12,192.168.10.13\n" +
-                "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
-                "\n" +
-                "#Self identification\n" +
-                "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n",
+                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
+                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_NTP_1=192.168.10.11\n" +
+                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.12,192.168.10.13\n" +
+                        "export NODE_NBR_ETCD_1921681012=2\n" +
+                        "export NODE_NBR_ETCD_1921681013=3\n" +
+                        "export NODE_NBR_ETCD_1921681011=1\n" +
+                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.12\n" +
+                        "export ALL_NODES_LIST_kube_slave=192.168.10.11,192.168.10.12,192.168.10.13\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681013=3\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681012=2\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
+                        "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.11\n" +
+                        "export SELF_NODE_NUMBER=1\n" +
+                        "export ESKIMO_NODE_COUNT=3\n" +
+                        "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n" +
+                        "\n" +
+                        "#Kubernetes Topology\n",
                 topology.getTopologyScriptForNode(nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
     }
 
@@ -169,14 +160,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
             put("node_id1", "192.168.10.11");
             put("zookeeper", "1");
-            put("mesos-master", "1");
-            put("marathon", "1");
-            put("mesos-agent1", "on");
+            put("kube-master", "1");
+            put("kube-slave1", "on");
             put("ntp", "1");
-            put("elasticsearch1", "on");
-            put("spark-runtime1", "on");
-            put("kafka1", "on");
-            put("logstash1", "on");
+            put("etcd", "1");
         }});
 
         KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
@@ -184,6 +171,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("cerebro_install", "on");
             put("kibana_install", "on");
             put("zeppelin_install", "on");
+            put("elasticsearch_install", "on");
+            put("kafka_install", "on");
+            put("spark-runtime_install", "on");
+            put("logstash_install", "on");
         }});
 
         Topology topology = def.getTopology(
@@ -192,25 +183,24 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_MARATHON_1=192.168.10.11\n" +
-                "export MASTER_MESOS_MASTER_1=192.168.10.11\n" +
-                "export MASTER_NTP_1=192.168.10.11\n" +
-                "export MASTER_SPARK_EXECUTOR_1=192.168.10.11\n" +
-                "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                "export SELF_MASTER_ELASTICSEARCH_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_KAFKA_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_LOGSTASH_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_MESOS_MASTER_1921681011=192.168.10.11\n" +
-                "\n" +
-                "#Additional Environment\n" +
-                "export ALL_NODES_LIST_elasticsearch=192.168.10.11\n" +
-                "export NODE_NBR_KAFKA_1921681011=0\n" +
-                "export ALL_NODES_LIST_mesos_agent=192.168.10.11\n" +
-                "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
-                "\n" +
-                "#Self identification\n" +
-                "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n",
+                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_NTP_1=192.168.10.11\n" +
+                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export ALL_NODES_LIST_etcd=192.168.10.11\n" +
+                        "export NODE_NBR_ETCD_1921681011=1\n" +
+                        "export ALL_NODES_LIST_kube_slave=192.168.10.11\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
+                        "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.11\n" +
+                        "export SELF_NODE_NUMBER=1\n" +
+                        "export ESKIMO_NODE_COUNT=1\n" +
+                        "export ALL_NODES_LIST=192.168.10.11\n" +
+                        "\n" +
+                        "#Kubernetes Topology\n",
                 topology.getTopologyScriptForNode(nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
     }
 
@@ -219,7 +209,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesOrderedByDependencies();
 
-        assertEquals(19, orderedServices.length);
+        assertEquals(23, orderedServices.length);
 
         assertTrue (orderedServices[0].equals("zookeeper")
                 || orderedServices[0].equals("ntp")
@@ -236,7 +226,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listServicesInOrder();
 
-        assertEquals(19, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(23, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "ntp",
@@ -244,19 +234,24 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "prometheus",
                 "grafana",
                 "gluster",
-                "mesos-master",
-                "mesos-agent",
-                "marathon",
+                "etcd",
+                "kube-master",
+                "kube-slave",
+                "kubernetes-dashboard",
                 "kafka",
+                "kafka-cli",
                 "kafka-manager",
                 "spark-history-server",
                 "spark-runtime",
-                "flink-runtime",
-                "logstash",
                 "cerebro",
                 "elasticsearch",
-                "kibana",
-                "zeppelin"
+                "grafana",
+                "a",
+                "b",
+                "c",
+                "d",
+                "e",
+                "f"
         }, orderedServices);
     }
 
@@ -265,26 +260,30 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUniqueServices();
 
-        assertEquals(4, orderedServices.length);
+        assertEquals(2, orderedServices.length);
 
         assertArrayEquals(new String[] {
-                "flink-app-master",
-                "marathon",
-                "mesos-master",
+                "kube-master",
                 "zookeeper"
         }, orderedServices);
     }
 
     @Test
-    public void testListMarathonServices() throws Exception {
+    public void testListKubernetesServices() throws Exception {
         String[] marathonServices = def.listKubernetesServices();
 
-        assertEquals(6, marathonServices.length);
+        assertEquals(12, marathonServices.length);
 
         assertArrayEquals(new String[] {
                 "cerebro",
+                "elasticsearch",
+                "flink-runtime",
                 "grafana",
-                "kafka-manager",
+                "kafka",
+                "zeppelin",
+                "cerebro",
+                "grafana",
+                "flink-runtime",
                 "kibana",
                 "spark-history-server",
                 "zeppelin"
@@ -296,19 +295,18 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String[] orderedServices = def.listUIServices();
 
-        assertEquals(10, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(9, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
                 "grafana",
                 "gluster",
-                "mesos-master",
-                "marathon",
+                "kubernetes-dashboard",
                 "kafka-manager",
                 "spark-history-server",
-                "flink-app-master",
+                "flink-runtime",
                 "cerebro",
                 "kibana",
-                "zeppelin"
+                "zeppelin",
         }, orderedServices);
     }
 
@@ -320,15 +318,15 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertEquals(9, orderedServices.length);
 
         assertArrayEquals(new String[] {
-                "elasticsearch",
-                "flink-runtime",
+                "etcd",
+                "flink-cli",
                 "gluster",
-                "kafka",
-                "logstash",
-                "mesos-agent",
+                "kafka-cli",
+                "kube-slave",
+                "logstash-cli",
                 "ntp",
                 "prometheus",
-                "spark-runtime"
+                "spark-cli"
         }, orderedServices);
     }
 
@@ -336,27 +334,21 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     public void testGetDependentServices() throws Exception {
 
         String[] elasticsearchDep = def.getDependentServices("elasticsearch").toArray(new String[0]);
-        assertEquals(4, elasticsearchDep.length);
+        assertEquals(3, elasticsearchDep.length);
         assertArrayEquals(new String[] {
                 "cerebro",
                 "kibana",
-                "logstash",
                 "zeppelin"
         }, elasticsearchDep);
 
         String[] zookeeperDep = def.getDependentServices("zookeeper").toArray(new String[0]);
-        assertEquals(12, zookeeperDep.length, String.join(",", zookeeperDep));
+        assertEquals(6, zookeeperDep.length, String.join(",", zookeeperDep));
         assertArrayEquals(new String[] {
                 "zookeeper",
-                "gluster",
                 "flink-runtime",
+                "gluster",
                 "kafka",
                 "kafka-manager",
-                "mesos-master",
-                "marathon",
-                "mesos-agent",
-                "spark-runtime",
-                "spark-history-server",
                 "zeppelin"
         }, zookeeperDep);
     }
@@ -384,18 +376,20 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_NTP_1=192.168.10.11\n" +
-                "export MASTER_PROMETHEUS_1=192.168.10.11\n" +
-                "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                "\n" +
-                "#Additional Environment\n" +
-                "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13,192.168.10.14\n" +
-                "export ALL_NODES_LIST_prometheus=192.168.10.11,192.168.10.13,192.168.10.14\n" +
-                "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
-                "\n" +
-                "#Self identification\n" +
-                "export SELF_IP_ADDRESS=192.168.10.11\n" +
-                "export SELF_NODE_NUMBER=1\n",
+                        "export MASTER_NTP_1=192.168.10.11\n" +
+                        "export MASTER_PROMETHEUS_1=192.168.10.11\n" +
+                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13,192.168.10.14\n" +
+                        "export ALL_NODES_LIST_prometheus=192.168.10.11,192.168.10.13,192.168.10.14\n" +
+                        "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.11\n" +
+                        "export SELF_NODE_NUMBER=1\n" +
+                        "export ESKIMO_NODE_COUNT=3\n" +
+                        "export ALL_NODES_LIST=192.168.10.11,192.168.10.13,192.168.10.14\n",
                 topology.getTopologyScriptForNode(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
     }
 

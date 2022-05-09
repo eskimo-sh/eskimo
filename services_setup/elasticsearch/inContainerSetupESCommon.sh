@@ -43,7 +43,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ES_USER_ID=$1
 if [[ $ES_USER_ID == "" ]]; then
     echo " - Didn't get ES User ID as argument"
-    exit -1
+    exit 1
 fi
 
 
@@ -57,7 +57,7 @@ if [[ $elasticsearch_user_id == "" ]]; then
     useradd -u $ES_USER_ID elasticsearch
 elif [[ $elasticsearch_user_id != $ES_USER_ID ]]; then
     echo "Docker ES USER ID is $elasticsearch_user_id while requested USER ID is $ES_USER_ID"
-    exit -2
+    exit 2
 fi
 
 echo " - Creating user elasticsearch home directory"

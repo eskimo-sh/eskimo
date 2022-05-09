@@ -34,19 +34,28 @@
 # Software.
 #
 
-set -e
 
-echo " - Injecting topology"
-. /usr/local/sbin/inContainerInjectTopology.sh
+export REBUILD_ARGS=""
+export STDIN=""
+export PROCESS_NEXT_STDIN="0"
+for argument in "$@"; do
+    if [[ $PROCESS_NEXT_STDIN == "1" ]]; then
+        STDIN=$argument
+        export PROCESS_NEXT_STDIN="0"
+    else
+        if [[ $argument == "-std_in" || $argument == "--std_in" ]]; then
+            export PROCESS_NEXT_STDIN="1"
+        else
+            export PROCESS_NEXT_STDIN="0"
+            export REBUILD_ARGS="$REBUILD_ARGS $argument"
+        fi
+    fi
+done
 
-echo " - Inject settings"
-/usr/local/sbin/settingsInjector.sh logstash
-
-echo " - Creating potentially missing /var/log/elasticsearch/logstash folder"
-mkdir -p /var/log/elasticsearch/logstash
-
-echo " - Mounting logstash gluster shares"
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch
-
-echo " - Starting logstash remote server"
-/usr/local/sbin/logstash_remote.sh
+if [[ $STDIN == "" ]]; then
+    echo "Executing : /usr/local/lib/logstash/bin/logstash" $REBUILD_ARGS
+    /usr/local/lib/logstash/bin/logstash $REBUILD_ARGS
+else
+    echo "Executing : cat $STDIN | /usr/local/lib/logstash/bin/logstash" "$REBUILD_ARGS"
+    cat $STDIN | /usr/local/lib/logstash/bin/logstash $REBUILD_ARGS
+fi
