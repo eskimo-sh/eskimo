@@ -418,6 +418,38 @@ public class ServicesDefinition implements InitializingBean {
 
             services.put(serviceString, service);
         }
+
+        enforceConsistency();
+    }
+
+    private void enforceConsistency() throws ServiceDefinitionException {
+
+        // make sure there is no hole in order: sum of configOrder should be n(n+1) / 2
+        int effSum = services.values().stream()
+                .map (Service::getConfigOrder)
+                .reduce(0, Integer::sum);
+
+        int nbr = services.keySet().size();
+        int theoreticalSum = (nbr * (nbr + 1) / 2) - nbr;
+        if (effSum != theoreticalSum) {
+            throw new ServiceDefinitionException("There must be a hole in the services config.order. Theoretical sum is " + theoreticalSum
+                    + " while effective sum is " + effSum);
+        }
+
+        // make sure all master service exist
+        try {
+            services.values().stream()
+                    .map(Service::getDependencies)
+                    .flatMap(Collection::stream)
+                    .forEach(dep -> {
+                        String master = dep.getMasterService();
+                        if (services.get(master) == null) {
+                            throw new IllegalArgumentException("Master service " + master + " doesn't exist");
+                        }
+                    });
+        } catch (IllegalArgumentException e) {
+            throw new ServiceDefinitionException(e.getMessage(), e);
+        }
     }
 
 

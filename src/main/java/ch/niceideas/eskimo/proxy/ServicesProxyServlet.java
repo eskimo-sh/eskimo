@@ -82,6 +82,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         /*
         super.init();
         */
+        doPreserveHost = true;
     }
 
     private String getServiceName(HttpServletRequest servletRequest) {
@@ -279,7 +280,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
             if (config == null) {
-                throw new IllegalStateException("Asked for procy for service " + key + " - but none has been configured !");
+                throw new IllegalStateException("Asked for proxy for service " + key + " - but none has been configured !");
             }
             input = input.replace(config.getNode()+":"+config.getLocalPort(), "/" + key);
         }

@@ -56,7 +56,7 @@ echo " - Creating grafana user (if not exist)"
 grafana_user_id=`id -u grafana 2>> grafana_install_log`
 if [[ $grafana_user_id == "" ]]; then
     echo "User grafana should have been added by eskimo-base-system setup script"
-    exit -4
+    exit 4
 fi
 
 # create and start container
@@ -65,7 +65,7 @@ docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
         -v /var/log/grafana:/var/log/grafana \
-        -v /var/lib/grafana:/var/lib/grafana \
+        -v /var/run/grafana:/var/run/grafana \
         -v $SCRIPT_DIR/provisioning:/eskimo/provisioning \
         -d --name grafana \
         -i \
@@ -80,7 +80,7 @@ docker exec grafana bash /scripts/inContainerSetupGrafana.sh $grafana_user_id $C
 if [[ `tail -n 1 grafana_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat grafana_install_log
-    exit -100
+    exit 100
 fi
 
 #echo " - TODO"
@@ -92,7 +92,6 @@ handle_topology_settings grafana grafana_install_log
 echo " - Committing changes to local template and exiting container grafana"
 commit_container grafana grafana_install_log
 
-
 echo " - Starting marathon deployment"
-deploy_marathon grafana grafana_install_log
+deploy_kubernetes grafana grafana_install_log
 

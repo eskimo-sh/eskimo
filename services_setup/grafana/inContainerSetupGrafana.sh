@@ -65,6 +65,10 @@ fi
 
 
 echo " - Symlinking grafana directories to system directories"
+sudo mkdir -p /var/lib/grafana
+sudo chown -R grafana. /var/lib/grafana
+sudo rm -Rf /var/lib/grafana/*
+
 sudo rm -Rf /usr/local/lib/grafana/data
 sudo ln -s /var/lib/grafana /usr/local/lib/grafana/data
 
@@ -111,6 +115,15 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 # # Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
 # serve_from_sub_path = false
 
+
+
+#if [[ $ESKIMO_CONTEXT_PATH != "" ]]; then
+#    sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/$ESKIMO_CONTEXT_PATH\/grafana\/api\/v1\/namespaces\/default\/services\/grafana:31300\/proxy\/"/g \
+#        /usr/local/lib/grafana/conf/defaults.ini
+#else
+#    sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/grafana\/api\/v1\/namespaces\/default\/services\/grafana:31300\/proxy\/"/g \
+#        /usr/local/lib/grafana/conf/defaults.ini
+#fi
 
 if [[ $ESKIMO_CONTEXT_PATH != "" ]]; then
     sed -i s/"root_url = %(protocol)s:\/\/%(domain)s:%(http_port)s\/"/"root_url = \/$ESKIMO_CONTEXT_PATH\/grafana\/"/g \
