@@ -64,7 +64,7 @@ nodes = [
   { :hostname => 'test-node1', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.21', :ram => 8000},
   { :hostname => 'test-node2', :box => 'centos/7',  :ip => '192.168.56.22', :ram => 8000},
   { :hostname => 'test-node3', :box => 'ubuntu/xenial64',  :ip => '192.168.56.23', :ram => 8000},
-  { :hostname => 'test-node3-bis', :box => 'fedora/31-cloud-base', :ip => '192.168.56.23', :ram => 8000 },
+  { :hostname => 'test-node4', :box => 'fedora/35-cloud-base', :ip => '192.168.56.24', :ram => 8000 },
   { :hostname => 'test-large', :box => 'centos/7',  :ip => '192.168.56.31', :ram => 10000},
   { :hostname => 'integration-test', :box => 'centos/7',  :ip => '192.168.56.41', :ram => 14000},
   { :hostname => 'integration-test1', :box => 'centos/7',  :ip => '192.168.56.51', :ram => 6500},

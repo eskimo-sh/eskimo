@@ -261,7 +261,7 @@ function deploy_registry() {
 }
 
 
-# Install container in registry and deploy it using marathon
+# Install container in registry and deploy it using kubernetes
 # Arguments:
 # - $1 the name of the container image and service
 # - $2 the lof file to dump command outputs to
@@ -349,85 +349,6 @@ function deploy_kubernetes() {
     deploy_registry "$@"
 
     deploy_kubernetes_only "$@"
-}
-
-
-# Install container in registry and deploy it using marathon
-# Arguments:
-# - $1 the name of the systemd service
-# - $2 the lof file to dump command outputs to
-### Deprecated
-function deploy_marathon() {
-
-    if [[ $1 == "" ]]; then
-        echo "Container needs to be passed in argument"
-        exit 2
-    fi
-    export CONTAINER=$1
-
-    if [[ $2 == "" ]]; then
-        echo "Log file path needs to be passed in argument"
-        exit 3
-    fi
-    export LOG_FILE=$2
-
-    echo " - Deploying $CONTAINER Service in docker registry for marathon"
-    docker tag eskimo:$CONTAINER marathon.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
-    if [[ $? != 0 ]]; then
-        echo "   + Could not re-tag marathon container image"
-        exit 4
-    fi
-
-    docker push marathon.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
-    if [[ $? != 0 ]]; then
-        echo "Image push in docker registry failed !"
-        exit 5
-    fi
-
-    echo " - removing local image"
-    docker image rm eskimo:$CONTAINER  >> $LOG_FILE 2>&1
-    if [[ $? != 0 ]]; then
-        echo "local image removal failed !"
-        exit 6
-    fi
-
-    echo " - Removing any previously deployed $CONTAINER service from marathon"
-    curl -XDELETE http://$MASTER_MARATHON_1:28080/v2/apps/$CONTAINER >> $LOG_FILE"_marathon_deploy" 2>&1
-    if [[ $? != 0 ]]; then
-        echo "   + Could not reach marathon"
-        cat "$LOG_FILE"_marathon_deploy
-        exit 7
-    fi
-
-    if [[ `cat "$LOG_FILE"_marathon_deploy` != "" && `grep "does not exist" "$LOG_FILE"_marathon_deploy` == "" ]]; then
-        echo "   + Previous instance removed"
-        if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
-    fi
-
-    echo " - Deploying $CONTAINER service in marathon"
-    # 10 attempts with 5 seconds sleep each
-    for i in $(seq 1 10); do
-        echo "   + Attempt $i"
-        curl  -X POST -H 'Content-Type: application/json' \
-            -d "@$CONTAINER.marathon.json" \
-            http://$MASTER_MARATHON_1:28080/v2/apps 2>&1 | tee "$LOG_FILE"_deploy >> $LOG_FILE
-        if [[ $? != 0 ]]; then
-            echo "   + Could not deploy $CONTAINER application in marathon"
-            cat "$LOG_FILE"_deploy
-            exit 8
-        fi
-        if [[ `grep "App is locked by one or more deployments" "$LOG_FILE"_deploy` == "" ]]; then
-            break
-        fi
-        if [[ "$i" == "10" ]]; then
-            echo "   + Failed 10 times !!"
-            exit 9
-        fi
-        if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
-    done
-
-
-    #-H "Authorization: token=$(dcos config show core.dcos_acs_token)" \
 }
 
 

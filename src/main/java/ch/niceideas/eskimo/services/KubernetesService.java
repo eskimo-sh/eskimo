@@ -48,6 +48,9 @@ public class KubernetesService {
     private OperationsMonitoringService operationsMonitoringService;
 
     @Autowired
+    private NodeRangeResolver nodeRangeResolver;
+
+    @Autowired
     private SystemService systemService;
 
     @Autowired
@@ -356,7 +359,8 @@ public class KubernetesService {
                 return;
             }
 
-            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
+            NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
+            NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
             List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<String>(){{add(kubeMasterNode);}}, nodesConfig, liveIps, deadIps);
 

@@ -45,7 +45,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
-public class MarathonSetupTest extends AbstractSetupShellTest {
+public class KubernetesDashboardSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 

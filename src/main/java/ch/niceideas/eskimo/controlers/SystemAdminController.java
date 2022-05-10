@@ -110,20 +110,6 @@ public class SystemAdminController extends AbstractOperationController {
         }
     }
 
-    @Deprecated
-    private String performMarathonOperation(MarathonOperation operation, String message) {
-
-        try {
-            operation.performOperation(marathonService);
-
-            return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
-
-        } catch (MarathonException | SystemException e) {
-            logger.error(e, e);
-            return ReturnStatusHelper.createErrorStatus(e);
-        }
-    }
-
     private String performSystemOperation(SystemOperation operation, String message) {
 
         try {
@@ -285,11 +271,6 @@ public class SystemAdminController extends AbstractOperationController {
 
     private interface SystemOperation {
         void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException, MarathonException;
-    }
-
-    @Deprecated
-    private interface MarathonOperation {
-        void performOperation (MarathonService marathonService) throws MarathonException, SystemException;
     }
 
     private interface KubernetesOperation {

@@ -94,7 +94,7 @@ export HOME=/root
 if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
     echo "   + Deleting serviceaccount-$ADMIN_USER"
     kubectl delete serviceaccount $ADMIN_USER
-    sleep 2
+    sleep 3
 fi
 
 echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"

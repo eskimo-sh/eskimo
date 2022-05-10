@@ -47,18 +47,18 @@ if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
 fi
 
 
-if [[ "$ESKIMO_NODE_NAME" != "" ]]; then
-    export BROKER_ID=`echo $ESKIMO_NODE_NAME | cut -d '-' -f 2`
+if [[ "$ESKIMO_POD_NAME" != "" ]]; then
+    export BROKER_ID=`echo $ESKIMO_POD_NAME | cut -d '-' -f 2`
     if [[ $BROKER_ID == "" ]]; then
-        echo " - No broker ID found could be exracted from $ESKIMO_NODE_NAME"
+        echo " - No broker ID found could be exracted from $ESKIMO_POD_NAME"
         exit 3
     fi
 
     sed -i s/"broker.id=0"/"broker.id=$BROKER_ID"/g /usr/local/etc/kafka/server.properties
 
-    sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$ESKIMO_NODE_NAME.kafka.default.svc.cluster.eskimo:9092"/g /usr/local/etc/kafka/server.properties
+    sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$ESKIMO_POD_NAME.kafka.default.svc.cluster.eskimo:9092"/g /usr/local/etc/kafka/server.properties
 
-    echo "   + Using advertised.listeners=$ESKIMO_NODE_NAME.kafka.default.svc.cluster.eskimo"
+    echo "   + Using advertised.listeners=$ESKIMO_POD_NAME.kafka.default.svc.cluster.eskimo"
 fi
 
 # silent

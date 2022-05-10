@@ -49,7 +49,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MesosAgentSetupTest extends AbstractSetupShellTest {
+public class KubeSlaveSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 

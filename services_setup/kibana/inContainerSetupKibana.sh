@@ -59,11 +59,27 @@ sudo sed -i s/"#server.host: \"localhost\""/"server.host: \"0.0.0.0\""/g /usr/lo
 sudo sed -i s/"#server.name: \"your-hostname\""/"server.name: \"Eskimo\""/g /usr/local/etc/kibana/kibana.yml
 
 sudo sed -i s/"#pid.file: \/var\/run\/kibana.pid"/"pid.file: \/var\/run\/elasticsearch\/kibana\/kibana.pid"/g /usr/local/etc/kibana//kibana.yml
+
+
+# FIXME replace with the below
 sudo sed -i s/"#logging.dest: stdout"/"logging.dest: \/var\/log\/elasticsearch\/kibana\/kibana.log"/g /usr/local/etc/kibana/kibana.yml
+
+#logging.appenders.default:
+#  type: file
+#  fileName: /var/logs/kibana.log
+#  layout:
+#    type: json
+
+
+
 
 # It runs behind a proxy in eskimo
 sudo sed -i s/"#server.basePath: \"\""/"server.basePath: \"\/kibana\""/g /usr/local/etc/kibana/kibana.yml
+
 #sudo sed -i s/"#server.rewriteBasePath: false"/"server.rewriteBasePath: true"/g /usr/local/etc/kibana/kibana.yml
+
+
+
 
 echo " - enabling user elasticsearch to change config"
 chown -R elasticsearch. /usr/local/lib/kibana/config

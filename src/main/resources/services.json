@@ -148,8 +148,6 @@
           "source" : "this._websocket(this._url)",
           "target" : "this._websocket(this._url.replace(\"ws://localhost:9191/grafana\", \"ws://localhost:9191/ws/grafana\"))"
         },
-
-        
         {
           "type" : "PLAIN",
           "source" : "prometheus/api",
@@ -422,6 +420,13 @@
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      },
+      {
+        "masterElectionStrategy": "ALL_NODES",
+        "masterService": "kube-slave",
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
@@ -867,11 +872,11 @@
         "restart": true
       },
       {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "kube-master",
+        "masterElectionStrategy": "ALL_NODES",
+        "masterService": "kube-slave",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": false
+        "restart": true
       }
     ],
     "commands" : [
@@ -1067,8 +1072,8 @@
       "icon" : "images/kibana-icon.png"
     },
     "ui": {
-      "urlTemplate": "./kibana/app/kibana",
-      "proxyTargetPort" : 31561,
+      "urlTemplate": "./kibana/app/home",
+      "proxyTargetPort" : 31562,
       "waitTime": 8000,
       "role" : "*",
       "title" : "Kibana",

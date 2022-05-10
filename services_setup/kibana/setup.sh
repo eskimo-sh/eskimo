@@ -103,4 +103,4 @@ commit_container kibana /tmp/kibana_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon kibana /tmp/kibana_install_log
+deploy_kubernetes kibana /tmp/kibana_install_log

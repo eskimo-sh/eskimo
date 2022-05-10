@@ -52,6 +52,46 @@ spec:
 
 ---
 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: es-var-lib-volume
+  labels:
+    type: local
+spec:
+  storageClassName: es-local-storage
+  volumeMode: Filesystem
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  local:
+    path: "/var/lib/elasticsearch"
+  nodeAffinity: # dummy node affinity since one is required.
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: es-var-lib-claim
+spec:
+  storageClassName: es-local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -125,9 +165,8 @@ spec:
             path: /var/log/elasticsearch
             type: Directory
         - name: var-lib-elasticsearch
-          hostPath:
-            path: /var/lib/elasticsearch
-            type: Directory
+          persistentVolumeClaim:
+            claimName: es-var-lib-claim
         - name: var-run-elasticsearch
           hostPath:
             path: /var/run/elasticsearch
