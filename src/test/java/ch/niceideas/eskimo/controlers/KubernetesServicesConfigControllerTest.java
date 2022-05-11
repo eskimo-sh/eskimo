@@ -61,12 +61,16 @@ public class KubernetesServicesConfigControllerTest {
             }
         });
 
+        System.err.println (mscc.loadKubernetesServicesConfig());
         assertTrue (new JSONObject("{\n" +
-                "    \"kibana_install\": \"on\",\n" +
                 "    \"cerebro_install\": \"on\",\n" +
-                "    \"spark-history-server_install\": \"on\",\n" +
+                "    \"kafka_install\": \"on\",\n" +
                 "    \"zeppelin_install\": \"on\",\n" +
-                "    \"kafka-manager_install\": \"on\"\n" +
+                "    \"kafka-manager_install\": \"on\",\n" +
+                "    \"kibana_install\": \"on\",\n" +
+                "    \"logstash_install\": \"on\",\n" +
+                "    \"spark-history-server_install\": \"on\",\n" +
+                "    \"spark-runtime_install\": \"on\"\n" +
                 "}").similar(new JSONObject (mscc.loadKubernetesServicesConfig())));
 
         mscc.setSetupService(new SetupService() {
@@ -149,6 +153,8 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"restarts\": [],\n" +
                 "    \"installations\": [\n" +
                 "      \"cerebro\",\n" +
+                "      \"spark-runtime\",\n" +
+                "      \"kafka\",\n" +
                 "      \"zeppelin\"\n" +
                 "    ],\n" +
                 "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
@@ -245,6 +251,7 @@ public class KubernetesServicesConfigControllerTest {
                         "    \"uninstallations\": [\n" +
                         "      \"kafka-manager\",\n" +
                         "      \"kibana\",\n" +
+                        "      \"logstash\",\n" +
                         "      \"spark-history-server\"\n" +
                         "    ],\n" +
                         "    \"restarts\": [],\n" +

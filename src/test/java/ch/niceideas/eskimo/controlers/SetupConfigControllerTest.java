@@ -209,17 +209,17 @@ public class SetupConfigControllerTest {
         });
 
         assertEquals ("{\n" +
-                "  \"command\": {\n" +
-                "    \"buildPackage\": [],\n" +
-                "    \"buildMesos\": [],\n" +
-                "    \"downloadMesos\": [],\n" +
-                "    \"none\": true,\n" +
-                "    \"downloadPackages\": [],\n" +
-                "    \"packageUpdates\": [],\n" +
-                "    \"packageDownloadUrl\": \"dummy\"\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}",
+                        "  \"command\": {\n" +
+                        "    \"buildPackage\": [],\n" +
+                        "    \"buildKube\": [],\n" +
+                        "    \"downloadKube\": [],\n" +
+                        "    \"none\": true,\n" +
+                        "    \"downloadPackages\": [],\n" +
+                        "    \"packageUpdates\": [],\n" +
+                        "    \"packageDownloadUrl\": \"dummy\"\n" +
+                        "  },\n" +
+                        "  \"status\": \"OK\"\n" +
+                        "}",
                 scc.saveSetup("" +
                     "{\"setup_storage\":\"/data/eskimo_config\"," +
                     "\"ssh_username\":\"eskimo\"," +

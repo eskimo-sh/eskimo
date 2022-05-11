@@ -103,8 +103,6 @@ public class NodesConfigurationCheckerTest {
             put("gluster2", "on");
             put("etcd1", "on");
             put("etcd2", "on");
-            put("logstash1", "on");
-            put("logstash2", "on");
             put("kube-slave1", "on");
             put("kube-slave2", "on");
             put("kube-master", "1");
@@ -128,8 +126,6 @@ public class NodesConfigurationCheckerTest {
                 put("gluster2", "on");
                 put("etcd1", "on");
                 put("etcd2", "on");
-                put("logstash1", "on");
-                put("logstash2", "on");
                 put("kube-slave1", "on");
                 put("kube-slave2", "on");
                 put("kube-master", "1");
@@ -148,7 +144,6 @@ public class NodesConfigurationCheckerTest {
                 put("ntp1", "on");
                 put("gluster1", "on");
                 put("prometheus1", "on");
-                put("logstash1", "on");
                 put("kube-slave1", "on");
                 put("kube-master", "1");
                 put("zookeeper", "1");
@@ -197,8 +192,6 @@ public class NodesConfigurationCheckerTest {
                     put("ntp2", "on");
                     put("etcd1", "on");
                     put("etcd2", "on");
-                    put("logstash1", "on");
-                    put("logstash2", "on");
                     put("kube-slave1", "on");
                     put("kube-slave2", "on");
                     put("kube-master", "1");
@@ -263,7 +256,6 @@ public class NodesConfigurationCheckerTest {
             put("ntp1", "on");
             put("prometheus1", "on");
             put("gluster1", "on");
-            put("logstash1", "on");
             put("etcd1", "on");
             put("kube-slave1", "on");
             put("kube-master", "1");
@@ -282,7 +274,6 @@ public class NodesConfigurationCheckerTest {
                 put("ntp1", "on");
                 put("etcd1", "on");
                 put("prometheus1", "on");
-                put("logstash1", "on");
                 put("kube-slave1", "on");
                 put("kube-master", "1");
                 put("zookeeper", "1");
