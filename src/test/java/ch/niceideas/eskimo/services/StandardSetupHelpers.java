@@ -48,7 +48,6 @@ public class StandardSetupHelpers {
             put("node_id1", "192.168.10.11");
             put("gluster1", "on");
             put("etcd1", "on");
-            put("logstash1", "on");
             put("kube-slave1", "on");
             put("ntp1", "on");
 
@@ -57,7 +56,6 @@ public class StandardSetupHelpers {
             put("zookeeper", "2");
             put("gluster2", "on");
             put("etcd2", "on");
-            put("logstash2", "on");
             put("kube-slave2", "on");
             put("ntp2", "on");
         }});
@@ -72,8 +70,7 @@ public class StandardSetupHelpers {
             put("kafka-manager_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kafka_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kibana_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("logstash_installed_on_IP_192-168-10-11", "OK");
-            put("logstash_installed_on_IP_192-168-10-13", "OK");
+            put("logstash_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kube-slave_installed_on_IP_192-168-10-11", "OK");
             put("kube-slave_installed_on_IP_192-168-10-13", "OK");
             put("kube-master_installed_on_IP_192-168-10-13", "OK");
@@ -127,6 +124,7 @@ public class StandardSetupHelpers {
         return new KubernetesServicesConfigWrapper(new HashMap<>() {{
             put("cerebro_install", "on");
             put("kibana_install", "on");
+            put("logstash_install", "on");
             put("spark-history-server_install", "on");
             put("kafka-manager_install", "on");
             put("zeppelin_install", "on");

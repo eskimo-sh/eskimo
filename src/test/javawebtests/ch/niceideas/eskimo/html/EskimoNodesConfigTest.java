@@ -58,8 +58,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoNodesConfigurationChecker.js");
         loadScript(page, "eskimoNodesConfig.js");
 
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"kubernetes\" ];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-runtime\", \"gluster\", \"logstash\", \"flink-runtime\", \"prometheus\"];");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\", ];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\", ];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -87,9 +87,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @Test
     public void testServicesConfigMethods() throws Exception {
 
-        assertJavascriptEquals("images/flink-app-master-logo.png", "eskimoNodesConfig.getServiceLogoPath('flink-app-master')");
-        assertJavascriptEquals("images/flink-app-master-icon.png", "eskimoNodesConfig.getServiceIconPath('flink-app-master')");
-        assertJavascriptEquals("true", "eskimoNodesConfig.isServiceUnique('flink-app-master')");
+        assertJavascriptEquals("images/kube-slave-logo.png", "eskimoNodesConfig.getServiceLogoPath('kube-slave')");
+        assertJavascriptEquals("images/kube-slave-icon.png", "eskimoNodesConfig.getServiceIconPath('kube-slave')");
+        assertJavascriptEquals("true", "eskimoNodesConfig.isServiceUnique('zookeeper')");
 
         assertJavascriptEquals("false", "eskimoNodesConfig.isServiceUnique('gluster')");
 
@@ -105,18 +105,18 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // test a few nodes
         assertJavascriptEquals("1.0", "$('#ntp1:checked').length");
-        assertJavascriptEquals("1.0", "$('#spark-runtime1:checked').length");
-        assertJavascriptEquals("1.0", "$('#logstash1:checked').length");
+        assertJavascriptEquals("1.0", "$('#etcd1:checked').length");
+        assertJavascriptEquals("1.0", "$('#kube-slave1:checked').length");
 
         assertJavascriptEquals("1.0", "$('#ntp2:checked').length");
-        assertJavascriptEquals("1.0", "$('#spark-runtime2:checked').length");
-        assertJavascriptEquals("1.0", "$('#logstash2:checked').length");
+        assertJavascriptEquals("1.0", "$('#etcd2:checked').length");
+        assertJavascriptEquals("1.0", "$('#kube-slave2:checked').length");
 
         assertJavascriptEquals("0.0", "$('#zookeeper1:checked').length");
         assertJavascriptEquals("1.0", "$('#zookeeper2:checked').length");
 
-        assertJavascriptEquals("0.0", "$('#mesos-master1:checked').length");
-        assertJavascriptEquals("1.0", "$('#mesos-master2:checked').length");
+        assertJavascriptEquals("0.0", "$('#kube-master1:checked').length");
+        assertJavascriptEquals("1.0", "$('#kube-master2:checked').length");
     }
 
     @Test
@@ -133,24 +133,17 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         JSONObject expectedResult = new JSONObject("{" +
                 "\"node_id1\":\"192.168.10.11\"," +
-                "\"kubernetes\":\"1\"," +
                 "\"ntp1\":\"on\"," +
-                "\"elasticsearch1\":\"on\"," +
-                "\"kafka1\":\"on\"," +
-                "\"mesos-agent1\":\"on\"," +
-                "\"spark-runtime1\":\"on\"," +
+                "\"etcd1\":\"on\"," +
+                "\"kube-slave1\":\"on\"," +
                 "\"gluster1\":\"on\"," +
-                "\"logstash1\":\"on\"," +
                 "\"node_id2\":\"192.168.10.13\"," +
                 "\"zookeeper\":\"2\"," +
-                "\"mesos-master\":\"2\"," +
+                "\"kube-master\":\"2\"," +
                 "\"ntp2\":\"on\"," +
-                "\"elasticsearch2\":\"on\"," +
-                "\"kafka2\":\"on\"," +
-                "\"mesos-agent2\":\"on\"," +
-                "\"spark-runtime2\":\"on\"," +
-                "\"gluster2\":\"on\"," +
-                "\"logstash2\":\"on\"}");
+                "\"kube-slave2\":\"on\"," +
+                "\"etcd2\":\"on\"," +
+                "\"gluster2\":\"on\"}");
 
         JSONObject actualResult = new JSONObject((String)js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
 
@@ -202,21 +195,17 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("eskimoNodesConfig.renderNodesConfig(" + nodesConfig.getFormattedValue() + ");");
 
         js("eskimoNodesConfig.onServicesSelectedForNode({\n" +
-                "\"elasticsearch2\": \"on\",\n" +
-                "\"flink-runtime2\": \"on\",\n" +
-                "\"flink-app-master\": \"2\",\n" +
+                "\"kube-master\": \"2\",\n" +
                 "\"gluster2\": \"on\",\n" +
-                "\"kafka2\": \"on\",\n" +
-                "\"logstash2\": \"on\",\n" +
-                "\"mesos-agent2\": \"on\",\n" +
+                "\"etcd2\": \"on\",\n" +
+                "\"kube-slave2\": \"on\",\n" +
                 "\"ntp2\": \"on\",\n" +
                 "\"prometheus2\": \"on\",\n" +
-                "\"spark-runtime2\": \"on\"\n" +
                 "}, 2)");
 
         assertJavascriptEquals("1.0", "$('#prometheus2:checked').length");
 
-        assertJavascriptEquals("1.0", "$('#flink-app-master2:checked').length");
+        assertJavascriptEquals("1.0", "$('#ntp2:checked').length");
     }
 
 
@@ -229,17 +218,17 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         // manipulate node 2
         js("$('#node_id2').attr('value', '192.168.10.11')");
-        js("$('#flink-app-master2').get(0).checked = true");
-        js("$('#elasticsearch2').get(0).checked = true");
+        js("$('#zookeeper2').get(0).checked = true");
+        js("$('#ntp2').get(0).checked = true");
 
         // remove node 1
         js("eskimoNodesConfig.removeNode ('remove1')");
 
-        // ensure values are found in node 1
+        // ensure values are found in node 2 now as node 1
         assertAttrValue("#node_id1", "value", "192.168.10.11");
 
-        assertJavascriptEquals("true", "$('#flink-app-master1').get(0).checked");
-        assertJavascriptEquals("true", "$('#elasticsearch1').get(0).checked");
+        assertJavascriptEquals("true", "$('#zookeeper1').get(0).checked");
+        assertJavascriptEquals("true", "$('#ntp1').get(0).checked");
     }
 
     @Test
@@ -258,20 +247,11 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertNotNull (page.getElementById("gluster1"));
         assertTagName ("gluster1", "input");
 
-        assertNotNull (page.getElementById("mesos-master1"));
-        assertTagName ("mesos-master1", "input");
+        assertNotNull (page.getElementById("kube-master1"));
+        assertTagName ("kube-master1", "input");
 
-        assertNotNull (page.getElementById("elasticsearch1"));
-        assertTagName ("elasticsearch1", "input");
-
-        assertNotNull (page.getElementById("spark-runtime1"));
-        assertTagName ("spark-runtime1", "input");
-
-        assertNotNull (page.getElementById("kafka1"));
-        assertTagName ("kafka1", "input");
-
-        assertNotNull (page.getElementById("logstash1"));
-        assertTagName ("logstash1", "input");
+        assertNotNull (page.getElementById("etcd1"));
+        assertTagName ("etcd1", "input");
 
         assertJavascriptEquals ("1.0", "eskimoNodesConfig.getNodesCount()");
 
