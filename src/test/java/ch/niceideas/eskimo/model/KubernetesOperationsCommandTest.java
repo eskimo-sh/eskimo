@@ -129,6 +129,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         KubernetesOperationsCommand moc = prepareFourOps();
 
         assertEquals("{\n" +
+                "  \"restarts\": [],\n" +
                 "  \"uninstallations\": [\n" +
                 "    \"kafka-manager\",\n" +
                 "    \"zeppelin\"\n" +

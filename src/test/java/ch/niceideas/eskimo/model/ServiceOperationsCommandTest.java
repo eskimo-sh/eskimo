@@ -67,45 +67,45 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
     }
 
     @Test
-    public void testInstallationLogstash() throws Exception {
+    public void testInstallationKubeMaster() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("logstash_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("kube-master_installed_on_IP_192-168-10-11");
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
-        assertEquals("logstash", oc.getInstallations().get(0).getService());
-        assertEquals("192.168.10.13", oc.getInstallations().get(0).getNode());
+        assertEquals("kube-master", oc.getInstallations().get(0).getService());
+        assertEquals("192.168.10.11", oc.getInstallations().get(0).getNode());
 
         assertEquals(0, oc.getUninstallations().size());
 
-        assertEquals(1, oc.getRestarts().size());
-        assertEquals("zeppelin", oc.getRestarts().get(0).getService());
-        assertEquals("(kubernetes)", oc.getRestarts().get(0).getNode());
+        assertEquals(9, oc.getRestarts().size());
+        assertEquals("kube-slave", oc.getRestarts().get(0).getService());
+        assertEquals("192.168.10.11", oc.getRestarts().get(0).getNode());
     }
 
     @Test
-    public void testUninstallationLogstash() throws Exception {
+    public void testUninstallationKubeMaster() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("logstash2");
+        nodesConfig.getJSONObject().remove("kube-master");
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(0, oc.getInstallations().size());
 
         assertEquals(1, oc.getUninstallations().size());
-        assertEquals("logstash", oc.getUninstallations().get(0).getService());
-        assertEquals("192.168.10.13", oc.getUninstallations().get(0).getNode());
+        assertEquals("kube-master", oc.getUninstallations().get(0).getService());
+        assertEquals("192.168.10.11", oc.getUninstallations().get(0).getNode());
 
-        assertEquals(1, oc.getRestarts().size());
-        assertEquals("zeppelin", oc.getRestarts().get(0).getService());
-        assertEquals("(kubernetes)", oc.getRestarts().get(0).getNode());
+        assertEquals(9, oc.getRestarts().size());
+        assertEquals("kube-slave", oc.getRestarts().get(0).getService());
+        assertEquals("192.168.10.11", oc.getRestarts().get(0).getNode());
     }
 
     @Test
@@ -113,12 +113,12 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         ServiceOperationsCommand oc = prepareFiveOps();
 
-        //System.err.println (oc.toJSON());
+        System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject(
-                    "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"kafka\":\"(kubernetes)\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                    "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                    "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
+                    "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                            "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
+                            "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                         .similar(oc.toJSON()));
     }
 
@@ -139,10 +139,10 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         assertEquals(0, oc.getUninstallations().size());
 
-        assertEquals(5, oc.getRestarts().size());
+        assertEquals(6, oc.getRestarts().size());
 
         assertEquals (
-                        "etcd=192.168.10.11, logstash=192.168.10.11, kube-slave=192.168.10.11, spark-history-server=(kubernetes), zeppelin=(kubernetes)"
+                        "etcd=192.168.10.11, kube-master=192.168.10.11, kube-slave=192.168.10.11, spark-history-server=(kubernetes), logstash=(kubernetes), zeppelin=(kubernetes)"
                 , oc.getRestarts().stream()
                         .map(operationId -> operationId.getService()+"="+operationId.getNode())
                         .collect(Collectors.joining(", ")));
@@ -154,13 +154,13 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         ServicesInstallStatusWrapper savedServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>() {{
                 put ("cerebro_installed_on_IP_KUBERNETES_NODE", "OK");
                 put ("ntp_installed_on_IP_192-168-10-11", "OK");
-                put ("logstash_installed_on_IP_192-168-10-11", "OK");
+                put ("etcd_installed_on_IP_192-168-10-11", "OK");
         }});
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put ("node_id1", "192.168.10.11");
                 put ("node_id2", "192.168.10.13");
-                put ("logstash2", "on");
+                put ("etcd2", "on");
                 put ("ntp2", "on");
         }} );
 
@@ -168,7 +168,10 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         //System.err.println (oc.toJSON());
 
-        assertTrue (new JSONObject("{\"restarts\":[],\"uninstallations\":[{\"logstash\":\"192.168.10.11\"},{\"ntp\":\"192.168.10.11\"}],\"installations\":[{\"ntp\":\"192.168.10.13\"},{\"logstash\":\"192.168.10.13\"}]}")
+        assertTrue (new JSONObject("{" +
+                "\"restarts\":[]," +
+                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"ntp\":\"192.168.10.11\"}]," +
+                "\"installations\":[{\"ntp\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
 
     }
@@ -240,8 +243,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         //System.err.println (oc.toJSON());
 
-        assertTrue (new JSONObject(
-                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"kafka\":\"(kubernetes)\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+        assertTrue (new JSONObject("{" +
+                "\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                 "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
@@ -261,12 +264,12 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc2.toJSON());
+        System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
-                    "{\"restarts\":[{\"zookeeper\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"logstash\":\"192.168.10.11\"},{\"logstash\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"kafka\":\"(kubernetes)\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                    "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                    "\"installations\":[]}")
+                    "{\"restarts\":[{\"zookeeper\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                            "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
+                            "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
@@ -287,8 +290,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         //System.err.println (oc.toJSON());
 
-        assertTrue(new JSONObject("{\"" +
-                "restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"kafka\":\"(kubernetes)\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+        assertTrue(new JSONObject("{" +
+                "\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                 "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
@@ -310,9 +313,12 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc2.toJSON());
+        System.err.println (oc2.toJSON());
 
-        assertTrue (new JSONObject("{\"restarts\":[{\"etcd\":\"192.168.10.13\"},{\"kube-master\":\"192.168.10.13\"},{\"logstash\":\"192.168.10.11\"},{\"logstash\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"}],\"uninstallations\":[],\"installations\":[]}")
+        assertTrue (new JSONObject("{" +
+                "\"restarts\":[{\"etcd\":\"192.168.10.13\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                "\"uninstallations\":[{\"kube-master\":\"192.168.10.13\"}]," +
+                "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
@@ -333,8 +339,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         //System.err.println (oc.toJSON());
 
-        assertTrue(new JSONObject("{\"" +
-                "restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"kafka\":\"(kubernetes)\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+        assertTrue(new JSONObject("{" +
+                "\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                 "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
@@ -361,9 +367,12 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc2.toJSON());
+        System.err.println (oc2.toJSON());
 
-        assertTrue (new JSONObject("{\"restarts\":[{\"logstash\":\"192.168.10.11\"},{\"logstash\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"}],\"uninstallations\":[],\"installations\":[]}")
+        assertTrue (new JSONObject("{" +
+                "\"restarts\":[{\"kube-master\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                "\"uninstallations\":[{\"kube-master\":\"192.168.10.13\"}]," +
+                "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
@@ -376,10 +385,10 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
                 "  \"restarts\": [\n" +
                 "    {\"gluster\": \"192.168.10.11\"},\n" +
                 "    {\"gluster\": \"192.168.10.13\"},\n" +
-                "    {\"kafka\": \"(kubernetes)\"},\n" +
                 "    {\"elasticsearch\": \"(kubernetes)\"},\n" +
+                "    {\"kafka\": \"(kubernetes)\"},\n" +
                 "    {\"kafka-manager\": \"(kubernetes)\"},\n" +
-                "    {\"spark-history-server\": \"(kubernetes)\"},\n" +
+                "    {\"logstash\": \"(kubernetes)\"},\n" +
                 "    {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "  ],\n" +
                 "  \"uninstallations\": [\n" +
@@ -441,9 +450,9 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
                         "restart_gluster_192-168-10-11," +
                         "restart_gluster_192-168-10-13," +
                         "restart_elasticsearch_kubernetes," +
+                        "restart_logstash_kubernetes," +
                         "restart_kafka_kubernetes," +
                         "restart_kafka-manager_kubernetes," +
-                        "restart_spark-history-server_kubernetes," +
                         "restart_zeppelin_kubernetes",
                 opsInOrder.stream().map(ServiceOperationsCommand.ServiceOperationId::toString).collect(Collectors.joining(",")));
     }

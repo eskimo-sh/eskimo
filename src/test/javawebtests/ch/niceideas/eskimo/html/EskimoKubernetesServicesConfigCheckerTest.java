@@ -83,9 +83,9 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             "    \"elasticsearch_install\": \"on\",\n" +
             "    \"elasticsearch_cpu\": \"1\",\n" +
             "    \"elasticsearch_ram\": \"1G\",\n" +
-            "    \"flink_install\": \"on\",\n" +
-            "    \"flink_cpu\": \"1\",\n" +
-            "    \"flink_ram\": \"1G\",\n" +
+            "    \"flink-runtime_install\": \"on\",\n" +
+            "    \"flink-runtime_cpu\": \"1\",\n" +
+            "    \"flink-runtime_ram\": \"1G\",\n" +
             "    \"grafana_install\": \"on\",\n" +
             "    \"grafana_cpu\": \"0.3\",\n" +
             "    \"grafana_ram\": \"400M\",\n" +
@@ -141,50 +141,50 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     @Test
     public void testWithKubeConfigRequest_BuggyCPU() throws Exception {
 
-        kubernetesConfig.removeRootKey("flink_install");
+        kubernetesConfig.removeRootKey("flink-runtime_install");
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
                 js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Found a CPU definition for flink_cpu. But corresponding service installation is not enabled"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Found a CPU definition for flink-runtime_cpu. But corresponding service installation is not enabled"));
     }
 
     @Test
     public void testWithKubeConfigRequest_BuggyRAM() throws Exception {
 
-        kubernetesConfig.removeRootKey("flink_install");
-        kubernetesConfig.removeRootKey("flink_cpu");
+        kubernetesConfig.removeRootKey("flink-runtime_install");
+        kubernetesConfig.removeRootKey("flink-runtime_cpu");
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Found a RAM definition for flink_ram. But corresponding service installation is not enabled"));
+        assertTrue(exception.getMessage().startsWith("Inconsistency found : Found a RAM definition for flink-runtime_ram. But corresponding service installation is not enabled"));
     }
 
     @Test
     public void testWithKubeConfigRequest_wrongCPU() throws Exception {
 
-        kubernetesConfig.setValueForPath("flink_cpu", "0.5z");
+        kubernetesConfig.setValueForPath("flink-runtime_cpu", "0.5z");
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("CPU definition for flink_cpu doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}"));
+        assertTrue(exception.getMessage().startsWith("CPU definition for flink-runtime_cpu doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}"));
     }
 
     @Test
     public void testWithKubeConfigRequest_wrongRAM() throws Exception {
 
-        kubernetesConfig.setValueForPath("flink_ram", "500Gb");
+        kubernetesConfig.setValueForPath("flink-runtime_ram", "500Gb");
 
         ScriptException exception = assertThrows(ScriptException.class, () -> {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("RAM definition for flink_ram doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}"));
+        assertTrue(exception.getMessage().startsWith("RAM definition for flink-runtime_ram doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}"));
     }
 
     @Test

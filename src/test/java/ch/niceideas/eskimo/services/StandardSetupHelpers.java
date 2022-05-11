@@ -44,15 +44,15 @@ import java.util.HashMap;
 public class StandardSetupHelpers {
 
     public static NodesConfigWrapper getStandard2NodesSetup() {
-        return new NodesConfigWrapper(new HashMap<String, Object>() {{
+        return new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
+            put("kube-master", "1");
             put("gluster1", "on");
             put("etcd1", "on");
             put("kube-slave1", "on");
             put("ntp1", "on");
 
             put("node_id2", "192.168.10.13");
-            put("kube-master", "2");
             put("zookeeper", "2");
             put("gluster2", "on");
             put("etcd2", "on");
@@ -62,15 +62,15 @@ public class StandardSetupHelpers {
     }
 
     public static ServicesInstallStatusWrapper getStandard2NodesInstallStatus() {
-        return new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
+        return new ServicesInstallStatusWrapper(new HashMap<>() {{
             put("cerebro_installed_on_IP_KUBERNETES_NODE", "OK");
             put("elasticsearch_installed_on_IP_KUBERNETES_NODE", "OK");
             put("gluster_installed_on_IP_192-168-10-11", "OK");
             put("gluster_installed_on_IP_192-168-10-13", "OK");
             put("kafka-manager_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("logstash_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kafka_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kibana_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("logstash_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kube-slave_installed_on_IP_192-168-10-11", "OK");
             put("kube-slave_installed_on_IP_192-168-10-13", "OK");
             put("kube-master_installed_on_IP_192-168-10-11", "OK");
@@ -86,7 +86,7 @@ public class StandardSetupHelpers {
     }
 
     public static SystemStatusWrapper getStandard2NodesSystemStatus() {
-        return  new SystemStatusWrapper (new HashMap<String, Object>() {{
+        return  new SystemStatusWrapper (new HashMap<>() {{
             put("node_address_192-168-10-11", "192.168.10.11");
             put("node_address_192-168-10-13", "192.168.10.13");
             put("node_alive_192-168-10-11", "OK");
@@ -130,6 +130,7 @@ public class StandardSetupHelpers {
             put("kafka-manager_install", "on");
             put("kafka_install", "on");
             put("zeppelin_install", "on");
+            put("elasticsearch_install", "on");
         }});
     }
 }
