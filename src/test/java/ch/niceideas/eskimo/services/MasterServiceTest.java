@@ -74,7 +74,7 @@ public class MasterServiceTest extends AbstractSystemTest {
             }
             @Override
             public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
-                return StandardSetupHelpers.getStandardMarathonConfig();
+                return StandardSetupHelpers.getStandardKubernetesConfig();
             }
         };
     }

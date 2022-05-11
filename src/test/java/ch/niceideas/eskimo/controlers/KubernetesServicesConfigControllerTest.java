@@ -3,7 +3,6 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,7 @@ public class KubernetesServicesConfigControllerTest {
         mscc.setConfigurationService(new ConfigurationService() {
             @Override
             public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
-                return StandardSetupHelpers.getStandardMarathonConfig();
+                return StandardSetupHelpers.getStandardKubernetesConfig();
             }
         });
 
@@ -132,7 +131,7 @@ public class KubernetesServicesConfigControllerTest {
             }
             @Override
             public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
-                return StandardSetupHelpers.getStandardMarathonConfig();
+                return StandardSetupHelpers.getStandardKubernetesConfig();
             }
             @Override
             public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {

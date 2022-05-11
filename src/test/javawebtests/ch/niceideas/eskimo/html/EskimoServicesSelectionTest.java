@@ -74,8 +74,8 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         js("SERVICES_CONFIGURATION = " + jsonServices + ";");
         //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"flink-app-master\", \"kubernetes\"];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-runtime\", \"gluster\", \"logstash\", \"flink-runtime\", \"prometheus\"];");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\"];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"etcd\", \"kube-slave\", \"gluster\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -97,22 +97,22 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testInitModalServicesConfig() throws Exception {
 
-        assertJavascriptEquals("1.0", "$('#flink-app-master-choice').length");
-        assertJavascriptEquals("1.0", "$('#mesos-master-choice').length");
+        assertJavascriptEquals("1.0", "$('#etcd-choice').length");
+        assertJavascriptEquals("1.0", "$('#kube-master-choice').length");
         assertJavascriptEquals("1.0", "$('#zookeeper-choice').length");
     }
 
     @Test
     public void testServicesSelectionRadioMouseDown() throws Exception {
-        page.getElementById("flink-app-master-choice").click();
+        page.getElementById("zookeeper-choice").click();
 
-        assertJavascriptEquals("true", "$('#flink-app-master-choice').get(0).checked");
+        assertJavascriptEquals("true", "$('#zookeeper-choice').get(0).checked");
 
-        page.getElementById("flink-app-master-choice").click();
+        page.getElementById("zookeeper-choice").click();
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> js("$('#flink-app-master-choice').get(0).checked").getJavaScriptResult().toString().equals ("false"));
+        await().atMost(10, TimeUnit.SECONDS).until(() -> js("$('#zookeeper-choice').get(0).checked").getJavaScriptResult().toString().equals ("false"));
 
-        assertJavascriptEquals("false", "$('#flink-app-master-choice').get(0).checked");
+        assertJavascriptEquals("false", "$('#zookeeper-choice').get(0).checked");
     }
 
     @Test
@@ -123,16 +123,12 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         js("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
                 "return {\n" +
                 "  \"node_id1\": \"192.168.10.11\",\n" +
-                "  \"elasticsearch1\": \"on\",\n" +
-                "  \"flink-app-master\": \"1\",\n" +
-                "  \"flink-runtime1\": \"on\",\n" +
-                "  \"kafka1\": \"on\",\n" +
-                "  \"logstash1\": \"on\",\n" +
-                "  \"mesos-agent1\": \"on\",\n" +
-                "  \"mesos-master\": \"1\",\n" +
+                "  \"etcd1\": \"on\",\n" +
+                "  \"kube-slave1\": \"on\",\n" +
+                "  \"kube-master\": \"1\",\n" +
                 "  \"ntp1\": \"on\",\n" +
+                "  \"gluster1\": \"on\",\n" +
                 "  \"prometheus1\": \"on\",\n" +
-                "  \"spark-runtime1\": \"on\",\n" +
                 "  \"zookeeper\": \"1\"\n" +
                 "};" +
                 "}");
@@ -143,18 +139,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{\"ntp1\":\"on\"," +
-                "\"zookeeper\":\"1\"," +
-                "\"elasticsearch1\":\"on\"," +
-                "\"gluster1\":\"on\"," +
-                "\"mesos-master\":\"1\"," +
-                "\"logstash1\":\"on\"," +
-                "\"mesos-agent1\":\"on\"," +
-                "\"spark-runtime1\":\"on\"," +
-                "\"prometheus1\":\"on\"," +
-                "\"flink-app-master\":\"1\"," +
-                "\"flink-runtime1\":\"on\"," +
-                "\"kafka1\":\"on\"}", "JSON.stringify (result)");
+        assertJavascriptEquals("{\"ntp1\":\"on\",\"zookeeper\":\"1\",\"kube-slave1\":\"on\",\"gluster1\":\"on\",\"prometheus1\":\"on\",\"etcd1\":\"on\",\"kube-master\":\"1\"}", "JSON.stringify (result)");
     }
 
     @Test
@@ -170,18 +155,6 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{\"ntp\":\"on\"," +
-                "\"zookeeper\":\"on\"," +
-                "\"elasticsearch\":\"on\"," +
-                "\"gluster\":\"on\"," +
-                "\"mesos-master\":\"on\"," +
-                "\"logstash\":\"on\"," +
-                "\"mesos-agent\":\"on\"," +
-                "\"kubernetes\":\"on\"," +
-                "\"spark-runtime\":\"on\"," +
-                "\"prometheus\":\"on\"," +
-                "\"flink-app-master\":\"on\"," +
-                "\"flink-runtime\":\"on\"," +
-                "\"kafka\":\"on\"}", "JSON.stringify (result)");
+        assertJavascriptEquals("{\"ntp\":\"on\",\"zookeeper\":\"on\",\"kube-slave\":\"on\",\"gluster\":\"on\",\"prometheus\":\"on\",\"etcd\":\"on\",\"kube-master\":\"on\"}", "JSON.stringify (result)");
     }
 }

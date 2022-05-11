@@ -643,31 +643,6 @@ public class SystemService {
                     String nodeName = installationPairs.getValue();
                     String originalNodeName = nodeName;
 
-                    /* Deprecated */
-                    // if service is a marathon service
-                    if (nodeName.equals(ServicesInstallStatusWrapper.MARATHON_NODE)) {
-
-                        // if marathon is not available, don't do anything
-                        String marathonNodeName = systemStatus.getFirstNodeName(MARATHON_SERVICE_NAME);
-                        if (StringUtils.isBlank(marathonNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
-                            //notificationService.addError("Marathon inconsistency.");
-                            //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
-                            continue;
-                        }
-
-                        if (!systemStatus.isServiceOKOnNode(MARATHON_SERVICE_NAME, marathonNodeName)) {
-                            //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
-                            continue;
-                        }
-
-                        // get first node actually running service
-                        nodeName = systemStatus.getFirstNodeName(savedService);
-                        if (StringUtils.isBlank(nodeName)) {
-                            // if none, consider marathon node as DEFAULT node running service
-                            nodeName = marathonNodeName;
-                        }
-                    }
-
                     // if service is a kubernetes service
                     if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)) {
 

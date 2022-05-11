@@ -1,7 +1,7 @@
-● kafka.service - Apache Kafka server (broker)
-   Loaded: loaded (/lib/systemd/system/kafka.service; enabled; vendor preset: enabled)
+● etcd.service - Etcd server
+   Loaded: loaded (/lib/systemd/system/etcd.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-09 10:08:34 UTC; 9h ago
-     Docs: http://kafka.apache.org/documentation.html
+     Docs: http://kubernetes.org
  Main PID: 7511 (docker)
     Tasks: 10 (limit: 4915)
 ● ntp.service - NTP Server

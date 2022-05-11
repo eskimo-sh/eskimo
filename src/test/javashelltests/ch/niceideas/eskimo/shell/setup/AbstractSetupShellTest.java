@@ -95,7 +95,7 @@ public abstract class AbstractSetupShellTest {
 
         // generate custom topology file
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
         ServicesDefinition def = new ServicesDefinition();
         SetupService setupService = new SetupService();

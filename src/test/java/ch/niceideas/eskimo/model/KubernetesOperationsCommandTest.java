@@ -61,7 +61,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
         KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, systemService,
                 KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
@@ -74,9 +74,9 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
     public void testInstallation() {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_MARATHON_NODE");
+        savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_KUBERNETES_NODE");
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
         SystemService ss = new SystemService() {
             @Override
@@ -101,7 +101,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
 
         SystemService ss = new SystemService() {
@@ -142,10 +142,10 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
     private KubernetesOperationsCommand prepareFourOps() {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("cerebro_installed_on_IP_MARATHON_NODE");
-        savedServicesInstallStatus.getJSONObject().remove("kibana_installed_on_IP_MARATHON_NODE");
+        savedServicesInstallStatus.getJSONObject().remove("cerebro_installed_on_IP_KUBERNETES_NODE");
+        savedServicesInstallStatus.getJSONObject().remove("kibana_installed_on_IP_KUBERNETES_NODE");
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
         kubeServicesConfig.getJSONObject().remove("zeppelin_install");
 

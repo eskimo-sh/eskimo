@@ -73,7 +73,7 @@ public class StandardSetupHelpers {
             put("logstash_installed_on_IP_KUBERNETES_NODE", "OK");
             put("kube-slave_installed_on_IP_192-168-10-11", "OK");
             put("kube-slave_installed_on_IP_192-168-10-13", "OK");
-            put("kube-master_installed_on_IP_192-168-10-13", "OK");
+            put("kube-master_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-13", "OK");
             put("etcd_installed_on_IP_192-168-10-11", "OK");
@@ -107,7 +107,7 @@ public class StandardSetupHelpers {
             put("service_logstash_192-168-10-13", "OK");
             put("service_kube-slave_192-168-10-11", "OK");
             put("service_kube-slave_192-168-10-13", "OK");
-            put("service_kube-master_192-168-10-13", "OK");
+            put("service_kube-master_192-168-10-11", "OK");
             put("service_ntp_192-168-10-11", "OK");
             put("service_ntp_192-168-10-13", "OK");
             put("service_etcd_192-168-10-11", "OK");
@@ -120,13 +120,15 @@ public class StandardSetupHelpers {
         }});
     }
 
-    public static KubernetesServicesConfigWrapper getStandardMarathonConfig() {
+    public static KubernetesServicesConfigWrapper getStandardKubernetesConfig() {
         return new KubernetesServicesConfigWrapper(new HashMap<>() {{
             put("cerebro_install", "on");
             put("kibana_install", "on");
+            put("spark-runtime_install", "on");
             put("logstash_install", "on");
             put("spark-history-server_install", "on");
             put("kafka-manager_install", "on");
+            put("kafka_install", "on");
             put("zeppelin_install", "on");
         }});
     }

@@ -88,25 +88,6 @@ public class SystemServiceTest extends AbstractSystemTest {
         };
     }
 
-    @Override
-    protected MarathonService createMarathonService() {
-        return new MarathonService() {
-            @Override
-            protected Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
-                return new Pair<>("192.168.10.11", "running");
-            }
-            @Override
-            protected String queryMarathon (String endpoint, String method) throws MarathonException {
-                return "{}";
-            }
-            @Override
-            protected String restartServiceMarathonInternal(Service service) throws MarathonException {
-                // No Op
-                return "";
-            }
-        };
-    }
-
     public static String createTempStoragePath() throws Exception {
         File dtempFileName = File.createTempFile("test_systemservice_", "config_storage");
         FileUtils.delete (dtempFileName); // delete file to create directory below
@@ -118,26 +99,26 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournal() throws Exception {
-        systemService.showJournal("elasticsearch", "192.168.10.11");
-        assertEquals ("sudo journalctl -u elasticsearch", testSSHCommandScript.toString().trim());
+        systemService.showJournal("ntp", "192.168.10.11");
+        assertEquals ("sudo journalctl -u ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStartService() throws Exception {
-        systemService.startService("elasticsearch", "192.168.10.11");
-        assertEquals ("sudo systemctl start elasticsearch", testSSHCommandScript.toString().trim());
+        systemService.startService("ntp", "192.168.10.11");
+        assertEquals ("sudo systemctl start ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStopService() throws Exception {
-        systemService.stopService("elasticsearch", "192.168.10.11");
-        assertEquals ("sudo systemctl stop elasticsearch", testSSHCommandScript.toString().trim());
+        systemService.stopService("ntp", "192.168.10.11");
+        assertEquals ("sudo systemctl stop ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testRestartService() throws Exception {
-        systemService.restartService("elasticsearch", "192.168.10.11");
-        assertEquals ("sudo systemctl restart elasticsearch", testSSHCommandScript.toString().trim());
+        systemService.restartService("ntp", "192.168.10.11");
+        assertEquals ("sudo systemctl restart ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
@@ -153,7 +134,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testUpdateStatusWithMarathonException() throws Exception {
+    public void testUpdateStatusWithKubernetesException() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         configurationService.saveNodesConfig(nodesConfig);
@@ -161,7 +142,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
 
         systemService.setSshCommandService(new SSHCommandService() {
@@ -199,15 +180,6 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
         });
 
-        systemService.setMarathonService(new MarathonService() {
-            @Override
-            public void fetchMarathonServicesStatus
-                    (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
-                    throws MarathonException {
-                throw new MarathonException ("dummy");
-            }
-        });
-
         systemService.updateStatus();
 
         SystemStatusWrapper systemStatus = systemService.getStatus();
@@ -215,10 +187,10 @@ public class SystemServiceTest extends AbstractSystemTest {
         //System.err.println(systemStatus.getFormattedValue());
 
         SystemStatusWrapper expectedStatusWrapper = new SystemStatusWrapper(expectedFullStatus);
-        for (String marathonService : servicesDefinition.listKubernetesServices()) {
-            String prevValue = expectedStatusWrapper.getValueForPathAsString(SystemStatusWrapper.SERVICE_PREFIX + marathonService + "_192-168-10-11");
+        for (String kubeService : servicesDefinition.listKubernetesServices()) {
+            String prevValue = expectedStatusWrapper.getValueForPathAsString(SystemStatusWrapper.SERVICE_PREFIX + kubeService + "_192-168-10-11");
             if (StringUtils.isNotBlank(prevValue) && prevValue.equals("OK")) {
-                expectedStatusWrapper.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + marathonService + "_192-168-10-11", "KO");
+                expectedStatusWrapper.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + kubeService + "_192-168-10-11", "KO");
             }
         }
         expectedStatusWrapper.removeRootKey(SystemStatusWrapper.SERVICE_PREFIX + "grafana_192-168-10-11");
@@ -281,11 +253,11 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
-        assertEquals(9, statusMap.size());
+        assertEquals(5, statusMap.size());
 
-        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to marathon
+        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to Kubernetes
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
-        assertEquals("OK", statusMap.get("service_spark-runtime_192-168-10-11"));
+        assertEquals("OK", statusMap.get("service_etcd_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
     }
@@ -299,7 +271,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
 
         systemService.setSshCommandService(new SSHCommandService() {
@@ -395,16 +367,16 @@ public class SystemServiceTest extends AbstractSystemTest {
             }
         });
 
-        servicesInstallStatus.setValueForPath("spark-runtime_installed_on_IP_192-168-10-11", "restart");
+        servicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-11", "restart");
         servicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "restart");
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
 
-        assertEquals(9, statusMap.size());
+        assertEquals(5, statusMap.size());
 
-        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to marathon
+        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to kubernetes
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
-        assertEquals("restart", statusMap.get("service_spark-runtime_192-168-10-11"));
+        assertEquals("restart", statusMap.get("service_etcd_192-168-10-11"));
         assertEquals("restart", statusMap.get("service_gluster_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
     }
@@ -505,7 +477,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_kafka_192-168-10-11");
+        systemStatus.getJSONObject().remove("service_etcd_192-168-10-11");
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -523,8 +495,8 @@ public class SystemServiceTest extends AbstractSystemTest {
         // now I have changes
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
-        // kafka is missing
-        //System.err.println (resultPrevStatus.getFormattedValue());
+        // etcd is missing
+        System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue (new JSONObject(expectedPrevStatusServicesRemoved).similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -569,7 +541,7 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Test
-    public void testHandleStatusChangesMarathonService() throws Exception {
+    public void testHandleStatusChangesKubernetesService() throws Exception {
 
         Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
@@ -596,15 +568,17 @@ public class SystemServiceTest extends AbstractSystemTest {
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatusServicesRemoved);
-        expectedPrevStatusJson.put("kafka_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatusServicesRemoved is for another test
-        expectedPrevStatusJson.remove("cerebro_installed_on_IP_MARATHON_NODE");
+        expectedPrevStatusJson.put("etcd_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatusServicesRemoved is for another test
+        expectedPrevStatusJson.remove("cerebro_installed_on_IP_KUBERNETES_NODE");
 
-        // kafka manager is missing
+        // cerebro is missing
+        //System.err.println (expectedPrevStatusJson.toString(2));
+        //System.err.println (resultPrevStatus.getJSONObject().toString(2));
         assertTrue (expectedPrevStatusJson.similar(resultPrevStatus.getJSONObject()));
     }
 
     @Test
-    public void testHandleStatusChangesMarathonServiceWhenMarathonDown() throws Exception {
+    public void testHandleStatusChangesKubernetesServiceWhenKubernetesDown() throws Exception {
 
         Set<String> configuredAndLiveIps = new HashSet<String>(){{
             add("192.168.10.11");
@@ -613,7 +587,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
-        systemStatus.getJSONObject().put("service_marathon_192-168-10-11", "KO");
+        systemStatus.getJSONObject().put("service_kube-master_192-168-10-11", "KO");
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -628,7 +602,7 @@ public class SystemServiceTest extends AbstractSystemTest {
             systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
-        // Since the marathon service status change has not been saved (since marazthon is down), it's still empty !!
+        // Since the Kubernetes service status change has not been saved (since marazthon is down), it's still empty !!
         resultPrevStatus = configurationService.loadServicesInstallationStatus();
 
         assertEquals("{}", resultPrevStatus.getJSONObject().toString(2));
@@ -679,19 +653,18 @@ public class SystemServiceTest extends AbstractSystemTest {
         // kafka and elasticsearch have been kept
         System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
-                "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
-                "    \"elasticsearch_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"elasticsearch_installed_on_IP_192-168-10-13\": \"OK\",\n" +
-                "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kafka-manager_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
-                "    \"kafka_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kafka_installed_on_IP_192-168-10-13\": \"OK\",\n" +
-                "    \"kibana_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
-                "    \"logstash_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"marathon_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kafka-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"logstash_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"kube-slave_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kibana_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"kafka_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"etcd_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"elasticsearch_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"spark-runtime_installed_on_IP_192-168-10-11\": \"OK\"\n" +
+                "    \"cerebro_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kube-master_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"spark-runtime_installed_on_IP_KUBERNETES_NODE\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -786,17 +759,18 @@ public class SystemServiceTest extends AbstractSystemTest {
         // everything has been removed
         System.err.println(resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
-                "    \"cerebro_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
-                "    \"elasticsearch_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kafka-manager_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
-                "    \"kafka_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kibana_installed_on_IP_MARATHON_NODE\": \"OK\",\n" +
-                "    \"logstash_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"mesos-agent_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"marathon_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kafka-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"logstash_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"kube-slave_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kibana_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"kafka_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"etcd_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"elasticsearch_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
                 "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"spark-runtime_installed_on_IP_192-168-10-11\": \"OK\"\n" +
+                "    \"cerebro_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"kube-master_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"spark-runtime_installed_on_IP_KUBERNETES_NODE\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 
