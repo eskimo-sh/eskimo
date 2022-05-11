@@ -28,8 +28,9 @@ public class KubernetesService {
 
     public static final String KUBE_MASTER = "kube-master";
     public static final String KUBE_SLAVE = "kube-slave";
-    public static final String KUBE_NA_FLAG = "MARATHON_NA";
+    public static final String KUBE_NA_FLAG = "KUBERNETES_NA";
     public static final String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
+    public static final String KUBERNETES_NODE = "kubernetes node";
 
     public static final String STATUS_RUNNING = "Running";
     public static final String STATUS_TERMINATING = "Terminating";
@@ -116,24 +117,42 @@ public class KubernetesService {
     }
 
     // FIXME
-    public void showJournal(Service service) {
+    public void showJournal(Service service) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> showJournalInternal(service));
+    }
+
+    String showJournalInternal(Service service) {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
     // FIXME
-    public void startService(Service service) {
+    public void startService(Service service) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Starting", () -> startServiceInternal(service));
+    }
+
+    String startServiceInternal(Service service) throws MarathonException {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
     // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void stopService(Service service) {
+    public void stopService(Service service) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> stopServiceInternal(service));
+    }
+
+    @Deprecated
+    String stopServiceInternal(Service service) throws MarathonException {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
     // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void restartService(Service service) {
+    public void restartService(Service service) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> restartServiceInternal(service));
+    }
+
+    @Deprecated
+    protected String restartServiceInternal(Service service) throws MarathonException {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
@@ -464,7 +483,7 @@ public class KubernetesService {
         }
     }
 
-    private KubeStatusParser getKubeStatusParser() throws KubernetesException {
+    protected KubeStatusParser getKubeStatusParser() throws KubernetesException {
 
         try {
             ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
