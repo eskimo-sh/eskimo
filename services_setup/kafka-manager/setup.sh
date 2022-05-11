@@ -49,7 +49,7 @@ loadTopology
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 3
 fi
 
 
@@ -60,7 +60,7 @@ echo " - Configuring host kafka common part"
 . ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 echo " - Building container kafka-manager"
@@ -90,7 +90,7 @@ docker exec kafka-manager bash /scripts/inContainerSetupKafkaCommon.sh $kafka_us
 if [[ `tail -n 1 kafka-manager_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat kafka-manager_install_log
-    exit -100
+    exit 100
 fi
 
 echo " - Configuring kafka-manager container"
@@ -98,7 +98,7 @@ docker exec kafka-manager bash /scripts/inContainerSetupKafkaManager.sh | tee -a
 if [[ `tail -n 1 kafka-manager_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat kafka-manager_install_log
-    exit -100
+    exit 101
 fi
 
 #echo " - TODO"
@@ -112,4 +112,4 @@ commit_container kafka-manager kafka-manager_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon kafka-manager kafka-manager_install_log
+deploy_kubernetes kafka-manager kafka-manager_install_log

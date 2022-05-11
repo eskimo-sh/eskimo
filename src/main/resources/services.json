@@ -538,11 +538,21 @@
       "icon" : "images/kafka-manager-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 31220,
+      "__comment_urlTemplate": "Going through Kubectl proxy.",
+      "urlTemplate": "kafka-manager/api/v1/namespaces/default/services/kafka-manager:31220/proxy/",
+      "__comment_proxyTargetPort": "Kubectl proxy target port",
+      "proxyTargetPort" : 8001,
       "waitTime": 6000,
       "role" : "ADMIN",
       "title" : "Kafka manager",
-      "statusPageLinktitle" : "Manage your kafka topics"
+      "statusPageLinktitle" : "Manage your kafka topics",
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "{PREFIX_PATH}/{PREFIX_PATH}",
+          "target" : "{PREFIX_PATH}"
+        }
+      ]
     },
     "dependencies": [
       {
