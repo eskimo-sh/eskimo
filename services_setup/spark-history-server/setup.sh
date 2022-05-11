@@ -138,4 +138,4 @@ commit_container spark-history-server spark_history_server_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_marathon spark-history-server spark_history_server_install_log
+deploy_kubernetes spark-history-server spark_history_server_install_log

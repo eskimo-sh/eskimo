@@ -49,21 +49,9 @@ rm -f /tmp/cerebro_build_log
 echo " - Building image cerebro"
 build_image cerebro_template /tmp/cerebro_build_log
 
-# connect to container
-#docker exec -i cerebro bash
-
-
-# TODO install base system
-# See what I do in config.sh
-
 echo " - Installing OpenJDK 11"
 docker exec -i cerebro_template apt-get install -y openjdk-11-jdk  > /tmp/cerebro_build_log 2>&1
 fail_if_error $? "/tmp/cerebro_build_log" -3
-
-# cerebro doesn't need scala pre-installed
-#echo " - Installing scala"
-#docker exec -i cerebro_template apt-get install -y scala > /tmp/cerebro_build_log 2>&1
-#fail_if_error $? "/tmp/cerebro_build_log" -4
 
 echo " - Installing cerebro"
 docker exec -i cerebro_template bash /scripts/installCerebro.sh  | tee -a /tmp/cerebro_build_log 2>&1

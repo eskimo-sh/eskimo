@@ -88,7 +88,7 @@ fi
 
 
 #echo " - TODO"
-#docker exec -it flink_template bash
+docker exec -it flink_template bash
 
 
 echo " - Cleaning up image"

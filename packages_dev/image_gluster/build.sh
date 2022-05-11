@@ -49,18 +49,6 @@ rm -f /tmp/gluster_build_log
 echo " - Building image gluster"
 build_image gluster_template /tmp/gluster_build_log
 
-# connect to container
-#docker exec -i gluster bash
-
-# EDIT : I don't nee python anymore
-#echo " - Installing python"
-#docker exec -i gluster_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/gluster_build_log 2>&1
-#fail_if_error $? "/tmp/gluster_build_log" 1
-
-#echo " - Installing required python packages"
-#docker exec -i gluster_template pip install furl >> /tmp/gluster_build_log 2>&1
-#fail_if_error $? "/tmp/gluster_build_log" 2
-
 echo " - Installing OpenJDK 11"
 docker exec -i gluster_template apt-get install -y openjdk-11-jdk > /tmp/gluster_build_log 2>&1
 fail_if_error $? "/tmp/gluster_build_log" 3

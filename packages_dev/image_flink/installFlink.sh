@@ -211,6 +211,9 @@ returned_to_saved_dir
 echo " - Cleaning up maven repository"
 sudo rm -Rf $HOME/.m2/repository
 
+echo " - Cleanup container"
+sudo rm -Rf /usr/share/doc/openjdk-11-jre-headless
+
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container install SUCCESS"

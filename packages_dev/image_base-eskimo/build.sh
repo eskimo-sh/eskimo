@@ -63,9 +63,6 @@ echo " - Starting setup docker container"
 docker run -d --name base-eskimo_template -i -t eskimo:base-eskimo_template bash > /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
-# connect to conainter
-#docker exec -i base-eskimo_template bash
-
 echo " - (Hack) Creating missing directory /usr/share/man/man1/"
 docker exec -i base-eskimo_template mkdir -p /usr/share/man/man1/ > /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
@@ -79,7 +76,17 @@ docker exec -i -e DEBIAN_FRONTEND=noninteractive base-eskimo_template apt-get -y
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 echo " - Installing required utility tools for eskimo framework"
-docker exec -i base-eskimo_template apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq iputils-ping > /tmp/base_image_build_log 2>&1
+docker exec -i base-eskimo_template apt-get install -y tar wget git unzip curl moreutils procps sudo net-tools jq iputils-ping apt-utils > /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
+
+echo " - Removing unused packages"
+docker exec -i base-eskimo_template apt-get remove -y openssh-client > /tmp/base_image_build_log 2>&1
+fail_if_error $? "/tmp/base_image_build_log" -2
+
+
+
+# connect to container
+#docker exec -it base-eskimo_template bash
+
 
 close_and_save_image base-eskimo_template /tmp/base_image_build_log $ESKIMO_VERSION

@@ -591,7 +591,7 @@
       "icon" : "images/spark-history-server-icon.png"
     },
     "ui": {
-      "proxyTargetPort" : 31810,
+      "proxyTargetPort" : 31811,
       "waitTime": 5000,
       "role" : "*",
       "title" : "Spark Console",
@@ -599,26 +599,29 @@
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
-          "source" : "uiroot}}/history",
-          "target" : "uiroot}}/{PREFIX_PATH}/history"
-        }
+          "source" : "uiRoot + \"/history/\"",
+          "target": "uiRoot + \"/{PREFIX_PATH}/history/\"",
+          "__target" : "uiroot}}/history"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "newBaseURI = words.slice(0, words.indexOf(\"history\")).join('/');",
+          "target": "newBaseURI = words.slice(0, words.indexOf(\"history\") - 1).join('/');"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "newBaseURI = words.slice(0, ind).join('/');",
+          "target": "newBaseURI = words.slice(0, ind - 1).join('/');"
+        },
       ]
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
+        "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": false,
         "restart": true
-      },
-      {
-        "__comment": "this is to enforce the presence of at least one spark-executor otherwise spark-history makes no sense.",
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "spark-runtime",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
       }
     ],
     "commands" : [

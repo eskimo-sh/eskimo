@@ -179,9 +179,21 @@ function close_and_save_image() {
         exit 4
     fi
     VERSION=$3
-    
+
+    echo " - Running apt-autoremove"
+    docker exec -i $IMAGE apt -y autoremove > $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -2
+
     echo " - Cleaning apt cache"
     docker exec -i $IMAGE apt-get clean -q > $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -2
+
+    echo " - Cleanup doc and man pages"
+    docker exec -i $IMAGE rm -Rf /usr/share/doc/ /usr/share/man /usr/share/doc-base/ /usr/share/info/ > $LOG_FILE 2>&1
+    fail_if_error $? $LOG_FILE -2
+
+    echo " - Recreating required folders"
+    docker exec -i $IMAGE mkdir -p /usr/share/man/man1/ > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -2
 
     # Exit the container and commit the changes

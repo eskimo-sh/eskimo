@@ -140,6 +140,9 @@ userdel estest
 
 echo " - Cleanup "
 rm -Rf /usr/local/lib/elasticsearch-8.1.2/config/elasticsearch.keystore.tmp
+rm -Rf /usr/local/lib/elasticsearch-8.1.2/NOTICE.txt
+rm -Rf /usr/local/lib/elasticsearch/jdk/man/*
+
 
 rm -Rf /tmp/es_setup
 returned_to_saved_dir
