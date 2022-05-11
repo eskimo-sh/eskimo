@@ -100,7 +100,7 @@ public class KibanaSetupTest extends AbstractSetupShellTest {
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
-        assertMarathonServiceDockerCommands();
+        assertKubernetesServiceDockerCommands();
 
     }
 

@@ -97,7 +97,7 @@ public class CerebroSetupTest extends AbstractSetupShellTest {
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
-        assertMarathonServiceDockerCommands();
+        assertKubernetesServiceDockerCommands();
 
     }
 

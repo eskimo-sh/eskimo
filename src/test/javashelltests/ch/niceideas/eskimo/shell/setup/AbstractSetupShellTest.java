@@ -361,7 +361,7 @@ public abstract class AbstractSetupShellTest {
         }
     }
 
-    protected final void assertMarathonServiceDockerCommands() throws IOException {
+    protected final void assertKubernetesServiceDockerCommands() throws IOException {
         //System.err.println(setupLogs);
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"));
         if (StringUtils.isNotBlank(dockerLogs)) {

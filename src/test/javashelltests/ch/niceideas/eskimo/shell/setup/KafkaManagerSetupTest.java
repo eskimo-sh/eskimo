@@ -116,7 +116,7 @@ public class KafkaManagerSetupTest extends AbstractSetupShellTest {
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
-        assertMarathonServiceDockerCommands();
+        assertKubernetesServiceDockerCommands();
 
     }
 
