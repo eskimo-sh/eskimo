@@ -7,7 +7,7 @@
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/spark-history-server",
+      "image": "kubernetes.registry:5000/spark-history-server",
       "forcePullImage": true,
       "privileged": true,
       "parameters": [

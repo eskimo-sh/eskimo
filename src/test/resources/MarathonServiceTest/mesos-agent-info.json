@@ -92,7 +92,7 @@
   "attributes":{
 
   },
-  "master_hostname":"marathon.registry",
+  "master_hostname":"kubernetes.registry",
   "log_dir":"/var/log/mesos",
   "flags":{
     "appc_simple_discovery_uri_prefix":"http://",
@@ -293,7 +293,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/zeppelin",
+                  "image":"kubernetes.registry:5000/zeppelin",
                   "network":"HOST",
                   "privileged":true,
                   "parameters":[
@@ -453,7 +453,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/grafana",
+                  "image":"kubernetes.registry:5000/grafana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -621,7 +621,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kafka-manager",
+                  "image":"kubernetes.registry:5000/kafka-manager",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -855,7 +855,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kafka-manager",
+                  "image":"kubernetes.registry:5000/kafka-manager",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1010,7 +1010,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1165,7 +1165,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1330,7 +1330,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/cerebro",
+                  "image":"kubernetes.registry:5000/cerebro",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1490,7 +1490,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kafka-manager",
+                  "image":"kubernetes.registry:5000/kafka-manager",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1660,7 +1660,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/grafana",
+                  "image":"kubernetes.registry:5000/grafana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1820,7 +1820,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -1985,7 +1985,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kafka-manager",
+                  "image":"kubernetes.registry:5000/kafka-manager",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -2145,7 +2145,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -2310,7 +2310,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kibana",
+                  "image":"kubernetes.registry:5000/kibana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -2475,7 +2475,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/cerebro",
+                  "image":"kubernetes.registry:5000/cerebro",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -2635,7 +2635,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kibana",
+                  "image":"kubernetes.registry:5000/kibana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -2790,7 +2790,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -2950,7 +2950,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kafka-manager",
+                  "image":"kubernetes.registry:5000/kafka-manager",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -3105,7 +3105,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -3265,7 +3265,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kibana",
+                  "image":"kubernetes.registry:5000/kibana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -3420,7 +3420,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -3580,7 +3580,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kibana",
+                  "image":"kubernetes.registry:5000/kibana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -3735,7 +3735,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -3895,7 +3895,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kibana",
+                  "image":"kubernetes.registry:5000/kibana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -4055,7 +4055,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/kibana",
+                  "image":"kubernetes.registry:5000/kibana",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {
@@ -4210,7 +4210,7 @@
                   }
                 ],
                 "docker":{
-                  "image":"marathon.registry:5000/spark-history-server",
+                  "image":"kubernetes.registry:5000/spark-history-server",
                   "network":"BRIDGE",
                   "port_mappings":[
                     {

@@ -63,6 +63,7 @@ public class KubernetesServicesConfigControllerTest {
 
         System.err.println (mscc.loadKubernetesServicesConfig());
         assertTrue (new JSONObject("{\n" +
+                "    \"elasticsearch_install\": \"on\",\n" +
                 "    \"cerebro_install\": \"on\",\n" +
                 "    \"kafka_install\": \"on\",\n" +
                 "    \"zeppelin_install\": \"on\",\n" +
@@ -152,6 +153,7 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"uninstallations\": [],\n" +
                 "    \"restarts\": [],\n" +
                 "    \"installations\": [\n" +
+                "      \"elasticsearch\",\n" +
                 "      \"cerebro\",\n" +
                 "      \"spark-runtime\",\n" +
                 "      \"kafka\",\n" +

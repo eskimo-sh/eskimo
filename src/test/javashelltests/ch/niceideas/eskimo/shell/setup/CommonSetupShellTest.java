@@ -179,10 +179,10 @@ public class CommonSetupShellTest {
 
             //System.err.println (dockerLogs);
 
-            int indexOfTag = dockerLogs.indexOf("tag eskimo:cerebro marathon.registry:5000/cerebro");
+            int indexOfTag = dockerLogs.indexOf("tag eskimo:cerebro kubernetes.registry:5000/cerebro");
             assertTrue(indexOfTag > -1);
 
-            int indexOfPush = dockerLogs.indexOf("push marathon.registry:5000/cerebro", indexOfTag);
+            int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/cerebro", indexOfTag);
             assertTrue(indexOfPush > -1);
 
             int indexOfImage = dockerLogs.indexOf("image rm eskimo:cerebro", indexOfPush);

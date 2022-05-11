@@ -215,11 +215,18 @@ public abstract class AbstractSetupShellTest {
         createLoggingExecutable("wget", tempFile.getAbsolutePath());
         createLoggingExecutable("mv", tempFile.getAbsolutePath());
         createLoggingExecutable("gluster_call_remote.sh", tempFile.getAbsolutePath());
+        createLoggingExecutable("kubectl", tempFile.getAbsolutePath());
+        createLoggingExecutable("envsubst", tempFile.getAbsolutePath());
 
         createDummyExecutable("id", tempFile.getAbsolutePath());
         createDummyExecutable("docker", tempFile.getAbsolutePath());
         createDummyExecutable("sed", tempFile.getAbsolutePath());
         createDummyExecutable("sudo", tempFile.getAbsolutePath());
+
+        File var = new File (tempFile, "var"); var.mkdirs();
+        File lib = new File (var, "lib"); var.mkdirs();
+        File eskimo = new File (lib, "eskimo"); var.mkdirs();
+        new File (eskimo, "kube-services"); var.mkdirs();
 
         return tempFile.getAbsolutePath();
     }
@@ -382,10 +389,10 @@ public abstract class AbstractSetupShellTest {
             int indexOfRm = dockerLogs.indexOf("container rm " + getServiceName(), indexOfStop + 1);
             assertTrue(indexOfRm > -1);
 
-            int indexOfTag = dockerLogs.indexOf("tag eskimo:" + getServiceName() + " marathon.registry:5000/" + getServiceName(), indexOfRm + 1);
+            int indexOfTag = dockerLogs.indexOf("tag eskimo:" + getServiceName() + " kubernetes.registry:5000/" + getServiceName(), indexOfRm + 1);
             assertTrue(indexOfTag > -1);
 
-            int indexOfPush = dockerLogs.indexOf("push marathon.registry:5000/" + getServiceName(), indexOfTag + 1);
+            int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/" + getServiceName(), indexOfTag + 1);
             assertTrue(indexOfPush > -1);
 
             int indexOfImageRm = dockerLogs.indexOf("image rm eskimo:" + getServiceName(), indexOfTag + 1);

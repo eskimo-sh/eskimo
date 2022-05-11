@@ -79,6 +79,7 @@ public class ZeppelinSetupTest extends AbstractSetupShellTest {
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
+        copyFile(jailPath, "zeppelin.k8s.yaml");
         copyFile(jailPath, "setupESCommon.sh");
         copyFile(jailPath, "setupFlinkCommon.sh");
         copyFile(jailPath, "setupSparkCommon.sh");

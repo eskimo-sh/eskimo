@@ -8,7 +8,7 @@
       "type":"DOCKER",
       "docker":{
         "forcePullImage":true,
-        "image":"marathon.registry:5000/zeppelin",
+        "image":"kubernetes.registry:5000/zeppelin",
         "parameters":[
           {
             "key":"user",

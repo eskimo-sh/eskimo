@@ -27,7 +27,7 @@ Marathon Service Definition for zeppelin:
         "type": "DOCKER",
         "docker": {
             "privileged": true,
-            "image": "marathon.registry:5000/zeppelin",
+            "image": "kubernetes.registry:5000/zeppelin",
             "parameters": [{
                 "value": "spark",
                 "key": "user"

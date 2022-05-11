@@ -290,12 +290,16 @@ function deploy_kubernetes_only() {
         exit 16
     fi
 
-    echo " - Saving Kube deployment file $CONTAINER.k8s.yml in /var/lib/eskimo/kube-services"
-    mkdir -p /var/lib/eskimo/kube-services/
-    /bin/cp -f $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/
+    export PATH=$PATH:/usr/local/bin
+
+    if [[ -z "$TEST_MODE" ]]; then
+        echo " - Saving Kube deployment file $CONTAINER.k8s.yml in /var/lib/eskimo/kube-services"
+        mkdir -p /var/lib/eskimo/kube-services/
+        /bin/cp -f $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/
+    fi
 
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"
-    /usr/local/bin/kubectl delete -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    kubectl delete -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         if [[ `cat "$LOG_FILE"_kubernetes_deploy` != "" && `grep "not found" "$LOG_FILE"_kubernetes_deploy` != "" ]]; then
             echo "   + Some elements were not found. Moving on ..."
@@ -312,7 +316,7 @@ function deploy_kubernetes_only() {
     fi
 
     echo " - Deploying $CONTAINER service in kubernetes"
-    /bin/bash -c ". /etc/eskimo_topology.sh && /usr/bin/envsubst < $CONTAINER.k8s.yaml | /usr/local/bin/kubectl apply -f -" >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    /bin/bash -c "envsubst < $CONTAINER.k8s.yaml | kubectl apply -f -" >> $LOG_FILE"_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not deploy $CONTAINER application in kubernetes"
         cat "$LOG_FILE"_kubernetes_deploy

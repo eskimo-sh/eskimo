@@ -7,7 +7,7 @@
   "instances": 1,
   "container": {
     "docker": {
-      "image": "marathon.registry:5000/kafka-manager",
+      "image": "kubernetes.registry:5000/kafka-manager",
       "forcePullImage": true,
       "parameters": [
         { "key": "user", "value": "kafka" }

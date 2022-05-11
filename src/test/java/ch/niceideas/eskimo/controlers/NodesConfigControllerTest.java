@@ -61,20 +61,20 @@ public class NodesConfigControllerTest {
             }
         });
 
+        //System.err.println (ncc.loadNodesConfig());
+
         assertTrue (new JSONObject("{\n" +
+                "    \"kube-master\": \"1\",\n" +
                 "    \"etcd1\": \"on\",\n" +
+                "    \"ntp1\": \"on\",\n" +
                 "    \"zookeeper\": \"2\",\n" +
                 "    \"etcd2\": \"on\",\n" +
-                "    \"node_id1\": \"192.168.10.11\",\n" +
-                "    \"node_id2\": \"192.168.10.13\",\n" +
-                "    \"logstash1\": \"on\",\n" +
-                "    \"logstash2\": \"on\",\n" +
-                "    \"ntp1\": \"on\",\n" +
-                "    \"kube-master\": \"2\",\n" +
                 "    \"gluster1\": \"on\",\n" +
                 "    \"ntp2\": \"on\",\n" +
+                "    \"node_id1\": \"192.168.10.11\",\n" +
                 "    \"kube-slave1\": \"on\",\n" +
                 "    \"kube-slave2\": \"on\",\n" +
+                "    \"node_id2\": \"192.168.10.13\",\n" +
                 "    \"gluster2\": \"on\"\n" +
                 "}").similar(new JSONObject (ncc.loadNodesConfig())));
 
@@ -139,24 +139,23 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
-                "      {\"etcd\": \"192.168.10.11\"},\n" +
-                "      {\"etcd\": \"192.168.10.13\"},\n" +
-                "      {\"kube-master\": \"192.168.10.13\"},\n" +
+                "      {\"kube-master\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.13\"},\n" +
                 "      {\"spark-history-server\": \"(kubernetes)\"},\n" +
+                "      {\"logstash\": \"(kubernetes)\"},\n" +
                 "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
                 "      {\"gluster\": \"192.168.10.11\"},\n" +
                 "      {\"gluster\": \"192.168.10.13\"},\n" +
-                "      {\"logstash\": \"192.168.10.11\"},\n" +
-                "      {\"logstash\": \"192.168.10.13\"}\n" +
+                "      {\"etcd\": \"192.168.10.11\"},\n" +
+                "      {\"etcd\": \"192.168.10.13\"}\n" +
                 "    ]\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ncc.reinstallNodesConfig("{\"gluster\":\"on\",\"logstash\":\"on\"}", session));
+                "}", ncc.reinstallNodesConfig("{\"gluster\":\"on\",\"etcd\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
@@ -235,24 +234,15 @@ public class NodesConfigControllerTest {
                         "    \"restarts\": [\n" +
                         "      {\"gluster\": \"192.168.10.11\"},\n" +
                         "      {\"gluster\": \"192.168.10.13\"},\n" +
-                        "      {\"kube-slave\": \"192.168.10.11\"},\n" +
-                        "      {\"kube-slave\": \"192.168.10.13\"},\n" +
                         "      {\"kafka\": \"(kubernetes)\"},\n" +
-                        "      {\"elasticsearch\": \"(kubernetes)\"},\n" +
-                        "      {\"cerebro\": \"(kubernetes)\"},\n" +
                         "      {\"kafka-manager\": \"(kubernetes)\"},\n" +
-                        "      {\"spark-history-server\": \"(kubernetes)\"},\n" +
                         "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                         "    ],\n" +
-                        "    \"uninstallations\": [\n" +
-                        "      {\"kube-master\": \"192.168.10.13\"},\n" +
-                        "      {\"zookeeper\": \"192.168.10.13\"}\n" +
-                        "    ],\n" +
+                        "    \"uninstallations\": [{\"zookeeper\": \"192.168.10.13\"}],\n" +
                         "    \"installations\": [\n" +
                         "      {\"zookeeper\": \"192.168.10.11\"},\n" +
                         "      {\"prometheus\": \"192.168.10.11\"},\n" +
-                        "      {\"prometheus\": \"192.168.10.13\"},\n" +
-                        "      {\"kube-master\": \"192.168.10.11\"}\n" +
+                        "      {\"prometheus\": \"192.168.10.13\"}\n" +
                         "    ]\n" +
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
@@ -262,14 +252,12 @@ public class NodesConfigControllerTest {
                 "\"kube-master\":\"1\"," +
                 "\"zookeeper\":\"1\"," +
                 "\"gluster1\":\"on\"," +
-                "\"logstash1\":\"on\"," +
                 "\"kube-slave1\":\"on\"," +
                 "\"ntp1\":\"on\"," +
                 "\"etcd1\":\"on\"," +
                 "\"prometheus1\":\"on\"," +
                 "\"node_id2\":\"192.168.10.13\"," +
                 "\"gluster2\":\"on\"," +
-                "\"logstash2\":\"on\"," +
                 "\"kube-slave2\":\"on\"," +
                 "\"ntp2\":\"on\"," +
                 "\"etcd2\":\"on\"," +
