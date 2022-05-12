@@ -44,7 +44,9 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
-public class LogstashSearchSetupTest extends AbstractSetupShellTest {
+import static org.junit.Assert.assertTrue;
+
+public class SparkRuntimeSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
@@ -72,37 +74,75 @@ public class LogstashSearchSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "logstash";
+        return "spark-runtime";
+    }
+
+    @Override
+    protected String getTemplateName() {
+        return "spark";
+    }
+
+    @Override
+    protected String getImageName() {
+        return "spark";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
-        copyFile(jailPath, "setupESCommon.sh");
-        copyFile(jailPath, "setupLogstashCommon.sh");
-        copyFile(jailPath, "inContainerSetupLogstash.sh");
-        copyFile(jailPath, "inContainerSetupESCommon.sh");
-        copyFile(jailPath, "inContainerStartService.sh");
+        copyFile(jailPath, "setupCommon.sh");
+        copyFile(jailPath, "inContainerSetupSpark.sh");
+        copyFile(jailPath, "inContainerSetupSparkCommon.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
+        copyFile(jailPath, "inContainerMountGluster.sh");
     }
 
     @Override
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupLogstash.sh",
+                "inContainerSetupSpark.sh",
                 "inContainerInjectTopology.sh"
         };
     }
 
-    @Test
-    public void testSystemDInstallation() throws Exception {
-        assertSystemDInstallation();
+    @Override
+    protected String[][] getCustomScriptsToExecute() {
+        return new String[][] {
+                new String[] {"inContainerSetupSparkCommon.sh", "3302"}
+        };
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
+        assertKubernetesServiceDockerCommands();
+        assertKubernetesServiceDockerCommands(getJailPath() + "/spark_executor_setup/", "spark-runtime", true);
     }
 
+    @Test
+    public void testConfigurationFileUpdate() throws Exception {
+        String configEchoed = FileUtils.readFile(new File (getJailPath() + "/.log_bash"));
+
+        // test a few essential ones
+        assertTrue (configEchoed.contains("spark.master=k8s://https://192.168.10.11:6443\""));
+        assertTrue (configEchoed.contains("spark.kubernetes.driver.master=https://192.168.10.11:6443\""));
+        assertTrue (configEchoed.contains("spark.es.nodes=elasticsearch.default.svc.cluster.eskimo\""));
+        assertTrue (configEchoed.contains("spark.driver.host=192.168.10.11\""));
+        assertTrue (configEchoed.contains("spark.driver.bindAddress=192.168.10.11\""));
+
+        configEchoed = FileUtils.readFile(new File (getJailPath() + "/.log_sudo"));
+
+        // test a few essential ones
+        assertTrue (configEchoed.contains("echo -e \"export SPARK_CONF_DIR=/usr/local/lib/spark/conf\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
+        assertTrue (configEchoed.contains("echo -e \"export SPARK_LOG_DIR=/usr/local/lib/spark/logs\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
+        assertTrue (configEchoed.contains("echo -e \"export KUBECONFIG=/home/spark/.kube/config\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
+        assertTrue (configEchoed.contains("echo -e \"spark.eventLog.dir=/var/lib/spark/eventlog\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.dynamicAllocation.enabled=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-runtime\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.file.upload.path=/var/lib/spark/data\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.driver.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.executor.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.authenticate.driver.serviceAccountName=eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+
+    }
 }

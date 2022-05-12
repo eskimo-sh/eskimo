@@ -43,7 +43,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 KUBERNETES_USER_ID=$1
 if [[ $KUBERNETES_USER_ID == "" ]]; then
     echo " - Didn't get KUBERNETES User ID as argument"
-    exit -2
+    exit 2
 fi
 
 # Loading topology
@@ -52,12 +52,12 @@ fi
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 3
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 4
 fi
 
 
@@ -69,7 +69,7 @@ if [[ $kubernetes_user_id == "" ]]; then
     useradd -u $KUBERNETES_USER_ID kubernetes
 elif [[ $kubernetes_user_id != $KUBERNETES_USER_ID ]]; then
     echo "Docker KUBERNETES USER ID is $KUBERNETES_USER_ID while requested USER ID is $KUBERNETES_USER_ID"
-    exit -2
+    exit 5
 fi
 
 echo " - Creating user kubernetes home directory"

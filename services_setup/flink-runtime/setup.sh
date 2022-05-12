@@ -158,7 +158,7 @@ echo " ---> Flink worker part --------------------------------------------------
 set -e
 
 echo " - Creating sub-setup dir for flink-worker"
-mkdir flink_worker_setup
+/bin/mkdir flink_worker_setup
 
 echo " - Copying specific docker file to flink-worker setup"
 cp Dockerfile.flink-runtime flink_worker_setup/Dockerfile
@@ -174,6 +174,8 @@ build_container flink-runtime flink flink_worker_install_log
 echo " - Deploying flink worker in docker registry for kubernetes"
 deploy_registry flink-runtime flink_worker_install_log
 
+cd ..
+
 echo " - Removing local image for common part"
 docker image rm eskimo:flink  >> flink_worker_install_log 2>&1
 if [[ $? != 0 ]]; then
@@ -181,7 +183,6 @@ if [[ $? != 0 ]]; then
     exit 6
 fi
 
-cd ..
 
 echo " - Creating configmaps"
 

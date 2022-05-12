@@ -79,6 +79,7 @@ public class CerebroSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupESCommon.sh");
+        copyFile(jailPath, "cerebro.k8s.yaml");
         copyFile(jailPath, "inContainerSetupCerebro.sh");
         copyFile(jailPath, "inContainerSetupESCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
@@ -91,14 +92,13 @@ public class CerebroSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testMarathonInstallation() throws Exception {
-        assertMarathonCommands();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
         assertKubernetesServiceDockerCommands();
-
     }
 
     @Test

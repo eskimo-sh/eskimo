@@ -162,17 +162,17 @@ public class CommonSetupShellTest {
     }
 
     @Test
-    public void testDeployMarathon() throws Exception {
-        createTestScript("deploy_marathon.sh", "deploy_marathon cerebro /tmp/test.log");
+    public void testDeployKubernetes() throws Exception {
+        createTestScript("cerebro.k8s.yaml", "dummy");
+        createTestScript("deploy_kubernetes.sh", "deploy_kubernetes cerebro /tmp/test.log");
 
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/deploy_marathon.sh"}, true);
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/deploy_kubernetes.sh"}, true);
 
         // no error reported
-        assertEquals (" - Deploying cerebro Service in docker registry for marathon\n" +
+        assertEquals (" - Deploying cerebro Service in docker registry for kubernetes\n" +
                 " - removing local image\n" +
-                " - Removing any previously deployed cerebro service from marathon\n" +
-                " - Deploying cerebro service in marathon\n" +
-                "   + Attempt 1\n", result);
+                " - Removing any previously deployed cerebro service from kubernetes\n" +
+                " - Deploying cerebro service in kubernetes\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
         if (StringUtils.isNotBlank(dockerLogs)) {
@@ -192,16 +192,14 @@ public class CommonSetupShellTest {
             fail ("No docker manipulations found");
         }
 
-        String curlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_curl"));
-        if (StringUtils.isNotBlank(curlLogs)) {
+        String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_kubectl"));
+        if (StringUtils.isNotBlank(kubeCtlLogs)) {
 
-            //System.err.println (curlLogs);
-
-            int indexOfDelete = curlLogs.indexOf("-XDELETE http://:28080/v2/apps/cerebro");
+            int indexOfDelete = kubeCtlLogs.indexOf("delete -f cerebro.k8s.yaml");
             assertTrue(indexOfDelete > -1);
 
-            int indexOfPost = curlLogs.indexOf("-X POST -H Content-Type: application/json -d @cerebro.marathon.json http://:28080/v2/apps", indexOfDelete);
-            assertTrue(indexOfPost > -1);
+            int indexOfApply = kubeCtlLogs.indexOf("apply -f -", indexOfDelete);
+            assertTrue(indexOfApply > -1);
 
         } else {
             fail ("No curl manipulations found");
@@ -219,7 +217,7 @@ public class CommonSetupShellTest {
                 " - Reloading systemd config\n" +
                 " - Checking Systemd file\n" +
                 " - Testing systemd startup - starting cerebro\n" +
-                " - Testing systemd startup - Checking startup\n" +
+                " - Testing systemd startup - Checking cerebro startup\n" +
                 " - Testing systemd startup - Make sure service is really running\n" +
                 " - Enabling cerebro on startup\n", result);
 

@@ -36,6 +36,8 @@
 package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +46,10 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
-public class SparkWorkerSetupTest extends AbstractSetupShellTest {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class FlinkRuntimeSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
@@ -72,49 +77,56 @@ public class SparkWorkerSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "spark-runtime";
+        return "flink-runtime";
+    }
+
+    @Override
+    protected String getImageName() {
+        return "flink";
     }
 
     @Override
     protected String getTemplateName() {
-        return "spark";
+        return "flink";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "inContainerSetupSpark.sh");
-        copyFile(jailPath, "inContainerSetupSparkCommon.sh");
-        copyFile(jailPath, "inContainerSetupSparkMesosShuffleService.sh");
-        copyFile(jailPath, "inContainerStartMesosShuffleService.sh");
+        copyFile(jailPath, "flink-runtime.k8s.yaml");
+        copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
-        copyFile(jailPath, "inContainerInjectTopologyMesosShuffle.sh");
     }
 
     @Override
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupSpark.sh",
-                "inContainerSetupSparkMesosShuffleService.sh",
-                "inContainerInjectTopology.sh",
-                "inContainerInjectTopologyMesosShuffle.sh"
+                "inContainerInjectTopology.sh"
+        };
+    }
+
+    @Override
+    protected String[][] getCustomScriptsToExecute() {
+        return new String[][] {
+                new String[] {"inContainerSetupFlinkCommon.sh", "3305"}
         };
     }
 
     @Test
-    public void testSystemDInstallation() throws Exception {
-        assertSystemDInstallation();
+    public void testSystemDockerManipulations() throws Exception {
+        assertKubernetesServiceDockerCommands();
+        assertKubernetesServiceDockerCommands(getJailPath() + "/flink_worker_setup/", "flink-runtime", true);
     }
 
     @Test
-    public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testConfigurationFileUpdate() throws Exception {
-        assertTestConfFileUpdate();
+        fail ("To Be Implemented");
     }
 }

@@ -40,7 +40,7 @@ Software.
 == Eskimo Introduction
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
-*Big Data 2.0* clusters using *Docker* and *Mesos*.
+*Big Data 2.0* clusters leveraging on  *Kubernetes*.
 
 Reach http://www.eskimo.sh for more information on Eskimo or look at the documentation in the folder `doc`.
 

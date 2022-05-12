@@ -80,6 +80,7 @@ public class KafkaManagerSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
+        copyFile(jailPath, "kafka-manager.k8s.yaml");
         //copyFile(jailPath, "inContainerSetupKafkaManager.sh");
         copyFile(jailPath, "inContainerSetupKafkaCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
@@ -110,14 +111,13 @@ public class KafkaManagerSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testMarathonInstallation() throws Exception {
-        assertMarathonCommands();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
         assertKubernetesServiceDockerCommands();
-
     }
 
     @Test

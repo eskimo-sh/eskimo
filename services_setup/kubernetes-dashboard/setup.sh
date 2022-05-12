@@ -45,16 +45,18 @@ cd $SCRIPT_DIR
 # Loading topology
 loadTopology
 
-k8s_dashboard_archive=`ls -1 docker_template_kubernetes-dashboard*.tar.gz`
-if [[ ! -f $k8s_dashboard_archive ]]; then
-    echo "Couldn't find k8s-dashboard archive"
-    exit 1
-fi
+if [[ -z "$TEST_MODE" ]]; then
+    k8s_dashboard_archive=`ls -1 docker_template_kubernetes-dashboard*.tar.gz`
+    if [[ ! -f $k8s_dashboard_archive ]]; then
+        echo "Couldn't find k8s-dashboard archive"
+        exit 1
+    fi
 
-tar xvfz $k8s_dashboard_archive > kubernetes_dashboard_install_log 2>&1
-if [[ $? != 0 ]]; then
-  echo "Couldn't extract k8s-dashboard archive"
-  cat kubernetes_dashboard_install_log
+    tar xvfz $k8s_dashboard_archive > kubernetes_dashboard_install_log 2>&1
+    if [[ $? != 0 ]]; then
+      echo "Couldn't extract k8s-dashboard archive"
+      cat kubernetes_dashboard_install_log
+    fi
 fi
 
 

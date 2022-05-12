@@ -60,9 +60,9 @@ elif [[ $flink_user_id != $FLINK_USER_ID ]]; then
 fi
 
 echo " - Enabling flink user to mount gluster shares (sudo)"
-echo "flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" >> /etc/sudoers.d/flink
-echo "flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/completed_jobs" >> /etc/sudoers.d/flink
-echo "flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/data" >> /etc/sudoers.d/flink
+sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *\" >> /etc/sudoers.d/flink"
+sudo bash -c "echo \"link  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/completed_jobs\" >> /etc/sudoers.d/flink"
+sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/data\" >> /etc/sudoers.d/flink"
 
 echo " - Creating user flink home directory"
 mkdir -p /home/flink
@@ -188,10 +188,10 @@ echo " - Copying configuration over to host /var/lib/flink/config for kube confi
 sudo mkdir -p /var/lib/flink/config
 sudo chown -R flink. /var/lib/flink/config
 
-cat /usr/local/lib/flink/conf/flink-conf.yaml | grep -v "^$" | grep -v "^#" > /var/lib/flink/config/flink-conf.yaml
-echo "kubernetes.internal.jobmanager.entrypoint.class: org.apache.flink.kubernetes.entrypoint.KubernetesSessionClusterEntrypoint" >> /var/lib/flink/config/flink-conf.yaml
-echo "execution.target: kubernetes-session" >> /var/lib/flink/config/flink-conf.yaml
-echo "internal.cluster.execution-mode: NORMAL" >> /var/lib/flink/config/flink-conf.yaml
+sudo bash -c "cat /usr/local/lib/flink/conf/flink-conf.yaml | grep -v '^$' | grep -v '^#' > /var/lib/flink/config/flink-conf.yaml"
+sudo bash -c "echo 'kubernetes.internal.jobmanager.entrypoint.class: org.apache.flink.kubernetes.entrypoint.KubernetesSessionClusterEntrypoint' >> /var/lib/flink/config/flink-conf.yaml"
+sudo bash -c "echo 'execution.target: kubernetes-session' >> /var/lib/flink/config/flink-conf.yaml"
+sudo bash -c "echo 'internal.cluster.execution-mode: NORMAL' >> /var/lib/flink/config/flink-conf.yaml"
 
 cp /usr/local/lib/flink/conf/log4j-console.properties /var/lib/flink/config/
 cp /usr/local/lib/flink/conf/logback-console.xml /var/lib/flink/config/

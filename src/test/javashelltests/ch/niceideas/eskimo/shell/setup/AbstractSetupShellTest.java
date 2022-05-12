@@ -50,7 +50,10 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -108,7 +111,7 @@ public abstract class AbstractSetupShellTest {
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, kubeServicesConfig, new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
-        String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCaemlCaseServiceName()+"SetupShellTest/testFile.conf"));
+        String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"));
         if (StringUtils.isNotBlank(testFileConf)) {
             copyResource("testFile.conf", jailPath, testFileConf);
         }
@@ -168,6 +171,10 @@ public abstract class AbstractSetupShellTest {
 
     protected abstract String getServiceName();
 
+    protected String getImageName() {
+        return getServiceName();
+    }
+
     protected String getTemplateName() {
         return getServiceName();
     }
@@ -176,8 +183,16 @@ public abstract class AbstractSetupShellTest {
 
     protected abstract String[] getScriptsToExecute();
 
+    protected String[][] getCustomScriptsToExecute() {
+        return new String[][]{};
+    }
+
     protected String[] getScriptsToEnhance() {
-        return getScriptsToExecute();
+        List<String> scripts = new ArrayList<>(Arrays.asList(getScriptsToExecute()));
+        Arrays.stream(getCustomScriptsToExecute())
+                .map (cusScriptArray -> cusScriptArray[0])
+                .forEach(scripts::add);
+        return scripts.toArray(new String[0]);
     }
 
     protected final String executeScripts(String jailPath) throws ProcessHelper.ProcessHelperException {
@@ -185,6 +200,12 @@ public abstract class AbstractSetupShellTest {
         for (String scriptToExecute: getScriptsToExecute()) {
             logger.info ("Executing " + scriptToExecute);
             resultBuilder.append(ProcessHelper.exec(new String[]{"bash", jailPath + "/" + scriptToExecute}, true));
+        }
+        for (String[] custScriptToExecute: getCustomScriptsToExecute()) {
+            logger.info ("Executing " + custScriptToExecute[0]);
+            List<String> args = new ArrayList<>(Arrays.asList("bash", jailPath + "/" + custScriptToExecute[0]));
+            args.addAll(Arrays.asList(Arrays.copyOfRange(custScriptToExecute, 1, custScriptToExecute.length)));
+            resultBuilder.append(ProcessHelper.exec(args.toArray(new String[0]), true));
         }
         return resultBuilder.toString();
     }
@@ -260,27 +281,23 @@ public abstract class AbstractSetupShellTest {
         return targetPath;
     }
 
-    public String getCaemlCaseServiceName() {
+    public String getCamelCaseServiceName() {
         return StringUtils.toCamelCase(getServiceName());
     }
 
+    protected final void assertKubernetesCommands() throws IOException {
+        String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_kubectl"));
+        System.err.println (kubeCtlLogs);
 
-    protected final void assertMarathonCommands() throws IOException {
-        //System.err.println (setupLogs);
+        if (StringUtils.isNotBlank(kubeCtlLogs)) {
 
-        String curlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_curl"));
-        if (StringUtils.isNotBlank(curlLogs)) {
-
-            //System.err.println (curlLogs);
-
-            int indexOfDelete = curlLogs.indexOf("-XDELETE http://192.168.10.11:28080/v2/apps/" + getServiceName());
+            int indexOfDelete = kubeCtlLogs.indexOf("delete -f " + getServiceName() + ".k8s.yaml");
             assertTrue(indexOfDelete > -1);
 
-            int indexOfDeploy = curlLogs.indexOf("-X POST -H Content-Type: application/json -d @" + getServiceName() + ".marathon.json http://192.168.10.11:28080/v2/apps", indexOfDelete);
-            assertTrue(indexOfDeploy > -1);
-
+            int indexOfApply = kubeCtlLogs.indexOf("apply -f -", indexOfDelete);
+            assertTrue(indexOfApply > -1);
         } else {
-            fail ("No curl manipulations found");
+            fail ("No kubectl manipulations found");
         }
     }
 
@@ -362,11 +379,15 @@ public abstract class AbstractSetupShellTest {
     }
 
     protected final void assertKubernetesServiceDockerCommands() throws IOException {
+        assertKubernetesServiceDockerCommands (getJailPath(), getImageName(), false);
+    }
+
+    protected final void assertKubernetesServiceDockerCommands(String currentFolder, String imageName, boolean simplified) throws IOException {
         //System.err.println(setupLogs);
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(currentFolder + "/.log_docker"));
         if (StringUtils.isNotBlank(dockerLogs)) {
 
-            //System.err.println (dockerLogs);
+            System.err.println (dockerLogs);
 
             int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getTemplateName() + "_template");
             assertTrue(indexOfImagesQ > -1);
@@ -374,28 +395,31 @@ public abstract class AbstractSetupShellTest {
             int indexOfLoad = dockerLogs.indexOf("load", indexOfImagesQ + 1);
             assertTrue(indexOfLoad > -1);
 
-            int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=" + getServiceName(), indexOfLoad + 1);
+            int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=" + imageName, indexOfLoad + 1);
             assertTrue(indexOfPs > -1);
 
-            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:" + getServiceName() + " .", indexOfPs + 1);
+            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:" + imageName + " .", indexOfPs + 1);
             assertTrue(indexOfBuild > -1);
 
-            int indexOfCommit = dockerLogs.indexOf("commit " + getServiceName() + " eskimo:" + getServiceName(), indexOfBuild + 1);
-            assertTrue(indexOfCommit > -1);
+            int indexOfRm = indexOfBuild;
+            if (!simplified) {
+                int indexOfCommit = dockerLogs.indexOf("commit " + imageName + " eskimo:" + imageName, indexOfBuild + 1);
+                assertTrue(indexOfCommit > -1);
 
-            int indexOfStop = dockerLogs.indexOf("stop " + getServiceName(), indexOfCommit + 1);
-            assertTrue(indexOfStop > -1);
+                int indexOfStop = dockerLogs.indexOf("stop " + imageName, indexOfCommit + 1);
+                assertTrue(indexOfStop > -1);
 
-            int indexOfRm = dockerLogs.indexOf("container rm " + getServiceName(), indexOfStop + 1);
-            assertTrue(indexOfRm > -1);
+                indexOfRm = dockerLogs.indexOf("container rm " + imageName, indexOfStop + 1);
+                assertTrue(indexOfRm > -1);
+            }
 
-            int indexOfTag = dockerLogs.indexOf("tag eskimo:" + getServiceName() + " kubernetes.registry:5000/" + getServiceName(), indexOfRm + 1);
+            int indexOfTag = dockerLogs.indexOf("tag eskimo:" + imageName + " kubernetes.registry:5000/" + imageName, indexOfRm + 1);
             assertTrue(indexOfTag > -1);
 
-            int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/" + getServiceName(), indexOfTag + 1);
+            int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/" + imageName, indexOfTag + 1);
             assertTrue(indexOfPush > -1);
 
-            int indexOfImageRm = dockerLogs.indexOf("image rm eskimo:" + getServiceName(), indexOfTag + 1);
+            int indexOfImageRm = dockerLogs.indexOf("image rm eskimo:" + imageName, indexOfTag + 1);
             assertTrue(indexOfImageRm > -1);
 
 
@@ -405,7 +429,7 @@ public abstract class AbstractSetupShellTest {
     }
 
     protected final void assertTestConfFileUpdate() throws Exception {
-        String testFileConfResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCaemlCaseServiceName()+"SetupShellTest/testFile.conf.result"));
+        String testFileConfResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf.result"));
         if (StringUtils.isNotBlank(testFileConfResult)) {
 
             File updatedTestConfFilePath = new File (getJailPath() + "/testFile.conf");
@@ -414,7 +438,7 @@ public abstract class AbstractSetupShellTest {
             assertEquals(testFileConfResult.trim(), updatedTestConfFile.trim());
 
         } else {
-            fail ("file 'testFile.conf.result' is missing in " + getCaemlCaseServiceName()+"SetupShellTest/");
+            fail ("file 'testFile.conf.result' is missing in " + getCamelCaseServiceName()+"SetupShellTest/");
         }
     }
 

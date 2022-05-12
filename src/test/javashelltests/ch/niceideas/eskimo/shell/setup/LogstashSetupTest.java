@@ -36,8 +36,6 @@
 package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,10 +44,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
+public class LogstashSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
@@ -77,20 +72,17 @@ public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "flink-app-master";
-    }
-
-    @Override
-    protected String getTemplateName() {
-        return "flink";
+        return "logstash";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
-        copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "inContainerSetupFlinkAppMaster.sh");
-        copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
+        copyFile(jailPath, "setupESCommon.sh");
+        copyFile(jailPath, "setupLogstashCommon.sh");
+        copyFile(jailPath, "logstash.k8s.yaml");
+        copyFile(jailPath, "inContainerSetupLogstash.sh");
+        copyFile(jailPath, "inContainerSetupESCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }
@@ -99,34 +91,19 @@ public class FlinkAppMasterSetupTest extends AbstractSetupShellTest {
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupFlinkAppMaster.sh",
+                "inContainerSetupLogstash.sh",
                 "inContainerInjectTopology.sh"
         };
     }
 
     @Test
-    public void testSystemDInstallation() throws Exception {
-        assertSystemDInstallation();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
+        assertKubernetesServiceDockerCommands();
     }
 
-    @Test
-    public void testConfigurationFileUpdate() throws Exception {
-        assertTestConfFileUpdate();
-
-        String bashLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_bash"));
-        if (StringUtils.isNotBlank(bashLogs)) {
-
-            //System.err.println (bashLogs);
-
-            assertTrue(bashLogs.contains("-c echo -e \"\\n# Specyfing mesos master\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
-            assertTrue(bashLogs.contains("-c echo -e \"mesos.master: zk://192.168.10.13:2181/mesos\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
-        } else {
-            fail ("Expected to find bash logs in .log_bash");
-        }
-    }
 }

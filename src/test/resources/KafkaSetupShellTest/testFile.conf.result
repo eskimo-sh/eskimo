@@ -12,5 +12,3 @@ COMMAND=$1
 broker.id=0
 
 zookeeper.connect=192.168.10.13:2181
-
-advertised.listeners=PLAINTEXT://192.168.10.11:9092

@@ -57,22 +57,22 @@ if [[ $spark_user_id == "" ]]; then
     useradd -u $SPARK_USER_ID spark
 elif [[ $spark_user_id != $SPARK_USER_ID ]]; then
     echo "Docker SPARK USER ID is $spark_user_id while requested USER ID is $SPARK_USER_ID"
-    exit -2
+    exit 2
 fi
 
 echo " - Enabling spark user to mount gluster shares (sudo)"
-echo "spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" >> /etc/sudoers.d/spark
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *\" >> /etc/sudoers.d/spark"
 
 echo " - Enabling spark user to create /var/lib/spark/tmp and chown it"
-echo "spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/mkdir -p /var/lib/spark/tmp" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/chown spark /var/lib/spark/tmp" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/chown -R spark /var/lib/spark" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/chown -R spark. /var/lib/spark" >> /etc/sudoers.d/spark
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/mkdir /var/lib/spark/tmp\" >> /etc/sudoers.d/spark"
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/mkdir -p /var/lib/spark/tmp\" >> /etc/sudoers.d/spark"
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown spark /var/lib/spark/tmp\" >> /etc/sudoers.d/spark"
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown -R spark /var/lib/spark\" >> /etc/sudoers.d/spark"
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown -R spark. /var/lib/spark\" >> /etc/sudoers.d/spark"
 
 echo " - Enabling spark user to use host_spark"
-echo "spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/spark" >> /etc/sudoers.d/spark
-echo "spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_spark /var/lib/spark" >> /etc/sudoers.d/spark
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/spark\" >> /etc/sudoers.d/spark"
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_spark /var/lib/spark\" >> /etc/sudoers.d/spark"
 
 
 echo " - Creating user spark home directory"

@@ -158,7 +158,7 @@ echo " ---> Spark executor part ------------------------------------------------
 set -e
 
 echo " - Creating sub-setup dir for spark-executor"
-mkdir spark_executor_setup
+/bin/mkdir spark_executor_setup
 
 echo " - Copying specific docker file to spark-executor setup"
 cp Dockerfile.spark-runtime spark_executor_setup/Dockerfile
@@ -173,6 +173,8 @@ build_container spark-runtime spark spark_executor_install_log
 
 echo " - Deploying spark runtime in docker registry for kubernetes"
 deploy_registry spark-runtime spark_executor_install_log
+
+cd ..
 
 echo " - removing local image for common part"
 docker image rm eskimo:spark  >> spark_executor_install_log 2>&1

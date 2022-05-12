@@ -109,7 +109,7 @@ public class Topology {
                 topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getNodeNumber(), nodesConfig);
             }
 
-            // Define master for marathon services
+            // Define master for kubernetes services
             if (currentNode != null && kubeServicesConfig != null) {
                 for (String key : kubeServicesConfig.getEnabledServices()) {
 

@@ -86,6 +86,7 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupESCommon.sh");
+        copyFile(jailPath, "elasticsearch.k8s.yaml");
         copyFile(jailPath, "inContainerSetupElasticSearch.sh");
         copyFile(jailPath, "inContainerSetupESCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");
@@ -102,13 +103,13 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testSystemDInstallation() throws Exception {
-        assertSystemDInstallation();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
+        assertKubernetesServiceDockerCommands();
     }
 
     @Test
@@ -120,10 +121,9 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
 
             //System.err.println (bashLogs);
 
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_timeout: 60s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"discovery.zen.fd.ping_retries: 8\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
-            assertTrue(bashLogs.contains("-c echo \"network.publish_host: 192.168.10.11\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
+            assertTrue(bashLogs.contains("-c echo \"discovery.find_peers_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
+            assertTrue(bashLogs.contains("-c echo \"discovery.probe.connect_timeout: 80s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
+            assertTrue(bashLogs.contains("-c echo \"discovery.request_peers_timeout: 5s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"));
         } else {
             fail ("Expected to find bash logs in .log_bash");
         }

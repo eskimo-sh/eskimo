@@ -91,6 +91,7 @@ public class SparkHistoryServerSetupTest extends AbstractSetupShellTest {
         copyFile(jailPath, "setupCommon.sh");
         copyFile(jailPath, "inContainerSetupSparkHistoryServer.sh");
         copyFile(jailPath, "inContainerSetupSparkCommon.sh");
+        copyFile(jailPath, "spark-history-server.k8s.yaml");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
         copyFile(jailPath, "inContainerInjectTopologySparkHistory.sh");
@@ -106,8 +107,8 @@ public class SparkHistoryServerSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testMarathonInstallation() throws Exception {
-        assertMarathonCommands();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test

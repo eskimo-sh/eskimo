@@ -79,6 +79,7 @@ public class GrafanaSetupTest extends AbstractSetupShellTest {
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
+        copyFile(jailPath, "grafana.k8s.yaml");
         copyFile(jailPath, "inContainerSetupGrafana.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
 
@@ -112,14 +113,13 @@ public class GrafanaSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testMarathonInstallation() throws Exception {
-        assertMarathonCommands();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
         assertKubernetesServiceDockerCommands();
-
     }
 
     @Test

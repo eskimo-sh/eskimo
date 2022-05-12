@@ -77,13 +77,13 @@ public class KubeMasterSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "mesos-master";
+        return "kube-master";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
-        copyFile(jailPath, "inContainerSetupMesosMaster.sh");
+        copyFile(jailPath, "inContainerSetupRegistry.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }
@@ -92,8 +92,14 @@ public class KubeMasterSetupTest extends AbstractSetupShellTest {
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupMesosMaster.sh",
                 "inContainerInjectTopology.sh"
+        };
+    }
+
+    @Override
+    protected String[][] getCustomScriptsToExecute() {
+        return new String[][] {
+                new String[] {"inContainerSetupRegistry.sh", "3306" }
         };
     }
 
@@ -103,29 +109,7 @@ public class KubeMasterSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
-    }
-
-    @Test
     public void testConfigurationFileUpdate() throws Exception {
-
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
-        if (StringUtils.isNotBlank(sudoLogs)) {
-
-            //System.err.println (sudoLogs);
-
-            assertTrue(sudoLogs.contains("bash -c echo -e \"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/:/usr/local/lib/mesos/lib\" >> /etc/profile"));
-            assertTrue(sudoLogs.contains("bash -c echo -e \"export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/:/usr/local/lib/mesos/lib/python2.7/site-packages/\" >> /etc/profile"));
-            assertTrue(sudoLogs.contains("bash -c echo -e \"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/:/usr/local/lib/mesos/lib\" >> /etc/bash.bashrc"));
-            assertTrue(sudoLogs.contains("bash -c echo -e \"export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/:/usr/local/lib/mesos/lib/python2.7/site-packages/\" >> /etc/bash.bashrc"));
-            assertTrue(sudoLogs.contains("bash -c echo \"export MESOS_ip=192.168.10.11\" >> /usr/local/etc/mesos/mesos-master-env.sh"));
-            assertTrue(sudoLogs.contains("bash -c echo \"export MESOS_hostname=192.168.10.11\" >> /usr/local/etc/mesos/mesos-master-env.sh"));
-            assertTrue(sudoLogs.contains("bash -c echo \"export MESOS_work_dir=/var/lib/mesos/master\" >> /usr/local/etc/mesos/mesos-master-env.sh"));
-            assertTrue(sudoLogs.contains("bash -c echo \"export MESOS_quorum=1\" >> /usr/local/etc/mesos/mesos-master-env.sh"));
-            assertTrue(sudoLogs.contains("bash -c echo \"export MESOS_acls=/usr/local/lib/mesos/etc/mesos/mesos-acls.json\" >> /usr/local/etc/mesos/mesos-master-env.sh"));
-        } else {
-            fail ("Expected to find sudo logs in .log_sudo");
-        }
+        fail ("To Be Implemented");
     }
 }

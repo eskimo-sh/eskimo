@@ -12,6 +12,6 @@ elif [[ $2 == 'grafana' ]]; then
     echo '3304'
 elif [[ $2 == 'flink' ]]; then
     echo '3305'
-elif [[ $2 == 'marathon' ]]; then
+elif [[ $2 == 'kubernetes' ]]; then
     echo '3306'
 fi

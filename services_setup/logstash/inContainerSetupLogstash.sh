@@ -44,7 +44,7 @@ echo "-- SETTING UP LOGSTASH ---------------------------------------------------
 
 echo " - Getting elasticsearch user_id"
 set +e
-elasticsearch_user_id=`id -u elasticsearch 2> /tmp/cerebro_install_log`
+elasticsearch_user_id=`id -u elasticsearch 2> /tmp/logstash_install_log`
 set -e
 
 echo " - creating logstash required directory"
@@ -56,7 +56,7 @@ sudo mkdir -p /var/run/elasticsearch/logstash
 sudo mkdir -p /var/log/elasticsearch/logstash
 
 echo " - Enabling elasticsearch user to mount gluster shares (sudo)"
-echo "elasticsearch  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *" >> /etc/sudoers.d/elasticsearch
+sudo bash -c "echo \"elasticsearch  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *\" >> /etc/sudoers.d/elasticsearch"
 
 
 echo " - creating logstash wrapper in /usr/local/bin"

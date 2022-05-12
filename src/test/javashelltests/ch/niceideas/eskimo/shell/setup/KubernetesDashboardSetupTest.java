@@ -73,48 +73,33 @@ public class KubernetesDashboardSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "marathon";
+        return "kubernetes-dashboard";
+    }
+
+    @Override
+    protected String getImageName() {
+        return "kubernetesui/dashboard";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
-        copyFile(jailPath, "inContainerStartService.sh");
-        copyFile(jailPath, "inContainerInjectTopology.sh");
+        copyFile(jailPath, "kubernetes-dashboard.k8s.yaml");
 
-        // create a wrapper passing arguments to inContainerSetupGrafana.sh
-        try {
-            String setupScript = FileUtils.readFile(new File("./services_setup/marathon/inContainerSetupMarathon.sh"));
-
-            setupScript = setupScript.replace("MARATHON_USER_ID=$1", "MARATHON_USER_ID=3306");
-
-            FileUtils.writeFile(new File(jailPath + "/inContainerSetupMarathon.sh"), setupScript);
-        } catch (FileException e) {
-            throw new IOException(e);
-        }
+        new File (jailPath + "/kubernetesui_dashboard.tar.gz").createNewFile();
+        new File (jailPath + "/kubernetesui_metrics-scraper.tar.gz").createNewFile();
     }
 
     @Override
     protected String[] getScriptsToExecute() {
         return new String[] {
-                "setup.sh",
-                "inContainerSetupMarathon.sh",
-                "inContainerInjectTopology.sh"
+                "setup.sh"
         };
     }
 
     @Test
-    public void testSystemDInstallation() throws Exception {
-        assertSystemDInstallation();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
-    @Test
-    public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
-    }
-
-    @Test
-    public void testConfigurationFileUpdate() throws Exception {
-        assertTestConfFileUpdate();
-    }
 }

@@ -39,7 +39,6 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
-import org.junit.AfterClass;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
+public class EtcdSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
@@ -78,29 +77,19 @@ public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "flink-runtime";
-    }
-
-    @Override
-    protected String getTemplateName() {
-        return "flink";
+        return "etcd";
     }
 
     @Override
     protected void copyScripts(String jailPath) throws IOException {
-        // setup.sh and common.sh are automatic
-        copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "inContainerSetupFlinkWorker.sh");
-        copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
-        copyFile(jailPath, "inContainerInjectTopology.sh");
+         // nothing in addition to setup.sh and common.sh
     }
+
 
     @Override
     protected String[] getScriptsToExecute() {
         return new String[] {
-                "setup.sh",
-                "inContainerSetupFlinkWorker.sh",
-                "inContainerInjectTopology.sh"
+                "setup.sh"
         };
     }
 
@@ -109,23 +98,4 @@ public class FlinkWorkerSetupTest extends AbstractSetupShellTest {
         assertSystemDInstallation();
     }
 
-    @Test
-    public void testSystemDockerManipulations() throws Exception {
-        assertSystemDServiceDockerCommands();
-    }
-
-    @Test
-    public void testConfigurationFileUpdate() throws Exception {
-        assertTestConfFileUpdate();
-
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
-        if (StringUtils.isNotBlank(sudoLogs)) {
-
-            //System.err.println (sudoLogs);
-
-            assertTrue(sudoLogs.contains("bash -c echo -e \"taskmanager.host: 192.168.10.11\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"));
-        } else {
-            fail ("Expected to find bash logs in .log_bash");
-        }
-    }
 }

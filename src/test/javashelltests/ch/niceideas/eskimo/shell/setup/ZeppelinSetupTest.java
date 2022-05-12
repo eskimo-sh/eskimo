@@ -117,14 +117,13 @@ public class ZeppelinSetupTest extends AbstractSetupShellTest {
     }
 
     @Test
-    public void testMarathonInstallation() throws Exception {
-        assertMarathonCommands();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test
     public void testSystemDockerManipulations() throws Exception {
         assertKubernetesServiceDockerCommands();
-
     }
 
     @Test
