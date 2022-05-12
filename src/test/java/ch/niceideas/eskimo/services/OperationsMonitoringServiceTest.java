@@ -139,6 +139,8 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
         configurationService.saveNodesConfig(nodesConfig);
 
+        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,
                 nodeRangeResolver,
@@ -210,6 +212,13 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
             }
         });
 
+        nodesConfigurationService.setKubernetesService(new KubernetesService() {
+            protected String restartServiceKubernetesInternal(Service service) throws KubernetesException {
+                // No Op
+                return null;
+            }
+        });
+
         nodesConfigurationService.applyNodesConfig(command);
 
         OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
@@ -235,6 +244,8 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
         configurationService.saveNodesConfig(nodesConfig);
+
+        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
 
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,

@@ -246,6 +246,7 @@ public abstract class AbstractSystemTest {
 
         servicesInstallationSorter = new ServicesInstallationSorter ();
         servicesInstallationSorter.setServicesDefinition(servicesDefinition);
+        servicesInstallationSorter.setConfigurationService (configurationService);
 
         operationsMonitoringService.setServicesInstallationSorter(servicesInstallationSorter);
 

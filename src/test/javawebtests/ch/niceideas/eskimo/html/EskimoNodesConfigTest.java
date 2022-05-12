@@ -59,7 +59,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoNodesConfig.js");
 
         js("UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\", ];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\", ];");
+        js("MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\" ];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -115,8 +115,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertJavascriptEquals("0.0", "$('#zookeeper1:checked').length");
         assertJavascriptEquals("1.0", "$('#zookeeper2:checked').length");
 
-        assertJavascriptEquals("0.0", "$('#kube-master1:checked').length");
-        assertJavascriptEquals("1.0", "$('#kube-master2:checked').length");
+        assertJavascriptEquals("1.0", "$('#kube-master1:checked').length");
+        assertJavascriptEquals("0.0", "$('#kube-master2:checked').length");
     }
 
     @Test
@@ -132,21 +132,22 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         //System.err.println(js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
 
         JSONObject expectedResult = new JSONObject("{" +
-                "\"node_id1\":\"192.168.10.11\"," +
+                "\"kube-master\":\"1\"," +
                 "\"ntp1\":\"on\"," +
                 "\"etcd1\":\"on\"," +
-                "\"kube-slave1\":\"on\"," +
-                "\"gluster1\":\"on\"," +
-                "\"node_id2\":\"192.168.10.13\"," +
                 "\"zookeeper\":\"2\"," +
-                "\"kube-master\":\"2\"," +
-                "\"ntp2\":\"on\"," +
-                "\"kube-slave2\":\"on\"," +
                 "\"etcd2\":\"on\"," +
+                "\"gluster1\":\"on\"," +
+                "\"ntp2\":\"on\"," +
+                "\"node_id1\":\"192.168.10.11\"," +
+                "\"kube-slave1\":\"on\"," +
+                "\"kube-slave2\":\"on\"," +
+                "\"node_id2\":\"192.168.10.13\"," +
                 "\"gluster2\":\"on\"}");
 
         JSONObject actualResult = new JSONObject((String)js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
 
+        System.err.println (actualResult);
         assertTrue(expectedResult.similar(actualResult));
     }
 

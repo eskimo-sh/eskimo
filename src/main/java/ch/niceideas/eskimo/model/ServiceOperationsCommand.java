@@ -300,19 +300,19 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     public List<List<ServiceOperationId>> getRestartsInOrder
             (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException {
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);
     }
 
     public List<List<ServiceOperationId>> getInstallationsInOrder
             (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException {
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         return servicesInstallationSorter.orderOperations (getInstallations(), nodesConfig);
     }
 
     public List<List<ServiceOperationId>> getUninstallationsInOrder
             (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException {
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         List<List<ServiceOperationId>> orderedUninstallations = servicesInstallationSorter.orderOperations (getUninstallations(), nodesConfig);
         Collections.reverse(orderedUninstallations);
         return orderedUninstallations;
@@ -321,7 +321,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     @Override
     public List<ServiceOperationId> getAllOperationsInOrder
             (OperationsContext context)
-            throws ServiceDefinitionException, NodesConfigurationException {
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
         List<ServiceOperationId> allOpList = new ArrayList<>();
 

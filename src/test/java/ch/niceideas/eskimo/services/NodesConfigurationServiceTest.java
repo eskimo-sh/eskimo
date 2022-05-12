@@ -148,11 +148,9 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         assertEquals (" - Calling install-eskimo-base-system.sh\n" +
                 " - Copying jq program\n" +
-                " - Copying mesos-cli script\n" +
                 " - Copying gluster-mount script\n", sb.toString());
 
         assertEquals ("192.168.10.11-./services_setup/base-eskimo/jq-1.6-linux64\n" +
-                "192.168.10.11-./services_setup/base-eskimo/mesos-cli.sh\n" +
                 "192.168.10.11-./services_setup/base-eskimo/gluster_mount.sh", testSCPCommands.toString().trim());
 
         assertTrue (testSSHCommandScript.toString().startsWith("#!/bin/bash\n"));
@@ -233,6 +231,8 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
         configurationService.saveNodesConfig(nodesConfig);
 
+        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,
                 nodeRangeResolver,
@@ -282,6 +282,13 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
         };
+
+        nodesConfigurationService.setKubernetesService(new KubernetesService() {
+            protected String restartServiceKubernetesInternal(Service service) throws KubernetesException {
+                // No-Op
+                return null;
+            }
+        });
 
         systemService.setSshCommandService(sshCommandService);
 

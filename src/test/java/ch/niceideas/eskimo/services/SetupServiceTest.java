@@ -167,7 +167,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(17, command.getBuildPackage().size());
 
         assertEquals("kube", String.join(",", command.getBuildKube()));
-        assertEquals("base-eskimo,ntp,prometheus,zookeeper,gluster,kube-master,logstash,kubernetes-dashboard,elasticsearch,cerebro,grafana,kafka,spark,flink,kafka-manager,kibana,zeppelin", String.join(",", command.getBuildPackage()));
+        assertEquals("base-eskimo,ntp,prometheus,zookeeper,gluster,kube-master,kubernetes-dashboard,elasticsearch,cerebro,grafana,spark,flink,kafka,kafka-manager,kibana,logstash,zeppelin", String.join(",", command.getBuildPackage()));
 
         assertEquals(0, command.getDownloadKube().size());
         assertEquals(0, command.getDownloadPackages().size());
@@ -219,7 +219,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         assertEquals(17, command.getDownloadPackages().size());
 
         assertEquals("kube_1.23.5_1", String.join(",", command.getDownloadKube()));
-        assertEquals("base-eskimo_0.2_1,ntp_debian_09_stretch_1,prometheus_2.10.0_1,zookeeper_debian_09_stretch_1,gluster_debian_09_stretch_1,kube-master_1.8.1_1,logstash_6.8.3_1,kubernetes-dashboard_2.5.1_1,elasticsearch_6.8.3_1,cerebro_0.8.4_1,grafana_6.3.3_1,kafka_2.2.0_1,spark_2.4.4_1,flink_1.9.1_1,kafka-manager_2.0.0.2_1,kibana_6.8.3_1,zeppelin_0.9.0_1", String.join(",", command.getDownloadPackages()));
+        assertEquals("base-eskimo_0.2_1,ntp_debian_09_stretch_1,prometheus_2.10.0_1,zookeeper_debian_09_stretch_1,gluster_debian_09_stretch_1,kube-master_1.8.1_1,kubernetes-dashboard_2.5.1_1,elasticsearch_6.8.3_1,cerebro_0.8.4_1,grafana_6.3.3_1,spark_2.4.4_1,flink_1.9.1_1,kafka_2.2.0_1,kafka-manager_2.0.0.2_1,kibana_6.8.3_1,logstash_6.8.3_1,zeppelin_0.9.0_1", String.join(",", command.getDownloadPackages()));
     }
 
     @Test

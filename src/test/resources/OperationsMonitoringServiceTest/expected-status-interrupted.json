@@ -1,11 +1,7 @@
 {
   "result": "OK",
   "messages": {
-    "restart_logstash_192-168-10-13": {
-      "lines": "",
-      "lastLine": 0
-    },
-    "restart_logstash_192-168-10-15": {
+    "restart_kafka_kubernetes": {
       "lines": "",
       "lastLine": 0
     },
@@ -21,19 +17,11 @@
       "lines": "",
       "lastLine": 0
     },
-    "restart_cerebro_marathon": {
+    "installation_kube-slave_192-168-10-13": {
       "lines": "",
       "lastLine": 0
     },
-    "installation_mesos-master_192-168-10-15": {
-      "lines": "",
-      "lastLine": 0
-    },
-    "restart_kibana_marathon": {
-      "lines": "",
-      "lastLine": 0
-    },
-    "installation_marathon_192-168-10-15": {
+    "installation_kube-slave_192-168-10-15": {
       "lines": "",
       "lastLine": 0
     },
@@ -41,15 +29,19 @@
       "lines": "",
       "lastLine": 0
     },
-    "installation_spark-runtime_192-168-10-15": {
+    "installation_kube-master_192-168-10-15": {
       "lines": "",
       "lastLine": 0
     },
-    "installation_mesos-agent_192-168-10-15": {
+    "restart_cerebro_kubernetes": {
       "lines": "",
       "lastLine": 0
     },
     "installation_elasticsearch_192-168-10-13": {
+      "lines": "",
+      "lastLine": 0
+    },
+    "restart_kibana_kubernetes": {
       "lines": "",
       "lastLine": 0
     },
@@ -61,15 +53,19 @@
       "lines": "",
       "lastLine": 0
     },
-    "installation_mesos-agent_192-168-10-13": {
+    "restart_kafka-manager_kubernetes": {
       "lines": "",
       "lastLine": 0
     },
-    "restart_kafka-manager_marathon": {
+    "restart_logstash_kubernetes": {
       "lines": "",
       "lastLine": 0
     },
-    "restart_grafana_marathon": {
+    "installation_spark-runtime_192-168-10-15": {
+      "lines": "",
+      "lastLine": 0
+    },
+    "restart_grafana_kubernetes": {
       "lines": "",
       "lastLine": 0
     }
@@ -88,20 +84,24 @@
       "label": "Check / Install of Base System on 192.168.10.15"
     },
     {
+      "operation": "installation_kube-master_192-168-10-15",
+      "label": "installation of kube-master on 192.168.10.15"
+    },
+    {
+      "operation": "installation_kube-slave_192-168-10-15",
+      "label": "installation of kube-slave on 192.168.10.15"
+    },
+    {
+      "operation": "installation_kube-slave_192-168-10-13",
+      "label": "installation of kube-slave on 192.168.10.13"
+    },
+    {
       "operation": "installation_elasticsearch_192-168-10-15",
       "label": "installation of elasticsearch on 192.168.10.15"
     },
     {
       "operation": "installation_elasticsearch_192-168-10-13",
       "label": "installation of elasticsearch on 192.168.10.13"
-    },
-    {
-      "operation": "installation_mesos-master_192-168-10-15",
-      "label": "installation of mesos-master on 192.168.10.15"
-    },
-    {
-      "operation": "installation_marathon_192-168-10-15",
-      "label": "installation of marathon on 192.168.10.15"
     },
     {
       "operation": "installation_spark-runtime_192-168-10-15",
@@ -112,14 +112,6 @@
       "label": "installation of spark-runtime on 192.168.10.13"
     },
     {
-      "operation": "installation_mesos-agent_192-168-10-15",
-      "label": "installation of mesos-agent on 192.168.10.15"
-    },
-    {
-      "operation": "installation_mesos-agent_192-168-10-13",
-      "label": "installation of mesos-agent on 192.168.10.13"
-    },
-    {
       "operation": "installation_spark-history-server_192-168-10-15",
       "label": "installation of spark-history-server on 192.168.10.15"
     },
@@ -128,48 +120,47 @@
       "label": "installation of zeppelin on 192.168.10.15"
     },
     {
-      "operation": "restart_logstash_192-168-10-15",
-      "label": "restart of logstash on 192.168.10.15"
+      "operation": "restart_cerebro_kubernetes",
+      "label": "restart of cerebro on (kubernetes)"
     },
     {
-      "operation": "restart_logstash_192-168-10-13",
-      "label": "restart of logstash on 192.168.10.13"
+      "operation": "restart_grafana_kubernetes",
+      "label": "restart of grafana on (kubernetes)"
     },
     {
-      "operation": "restart_cerebro_marathon",
-      "label": "restart of cerebro on (marathon)"
+      "operation": "restart_logstash_kubernetes",
+      "label": "restart of logstash on (kubernetes)"
     },
     {
-      "operation": "restart_grafana_marathon",
-      "label": "restart of grafana on (marathon)"
+      "operation": "restart_kafka_kubernetes",
+      "label": "restart of kafka on (kubernetes)"
     },
     {
-      "operation": "restart_kibana_marathon",
-      "label": "restart of kibana on (marathon)"
+      "operation": "restart_kafka-manager_kubernetes",
+      "label": "restart of kafka-manager on (kubernetes)"
     },
     {
-      "operation": "restart_kafka-manager_marathon",
-      "label": "restart of kafka-manager on (marathon)"
+      "operation": "restart_kibana_kubernetes",
+      "label": "restart of kibana on (kubernetes)"
     }
   ],
   "status": {
-    "restart_logstash_192-168-10-13": "CANCELLED",
-    "restart_logstash_192-168-10-15": "CANCELLED",
+    "restart_kafka_kubernetes": "CANCELLED",
     "Check--Install_Base-System_192-168-10-13": "CANCELLED",
     "Check--Install_Base-System_192-168-10-15": "CANCELLED",
     "installation_zeppelin_192-168-10-15": "CANCELLED",
-    "restart_cerebro_marathon": "CANCELLED",
-    "installation_mesos-master_192-168-10-15": "CANCELLED",
-    "restart_kibana_marathon": "CANCELLED",
-    "installation_marathon_192-168-10-15": "CANCELLED",
+    "installation_kube-slave_192-168-10-13": "CANCELLED",
+    "installation_kube-slave_192-168-10-15": "CANCELLED",
     "installation_spark-runtime_192-168-10-13": "CANCELLED",
-    "installation_spark-runtime_192-168-10-15": "CANCELLED",
-    "installation_mesos-agent_192-168-10-15": "CANCELLED",
+    "installation_kube-master_192-168-10-15": "CANCELLED",
+    "restart_cerebro_kubernetes": "CANCELLED",
     "installation_elasticsearch_192-168-10-13": "CANCELLED",
+    "restart_kibana_kubernetes": "CANCELLED",
     "installation_spark-history-server_192-168-10-15": "CANCELLED",
     "installation_elasticsearch_192-168-10-15": "CANCELLED",
-    "installation_mesos-agent_192-168-10-13": "CANCELLED",
-    "restart_kafka-manager_marathon": "CANCELLED",
-    "restart_grafana_marathon": "CANCELLED"
+    "restart_kafka-manager_kubernetes": "CANCELLED",
+    "restart_logstash_kubernetes": "CANCELLED",
+    "installation_spark-runtime_192-168-10-15": "CANCELLED",
+    "restart_grafana_kubernetes": "CANCELLED"
   }
 }

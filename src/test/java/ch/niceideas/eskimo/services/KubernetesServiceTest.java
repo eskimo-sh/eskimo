@@ -118,6 +118,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         kubernetesService.setNotificationService(notificationService);
         kubernetesService.setConnectionManagerService(connectionManagerService);
         kubernetesService.setOperationsMonitoringService(operationsMonitoringService);
+        kubernetesService.setNodeRangeResolver(nodeRangeResolver);
 
         systemService.setKubernetesService(kubernetesService);
         return kubernetesService;
@@ -158,7 +159,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         KubernetesException exception = assertThrows(KubernetesException.class, () -> kubernetesService.applyServicesConfig(command));
         assertNotNull(exception);
-        assertEquals("ch.niceideas.eskimo.services.SystemException: Kubernetes doesn't seem to be installed. Kubernetes services configuration is saved but will need to be re-applied when kubernetes is available.", exception.getMessage());
+        assertEquals("ch.niceideas.eskimo.services.SystemException: Kubernetes doesn't seem to be installed. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.", exception.getMessage());
 
         configurationService.saveServicesInstallationStatus(serviceInstallStatus);
 
@@ -177,14 +178,20 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         kubernetesService.applyServicesConfig(command);
 
         assertEquals(5, installList.size());
-        assertEquals("cerebro-192.168.10.11," +
+        assertEquals("" +
+                "cerebro-192.168.10.11," +
+                "spark-history-server-192.168.10.11," +
                 "kafka-manager-192.168.10.11," +
                 "kibana-192.168.10.11," +
-                "spark-history-server-192.168.10.11," +
                 "zeppelin-192.168.10.11", String.join(",", installList));
 
-        assertEquals(1, uninstallList.size());
-        assertEquals("grafana-192.168.10.11", String.join(",", uninstallList));
+        assertEquals(5, uninstallList.size());
+        assertEquals("" +
+                "elasticsearch-192.168.10.11," +
+                "grafana-192.168.10.11," +
+                "kafka-192.168.10.11," +
+                "logstash-192.168.10.11," +
+                "spark-runtime-192.168.10.11", String.join(",", uninstallList));
     }
 
 
@@ -298,7 +305,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         kubernetesService.fetchKubernetesServicesStatus(statusMap, servicesInstallStatus);
 
-        assertEquals(8, statusMap.size());
+        assertEquals(9, statusMap.size());
         assertEquals("OK", statusMap.get("service_cerebro_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
         assertEquals("NA", statusMap.get("service_spark-history-server_192-168-10-11"));

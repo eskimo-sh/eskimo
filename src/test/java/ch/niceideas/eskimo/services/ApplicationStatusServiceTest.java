@@ -21,20 +21,18 @@ public class ApplicationStatusServiceTest extends AbstractSystemTest {
         assertEquals("DEV-SNAPSHOT", appStatus.getValueForPathAsString("buildVersion"));
         assertEquals("LATEST DEV", appStatus.getValueForPathAsString("buildTimestamp"));
         assertEquals("(Setup incomplete)", appStatus.getValueForPathAsString("sshUsername"));
-        assertEquals("true", appStatus.getValueForPathAsString("enableMarathon"));
+        assertEquals("true", appStatus.getValueForPathAsString("enableKubernetes"));
 
         assertEquals("[" +
                         "{\"title\":\"Access all monitoring dashboards in Grafana\",\"service\":\"grafana\"}," +
                         "{\"title\":\"Monitor Gluster volumes\",\"service\":\"gluster\"}," +
-                        "{\"title\":\"Monitor Mesos Processes\",\"service\":\"mesos-master\"}," +
-                        "{\"title\":\"Manage Marathon Services\",\"service\":\"marathon\"}," +
+                        "{\"title\":\"Manage Kubernetes Cluster\",\"service\":\"kubernetes-dashboard\"}," +
                         "{\"title\":\"Manage your kafka topics\",\"service\":\"kafka-manager\"}," +
                         "{\"title\":\"Monitor your Spark jobs\",\"service\":\"spark-history-server\"}," +
-                        "{\"title\":\"Manage and Monitor your Flink jobs\",\"service\":\"flink-app-master\"}," +
+                        "{\"title\":\"Manage Flink Session\",\"service\":\"flink-runtime\"}," +
                         "{\"title\":\"Manage your data in Elasticsearch\",\"service\":\"cerebro\"}," +
                         "{\"title\":\"Visualize your data in Elasticsearch\",\"service\":\"kibana\"}," +
-                        "{\"title\":\"Use Zeppelin for your Data Science projects\",\"service\":\"zeppelin\"}" +
-                        "]",
+                        "{\"title\":\"Use Zeppelin for your Data Science projects\",\"service\":\"zeppelin\"}]",
                 appStatus.getValueForPathAsString("links"));
 
         assertEquals("true", appStatus.getValueForPathAsString("isSnapshot"));

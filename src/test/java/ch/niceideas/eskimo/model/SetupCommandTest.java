@@ -42,28 +42,24 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
         assertEquals ("{\n" +
                 "  \"buildPackage\": [\n" +
                 "    \"base-eskimo\",\n" +
-                "    \"elasticsearch\",\n" +
                 "    \"ntp\",\n" +
                 "    \"prometheus\",\n" +
                 "    \"zookeeper\",\n" +
                 "    \"gluster\",\n" +
-                "    \"kafka\",\n" +
-                "    \"mesos-master\",\n" +
-                "    \"logstash\",\n" +
-                "    \"flink\",\n" +
-                "    \"marathon\",\n" +
-                "    \"spark\",\n" +
+                "    \"kube-master\",\n" +
+                "    \"elasticsearch\",\n" +
                 "    \"cerebro\",\n" +
                 "    \"grafana\",\n" +
-                "    \"kibana\",\n" +
+                "    \"spark\",\n" +
+                "    \"flink\",\n" +
+                "    \"kafka\",\n" +
                 "    \"kafka-manager\",\n" +
+                "    \"kibana\",\n" +
+                "    \"logstash\",\n" +
                 "    \"zeppelin\"\n" +
                 "  ],\n" +
-                "  \"buildMesos\": [\n" +
-                "    \"mesos-debian\",\n" +
-                "    \"mesos-redhat\"\n" +
-                "  ],\n" +
-                "  \"downloadMesos\": [],\n" +
+                "  \"buildKube\": [\"kube\"],\n" +
+                "  \"downloadKube\": [],\n" +
                 "  \"none\": false,\n" +
                 "  \"downloadPackages\": [],\n" +
                 "  \"packageUpdates\": [],\n" +
@@ -95,25 +91,24 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
 
         List<SetupCommand.SetupOperationId> opInOrder = setupCommand.getAllOperationsInOrder(null);
 
-        assertEquals ("Build_base-eskimo," +
-                "Build_elasticsearch," +
-                "Build_ntp," +
-                "Build_prometheus," +
-                "Build_zookeeper," +
-                "Build_gluster," +
-                "Build_kafka," +
-                "Build_mesos-master," +
-                "Build_logstash," +
-                "Build_flink," +
-                "Build_marathon," +
-                "Build_spark," +
-                "Build_cerebro," +
-                "Build_grafana," +
-                "Build_kibana," +
-                "Build_kafka-manager," +
-                "Build_zeppelin," +
-                "Build_mesos-debian," +
-                "Build_mesos-redhat",
+        assertEquals ("" +
+                        "Build_base-eskimo," +
+                        "Build_ntp," +
+                        "Build_prometheus," +
+                        "Build_zookeeper," +
+                        "Build_gluster," +
+                        "Build_kube-master," +
+                        "Build_elasticsearch," +
+                        "Build_cerebro," +
+                        "Build_grafana," +
+                        "Build_spark," +
+                        "Build_flink," +
+                        "Build_kafka," +
+                        "Build_kafka-manager," +
+                        "Build_kibana," +
+                        "Build_logstash," +
+                        "Build_zeppelin," +
+                        "Build_kube",
                 opInOrder.stream().map(SetupCommand.SetupOperationId::toString).collect(Collectors.joining(",")));
     }
 

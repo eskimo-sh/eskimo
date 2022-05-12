@@ -111,8 +111,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "export MASTER_GLUSTER_1=192.168.10.11\n" +
                         "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
                         "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                        "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n", topology.getTopologyScript());
+                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n", topology.getTopologyScript());
     }
 
     @Test
@@ -130,7 +129,6 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
                         "export MASTER_NTP_1=192.168.10.11\n" +
                         "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
-                        "export SELF_MASTER_GLUSTER_1921681011=192.168.10.11\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.12,192.168.10.13\n" +
@@ -243,15 +241,15 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "kafka-manager",
                 "spark-history-server",
                 "spark-runtime",
+                "spark-cli",
+                "flink-runtime",
+                "flink-cli",
+                "logstash",
+                "logstash-cli",
                 "cerebro",
                 "elasticsearch",
-                "grafana",
-                "a",
-                "b",
-                "c",
-                "d",
-                "e",
-                "f"
+                "kibana",
+                "zeppelin"
         }, orderedServices);
     }
 
@@ -280,12 +278,12 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "flink-runtime",
                 "grafana",
                 "kafka",
-                "zeppelin",
-                "cerebro",
-                "grafana",
-                "flink-runtime",
+                "kafka-manager",
                 "kibana",
+                "kubernetes-dashboard",
+                "logstash",
                 "spark-history-server",
+                "spark-runtime",
                 "zeppelin"
         }, marathonServices);
     }

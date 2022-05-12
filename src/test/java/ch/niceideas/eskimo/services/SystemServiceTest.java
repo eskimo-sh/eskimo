@@ -253,7 +253,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
-        assertEquals(5, statusMap.size());
+        assertEquals(6, statusMap.size());
 
         assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to Kubernetes
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
@@ -372,7 +372,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
 
-        assertEquals(5, statusMap.size());
+        assertEquals(6, statusMap.size());
 
         assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to kubernetes
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));

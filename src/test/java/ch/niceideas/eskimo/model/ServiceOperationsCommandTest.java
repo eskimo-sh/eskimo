@@ -427,6 +427,13 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
             public ServicesInstallationSorter getServicesInstallationSorter() {
                 ServicesInstallationSorter sis = new ServicesInstallationSorter();
                 sis.setServicesDefinition(def);
+                ConfigurationService cs = new ConfigurationService();
+                sis.setConfigurationService(cs);
+                cs.setSetupService(new SetupService() {
+                    public String getConfigStoragePath() {
+                        return "/tmp";
+                    }
+                });
                 return sis;
             }
 

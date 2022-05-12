@@ -627,7 +627,7 @@ public class SetupService {
             success = true;
             return "{\"status\": \"OK\"}";
 
-        } catch (JSONException | SetupException | ServiceDefinitionException | NodesConfigurationException e) {
+        } catch (JSONException | SetupException | ServiceDefinitionException | NodesConfigurationException | SystemException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus (e);
 

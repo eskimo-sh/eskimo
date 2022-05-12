@@ -148,7 +148,10 @@ public class CommonDevShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/close_and_save_image.sh"}, true);
 
         // no error reported
-        assertEquals (" - Cleaning apt cache\n" +
+        assertEquals (" - Running apt-autoremove\n" +
+                        " - Cleaning apt cache\n" +
+                        " - Cleanup doc and man pages\n" +
+                        " - Recreating required folders\n" +
                         " - Comitting changes on container cerebro_template\n" +
                         " - Stopping container cerebro_template\n" +
                         " - removing container cerebro_template\n" +
@@ -162,7 +165,10 @@ public class CommonDevShellTest {
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
-            assertEquals("exec -i cerebro_template apt-get clean -q\n" +
+            assertEquals("exec -i cerebro_template apt -y autoremove\n" +
+                    "exec -i cerebro_template apt-get clean -q\n" +
+                    "exec -i cerebro_template rm -Rf /usr/share/doc/ /usr/share/man /usr/share/doc-base/ /usr/share/info/\n" +
+                    "exec -i cerebro_template mkdir -p /usr/share/man/man1/\n" +
                     "commit cerebro_template eskimo:cerebro_template\n" +
                     "stop cerebro_template\n" +
                     "container rm cerebro_template\n" +

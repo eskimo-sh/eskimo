@@ -115,6 +115,9 @@ public class KubernetesService {
     void setSshCommandService (SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
     }
+    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
+        this.nodeRangeResolver = nodeRangeResolver;
+    }
 
     // FIXME
     public void showJournal(Service service) throws SystemException {

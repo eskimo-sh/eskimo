@@ -1,13 +1,16 @@
 echo OK
-echo OK
+sudo ls
 cat /proc/meminfo | grep MemTotal
 cat /proc/meminfo | grep MemTotal
 cat /etc/eskimo_flag_base_system_installed
 cat /etc/eskimo_flag_base_system_installed
-sudo mv eskimo_topology-{UUID}-192.168.10.15.sh /etc/eskimo_topology.sh 
-sudo chmod 755 /etc/eskimo_topology.sh 
-sudo mv eskimo_services-settings-{UUID}-192.168.10.15.json /etc/eskimo_services-settings.json
+
+sudo chmod 755 /etc/eskimo_topology.sh
+
+sudo chmod 755 /etc/eskimo_topology.sh
+
 sudo chmod 755 /etc/eskimo_services-settings.json
-cat /etc/eskimo_flag_mesos_installed
-if [[ -f /etc/debian_version ]]; then echo debian; fi
-#!/usr/bin/env bash
+cat /etc/eskimo_flag_k8s_installed
+
+sudo chmod 755 /etc/eskimo_services-settings.json
+cat /etc/eskimo_flag_k8s_installed

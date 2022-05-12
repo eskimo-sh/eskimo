@@ -52,6 +52,7 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
 
         SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, scs);
 
+        System.err.println (command.toJSON());
         assertTrue (new JSONObject(expectedJson).similar(command.toJSON()));
     }
 

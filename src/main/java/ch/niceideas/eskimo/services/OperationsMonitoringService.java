@@ -110,7 +110,7 @@ public class OperationsMonitoringService implements OperationsContext {
         return systemActionLock.isLocked();
     }
 
-    void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException {
+    void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         currentOperation = operation;
         systemActionLock.lock();
 

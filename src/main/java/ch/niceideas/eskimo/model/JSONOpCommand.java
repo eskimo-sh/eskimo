@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import ch.niceideas.eskimo.services.SystemException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -49,6 +50,6 @@ public interface JSONOpCommand extends Serializable {
     boolean hasChanges();
 
     List<? extends OperationId> getAllOperationsInOrder (OperationsContext context)
-            throws ServiceDefinitionException, NodesConfigurationException;
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException;
 
 }

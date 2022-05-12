@@ -10,7 +10,6 @@
   "kafka_installed_on_IP_192-168-10-13": "OK",
   "kafka_installed_on_IP_192-168-10-15": "OK",
   "zookeeper_installed_on_IP_192-168-10-15": "OK",
-  "flink-app-master_installed_on_IP_192-168-10-15": "OK",
   "kibana_installed_on_IP_192-168-10-15": "OK",
   "kafka-manager_installed_on_IP_192-168-10-15": "OK",
   "logstash_installed_on_IP_192-168-10-13": "OK",

@@ -59,6 +59,14 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         sio = new ServicesInstallationSorter();
         sio.setServicesDefinition(def);
 
+        ConfigurationService cs = new ConfigurationService();
+        sio.setConfigurationService(cs);
+        cs.setSetupService(new SetupService() {
+            public String getConfigStoragePath() {
+                return "/tmp";
+            }
+        });
+
         nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
     }
 
@@ -73,29 +81,28 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
 
         assertNotNull(orderedInstall);
 
-        assertEquals(10, orderedInstall.size());
+        assertEquals(6, orderedInstall.size());
 
         // Test first, third and last group
         List<ServiceOperationsCommand.ServiceOperationId> group1 = orderedInstall.get(0);
         assertEquals(2, group1.size());
-        assertEquals("elasticsearch", group1.get(0).getService());
-        assertEquals("192.168.10.11", group1.get(0).getNode());
+        assertEquals("zookeeper", group1.get(0).getService());
+        assertEquals("192.168.10.13", group1.get(0).getNode());
 
-        assertEquals("elasticsearch", group1.get(1).getService());
-        assertEquals("192.168.10.13", group1.get(1).getNode());
+        assertEquals("ntp", group1.get(1).getService());
+        assertEquals("192.168.10.11", group1.get(1).getNode());
 
-        List<ServiceOperationsCommand.ServiceOperationId> group6 = orderedInstall.get(5);
-        assertEquals(2, group6.size());
-        assertEquals("gluster", group6.get(0).getService());
-        assertEquals("192.168.10.11", group6.get(0).getNode());
-        assertEquals("gluster", group6.get(1).getService());
+        List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedInstall.get(4);
+        assertEquals(1, group4.size());
+        assertEquals("kube-master", group4.get(0).getService());
+        assertEquals("192.168.10.11", group4.get(0).getNode());
 
-        List<ServiceOperationsCommand.ServiceOperationId> group8 = orderedInstall.get(8);
-        assertEquals(2, group8.size());
-        assertEquals("spark-runtime", group8.get(0).getService());
-        assertEquals("192.168.10.11", group8.get(0).getNode());
-        assertEquals("spark-runtime", group8.get(1).getService());
-        assertEquals("192.168.10.13", group8.get(1).getNode());
+        List<ServiceOperationsCommand.ServiceOperationId> group5 = orderedInstall.get(5);
+        assertEquals(2, group5.size());
+        assertEquals("kube-slave", group5.get(0).getService());
+        assertEquals("192.168.10.11", group5.get(0).getNode());
+        assertEquals("kube-slave", group5.get(1).getService());
+        assertEquals("192.168.10.13", group5.get(1).getNode());
 
 
     }

@@ -225,7 +225,7 @@ public class Topology {
                             + " defines a dependency on a kube service " + masterService.getName() + " which is not supported.");
                 }
 
-                if (!kubeServicesConfig.isServiceInstallRequired(masterService.getName())) {
+                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterService.getName())) {
                     throw new ServiceDefinitionException ("Service " + service.getName()
                             + " defines a dependency on another kube service " + masterService.getName() + " but that service is not going to be installed.");
                 }

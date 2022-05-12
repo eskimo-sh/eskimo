@@ -51,15 +51,22 @@ public class ServicesInstallationSorter {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     /** For tests only */
     public void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
 
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
 
     public <T extends OperationId> List<List<T>> orderOperations  (
             List<T> operations,
-            NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException {
+            NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException, SystemException {
 
         if (operations == null || operations.isEmpty()) {
             return Collections.emptyList();
@@ -86,7 +93,7 @@ public class ServicesInstallationSorter {
         // 3. Reprocess and separate master installation
         List<List<T>> orderedOperationsSteps = new ArrayList<>();
 
-        Topology topology = servicesDefinition.getTopology(nodesConfig, null, null);
+        Topology topology = servicesDefinition.getTopology(nodesConfig, configurationService.loadKubernetesServicesConfig(), null);
 
         for (Service service : services) {
 
@@ -185,4 +192,5 @@ public class ServicesInstallationSorter {
 
         return orderedOperationsSteps;
     }
+
 }

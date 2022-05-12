@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SystemServiceNodesStatusTest extends AbstractSystemTest {
@@ -138,7 +139,8 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
         String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), "UTF-8");
 
-        //assertEquals(expectedStatus, systemStatus.getFormattedValue());
+        assertEquals(expectedStatus, systemStatus.getFormattedValue());
+        //System.err.println (systemStatus.getJSONObject());
         assertTrue(new JsonWrapper(expectedStatus).getJSONObject().similar(systemStatus.getJSONObject()));
     }
 }
