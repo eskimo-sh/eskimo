@@ -6,7 +6,6 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
-import com.trilead.ssh2.Connection;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +132,7 @@ public class KubernetesService {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Starting", () -> startServiceInternal(service));
     }
 
-    String startServiceInternal(Service service) throws MarathonException {
+    String startServiceInternal(Service service) throws KubernetesException {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
@@ -144,7 +143,7 @@ public class KubernetesService {
     }
 
     @Deprecated
-    String stopServiceInternal(Service service) throws MarathonException {
+    String stopServiceInternal(Service service) throws KubernetesException {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
@@ -155,7 +154,7 @@ public class KubernetesService {
     }
 
     @Deprecated
-    protected String restartServiceInternal(Service service) throws MarathonException {
+    protected String restartServiceInternal(Service service) throws KubernetesException {
         throw new UnsupportedOperationException("To Be Implemented");
     }
 
@@ -407,7 +406,7 @@ public class KubernetesService {
                 return;
             }
 
-            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
+            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, command.getRawConfig(), deadIps);
 
             if (operationsMonitoringService.isInterrupted()) {
                 return;
@@ -460,7 +459,7 @@ public class KubernetesService {
     private void proceedWithKubernetesServiceInstallation(MessageLogger ml, String kubeMasterNode, String service)
             throws IOException, SystemException, SSHCommandException {
 
-        Connection connection = null;
+        SSHConnection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(kubeMasterNode);
 

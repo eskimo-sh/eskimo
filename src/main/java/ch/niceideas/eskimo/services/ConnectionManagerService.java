@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.LocalPortForwarder;
@@ -87,16 +88,19 @@ public class ConnectionManagerService {
     @Value("${connectionManager.scriptOperationTimeout}")
     private int scriptOperationTimeout = 1800000;
 
+    @Value("${connectionManager.statusOperationTimeout}")
+    private int statusOperationTimeout = 1800000;
+
     private final ReentrantLock connectionMapLock = new ReentrantLock();
 
-    private final Map<String, Connection> connectionMap = new HashMap<>();
-    private final Map<Connection, List<LocalPortForwarderWrapper>> portForwardersMap = new HashMap<>();
+    private final Map<String, SSHConnection> connectionMap = new HashMap<>();
+    private final Map<SSHConnection, List<LocalPortForwarderWrapper>> portForwardersMap = new HashMap<>();
 
     private final Map<String, Long> connectionAges = new HashMap<>();
 
     private String privateSShKeyContent = null;
 
-    private final List<Connection> connectionsToCloseLazily = new ArrayList<>();
+    private final List<SSHConnection> connectionsToCloseLazily = new ArrayList<>();
 
     private final Timer timer;
 
@@ -108,7 +112,7 @@ public class ConnectionManagerService {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (Connection connection : connectionsToCloseLazily) {
+                for (SSHConnection connection : connectionsToCloseLazily) {
                     logger.info ("Lazily closing connection to " + connection.getHostname());
                     closeConnection(connection);
                 }
@@ -139,9 +143,9 @@ public class ConnectionManagerService {
         this.configurationService = configurationService;
     }
 
-    public Connection getPrivateConnection (String node) throws ConnectionManagerException {
+    public SSHConnection getPrivateConnection (String node) throws ConnectionManagerException {
         try {
-            return createConnectionInternal(node);
+            return createConnectionInternal(node, scriptOperationTimeout);
         } catch (IOException | JSONException | FileException | SetupException e) {
             logger.error (e.getMessage());
             logger.debug (e, e);
@@ -149,7 +153,7 @@ public class ConnectionManagerService {
         }
     }
 
-    public Connection getSharedConnection (String node) throws ConnectionManagerException {
+    public SSHConnection getSharedConnection (String node) throws ConnectionManagerException {
         return getConnectionInternal(node);
     }
 
@@ -160,7 +164,7 @@ public class ConnectionManagerService {
 
         try {
 
-            Connection connection = connectionMap.get(node);
+            SSHConnection connection = connectionMap.get(node);
 
             if (connection == null) {
                 throw new IllegalStateException();
@@ -193,23 +197,23 @@ public class ConnectionManagerService {
     }
 
     public void dropTunnels (String host) {
-        Connection connection = connectionMap.get(host);
+        SSHConnection connection = connectionMap.get(host);
         if (connection != null) {
             dropTunnels(connection, host);
         }
     }
 
-    private Connection getConnectionInternal (String node) throws ConnectionManagerException {
+    private SSHConnection getConnectionInternal (String node) throws ConnectionManagerException {
 
         connectionMapLock.lock();
 
         try {
 
-            Connection connection = connectionMap.get(node);
+            SSHConnection connection = connectionMap.get(node);
 
             // if connection doesn't exist, create it
             if (connection == null) {
-                connection = createConnectionInternal(node);
+                connection = createConnectionInternal(node, statusOperationTimeout);
 
                 recreateTunnels(connection, node);
 
@@ -258,18 +262,18 @@ public class ConnectionManagerService {
 
     }
 
-    private void removeConnectionAndRegisterClose(String node, Connection connection) {
+    private void removeConnectionAndRegisterClose(String node, SSHConnection connection) {
         connectionMap.remove(node);
         connectionAges.remove(node);
         connectionsToCloseLazily.add (connection);
     }
 
-    protected Connection createConnectionInternal(String node) throws IOException, FileException, SetupException {
+    protected SSHConnection createConnectionInternal(String node, int operationTimeout) throws IOException, FileException, SetupException {
 
         logger.info ("Creating connection to " + node);
-        Connection connection = new Connection(node, sshPort);
+        SSHConnection connection = new SSHConnection(node, sshPort, operationTimeout);
         connection.setTCPNoDelay(true);
-        connection.connect(null, tcpConnectionTimeout, scriptOperationTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
+        connection.connect(null, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 
         JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
 
@@ -288,7 +292,7 @@ public class ConnectionManagerService {
         return connection;
     }
 
-    private void closeConnection (Connection connection) {
+    private void closeConnection (SSHConnection connection) {
         try {
             logger.info ("Closing connection to " + connection.getHostname());
 
@@ -303,7 +307,7 @@ public class ConnectionManagerService {
     }
 
 
-    protected void dropTunnels(Connection connection, String node) {
+    protected void dropTunnels(SSHConnection connection, String node) {
 
         // Find out about declared forwarders to be handled (those that need to stay)
         List<ProxyTunnelConfig> keptTunnelConfigs = proxyManagerService.getTunnelConfigForHost(node);
@@ -325,7 +329,7 @@ public class ConnectionManagerService {
         }
     }
 
-    protected void recreateTunnels(Connection connection, String node) throws ConnectionManagerException {
+    protected void recreateTunnels(SSHConnection connection, String node) throws ConnectionManagerException {
 
         final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
 
@@ -345,7 +349,7 @@ public class ConnectionManagerService {
         }
     }
 
-    private List<LocalPortForwarderWrapper> getForwarders(Connection connection) {
+    private List<LocalPortForwarderWrapper> getForwarders(SSHConnection connection) {
         return portForwardersMap.computeIfAbsent(connection, k -> new ArrayList<>());
     }
 
@@ -361,7 +365,7 @@ public class ConnectionManagerService {
 
         private final Timer timer;
 
-        public ConnectionOperationWatchDog(Connection connection) {
+        public ConnectionOperationWatchDog(SSHConnection connection) {
             this.timer = new Timer(true);
 
             timer.schedule(new TimerTask() {
@@ -386,7 +390,7 @@ public class ConnectionManagerService {
         private final String targetHost;
         private final int targetPort;
 
-        public LocalPortForwarderWrapper (String serviceName, Connection connection, int localPort, String targetHost, int targetPort) throws ConnectionManagerException {
+        public LocalPortForwarderWrapper (String serviceName, SSHConnection connection, int localPort, String targetHost, int targetPort) throws ConnectionManagerException {
             this.serviceName = serviceName;
             this.localPort = localPort;
             this.targetHost = targetHost;

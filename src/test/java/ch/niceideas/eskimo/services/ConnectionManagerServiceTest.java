@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.model.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.LocalPortForwarder;
@@ -93,18 +94,18 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertNotNull (sshd);
 
         // create a connection to localhost
-        Connection connection = cm.getSharedConnection("localhost");
+        SSHConnection connection = cm.getSharedConnection("localhost");
         assertNotNull(connection);
 
         // get a second connection and make sure it matches
-        Connection second = cm.getSharedConnection("localhost");
+        SSHConnection second = cm.getSharedConnection("localhost");
         assertNotNull(second);
         assertSame(connection, second);
 
         // close connection and make sure it gets properly recreated
         second.close();
 
-        Connection newOne = cm.getSharedConnection("localhost");
+        SSHConnection newOne = cm.getSharedConnection("localhost");
         assertNotNull(newOne);
         assertNotSame (newOne, second);
     }
@@ -123,8 +124,8 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
-            protected Connection createConnectionInternal(String node) {
-                return new Connection(node, getSShPort()) {
+            protected SSHConnection createConnectionInternal(String node, int operationTimeout) {
+                return new SSHConnection(node, getSShPort()) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
                         createCalledFor.add(""+port_to_connect);
                         return null;
@@ -135,7 +136,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(Connection connection, String node)  {
+            protected void dropTunnels(SSHConnection connection, String node)  {
                 super.dropTunnels(connection, node);
                 dropCalledFor.add(node);
             }
@@ -151,7 +152,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);
 
-        Connection connection = cm.getSharedConnection("localhost");
+        SSHConnection connection = cm.getSharedConnection("localhost");
 
         assertEquals(3, createCalledFor.size());
         assertEquals("123,124,125", String.join(",", createCalledFor));
@@ -191,8 +192,8 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
             @Override
-            protected Connection createConnectionInternal(String node) {
-                return new Connection(node, getSShPort()) {
+            protected SSHConnection createConnectionInternal(String node, int operationTimeout) {
+                return new SSHConnection(node, getSShPort()) {
                     public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
                         return null;
                     }
@@ -202,24 +203,24 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(Connection connection, String node) {
+            protected void dropTunnels(SSHConnection connection, String node) {
                 // NO-OP
             }
             @Override
-            protected void recreateTunnels(Connection connection, String node) {
+            protected void recreateTunnels(SSHConnection connection, String node) {
                 // NO-OP
             }
         };
         cm.setSetupService (setupService);
 
-        Connection con1 = cm.getSharedConnection("localhost");
-        Connection con2 = cm.getSharedConnection("localhost");
+        SSHConnection con1 = cm.getSharedConnection("localhost");
+        SSHConnection con2 = cm.getSharedConnection("localhost");
 
         assertSame (con1, con2);
 
         cm.forceRecreateConnection("localhost");
 
-        Connection con3 = cm.getSharedConnection("localhost");
+        SSHConnection con3 = cm.getSharedConnection("localhost");
         assertNotSame (con1, con3);
     }
 }

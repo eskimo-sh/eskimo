@@ -230,7 +230,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         sc = new FileManagerService() {
             @Override
             SFTPv3Client getClient(@RequestParam("address") String node) throws ConnectionManagerException, IOException {
-                return new SFTPv3Client(cm.getSharedConnection("localhost"));
+                return new SFTPv3Client(cm.getSharedConnection("localhost").getUnder());
             }
             @Override
             String getFileMimeType(String node, String newPath) throws SSHCommandException {

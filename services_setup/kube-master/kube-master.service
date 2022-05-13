@@ -39,6 +39,8 @@ Documentation=https://www.eskimo.sh
 Wants=network-online.target
 After=network-online.target
 After=eskimo-startup-checks.service
+After=gluster.service
+After=ntp.service
 Wants=etcd.service
 
 [Service]

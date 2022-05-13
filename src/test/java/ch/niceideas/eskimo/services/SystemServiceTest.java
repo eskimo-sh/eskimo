@@ -147,15 +147,15 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public String runSSHCommand(Connection connection, String command) {
+            public String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public void copySCPFile(Connection connection, String filePath) {
+            public void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override
@@ -217,15 +217,15 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public String runSSHCommand(Connection connection, String command) {
+            public String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public void copySCPFile(Connection connection, String filePath) {
+            public void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override
@@ -276,15 +276,15 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public String runSSHCommand(Connection connection, String command) {
+            public String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public void copySCPFile(Connection connection, String filePath) {
+            public void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override
@@ -334,15 +334,15 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
-            public String runSSHCommand(Connection connection, String command) {
+            public String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
-            public void copySCPFile(Connection connection, String filePath) {
+            public void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override

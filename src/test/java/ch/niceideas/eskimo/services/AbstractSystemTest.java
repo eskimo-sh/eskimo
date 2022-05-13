@@ -38,9 +38,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.MemoryModel;
-import ch.niceideas.eskimo.model.MessageLogger;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import com.trilead.ssh2.Connection;
@@ -77,9 +75,6 @@ public abstract class AbstractSystemTest {
     protected MemoryComputer memoryComputer = null;
 
     protected ConfigurationService configurationService = null;
-
-    @Deprecated
-    protected MarathonService marathonService = null;
 
     protected KubernetesService kubernetesService = null;
 
@@ -161,7 +156,7 @@ public abstract class AbstractSystemTest {
 
         sshCommandService = new SSHCommandService() {
             @Override
-            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript("192.168.10.11", script, throwsException);
             }
             @Override
@@ -198,7 +193,7 @@ public abstract class AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(Connection connection, String command) {
+            public String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand("192.168.10.11", command);
             }
             @Override
@@ -207,7 +202,7 @@ public abstract class AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(Connection connection, String filePath) {
+            public void copySCPFile(SSHConnection connection, String filePath) {
                 copySCPFile("192.168.10.11", filePath);
             }
             @Override
@@ -235,12 +230,7 @@ public abstract class AbstractSystemTest {
 
         setupService.setSystemOperationService (systemOperationService);
 
-        memoryComputer = new MemoryComputer() {
-            @Override
-            public MemoryModel buildMemoryModel(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
-                return new MemoryModel(computeMemory(nodesConfig, deadIps));
-            }
-        };
+        memoryComputer = new MemoryComputer();
         memoryComputer.setServicesDefinition(servicesDefinition);
         memoryComputer.setSshCommandService(sshCommandService);
 
@@ -256,28 +246,15 @@ public abstract class AbstractSystemTest {
 
         connectionManagerService = new ConnectionManagerService() {
             @Override
-            public Connection getPrivateConnection (String node) throws ConnectionManagerException {
+            public SSHConnection getPrivateConnection (String node) {
                 return null;
             }
 
             @Override
-            public Connection getSharedConnection (String node) throws ConnectionManagerException {
+            public SSHConnection getSharedConnection (String node) {
                 return null;
             }
         };
-
-        /* Deprecated */
-        marathonService = createMarathonService();
-        marathonService.setServicesDefinition(servicesDefinition);
-        marathonService.setConfigurationService (configurationService);
-        marathonService.setSystemService(systemService);
-        marathonService.setSshCommandService(sshCommandService);
-        marathonService.setSystemOperationService(systemOperationService);
-        marathonService.setProxyManagerService(proxyManagerService);
-        marathonService.setMemoryComputer(memoryComputer);
-        marathonService.setNotificationService(notificationService);
-        marathonService.setConnectionManagerService (connectionManagerService);
-        marathonService.setOperationsMonitoringService(operationsMonitoringService);
 
         kubernetesService = createKubernetesService();
         kubernetesService.setServicesDefinition(servicesDefinition);
@@ -296,7 +273,6 @@ public abstract class AbstractSystemTest {
         systemService.setProxyManagerService(proxyManagerService);
         systemService.setSshCommandService(sshCommandService);
         systemService.setServicesDefinition(servicesDefinition);
-        systemService.setMarathonService(marathonService);
         systemService.setKubernetesService(kubernetesService);
         systemService.setNotificationService(notificationService);
         systemService.setConfigurationService(configurationService);
@@ -304,7 +280,6 @@ public abstract class AbstractSystemTest {
 
         nodesConfigurationService = createNodesConfigurationService();
         nodesConfigurationService.setConfigurationService(configurationService);
-        nodesConfigurationService.setMarathonService(marathonService);
         nodesConfigurationService.setKubernetesService (kubernetesService);
         nodesConfigurationService.setMemoryComputer(memoryComputer);
         nodesConfigurationService.setNodeRangeResolver(nodeRangeResolver);
@@ -349,16 +324,6 @@ public abstract class AbstractSystemTest {
 
     protected NodesConfigurationService createNodesConfigurationService () {
         return new NodesConfigurationService();
-    }
-
-    @Deprecated
-    protected MarathonService createMarathonService() {
-        return new MarathonService() {
-            @Override
-            protected String queryMarathon (String endpoint, String method) {
-                return "{}";
-            }
-        };
     }
 
     protected KubernetesService createKubernetesService() {

@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.terminal;
 
+import ch.niceideas.eskimo.model.SSHConnection;
 import com.trilead.ssh2.Connection;
 import lombok.Getter;
 import org.apache.log4j.Logger;
@@ -57,7 +58,7 @@ public final class Session extends Thread {
 
     public static final String AJAX_TERM_NAME = "linux";
 
-    private final Connection connection;
+    private final SSHConnection connection;
 
     private final ProcessWithPty childProcess;
 
@@ -86,7 +87,7 @@ public final class Session extends Thread {
      *      A child process forked with pty as its stdin/stdout..
      *      Make sure to set the correct terminal name in its environment variable.
      */
-    public Session(Connection connection, int width, int height, ProcessWithPty childProcessWithTty) throws IOException {
+    public Session(SSHConnection connection, int width, int height, ProcessWithPty childProcessWithTty) throws IOException {
         this.connection = connection;
         this.terminal = new Terminal(width,height);
         this.childProcess = childProcessWithTty;
@@ -180,7 +181,7 @@ public final class Session extends Thread {
         return childProcess;
     }
 
-    public Connection getConnection() {
+    public SSHConnection getConnection() {
         return connection;
     }
 

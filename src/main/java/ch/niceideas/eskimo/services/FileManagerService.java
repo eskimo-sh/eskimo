@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.SSHConnection;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
@@ -286,8 +287,8 @@ public class FileManagerService {
 
         try {
             // getting dedicated client for file upload
-            Connection con = connectionManagerService.getSharedConnection(node);
-            client = new SFTPv3Client (con);
+            SSHConnection con = connectionManagerService.getSharedConnection(node);
+            client = new SFTPv3Client (con.getUnder());
 
             String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + name);
 
@@ -344,8 +345,8 @@ public class FileManagerService {
 
         if (client == null) {
 
-            Connection con = connectionManagerService.getSharedConnection(node);
-            client = new SFTPv3Client (con);
+            SSHConnection con = connectionManagerService.getSharedConnection(node);
+            client = new SFTPv3Client (con.getUnder());
 
             sftpClients.put(node, client);
 

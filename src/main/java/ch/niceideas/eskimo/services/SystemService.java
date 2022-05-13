@@ -98,9 +98,6 @@ public class SystemService {
     private ConfigurationService configurationService;
 
     @Autowired
-    private MarathonService marathonService;
-
-    @Autowired
     private KubernetesService kubernetesService;
 
     @Autowired
@@ -157,10 +154,6 @@ public class SystemService {
     }
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
-    }
-    @Deprecated
-    void setMarathonService (MarathonService marathonService) {
-        this.marathonService = marathonService;
     }
     void setKubernetesService (KubernetesService kubernetesService) {
         this.kubernetesService = kubernetesService;
@@ -291,7 +284,7 @@ public class SystemService {
             notificationService.addInfo(opLabel + " " + service + " succeeded on " + node);
 
             success = true;
-        } catch (SSHCommandException | MarathonException | ServiceDefinitionException | NodesConfigurationException e) {
+        } catch (SSHCommandException | KubernetesException | ServiceDefinitionException | NodesConfigurationException e) {
 
             operationsMonitoringService.addInfo(operationId, "\nDone : "
                     + message
@@ -377,26 +370,6 @@ public class SystemService {
                     logger.error(e, e);
                 }
 
-                /* Deprecated
-                // fetch marathon services status
-                try {
-                    marathonService.fetchMarathonServicesStatus(statusMap, servicesInstallationStatus);
-                } catch (MarathonException e) {
-                    logger.debug(e, e);
-                    // workaround : flag all marathon services as KO on marathon node
-                    String marathonNode = servicesInstallationStatus.getFirstNode(MARATHON_SERVICE_NAME);
-                    if (StringUtils.isNotBlank(marathonNode)) {
-                        String marathonNodeName = marathonNode.replace(".", "-");
-                        MarathonServicesConfigWrapper marathonConfig = configurationService.loadMarathonServicesConfig();
-                        for (String service : servicesDefinition.listMarathonServices()) {
-                            if (marathonService.shouldInstall(marathonConfig, service)) {
-                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + marathonNodeName, "KO");
-                            }
-                        }
-                    }
-                }
-                */
-
                 // fetch kubernetes services status
                 try {
                     kubernetesService.fetchKubernetesServicesStatus(statusMap, servicesInstallationStatus);
@@ -408,7 +381,7 @@ public class SystemService {
                         String kubeNodeName = kubeNode.replace(".", "-");
                         KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
                         for (String service : servicesDefinition.listKubernetesServices()) {
-                            if (marathonService.shouldInstall(kubeServicesConfig, service)) {
+                            if (kubernetesService.shouldInstall(kubeServicesConfig, service)) {
                                 statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + kubeNodeName, "KO");
                             }
                         }
@@ -776,7 +749,7 @@ public class SystemService {
         }
     }
 
-    void callUninstallScript(MessageLogger ml, Connection connection, String service) throws SystemException {
+    void callUninstallScript(MessageLogger ml, SSHConnection connection, String service) throws SystemException {
         File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
             throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
@@ -795,7 +768,7 @@ public class SystemService {
         }
     }
 
-    void installationSetup(MessageLogger ml, Connection connection, String node, String service) throws SystemException {
+    void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) throws SystemException {
         try {
             exec(connection, ml, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node});
         } catch (SSHCommandException e) {
@@ -805,7 +778,7 @@ public class SystemService {
         }
     }
 
-    void installationCleanup(MessageLogger ml, Connection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
+    void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
         exec(connection, ml, "rm -Rf " + TMP_PATH_PREFIX + service);
         exec(connection, ml, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
 
@@ -839,11 +812,11 @@ public class SystemService {
         }
     }
 
-    void exec(Connection connection, MessageLogger ml, String[] setupScript) throws SSHCommandException {
+    void exec(SSHConnection connection, MessageLogger ml, String[] setupScript) throws SSHCommandException {
         ml.addInfo(sshCommandService.runSSHCommand(connection, setupScript));
     }
 
-    void exec(Connection connection, MessageLogger ml, String command) throws SSHCommandException {
+    void exec(SSHConnection connection, MessageLogger ml, String command) throws SSHCommandException {
         ml.addInfo(sshCommandService.runSSHCommand(connection, command));
     }
 
@@ -917,7 +890,7 @@ public class SystemService {
         deadIps.add(node);
     }
 
-    File createRemotePackageFolder(MessageLogger ml, Connection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
+    File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist
@@ -995,7 +968,7 @@ public class SystemService {
     }
 
     interface ServiceOperation<V> {
-        V call() throws SSHCommandException, MarathonException;
+        V call() throws SSHCommandException, KubernetesException;
     }
 
     interface StatusUpdater {

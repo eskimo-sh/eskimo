@@ -55,9 +55,6 @@ public class SystemAdminController extends AbstractOperationController {
     private static final Logger logger = Logger.getLogger(SystemAdminController.class);
 
     @Autowired
-    private MarathonService marathonService;
-
-    @Autowired
     private KubernetesService kubernetesService;
 
     @Autowired
@@ -117,7 +114,7 @@ public class SystemAdminController extends AbstractOperationController {
 
             return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
 
-        } catch (SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException | MarathonException e) {
+        } catch (SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus(e);
         }
@@ -130,7 +127,7 @@ public class SystemAdminController extends AbstractOperationController {
 
         if (service.isKubernetes()) {
             return performKubernetesOperation(
-                    marathonService -> marathonService.showJournal(service),
+                    kubernetesService -> kubernetesService.showJournal(service),
                     "Successfully shown journal of " +  serviceName + ".");
 
         } else {
@@ -270,7 +267,7 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     private interface SystemOperation {
-        void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException, MarathonException;
+        void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException;
     }
 
     private interface KubernetesOperation {

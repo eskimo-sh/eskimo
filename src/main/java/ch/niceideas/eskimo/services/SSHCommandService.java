@@ -38,6 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.SSHConnection;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SCPClient;
@@ -64,12 +65,14 @@ public class SSHCommandService {
     @Value("${connectionManager.scriptOperationTimeout}")
     private int scriptOperationTimeout = 1800000;
 
+    private int statusOperationTimeout = 30000;
+
     /** For tests */
     public void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
         this.connectionManagerService = connectionManagerService;
     }
 
-    public String runSSHScript(Connection connection, String script) throws SSHCommandException {
+    public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
         return runSSHScript(connection, script, true);
     }
 
@@ -77,7 +80,7 @@ public class SSHCommandService {
         return runSSHScript(node, script, true);
     }
 
-    public String runSSHCommand(Connection connection, String[] command) throws SSHCommandException {
+    public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
         StringBuilder sb = new StringBuilder();
         for (String cmd : command) {
             sb.append (cmd);
@@ -86,7 +89,7 @@ public class SSHCommandService {
         return runSSHCommand(connection, sb.toString());
     }
 
-    public String runSSHScriptPath(Connection connection, String scriptName) throws SSHCommandException {
+    public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
         return runSSHScript(connection, getScriptContent(scriptName));
     }
 
@@ -120,7 +123,7 @@ public class SSHCommandService {
 
     public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getSharedConnection(node);
+            SSHConnection connection = connectionManagerService.getSharedConnection(node);
 
             return runSSHScript(connection, script, throwsException);
 
@@ -132,7 +135,7 @@ public class SSHCommandService {
         }
     }
 
-    public String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
+    public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
 
         Session session = null;
         try (ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
@@ -156,11 +159,11 @@ public class SSHCommandService {
             t2.join();
 
             // wait for some time since the delivery of the exit status often gets delayed
-            session.waitForCondition(ChannelCondition.EXIT_STATUS, scriptOperationTimeout);
+            session.waitForCondition(ChannelCondition.EXIT_STATUS, connection.getReadTimeout());
             Integer r = session.getExitStatus();
 
             if (r == null) {
-                throw new IOException("Could not get a return status within " + scriptOperationTimeout + " milliseconds");
+                throw new IOException("Could not get a return status within " + connection.getReadTimeout() + " milliseconds");
             }
 
             int retValue = r;
@@ -196,7 +199,7 @@ public class SSHCommandService {
 
     public String runSSHCommand(String node, String command) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getSharedConnection(node);
+            SSHConnection connection = connectionManagerService.getSharedConnection(node);
             return runSSHCommand(connection, command);
         } catch (ConnectionManagerException e) {
             logger.error (e, e);
@@ -204,7 +207,7 @@ public class SSHCommandService {
         }
     }
 
-    public String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+    public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int retValue = connection.exec(command, baos);
@@ -223,7 +226,7 @@ public class SSHCommandService {
 
     public void copySCPFile(String node, String filePath) throws SSHCommandException {
         try {
-            Connection connection = connectionManagerService.getSharedConnection(node);
+            SSHConnection connection = connectionManagerService.getSharedConnection(node);
             copySCPFile(connection, filePath);
 
         } catch (ConnectionManagerException e) {
@@ -232,7 +235,7 @@ public class SSHCommandService {
         }
     }
 
-    public void copySCPFile(Connection connection, String filePath) throws SSHCommandException {
+    public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
 
         try {
 

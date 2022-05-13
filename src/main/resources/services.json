@@ -39,7 +39,7 @@
       "unique": true,
       "name" : "Zookeeper",
       "selectionLayout" : { "row" : 1, "col" : 2},
-      "memory": "neglectable",
+      "memory": "small",
       "logo" : "images/zookeeper-logo.png",
       "icon" : "images/zookeeper-icon.png"
     },
@@ -115,7 +115,7 @@
       },
       "group" : "Monitoring",
       "name" : "Grafana",
-      "memory": "kube",
+      "memory": "small",
       "logo" : "images/grafana-logo.png",
       "icon" : "images/grafana-icon.png"
     },
@@ -381,7 +381,7 @@
       "unique": true,
       "group" : "Kubernetes",
       "name" : "Dashboard",
-      "memory": "kube",
+      "memory": "small",
       "logo" : "images/kube-master-logo.png",
       "icon" : "images/kube-master-icon.png"
     },
@@ -533,7 +533,7 @@
       "unique": true,
       "group" : "Kafka",
       "name" : "Manager",
-      "memory": "kube",
+      "memory": "small",
       "logo" : "images/kafka-manager-logo.png",
       "icon" : "images/kafka-manager-icon.png"
     },
@@ -596,7 +596,7 @@
       "unique": true,
       "group" : "Spark",
       "name" : "Console",
-      "memory": "kube",
+      "memory": "small",
       "logo" : "images/spark-history-server-logo.png",
       "icon" : "images/spark-history-server-icon.png"
     },
@@ -660,7 +660,7 @@
         }
       },
       "registryOnly": true,
-      "memory": "kube",
+      "memory": "large",
       "logo" : "images/spark-runtime-logo.png",
       "icon" : "images/spark-runtime-icon.png"
     },
@@ -758,7 +758,7 @@
           "ram": "1G"
         }
       },
-      "memory": "kube",
+      "memory": "large",
       "logo" : "images/flink-runtime-logo.png",
       "icon" : "images/flink-runtime-icon.png"
     },
@@ -935,7 +935,7 @@
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Cerebro",
-      "memory": "kube",
+      "memory": "small",
       "logo" : "images/cerebro-logo.png",
       "icon" : "images/cerebro-icon.png"
     },
@@ -1080,7 +1080,7 @@
       "unique": true,
       "group" : "Elastic Stack",
       "name" : "Kibana",
-      "memory": "kube",
+      "memory": "medium",
       "logo" : "images/kibana-logo.png",
       "icon" : "images/kibana-icon.png"
     },
@@ -1156,7 +1156,7 @@
         }
       },
       "name" : "Zeppelin",
-      "memory": "kube",
+      "memory": "verylarge",
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional__commentedOut": ["spark-runtime"],
       "logo" : "images/zeppelin-logo.png",

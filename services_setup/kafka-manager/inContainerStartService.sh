@@ -43,7 +43,7 @@ echo " - Injecting topology"
 export ZOOKEEPER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 3
 fi
 
 echo " - Inject settings"

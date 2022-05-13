@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,11 +53,13 @@ public class MemoryComputerTest {
 
     private ServicesDefinition servicesDefinition;
 
-    private String jsonConfig = null;
+    private String nodesConfigString = null;
+    private String kubeServicesConfigString = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        jsonConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
+        nodesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
+        kubeServicesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"));
 
         servicesDefinition = new ServicesDefinition();
         servicesDefinition.afterPropertiesSet();
@@ -88,41 +91,85 @@ public class MemoryComputerTest {
     }
 
     @Test
-    public void testComputeMemory() throws Exception {
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(jsonConfig);
+    public void testComputeMemory_singleNode() throws Exception {
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(nodesConfigString);
+        nodesConfig.keySet().stream()
+                .filter(key -> key.contains ("192-168-10-13")
+                        || key.contains ("192-168-10-12")
+                        || (""+nodesConfig.getValueForPath(key)).contains("192.168.10.12")
+                        || (""+nodesConfig.getValueForPath(key)).contains("192.168.10.13"))
+                .forEach(nodesConfig::removeRootKey);
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(kubeServicesConfigString);
 
-        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(nodesConfig, new HashSet<>());
+        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(nodesConfig, kubeServicesConfig, new HashSet<>());
+
+        assertNotNull(res);
+        assertEquals(1, res.size());
+
+        Map<String, Long> memmModel1 = res.get("192.168.10.11");
+        assertNotNull(memmModel1);
+        assertEquals(11, memmModel1.size());
+
+        assertEquals(Long.valueOf(178), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(534), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(534), memmModel1.get("spark-runtime"));
+        assertNull(memmModel1.get("flink-runtime")); // flink is not configured
+        assertNull(memmModel1.get("grafana")); // grafana is not configured
+        assertEquals(Long.valueOf(356), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(890), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(356), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(178), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(178), memmModel1.get("cerebro"));
+        assertEquals(Long.valueOf(178), memmModel1.get("zookeeper"));
+    }
+
+    @Test
+    public void testComputeMemory_multiNode() throws Exception {
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(nodesConfigString);
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(kubeServicesConfigString);
+
+        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(nodesConfig, kubeServicesConfig, new HashSet<>());
 
         assertNotNull(res);
         assertEquals(3, res.size());
 
         Map<String, Long> memmModel1 = res.get("192.168.10.11");
         assertNotNull(memmModel1);
-        assertEquals(4, memmModel1.size());
+        assertEquals(11, memmModel1.size());
 
-        assertEquals(Long.valueOf(370), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(1110), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(740), memmModel1.get("kafka"));
-        assertNull(memmModel1.get("spark-runtime"));
-        assertEquals(Long.valueOf(1850), memmModel1.get("mesos-agent"));
+        assertEquals(Long.valueOf(240), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(720), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(720), memmModel1.get("spark-runtime"));
+        assertNull(memmModel1.get("flink-runtime")); // flink is not configured
+        assertNull(memmModel1.get("grafana")); // grafana is not configured
+        assertEquals(Long.valueOf(480), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(1200), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(480), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(240), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(240), memmModel1.get("cerebro"));
+        assertEquals(Long.valueOf(240), memmModel1.get("zookeeper"));
 
         Map<String, Long> memmModel2 = res.get("192.168.10.12");
         assertNotNull(memmModel2);
-        assertEquals(4, memmModel2.size());
+        assertEquals(10, memmModel2.size());
 
-        assertEquals(Long.valueOf(357), memmModel2.get("logstash"));
-        assertEquals(Long.valueOf(1071), memmModel2.get("elasticsearch"));
-        assertEquals(Long.valueOf(714), memmModel2.get("kafka"));
-        assertNull(memmModel2.get("spark-runtime"));
+        assertEquals(Long.valueOf(240), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(720), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(720), memmModel1.get("spark-runtime"));
+        assertNull(memmModel1.get("flink-runtime")); // flink is not configured
+        assertNull(memmModel1.get("grafana")); // grafana is not configured
+        assertEquals(Long.valueOf(480), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(1200), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(480), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(240), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(240), memmModel1.get("cerebro"));
 
         Map<String, Long> memmModel3 = res.get("192.168.10.13");
         assertNotNull(memmModel3);
-        assertEquals(3, memmModel3.size());
+        assertEquals(10, memmModel3.size());
 
-        assertEquals(Long.valueOf(723), memmModel3.get("elasticsearch"));
-        assertEquals(Long.valueOf(482), memmModel3.get("kafka"));
-        assertNull(memmModel3.get("spark-runtime"));
-        assertEquals(Long.valueOf(1205), memmModel3.get("mesos-agent"));
+        assertEquals(Long.valueOf(456), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(304), memmModel3.get("kafka"));
 
     }
 
@@ -156,9 +203,6 @@ public class MemoryComputerTest {
 
     @Test
     public void testOtherConfig() throws Exception {
-        String otherConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("MemoryComputerTest/testConfig.json"));
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(otherConfig);
 
         memoryComputer = new MemoryComputer();
         memoryComputer.setServicesDefinition(servicesDefinition);
@@ -178,26 +222,34 @@ public class MemoryComputerTest {
             }
         });
 
-        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(nodesConfig, new HashSet<>());
+        Map<String, Map<String, Long>> res = memoryComputer.computeMemory(
+                StandardSetupHelpers.getStandard2NodesSetup(),
+                StandardSetupHelpers.getStandardKubernetesConfig(), new HashSet<>());
+
+        assertNotNull(res);
+        assertEquals(2, res.size());
 
         Map<String, Long> memmModel1 = res.get("192.168.10.11");
         assertNotNull(memmModel1);
-        assertEquals(4, memmModel1.size());
+        assertEquals(10, memmModel1.size());
 
-        assertNull(memmModel1.get("ntp"));
-        assertNull(memmModel1.get("prometheus"));
-        assertNull(memmModel1.get("gluster"));
-        assertNull(memmModel1.get("cerebro"));
-        assertNull(memmModel1.get("grafana"));
-        assertNull(memmModel1.get("kafka-manager"));
-        assertNull(memmModel1.get("zeppelin"));
-        assertNull(memmModel1.get("kibana"));
-        assertEquals(Long.valueOf(3960), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(1320), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(2640), memmModel1.get("kafka"));
-        assertNull(memmModel1.get("spark-runtime"));
-        assertNull(memmModel1.get("flink-runtime"));
-        assertEquals(Long.valueOf(6600), memmModel1.get("mesos-agent"));
+        assertEquals(Long.valueOf(840), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(2520), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(2520), memmModel1.get("spark-runtime"));
+        assertNull(memmModel1.get("flink-runtime")); // flink is not configured
+        assertNull(memmModel1.get("grafana")); // grafana is not configured
+        assertEquals(Long.valueOf(1680), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(4200), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(1680), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(840), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(840), memmModel1.get("cerebro"));
         assertNull(memmModel1.get("zookeeper"));
+
+        Map<String, Long> memmModel3 = res.get("192.168.10.13");
+        assertNotNull(memmModel3);
+        assertEquals(11, memmModel3.size());
+
+        assertEquals(Long.valueOf(2412), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(1608), memmModel3.get("kafka"));
     }
 }

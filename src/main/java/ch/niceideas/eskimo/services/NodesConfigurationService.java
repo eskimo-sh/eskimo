@@ -67,9 +67,6 @@ public class NodesConfigurationService {
     private ProxyManagerService proxyManagerService;
 
     @Autowired
-    private MarathonService marathonService;
-
-    @Autowired
     private KubernetesService kubernetesService;
 
     @Autowired
@@ -118,10 +115,6 @@ public class NodesConfigurationService {
     void setProxyManagerService(ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
     }
-    @Deprecated
-    void setMarathonService (MarathonService marathonService) {
-        this.marathonService = marathonService;
-    }
     void setKubernetesService (KubernetesService kubernetesService) {
         this.kubernetesService = kubernetesService;
     }
@@ -160,13 +153,13 @@ public class NodesConfigurationService {
                             .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, ServiceOperationsCommand.BASE_SYSTEM, nodeSetupPair.getValue()))
                             .collect(Collectors.toList());
 
-            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, deadIps);
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+
+            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadIps);
 
             if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
-
-            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
             // Nodes setup
             systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
@@ -280,7 +273,7 @@ public class NodesConfigurationService {
     }
 
     void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
-        Connection connection = null;
+        SSHConnection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
@@ -307,7 +300,7 @@ public class NodesConfigurationService {
         return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-kubernetes.sh");
     }
 
-    void copyCommand (String source, String target, Connection connection) throws SSHCommandException {
+    void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException {
         sshCommandService.copySCPFile(connection, servicesSetupPath + "/base-eskimo/" + source);
         sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", source, target});
         sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chown", "root.root", target});
@@ -328,7 +321,7 @@ public class NodesConfigurationService {
     void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, MemoryModel memoryModel, String node)
             throws SystemException, SSHCommandException, IOException {
 
-        Connection connection = null;
+        SSHConnection connection = null;
         try {
 
             connection = connectionManagerService.getPrivateConnection(node);
@@ -392,7 +385,7 @@ public class NodesConfigurationService {
     }
 
     private void uploadKubernetes(String node) throws SSHCommandException, SystemException {
-        Connection connection = null;
+        SSHConnection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
@@ -464,7 +457,7 @@ public class NodesConfigurationService {
     private void proceedWithServiceUninstallation(MessageLogger ml, String node, String service)
             throws SSHCommandException, SystemException {
 
-        Connection connection = null;
+        SSHConnection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
@@ -513,7 +506,7 @@ public class NodesConfigurationService {
 
         String imageName = servicesDefinition.getService(service).getImageName();
 
-        Connection connection = null;
+        SSHConnection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
 
@@ -538,15 +531,15 @@ public class NodesConfigurationService {
         }
     }
 
-    private void sshChmod755 (Connection connection, String file) throws SSHCommandException {
+    private void sshChmod755 (SSHConnection connection, String file) throws SSHCommandException {
         sshChmod (connection, file, "755");
     }
 
-    private void sshChmod (Connection connection, String file, String mode) throws SSHCommandException {
+    private void sshChmod (SSHConnection connection, String file, String mode) throws SSHCommandException {
         sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chmod", mode, file});
     }
 
-    String getNodeFlavour(Connection connection) throws SSHCommandException, SystemException {
+    String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException {
         // Find out if debian or RHEL or SUSE
         String flavour = null;
         String rawIsDebian = sshCommandService.runSSHScript(connection, "if [[ -f /etc/debian_version ]]; then echo debian; fi");

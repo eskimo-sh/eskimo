@@ -71,10 +71,11 @@ while [[ -f /etc/k8s/k8s_poststart_management_lock ]] ; do
     fi
 done
 
-touch /etc/k8s/k8s_poststart_management_lock
 
 trap delete_k8s_poststart_lock_file 15
 trap delete_k8s_poststart_lock_file EXIT
+
+touch /etc/k8s/k8s_poststart_management_lock
 
 set -e
 

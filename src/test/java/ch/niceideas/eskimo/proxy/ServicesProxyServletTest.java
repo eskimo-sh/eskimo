@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
@@ -79,11 +80,11 @@ public class ServicesProxyServletTest {
 
         pms.setConnectionManagerService(new ConnectionManagerService() {
             @Override
-            protected void recreateTunnels(Connection connection, String node) throws ConnectionManagerException {
+            protected void recreateTunnels(SSHConnection connection, String node){
                 // No Op
             }
             @Override
-            public void recreateTunnels(String host) throws ConnectionManagerException {
+            public void recreateTunnels(String host) {
                 // No Op
             }
         });

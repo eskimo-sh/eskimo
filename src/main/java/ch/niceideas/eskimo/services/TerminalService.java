@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Session;
 import ch.niceideas.eskimo.terminal.SshProcessWithPty;
@@ -186,7 +187,7 @@ public class TerminalService {
 
             String node = extractArgument (terminalBody, "node");
 
-            Connection con = connectionManagerService.getPrivateConnection(node);
+            SSHConnection con = connectionManagerService.getPrivateConnection(node);
 
             com.trilead.ssh2.Session innerSession = con.openSession();
 

@@ -37,10 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import com.trilead.ssh2.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,7 +98,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
         systemService.setSshCommandService(new SSHCommandService() {
             @Override
-            public String runSSHScript(Connection connection, String script, boolean throwsException) {
+            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
@@ -116,7 +113,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public String runSSHCommand(Connection connection, String command) {
+            public String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
@@ -125,7 +122,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public void copySCPFile(Connection connection, String filePath) {
+            public void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override

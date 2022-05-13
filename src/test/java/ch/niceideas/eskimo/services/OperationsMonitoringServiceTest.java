@@ -90,25 +90,6 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         };
     }
 
-    @Override
-    protected MarathonService createMarathonService() {
-        return new MarathonService() {
-            @Override
-            protected Pair<String, String> getAndWaitServiceRuntimeNode(String service, int numberOfAttempts) {
-                return new Pair<>("192.168.10.11", "running");
-            }
-            @Override
-            protected String queryMarathon (String endpoint, String method) throws MarathonException {
-                return "{}";
-            }
-            @Override
-            protected String restartServiceMarathonInternal(Service service) throws MarathonException {
-                // No Op
-                return "";
-            }
-        };
-    }
-
     @Test
     public void testInterruption() throws Exception {
 
@@ -150,7 +131,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         SSHCommandService sshCommandService = new SSHCommandService() {
             @Override
-            public synchronized String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
+            public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
@@ -169,7 +150,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public synchronized String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+            public synchronized String runSSHCommand(SSHConnection connection, String command) {
                 return runSSHCommand((String)null, command);
             }
             @Override
@@ -182,7 +163,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public synchronized void copySCPFile(Connection connection, String filePath) {
+            public synchronized void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override
@@ -203,11 +184,11 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 // no Op
             }
             @Override
-            public Connection getPrivateConnection (String node) {
+            public SSHConnection getPrivateConnection (String node) {
                 return null;
             }
             @Override
-            public Connection getSharedConnection (String node) {
+            public SSHConnection getSharedConnection (String node) {
                 return null;
             }
         });
@@ -256,7 +237,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         SSHCommandService sshCommandService = new SSHCommandService() {
             @Override
-            public synchronized String runSSHScript(Connection connection, String script, boolean throwsException) throws SSHCommandException {
+            public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
                 return runSSHScript((String)null, script, throwsException);
             }
             @Override
@@ -284,7 +265,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public synchronized String runSSHCommand(Connection connection, String command) throws SSHCommandException {
+            public synchronized String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
                 return runSSHCommand((String)null, command);
             }
             @Override
@@ -297,7 +278,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 return testSSHCommandResultBuilder.toString();
             }
             @Override
-            public synchronized void copySCPFile(Connection connection, String filePath) {
+            public synchronized void copySCPFile(SSHConnection connection, String filePath) {
                 // just do nothing
             }
             @Override
@@ -318,11 +299,11 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 // no Op
             }
             @Override
-            public Connection getPrivateConnection (String node) {
+            public SSHConnection getPrivateConnection (String node) {
                 return null;
             }
             @Override
-            public Connection getSharedConnection (String node) {
+            public SSHConnection getSharedConnection (String node) {
                 return null;
             }
         });

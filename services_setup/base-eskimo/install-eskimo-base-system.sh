@@ -490,7 +490,7 @@ sudo /usr/bin/getent group eskimoservices 2>&1 > /dev/null || sudo /usr/sbin/gro
 
 echo "  - Creating common system users"
 
-cat > /tmp/eskimo-check-users.sh <<- "EOF"
+cat > /tmp/eskimo-system-checks.sh <<- "EOF"
 #!/usr/bin/env bash
 
 function create_user_infrastructure() {
@@ -549,10 +549,13 @@ create_user_infrastructure marathon 3306
 
 create_user_infrastructure kubernetes 3307
 
+# removing all remaining locks
+rm -Rf /etc/k8s/k8s_poststart_management_lock
+
 EOF
 
-sudo mv /tmp/eskimo-check-users.sh /usr/local/sbin/eskimo-check-users.sh
-sudo chmod 754 /usr/local/sbin/eskimo-check-users.sh
+sudo mv /tmp/eskimo-system-checks.sh /usr/local/sbin/eskimo-system-checks.sh
+sudo chmod 754 /usr/local/sbin/eskimo-system-checks.sh
 
 cat > /tmp/eskimo-startup-checks.service <<- "EOF"
 [Unit]
@@ -561,7 +564,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/sbin/eskimo-check-users.sh
+ExecStart=/usr/local/sbin/eskimo-system-checks.sh
 Restart=on-abort
 
 [Install]

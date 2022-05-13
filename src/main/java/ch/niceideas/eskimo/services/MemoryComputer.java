@@ -34,8 +34,10 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,11 +86,11 @@ public class MemoryComputer {
 
 
 
-    public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
-        return new MemoryModel(computeMemory(nodesConfig, deadIps));
+    public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<String> deadIps) throws SystemException {
+        return new MemoryModel(computeMemory(nodesConfig, kubeServicesConfig, deadIps));
     }
 
-    Map<String, Map<String, Long>> computeMemory(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
+    Map<String, Map<String, Long>> computeMemory(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<String> deadIps) throws SystemException {
 
         // returns ipAdress -> service -> memory in MB
         Map<String, Map<String, Long>> retMap = new HashMap<>();
@@ -108,19 +110,48 @@ public class MemoryComputer {
             //       assume filesystem cache has to keep a high share (3) or medium share (2) => dynamical
             Set<String> services = new HashSet<>(nodesConfig.getServicesForNode(node));
 
-            Long sumOfParts = services.stream()
-                    .map (service -> servicesDefinition.getService(service))
+            long sumOfParts = services.stream()
+                    .map (serviceName -> servicesDefinition.getService(serviceName))
                     .map (service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
                     .reduce( (long)(totalMemory > 10000 ? 3 : 2), Long::sum); // the filesystem cache is considered always 3 or 2
 
-            // 2.2. Dive the total memory by the total shards => gives us the value of a shard
+            // 3. Now get full memory required for Kubernetes services, divide it by number of nodes and add it to each node
+            if (kubeServicesConfig != null) {
+
+                // 3.1 non unique services are considered on the node
+                sumOfParts += (kubeServicesConfig.getEnabledServices().stream()
+                        .map(serviceName -> servicesDefinition.getService(serviceName))
+                        .filter(service -> !service.isUnique())
+                        .map(service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
+                        .reduce(0L, Long::sum));
+
+                // 3.2, Unique services sum is divided by number of nodes
+                long sumOfUniqueParts = (kubeServicesConfig.getEnabledServices().stream()
+                        .map(serviceName -> servicesDefinition.getService(serviceName))
+                        .filter(Service::isUnique)
+                        .map(service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
+                        .reduce(0L, Long::sum));
+
+                sumOfParts += (sumOfUniqueParts / memoryMap.size());
+
+            }
+
+            // 4.1. Dive the total memory by the total shards => gives us the value of a shard
             long valueOfShard = (totalMemory - reservedMemoryMb) / sumOfParts;
 
-            // 2.3 Now assign the memory to every service for the nide
+            // 4.1 Now assign the memory to every node service for the node
             services.stream()
                     .map (service -> servicesDefinition.getService(service))
                     .filter (service -> service.getMemoryConsumptionSize().getNbrParts() > 0)
                     .forEach(service -> nodeMemoryModel.put (service.getName(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
+
+            // 4.2 Do the same for multiple kubernetes services
+            if (kubeServicesConfig != null) {
+                kubeServicesConfig.getEnabledServices().stream()
+                        .map(service -> servicesDefinition.getService(service))
+                        .filter(service -> service.getMemoryConsumptionSize().getNbrParts() > 0)
+                        .forEach(service -> nodeMemoryModel.put(service.getName(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
+            }
 
             retMap.put(node, nodeMemoryModel);
         }
