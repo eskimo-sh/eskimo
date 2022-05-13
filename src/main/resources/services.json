@@ -332,7 +332,7 @@
       "group" : "Kubernetes",
       "name" : "Slave",
       "selectionLayout" : { "row" : 5, "col" : 1},
-      "memory": "verylarge",
+      "memory": "NEGLECTABLE",
       "logo" : "images/kube-slave-logo.png",
       "icon" : "images/kube-slave-icon.png"
     },

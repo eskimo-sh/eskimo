@@ -108,19 +108,19 @@ public class MemoryComputerTest {
 
         Map<String, Long> memmModel1 = res.get("192.168.10.11");
         assertNotNull(memmModel1);
-        assertEquals(11, memmModel1.size());
+        assertEquals(10, memmModel1.size());
 
-        assertEquals(Long.valueOf(178), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(534), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(534), memmModel1.get("spark-runtime"));
+        assertEquals(Long.valueOf(219), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(657), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(657), memmModel1.get("spark-runtime"));
         assertNull(memmModel1.get("flink-runtime")); // flink is not configured
         assertNull(memmModel1.get("grafana")); // grafana is not configured
-        assertEquals(Long.valueOf(356), memmModel1.get("kibana"));
-        assertEquals(Long.valueOf(890), memmModel1.get("zeppelin"));
-        assertEquals(Long.valueOf(356), memmModel1.get("kafka"));
-        assertEquals(Long.valueOf(178), memmModel1.get("kafka-manager"));
-        assertEquals(Long.valueOf(178), memmModel1.get("cerebro"));
-        assertEquals(Long.valueOf(178), memmModel1.get("zookeeper"));
+        assertEquals(Long.valueOf(438), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(1095), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(438), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(219), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(219), memmModel1.get("cerebro"));
+        assertEquals(Long.valueOf(219), memmModel1.get("zookeeper"));
     }
 
     @Test
@@ -135,41 +135,41 @@ public class MemoryComputerTest {
 
         Map<String, Long> memmModel1 = res.get("192.168.10.11");
         assertNotNull(memmModel1);
-        assertEquals(11, memmModel1.size());
+        assertEquals(10, memmModel1.size());
 
-        assertEquals(Long.valueOf(240), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(720), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(720), memmModel1.get("spark-runtime"));
+        assertEquals(Long.valueOf(321), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(963), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(963), memmModel1.get("spark-runtime"));
         assertNull(memmModel1.get("flink-runtime")); // flink is not configured
         assertNull(memmModel1.get("grafana")); // grafana is not configured
-        assertEquals(Long.valueOf(480), memmModel1.get("kibana"));
-        assertEquals(Long.valueOf(1200), memmModel1.get("zeppelin"));
-        assertEquals(Long.valueOf(480), memmModel1.get("kafka"));
-        assertEquals(Long.valueOf(240), memmModel1.get("kafka-manager"));
-        assertEquals(Long.valueOf(240), memmModel1.get("cerebro"));
-        assertEquals(Long.valueOf(240), memmModel1.get("zookeeper"));
+        assertEquals(Long.valueOf(642), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(1605), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(642), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(321), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(321), memmModel1.get("cerebro"));
+        assertEquals(Long.valueOf(321), memmModel1.get("zookeeper"));
 
         Map<String, Long> memmModel2 = res.get("192.168.10.12");
         assertNotNull(memmModel2);
-        assertEquals(10, memmModel2.size());
+        assertEquals(9, memmModel2.size());
 
-        assertEquals(Long.valueOf(240), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(720), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(720), memmModel1.get("spark-runtime"));
+        assertEquals(Long.valueOf(321), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(963), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(963), memmModel1.get("spark-runtime"));
         assertNull(memmModel1.get("flink-runtime")); // flink is not configured
         assertNull(memmModel1.get("grafana")); // grafana is not configured
-        assertEquals(Long.valueOf(480), memmModel1.get("kibana"));
-        assertEquals(Long.valueOf(1200), memmModel1.get("zeppelin"));
-        assertEquals(Long.valueOf(480), memmModel1.get("kafka"));
-        assertEquals(Long.valueOf(240), memmModel1.get("kafka-manager"));
-        assertEquals(Long.valueOf(240), memmModel1.get("cerebro"));
+        assertEquals(Long.valueOf(642), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(1605), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(642), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(321), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(321), memmModel1.get("cerebro"));
 
         Map<String, Long> memmModel3 = res.get("192.168.10.13");
         assertNotNull(memmModel3);
-        assertEquals(10, memmModel3.size());
+        assertEquals(9, memmModel3.size());
 
-        assertEquals(Long.valueOf(456), memmModel3.get("elasticsearch"));
-        assertEquals(Long.valueOf(304), memmModel3.get("kafka"));
+        assertEquals(Long.valueOf(621), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(414), memmModel3.get("kafka"));
 
     }
 
@@ -231,25 +231,25 @@ public class MemoryComputerTest {
 
         Map<String, Long> memmModel1 = res.get("192.168.10.11");
         assertNotNull(memmModel1);
-        assertEquals(10, memmModel1.size());
+        assertEquals(9, memmModel1.size());
 
-        assertEquals(Long.valueOf(840), memmModel1.get("logstash"));
-        assertEquals(Long.valueOf(2520), memmModel1.get("elasticsearch"));
-        assertEquals(Long.valueOf(2520), memmModel1.get("spark-runtime"));
+        assertEquals(Long.valueOf(1087), memmModel1.get("logstash"));
+        assertEquals(Long.valueOf(3261), memmModel1.get("elasticsearch"));
+        assertEquals(Long.valueOf(3261), memmModel1.get("spark-runtime"));
         assertNull(memmModel1.get("flink-runtime")); // flink is not configured
         assertNull(memmModel1.get("grafana")); // grafana is not configured
-        assertEquals(Long.valueOf(1680), memmModel1.get("kibana"));
-        assertEquals(Long.valueOf(4200), memmModel1.get("zeppelin"));
-        assertEquals(Long.valueOf(1680), memmModel1.get("kafka"));
-        assertEquals(Long.valueOf(840), memmModel1.get("kafka-manager"));
-        assertEquals(Long.valueOf(840), memmModel1.get("cerebro"));
+        assertEquals(Long.valueOf(2174), memmModel1.get("kibana"));
+        assertEquals(Long.valueOf(5435), memmModel1.get("zeppelin"));
+        assertEquals(Long.valueOf(2174), memmModel1.get("kafka"));
+        assertEquals(Long.valueOf(1087), memmModel1.get("kafka-manager"));
+        assertEquals(Long.valueOf(1087), memmModel1.get("cerebro"));
         assertNull(memmModel1.get("zookeeper"));
 
         Map<String, Long> memmModel3 = res.get("192.168.10.13");
         assertNotNull(memmModel3);
-        assertEquals(11, memmModel3.size());
+        assertEquals(10, memmModel3.size());
 
-        assertEquals(Long.valueOf(2412), memmModel3.get("elasticsearch"));
-        assertEquals(Long.valueOf(1608), memmModel3.get("kafka"));
+        assertEquals(Long.valueOf(3081), memmModel3.get("elasticsearch"));
+        assertEquals(Long.valueOf(2054), memmModel3.get("kafka"));
     }
 }
