@@ -143,7 +143,7 @@ else
     if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
           `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
 
-        bash -c "echo \"gateway.recover_after_data_nodes: $number_of_master_nodes\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
+        bash -c "echo \"gateway.recover_after_data_nodes: 1\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
     fi
 fi
 

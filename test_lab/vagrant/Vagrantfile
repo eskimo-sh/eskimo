@@ -56,25 +56,25 @@ end
 
 # Define cluster nodes
 nodes = [
-  { :hostname => 'deb-node1', :box => 'debian/buster64',  :ip => '192.168.56.11', :ram => 8000 },
-  { :hostname => 'deb-node2', :box => 'ubuntu/xenial64',  :ip => '192.168.56.12', :ram => 8000 },
-  { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.56.13', :ram => 8000},
-  { :hostname => 'cent-node2', :box => 'fedora/31-cloud-base', :ip => '192.168.56.14', :ram => 8000 },
-  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.56.15', :ram => 10000},
-  { :hostname => 'test-node1', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.21', :ram => 8000},
-  { :hostname => 'test-node2', :box => 'centos/7',  :ip => '192.168.56.22', :ram => 8000},
-  { :hostname => 'test-node3', :box => 'ubuntu/xenial64',  :ip => '192.168.56.23', :ram => 8000},
-  { :hostname => 'test-node4', :box => 'fedora/35-cloud-base', :ip => '192.168.56.24', :ram => 8000 },
-  { :hostname => 'test-large', :box => 'centos/7',  :ip => '192.168.56.31', :ram => 10000},
-  { :hostname => 'integration-test', :box => 'centos/7',  :ip => '192.168.56.41', :ram => 14000},
-  { :hostname => 'integration-test1', :box => 'centos/7',  :ip => '192.168.56.51', :ram => 6500},
-  { :hostname => 'integration-test2', :box => 'centos/7',  :ip => '192.168.56.52', :ram => 6500},
-  { :hostname => 'integration-test3', :box => 'centos/7',  :ip => '192.168.56.53', :ram => 6500},
-  { :hostname => 'integration-test4', :box => 'centos/7',  :ip => '192.168.56.54', :ram => 6500},
-  { :hostname => 'small-node1', :box => 'centos/7',  :ip => '192.168.56.71', :ram => 6000},
-  { :hostname => 'small-node2', :box => 'centos/7',  :ip => '192.168.56.72', :ram => 6000},
-  { :hostname => 'small-node3', :box => 'centos/7',  :ip => '192.168.56.73', :ram => 6000},
-  { :hostname => 'small-node4', :box => 'centos/7',  :ip => '192.168.56.74', :ram => 6000},
+  { :hostname => 'deb-node1', :box => 'debian/buster64',  :ip => '192.168.56.11', :ram => 8000, :cpu => 2 },
+  { :hostname => 'deb-node2', :box => 'ubuntu/xenial64',  :ip => '192.168.56.12', :ram => 8000, :cpu => 2  },
+  { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.56.13', :ram => 8000, :cpu => 2 },
+  { :hostname => 'cent-node2', :box => 'fedora/31-cloud-base', :ip => '192.168.56.14', :ram => 8000, :cpu => 2  },
+  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.56.15', :ram => 10000, :cpu => 2 },
+  { :hostname => 'test-node1', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.21', :ram => 8000, :cpu => 2 },
+  { :hostname => 'test-node2', :box => 'centos/7',  :ip => '192.168.56.22', :ram => 8000, :cpu => 2 },
+  { :hostname => 'test-node3', :box => 'ubuntu/xenial64',  :ip => '192.168.56.23', :ram => 8000, :cpu => 2 },
+  { :hostname => 'test-node4', :box => 'fedora/35-cloud-base', :ip => '192.168.56.24', :ram => 8000, :cpu => 2  },
+  { :hostname => 'test-large', :box => 'bento/opensuse-leap-15.1',  :ip => '192.168.56.31', :ram => 14000, :cpu => 4 },
+  { :hostname => 'integration-test', :box => 'centos/7',  :ip => '192.168.56.41', :ram => 14000, :cpu => 2 },
+  { :hostname => 'integration-test1', :box => 'centos/7',  :ip => '192.168.56.51', :ram => 6500, :cpu => 2 },
+  { :hostname => 'integration-test2', :box => 'centos/7',  :ip => '192.168.56.52', :ram => 6500, :cpu => 2 },
+  { :hostname => 'integration-test3', :box => 'centos/7',  :ip => '192.168.56.53', :ram => 6500, :cpu => 2 },
+  { :hostname => 'integration-test4', :box => 'centos/7',  :ip => '192.168.56.54', :ram => 6500, :cpu => 2 },
+  { :hostname => 'small-node1', :box => 'centos/7',  :ip => '192.168.56.71', :ram => 6000, :cpu => 2 },
+  { :hostname => 'small-node2', :box => 'centos/7',  :ip => '192.168.56.72', :ram => 6000, :cpu => 2 },
+  { :hostname => 'small-node3', :box => 'centos/7',  :ip => '192.168.56.73', :ram => 6000, :cpu => 2 },
+  { :hostname => 'small-node4', :box => 'centos/7',  :ip => '192.168.56.74', :ram => 6000, :cpu => 2 },
 ]
 
 # Ubuntu xenial requires :
@@ -106,6 +106,7 @@ Vagrant.configure("2") do |config|
       nodeconfig.vm.network :private_network, ip: node[:ip]
       # This actually doesn't work since it would require to change the partitions on the VM
       memory = node[:ram] ? node[:ram] : 2500;
+      cpu = node[:cpu] ? node[:cpu] : 2;
 
       # force rsync for libvirt
       nodeconfig.vm.synced_folder './', '/vagrant', type: 'rsync'
@@ -115,7 +116,7 @@ Vagrant.configure("2") do |config|
         vb.name = node[:hostname]
         vb.customize ["modifyvm", :id, "--memory", memory.to_s]
         vb.customize ["modifyvm", :id, "--ioapic", "on"]
-        vb.customize ["modifyvm", :id, "--cpus", "2"]
+        vb.customize ["modifyvm", :id, "--cpus", cpu.to_s]
       end
 
       # Config for libvirt

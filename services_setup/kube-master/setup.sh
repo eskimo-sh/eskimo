@@ -77,11 +77,22 @@ fi
 bash ./setup-kube-common.sh
 fail_if_error $? /dev/null 101
 
+if [[ -d /lib/systemd/system/ ]]; then
+    export systemd_units_dir=/lib/systemd/system/
+elif [[ -d /usr/lib/systemd/system/ ]]; then
+    export systemd_units_dir=/usr/lib/systemd/system/
+else
+    echo "Couldn't find systemd unit files directory"
+    exit 24
+fi
+
+set -e
+
 echo " - Copying SystemD unit files to /lib/systemd/system"
 for i in `find ./service_files -mindepth 1`; do
-    sudo cp $i /lib/systemd/system/
+    sudo cp $i $systemd_units_dir
     filename=`echo $i | cut -d '/' -f 3`
-    sudo chmod 755 /lib/systemd/system/$filename
+    sudo chmod 755 $systemd_units_dir$filename
 done
 
 echo " - Copying K8s service files to /etc/k8s/services"
@@ -92,6 +103,7 @@ for i in `find ./k8s-service_files -mindepth 1`; do
     sudo chmod 755 /etc/k8s/services/$filename
 done
 
+set +e
 
 # Setup all individual services
 bash ./setup-k8s-registry.sh

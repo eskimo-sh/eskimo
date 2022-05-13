@@ -654,7 +654,7 @@ eskimo.Main = function() {
         let menuContainerHeight = $("#hoe-left-panel").height();
         let actualMenuHeight = $("#menu-container").height();
 
-        console.log(menuContainerHeight, actualMenuHeight, menuHidingPos);
+        //console.log(menuContainerHeight, actualMenuHeight, menuHidingPos);
 
         // IF AND ONLY IF size is not sufficient for current menu site, THEN
         if (menuContainerHeight - 80 < actualMenuHeight) {

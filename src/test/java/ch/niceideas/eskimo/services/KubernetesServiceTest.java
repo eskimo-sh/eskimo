@@ -476,4 +476,10 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         assertEquals("http://localhost:12345/v2/apps/cerebro", kubernetesApiCalls.get(1));
     }
 
+    @Test
+    public void testEnsureKubernetesAvailability() throws Exception {
+        // do a kubectl get service kubernetes and ensure available
+        fail ("To Be Implemented");
+    }
+
 }
