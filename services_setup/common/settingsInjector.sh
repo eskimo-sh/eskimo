@@ -71,6 +71,73 @@ function echoDebug() {
     fi
 }
 
+function injectRegexProperty () {
+    SERVICE=$1
+    filename=$2
+    propertyFormat=$3
+    commentPrefix=$4
+    filesystemService=$5
+    name=$6
+    value=$7
+
+    echoDebug "injectRegexProperty $SERVICE $filename $propertyFormat $commentPrefix $name"
+
+    export sedName=`echo $name | sed -e 's/\[\]\/\-$*^/\\&/g'`
+    echoDebug "sedName=$sedName"
+
+    export sedValue=`echo $value | sed -e 's/\[\]\/\-$*^/\\&/g'`
+    echoDebug "sedValue=$sedValue"
+
+    #export sedPattern=`echo $propertyFormat | sed "s/\{value\}/\(.*\)/g"`
+    export sedPattern=`echo $propertyFormat | sed "s/{value}/.*/" | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/`
+    echoDebug "sedPattern=$sedPattern"
+
+    export searchedResult=`echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g"`
+    echoDebug "searchedResult=$searchedResult"
+
+    # Search for $filename under /usr/local/lib/$SERVICE
+    for i in `find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename `; do
+        echo "     == processing $i"
+
+        echoDebug "replacing $name $value"
+
+        sed -i s/"$sedPattern"/"\1$sedValue"/g $i
+
+        # add variable if not found
+        echoDebug "check if variable is found"
+        if [[ `grep "$searchedResult" $i` == "" ]]; then
+
+            echoDebug "adding not found variable"
+
+            echoDebug "bash -c \"echo -e \\\"$searchedResult\\\"  >> $i\""
+            bash -c "echo -e \"$searchedResult\"  >> $i"
+
+        else
+
+            # remove comment prefix if found
+            if [[ `grep "$commentPrefix$searchedResult" $i` != "" ]]; then
+
+                export commentValue=`echo $commentPrefix$searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+                export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+
+                echoDebug " removing comment"
+
+                echoDebug "sed -i s/\"$commentValue\"/\"$freeValue\"/g $i"
+                sed -i s/"$commentValue"/"$freeValue"/g $i
+            fi
+
+        fi
+
+        # Assess it's found as expected (using propertyFormat)
+        if [[ `grep "^$freeValue" $i` == "" ]]; then
+            echo "Unable to perform replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
+            exit 5
+        fi
+
+    done
+}
+
+
 function injectVariableProperty () {
     SERVICE=$1
     filename=$2
@@ -161,6 +228,7 @@ function injectVariableProperty () {
 
 echoDebug "finding filenames"
 
+
 IFS=$'\n'
 for settingsFile in `jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\") | {filename,propertyType,propertyFormat,commentPrefix,filesystemService}" $SETTINGS_FILE`; do
 
@@ -183,12 +251,16 @@ for settingsFile in `jq -c  ".settings | .[] | .settings | .[] | select (.servic
         # Don't overwrite values that need to be kept to default
         if [[ "$value" != "[ESKIMO_DEFAULT]" ]]; then
 
+            echoDebug ""
             echoDebug "Found property $name : $value"
 
             # TODO Implement additional cases as they appear
             case "$propertyType" in
                 VARIABLE)
                     injectVariableProperty $SERVICE $filename $propertyFormat $commentPrefix $filesystemService $name $value
+                    ;;
+                REGEX)
+                    injectRegexProperty $SERVICE $filename $propertyFormat $commentPrefix $filesystemService $name $value
                     ;;
                 *)
                     echo "Unknown property type $propertyType";

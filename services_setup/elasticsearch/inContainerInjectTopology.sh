@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 #
@@ -152,9 +153,12 @@ fi
 #bash -c "echo \"# for node-to-node communication, you should explicitly set network.publish_host.\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 #bash -c "echo \"network.publish_host: $SELF_IP_ADDRESS\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
-
+echo " - Applying eskimo memory settings from topology in jvm.options"
+echo "# Eskimo memory settings" > /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
 if [[ $MEMORY_ELASTICSEARCH != "" ]]; then
-    echo " - Applying eskimo memory settings from topology in jvm.options"
-    sed -i s/"-Xms1g"/"-Xms"$MEMORY_ELASTICSEARCH"m"/g /usr/local/lib/elasticsearch/config/jvm.options
-    sed -i s/"-Xmx1g"/"-Xmx"$MEMORY_ELASTICSEARCH"m"/g /usr/local/lib/elasticsearch/config/jvm.options
+    echo "-Xms"$MEMORY_ELASTICSEARCH"m" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
+    echo "-Xmx"$MEMORY_ELASTICSEARCH"m" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
+else
+    echo "-Xms1g" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
+    echo "-Xmx1g" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
 fi

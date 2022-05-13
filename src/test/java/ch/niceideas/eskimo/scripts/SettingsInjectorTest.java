@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -61,6 +62,7 @@ public class SettingsInjectorTest {
     private File sparkFile;
     private File esFile;
     private File grafanaFile;
+    private File cerebroJVMFile;
 
     /** Run Test on Linux only */
     @BeforeEach
@@ -106,6 +108,10 @@ public class SettingsInjectorTest {
         esFile = copyFile (tempFile, "elasticsearch/config/elasticsearch.yml");
         grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
+        cerebroJVMFile = new File (tempFile,"usr_local_lib/cerebro/config/eskimo.options");
+        cerebroJVMFile.getParentFile().mkdirs();
+        FileUtils.writeFile(cerebroJVMFile, "# test\n-Xms1g\n-Xmx1g");
+
         settingsInjectorScriptFile = new File ("services_setup/common/settingsInjector.sh");
         //System.out.println(System.getProperty("user.dir"));
         assertTrue (settingsInjectorScriptFile.exists());
@@ -131,6 +137,33 @@ public class SettingsInjectorTest {
     @AfterEach
     public void tearDown() throws Exception {
         new File (tempFolder).delete();
+    }
+
+    @Test
+    public void testElasticSearchJVMOptions() throws Exception {
+
+        String result = ProcessHelper.exec(new String[]{
+                "bash",
+                "-c",
+                "export SETTING_INJECTOR_DEBUG=1 && " +
+                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
+                        "bash " +
+                        settingsInjectorScriptFile.getCanonicalPath() +
+                        " cerebro " +
+                        settingsFile.getCanonicalPath() +
+                        " ; " +
+                        "exit $?"}, true);
+        logger.info(result);
+
+        // ensure properties were found
+        assertTrue(result.contains("== Found property Xms : 600m"));
+        assertTrue(result.contains("== Found property Xmx : 600m"));
+
+        String cerebroJVMFileContent = FileUtils.readFile(cerebroJVMFile);
+
+        assertTrue(cerebroJVMFileContent.contains("-Xms600m"));
+        assertTrue(cerebroJVMFileContent.contains("-Xmx600m"));
+        assertTrue(cerebroJVMFileContent.contains("# test"));
     }
 
     @Test
@@ -251,5 +284,6 @@ public class SettingsInjectorTest {
         assertTrue(result.endsWith("== finding filenames\n"));
 
     }
+
 
 }

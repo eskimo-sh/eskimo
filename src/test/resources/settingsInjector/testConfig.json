@@ -29,7 +29,30 @@
       "name": "logstash"
     },
     {
-      "settings": [],
+      "settings": [
+        {
+          "filename": "eskimo.options",
+          "propertyType": "REGEX",
+          "propertyFormat": "{name}{value}",
+          "commentPrefix": "#",
+          "service": "cerebro",
+          "filesystemService": "cerebro",
+          "properties": [
+            {
+              "name": "Xms",
+              "comment": "Startup Heap Size for ES java process\n [ESKIMO_DEFAULT] means memory allocator will decide of ES memory share.",
+              "defaultValue": "[ESKIMO_DEFAULT]",
+              "value": "600m"
+            },
+            {
+              "name": "Xmx",
+              "comment": "Maximum Heap Size for ES java process\n [ESKIMO_DEFAULT] means memory allocator will decide of ES memory share.",
+              "defaultValue": "[ESKIMO_DEFAULT]",
+              "value": "600m"
+            }
+          ]
+        }
+      ],
       "name": "cerebro"
     },
     {

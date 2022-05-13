@@ -622,7 +622,7 @@
           "type" : "PLAIN",
           "source" : "newBaseURI = words.slice(0, ind).join('/');",
           "target": "newBaseURI = words.slice(0, ind - 1).join('/');"
-        },
+        }
       ]
     },
     "dependencies": [
@@ -990,6 +990,25 @@
     ],
     "editableSettings": [
       {
+        "filename": "eskimo.options",
+        "propertyType": "REGEX",
+        "propertyFormat": "{name}{value}",
+        "commentPrefix": "#",
+        "filesystemService": "elasticsearch",
+        "properties": [
+          {
+            "name": "Xms",
+            "comment": "Startup Heap Size for ES java process\n[ESKIMO_DEFAULT] means memory allocator will decide of ES memory share.\n<strong>THIS NEEDS TO BE THE SAME VALUE AS Xmx OTHERWISE ES WILL LIKELY REFUSE TO START</strong>.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name": "Xmx",
+            "comment": "Maximum Heap Size for ES java process\n[ESKIMO_DEFAULT] means memory allocator will decide of ES memory share.\n<strong>THIS NEEDS TO BE THE SAME VALUE AS Xms OTHERWISE ES WILL LIKELY REFUSE TO START</strong>.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          }
+        ]
+      },
+      {
         "filename": "elasticsearch.yml",
         "propertyType": "variable",
         "propertyFormat": "{name}: {value}",
@@ -997,14 +1016,9 @@
         "filesystemService": "elasticsearch",
         "properties": [
           {
-            "name": "bootstrap.memory_lock",
-            "comment": "Lock the memory on startup",
-            "defaultValue": "false"
-          },
-          {
             "name": "action.destructive_requires_name",
             "comment": "Require explicit names when deleting indices",
-            "defaultValue": "true"
+            "defaultValue": "false"
           }
         ]
       },
