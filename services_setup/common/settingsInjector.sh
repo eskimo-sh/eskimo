@@ -88,8 +88,7 @@ function injectRegexProperty () {
     export sedValue=`echo $value | sed -e 's/\[\]\/\-$*^/\\&/g'`
     echoDebug "sedValue=$sedValue"
 
-    #export sedPattern=`echo $propertyFormat | sed "s/\{value\}/\(.*\)/g"`
-    export sedPattern=`echo $propertyFormat | sed "s/{value}/.*/" | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/`
+    export sedPattern=`echo $propertyFormat | sed s/"{value}"/"[a-zA-Z0-9"'\\'"\-]*"/ | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/`
     echoDebug "sedPattern=$sedPattern"
 
     export searchedResult=`echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g"`

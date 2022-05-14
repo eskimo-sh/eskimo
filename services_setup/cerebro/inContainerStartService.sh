@@ -45,5 +45,9 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh cerebro
 
+echo " - sourcing JVM Opts File"
+. /usr/local/lib/cerebro/conf/JVM_OPTS.sh
+echo "   + Using : JAVA_OPTS=$JAVA_OPTS"
+
 echo " - Starting service"
 /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0

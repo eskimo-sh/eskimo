@@ -39,45 +39,7 @@ set -e
 echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
-#export ELASTICSEARCH_MASTER=`eval echo "\$"$(echo SELF_MASTER_ELASTICSEARCH_$SELF_IP_ADDRESS | tr -d .)`
-#if [[ $ELASTICSEARCH_MASTER == "" ]]; then
-#    echo " - No ES master found in topology for $SELF_IP_ADDRESS"
-#    exit 3
-#fi
-#
-#echo " - Adapting configuration in file application.conf"
-#
-## Cerebro 0.8.1
-#sed -i -n '1h;1!H;${;g;s/'\
-#'  #{\n'\
-#'  #  host = \"http:\/\/localhost:9200\"\n'\
-#'  #  name = \"Some Cluster\"\n'\
-#'  #},'\
-#'/'\
-#'  {\n'\
-#'    host = \"http:\/\/'$ELASTICSEARCH_MASTER':9200\"\n'\
-#'    name = \"Eskimo\"\n '\
-#' }/g;p;}' /usr/local/lib/cerebro/conf/application.conf
-#
-#
-## Cerebro 0.8.4
-#sed -i -n '1h;1!H;${;g;s/'\
-#'  #{\n'\
-#'  #  host = \"http:\/\/localhost:9200\"\n'\
-#'  #  name = \"Localhost cluster\"\n'\
-#'  #  headers-whitelist = \[ \"x-proxy-user\", \"x-proxy-roles\", \"X-Forwarded-For\" \]\n'\
-#'  #}'\
-#'/'\
-#'  {\n'\
-#'    host = \"http:\/\/'$ELASTICSEARCH_MASTER':9200\"\n'\
-#'    name = \"Eskimo\"\n'\
-#'    headers-whitelist = \[ \"x-proxy-user\", \"x-proxy-roles\", \"X-Forwarded-For\" \]\n'\
-#' }/g;p;}' /usr/local/lib/cerebro/conf/application.conf
-
-
-
-
-
+echo " - Configuring ElasticSearc target"
 sed -i -n '1h;1!H;${;g;s/'\
 '  #{\n'\
 '  #  host = \"http:\/\/localhost:9200\"\n'\
@@ -90,3 +52,13 @@ sed -i -n '1h;1!H;${;g;s/'\
 '    name = \"Eskimo\"\n'\
 '    headers-whitelist = \[ \"x-proxy-user\", \"x-proxy-roles\", \"X-Forwarded-For\" \]\n'\
 ' }/g;p;}' /usr/local/lib/cerebro/conf/application.conf
+
+
+echo " - Preparing JVM Opts configuration file"
+if [[ $MEMORY_ELASTICSEARCH != "" ]]; then
+    bash -c "echo \"# JVM Memory options\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
+    bash -c "echo \"export JAVA_OPTS='-Xmx"$MEMORY_CEREBRO"m -Xms"$MEMORY_CEREBRO"m'\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
+else
+    bash -c "echo \"# JVM Memory options\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
+    bash -c "echo \"export JAVA_OPTS='-Xmx256m -Xms256m'\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
+fi

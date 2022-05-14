@@ -154,11 +154,11 @@ fi
 #bash -c "echo \"network.publish_host: $SELF_IP_ADDRESS\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
 echo " - Applying eskimo memory settings from topology in jvm.options"
-echo "# Eskimo memory settings" > /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
+bash -c "echo \"# Eskimo memory settings\" > /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options"
 if [[ $MEMORY_ELASTICSEARCH != "" ]]; then
-    echo "-Xms"$MEMORY_ELASTICSEARCH"m" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
-    echo "-Xmx"$MEMORY_ELASTICSEARCH"m" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
+    bash -c "echo \"-Xms\"$MEMORY_ELASTICSEARCH\"m\" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options"
+    bash -c "echo \"-Xmx\"$MEMORY_ELASTICSEARCH\"m\" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options"
 else
-    echo "-Xms1g" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
-    echo "-Xmx1g" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options
+    bash -c "echo \"-Xms1g\" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options"
+    bash -c "echo \"-Xmx1g\" >> /usr/local/lib/elasticsearch/config/jvm.options.d/eskimo.options"
 fi

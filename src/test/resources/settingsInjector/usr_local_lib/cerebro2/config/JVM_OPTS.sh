@@ -1,0 +1,1 @@
+JAVA_OPTS=-Xmx256m -Xms256m

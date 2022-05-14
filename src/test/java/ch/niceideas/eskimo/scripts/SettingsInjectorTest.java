@@ -63,6 +63,7 @@ public class SettingsInjectorTest {
     private File esFile;
     private File grafanaFile;
     private File cerebroJVMFile;
+    private File cerebroJVMOptsFile;
 
     /** Run Test on Linux only */
     @BeforeEach
@@ -108,9 +109,8 @@ public class SettingsInjectorTest {
         esFile = copyFile (tempFile, "elasticsearch/config/elasticsearch.yml");
         grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
-        cerebroJVMFile = new File (tempFile,"usr_local_lib/cerebro/config/eskimo.options");
-        cerebroJVMFile.getParentFile().mkdirs();
-        FileUtils.writeFile(cerebroJVMFile, "# test\n-Xms1g\n-Xmx1g");
+        cerebroJVMFile = copyFile (tempFile, "cerebro/config/eskimo.options");
+        cerebroJVMOptsFile = copyFile (tempFile, "cerebro2/config/JVM_OPTS.sh");
 
         settingsInjectorScriptFile = new File ("services_setup/common/settingsInjector.sh");
         //System.out.println(System.getProperty("user.dir"));
@@ -140,6 +140,34 @@ public class SettingsInjectorTest {
     }
 
     @Test
+    public void testCerebroSearchJVMOptions() throws Exception {
+
+        String result = ProcessHelper.exec(new String[]{
+                "bash",
+                "-c",
+                "export SETTING_INJECTOR_DEBUG=1 && " +
+                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
+                        "bash " +
+                        settingsInjectorScriptFile.getCanonicalPath() +
+                        " cerebro2 " +
+                        settingsFile.getCanonicalPath() +
+                        " ; " +
+                        "exit $?"}, true);
+        logger.info(result);
+
+        // ensure properties were found
+        assertTrue(result.contains("== Found property Xms : 600m"));
+        assertTrue(result.contains("== Found property Xmx : 600m"));
+
+        String cerebroJVMFileContent = FileUtils.readFile(cerebroJVMOptsFile);
+        System.err.println (cerebroJVMFileContent);
+
+        assertTrue(cerebroJVMFileContent.contains("-Xms600m"));
+        assertTrue(cerebroJVMFileContent.contains("-Xmx600m"));
+        assertTrue(cerebroJVMFileContent.contains("JAVA_OPTS=-Xmx600m -Xms600m"));
+    }
+
+    @Test
     public void testElasticSearchJVMOptions() throws Exception {
 
         String result = ProcessHelper.exec(new String[]{
@@ -163,7 +191,7 @@ public class SettingsInjectorTest {
 
         assertTrue(cerebroJVMFileContent.contains("-Xms600m"));
         assertTrue(cerebroJVMFileContent.contains("-Xmx600m"));
-        assertTrue(cerebroJVMFileContent.contains("# test"));
+        assertTrue(cerebroJVMFileContent.contains("# Eskimo memory settings"));
     }
 
     @Test
