@@ -62,6 +62,7 @@ public class SettingsInjectorTest {
     private File sparkFile;
     private File esFile;
     private File grafanaFile;
+    private File kibanaFile;
     private File cerebroJVMFile;
     private File cerebroJVMOptsFile;
 
@@ -109,6 +110,8 @@ public class SettingsInjectorTest {
         esFile = copyFile (tempFile, "elasticsearch/config/elasticsearch.yml");
         grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
+        kibanaFile = copyFile (tempFile, "kibana/config/node.options");
+
         cerebroJVMFile = copyFile (tempFile, "cerebro/config/eskimo.options");
         cerebroJVMOptsFile = copyFile (tempFile, "cerebro2/config/JVM_OPTS.sh");
 
@@ -137,6 +140,31 @@ public class SettingsInjectorTest {
     @AfterEach
     public void tearDown() throws Exception {
         new File (tempFolder).delete();
+    }
+
+    @Test
+    public void testKibanaNodeOptions() throws Exception {
+
+        String result = ProcessHelper.exec(new String[]{
+                "bash",
+                "-c",
+                "export SETTING_INJECTOR_DEBUG=1 && " +
+                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
+                        "bash " +
+                        settingsInjectorScriptFile.getCanonicalPath() +
+                        " kibana " +
+                        settingsFile.getCanonicalPath() +
+                        " ; " +
+                        "exit $?"}, true);
+        logger.info(result);
+
+        // ensure properties were found
+        assertTrue(result.contains("== Found property max-old-space-size : 1234"));
+
+        String kibanaFileContent = FileUtils.readFile(kibanaFile);
+        System.err.println (kibanaFileContent);
+
+        assertTrue(kibanaFileContent.contains("--max-old-space-size=1234"));
     }
 
     @Test

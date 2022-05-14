@@ -213,7 +213,7 @@ eskimo.ServicesSettings = function () {
 
                         let property = serviceEditableSettingsFile.properties[k];
 
-                        let inputName = serviceName + "-" + property.name.replace(/\./g, "-");
+                        let inputName = serviceName + "-" + property.name.replace(/\./g, "---");
 
                         servicesSettingsContent = servicesSettingsContent +
                             '<div class="col-md-12 col-sd-12">\n' +

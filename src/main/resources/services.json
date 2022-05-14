@@ -1166,6 +1166,22 @@
         "restart": false
       }
     ],
+    "editableSettings" : [
+      {
+        "filename": "node.options",
+        "filesystemService": "kibana",
+        "propertyType": "REGEX",
+        "propertyFormat": "{name}={value}",
+        "commentPrefix": "#",
+        "properties": [
+          {
+            "name": "max-old-space-size",
+            "comment": "Maximum Old Space Size of the nodejs runtime for Kibana",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          }
+        ]
+      }
+    ],
     "commands" : [
       {
         "id" : "show_log",
@@ -1198,7 +1214,6 @@
       "icon" : "images/zeppelin-icon.png"
     },
     "ui": {
-
       "__comment_urlTemplate": "Going through Kubectl proxy.",
       "urlTemplate": "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/#/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",

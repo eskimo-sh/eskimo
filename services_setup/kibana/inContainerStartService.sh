@@ -48,7 +48,7 @@ echo " - Inject settings"
 
 echo " - Starting service"
 # Use file created from inContainerInjectTopology.sh
-/tmp/kibana.eskimo &
+/usr/local/lib/kibana/bin/kibana &
 export KIBANA_PID=$!
 
 echo " - Waiting for Kibana to be up and running"

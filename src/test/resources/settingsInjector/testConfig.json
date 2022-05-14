@@ -270,7 +270,24 @@
       "name": "prometheus"
     },
     {
-      "settings": [],
+      "settings": [
+        {
+          "filename": "node.options",
+          "propertyType": "REGEX",
+          "propertyFormat": "{name}={value}",
+          "commentPrefix": "#",
+          "service": "kibana",
+          "filesystemService": "kibana",
+          "properties": [
+            {
+              "name": "max-old-space-size",
+              "comment": "Maximum Old Space Size of the nodejs runtime for Kibana",
+              "defaultValue": "[ESKIMO_DEFAULT]",
+              "value": "1234"
+            }
+          ]
+        }
+      ],
       "name": "kibana"
     },
     {

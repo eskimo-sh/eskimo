@@ -152,7 +152,7 @@ public class ServicesSettingsService {
 
                     String value = settingsForm.getString(settingsKey);
 
-                    String propertyKey = settingsKey.substring(service.length() + 1).replace("-", ".");
+                    String propertyKey = settingsKey.substring(service.length() + 1).replace("---", ".");
 
                     // now iterate through saved (existing) configs and update values
                     main:

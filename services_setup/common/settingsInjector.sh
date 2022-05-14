@@ -91,6 +91,9 @@ function injectRegexProperty () {
     export sedPattern=`echo $propertyFormat | sed s/"{value}"/"[a-zA-Z0-9"'\\'"\-]*"/ | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/`
     echoDebug "sedPattern=$sedPattern"
 
+    export sedReplace=`echo $propertyFormat | sed s/"{value}"// | sed s/"{name}"/'\\''\1'/`
+    echoDebug "sedReplace=$sedReplace"
+
     export searchedResult=`echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g"`
     echoDebug "searchedResult=$searchedResult"
 
@@ -99,8 +102,8 @@ function injectRegexProperty () {
         echo "     == processing $i"
 
         echoDebug "replacing $name $value"
-
-        sed -i s/"$sedPattern"/"\1$sedValue"/g $i
+        echoDebug " -> using : sed -i s/\"$sedPattern\"/\"$sedReplace""$sedValue\"/g $i"
+        sed -i s/"$sedPattern"/"$sedReplace""$sedValue"/g $i
 
         # add variable if not found
         echoDebug "check if variable is found"
@@ -114,23 +117,31 @@ function injectRegexProperty () {
         else
 
             # remove comment prefix if found
-            if [[ `grep "$commentPrefix$searchedResult" $i` != "" ]]; then
-
-                export commentValue=`echo $commentPrefix$searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
-                export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+            if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
 
                 echoDebug " removing comment"
 
-                echoDebug "sed -i s/\"$commentValue\"/\"$freeValue\"/g $i"
-                sed -i s/"$commentValue"/"$freeValue"/g $i
+                echo sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
+                sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
+
+                if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
+                    echo "Unable to perform comment replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
+                    exit 5
+                fi
             fi
 
         fi
 
+        export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+        echoDebug "freeValue=$freeValue"
+
         # Assess it's found as expected (using propertyFormat)
-        if [[ `grep "^$freeValue" $i` == "" ]]; then
+        if [[ `grep "$freeValue" $i` == "" ]]; then
+
+cat $i
+
             echo "Unable to perform replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
-            exit 5
+            exit 6
         fi
 
     done
@@ -191,6 +202,8 @@ function injectVariableProperty () {
                 ;;
         esac
 
+        echoDebug "searchedResult=$searchedResult"
+
         # add variable if not found
         echoDebug "check if variable is found"
         if [[ `grep "$searchedResult" $i` == "" ]]; then
@@ -203,18 +216,22 @@ function injectVariableProperty () {
         else
 
             # remove comment prefix if found
-            if [[ `grep "$commentPrefix$searchedResult" $i` != "" ]]; then
-
-                export commentValue=`echo $commentPrefix$searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
-                export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+            if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
 
                 echoDebug " removing comment"
 
-                echoDebug "sed -i s/\"$commentValue\"/\"$freeValue\"/g $i"
-                sed -i s/"$commentValue"/"$freeValue"/g $i
+                echo sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
+                sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
+
+                if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
+                    echo "Unable to perform comment replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
+                    exit 5
+                fi
             fi
 
         fi
+
+        export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
 
         # Assess it's found as expected (using propertyFormat)
         if [[ `grep "^$freeValue" $i` == "" ]]; then

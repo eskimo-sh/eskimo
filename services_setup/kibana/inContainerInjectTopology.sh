@@ -50,14 +50,9 @@ sed -i s/"#elasticsearch.hosts: \[\"http:\/\/localhost:9200\"\]"/"elasticsearch.
         /usr/local/etc/kibana/kibana.yml
 
 
-# For memory, I need to adapt the node command line in bin/kibana
-echo "#/bin/bash" > /tmp/kibana.eskimo
-
+echo " - Injecting memory profile"
 if [[ $MEMORY_KIBANA != "" ]]; then
-    echo "export NODE_OPTIONS=\"--max-old-space-size="$MEMORY_KIBANA"\"" >> /tmp/kibana.eskimo
+    sed -i s/"#--max-old-space-size=4096"/"--max-old-space-size=$MEMORY_KIBANA"/g /usr/local/lib/kibana/config/node.options
+else
+    sed -i s/"#--max-old-space-size=4096"/"--max-old-space-size=1200"/g /usr/local/lib/kibana/config/node.options
 fi
-
-echo "/usr/local/lib/kibana/bin/kibana" >> /tmp/kibana.eskimo
-
-chmod 755 /tmp/kibana.eskimo
-
