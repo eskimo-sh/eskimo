@@ -3,18 +3,18 @@
     "spark-runtime": {
       "spark-defaults.conf": [
         {
-          "value": "",
-          "key": "spark.locality.wait",
-          "oldValue": "40s"
-        },
-        {
-          "value": "10",
-          "key": "spark.rpc.numRetries",
-          "oldValue": ""
+          "value": "200s",
+          "key": "spark.dynamicAllocation.executorIdleTimeout",
+          "oldValue": "300s"
         },
         {
           "value": "FIFO",
           "key": "spark.scheduler.mode",
+          "oldValue": ""
+        },
+        {
+          "value": "10",
+          "key": "spark.rpc.numRetries",
           "oldValue": ""
         },
         {
@@ -23,14 +23,14 @@
           "oldValue": ""
         },
         {
-          "value": "200s",
-          "key": "spark.dynamicAllocation.executorIdleTimeout",
-          "oldValue": "300s"
-        },
-        {
           "value": "400s",
           "key": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
           "oldValue": ""
+        },
+        {
+          "value": "",
+          "key": "spark.locality.wait",
+          "oldValue": "40s"
         }
       ]
     },
@@ -60,19 +60,9 @@
     "kafka": {
       "server.properties": [
         {
-          "value": "10",
-          "key": "num.io.threads",
-          "oldValue": ""
-        },
-        {
           "value": "5",
           "key": "num.network.threads",
           "oldValue": ""
-        },
-        {
-          "value": "",
-          "key": "socket.request.max.bytes",
-          "oldValue": "128857600"
         },
         {
           "value": "",
@@ -85,9 +75,19 @@
           "oldValue": "3"
         },
         {
+          "value": "10",
+          "key": "num.io.threads",
+          "oldValue": ""
+        },
+        {
           "value": "",
           "key": "log.retention.hours",
           "oldValue": "48"
+        },
+        {
+          "value": "",
+          "key": "socket.request.max.bytes",
+          "oldValue": "128857600"
         }
       ]
     }

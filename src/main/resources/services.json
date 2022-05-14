@@ -1289,6 +1289,20 @@
     ],
     "editableSettings": [
       {
+        "filename": "zeppelin-env.sh",
+        "filesystemService": "zeppelin",
+        "propertyType": "REGEX",
+        "propertyFormat": "{name}{value}",
+        "commentPrefix": "#",
+        "properties": [
+          {
+            "name": "Xmx",
+            "comment": "Maximum heap size memory allocated to Zeppelin process.\n[ESKIMO_DEFAULT] leaves the default memory allocation strategy decide of it.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          }
+        ]
+      },
+      {
         "filename": "eskimo_settings.conf",
         "filesystemService": "zeppelin",
         "propertyType": "variable",

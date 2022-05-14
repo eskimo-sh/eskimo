@@ -75,15 +75,6 @@ if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCE
     exit 103
 fi
 
-echo " - Installing prometheus Mesos Exporter"
-docker exec -i prometheus_template bash /scripts/installPrometheusMesosExporter.sh | tee /tmp/prometheus_build_log 2>&1
-if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/prometheus_build_log
-    exit 104
-fi
-
-
 #echo " - TODO"
 #docker exec -i prometheus bash TODO
 

@@ -1,4 +1,0 @@
-
-
-# Test spark
-/usr/local/bin/spark-submit run-example --deploy-mode cluster|client org.apache.spark.examples.SparkPi

@@ -87,10 +87,13 @@ sed -i -n '1h;1!H;${;g;s/'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 
+echo " - Applying eskimo memory settings from topology in jvm.options"
 if [[ $MEMORY_ZEPPELIN != "" ]]; then
-    echo " - Applying eskimo memory settings from topology in jvm.options"
-
-    sed -i s/"# export ZEPPELIN_MEM"/"export ZEPPELIN_MEM\"=-Xmx"$MEMORY_ZEPPELIN"m "/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+    # taking only half for zeppelin and leaving the rest to interpreters
+    let EFF_MEM=$MEMORY_ZEPPELIN/2
+    sed -i s/"# export ZEPPELIN_MEM"/"export ZEPPELIN_MEM\"=-Xmx"$EFF_MEM"m\""/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
+else
+    sed -i s/"# export ZEPPELIN_MEM"/"export ZEPPELIN_MEM\"=-Xmx800m\""/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 fi
 
 echo " - Overriding driver host in spark config"
