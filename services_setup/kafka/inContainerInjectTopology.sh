@@ -70,6 +70,9 @@ sed -i s/"zookeeper.connect=localhost:2181"/"zookeeper.connect=$ZOOKEEPER_IP_ADD
 
 
 if [[ $MEMORY_KAFKA != "" ]]; then
-    #echo " - Applying eskimo memory settings from topology as KAFKA_HEAP_OPTS Environment variable"
+    echo " - Applying eskimo memory settings from topology as KAFKA_HEAP_OPTS Environment variable"
     export KAFKA_HEAP_OPTS="-Xmx"$MEMORY_KAFKA"m -Xms"$MEMORY_KAFKA"m"
+else
+    echo " - Applying default memory settings as KAFKA_HEAP_OPTS Environment variable"
+    export KAFKA_HEAP_OPTS="-Xmx1024m -Xms1024m"
 fi

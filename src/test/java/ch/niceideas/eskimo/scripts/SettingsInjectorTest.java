@@ -60,6 +60,7 @@ public class SettingsInjectorTest {
     private File settingsFile = null;
 
     private File sparkFile;
+    private File kafkaFile;
     private File esFile;
     private File grafanaFile;
     private File kibanaFile;
@@ -107,6 +108,7 @@ public class SettingsInjectorTest {
 
         // Copy configuration files to tempFolder
         sparkFile = copyFile(tempFile, "spark/conf/spark-defaults.conf");
+        kafkaFile = copyFile(tempFile, "kafka/config/eskimo-memory.opts");
         esFile = copyFile (tempFile, "elasticsearch/config/elasticsearch.yml");
         grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
@@ -140,6 +142,32 @@ public class SettingsInjectorTest {
     @AfterEach
     public void tearDown() throws Exception {
         new File (tempFolder).delete();
+    }
+
+    @Test
+    public void testKafkaJavaOpts() throws Exception {
+
+        String result = ProcessHelper.exec(new String[]{
+                "bash",
+                "-c",
+                "export SETTING_INJECTOR_DEBUG=1 && " +
+                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
+                        "bash " +
+                        settingsInjectorScriptFile.getCanonicalPath() +
+                        " kafka " +
+                        settingsFile.getCanonicalPath() +
+                        " ; " +
+                        "exit $?"}, true);
+        logger.info(result);
+
+        // ensure properties were found
+        assertTrue(result.contains("== adding not found variable"));
+
+        String kafkaFileContent = FileUtils.readFile(kafkaFile);
+        System.err.println (kafkaFileContent);
+
+        assertTrue(kafkaFileContent.contains("Xms1234m"));
+        assertTrue(kafkaFileContent.contains("Xms1234m"));
     }
 
     @Test

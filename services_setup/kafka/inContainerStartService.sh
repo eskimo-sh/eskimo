@@ -42,5 +42,16 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh kafka
 
+# we rely on settings injector to add overriden memory setting in /usr/local/lib/kafka/config/eskimo-memory.opts
+if [[ -f /usr/local/lib/kafka/config/eskimo-memory.opts && `cat /usr/local/lib/kafka/config/eskimo-memory.opts` != "" ]]; then
+
+    export KAFKA_HEAP_OPTS=""
+    for line in `cat /usr/local/lib/kafka/config/eskimo-memory.opts`; do
+        export KAFKA_HEAP_OPTS="$KAFKA_HEAP_OPTS -$line"
+    done
+
+    echo " - Using overriden memory settings : $KAFKA_HEAP_OPTS"
+fi
+
 echo " - Starting service"
 /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties

@@ -176,8 +176,6 @@ delete_k8s_slave_lock_file
 echo "   + Entering monitoring loop"
 while : ; do
 
-    sleep 10
-
     if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
         echo "   + Failed to run Kubernetes Kubelet"
         tail -n 50 /var/log/kubernetes/kubelet.log 2>&1
@@ -190,67 +188,11 @@ while : ; do
         exit 48
     fi
 
-    # don't bother on master node, the master does it better
-    if [[ "$MASTER_KUBE_MASTER_1" != "$SELF_IP_ADDRESS" ]]; then
+    sleep 10
 
-        # ensure DNS is still working alright
-        #echo "   + Trying to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN" # this is filling up logs
-        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
-        if [[ $? != 0 ]]; then
-
-            sleep 5
-
-            echo "   + Previous ping failed. Trying AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
-            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
-            if [[ $? != 0 ]]; then
-
-                echo "   + Failed to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN. Checking pod status"
-
-                coredns_status=`kubectl get pod -n kube-system -o custom-columns=NAME:metadata.name,STATUS:status.phase | grep coredns | sed 's/  */ /g' | cut -d ' ' -f 2`
-                if [[ "$coredns_status" != "" && "$coredns_status" != "Running" ]]; then
-                    echo "! Coredns pod status is $coredns_status. Not attempting any resolution."
-                    continue
-                fi
-
-                echo "   + Trying to restart Network Manager"
-
-                if [[ -d /lib/systemd/system/ ]]; then
-                    export systemd_units_dir=/lib/systemd/system/
-                elif [[ -d /usr/lib/systemd/system/ ]]; then
-                    export systemd_units_dir=/usr/lib/systemd/system/
-                else
-                    echo "Couldn't find systemd unit files directory"
-                    exit 51
-                fi
-
-                if [[ -f $systemd_units_dir/NetworkManager.service ]]; then
-                    /bin/systemctl restart NetworkManager
-                else
-                    /bin/systemctl restart dnsmasq
-                fi
-                if [[ $? != 0 ]]; then
-                    echo "Failing to restart NetworkManager / dnsmasq"
-                    exit 52
-                fi
-
-                sleep 2
-
-                echo "   + Trying YET AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
-                /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
-                if [[ $? != 0 ]]; then
-
-                    let ping_cnt=ping_cnt+1
-
-                else
-                    ping_cnt=0
-                fi
-            else
-                ping_cnt=0
-            fi
-        else
-            ping_cnt=0
-        fi
-
+    /etc/k8s/runtime_config/setup-and-check-runtime-kube-dns.sh SLAVE
+    if [[ $? != 0 ]]; then
+        exit 51
     fi
 
 done

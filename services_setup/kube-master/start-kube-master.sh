@@ -261,89 +261,9 @@ while : ; do
 
     sleep 10
 
-    # ensure DNS is still working alright
-    #echo "   + Trying to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN" # this is filling up logs
-    /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
+    /etc/k8s/runtime_config/setup-and-check-runtime-kube-dns.sh MASTER
     if [[ $? != 0 ]]; then
-
-        sleep 5
-
-        echo "   + Previous ping failed. Trying AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
-        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
-        if [[ $? != 0 ]]; then
-
-            echo "   + Failed to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN. Checking pod status"
-
-            coredns_status=`kubectl get pod -n kube-system -o custom-columns=NAME:metadata.name,STATUS:status.phase | grep coredns | sed 's/  */ /g' | cut -d ' ' -f 2`
-            if [[ "$coredns_status" != "" && "$coredns_status" != "Running" ]]; then
-                echo "! Coredns pod status is $coredns_status. Not attempting any resolution."
-                continue
-            fi
-
-            echo "   + Trying to restart Network Manager"
-
-            if [[ -d /lib/systemd/system/ ]]; then
-                export systemd_units_dir=/lib/systemd/system/
-            elif [[ -d /usr/lib/systemd/system/ ]]; then
-                export systemd_units_dir=/usr/lib/systemd/system/
-            else
-                echo "Couldn't find systemd unit files directory"
-                exit 51
-            fi
-
-            if [[ -f $systemd_units_dir/NetworkManager.service ]]; then
-                /bin/systemctl restart NetworkManager
-            else
-                /bin/systemctl restart dnsmasq
-            fi
-            if [[ $? != 0 ]]; then
-                echo "Failing to restart NetworkManager / dnsmasq"
-                exit 52
-            fi
-
-            sleep 2
-
-            echo "   + Trying YET AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
-            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
-            if [[ $? != 0 ]]; then
-
-                echo "   + Failed to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN. Trying to restart coredns"
-
-                echo "     - Deleting coredns deployment"
-                /bin/bash --login -c '/usr/local/bin/kubectl \
-                     delete -f /var/lib/kubernetes/core-dns.yaml \
-                    --kubeconfig=/root/.kube/config \
-                    > /var/log/kubernetes/start_k8s_master.log 2>&1'
-                if [[ $? != 0 ]]; then
-                    echo "       + Failed to undeploy coredns"
-                    exit 51
-                fi
-
-                echo "     - redeploy coredns deployment"
-                /bin/bash --login -c '/usr/local/bin/kubectl \
-                     apply -f /var/lib/kubernetes/core-dns.yaml \
-                    --kubeconfig=/root/.kube/config \
-                    > /var/log/kubernetes/start_k8s_master.log 2>&1'
-                if [[ $? != 0 ]]; then
-                    echo "       + Failed to re-deploy coredns"
-                    exit 52
-                fi
-
-                let ping_cnt=ping_cnt+1
-
-                echo "     - checking redeploy coredns looping"
-                if [[ $ping_cnt -gt 5 ]]; then
-                    echo "       + Redeployed coredns 5 times in a row. Crashing !"
-                    exit 53
-                fi
-            else
-                ping_cnt=0
-            fi
-        else
-            ping_cnt=0
-        fi
-    else
-        ping_cnt=0
+        exit 51
     fi
 
 done

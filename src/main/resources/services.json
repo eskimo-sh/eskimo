@@ -434,6 +434,25 @@
     ],
     "editableSettings": [
       {
+        "filename": "eskimo-memory.opts",
+        "propertyType": "REGEX",
+        "propertyFormat": "{name}{value}",
+        "commentPrefix": "#",
+        "filesystemService": "kafka",
+        "properties": [
+          {
+            "name": "Xms",
+            "comment": "Startup Heap Size for Kafka java process\n [ESKIMO_DEFAULT] means memory allocator will decide of Kafka memory share.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name": "Xmx",
+            "comment": "Maximum Heap Size for Kafka java process\n [ESKIMO_DEFAULT] means memory allocator will decide of Kafka memory share.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          }
+        ]
+      },
+      {
         "filename": "server.properties",
         "filesystemService": "kafka",
         "propertyType": "variable",
