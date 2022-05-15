@@ -327,6 +327,12 @@ public class ServicesProxyServlet extends ProxyServlet {
     @Override
     protected String rewriteUrlFromResponse(HttpServletRequest servletRequest, String theUrl) {
 
+        // FIXME hack for spark history server send redirects
+        if (theUrl.startsWith("http://localhost:9191/history/")) {
+            return "http://localhost:9191/spark-history-server/history/" + theUrl.substring(30);
+        }
+
+
         final String targetUri = getTargetUri(servletRequest);
 
         if (theUrl.startsWith(targetUri)) {

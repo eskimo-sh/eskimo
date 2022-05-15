@@ -31,6 +31,7 @@ public class NodesConfigurationService {
 
     public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
     public static final String USR_LOCAL_SBIN_GLUSTER_MOUNT_SH = "/usr/local/sbin/gluster_mount.sh";
+    public static final String USR_LOCAL_BIN_ESKIMO_KUBECTL = "/usr/local/bin/eskimo-kubectl";
     public static final String ESKIMO_TOPOLOGY_SH = "/etc/eskimo_topology.sh";
 
     @Autowired
@@ -286,6 +287,9 @@ public class NodesConfigurationService {
             ml.addInfo(" - Copying gluster-mount script");
             copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
 
+            ml.addInfo(" - Copying eskimo-kubectl script");
+            copyCommand("eskimo-kubectl", USR_LOCAL_BIN_ESKIMO_KUBECTL, connection);
+
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);
 
@@ -438,7 +442,7 @@ public class NodesConfigurationService {
             systemOperationService.applySystemOperation(operationId,
                     ml -> {
                         try {
-                            ml.addInfo(kubernetesService.restartServiceKubernetesInternal(servicesDefinition.getService(operationId.getService())));
+                            ml.addInfo(kubernetesService.restartServiceInternal(servicesDefinition.getService(operationId.getService()), operationId.getNode()));
                         } catch (KubernetesException e) {
                             logger.error (e, e);
                             throw new SystemException (e);

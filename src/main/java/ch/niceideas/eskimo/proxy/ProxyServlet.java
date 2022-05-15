@@ -302,6 +302,7 @@ public class ProxyServlet extends HttpServlet {
         //note: we won't transfer the protocol version because I'm not sure it would truly be compatible
         String method = servletRequest.getMethod();
         String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
+
         HttpRequest proxyRequest;
         //spec: RFC 2616, sec 4.3: either of these two headers signal that there is a message body.
         if (servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null ||
@@ -654,10 +655,13 @@ public class ProxyServlet extends HttpServlet {
      * and translates it to one the original client can use.
      */
     protected String rewriteUrlFromResponse(HttpServletRequest servletRequest, String theUrl) {
-        //TODO document example paths
+
+        // CAUTION : THIS METHOD IS OVERRIDEN IN ServicesProxyServlet
+        // DON'T DO ANY MODIFICATION HERE, IT'S USELESS
+
         final String targetUri = getTargetUri(servletRequest);
         if (theUrl.startsWith(targetUri)) {
-            /*-
+             /*
              * The URL points back to the back-end server.
              * Instead of returning it verbatim we replace the target path with our
              * source path in a way that should instruct the original client to

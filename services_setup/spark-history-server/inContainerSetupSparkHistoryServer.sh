@@ -61,6 +61,8 @@ sudo bash -c "echo -e \"spark.history.fs.logDirectory=file:///var/lib/spark/even
 sudo bash -c "echo -e \"\n#The period at which to check for new or updated logs in the log directory.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.history.fs.update.interval=5s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
+sudo bash -c "echo -e \"spark.ui.proxyBase=/spark-history-server\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+
 echo " - Creating glusterMountCheckerPeriodic.sh script"
 cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
 #!/usr/bin/env bash

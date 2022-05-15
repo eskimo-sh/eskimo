@@ -119,50 +119,61 @@ public class KubernetesService {
     }
 
     // FIXME
-    public void showJournal(Service service) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> showJournalInternal(service));
-    }
-
-    String showJournalInternal(Service service) {
-        throw new UnsupportedOperationException("To Be Implemented");
+    public void showJournal(Service service, String node) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> {
+            if (service.isKubernetes()) {
+                return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl logs " + service.getName() + " " + node);
+            } else {
+                throw new UnsupportedOperationException("Showing service journal for " + service.getName()
+                        + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
+            }
+        });
     }
 
     // FIXME
-    public void startService(Service service) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Starting", () -> startServiceInternal(service));
+    public void startService(Service service, String node) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Starting", () -> {
+            if (service.isKubernetes()) {
+                return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl start " + service.getName() + " " + node);
+            } else {
+                throw new UnsupportedOperationException("Starting service for " + service.getName()
+                        + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
+            }
+        });
     }
 
-    String startServiceInternal(Service service) throws KubernetesException {
-        throw new UnsupportedOperationException("To Be Implemented");
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void stopService(Service service, String node) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> {
+            if (service.isKubernetes()) {
+                return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl stop " + service.getName() + " " + node);
+            } else {
+                throw new UnsupportedOperationException("Stopping service for " + service.getName()
+                        + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
+            }
+        });
     }
 
     // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void stopService(Service service) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> stopServiceInternal(service));
+    public void restartService(Service service, String node) throws SystemException {
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> restartServiceInternal(service, node));
     }
 
-    @Deprecated
-    String stopServiceInternal(Service service) throws KubernetesException {
-        throw new UnsupportedOperationException("To Be Implemented");
-    }
-
-    // FIXME
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void restartService(Service service) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> restartServiceInternal(service));
-    }
-
-    @Deprecated
-    protected String restartServiceInternal(Service service) throws KubernetesException {
-        throw new UnsupportedOperationException("To Be Implemented");
+    protected String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
+        if (service.isKubernetes()) {
+            return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl restart " + service.getName() + " " + node);
+        } else {
+            throw new UnsupportedOperationException("Restart service for " + service.getName()
+                    + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
+        }
     }
 
     void restartServiceForSystem(KubernetesOperationsCommand.KubernetesOperationId operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
                 ml -> {
                     try {
-                        ml.addInfo(restartServiceKubernetesInternal(servicesDefinition.getService(operationId.getService())));
+                        ml.addInfo(restartServiceInternal(servicesDefinition.getService(operationId.getService()), KUBERNETES_NODE));
                     } catch (KubernetesException e) {
                         logger.error (e, e);
                         throw new SystemException (e);
@@ -207,21 +218,24 @@ public class KubernetesService {
         }
     }
 
-    // FIXME
-    private void proceedWithKubernetesServiceUninstallation(MessageLogger ml, String kubeMasterNode, String service)
-            throws SSHCommandException, SystemException, KubernetesException {
-        throw new UnsupportedOperationException("To Be Implemented");
-    }
+    private void proceedWithKubernetesServiceUninstallation(MessageLogger ml, String kubeMasterNode, String serviceName)
+            throws SSHCommandException, KubernetesException {
+        Service service = servicesDefinition.getService(serviceName);
 
-    // FIXME
-    protected String restartServiceKubernetesInternal(Service service) throws KubernetesException {
-        throw new UnsupportedOperationException("To Be Implemented");
-    }
+        SSHConnection connection = null;
+        try {
+            connection = connectionManagerService.getPrivateConnection(kubeMasterNode);
 
-    // FIXME
-    void ensureKubernetesAvailability() throws KubernetesException {
-        // TODO
-        logger.warn("ensureKubernetesAvailability - To Be Implemented");
+            sshCommandService.runSSHCommand(connection, "eskimo-kubectl uninstall " + service.getName() + " " + kubeMasterNode);
+
+        } catch (ConnectionManagerException e) {
+            throw new SSHCommandException(e);
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
     boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service) {
@@ -395,8 +409,6 @@ public class KubernetesService {
             if (operationsMonitoringService.isInterrupted()) {
                 return;
             }
-
-            ensureKubernetesAvailability();
 
             if (operationsMonitoringService.isInterrupted()) {
                 return;

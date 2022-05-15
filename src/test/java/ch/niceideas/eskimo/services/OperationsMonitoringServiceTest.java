@@ -194,7 +194,9 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         });
 
         nodesConfigurationService.setKubernetesService(new KubernetesService() {
-            protected String restartServiceKubernetesInternal(Service service) throws KubernetesException {
+
+            @Override
+            protected String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
                 // No Op
                 return null;
             }

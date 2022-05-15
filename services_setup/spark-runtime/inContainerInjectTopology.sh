@@ -66,9 +66,12 @@ bash -c "echo -e \"spark.master=k8s://https://${KUBERNETES_API_MASTER}:6443\"  >
 #fi
 
 
-if [[ $MEMORY_SPARK_EXECUTOR != "" ]]; then
+if [[ $MEMORY_SPARK_RUNTIME != "" ]]; then
     bash -c "echo -e \"\n#Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-    bash -c "echo -e \"spark.executor.memory=\"$MEMORY_SPARK_EXECUTOR\"m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.executor.memory=\"$MEMORY_SPARK_RUNTIME\"m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+else
+    bash -c "echo -e \"\n#Defining default Spark executor memory 800m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.executor.memory=800m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 fi
 
 # defining driver bind IP address at runtime

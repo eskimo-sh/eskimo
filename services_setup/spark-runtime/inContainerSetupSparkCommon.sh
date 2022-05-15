@@ -183,6 +183,7 @@ sudo bash -c "echo -e \"spark.dynamicAllocation.enabled=true\"  >> /usr/local/li
 sudo bash -c "echo -e \"#(Caution here : small values cause issues. I have executors killed with 10s for instance)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.dynamicAllocation.executorIdleTimeout=200s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.dynamicAllocation.cachedExecutorIdleTimeout=300s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.dynamicAllocation.schedulerBacklogTimeout=5s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Configuring spark shuffle service (required for dynamic allocation)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.dynamicAllocation.shuffleTracking.enabled=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

@@ -177,7 +177,33 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
     @Test
     public void testRestarts() throws Exception {
-        fail ("To Be Implemented");
+
+        ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeServicesConfig.setValueForPath("kafka_cpu", "1");
+        kubeServicesConfig.setValueForPath("zeppelin_ram", "3000m");
+
+        SystemService ss = new SystemService() {
+            @Override
+            public SystemStatusWrapper getStatus() {
+                return StandardSetupHelpers.getStandard2NodesSystemStatus();
+            }
+        };
+
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+                KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
+
+        assertEquals(0, koc.getInstallations().size());
+        assertEquals(0, koc.getUninstallations().size());
+        assertEquals(2, koc.getRestarts().size());
+
+        assertEquals ("kafka", koc.getRestarts().get(0).getService());
+        assertEquals ("restart", koc.getRestarts().get(0).getType());
+
+        assertEquals ("zeppelin", koc.getRestarts().get(1).getService());
+        assertEquals ("restart", koc.getRestarts().get(1).getType());
+
     }
 
 }

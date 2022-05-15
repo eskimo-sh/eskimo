@@ -2,6 +2,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
@@ -62,7 +63,7 @@ public class SystemAdminControllerTest {
     public void testShowJournal() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void showJournal(String service, String node) {
+            public void showJournal(Service service, String node) {
                 // No Op
             }
         });
@@ -76,7 +77,7 @@ public class SystemAdminControllerTest {
     public void testStartService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void startService(String service, String node) {
+            public void startService(Service service, String node) {
                 // No Op
             }
         });
@@ -87,7 +88,7 @@ public class SystemAdminControllerTest {
 
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void startService(String service, String node) throws SystemException {
+            public void startService(Service service, String node) throws SystemException {
                 throw new SystemException("Test Error");
             }
         });
@@ -102,7 +103,7 @@ public class SystemAdminControllerTest {
     public void testStopService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void stopService(String service, String node) {
+            public void stopService(Service service, String node) {
                 // No Op
             }
         });
@@ -116,7 +117,7 @@ public class SystemAdminControllerTest {
     public void testRestartService() {
         sac.setSystemService(new SystemService(false) {
             @Override
-            public void restartService(String service, String node) {
+            public void restartService(Service service, String node) {
                 // No Op
             }
         });

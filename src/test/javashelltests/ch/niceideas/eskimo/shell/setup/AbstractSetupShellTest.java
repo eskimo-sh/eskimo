@@ -46,6 +46,7 @@ import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import org.apache.log4j.Logger;
 import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -64,7 +65,7 @@ public abstract class AbstractSetupShellTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
     protected void copyFile(String jailPath, String source) throws IOException {

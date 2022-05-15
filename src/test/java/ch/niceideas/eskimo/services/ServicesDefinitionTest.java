@@ -412,7 +412,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         List<EditableProperty> props = conf.getProperties();
         assertNotNull(props);
 
-        assertEquals(8, props.size());
+        assertEquals(10, props.size());
 
         EditableProperty firstProp = props.get(0);
         assertNotNull(firstProp);
@@ -424,10 +424,9 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         EditableProperty lastProp = props.get(7);
         assertNotNull(lastProp);
 
-        assertEquals("spark.executor.memory", lastProp.getName());
-        assertEquals("Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \n" +
-                "USE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc.", lastProp.getComment());
-        assertEquals("[ESKIMO_DEFAULT]", lastProp.getDefaultValue());
+        assertEquals("spark.dynamicAllocation.shuffleTracking.timeout", lastProp.getName());
+        assertEquals("When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data.", lastProp.getComment());
+        assertEquals("600s", lastProp.getDefaultValue());
 
         String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"));
 

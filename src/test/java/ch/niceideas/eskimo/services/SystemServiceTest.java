@@ -99,25 +99,25 @@ public class SystemServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournal() throws Exception {
-        systemService.showJournal("ntp", "192.168.10.11");
+        systemService.showJournal(servicesDefinition.getService("ntp"), "192.168.10.11");
         assertEquals ("sudo journalctl -u ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStartService() throws Exception {
-        systemService.startService("ntp", "192.168.10.11");
+        systemService.startService(servicesDefinition.getService("ntp"), "192.168.10.11");
         assertEquals ("sudo systemctl start ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStopService() throws Exception {
-        systemService.stopService("ntp", "192.168.10.11");
+        systemService.stopService(servicesDefinition.getService("ntp"), "192.168.10.11");
         assertEquals ("sudo systemctl stop ntp", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testRestartService() throws Exception {
-        systemService.restartService("ntp", "192.168.10.11");
+        systemService.restartService(servicesDefinition.getService("ntp"), "192.168.10.11");
         assertEquals ("sudo systemctl restart ntp", testSSHCommandScript.toString().trim());
     }
 

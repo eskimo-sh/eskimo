@@ -222,17 +222,9 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         kubernetesService.uninstallService(new KubernetesOperationsCommand.KubernetesOperationId("uninstallation", "cerebro"), "192.168.10.11");
 
-        assertEquals(1, kubernetesApiCalls.size());
-        assertEquals("http://localhost:12345/v2/apps/cerebro", kubernetesApiCalls.get(0));
+        //System.err.println (testSSHCommandScript.toString());
 
-        assertTrue(testSSHCommandScript.toString().contains("docker exec -i --user root kubernetes bash -c \"rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/cerebro\""));
-        assertTrue(testSSHCommandScript.toString().contains("docker exec -i --user root kubernetes bash -c \"docker-registry garbage-collect /etc/docker/registry/config.yml\""));
-
-        /*
-        System.out.println(testSSHCommandResultBuilder);
-        System.err.println(testSSHCommandScript);
-        System.err.println(String.join(",", kubernetesApiCalls));
-        */
+        assertEquals("eskimo-kubectl uninstall cerebro 192.168.10.11\n", testSSHCommandScript.toString());
 
         operationsMonitoringService.operationsFinished(true);
     }
@@ -372,114 +364,26 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournalKubernetes () throws Exception {
-
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
-
-        });
-
-        String expectedResults = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/expected-result.txt"));
-        String result = kubernetesService.showJournalInternal(servicesDefinition.getService("zeppelin"));
-        assertEquals(expectedResults, result);
+        kubernetesService.showJournal(servicesDefinition.getService("cerebro"), "192.168.10.11");
+        assertEquals ("eskimo-kubectl logs cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStartServiceKubernetes () throws Exception {
-
-        final List<String> kubernetesApiCalls = new ArrayList<>();
-
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
-
-        });
-
-        SystemService ss = new SystemService() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
-                retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "kubernetes_192-168-10-11", "OK");
-                return retStatus;
-            }
-        };
-        ss.setNotificationService(notificationService);
-        ss.setOperationsMonitoringService(operationsMonitoringService);
-        kubernetesService.setSystemService(ss);
-
-        kubernetesService.startService(servicesDefinition.getService("cerebro"));
-
-        kubernetesService.setOperationsMonitoringService(operationsMonitoringService);
-
-        System.out.println(testSSHCommandResultBuilder);
-        System.err.println(testSSHCommandScript);
-        System.err.println(String.join(",", kubernetesApiCalls));
-
-        assertEquals(1, kubernetesApiCalls.size());
-        assertEquals("http://localhost:12345/v2/apps/cerebro", kubernetesApiCalls.get(0));
-
+        kubernetesService.startService(servicesDefinition.getService("cerebro"), "192.168.10.11");
+        assertEquals ("eskimo-kubectl start cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStopServiceKubernetes () throws Exception {
-
-        final List<String> kubernetesApiCalls = new ArrayList<>();
-
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
-
-        });
-
-        SystemService ss = new SystemService() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
-                retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "kubernetes_192-168-10-11", "OK");
-                return retStatus;
-            }
-        };
-        ss.setNotificationService(notificationService);
-        ss.setOperationsMonitoringService(operationsMonitoringService);
-        kubernetesService.setSystemService(ss);
-
-        kubernetesService.setOperationsMonitoringService(operationsMonitoringService);
-
-        kubernetesService.stopService(servicesDefinition.getService("cerebro"));
-
-        assertEquals(1, kubernetesApiCalls.size());
-        assertEquals("http://localhost:12345/v2/apps/cerebro/tasks?scale=true", kubernetesApiCalls.get(0));
+        kubernetesService.stopService(servicesDefinition.getService("cerebro"), "192.168.10.11");
+        assertEquals ("eskimo-kubectl stop cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testRestartServiceKubernetes() throws Exception {
-
-
-        final List<String> kubernetesApiCalls = new ArrayList<>();
-        final AtomicInteger callCounter = new AtomicInteger(0);
-
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
-
-        });
-        SystemService ss = new SystemService() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                SystemStatusWrapper retStatus = new SystemStatusWrapper("{}");
-                retStatus.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + "kubernetes_192-168-10-11", "OK");
-                return retStatus;
-            }
-        };
-        ss.setNotificationService(notificationService);
-        ss.setOperationsMonitoringService(operationsMonitoringService);
-        kubernetesService.setSystemService(ss);
-
-        kubernetesService.setOperationsMonitoringService(operationsMonitoringService);
-
-        kubernetesService.restartService(servicesDefinition.getService("cerebro"));
-
-        assertEquals(2, kubernetesApiCalls.size());
-        assertEquals("http://localhost:12345/v2/apps/cerebro/tasks?scale=true", kubernetesApiCalls.get(0));
-        assertEquals("http://localhost:12345/v2/apps/cerebro", kubernetesApiCalls.get(1));
-    }
-
-    @Test
-    public void testEnsureKubernetesAvailability() throws Exception {
-        // do a kubectl get service kubernetes and ensure available
-        fail ("To Be Implemented");
+        kubernetesService.restartService(servicesDefinition.getService("cerebro"), "192.168.10.11");
+        assertEquals ("eskimo-kubectl restart cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
 }

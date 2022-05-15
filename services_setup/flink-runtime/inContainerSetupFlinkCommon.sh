@@ -160,22 +160,6 @@ sed -i s/"#rest.address: 0.0.0.0"/"rest.address: flink-runtime-rest.default.svc.
 sudo bash -c "echo -e \"blob.server.port: 6124\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 sudo bash -c "echo -e \"taskmanager.rpc.port: 50100\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-# temporary debug logs
-#sed -i s/"log4j.rootLogger=INFO, file"/"log4j.rootLogger=DEBUG, file"/g \
-#        /usr/local/lib/flink/conf/log4j.properties
-
-
-
-# This hack was required with FLink 1.9 when a killed task manager made is to that flink was never anymore able to
-# recover some resources from mesos !
-## temporary increasing timeout to workaround
-## https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af
-## https://issues.apache.org/jira/browse/FLINK-14074
-#
-#sudo bash -c "echo -e \"\n# FIXME emporary increasing timeout to workaround \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-#sudo bash -c "echo -e \"\n# https://stackoverflow.com/questions/58537199/apache-flink-resource-manager-app-master-fails-allocating-new-task-managers-af \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-#sudo bash -c "echo -e \"\n# https://issues.apache.org/jira/browse/FLINK-14074 \"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-#sudo bash -c "echo -e \"resourcemanager.taskmanager-timeout: 1800000\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 echo " - Symlinking entrypoint to /docker-entrypoint.sh"
 sudo ln -s /usr/local/sbin/eskimo-flink-entrypoint.sh /docker-entrypoint.sh

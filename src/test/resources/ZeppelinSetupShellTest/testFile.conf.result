@@ -34,7 +34,7 @@ export SPARK_HOME=/usr/local/lib/spark/
           "value": "/usr/local/lib/flink/",
 
           "name": "flink.tm.memory",
-          "value": "800m",
+          "value": "1024",
 
           "name": "shell.command.timeout.millisecs",
           "value": "1200000",

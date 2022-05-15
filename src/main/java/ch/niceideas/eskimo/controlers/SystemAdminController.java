@@ -124,15 +124,14 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
         Service service = servicesDefinition.getService(serviceName);
-
         if (service.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.showJournal(service),
+                    kubernetesService -> kubernetesService.showJournal(service, node),
                     "Successfully shown journal of " +  serviceName + ".");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.showJournal(serviceName, node),
+                    sysService -> sysService.showJournal(service, node),
                     serviceName + " journal display from " + node + ".");
         }
 
@@ -144,12 +143,12 @@ public class SystemAdminController extends AbstractOperationController {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.startService(service),
+                    kubernetesService -> kubernetesService.startService(service, node),
                     serviceName + " has been started successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.startService(serviceName, node),
+                    sysService -> sysService.startService(service, node),
                     serviceName + " has been started successfuly on " + node + ".");
         }
     }
@@ -161,12 +160,12 @@ public class SystemAdminController extends AbstractOperationController {
         Service service = servicesDefinition.getService(serviceName);
         if (service.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.stopService(service),
+                    kubernetesService -> kubernetesService.stopService(service, node),
                     serviceName + " has been stopped successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.stopService(serviceName, node),
+                    sysService -> sysService.stopService(service, node),
                     serviceName + " has been stopped successfuly on " + node + ".");
         }
     }
@@ -175,16 +174,15 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
-
         Service service = servicesDefinition.getService(serviceName);
         if (service.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.restartService(service),
+                    kubernetesService -> kubernetesService.restartService(service, node),
                     serviceName + " has been restarted successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.restartService(serviceName, node),
+                    sysService -> sysService.restartService(service, node),
                     serviceName + " has been restarted successfuly on " + node + ".");
         }
     }

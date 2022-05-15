@@ -42,6 +42,16 @@
       "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
     },
     {
+      "name": "spark.dynamicAllocation.shuffleTracking.timeout",
+      "defaultValue": "600s",
+      "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data."
+    },
+    {
+      "name": "spark.dynamicAllocation.schedulerBacklogTimeout",
+      "defaultValue": "5s",
+      "comment": "\tIf dynamic allocation is enabled and there have been pending tasks backlogged for more than this duration, new executors will be requested."
+    },
+    {
       "name": "spark.executor.memory",
       "defaultValue": "[ESKIMO_DEFAULT]",
       "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."

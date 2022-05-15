@@ -625,24 +625,7 @@
       "role" : "*",
       "title" : "Spark Console",
       "statusPageLinktitle" : "Monitor your Spark jobs",
-      "proxyReplacements" : [
-        {
-          "type" : "PLAIN",
-          "source" : "uiRoot + \"/history/\"",
-          "target": "uiRoot + \"/{PREFIX_PATH}/history/\"",
-          "__target" : "uiroot}}/history"
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "newBaseURI = words.slice(0, words.indexOf(\"history\")).join('/');",
-          "target": "newBaseURI = words.slice(0, words.indexOf(\"history\") - 1).join('/');"
-        },
-        {
-          "type" : "PLAIN",
-          "source" : "newBaseURI = words.slice(0, ind).join('/');",
-          "target": "newBaseURI = words.slice(0, ind - 1).join('/');"
-        }
-      ]
+      "applyStandardProxyReplacements": false
     },
     "dependencies": [
       {
@@ -734,6 +717,16 @@
             "name" :  "spark.dynamicAllocation.cachedExecutorIdleTimeout",
             "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
             "defaultValue" : "300s"
+          },
+          {
+            "name" :  "spark.dynamicAllocation.shuffleTracking.timeout",
+            "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data.",
+            "defaultValue" : "600s"
+          },
+          {
+            "name" :  "spark.dynamicAllocation.schedulerBacklogTimeout",
+            "comment": "\tIf dynamic allocation is enabled and there have been pending tasks backlogged for more than this duration, new executors will be requested.",
+            "defaultValue" : "5s"
           },
           {
             "name" :  "spark.executor.memory",

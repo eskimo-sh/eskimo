@@ -176,6 +176,34 @@ public class ServicesProxyServletTest {
     }
 
     @Test
+    public void testRewriteUrlFromResponse_sparkHistoryCase() throws Exception {
+        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
+                ServicesProxyServletTest.class.getClassLoader(),
+                new Class[] { HttpServletRequest.class },
+                (proxy, method, methodArgs) -> {
+                    switch (method.getName()) {
+                        case "getRequestURI":
+                            return "/history/spark-application-1652639268719/jobs/";
+                        case "getPathInfo":
+                            return "/history/spark-application-1652639268719/jobs/";
+                        case "getRequestURL":
+                            return new StringBuffer("http://localhost:9191/history/spark-application-1652639268719/jobs/");
+                        case "getQueryString":
+                            return "";
+                        case "getContextPath":
+                            return null;
+                        default:
+                            throw new UnsupportedOperationException(
+                                    "Unsupported method: " + method.getName());
+                    }
+                });
+        pms.updateServerForService("spark-history-server", "192.168.10.11");
+
+        assertEquals("http://localhost:9191/spark-history-server/history/spark-application-1652639268719/jobs/",
+                servlet.rewriteUrlFromResponse(request, "http://localhost:9191/history/spark-application-1652639268719/jobs/"));
+    }
+
+    @Test
     public void testNominalReplacements() throws Exception {
 
         Service kafkaManagerService = sd.getService("kafka-manager");

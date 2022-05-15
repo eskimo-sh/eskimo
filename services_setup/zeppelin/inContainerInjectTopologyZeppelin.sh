@@ -51,7 +51,7 @@ if [[ $KUBERNETES_API_MASTER == "" ]]; then
     exit 3
 fi
 
-echo " - Adapting configuration files and scripts"
+echo " - Adapting configuration files and scripts to Eskimo topology"
 
 sed -i -n '1h;1!H;${;g;s/'\
 '          \"name\": \"elasticsearch.host\",\n'\
@@ -87,8 +87,51 @@ sed -i -n '1h;1!H;${;g;s/'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 
+echo " - Adapting configuration files and scripts to Eskimo memory Allocation policy"
+
+if [[ "$MEMORY_FLINK_RUNTIME" != "" ]]; then
+
+    sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"jobmanager.memory.process.size\",\n'\
+'          \"value\": \"1024m\",'\
+'/'\
+'          \"name\": \"jobmanager.memory.process.size\",\n'\
+'          \"value\": \"'$MEMORY_FLINK_RUNTIME'm\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+    sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"taskmanager.memory.process.size\",\n'\
+'          \"value\": \"1024m\",'\
+'/'\
+'          \"name\": \"taskmanager.memory.process.size\",\n'\
+'          \"value\": \"'$MEMORY_FLINK_RUNTIME'm\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+fi
+
+if [[ "$MEMORY_SPARK_RUNTIME" != "" ]]; then
+
+    sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"spark.driver.memory\",\n'\
+'          \"value\": \"1g\",'\
+'/'\
+'          \"name\": \"spark.driver.memory\",\n'\
+'          \"value\": \"'$MEMORY_SPARK_RUNTIME'm\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+    sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"spark.executor.memory\",\n'\
+'          \"value\": \"1g\",'\
+'/'\
+'          \"name\": \"spark.executor.memory\",\n'\
+'          \"value\": \"'$MEMORY_SPARK_RUNTIME'm\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+fi
+
+
 echo " - Applying eskimo memory settings from topology in jvm.options"
-if [[ $MEMORY_ZEPPELIN != "" ]]; then
+if [[ "$MEMORY_ZEPPELIN" != "" ]]; then
     # taking only half for zeppelin and leaving the rest to interpreters
     let EFF_MEM=$MEMORY_ZEPPELIN/2
     sed -i s/"# export ZEPPELIN_MEM"/"export ZEPPELIN_MEM\"=-Xmx"$EFF_MEM"m\""/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
