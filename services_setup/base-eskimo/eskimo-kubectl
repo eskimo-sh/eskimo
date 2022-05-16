@@ -237,16 +237,14 @@ function restart_service() {
     echo " - Restart Service $SERVICE"
 
     SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
-    if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
-        echo "File $SERVICE_FILE can't be found !";
-        exit 2
+
+    if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
+        echo "   + Deleting $SERVICE"
+        envsubst < $SERVICE_FILE | kubectl delete -f -
+
+        echo "   + (Re-)applying $SERVICE"
+        envsubst < $SERVICE_FILE | kubectl apply -f -
     fi
-
-    echo "   + Deleting $SERVICE"
-    envsubst < $SERVICE_FILE | kubectl delete -f -
-
-    echo "   + (Re-)applying $SERVICE"
-    envsubst < $SERVICE_FILE | kubectl apply -f -
 }
 
 
