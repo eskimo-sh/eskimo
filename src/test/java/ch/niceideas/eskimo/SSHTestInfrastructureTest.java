@@ -43,6 +43,7 @@ import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -87,11 +88,11 @@ public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
         sftpChannel.get(uploadedFileName, downloadedFileName);
 
         File downloadedFile = new File(downloadedFileName);
-        Assert.assertTrue(downloadedFile.exists());
+        Assertions.assertTrue(downloadedFile.exists());
 
         String fileData = getFileContents(downloadedFile);
 
-        Assert.assertEquals(testFileContents, fileData);
+        Assertions.assertEquals(testFileContents, fileData);
 
         if (sftpChannel.isConnected()) {
             sftpChannel.exit();

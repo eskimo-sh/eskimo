@@ -56,9 +56,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
 
-    @Deprecated
-    public static final String MARATHON_FLAG = "(marathon)";
-
     public static final String KUBERNETES_FLAG = "(kubernetes)";
     public static final String CHECK_INSTALL_OP_TYPE = "Check / Install";
     public static final String BASE_SYSTEM = "Base System";
@@ -266,20 +263,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         }});
     }
 
-    private Collection<Object> toJsonList(List<ServiceOperationId> listOfPairs) {
-        return listOfPairs.stream()
-                .map((Function<ServiceOperationId, Object>) id -> {
-                    JSONObject ret = new JSONObject();
-                    try {
-                        ret.put(id.getService(), id.getNode());
-                    } catch (JSONException e) {
-                        // cannot happen
-                    }
-                    return ret;
-                })
-                .collect(Collectors.toList());
-    }
-
     public Set<String> getAllNodes() {
         Set<String> retSet = new HashSet<>();
         getInstallations().stream()
@@ -293,7 +276,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                 .forEach(retSet::add);
 
         // this one can come from restartes flags
-        retSet.remove(ServiceOperationsCommand.MARATHON_FLAG);
+        retSet.remove(ServiceOperationsCommand.KUBERNETES_FLAG);
 
         return retSet;
     }
@@ -334,33 +317,15 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return allOpList;
     }
 
-    @Data
-    @RequiredArgsConstructor
-    public static class ServiceOperationId implements OperationId {
+    public static class ServiceOperationId extends SimpleOperationCommand.SimpleOperationId implements OperationId {
 
-        private final String type;
-        private final String service;
-        private final String node;
-
-        public boolean isOnNode(String node) {
-            return this.node.equals(node);
-        }
-
-        public boolean isSameNode(OperationId other) {
-            return other.isOnNode(this.getNode());
+        public ServiceOperationId (String type, String service, String node) {
+            super (type, service, node);
         }
 
         public String getMessage() {
-            return type + " of " + getService() + " on " + getNode();
+            return getOperation() + " of " + getService() + " on " + getNode();
         }
 
-        @Override
-        public String toString() {
-            return standardizeOperationMember (type)
-                    + "_"
-                    + standardizeOperationMember (service)
-                    + "_"
-                    + standardizeOperationMember (node);
-        }
     }
 }

@@ -182,7 +182,7 @@ public class NodesConfigurationService {
 
                                         // topology
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
-                                            operationsMonitoringService.addInfo(operation, "Installing Topology");
+                                            operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
                                             installTopologyAndSettings(nodesConfig, kubeServicesConfig, memoryModel, node);
                                         }
 
@@ -205,11 +205,7 @@ public class NodesConfigurationService {
                     try {
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
                             String nodeName = restart.getNode().replace(".", "-");
-                            /* Deprecated */
-                            if (restart.getNode().equals(ServiceOperationsCommand.MARATHON_FLAG)) {
-                                nodeName = ServicesInstallStatusWrapper.MARATHON_NODE;
-                            } else
-                                if (restart.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG)) {
+                            if (restart.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG)) {
                                 nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
                             }
                             servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
@@ -255,7 +251,7 @@ public class NodesConfigurationService {
                     command.getRestarts(), nodesConfig)) {
                 systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            if (operation.getNode().equals(ServiceOperationsCommand.MARATHON_FLAG) || liveIps.contains(operation.getNode())) {
+                            if (operation.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG) || liveIps.contains(operation.getNode())) {
                                 restartServiceForSystem(operation);
                             }
                         });
@@ -434,7 +430,7 @@ public class NodesConfigurationService {
                 status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
     }
 
-    void restartServiceForSystem(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+    void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
 
         if (servicesDefinition.getService(operationId.getService()).isKubernetes()) {

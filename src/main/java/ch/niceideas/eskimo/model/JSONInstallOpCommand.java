@@ -35,11 +35,16 @@
 package ch.niceideas.eskimo.model;
 
 import lombok.Getter;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class JSONInstallOpCommand<T extends Serializable> implements JSONOpCommand {
 
@@ -60,7 +65,7 @@ public abstract class JSONInstallOpCommand<T extends Serializable> implements JS
         uninstallations.add(service);
     }
 
-    void addRestart (T service) {
+    protected void addRestart (T service) {
         restarts.add (service);
     }
 
@@ -72,4 +77,17 @@ public abstract class JSONInstallOpCommand<T extends Serializable> implements JS
         restarts.sort(c);
     }
 
+    protected Collection<Object> toJsonList(List<? extends SimpleOperationCommand.SimpleOperationId> listOfPairs) {
+        return listOfPairs.stream()
+                .map((Function<SimpleOperationCommand.SimpleOperationId, Object>) id -> {
+                    JSONObject ret = new JSONObject();
+                    try {
+                        ret.put(id.getService(), id.getNode());
+                    } catch (JSONException e) {
+                        // cannot happen
+                    }
+                    return ret;
+                })
+                .collect(Collectors.toList());
+    }
 }

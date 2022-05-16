@@ -35,23 +35,33 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.lang.management.MemoryPoolMXBean;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+
+import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesSettingsService {
+
+    public static String OPERATION_SETTINGS = "Settings";
 
     private static final Logger logger = Logger.getLogger(ServicesSettingsService.class);
 
@@ -62,10 +72,31 @@ public class ServicesSettingsService {
     private ConfigurationService configurationService;
 
     @Autowired
-    private NodeRangeResolver nodeRangeResolver;
+    private OperationsMonitoringService operationsMonitoringService;
+
+    @Autowired
+    private ServicesInstallationSorter servicesInstallationSorter;
+
+    @Autowired
+    private SystemService systemService;
+
+    @Autowired
+    private MemoryComputer memoryComputer;
+
+    @Autowired
+    private SystemOperationService systemOperationService;
 
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
+
+    @Value("${system.operationWaitTimoutSeconds}")
+    private int operationWaitTimoutSeconds = 800; // ~ 13 minutes (for an individual step)
+
+    @Value("${system.parallelismInstallThreadCount}")
+    private int parallelismInstallThreadCount = 10;
+
+    @Value("${system.baseInstallWaitTimoutSeconds}")
+    private int baseInstallWaitTimout = 1000;
 
     private final ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
 
@@ -73,8 +104,20 @@ public class ServicesSettingsService {
     public void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
-    public void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
+    public void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
+        this.operationsMonitoringService = operationsMonitoringService;
+    }
+    public void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
+        this.servicesInstallationSorter = servicesInstallationSorter;
+    }
+    public void setSystemService (SystemService systemService) {
+        this.systemService = systemService;
+    }
+    public void setMemoryComputer (MemoryComputer memoryComputer) {
+        this.memoryComputer = memoryComputer;
+    }
+    public void setSystemOperationService (SystemOperationService systemOperationService) {
+        this.systemOperationService = systemOperationService;
     }
     public void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
@@ -96,20 +139,71 @@ public class ServicesSettingsService {
             configurationService.saveServicesSettings(servicesSettings);
 
             if (dirtyServices != null && !dirtyServices.isEmpty()) {
+
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
+                KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
-                if (nodesConfig != null) { // maybe this happens before any nodes config has been set
+                ServiceRestartOperationsCommand restartCommand = ServiceRestartOperationsCommand.create(
+                        servicesInstallationSorter, servicesDefinition, nodesConfig, dirtyServices);
 
-                    ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
+                boolean success = false;
+                operationsMonitoringService.operationsStarted(restartCommand);
+                try {
 
-                    ServiceOperationsCommand restartCommand = ServiceOperationsCommand.createForRestartsOnly(
-                            servicesDefinition,
-                            nodeRangeResolver,
-                            dirtyServices.toArray(new String[0]),
-                            serviceInstallStatus,
-                            nodesConfig);
+                    Set<String> liveIps = new HashSet<>();
+                    Set<String> deadIps = new HashSet<>();
 
-                    nodesConfigurationService.applyNodesConfig(restartCommand);
+                    List<Pair<String, String>> nodeSetupPairs = systemService.buildDeadIps(
+                            restartCommand.getAllNodes(),
+                            nodesConfig,
+                            liveIps, deadIps);
+                    if (nodeSetupPairs == null) {
+                        return;
+                    }
+
+                    List<ServiceOperationsCommand.ServiceOperationId> nodesSetup =
+                            nodeSetupPairs.stream()
+                                    .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(
+                                            ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE,
+                                            OPERATION_SETTINGS,
+                                            nodeSetupPair.getValue()))
+                                    .collect(Collectors.toList());
+
+                    MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadIps);
+
+                    // Nodes setup
+                    systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
+                            (operation, error) -> {
+                                String node = operation.getNode();
+                                if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
+
+                                    systemOperationService.applySystemOperation(
+                                            new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, OPERATION_SETTINGS, node),
+                                            ml -> {
+
+                                                // topology
+                                                if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
+                                                    operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
+                                                    nodesConfigurationService.installTopologyAndSettings(nodesConfig, kubeServicesConfig, memoryModel, node);
+                                                }
+                                            }, null);
+                                }
+                            });
+
+                    // restarts
+                    for (List<SimpleOperationCommand.SimpleOperationId> restarts : servicesInstallationSorter.orderOperations (
+                            restartCommand.getRestarts(), nodesConfig)) {
+                        systemService.performPooledOperation(restarts, 1, operationWaitTimoutSeconds,
+                                (operation, error) -> {
+                                    if (operation.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG) || liveIps.contains(operation.getNode())) {
+                                        nodesConfigurationService.restartServiceForSystem(operation);
+                                    }
+                                });
+                    }
+
+                } finally {
+                    operationsMonitoringService.operationsFinished(success);
+                    logger.info ("System Deployment Operations Completed.");
                 }
             }
 
@@ -214,4 +308,79 @@ public class ServicesSettingsService {
 
         return dirtyServices.toArray(new String[0]);
     }
+
+    private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<SimpleOperationCommand.SimpleOperationId> {
+
+        private final ServicesInstallationSorter servicesInstallationSorter;
+
+        public static ServiceRestartOperationsCommand create (
+                ServicesInstallationSorter servicesInstallationSorter,
+                ServicesDefinition servicesDefinition,
+                NodesConfigWrapper nodesConfig,
+                List<String> dirtyServices) {
+            return new ServiceRestartOperationsCommand(servicesInstallationSorter, servicesDefinition, nodesConfig, dirtyServices);
+        }
+
+        public ServiceRestartOperationsCommand (
+                ServicesInstallationSorter servicesInstallationSorter,
+                ServicesDefinition servicesDefinition,
+                NodesConfigWrapper nodesConfig,
+                List<String> dirtyServices) {
+            this.servicesInstallationSorter = servicesInstallationSorter;
+            dirtyServices.stream()
+                    .map (servicesDefinition::getService)
+                    .forEach(service -> {
+                        if (service.isKubernetes()) {
+                            addRestart(new SimpleOperationCommand.SimpleOperationId("restart", service.getName(), ServiceOperationsCommand.KUBERNETES_FLAG));
+                        } else {
+                            nodesConfig.getNodeNumbers(service.getName()).stream()
+                                    .map (nodesConfig::getNodeAddress)
+                                    .forEach(node -> addRestart(new SimpleOperationCommand.SimpleOperationId("restart", service.getName(), node)));
+                        }
+                    });
+            //
+        }
+
+        @Override
+        public JSONObject toJSON () {
+            return new JSONObject(new HashMap<String, Object>() {{
+                put("restarts", new JSONArray(toJsonList(getRestarts())));
+            }});
+        }
+
+        public Set<String> getAllNodes() {
+            Set<String> retSet = new HashSet<>();
+            getRestarts().stream()
+                    .map(SimpleOperationCommand.SimpleOperationId::getNode)
+                    .forEach(retSet::add);
+
+            // this one can come from restartes flags
+            retSet.remove(ServiceOperationsCommand.KUBERNETES_FLAG);
+
+            return retSet;
+        }
+
+        @Override
+        public List<SimpleOperationCommand.SimpleOperationId> getAllOperationsInOrder
+                (OperationsContext context)
+                throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+
+            List<SimpleOperationCommand.SimpleOperationId> allOpList = new ArrayList<>();
+
+            context.getNodesConfig().getNodeAddresses()
+                    .forEach(node -> allOpList.add(new ServiceOperationsCommand.ServiceOperationId(
+                            ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, OPERATION_SETTINGS, node)));
+
+            getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
+
+            return allOpList;
+        }
+
+        public List<List<SimpleOperationCommand.SimpleOperationId>> getRestartsInOrder
+                (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
+                throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+            return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);
+        }
+    }
+
 }

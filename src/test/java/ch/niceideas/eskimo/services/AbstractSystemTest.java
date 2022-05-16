@@ -88,9 +88,9 @@ public abstract class AbstractSystemTest {
 
     protected OperationsMonitoringService operationsMonitoringService;
 
-    protected StringBuilder testSSHCommandResultBuilder = new StringBuilder();
-    protected StringBuilder testSSHCommandScript = new StringBuilder();
-    protected StringBuilder testSCPCommands = new StringBuilder();
+    protected StringBuilder testSSHCommandResultBuilder = new StringBuilder(10000);
+    protected StringBuilder testSSHCommandScript = new StringBuilder(10000);
+    protected StringBuilder testSCPCommands = new StringBuilder(10000);
 
     protected String systemStatusTest = null;
     protected String expectedFullStatus = null;
@@ -241,7 +241,13 @@ public abstract class AbstractSystemTest {
         operationsMonitoringService.setServicesInstallationSorter(servicesInstallationSorter);
 
         servicesSettingsService = new ServicesSettingsService();
-        servicesSettingsService.setNodeRangeResolver(nodeRangeResolver);
+        servicesSettingsService.setSystemService(systemService);
+        servicesSettingsService.setSystemOperationService(systemOperationService);
+        servicesSettingsService.setMemoryComputer(memoryComputer);
+        servicesSettingsService.setOperationsMonitoringService(operationsMonitoringService);
+        servicesSettingsService.setServicesInstallationSorter(servicesInstallationSorter);
+        servicesSettingsService.setConfigurationService(configurationService);
+        servicesSettingsService.setNodesConfigurationService(nodesConfigurationService);
         servicesSettingsService.setServicesDefinition(servicesDefinition);
 
         connectionManagerService = new ConnectionManagerService() {

@@ -2,6 +2,10 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.Service;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -39,7 +43,7 @@ public class KubeStatusParserTest {
 
     @Test
     public void testPodNameRexp() throws Exception {
-        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("elasticsearch-0").matches());
+        assertTrue(KubeStatusParser.POD_NAME_REXP.matcher("elasticsearch-0").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kafka-2").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kubernetes-dashboard-7db6bbdf55-vhgcc").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("flink-5db698798f-nkj2p").matches());
@@ -53,7 +57,7 @@ public class KubeStatusParserTest {
 
         //System.err.println (parser.toString());
 
-        assertEquals ("POD STATUSES\n" +
+        assertEquals("POD STATUSES\n" +
                         "elasticsearch-2 : NAMESPACE=default, READY=1/1, STATUS=Running, READINESS GATES=<none>, NOMINATED NODE=<none>, NODE=192.168.56.23, IP=172.30.1.2, RESTARTS=0, NAME=elasticsearch-2, AGE=11h, \n" +
                         "kubernetes-dashboard-54dd7bccfc-wngd4 : NAMESPACE=kubernetes-dashboard, READY=1/1, STATUS=Running, READINESS GATES=<none>, NOMINATED NODE=<none>, NODE=192.168.56.23, IP=192.168.56.23, RESTARTS=0, NAME=kubernetes-dashboard-54dd7bccfc-wngd4, AGE=54m, \n" +
                         "elasticsearch-1 : NAMESPACE=default, READY=1/1, STATUS=Running, READINESS GATES=<none>, NOMINATED NODE=<none>, NODE=192.168.56.22, IP=172.30.2.2, RESTARTS=0, NAME=elasticsearch-1, AGE=12h, \n" +
@@ -74,8 +78,7 @@ public class KubeStatusParserTest {
                         "elasticsearch\n" +
                         "k8s.gcr.io\n" +
                         "spark\n" +
-                        "spark-runtime\n",
-                parser.toString());
+                        "spark-runtime\n", parser.toString());
     }
 
     @Test

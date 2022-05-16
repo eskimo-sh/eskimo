@@ -146,7 +146,7 @@ public class KubernetesService {
                     if (StringUtils.isBlank(kubeMasterNode)) {
                         throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
                     }
-                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl start " + service.getName() + " " + node);
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl start " + service.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error (e, e);
                     throw new KubernetesException(e);
@@ -167,7 +167,7 @@ public class KubernetesService {
                     if (StringUtils.isBlank(kubeMasterNode)) {
                         throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
                     }
-                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl stop " + service.getName() + " " + node);
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl stop " + service.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error (e, e);
                     throw new KubernetesException(e);
@@ -192,7 +192,7 @@ public class KubernetesService {
                 if (StringUtils.isBlank(kubeMasterNode)) {
                     throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
                 }
-                return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + service.getName() + " " + node);
+                return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + service.getName() + " " + kubeMasterNode);
             } catch (FileException | SetupException e) {
                 logger.error (e, e);
                 throw new KubernetesException(e);

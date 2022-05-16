@@ -36,8 +36,6 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
 
         scs = new ServicesSettingsService();
 
-        scs.setNodeRangeResolver(nrr);
-
         scs.setConfigurationService(configurationService);
 
         scs.setServicesDefinition(def);

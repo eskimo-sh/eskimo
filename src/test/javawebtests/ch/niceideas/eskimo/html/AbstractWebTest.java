@@ -183,7 +183,7 @@ public abstract class AbstractWebTest {
 
         URL testPage = ResourceUtils.getURL("classpath:GenericTestPage.html");
         page = webClient.getPage(testPage);
-        Assert.assertEquals("Generic Test Page", page.getTitleText());
+        assertEquals("Generic Test Page", page.getTitleText());
 
         // create common mocks
         // create mock functions

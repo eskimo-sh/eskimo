@@ -53,6 +53,9 @@ if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
     . /usr/local/sbin/inContainerInjectTopology.sh
 fi
 
+echo " - Inject settings (flink-runtime)"
+/usr/local/sbin/settingsInjector.sh flink-runtime
+
 echo " - Changing current directory to /home/flink"
 cd /home/flink
 

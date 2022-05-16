@@ -44,8 +44,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServicesSettingsServiceTest extends AbstractSystemTest {
 
@@ -64,11 +63,14 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
 
         scs = new ServicesSettingsService();
 
-        scs.setNodeRangeResolver(nodeRangeResolver);
-
+        scs.setSystemService(systemService);
+        scs.setSystemOperationService(systemOperationService);
+        scs.setMemoryComputer(memoryComputer);
+        scs.setOperationsMonitoringService(operationsMonitoringService);
+        scs.setServicesInstallationSorter(servicesInstallationSorter);
         scs.setConfigurationService(configurationService);
-
-        scs.setNodesConfigurationService(createNodesConfiguratioNService());
+        scs.setServicesDefinition(servicesDefinition);
+        scs.setNodesConfigurationService(nodesConfigurationService);
 
         servicesDefinition = new ServicesDefinition() {
             @Override
@@ -86,7 +88,8 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }
 
-    protected NodesConfigurationService createNodesConfiguratioNService() {
+    @Override
+    protected NodesConfigurationService createNodesConfigurationService() {
         return new NodesConfigurationService() {
             @Override
             public void applyNodesConfig(ServiceOperationsCommand command) {
@@ -100,6 +103,8 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         //fail ("To Be Implemented");
 
         configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+        configurationService.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
 
         configurationService.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
 
@@ -187,6 +192,26 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         assertEquals ("[ESKIMO_DEFAULT]", newConfig.getValueForPath("settings.12.settings.0.properties.7.defaultValue"));
         assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.7.value"));
 
+        StringBuilder sb = new StringBuilder();
+        notificationService.fetchElements(1).getValue().stream()
+                .map (msg -> msg.get("message"))
+                .forEach(msg -> sb.append (msg).append("\n"));
+
+        String notifications = sb.toString();
+
+        System.err.println (notifications);
+
+        assertTrue(notifications.contains("Check / Install of Settings on 192.168.10.11 succeeded"));
+        assertTrue(notifications.contains("Check / Install of Settings on 192.168.10.13 succeeded"));
+
+        assertTrue (notifications.contains("Executing restart on elasticsearch on (kubernetes)\n" +
+                "Executing restart on elasticsearch on (kubernetes) succeeded\n" +
+                "Executing restart on grafana on (kubernetes)\n" +
+                "Executing restart on grafana on (kubernetes) succeeded\n" +
+                "Executing restart on spark-runtime on (kubernetes)\n" +
+                "Executing restart on spark-runtime on (kubernetes) succeeded\n" +
+                "Executing restart on kafka on (kubernetes)\n" +
+                "Executing restart on kafka on (kubernetes) succeeded"));
     }
 
 }
