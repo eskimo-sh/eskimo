@@ -391,7 +391,7 @@
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
-      "role" : "*",
+      "role" : "ADMIN",
       "title" : "Kubernetes Dashboard",
       "statusPageLinktitle" : "Manage Kubernetes Cluster"
     }

@@ -73,7 +73,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
             "\"users\" : [ " +
             "    { " +
             "        \"username\" : \"admin\", " +
-            "        \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\", " +
+            "        \"password\" : \"$2a$10$W5pa6y.k95V27ABPd7eFqeqniTnpYqYOiGl75jJoXApG8SBEvERYO\", " + // password
             "        \"role\": \"ADMIN\" " +
             "    }, " +
             "    { " +
