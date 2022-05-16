@@ -364,24 +364,28 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
     @Test
     public void testShowJournalKubernetes () throws Exception {
+        configurationService.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
         kubernetesService.showJournal(servicesDefinition.getService("cerebro"), "192.168.10.11");
         assertEquals ("eskimo-kubectl logs cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStartServiceKubernetes () throws Exception {
+        configurationService.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
         kubernetesService.startService(servicesDefinition.getService("cerebro"), "192.168.10.11");
         assertEquals ("eskimo-kubectl start cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testStopServiceKubernetes () throws Exception {
+        configurationService.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
         kubernetesService.stopService(servicesDefinition.getService("cerebro"), "192.168.10.11");
         assertEquals ("eskimo-kubectl stop cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }
 
     @Test
     public void testRestartServiceKubernetes() throws Exception {
+        configurationService.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
         kubernetesService.restartService(servicesDefinition.getService("cerebro"), "192.168.10.11");
         assertEquals ("eskimo-kubectl restart cerebro 192.168.10.11", testSSHCommandScript.toString().trim());
     }

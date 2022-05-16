@@ -118,11 +118,19 @@ public class KubernetesService {
         this.nodeRangeResolver = nodeRangeResolver;
     }
 
-    // FIXME
     public void showJournal(Service service, String node) throws SystemException {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> {
             if (service.isKubernetes()) {
-                return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl logs " + service.getName() + " " + node);
+                try {
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    if (StringUtils.isBlank(kubeMasterNode)) {
+                        throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
+                    }
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl logs " + service.getName() + " " + node);
+                } catch (FileException | SetupException e) {
+                    logger.error (e, e);
+                    throw new KubernetesException(e);
+                }
             } else {
                 throw new UnsupportedOperationException("Showing service journal for " + service.getName()
                         + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
@@ -130,11 +138,19 @@ public class KubernetesService {
         });
     }
 
-    // FIXME
     public void startService(Service service, String node) throws SystemException {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Starting", () -> {
             if (service.isKubernetes()) {
-                return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl start " + service.getName() + " " + node);
+                try {
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    if (StringUtils.isBlank(kubeMasterNode)) {
+                        throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
+                    }
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl start " + service.getName() + " " + node);
+                } catch (FileException | SetupException e) {
+                    logger.error (e, e);
+                    throw new KubernetesException(e);
+                }
             } else {
                 throw new UnsupportedOperationException("Starting service for " + service.getName()
                         + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
@@ -146,7 +162,16 @@ public class KubernetesService {
     public void stopService(Service service, String node) throws SystemException {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> {
             if (service.isKubernetes()) {
-                return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl stop " + service.getName() + " " + node);
+                try {
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    if (StringUtils.isBlank(kubeMasterNode)) {
+                        throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
+                    }
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl stop " + service.getName() + " " + node);
+                } catch (FileException | SetupException e) {
+                    logger.error (e, e);
+                    throw new KubernetesException(e);
+                }
             } else {
                 throw new UnsupportedOperationException("Stopping service for " + service.getName()
                         + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
@@ -162,7 +187,16 @@ public class KubernetesService {
 
     protected String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
         if (service.isKubernetes()) {
-            return sshCommandService.runSSHCommand(KUBERNETES_NODE, "eskimo-kubectl restart " + service.getName() + " " + node);
+            try {
+                String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                if (StringUtils.isBlank(kubeMasterNode)) {
+                    throw new KubernetesException("Couldn't find service " + KUBE_MASTER + " in installation status");
+                }
+                return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + service.getName() + " " + node);
+            } catch (FileException | SetupException e) {
+                logger.error (e, e);
+                throw new KubernetesException(e);
+            }
         } else {
             throw new UnsupportedOperationException("Restart service for " + service.getName()
                     + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);

@@ -52,5 +52,285 @@ if [[ $3 == "" ]]; then
 fi
 export NODE=$3
 
+export PATH=/usr/local/bin:$PATH
+
+if [[ $TEST_MODE != "true" ]]; then
+    . /etc/eskimo_topology.sh
+fi
 
 # FIXME Implement me
+MULTIPLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$'`
+SINGLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$'`
+
+MULTIPLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$' | sed 's/\([a-z]*\).*/\1/'`
+SINGLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$' | sed 's/\([a-z\-]\+\)-[a-z0-9]\+-[a-z0-9]\+/\1/'`
+
+
+function get_multiple_service_pod() {
+
+    if [[ "$1" == "" ]]; then
+        echo "ERROR: get_multiple_service_pod takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    if [[ "$2" == "" ]]; then
+        echo "ERROR: get_multiple_service_pod takes node as second argument"
+        exit 2
+    fi
+    NODE=$2
+
+    export IS_MULTIPLE=
+    if [[ `echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE` ]]; then
+        export IS_MULTIPLE=true
+    fi
+
+    if [[ ! $IS_MULTIPLE ]] ; then
+        echo "ERROR: get_multiple_service_pod should only be called for multiple services"
+        exit 3
+    fi
+
+    CANDIDATES=`echo "$MULTIPLE_SERVICES_PODS" | grep $SERVICE`
+    IFS=$'\n'
+    for pod in `kubectl get pods --all-namespaces -o custom-columns=NAME:metadata.name,NODE:status.hostIP`; do
+        for candidate in `echo "$CANDIDATES"`; do
+            if [[ `echo $pod | grep $candidate` != "" ]]; then
+                #FOUND_NODE=`echo $pod | sed 's/ \+/ /' | cut -d ' ' -f 2`
+                if [[ `echo $pod | grep $NODE` != "" ]]; then
+                    FOUND_POD=`echo $pod | cut -d ' ' -f 1`
+                    break 2
+                 fi
+            fi
+        done
+    done
+
+    if [[ "$FOUND_POD" == "" ]]; then
+        echo "ERROR: get_multiple_service_pod couldn't find pod"
+        exit 4
+    fi
+
+    echo "$FOUND_POD"
+}
+
+
+function get_pod() {
+    if [[ "$1" == "" ]]; then
+        echo "ERROR: get_pod takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    if [[ "$2" == "" ]]; then
+        echo "ERROR: get_pod takes node as second argument"
+        exit 2
+    fi
+    NODE=$2
+
+    IS_MULTIPLE=
+    if [[ `echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE` ]]; then
+        IS_MULTIPLE=true
+    fi
+
+    if [[ $IS_MULTIPLE ]]; then
+        POD=`get_multiple_service_pod $SERVICE $NODE`
+    else
+        POD=`echo "$SINGLE_SERVICES_PODS" | grep $SERVICE`
+    fi
+
+    if [[ "$POD" == "" || `echo $POD | grep "ERROR"` != "" ]]; then
+        echo "ERROR: Failed to get pod for $SERVICE on $NODE"
+        echo "$POD"
+        exit 3
+    fi
+
+    echo "$POD"
+}
+
+function get_namespace() {
+
+    if [[ "$1" == "" ]]; then
+        echo "ERROR: get_namespace takes pod as first argument"
+        exit 1
+    fi
+    POD=$1
+
+    NAMESPACE=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace | grep $POD | sed 's/  \+/ /g' | cut -d ' ' -f 2`
+    if [[ "$NAMESPACE" == "" ]]; then
+        echo "ERROR: Couldn't get namespace for pod $POD"
+        exit 2
+    fi
+
+    echo "$NAMESPACE"
+}
+
+
+function show_log() {
+
+    if [[ "$1" == "" ]]; then
+        echo "show_log takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    if [[ "$2" == "" ]]; then
+        echo "show_log takes node as second argument"
+        exit 1
+    fi
+    NODE=$2
+
+    echo " - Showing logs for Service $SERVICE on $NODE"
+
+    POD=`get_pod $SERVICE $NODE`
+    if [[ $POD == "" || `echo $POD | grep "ERROR"` != "" ]]; then
+        echo "ERROR: Couldn't get POD"
+        echo "$POD"
+        exit 2
+    fi
+
+    echo "   + POD is $POD"
+
+    NAMESPACE=`get_namespace $POD`
+    if [[ $NAMESPACE == "" || `echo $NAMESPACE | grep "ERROR"` != "" ]]; then
+        echo "ERROR: Couldn't get NAMESPACE"
+        echo "$NAMESPACE"
+        exit 3
+    fi
+
+    echo "   + NAMESPACE is $NAMESPACE"
+
+    kubectl -n $NAMESPACE logs $POD
+}
+
+
+function uninstall_service() {
+
+    if [[ "$1" == "" ]]; then
+        echo "restart_service takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    echo " - Uninstall Service $SERVICE"
+
+    SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
+        echo "File $SERVICE_FILE can't be found !";
+        exit 2
+    fi
+
+    echo "   + Deleting $SERVICE"
+    envsubst < $SERVICE_FILE | kubectl delete -f -
+
+    echo "   + Deleting service file"
+    sudo rm -Rf $SERVICE_FILE
+}
+
+
+function restart_service() {
+
+    if [[ "$1" == "" ]]; then
+        echo "restart_service takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    echo " - Restart Service $SERVICE"
+
+    SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
+        echo "File $SERVICE_FILE can't be found !";
+        exit 2
+    fi
+
+    echo "   + Deleting $SERVICE"
+    envsubst < $SERVICE_FILE | kubectl delete -f -
+
+    echo "   + (Re-)applying $SERVICE"
+    envsubst < $SERVICE_FILE | kubectl apply -f -
+}
+
+
+function stop_service() {
+
+    if [[ "$1" == "" ]]; then
+        echo "show_log takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    echo " - Stopping Service $SERVICE"
+
+    IS_MULTIPLE=
+    if [[ `echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE` ]]; then
+        IS_MULTIPLE=true
+    fi
+
+    POD=`get_pod $SERVICE $NODE`
+    if [[ $POD == "" || `echo $POD | grep "ERROR"` != "" ]]; then
+        echo "ERROR: Couldn't get POD"
+        echo "$POD"
+        exit 2
+    fi
+
+    echo "   + POD is $POD"
+
+    NAMESPACE=`get_namespace $POD`
+    if [[ $NAMESPACE == "" || `echo $NAMESPACE | grep "ERROR"` != "" ]]; then
+        echo "ERROR: Couldn't get NAMESPACE"
+        echo "$NAMESPACE"
+        exit 3
+    fi
+
+    if [[ $IS_MULTIPLE ]]; then
+
+        echo "   + Deleting statefulset $SERVICE"
+        kubectl -n $NAMESPACE delete statefulset $SERVICE
+
+    else
+
+        echo "   + Deleting deployment $SERVICE"
+        kubectl -n $NAMESPACE delete deployment $SERVICE
+    fi
+}
+
+
+function start_service() {
+
+    if [[ "$1" == "" ]]; then
+        echo "show_log takes service as first argument"
+        exit 1
+    fi
+    SERVICE=$1
+
+    echo " - Starting Service $SERVICE"
+
+    SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
+        echo "File $SERVICE_FILE can't be found !";
+        exit 2
+    fi
+
+    echo "   + (Re-)applying $SERVICE"
+    envsubst < $SERVICE_FILE | kubectl apply -f -
+}
+
+
+if [[ "$COMMAND" == "logs" ]]; then
+    show_log $SERVICE $NODE
+
+elif [[ "$COMMAND" == "restart" ]]; then
+    restart_service $SERVICE
+
+elif [[ "$COMMAND" == "start" ]]; then
+    start_service $SERVICE
+
+elif [[ "$COMMAND" == "stop" ]]; then
+    stop_service $SERVICE
+
+elif [[ "$COMMAND" == "uninstall" ]]; then
+    uninstall_service $SERVICE
+
+else
+    echo "Unknown Command : $COMMAND"
+    exit 100
+fi

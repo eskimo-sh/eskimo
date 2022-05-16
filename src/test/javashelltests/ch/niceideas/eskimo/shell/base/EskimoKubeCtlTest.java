@@ -65,6 +65,16 @@ public class EskimoKubeCtlTest {
                 new File("./services_setup/base-eskimo/eskimo-kubectl"),
                 new File (jailPath + "/eskimo-kubectl"));
 
+        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/eskimo-kubectl"}, true);
+
+        String kubectlMockCommandContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubeCtlTest/kubectl"), "UTF-8");
+        FileUtils.writeFile(new File (jailPath + "/kubectl"), kubectlMockCommandContent);
+
+        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/kubectl"}, true);
+
+        // I need the real sed
+        new File (jailPath + "/sed").delete();
+
     }
 
     @AfterEach
@@ -74,7 +84,7 @@ public class EskimoKubeCtlTest {
         }
     }
 
-    private void createTestScript(String scriptName, String command) throws FileException {
+    private void createTestScript(String scriptName, String command) throws FileException, ProcessHelper.ProcessHelperException {
 
         String script = "#!/bin/bash\n" + "\n" +
                 "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
@@ -98,56 +108,105 @@ public class EskimoKubeCtlTest {
 
     @Test
     public void testShowJournal_multiple() throws Exception {
-        createTestScript("showJournal.sh", "log elasticsearch 192.168.56.11");
+        createTestScript("calling_script.sh", "logs elasticsearch 192.168.56.31");
 
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/showJournal.sh"}, true);
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
-        fail ("To Be Implemented");
+        //System.err.println (result);
+        assertTrue (result.contains("-n default logs elasticsearch-0"));
     }
 
     @Test
     public void testShowJournal_single() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "logs cerebro 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("-n default logs cerebro-5bc7f5874b-w9x88"));
     }
 
     @Test
     public void testStop_deployment() throws Exception {
-        fail ("To Be Implemented");
+
+        createTestScript("calling_script.sh", "stop cerebro 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("-n default delete deployment cerebro"));
     }
 
     @Test
     public void testStop_statefulSet() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "stop kafka 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        System.err.println (result);
+        assertTrue (result.contains("-n default delete statefulset kafka"));
     }
 
     @Test
     public void testStart_deployment() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "start cerebro 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("apply -f -"));
     }
 
     @Test
     public void testStart_statefulSet() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "start logstash 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("apply -f -"));
     }
 
     @Test
     public void testRestart_deployment() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "restart cerebro 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("delete -f -"));
+        assertTrue (result.contains("apply -f -"));
     }
 
     @Test
     public void testRestart_statefulSet() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "restart elasticsearch 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("delete -f -"));
+        assertTrue (result.contains("apply -f -"));
     }
 
     @Test
     public void testUninstall_deployment() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "uninstall cerebro 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("delete -f -"));
     }
 
     @Test
     public void testUninstall_statefulSet() throws Exception {
-        fail ("To Be Implemented");
+        createTestScript("calling_script.sh", "uninstall kafka 192.168.56.31");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+
+        //System.err.println (result);
+        assertTrue (result.contains("delete -f -"));
     }
 
 }
