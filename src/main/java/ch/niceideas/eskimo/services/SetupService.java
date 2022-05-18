@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MessageLogger;
+import ch.niceideas.eskimo.model.Service;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
@@ -108,8 +109,8 @@ public class SetupService {
     @Value("${setup.packagesDevPath}")
     private String packagesDevPath = "./packages_dev";
 
-    @Value("${setup.packagesToBuild}")
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,kube-master,kube-dashboard,spark,flink,zeppelin,marathon";
+    @Value("${setup.additionalPackagesToBuild}")
+    private String additionalPackagesToBuild = "base-eskimo";
 
     @Value("${setup.kubePackages}")
     private String kubePackages = "kube";
@@ -134,9 +135,6 @@ public class SetupService {
     }
     public void setPackageDistributionPath(String packageDistributionPath) {
         this.packageDistributionPath = packageDistributionPath;
-    }
-    void setPackagesToBuild (String packagesToBuild) {
-        this.packagesToBuild = packagesToBuild;
     }
     void setKubePackages (String kubePackages) {
         this.kubePackages = kubePackages;
@@ -174,6 +172,16 @@ public class SetupService {
     @PostConstruct
     public void init() {
         configStoragePathInternal = readConfigStoragePath();
+    }
+
+    public String getPackagesToBuild() {
+        return additionalPackagesToBuild + "," + Arrays.stream(servicesDefinition.listAllServices())
+                .map (serviceName -> servicesDefinition.getService(serviceName))
+                .map (Service::getImageName)
+                .filter(Objects::nonNull)
+                .sorted()
+                .distinct()
+                .collect(Collectors.joining(","));
     }
 
     public String getConfigStoragePath() throws SetupException {
@@ -253,7 +261,7 @@ public class SetupService {
     }
 
     void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
-        for (String service : packagesToBuild.split(",")) {
+        for (String service : getPackagesToBuild().split(",")) {
             if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
                             file.getName().startsWith("docker_template")
@@ -444,7 +452,7 @@ public class SetupService {
                 && packagesVersion != null) {
             Set<String> updates = new HashSet<>();
 
-            for (String imageName : packagesToBuild.split(",")) {
+            for (String imageName : getPackagesToBuild().split(",")) {
 
                 Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);
                 Pair<String, String> lastVersionValues = lastVersion.getValue();
@@ -602,7 +610,7 @@ public class SetupService {
                     && StringUtils.isNotEmpty(servicesOrigin)
                     && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for services default is build
 
-                for (String imageName : packagesToBuild.split(",")) {
+                for (String imageName : getPackagesToBuild().split(",")) {
 
                     Pair<File, Pair<String, String>> lastVersion = findLastVersion(DOCKER_TEMPLATE_PREFIX, imageName, packagesDistribFolder);
                     Pair<String, String> lastVersionValues = lastVersion.getValue();

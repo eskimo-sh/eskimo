@@ -64,8 +64,6 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private File tempPackagesDistribPath = null;
 
-    private String packagesToBuild = "base-eskimo,ntp,zookeeper,gluster,flink,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,kube-master,kubernetes-dashboard,spark,zeppelin";
-
     private String kubePackages = "kube";
 
     private ServicesDefinition sd = new ServicesDefinition();
@@ -100,7 +98,6 @@ public class SetupServiceTest extends AbstractSystemTest {
         setupService.setSystemService(systemService);
         setupService.setServicesDefinition(sd);
 
-        setupService.setPackagesToBuild(packagesToBuild);
         setupService.setKubePackages(kubePackages);
 
         setupService.setConfigurationService(configurationService);
@@ -236,7 +233,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 exception.getMessage());
 
         // Create docker images packages
-        for (String service : packagesToBuild.split(",")) {
+        for (String service : setupService.getPackagesToBuild().split(",")) {
             FileUtils.writeFile(new File(tempPackagesDistribPath + "/docker_template_" + service + "_0.0.1_1.tar.gz"), "DUMMY");
         }
 
@@ -491,6 +488,10 @@ public class SetupServiceTest extends AbstractSystemTest {
             Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
                 return new Pair<>(new File ("package_" + packageName + ".tgz"), new Pair<>("1.10.1", "1"));
             }
+            @Override
+            public String getPackagesToBuild() {
+                return "flink";
+            }
         });
 
         setupService.setApplicationStatusService(new ApplicationStatusService() {
@@ -502,8 +503,6 @@ public class SetupServiceTest extends AbstractSystemTest {
         JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
         setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
         setupConfigWrapper.setValueForPath("setup-services-origin", "download");
-
-        setupService.setPackagesToBuild("flink");
 
         setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
 

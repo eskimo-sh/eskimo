@@ -111,6 +111,9 @@ public class OperationsMonitoringService implements OperationsContext {
     }
 
     void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+        if (currentOperation != null) {
+            throw new IllegalStateException("Can't start an operation while another operation is in progress");
+        }
         currentOperation = operation;
         systemActionLock.lock();
 

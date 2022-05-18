@@ -40,7 +40,7 @@ Software.
 == Eskimo Introduction
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
-*Big Data 2.0* clusters using *Docker* and *Mesos*.
+*Big Data 2.0* clusters using (mostly) *Kubernetes* (and Docker and SystemD).
 
 Reach https://www.eskimo.sh for more information on Eskimo or look at the documentation in the folder `doc`.
 
@@ -65,18 +65,18 @@ This document presents "1. The *Docker Images Development Framework*"
 Eskimo manages services (e.g. Flink, Kafka, ElasticSearch, Kibana, etc.) as Docker containers. A docker container is
 the individual and single unit representing a service to be managed by Eskimo. +
 Docker containers packaging eskimo services should be most of the time downloaded from the Eskimo online package
-archive. But an administrator can very well decide to build his own versions of Eskimo Provides service containers or
-event develop his own service packages. +
+archive. But an administrator can very well decide to build his own versions of Eskimo provided service container images
+or event implement his own service packages. +
 This is described in this section.
 
-The _Docker Images Development Framework_ provides tools and defines standards to build the docker images deployed on the
-eskimo cluster nodes.
+The _Docker Images Development Framework_ provides tools and defines standards to build the docker images deployed on
+the eskimo cluster nodes.
 
-Eskimo is leveraging on docker to deploy services across the cluster nodes and to ensure independence from host
-OSes and specificities as well as proper isolation between services.
+Eskimo is leveraging on docker to deploy services either on Kubernetes or natively across the cluster nodes and to
+ensure independence from host OSes and specificities as well as proper isolation between services.
 
-Again, Docker images can be downloaded from internet (or the internal corporation network) or build locally on the machine
-running eskimo.
+Again, Docker images can be downloaded from internet (or the internal corporation network) or build locally on the
+machine running the Eskimo backend.
 
 === Requirements
 
@@ -84,13 +84,14 @@ In order for one to be able to either build the eskimo software components packa
 them locally), there are a few requirements:
 
 * Docker must be installed and available on the user local computer or the eskimo host machine in case Eskimo builds
-them.
+  them.
 * At least 10Gb of hard drive space on the partition hosting `/tmp` must be available.
-* At least 15Gb of hard drive space on the partition histing the eskimo installation folder must be available.
+* At least 15Gb of hard drive space on the partition hosting the eskimo installation folder (Eskimo backend) must be
+  available.
 
 === Principle
 
-The principle is pretty straightforward
+The principle is pretty straightforward:
 
 * Every docker image (or package) is built by calling `build.sh` from the corresponding package folder, i.e. a
 sub-folder of this very folder `packages_dev`
@@ -107,31 +108,36 @@ as well as that some conventions are properly followed as explained below.
 Internet is usually required on the eskimo machine to build or re-build the eskimo provided pre-packages images since
 the target software component is downloaded from Internet.
 
-=== property 'system.packagesToBuild' in eskimo.properties
+=== identifying required images in `services.json`
 
-Eskimo needs a way during initial setup time to know which packages need to be built or downloaded.
+Eskimo needs a way during initial setup time to know which packages need to be built or downloaded. The list of docker
+images to be built is composed by the conjunction of two lists:
 
-This is indicated by the property `system.packagesToBuild` in the configuration file `eskimo.properties`, such as, for
-instance:
+* The images referenced by services in `services.json` (See <<services_json>> )
+* The additional packages from configuration property `system.additionalPackagesToBuild` in the configuration file `eskimo.properties`, such as, for
+instance: base-eskimo
 
 .default `system.packagesToBuild` property
 ----
-system.packagesToBuild=base-eskimo,ntp,zookeeper,gluster,elasticsearch,cerebro,kibana,logstash,prometheus,grafana,kafka,kafka-manager,mesos-master,spark,zeppelin
+system.packagesToBuild=base-eskimo
 ----
 
-Whenever one wants to implement a new package for a new service to be managed by eskimo, one needs to declare this new
-package in the given list.
+The property `system.additionalPackagesToBuild` is required to identify 3rd party or additional images that are required
+when building service images. +
+Only service images can be declared in `services.json`. +
+By default, only the image `base-eskimo` being used by all the orher package images needs to be built in addition to the
+ones actually in use by services and declared in  `services.json`.
 
 === Standards and conventions over requirements
 
 There are no requirements when building an eskimo package docker image. The image developer is free to install the
 software package within the image the way he wants and no specific requirement is enforced by eskimo.
 
-As long as eventually, _The Service Installation framework_ for the new  software package provides a systemd unit
+As long as eventually, _The Service Installation framework_ for the new software package provides a systemd unit
 configuration file enabling the eskimo framework to manipulate the service, a service developer has all the freedom to
 design his docker container the way he wants.
 
-However, adhering to some conventions eases a lot the maintenance and evolution of these images. +
+However, adhering to some conventions eases a lot the implementation and maintenance of these images. +
 These standard conventions are as follows:
 
 * All docker images are based on the `base-eskimo` image which is itself based on a lightweight debian stretch image.
@@ -140,15 +146,15 @@ not available in apt repositories and installed using standard debian `apt-get i
 ** In this case, a simlink preventing the further *Services Installation framework* from the need to mess with version
 numbers should be created : `/usr/local/lib/x` pointing to `/usr/local/lib/x-version`.
 ** This simlink is pretty important. In the second stage, when installing services on eskimo cluster nodes, it is
-important that setup and installation scripts can be prevented from knowing about the version of the software
-component. Hence the important of that simlink.
+important that setup and installation scripts can be prevented from knowing about the actual version of the software
+component being installed. Hence the need for that simlink.
 * The presence of a single `build.sh` script is a requirement. That script is called by eskimo to build the package if
 it is not yet available (either built or downloaded)
 * A helper script `../common/common.sh` can be linked in the new package build folder using
-`ln -s ../common/common.sh common.sh`. This common script provides various helper functions to build the docker
-container, save it to the proper location after build, etc.
-* The script performing the _in container installation_ of the software component X should be called `installX.sh`.
-* Software versions to be downloaded and extracted within docker images are coded _once and for all_ in the file
+`ln -s ../common/common.sh`. This common script provides various helper functions to build the docker
+container, save it to the proper location after building, etc.
+* The script performing the _in container installation_ of the software component X is usually called `installX.sh`.
+* Software versions to be downloaded and installed within docker images are coded _once and for all_ in the file
 `../common/common.sh`. This is actually a requirement since most of the time software version for common components such
 as ElasticSearch or scala are used in several different packages. Defining version numbers of software components to be
 downloaded and installed in a common place helps to enforce consistency.
@@ -165,8 +171,8 @@ The build process implemented as a standard in the `build.sh` script has two dif
 . The container preparation and all the container setup operated from outside the container
 . The software installation done from inside the container
 
-As a convention, all dependencies installation is performed from outside the container but then the installation of the
-software packaged in the container is performed from a script called within the container (script `installX.sh` for
+As a convention, installation of all dependencies is performed from outside the container but then the installation of
+the software packaged in the container is performed from a script called within the container (script `installX.sh` for
 package X).
 
 The build process thus typically looks this way:
@@ -184,53 +190,24 @@ The build process thus typically looks this way:
 
 And that's it.
 
-The package installation is limited to this, all the customizations is done at a later stage, during the *Service
-Installation* on eskimo cluster noes.
+The package installation is limited to this, all the customizations and fine tuning the image for its use by eskimo is
+done at a later stage, during the *Service Installation* on Kubernetes or directly on eskimo cluster nodes.
 
 === Look for examples and get inspired
 
 Look at the eskimo pre-packaged component packages development scripts for examples and the way they are built to get
-inspired for developing your own packages.
+inspired for implementing your own packages.
 
 
-=== Apache Mesos Building
+=== Building the Kubernetes archive
 
-Bulding Apache Mesos is a different story. There are two different components:
+Building the Kubernetes archive is different than building the component images as presented above. As a matter of fact,
+Kubernetes is installed natively on Eskimo cluster nodes and not through docker.
 
-* The *Mesos Master* which runs in a docker container just as every other service within Eskimo. The Mesos Master is
-responsible for orchestrating the resources requests and manages offering.
-* The *Mesos Agent* which runs natively on the Host OS.  The Mesos Agent is responsible for understanding the available
-resources on every node of the Eskimo cluster and answers offers.
-
-The reason why the Mesos Agent runs natively is that it needs to have low level access to the machine to understand its
-topology and the available resources. To be transparent, it could run as a docker container as well but that comes with
-some limitations that are not acceptable for a production cluster.
-
-*The Mesos Agent is the single and only component running natively within Eskimo* (understand, not in a docker
-container).
-
-As such, Mesos is build natively and mesos packages are tarballs (`tar.gz`) to be extracted on the Host OS on every
-node.
-
-In this very folder (`packages_dev`) eskimo provides a build framework for Mesos. +
-Currently Mesos is built for three targets : RHEL based (RHEL, CentOS, Fedora, etc.) and Debian based (Debian, Ubuntu,
-etc.) and SUSE.
-
-
-==== Building Mesos
-
-The Eskimo build system for Mesos is based on Vagrant and either VirtualBox or libvirt + QEMU/kvm. Vagrant takes care
-of building VMs using either VirtualBox or LibVirt, installs all the required packages for building mesos, builds mesos
-and creates installable packages.
-
-.For instance, toBuild Mesos package for Debian
-----
-..../packages_dev$ ./build.sh mesos-deb # for building mesos debian distrib with libvirt
-..../packages_dev$ ./build.sh -b mesos-deb # for building mesos debian distrib with VirtualBox
-----
-
-These both commands require vagrant and VirtualBox, respectively libvirt, kvm and the libvirt vagrant provider properly
-installed.
+The `build.sh` script in the `binary_k8s` folder behaves differently. It's objective is to package all of the Kubernetes
+runtime components software within a single archive. These components, from etcd to the different kube master and slave
+processes are packages together and extracted natively on Eskimo cluster nodes for native execution during the
+node base installation process.
 
 
 === Specific and various notes related to individual components shipped with Eskimo
@@ -242,7 +219,7 @@ This section presents different important notes related to some specific service
 Zeppelin can be built from a checkout of the latest git repository master or from an official release.
 
 The file `common/common.sh` defines a variable `ZEPPELIN_IS_SNAPSHOT` which, when defined to true, causes the build
-system to work from git and rebuilt zeppelin from the sources instead of downloading a released package.
+system to work from git and rebuild zeppelin from the sources instead of downloading a released package.
 
 ----
 export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master
@@ -253,10 +230,14 @@ though) which maps `/tmp` to its own `/tmp`). +
 *At least 20 GB of storage space needs to be available in `/tmp` of the machine running eskimo for the build to
 succeed.*
 
+It is recommended though to use a binary archive of Zeppelin since the build from the source rarely succeeds out of the
+box (Zeppelin build system is fairly complicated and the eskimo team maintains the "build from source" feature only when
+the last binary release of Zeppelin suffers from impacting bugs).
+
 
 === Setting up a remote packages repository
 
-When running eskimo, software packages - either service docker images or mesos binary packages - can be either built
+When running eskimo, software packages - either service docker images or the Kube binary archive - can be either built
 or downloaded from a *remote packages repository*.
 
 Setting up a remote packages repository is extremely simple:
@@ -267,21 +248,19 @@ available packages.
 
 For instance the following layout should be available from internet or the local network:
 
-* *https://www.niceideas.ch/eskimo/eskimo_packages_versions.json*
-* https://www.niceideas.ch/eskimo/docker_template_base-eskimo_0.2_1.tar.gz
-* https://www.niceideas.ch/eskimo/docker_template_cerebro_0.8.4_1.tar.gz
-* https://www.niceideas.ch/eskimo/docker_template_elasticsearch_6.8.3_1.tar.gz
-* https://www.niceideas.ch/eskimo/docker_template_flink_1.9.1_2.tar.gz
-* https://www.niceideas.ch/eskimo/docker_template_gluster_debian_09_stretch_1.tar.gz
+* *https://www.eskimo.ch/eskimo/V0.4/eskimo_packages_versions.json*
+* https://www.eskimo.ch/eskimo/V0.4/docker_template_base-eskimo_0.2_1.tar.gz
+* https://www.eskimo.ch/eskimo/V0.4/docker_template_cerebro_0.8.4_1.tar.gz
+* https://www.eskimo.ch/eskimo/V0.4/docker_template_elasticsearch_6.8.3_1.tar.gz
+* https://www.eskimo.ch/eskimo/V0.4/docker_template_flink_1.9.1_2.tar.gz
+* https://www.eskimo.ch/eskimo/V0.4/docker_template_gluster_debian_09_stretch_1.tar.gz
 * etc.
-* https://www.niceideas.ch/eskimo/eskimo_mesos-debian_1.8.1_1.tar.gz
-* https://www.niceideas.ch/eskimo/eskimo_mesos-redhat_1.8.1_1.tar.gz
-* etc.
+* https://www.eskimo.ch/eskimo/V0.4/eskimo_kube_1.23.5_1.tar.gz
 
 A software package should be named as follows:
 
 * `docker_template_[software]\_[software_version]_[eskimo_version].tar.gz` for service docker images
-* `eskimo_mesos-[platform]\_[software_version]_[eskimo_version].tar.gz` for service mesos packages
+* `eskimo_kube\_[software_version]_[eskimo_version].tar.gz` for kube archive
 
 The file `eskimo_packages_versions.json` describes the repository of packages and the available packages.
 
@@ -309,22 +288,17 @@ The file `eskimo_packages_versions.json` describes the repository of packages an
     "distribution": "1"
   },
   ...
-  "mesos-redhat": {
-    "software": "1.8.1",
+  "kube": {
+    "software": "1.23.5",
     "distribution": "1"
-  },
-  "mesos-debian": {
-    "software": "1.8.1",
-    "distribution": "1"
-  },
-  ...
+  }
 }
 ----
 
 It's content should be aligned with the following properties from the configuration file `eskimo.properties`:
 
-* `system.packagesToBuild` giving the set of docker images for packages to be or downloaded
-* `system.mesosPackages` giving the name of the mesos packages to built or downloaded
+* `system.additionalPackagesToBuild` and images declared on `services.json` giving the set of docker images for packages to be or downloaded
+* `system.kubePackages` giving the name of the kubernetes package to built or downloaded
 
 
 
@@ -338,7 +312,7 @@ It's content should be aligned with the following properties from the configurat
 
 
 
-// marker for exclusion : line 340
+// marker for exclusion : line 315
 
 [appendix]
 == Copyright and License
@@ -374,3 +348,8 @@ For more information, please contact eskimo.sh at https://www.eskimo.sh
 
 The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
 Software.
+
+
+
+
+

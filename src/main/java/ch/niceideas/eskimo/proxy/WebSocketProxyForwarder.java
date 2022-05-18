@@ -75,6 +75,11 @@ public class WebSocketProxyForwarder {
 
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig(serviceId);
 
+            if (config == null) {
+                throw new IllegalStateException("Tunnel configuration not created yet for service " + serviceId
+                        + " - likely status is not initialized yet");
+            }
+
             targetWsUri = WS_LOCALHOST_PREFIX + config.getLocalPort() + targetPath;
 
             WebSocketHttpHeaders headers = getWebSocketHttpHeaders(webSocketServerSession);

@@ -49,8 +49,9 @@ Reach http://www.eskimo.sh for more information on Eskimo or look at the documen
 The *Service Development framework* is actually composed by two distinct parts:
 
 1. The *Docker Images Development Framework* which is used to build the docker images deployed on the eskimo cluster
-nodes
-2. The *Services Installation Framework* which is used to install these images as services on the eskimo cluster nodes.
+   nodes
+2. The *Services Installation Framework* which is used to install these images as services on kubernetes or natively on
+   the eskimo cluster nodes.
 
 This document presents "2. The *Services Installation Framework*"
 
@@ -62,85 +63,93 @@ This document presents "2. The *Services Installation Framework*"
 == Services Installation Framework
 
 The Services Installation Framework provides tools and standards to install the packaged docker images containing the
-target software component on the eskimo cluster nodes.
+target software component on Kubernetes or natively on the eskimo cluster nodes.
 
-Eskimo is leveraging on _docker_ to run the the services on the cluster nodes and either _SystemD_ or _Marathon_ to
-operate them. Marathon is used specifically to provide HA - High Availability - and resilience to UI applications and
-other single instances services
+Eskimo is leveraging on _Kubernetes_ to run and operate most of the services and the couple _docker_ and _SystemD_
+for the few of them - such as gluster, ntp, etc - that need to run natively on Eskimo cluster nodes.
 
 * An eskimo package has to be a docker image
 * An eskimo package has to provide
-** either a *systemd unit configuration file* to enable eskimo to operate the component on the cluster.
-** or a *marathon JSON configuration file* to delegate this marathon
+** either a *systemd unit configuration file* to enable eskimo to operate the component natively on the cluster nodes.
+** or a *Kubernetes YAML configuration file* to delegate the deployment and operation to Kubernetes.
 
-The Eskimo Nodes Configuration process takes care of installing the services defined in the _services.json_
-configuration file and and copies them over to the nodes where they are intended to run. After the proper installation,
-eskimo relies either on plain old `systemctl` commands to operate (start / stop / restart / query / etc.) the services
-or on _marathon_
+The Eskimo Web User Interface takes care of installing the services defined in the `services.json`
+configuration file and copies them over to the nodes where they are intended to run (native node or Kubernetes).
+After the proper installation, eskimo relies either on plain old `systemctl` or `kubectl` commands to operate
+(deploy / start / stop / restart / query / etc.) the services.
 
 === Principle
 
 The principle is pretty straightforward:
 
-* Whenever a service `serviceX` is configured on a node, eskimo makes an archive of the folder
-`services_setup/serviceX`, copies that archive over to the node and extracts it in a subfolder of `/tmp`.
+* Whenever a service `serviceX` is to be deployed, eskimo makes an archive of the folder
+`services_setup/serviceX`, copies that archive over to the target node and extracts it in a subfolder of `/tmp`.
 * Then eskimo calls the script `setup.sh` from within that folder. The script `setup.sh` can do whatever it wants but has
-to respect the following constraint:
+to respect an important constraint.
 * After that `setup.sh` script is properly executed, the service should be
-** either installed on the node along with a systemd system unit file with name `serviceX.service` which is used for
-commands such as `systemctl start serviceX` to be able to control service _serviceX_,
-** or properly registered in marathon and operated by marathon with ID _serviceX_.
+** either installed natively on the node along with a systemd system unit file with name `serviceX.service` which is
+used to control the _serviceX_ service lifecycle through
+commands such as `systemctl start serviceX`,
+** or properly deployed in Kubernetes and executing a POD name prefixed by the service name and a kube service matching
+it.
 
 Aside from the above, nothing is enforced and service developers can implement services the way they want.
 
 ==== Gluster share mounts
 
 Many Eskimo services can leverage on gluster to share data accross cluster nodes. +
-SystemD services rely on the host to mount gluster shares and then mount the share to the gluster containre from the
+SystemD services rely on the host to mount gluster shares and then mount the share to the gluster container from the
 host mount. +
 The way to do this is as follows:
 
 * The service `setup.sh` script calls the script `/usr/local/sbin/gluster_mount.sh [SHARE_NAME] [SHARE_PATH] [OWNER_USER]` +
   This script will take care of registering the gluster mount with SystemD, fstab, etc.
-* The service SystemD unit file should define a dependency on the SystemD mount by usingf the following statements +
+* The service SystemD unit file should define a dependency on the SystemD mount by using the following statements +
   `After=gluster.service` +
   `After=[SHARE_PATH_HYPHEN-SEPARATED].mount`
 
 Using the host to mount gluster shares is interesting since it enables Eskimo users to see the content of the gluster
 share using the Eskimo File Manager.
 
-The approach is very similar for marathon services, but not relying on SystemD which is not available from within
-containers. +
-So marathon services actually mount the gluster share directly from within the docker container. +
+The approach is very similar for Kubernetes services, except they can't be relying on SystemD (which is not available
+to Kube containers) +
+So Kubernetes services actually mount the gluster share directly from inside the docker container. +
 The way to do this is as follows:
 
 * The container startup script calls the script `inContainerMountGluster.sh [SHARE_NAME] [SHARE_PATH] [OWNER_USER]`
 
 ==== OS System Users creation
 
-OS system users required to execute marathon services are required on every node of the cluster. For this reason,
+OS system users required to execute Kubernetes and native services are required to be created on every node of the
+Eskimo cluster nodes with consistent user IDs across the cluster . For this reason,
 the linux system users to be created on every node are not created in the individual services `setup.sh` scripts. They
-are created in the eskimo base system installation script `install-eskimo-base-system.sh` in the function
-`create_common_system_users`.
+are created by a specific script `/usr/local/sbin/eskimo-system-checks.sh` generated at installation time by  the eskimo
+base system installation script `install-eskimo-base-system.sh`.
 
 === Standards and conventions over requirements
 
 There are no requirements when setting up a service on a node aside from the constraints mentioned above.
 Services developers can set up services on nodes the way then want and no specific requirement is enforced by eskimo.
 
-However, adhering to some conventions eases a lot the maintenance and evolution of these services. +
+However, adhering to some conventions eases a lot the implementation and maintenance of these services. +
 These standard conventions are as follows (illustrated for a service called `serviceX`).
 
-* Services should put their persistent data (to be persisted between two docker container restart) in `/var/lib/serviceX`
-* Services should put their log files in `/var/log/serviceX`.
-* If the service required a file to track its PID, that file should be stored under `/var/run/serviceX`
+* Data persistency
+** Cluster node native Services should put their persistent data (to be persisted between two docker container restart)
+   in `/var/lib/serviceX` which shozld be mounted from the host by the called to docker in the SystemD unit file
+** Kubernetes services should either rely on Kubernetes provided persistent storage or use a gluster share.
+* Services should put their log files in `/var/log/serviceX` which is mounted from the runtime host.
+* If the service requires a file to track its PID, that file should be stored under `/var/run/serviceX` to be mounted
+  from the runtime host as well.
 * Whenever a service `serviceX` requires a subfolder of `/var/log/serviceX` to be shared among cluster nodes, a script
 `setupServiceXGlusterSares.sh` should be defined that calls the common helper script (define at eskimo base system
 installation on every node) `/usr/local/sbin/gluster_mount.sh` in the following way, for instance to define
  the _flink data_ share : `/usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink`
+* The approach is the same from within a container, but the name if the script to call is different:
+`/usr/local/sbin/inContainerMountGlusterShare.sh`.
 
-At the end of the day, it's really plain old Unix standards. The only challenge comes from the use of docker which
-requires to play with docker mounts a little. +
+At the end of the day, it's really plain old Unix standards. The only challenge comes from the use of docker and/or
+Kubernetes which requires to play with docker mounts a little. +
 Just look at eskimo pre-packaged services to see examples.
 
 === Typical setup.sh process
@@ -151,12 +160,13 @@ The setup process implemented as a standard in the `setup.sh` script has three d
 
 . The container instantiation from the pre-packaged image performed from outside the container
 . The software component setup performed from inside the container
-- The registration of the service to _SystemD_ or _marathon_
+- The registration of the service to _SystemD_ or _Kubernetes_
 . The software component configuration applied at runtime, i.e. at the time the container starts, re-applied everytime.
 
 The fourth phase is most of the time required to apply configurations depending on environment dynamically at startup
 time and not statically at setup time. +
-The goal is to address situations where, for instance,  master services are moved to another node. In this case,
+The goal is to address situations where, for instance, master services are moved to another node (native deployment) or
+moved around by Kubernetes. In this case,
 applying the master setup configuration at service startup time instead of statically enables to simply restart a slave
 service whenever the master node is moved to another node instead of requiring to entirely re-configure them.
 
@@ -182,18 +192,20 @@ setup time but dynamically at service startup time.
 
 ==== Standard and conventions
 
-While nothing is really enforced as a requirement by eskimo (aside of systemd and the name of the `setup.sh` script,
-there are some standards that should be followed (illustrated for a service named `serviceX`:
+While nothing is really enforced as a requirement by eskimo (aside of SystemD / Kubernetes and the name of the
+`setup.sh` script, there are some standards that should be followed (illustrated for a service named `serviceX`:
 
-* The in container setup script is usually called `inContainerSetupServiceX.sh`
+* The "in container" setup script is usually called `inContainerSetupServiceX.sh`
 * The script taking care of the dynamic configuration and the starting of the service - the one actually called by
 systemd upon service startup - is usually called `inContainerStartServiceX.sh`
 * The systemd system configuration file is usually limited to stopping and starting the docker container
+* The Kubernetes deployment file usually create a deployment (for replicaset) or a statefulset along with all services
+  required to reach the software component.
 
 
 ==== Look for examples and get inspired
 
-Look at examples and the way the packages provided with eskimo are setup and get inspired for developing your own
+Look at examples and the way the packages provided with eskimo are set up and get inspired for implementing your own
 packages.
 
 
@@ -204,6 +216,7 @@ able to operate the service. +
 A few additional steps are required, most importantly, defining the new service in the configuration file
 `services.json`.
 
+[[services_json]]
 ==== Configuration file `services.json`
 
 In order for a service to be understood and operable by eskimo, it needs to be declared in the *services configuration
@@ -227,8 +240,9 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## [unique] whether the service is a unique service (singpe instance) or multiple
     "unique": [true,false],
 
-    ## [unique] whether the service is managed through marathon (true) or SystemD (false)
-    "marathon": [true,false],
+    ## [unique] whether the service is managed through Kubernetes (true) or natively
+    ## on nodes with SystemD (false)
+    "kubernetes": [true,false],
 
     ## [optional] name of the group to associate it in the status table
     "group" : "{group name}",
@@ -244,15 +258,18 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 
     ## [mandatory] where to place the service in 'Service Selection Window'
     "selectionLayout" : {
-      "row" : [1-X],
-      "col" : [1-X]
+      "row" : [1 - X],
+      "col" : [1 - X]
     },
 
     ## memory to allocate to the service
-    ## (mesos and neglectable means the service is excluded from the hardware
-    ## memory split computation. Meos services are put in the 'mesos-agent' memory
-    ## share)
-    "memory": "[mesos|neglectable|small|medium|large|verylarge]",
+    ## (neglectable means the service is excluded from the memory allocation policy
+    ##  Kubernetes services are accounted specifically:
+    ##  - services running on all nodes are account as native services
+    ##  - services running as replicaSet are accounted globally and their total
+    ##    required memory is divided amongst all nodes.
+    ## )
+    "memory": "[neglectable|small|medium|large|verylarge]",
 
     ## [mandatory] The logo to use whenever displaying the service in the UI is
     ##     required
@@ -270,6 +287,23 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ## (static_images is configurable in eskimo.properties with property
     ##    eskimo.externalLogoAndIconFolder)
     "icon" : "[images|static_images]/{icon_file_name}"
+
+    # The specific Kubernetes configuration for kubernetes=true services
+    "kubeConfig": {
+
+      # the resource request to be made by PODs
+      "request": {
+
+        # The number of CPUs to be allocated to the POD(s) by Kubernetes
+        # Format : X for X cpus, can have decimal values
+        "cpu": "{number of CPU}, # e.g. 0.5
+
+        # The amount of RAM to be allocated to the POD(s) by Kubernetes
+        # Format: X[k|m|g|p] where k,m,g,p are multipliers (kilo, mega, etc.)
+        "ram": "{amount of RAM}, # e.g. 1600m
+
+      }
+    }
   },
 
   ## [optional] configuration of the serice web console (if anym)
@@ -331,11 +365,13 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 
   ## [optional] array of dependencies that need to be available and configured
   "dependencies": [
+
+    ## first dependency. As many as required can be declared
     {
 
-      ## [mandatory] THIS IS THE MOST ESSENTIAL CONFIG :
-      ## THE WAY THE MASTER IS IDENTIFIED FOR A SLSAVE SERVICE
-      "masterElectionStrategy": "[NONE|FIRST_NODE|SAME_NODE_OR_RANDOM|RANDOM|RANDOM_NODE_AFTER|SAME_NODE]"
+      ## [mandatory] For services not operated by kubernetes, this is
+      ## essential: it defines how the master service is determined.
+      "masterElectionStrategy": "[NONE|FIRST_NODE|SAME_NODE_OR_RANDOM|RANDOM|RANDOM_NODE_AFTER|SAME_NODE|ALl_NODES]"
 
       ## the service relating to this dependency
       "masterService": "{master service name}",
@@ -352,13 +388,15 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     }
   ]
 
-  ## [optional] array of configuration properties that should be editable using the Eskim UI
-  ## These configuration properties are injected
+  ## [optional] array of configuration properties that should be editable using the
+  ## Eskimo UI. These configuration properties are injected
   "editableConfigurations": [
+
+    ## first editable configuration. As many as required can be declared
     {
 
-      ## the name of the configuration file to search for in the software installation
-      ## directory (and sub-folders)
+      ## the name of the configuration file to search for in the software
+      ## installation directory (and sub-folders)
       "filename": "{configuration file name}", ## e.g. "server.properties"
 
       ## the name of the service installation folder under /usr/local/lib
@@ -366,14 +404,18 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       "filesystemService": "{folder name}", ## e.g. "kafka"
 
       ## the type of the property syntax
-      ## Currently only "variable" supported
+      ##  - "variable" for a simple approach where a variable declaration of the
+      ##    expected format is searched for
+      ##  - "regex" for a more advanced approach where the configuration is searched
+      ##    and replaces using the regex given in format
       "propertyType": "variable",
 
       ## The format of the property definition in the configuration file
       ## Supported formats are:
       ##  - "{name}: {value}" or
       ##  - "{name}={value}" or
-      ##  - "{name} = s{value}"
+      ##  - "{name} = s{value} or"
+      ##  - "REXG with {name} and {value} as placeholders"
       "propertyFormat": "property format", ## e.g. "{name}={value}"
 
       ## The prefix to use in the configuration file for comments
@@ -381,6 +423,8 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 
       ## The list of properties to be editable by administrators using the eskimo UI
       "properties": [
+
+        ## first property. As many as required can be declared
         {
 
           ## name of the property
@@ -396,8 +440,8 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     }
   ],
 
-  ## [optional] array of custom commands that are made available from the context menu
-  ## on the System Status Page (when clicking on services status (OK/KO/etc.)
+  ## [optional] array of custom commands that are made available from the context
+  ## menu on the System Status Page (when clicking on services status (OK/KO/etc.)
   "commands" : [
     {
 
@@ -413,7 +457,25 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       ## The font-awesome icon to be displayed in the menu
       "icon": "{fa-icon}" ## e.g. "fa-file"
     }
-  ]
+  ],
+
+  ## Additional environment information to be generated in eskimo_topology.sh
+  ## This can contain multiple values, all possibilities are listed underneath as
+  ## example
+  "additionalEnvironment": {
+
+    # Create an env var that lists all nodes where serviceX is installed
+    "ALL_NODES_LIST_serviceX",
+
+    # Create a env var that gives the number for this service, in a consistent and
+    # persistent way (can be 0 or 1 based
+    "SERVICE_NUMBER_[0|1]_BASED",
+
+    # Give in evnv var the context path under which the eskimo Wen Use Interface is
+    # deployed
+    "CONTEXT_PATH"
+
+  }
 }
 ----
 
@@ -430,6 +492,9 @@ inspiration when designing a new service to be operated by eskimo.
 As stated above, the most essential configuration property in a _service definition_ is the `masterElectionStrategy`
 of a dependency. +
 The whole master / slave topology management logic as well as the whole dependencies framework of eskimo relies on it.
+
+This is especially important for non-kubernetes services since most of the time the notion of "master" (in the eskimo
+sense) is replaced by the usage of a kubernetes service to reach the software component deployed on Kubernetes.
 
 ==== Master Election strategy
 
@@ -762,10 +827,7 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-
-
-
-// marker for exclusion : line 768
+// marker for exclusion : line 830
 
 
 
