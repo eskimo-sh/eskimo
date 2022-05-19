@@ -516,7 +516,7 @@ service is available. +
 In the case of `SAME_NODE_OR_RANDOM`, eskimo tries to find the dependency service on the very same node than
 the one running the declaring service if that dependent service is available on that very same node. +
 If no instance of the dependency service is not running on the very same node, then any other random node running the
-dependency service is used as dependency.
+dependency service is used as dependency. (This is only possible for native nodes SystemD services)
 * `RANDOM` : This is used to define a simple dependency on another service. In details, `RANDOM` indicates that the
 first service wants to know about at least one node where the dependency service is available. That other node can be
 any other node of the cluster where the dependency service is installed.
@@ -525,76 +525,69 @@ indicates that the first service wants to know about at least one node where tha
 That other node should be any node of the cluster where the second service is installed yet with a *node number*
 (internal eskimo node declaration order) greater than the current node where the first service is installed. +
 This is useful to define a chain of dependencies where every node instance depends on another node instance in a
-circular way (pretty nifty for instance for elasticsearch discovery configuration).
+circular way - pretty nifty for instance for elasticsearch discovery configuration. (This is only possible for native
+nodes SystemD services)
 * `SAME_NODE` : This means that the dependency service is expected to be available on the same node than the first
-service, otherwise eskimo will report an error during service installation.
+service, otherwise eskimo will report an error during service installation. (This is only possible for native nodes
+SystemD services)
+* `ALL_NODES` : this meands that every service defining this dependency will receive the full list of nodes running
+the master service in an topology variable.
 
 *The best way to understand this is to look at the examples in eskimo pre-packaged services declared in the bundled
 `services.json`.*
 
 For instance:
 
-* Cerebro tries to use the co-located instance of elasticsearch if it is available or any random one otherwise for
-instance by using the following dependency declaration:
+* Etcd wants to use the co-located instance of gluster. Since gluster is expected to be available from all nodes of the
+eskimo cluster, this dependency is simply expressed as:
 
-.cerebro dependency on elasticsearch
+.etcd dependency on gluster
 ----
     "dependencies": [
-      {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
-        "masterService": "elasticsearch",
-        "numberOfMasters": 1,
-        "mandatory": true
-      }
-    ]
-----
-
-* elasticsearch instances on the different nodes search for each other in a round robin fashion by declaring the
-following dependencies (mandatory false ise used to support single node deployments):
-
-.elasticsearch dependency on next elasticsearch instance
-----
-    "dependencies": [
-      {
-        "masterElectionStrategy": "RANDOM_NODE_AFTER",
-        "masterService": "elasticsearch",
-        "numberOfMasters": 1,
-        "mandatory": false
-      }
-    ],
-----
-
-* logstash needs both elasticsearch and gluster. In contrary to elasticsearch, gluster is required on every node in a
-multi-node cluster setup. Hence the following dependencies declaration for gluster:
-
-.gluster dependencies definition
-----
-    "dependencies": [
-      {
-        "masterElectionStrategy": "SAME_NODE_OR_RANDOM",
-        "masterService": "elasticsearch",
-        "numberOfMasters": 1,
-        "mandatory": true
-      },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false
+        "mandatory": false,
+        "restart": true
       }
+    ]
 ----
 
-* kafka uses zookeeper on the first node (in the order of declaration of nodes in the eskimo cluster) on which zookeeper
-is available:
+* kube-slave services needs to reach the first node where kube-master is available (only one in Eskimo Community
+edition in anyway), so the dependency is defined as follows:
 
-.kafka dependency on zookeeper
+.kube-slave dependency on first kube-master
+----
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      },
+----
+
+* kafka-manager needs to reach any random instance of kafka running on the cluster, so the dependency is expressed as
+simply as:
+
+.kafka-manager dependency on kafka:
 ----
     "dependencies": [
       {
         "masterElectionStrategy": "FIRST_NODE",
         "masterService": "zookeeper",
         "numberOfMasters": 1,
-        "mandatory": true
+        "mandatory": true,
+        "restart": true
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "kafka",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
 ----
 
@@ -815,6 +808,13 @@ are searched, respectively injected, in the text stream:
 instance `eskimo`
 * `PREFIX_PATH` will be resolved by the specific context path of the service web console context, such as for instance
 for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no context root is used.
+
+
+
+
+
+
+
 
 
 

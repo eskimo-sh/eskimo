@@ -1,0 +1,196 @@
+● etcd.service - etcd Server
+     Loaded: loaded (/usr/lib/systemd/system/etcd.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:36:44 UTC; 12h ago
+   Main PID: 109532 (etcd)
+      Tasks: 10 (limit: 9260)
+     Memory: 44.9M
+        CPU: 1min 45.214s
+     CGroup: /system.slice/etcd.service
+             └─109532 /usr/local/bin/etcd --name node4 --initial-advertise-peer-urls http://192.168.56.24:2380 --listen-peer-urls http://192.168.56.24:2380 --listen-client-urls http://192.168.56.24:2379,http://127.0.0.1:2379 --advertise-client-urls https://192.168.56.24:2379,https://localhost:2379 --initial-cluster-token etcd-cluster-eskimo --initial-cluster node1=http://192.168.56.21:2380,node2=http://192.168.56.22:2380,node3=http://192.168.56.23:2380,node4=http://192.168.56.24:2380 --initial-cluster-state new --data-dir /var/lib/etcd
+
+May 19 08:46:20 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:46:20.633Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_RAFT_MESSAGE","remote-peer-id":"dab2e3fec0c94fc1","clock-drift":"1h59m48.04325997s","rtt":"1.592007ms"}
+May 19 08:46:20 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:46:20.633Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_RAFT_MESSAGE","remote-peer-id":"7a6ff46678be7f4c","clock-drift":"1h59m47.145276121s","rtt":"1.527764ms"}
+May 19 08:46:50 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:46:50.635Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_RAFT_MESSAGE","remote-peer-id":"7a6ff46678be7f4c","clock-drift":"1h59m41.363118241s","rtt":"1.534129ms"}
+May 19 08:46:50 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:46:50.635Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_SNAPSHOT","remote-peer-id":"7a6ff46678be7f4c","clock-drift":"1h59m41.363485824s","rtt":"870.618µs"}
+May 19 08:46:50 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:46:50.635Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_SNAPSHOT","remote-peer-id":"dab2e3fec0c94fc1","clock-drift":"1h59m45.152071179s","rtt":"943.315µs"}
+May 19 08:46:50 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:46:50.635Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_RAFT_MESSAGE","remote-peer-id":"dab2e3fec0c94fc1","clock-drift":"1h59m45.151661051s","rtt":"1.631359ms"}
+May 19 08:47:20 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:47:20.640Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_RAFT_MESSAGE","remote-peer-id":"dab2e3fec0c94fc1","clock-drift":"1h59m42.620604063s","rtt":"6.001496ms"}
+May 19 08:47:20 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:47:20.640Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_RAFT_MESSAGE","remote-peer-id":"7a6ff46678be7f4c","clock-drift":"1h59m36.304059379s","rtt":"2.060011ms"}
+May 19 08:47:20 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:47:20.640Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_SNAPSHOT","remote-peer-id":"7a6ff46678be7f4c","clock-drift":"1h59m36.304636156s","rtt":"1.177785ms"}
+May 19 08:47:20 test-node4 bash[109532]: {"level":"warn","ts":"2022-05-19T08:47:20.640Z","caller":"rafthttp/probing_status.go:82","msg":"prober found high clock drift","round-tripper-name":"ROUND_TRIPPER_SNAPSHOT","remote-peer-id":"dab2e3fec0c94fc1","clock-drift":"1h59m42.620618352s","rtt":"5.070511ms"}
+
+● flink-cli.service - Flink client package Availability checker
+     Loaded: loaded (/usr/lib/systemd/system/flink-cli.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:28:30 UTC; 12h ago
+   Main PID: 99125 (bash)
+      Tasks: 2 (limit: 9260)
+     Memory: 576.0K
+        CPU: 8.905s
+     CGroup: /system.slice/flink-cli.service
+             ├─ 99125 /bin/bash -c "while [[ 1 ]]; do if [[ \`ls -1 /usr/local/bin | grep -e flink\$\` == \"\" ]]; then echo \"BAD\"; exit -1; fi; sleep 5; done"
+             └─210617 sleep 5
+
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+
+● gluster.service - Gluster FS Server
+     Loaded: loaded (/usr/lib/systemd/system/gluster.service; enabled; vendor preset: disabled)
+     Active: active (running) since Thu 2022-05-19 05:51:22 UTC; 2h 56min ago
+    Process: 202869 ExecStartPre=/usr/bin/docker kill gluster (code=exited, status=1/FAILURE)
+    Process: 202885 ExecStartPre=/usr/bin/docker rm -f gluster (code=exited, status=0/SUCCESS)
+    Process: 202891 ExecStartPre=/bin/rm -f /var/run/gluster/gluster.pid (code=exited, status=0/SUCCESS)
+    Process: 202892 ExecStart=/bin/bash -c /usr/local/sbin/startGlusterServiceContainer.sh (code=exited, status=0/SUCCESS)
+   Main PID: 202894 (docker)
+      Tasks: 9 (limit: 9260)
+     Memory: 18.0M
+        CPU: 241ms
+     CGroup: /system.slice/gluster.service
+             ├─202894 /usr/bin/docker run -i --name gluster --privileged=true --network host -v /var/lib/gluster:/var/lib/gluster -v /var/log/gluster:/var/log/gluster -v /var/run/gluster:/var/run/gluster --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo:gluster /usr/local/sbin/inContainerStartService.sh
+             └─202895 tee /var/log/gluster/gluster-container-out-log
+
+May 19 08:46:50 test-node4 bash[202895]: [30m2022-05-19T08:46:50,598[m [32mINFO  [m[[1;34mpool-2-thread-1[m] [1;33mc.n.e.e.m.ManagementService[m: - Updating System Status
+May 19 08:46:50 test-node4 bash[202895]: [30m2022-05-19T08:46:50,598[m [32mINFO  [m[[1;34mpool-2-thread-1[m] [1;33mc.n.e.e.m.ManagementService[m:   + Not updating status since I am no master
+May 19 08:46:51 test-node4 bash[202895]: [30m2022-05-19T08:46:51,348[m [32mINFO  [m[[1;34mhttp-nio-28901-exec-3[m] [1;33mc.n.e.e.c.CommandServer[m: About to execute command: pool - subcommand: list - options:
+May 19 08:46:51 test-node4 bash[202895]: [30m2022-05-19T08:46:51,392[m [32mINFO  [m[[1;34mhttp-nio-28901-exec-4[m] [1;33mc.n.e.e.c.CommandServer[m: About to execute command: volume - subcommand: info - options:
+May 19 08:46:51 test-node4 bash[202895]: [30m2022-05-19T08:46:51,437[m [32mINFO  [m[[1;34mhttp-nio-28901-exec-5[m] [1;33mc.n.e.e.c.CommandServer[m: About to execute command: volume - subcommand: status - options: all detail
+May 19 08:47:17 test-node4 bash[202895]: [30m2022-05-19T08:47:17,839[m [32mINFO  [m[[1;34mhttp-nio-28901-exec-6[m] [1;33mc.n.e.e.c.CommandServer[m: About to execute command: pool - subcommand: list - options:
+May 19 08:47:18 test-node4 bash[202895]: [30m2022-05-19T08:47:18,003[m [32mINFO  [m[[1;34mhttp-nio-28901-exec-7[m] [1;33mc.n.e.e.c.CommandServer[m: About to execute command: volume - subcommand: info - options:
+May 19 08:47:18 test-node4 bash[202895]: [30m2022-05-19T08:47:18,123[m [32mINFO  [m[[1;34mhttp-nio-28901-exec-8[m] [1;33mc.n.e.e.c.CommandServer[m: About to execute command: volume - subcommand: status - options: all detail
+May 19 08:47:20 test-node4 bash[202895]: [30m2022-05-19T08:47:20,599[m [32mINFO  [m[[1;34mpool-2-thread-1[m] [1;33mc.n.e.e.m.ManagementService[m: - Updating System Status
+May 19 08:47:20 test-node4 bash[202895]: [30m2022-05-19T08:47:20,600[m [32mINFO  [m[[1;34mpool-2-thread-1[m] [1;33mc.n.e.e.m.ManagementService[m:   + Not updating status since I am no master
+
+● kafka-cli.service - Kafka client package Availability checker
+     Loaded: loaded (/usr/lib/systemd/system/kafka-cli.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:27:58 UTC; 12h ago
+   Main PID: 98105 (bash)
+      Tasks: 2 (limit: 9260)
+     Memory: 592.0K
+        CPU: 8.918s
+     CGroup: /system.slice/kafka-cli.service
+             ├─ 98105 /bin/bash -c "while [[ 1 ]]; do if [[ \`ls -1 /usr/local/bin | grep -e kafka-topics.sh\` == \"\" ]]; then echo \"BAD\"; exit -1; fi; sleep 5; done"
+             └─210614 sleep 5
+
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/kafka-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+
+× kube-slave.service - Eskimo Kubernetes Slave Infrastructure
+     Loaded: loaded (/usr/lib/systemd/system/kube-slave.service; disabled; vendor preset: disabled)
+     Active: failed (Result: exit-code) since Wed 2022-05-18 20:39:34 UTC; 12h ago
+       Docs: https://www.eskimo.sh
+    Process: 114072 ExecStartPre=/bin/bash /usr/local/sbin/stop-kube-slave.sh (code=exited, status=0/SUCCESS)
+    Process: 114081 ExecStart=/bin/bash /usr/local/sbin/start-kube-slave.sh (code=exited, status=46)
+   Main PID: 114081 (code=exited, status=46)
+        CPU: 521ms
+
+May 18 20:39:29 test-node4 bash[114381]: I0518 20:39:25.728214  114278 hostport_manager.go:73] "The binary conntrack is not installed, this can cause failures in network connection cleanup."
+May 18 20:39:29 test-node4 bash[114381]: I0518 20:39:25.729549  114278 plugins.go:168] "Loaded network plugin" networkPluginName="cni"
+May 18 20:39:29 test-node4 bash[114381]: I0518 20:39:25.729597  114278 docker_service.go:258] "Docker cri networking managed by the network plugin" networkPluginName="cni"
+May 18 20:39:29 test-node4 bash[114381]: I0518 20:39:25.734422  114278 docker_service.go:264] "Docker Info" dockerInfo=&{ID:3ZOA:EIRX:O6RM:MVRH:SHYT:DHW4:PHRW:KVSL:L5TE:KO2R:SAIO:2YKJ Containers:3 ContainersRunning:3 ContainersPaused:0 ContainersStopped:0 Images:23 Driver:btrfs DriverStatus:[[Build Version Btrfs v5.16.2 ] [Library Version 102]] SystemStatus:[] Plugins:{Volume:[local] Network:[bridge host ipvlan macvlan null overlay] Authorization:[] Log:[awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog]} MemoryLimit:true SwapLimit:true KernelMemory:false KernelMemoryTCP:false CPUCfsPeriod:true CPUCfsQuota:true CPUShares:true CPUSet:true PidsLimit:true IPv4Forwarding:true BridgeNfIptables:true BridgeNfIP6tables:true Debug:false NFd:51 OomKillDisable:false NGoroutines:74 SystemTime:2022-05-18T20:39:25.730104093Z LoggingDriver:json-file CgroupDriver:systemd CgroupVersion:2 NEventsListener:0 KernelVersion:5.14.10-300.fc35.x86_64 OperatingSystem:Fedora Linux 35 (Cloud Edition) OSVersion:35 OSType:linux Architecture:x86_64 IndexServerAddress:https://index.docker.io/v1/ RegistryConfig:0xc0003fe000 NCPU:2 MemTotal:8126595072 GenericResources:[] DockerRootDir:/var/lib/docker HTTPProxy: HTTPSProxy: NoProxy: Name:test-node4 Labels:[] ExperimentalBuild:false ServerVersion:20.10.16 ClusterStore: ClusterAdvertise: Runtimes:map[io.containerd.runc.v2:{Path:runc Args:[] Shim:<nil>} io.containerd.runtime.v1.linux:{Path:runc Args:[] Shim:<nil>} runc:{Path:runc Args:[] Shim:<nil>}] DefaultRuntime:runc Swarm:{NodeID: NodeAddr: LocalNodeState:inactive ControlAvailable:false Error: RemoteManagers:[] Nodes:0 Managers:0 Cluster:<nil> Warnings:[]} LiveRestoreEnabled:false Isolation: InitBinary:docker-init ContainerdCommit:{ID:212e8b6fa2f44b9c21b2798135fc6fb7c53efc16 Expected:212e8b6fa2f44b9c21b2798135fc6fb7c53efc16} RuncCommit:{ID:v1.1.1-0-g52de29d Expected:v1.1.1-0-g52de29d} InitCommit:{ID:de40ad0 Expected:de40ad0} SecurityOptions:[name=seccomp,profile=default name=cgroupns] ProductLicense: DefaultAddressPools:[] Warnings:[]}
+May 18 20:39:29 test-node4 bash[114381]: E0518 20:39:25.734474  114278 server.go:302] "Failed to run kubelet" err="failed to run Kubelet: misconfiguration: kubelet cgroup driver: \"cgroupfs\" is different from docker cgroup driver: \"systemd\""
+May 18 20:39:34 test-node4 systemd[1]: kube-slave.service: Scheduled restart job, restart counter is at 3.
+May 18 20:39:34 test-node4 systemd[1]: Stopped Eskimo Kubernetes Slave Infrastructure.
+May 18 20:39:34 test-node4 systemd[1]: kube-slave.service: Start request repeated too quickly.
+May 18 20:39:34 test-node4 systemd[1]: kube-slave.service: Failed with result 'exit-code'.
+May 18 20:39:34 test-node4 systemd[1]: Failed to start Eskimo Kubernetes Slave Infrastructure.
+
+● logstash-cli.service - Logstash client package Availability checker
+     Loaded: loaded (/usr/lib/systemd/system/logstash-cli.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:28:14 UTC; 12h ago
+   Main PID: 98572 (bash)
+      Tasks: 2 (limit: 9260)
+     Memory: 580.0K
+        CPU: 8.988s
+     CGroup: /system.slice/logstash-cli.service
+             ├─ 98572 /bin/bash -c "while [[ 1 ]]; do if [[ \`ls -1 /usr/local/bin | grep -e logstash\$\` == \"\" ]]; then echo \"BAD\"; exit -1; fi; sleep 5; done"
+             └─210616 sleep 5
+
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+
+● ntp.service - NTP Server
+     Loaded: loaded (/usr/lib/systemd/system/ntp.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:33:04 UTC; 12h ago
+   Main PID: 104528 (docker)
+      Tasks: 8 (limit: 9260)
+     Memory: 17.6M
+        CPU: 457ms
+     CGroup: /system.slice/ntp.service
+             └─104528 /usr/bin/docker run -i --name ntp -p 123:123/udp -p 123:123/tcp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp -v /var/lib/ntp:/var/lib/ntp --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo:ntp /usr/local/sbin/inContainerStartService.sh
+
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:71: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:71: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:44 test-node4 bash[104528]: 18 May 20:38:44 ntpd[35]: 0.0.0.0 0612 02 freq_set kernel 2.214 PPM
+May 18 20:38:44 test-node4 bash[104528]: 18 May 20:38:44 ntpd[35]: 0.0.0.0 0615 05 clock_sync
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:71: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 21:37:04 test-node4 bash[104528]: 18 May 21:37:04 ntpd[35]: 192.168.56.21 9617 87 rate_exceeded
+
+● prometheus.service - Prometheus
+     Loaded: loaded (/usr/lib/systemd/system/prometheus.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:32:21 UTC; 12h ago
+   Main PID: 103109 (docker)
+      Tasks: 8 (limit: 9260)
+     Memory: 17.4M
+        CPU: 475ms
+     CGroup: /system.slice/prometheus.service
+             └─103109 /usr/bin/docker run -i --name prometheus --network host --privileged -v /var/log/prometheus:/var/log/prometheus -v /proc:/host/proc -v /sys:/host/sys -v /:/rootfs --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo:prometheus /usr/local/sbin/inContainerStartService.sh
+
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:73: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:73: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:73: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:73: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:73: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+
+● spark-cli.service - Spark client package Availability checker
+     Loaded: loaded (/usr/lib/systemd/system/spark-cli.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2022-05-18 20:27:41 UTC; 12h ago
+   Main PID: 97506 (bash)
+      Tasks: 2 (limit: 9260)
+     Memory: 596.0K
+        CPU: 9.114s
+     CGroup: /system.slice/spark-cli.service
+             ├─ 97506 /bin/bash -c "while [[ 1 ]]; do if [[ \`ls -1 /usr/local/bin | grep -e spark-submit\` == \"\" ]]; then echo \"BAD\"; exit -1; fi; sleep 5; done"
+             └─210615 sleep 5
+
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:40 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:61: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/spark-cli.service:62: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.

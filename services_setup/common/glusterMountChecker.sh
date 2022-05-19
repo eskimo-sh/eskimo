@@ -40,40 +40,48 @@ for SHARE in `cat /etc/fstab  | grep glusterfs | cut -d ' ' -f 2`; do
 
     rm -Rf /tmp/gluster_mount_checker_error
 
-    ls -la $SHARE >/dev/null 2>/tmp/gluster_mount_checker_error
-    if [[ $? != 0 ]]; then
+    # check if working only if it is supposed to be mounted
+    if [[ `grep $SHARE /etc/mtab | grep glusterfs` != "" ]]; then
 
-        if [[ `grep "Transport endpoint is not connected" /tmp/gluster_mount_checker_error` != "" \
-             || `grep "Too many levels of symbolic links" /tmp/gluster_mount_checker_error` != "" \
-             || `grep "No such device" /tmp/gluster_mount_checker_error` != "" ]]; then
+        # give it a try
+        ls -la $SHARE >/dev/null 2>/tmp/gluster_mount_checker_error
 
-            echo `date +"%Y-%m-%d %H:%M:%S"`" - There is an issue with $SHARE. Unmounting" \
-                >> /var/log/gluster/gluster-mount-checker.log
+        # unmount if it's not working
+        if [[ $? != 0 ]]; then
 
-            # 3 attempts
-            for i in 1 2 3; do
+            if [[ `grep "Transport endpoint is not connected" /tmp/gluster_mount_checker_error` != "" \
+                 || `grep "Too many levels of symbolic links" /tmp/gluster_mount_checker_error` != "" \
+                 || `grep "No such device" /tmp/gluster_mount_checker_error` != "" ]]; then
 
-                echo `date +"%Y-%m-%d %H:%M:%S"`"   + Attempt $i" >> /var/log/gluster/gluster-mount-checker.log
-                /bin/umount $SHARE  >> /var/log/gluster/gluster-mount-checker.log 2>&1
+                echo `date +"%Y-%m-%d %H:%M:%S"`" - There is an issue with $SHARE. Unmounting" \
+                    >> /var/log/gluster/gluster-mount-checker.log
 
-                if [[ $? != 0 ]]; then
+                # 3 attempts
+                for i in 1 2 3; do
 
-                    echo `date +"%Y-%m-%d %H:%M:%S"`"   + Unmount FAILED \!" >> /var/log/gluster/gluster-mount-checker.log
+                    echo `date +"%Y-%m-%d %H:%M:%S"`"   + Attempt $i" >> /var/log/gluster/gluster-mount-checker.log
+                    /bin/umount $SHARE  >> /var/log/gluster/gluster-mount-checker.log 2>&1
 
-                else
+                    if [[ $? != 0 ]]; then
+
+                        echo `date +"%Y-%m-%d %H:%M:%S"`"   + Unmount FAILED \!" >> /var/log/gluster/gluster-mount-checker.log
+
+                    else
+
+                        # give a little time
+                        sleep 2
+
+                        break
+                    fi
 
                     # give a little time
                     sleep 2
-
-                    break
-                fi
-
-                # give a little time
-                sleep 2
-            done
-         fi
+                done
+            fi
+        fi
     fi
 
+    # try to mount / remount
     if [[ `grep $SHARE /etc/mtab | grep glusterfs` == "" ]]; then
 
         echo `date +"%Y-%m-%d %H:%M:%S"`" - $SHARE is not mounted, remounting" \

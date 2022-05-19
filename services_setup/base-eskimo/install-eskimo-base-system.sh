@@ -102,7 +102,7 @@ function enable_docker() {
     # Deprecated, remove kubernetes.registry
     cat > /tmp/daemon.json <<- "EOF"
 {
-  "insecure-registries" : ["kubernetes.registry:5000", "kubernetes.registry:5000"]
+  "insecure-registries" : ["kubernetes.registry:5000"]
 }
 
 EOF
@@ -435,6 +435,28 @@ fi
 
 echo "  - Enabling docker"
 enable_docker
+
+
+# kubelet works for now with cgroupfs, need to ensure docker is working with cgroupfs as well
+if [[ `grep cgroup /proc/mounts | grep cgroup2` != "" && `grep cgroup /proc/mounts | wc -l` -lt 4 ]]; then
+
+    # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to cgroupfs (v1)
+    if [[ `grep native.cgroupdriver=cgroupfs /etc/docker/daemon.json` == "" ]]; then
+
+        sudo sed -i -n '1h;1!H;${;g;s/'\
+'{\n'\
+'  "insecure-registries"'\
+'/'\
+'{\n'\
+'  "exec-opts": \["native.cgroupdriver=cgroupfs"\],\n'\
+'  "insecure-registries"'\
+'/g;p;}' /etc/docker/daemon.json
+
+
+        sudo systemctl restart docker containerd
+    fi
+fi
+
 
 echo " - Disabling IPv6"
 

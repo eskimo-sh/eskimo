@@ -58,6 +58,19 @@ public class SystemStatusParserTest {
     }
 
     @Test
+    public void testKubeSlaveCase () throws Exception {
+
+        String testString = loadTestConfig("kube-slave-case.log");
+
+        SystemStatusParser parser = new SystemStatusParser(testString);
+
+        String serviceStatus = parser.getServiceStatus("kube-slave");
+
+        assertEquals ("Result: exit-code", serviceStatus);
+
+    }
+
+    @Test
     public void testParseFileDeb() throws Exception {
 
         String debConfig = loadTestConfig("systemctl-out-debnode1.log");

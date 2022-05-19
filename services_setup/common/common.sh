@@ -608,16 +608,3 @@ function preinstall_unmount_gluster_share () {
         done
     fi
 }
-
-# extract IP address
-function get_ip_address(){
-    ip_from_ifconfig=`/sbin/ifconfig | grep $SELF_IP_ADDRESS`
-
-    if [[ `echo $ip_from_ifconfig | grep Mask:` != "" ]]; then
-      ip=`echo $ip_from_ifconfig  | sed 's/.*inet addr:\([0-9\.]*\).*/\1/'`
-    elif [[ `echo $ip_from_ifconfig | grep netmask` != "" ]]; then
-      ip=`echo $ip_from_ifconfig  | sed 's/.*inet \([0-9\.]*\).*/\1/'`
-    fi
-
-    export IP_ADDRESS=$ip
-}

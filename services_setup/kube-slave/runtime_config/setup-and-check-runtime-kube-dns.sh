@@ -179,9 +179,9 @@ if [[ $MODE == "MASTER" || ( $MODE == "SLAVE" && "$MASTER_KUBE_MASTER_1" != "$SE
             fi
 
             if [[ -f $systemd_units_dir/NetworkManager.service ]]; then
-                /bin/systemctl restart NetworkManager
+                sudo /bin/systemctl restart NetworkManager
             else
-                /bin/systemctl restart dnsmasq
+                sudo /bin/systemctl restart dnsmasq
             fi
             if [[ $? != 0 ]]; then
                 echo "Failing to restart NetworkManager / dnsmasq"
@@ -192,6 +192,38 @@ if [[ $MODE == "MASTER" || ( $MODE == "SLAVE" && "$MASTER_KUBE_MASTER_1" != "$SE
             sleep 2
 
             echo "   + Trying YET AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
+            /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
+            if [[ $? != 0 ]]; then
+
+                which resolvectl >/dev/null 2>&1
+                if [[ $? == 0 ]]; then
+
+                    echo "   + Now trying the resolvectl trick"
+                    interface=`/sbin/ifconfig | grep -B 1 $SELF_IP_ADDRESS | grep flags | sed s/'^\([a-zA-Z0-9]\+\).*'/'\1'/`
+                    if [[ "$interface" != "" ]]; then
+
+                        echo "   + Calling resolvectl dns $interface 127.0.0.1"
+                        sudo resolvectl dns $interface 127.0.0.1
+
+                        sleep 2
+
+                        echo "   + Trying AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN to see if the resolbetrick on external interface worked"
+                        /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
+                        if [[ $? != 0 ]]; then
+
+                            echo "   + Out of desperation trying resolvectl trick with eth0"
+                            echo "   + Calling resolvectl dns eth0 127.0.0.1"
+                            sudo resolvectl dns eth0 127.0.0.1
+
+                            sleep 2
+
+                        fi
+                    fi
+                fi
+            fi
+
+
+            echo "   + Trying ONE LAST TIME to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN"
             /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
             if [[ $? != 0 ]]; then
 
@@ -225,7 +257,7 @@ if [[ $MODE == "MASTER" || ( $MODE == "SLAVE" && "$MASTER_KUBE_MASTER_1" != "$SE
 
                 let ping_cnt=ping_cnt+1
 
-                echo "     - checking redeploy coredns looping"
+                echo "     - checking looping"
                 if [[ $ping_cnt -gt 5 ]]; then
                     echo "       + Redeployed coredns 5 times in a row. Crashing !"
                     echo "0" > /etc/k8s/dns-ping-cnt
