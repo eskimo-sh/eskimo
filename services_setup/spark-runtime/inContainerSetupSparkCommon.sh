@@ -109,7 +109,7 @@ done
 
 echo " - Simlinking spark logs to /var/log/"
 sudo rm -Rf /usr/local/lib/spark/logs
-sudo ln -s /var/log/spark/logs /usr/local/lib/spark/logs
+sudo ln -s /var/log/spark /usr/local/lib/spark/logs
 
 echo " - Defining SPARK_HOME variable"
 # etc profile

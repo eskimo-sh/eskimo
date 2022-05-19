@@ -66,10 +66,6 @@ echo " - Creating user kafka home directory"
 mkdir -p /home/kafka
 chown kafka /home/kafka
 
-echo " - Preparing file to store overriden eskimo memory settings"
-touch /usr/local/lib/kafka/config/eskimo-memory.opts
-chown kafka /usr/local/lib/kafka/config/eskimo-memory.opts
-
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container config SUCCESS"

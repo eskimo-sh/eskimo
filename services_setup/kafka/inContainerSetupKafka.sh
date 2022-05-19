@@ -79,6 +79,9 @@ echo " - Creating temporary folder for kafka"
 sudo mkdir -p /tmp/kafka-logs/
 sudo chown -R kafka /tmp/kafka-logs/
 
+echo " - Preparing file to store overriden eskimo memory settings"
+touch /usr/local/lib/kafka/config/eskimo-memory.opts
+chown kafka /usr/local/lib/kafka/config/eskimo-memory.opts
 
 echo " - Adapting configuration in file server.properties"
 sudo sed -i s/"log.dirs=\/tmp\/kafka-logs"/"log.dirs=\/var\/lib\/kafka"/g /usr/local/etc/kafka/server.properties
