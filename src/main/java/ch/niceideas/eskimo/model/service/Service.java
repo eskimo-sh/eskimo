@@ -32,13 +32,14 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service;
 
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.Command;
+import ch.niceideas.eskimo.model.ConditionalInstallation;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

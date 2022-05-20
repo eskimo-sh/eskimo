@@ -1,6 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.eskimo.model.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
 import org.apache.log4j.Logger;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketMessage;

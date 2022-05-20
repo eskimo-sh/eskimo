@@ -32,19 +32,47 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
 
-import java.util.Map;
 
-public class MemoryModel {
+package ch.niceideas.eskimo.model.service;
 
-    private final Map<String, Map<String, Long>> innerModel;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import lombok.Data;
+import org.json.JSONObject;
 
-    public MemoryModel(Map<String, Map<String, Long>> innerModel) {
-        this.innerModel = innerModel;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
+@Data
+public class KubeRequest {
+
+    public static Pattern KUBE_REQUEST_CPU_RE = Pattern.compile("[0-9\\.]+[m]{0,1}");
+    public static Pattern KUBE_REQUEST_RAM_RE = Pattern.compile("[0-9\\.]+[EPTGMk]{0,1}");
+
+    private String cpu;
+    private String ram;
+
+    public void setCpu(String cpu) throws ServiceDefinitionException {
+        if (KUBE_REQUEST_CPU_RE.matcher(cpu).matches()) {
+            this.cpu = cpu;
+        } else {
+            throw new ServiceDefinitionException("Kubernetes request cpu '" + cpu + "' doesn't match expected pattern (number)[m]{0,1}");
+        }
     }
 
-    public Map<String,Long> getModelForNode(NodesConfigWrapper nodesConfig, int nodeNbr) {
-        return innerModel.get(nodesConfig.getNodeAddress(nodeNbr));
+    public void setRam(String ram) throws ServiceDefinitionException {
+        if (KUBE_REQUEST_RAM_RE.matcher(ram).matches()) {
+            this.ram = ram;
+        } else {
+            throw new ServiceDefinitionException("Kubernetes request ram '" + ram + "' doesn't match expected pattern (number)[EPTGMk]{0,1}");
+        }
+    }
+
+    public JSONObject toJSON() {
+        return new JSONObject(new HashMap<String, Object>() {{
+            put("cpu", getCpu());
+            put("ram", getRam());
+        }});
     }
 }

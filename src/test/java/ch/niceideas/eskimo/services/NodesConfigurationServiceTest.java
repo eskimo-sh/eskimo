@@ -34,13 +34,11 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import com.trilead.ssh2.Connection;
-import org.eclipse.jetty.util.StringUtil;
+import ch.niceideas.eskimo.model.service.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

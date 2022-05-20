@@ -34,8 +34,8 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.model.UIConfig;
+import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.json.JSONArray;

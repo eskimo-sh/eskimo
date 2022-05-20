@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MessageLogger;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;

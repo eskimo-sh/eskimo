@@ -35,6 +35,10 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.service.Dependency;
+import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
+import ch.niceideas.eskimo.model.service.MemoryConsumptionSize;
+import ch.niceideas.eskimo.model.service.Service;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractServicesDefinitionTest {

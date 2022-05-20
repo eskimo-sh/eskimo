@@ -42,21 +42,11 @@ fi
 
 . /etc/eskimo_topology.sh
 
-# expecting from topology
-#export ALL_NODES_LIST_kube_slave=192.168.56.21,192.168.56.22,192.168.56.23
-
-
-# IP and port of etcd cluster
-#export ETCD1_IP="192.168.1.102"
-#export ETCD2_IP="192.168.1.103"
-#export ETCD3_IP="192.168.1.101"
+# Port of etcd cluster
 export EKIMO_ETCD_PORT=2379
 
 # IPs of master nodes
-# TODO
 export MASTER1_IP=$MASTER_KUBE_MASTER_1
-#export MASTER2_IP="192.168.1.102"
-#export MASTER3_IP="192.168.1.103"
 
 # TLS Bootstrapping Token
 # $(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32;)
@@ -65,9 +55,6 @@ export BOOTSTRAP_TOKEN=1Qb_YYlsOFKa0q-4hur12yn_7urzYCRZ
 # Use unused netword ip range to define service ip and pod ip
 # (Service CIDR)
 export SERVICE_CIDR="10.254.0.0/16"
-
-# TODO FIXME this should be computed dynamically from k8s nodes IPs
-#export SERVICE_CIDR=`cat /etc/eskimo_network_cidr`
 
 # Pod Cluster CIDR
 export CLUSTER_CIDR="172.30.0.0/16"
@@ -92,11 +79,9 @@ export FLANNEL_ETCD_PREFIX="/eskimo/network"
 
 # kubernetes service IP (normally the first IP in SERVICE_CIDR)
 export CLUSTER_KUBERNETES_SVC_IP="10.254.0.1"
-#export CLUSTER_KUBERNETES_SVC_IP="$MASTER_KUBE_MASTER_1"
 
 #  DNS IP for the cluster (assigned from SERVICE_CIDR)
 export CLUSTER_DNS_SVC_IP="10.254.0.2"
-#export CLUSTER_DNS_SVC_IP="$MASTER_KUBE_MASTER_1"
 
 #  DNS domain name
 export CLUSTER_DNS_DOMAIN="cluster.eskimo"

@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONArray;
 import org.json.JSONObject;

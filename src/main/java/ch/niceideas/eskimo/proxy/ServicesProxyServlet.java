@@ -36,9 +36,9 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.ProxyReplacement;
-import ch.niceideas.eskimo.model.ProxyTunnelConfig;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.proxy.ProxyReplacement;
+import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;

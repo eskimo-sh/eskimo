@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -96,10 +96,10 @@ public class WebSocketProxyTest {
 
         client.doHandshake(new AbstractWebSocketHandler() {
             @Override
-            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            public void afterConnectionEstablished(WebSocketSession session) {
                 clientSessionReference.set(session);
             }
-            protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+            protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                 clientBlockingQueue.offer(message.getPayload());
             }
         }, server.getWsBaseUrl() + "ws/cerebro/application");
@@ -116,7 +116,7 @@ public class WebSocketProxyTest {
 
         client.doHandshake(new AbstractWebSocketHandler() {
             @Override
-            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            public void afterConnectionEstablished(WebSocketSession session) {
                 clientSessionReference.set(session);
             }
             protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -141,10 +141,10 @@ public class WebSocketProxyTest {
 
         client.doHandshake(new AbstractWebSocketHandler() {
             @Override
-            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            public void afterConnectionEstablished(WebSocketSession session) {
                 clientSessionReference.set(session);
             }
-            protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+            protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                 clientBlockingQueue.offer(message.getPayload());
             }
         }, server.getWsBaseUrl() + "ws/zeppelin/application");
@@ -153,7 +153,7 @@ public class WebSocketProxyTest {
 
         assertNull (clientBlockingQueue.poll(1, TimeUnit.SECONDS));
 
-        // session must have been closed folling error
+        // session must have been closed following error
         assertFalse (waitAndGetSession(clientSessionReference).isOpen());
     }
 
@@ -182,7 +182,7 @@ public class WebSocketProxyTest {
             // A dummy target application that just returns a text message with a "pong" prefix
             registry.addHandler(new AbstractWebSocketHandler() {
                         @Override
-                        public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+                        public void afterConnectionEstablished(WebSocketSession session) {
                             serverSessionReference.set (session);
                         }
                         @Override

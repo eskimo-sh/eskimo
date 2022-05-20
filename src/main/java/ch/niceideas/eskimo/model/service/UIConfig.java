@@ -32,25 +32,56 @@
  * Software.
  */
 
+package ch.niceideas.eskimo.model.service;
 
-package ch.niceideas.eskimo.model;
-
+import ch.niceideas.eskimo.model.proxy.ProxyReplacement;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Data
-public class KubeConfig {
+public class UIConfig {
 
-    private KubeRequest request;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private final Service service;
 
-    public JSONObject toJSON() {
+    private String urlTemplate;
+    private Integer proxyTargetPort;
+    private int waitTime;
+    private String title;
+    private String requiredRole;
+
+    private boolean applyStandardProxyReplacements = true;
+    private String statusPageLinkTitle;
+    private final List<ProxyReplacement> proxyReplacements = new ArrayList<>();
+
+    public UIConfig (Service service) {
+        this.service = service;
+    }
+
+    public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            if (request != null) {
-                put ("request", request.toJSON());
-            }
+            put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
+            put("proxyContext", "./"+service.getName()+"/");
+            put("waitTime", waitTime);
+            put("title", title);
+            put("role", requiredRole);
+            put("unique", service.isUnique());
         }});
+    }
+
+    public String getServiceName() {
+        return service.getName();
+    }
+
+    public void addProxyReplacement(ProxyReplacement pr) {
+        proxyReplacements.add (pr);
     }
 
 }

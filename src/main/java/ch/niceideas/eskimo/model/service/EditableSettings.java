@@ -32,18 +32,64 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service;
 
-import lombok.Getter;
+import ch.niceideas.eskimo.services.EditablePropertyType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-public enum MemoryConsumptionSize {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    NEGLECTABLE(0), SMALL(1), MEDIUM(2), LARGE(3), VERYLARGE (5);
+@Data
+public class EditableSettings {
 
-    @Getter
-    private final int nbrParts;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private final Service service;
 
-    MemoryConsumptionSize (int nbrParts) {
-        this.nbrParts = nbrParts;
+    private final String filename;
+    private final EditablePropertyType propertyType;
+    private final String propertyFormat;
+    private final String filesystemService;
+    private String commentPrefix = "";
+    private final List<EditableProperty> properties = new ArrayList<>();
+
+    public EditableSettings(Service service, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
+        this.filesystemService = filesystemService;
+        this.service = service;
+        this.filename = filename;
+        this.propertyType = propertyType;
+        this.propertyFormat = propertyFormat;
+    }
+
+    public List<EditableProperty> getProperties() {
+        return Collections.unmodifiableList(properties);
+    }
+
+    public void addProperty (EditableProperty property) {
+        properties.add(property);
+    }
+
+    public JSONObject toJSON() {
+        JSONArray propertiesArray = new JSONArray(properties.stream()
+                .map(EditableProperty::toJSON)
+                .collect(Collectors.toList())
+        );
+        return new JSONObject(new HashMap<String, Object>() {{
+            put("service", service.getName());
+            put("filesystemService", getFilesystemService());
+            put("filename", getFilename());
+            put("propertyType", getPropertyType());
+            put("propertyFormat", getPropertyFormat());
+            put("commentPrefix", getCommentPrefix());
+            put("properties", propertiesArray);
+        }});
     }
 }

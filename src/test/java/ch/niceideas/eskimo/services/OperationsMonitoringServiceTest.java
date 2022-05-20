@@ -34,11 +34,10 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
-import com.trilead.ssh2.Connection;
+import ch.niceideas.eskimo.model.service.Service;
 import org.apache.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;

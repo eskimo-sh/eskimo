@@ -101,7 +101,4 @@ echo "   + Using ESKIMO_KUBE_TLS_CERT_FILE=$ESKIMO_KUBE_TLS_CERT_FILE"
 echo "   + Using ESKIMO_KUBE_TLS_PRIVATE_KEY=$ESKIMO_KUBE_TLS_PRIVATE_KEY"
 echo "   + Using ESKIMO_KUBE_CLIENT_CA_FILE=$ESKIMO_KUBE_CLIENT_CA_FILE"
 
-# Not supported anymore as it seems
-#echo "   + Using ESKIMO_ALLOW_PRIVILEGED=$ESKIMO_ALLOW_PRIVILEGED"
-
 # --cert-dir=/etc/kubernetes/ssl

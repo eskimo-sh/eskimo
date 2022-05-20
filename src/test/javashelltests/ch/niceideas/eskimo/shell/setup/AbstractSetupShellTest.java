@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.model.MemoryModel;
+import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
 import ch.niceideas.eskimo.services.ServicesDefinition;
@@ -45,7 +45,6 @@ import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import org.apache.log4j.Logger;
-import org.junit.Assume;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 

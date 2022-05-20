@@ -32,32 +32,25 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.StringUtils;
-import lombok.AllArgsConstructor;
+package ch.niceideas.eskimo.model.service;
+
 import lombok.Data;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 @Data
-@AllArgsConstructor
-public class EditableProperty {
+public class KubeConfig {
 
-    private final String name;
-    private final String comment;
-    private final String defaultValue;
-    private String value;
+    private KubeRequest request;
 
     public JSONObject toJSON() {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("name", getName());
-            put("comment", getComment());
-            put("defaultValue", getDefaultValue());
-            if (StringUtils.isNotBlank(getValue())) {
-                put("value", getValue());
+            if (request != null) {
+                put ("request", request.toJSON());
             }
         }});
     }
+
 }

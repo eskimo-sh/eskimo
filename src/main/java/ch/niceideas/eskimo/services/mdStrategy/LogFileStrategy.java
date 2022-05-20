@@ -1,8 +1,8 @@
 package ch.niceideas.eskimo.services.mdStrategy;
 
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.MasterDetection;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.MasterDetection;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 

@@ -1,4 +1,4 @@
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.proxy;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

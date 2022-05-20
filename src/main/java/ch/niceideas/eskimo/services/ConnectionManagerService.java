@@ -36,10 +36,9 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.log4j.Logger;
 import org.json.JSONException;

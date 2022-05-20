@@ -36,10 +36,9 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
-import com.trilead.ssh2.Connection;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;

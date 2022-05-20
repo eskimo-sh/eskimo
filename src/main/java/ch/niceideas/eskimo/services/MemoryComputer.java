@@ -35,9 +35,9 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.model.MemoryModel;
+import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

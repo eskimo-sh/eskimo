@@ -35,6 +35,8 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.service.MasterDetection;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.mdStrategy.MdStrategy;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

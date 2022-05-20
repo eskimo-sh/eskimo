@@ -2,7 +2,7 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.KubernetesService;
 
 import java.util.*;

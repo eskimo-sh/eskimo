@@ -37,6 +37,8 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.proxy.ProxyReplacement;
+import ch.niceideas.eskimo.model.service.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;

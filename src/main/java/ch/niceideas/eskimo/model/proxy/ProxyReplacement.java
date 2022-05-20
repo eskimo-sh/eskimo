@@ -1,4 +1,4 @@
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
 import lombok.Data;

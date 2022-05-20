@@ -1,8 +1,8 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.model.ConditionalInstallation;
-import ch.niceideas.eskimo.model.Service;
-import ch.niceideas.eskimo.model.UIConfig;
+import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONException;
 import org.json.JSONObject;

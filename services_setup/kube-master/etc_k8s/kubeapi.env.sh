@@ -66,10 +66,6 @@ echo "   + Using ESKIMO_KUBE_API_ADVERTISE_ADDRESS=$ESKIMO_KUBE_API_ADVERTISE_AD
 export ESKIMO_KUBE_API_BIND_ADDRESS="0.0.0.0"
 echo "   + Using ESKIMO_KUBE_API_BIND_ADDRESS=$ESKIMO_KUBE_API_BIND_ADDRESS"
 
-# The port on the local server to listen on.
-# KUBE_API_PORT="--port=8080"
-# Unused
-
 # The certificates used by API server
 export ESKIMO_KUBE_TLS_CERT_FILE=/etc/k8s/ssl/kubernetes.pem
 echo "   + Using ESKIMO_KUBE_TLS_CERT_FILE=$ESKIMO_KUBE_TLS_CERT_FILE"
@@ -80,9 +76,6 @@ echo "   + Using ESKIMO_KUBE_TLS_PRIVATE_KEY=$ESKIMO_KUBE_TLS_PRIVATE_KEY"
 export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/ssl/ca.pem
 echo "   + Using ESKIMO_KUBE_CLIENT_CA_FILE=$ESKIMO_KUBE_CLIENT_CA_FILE"
 
-# Port minions listen on
-# KUBELET_PORT="--kubelet-port=10250"
-
 # The Kubelet authorization configs
 export ESKIMO_KUBE_AUTHORIZATION_MODE="Node,RBAC"
 echo "   + Using ESKIMO_KUBE_AUTHORIZATION_MODE=$ESKIMO_KUBE_AUTHORIZATION_MODE"
@@ -92,10 +85,6 @@ echo "   + Using ESKIMO_KUBE_AUTHORIZATION_MODE=$ESKIMO_KUBE_AUTHORIZATION_MODE"
 #export ESKIMO_KUBE_RUNTIME_CONFIG="v1=true,extensions/v1beta1=true,batch/v1=true,rbac.authorization.k8s.io/v1alpha1=true" # not working
 export ESKIMO_KUBE_RUNTIME_CONFIG="extensions/v1beta1=true,batch/v1=true,rbac.authorization.k8s.io/v1alpha1=true"
 echo "   + Using ESKIMO_KUBE_RUNTIME_CONFIG=$ESKIMO_KUBE_RUNTIME_CONFIG"
-
-# Unsupported as it seems
-#export ESKIMO_KUBE_KUBELET_HTTPS="true"
-#echo "   + Using ESKIMO_KUBE_KUBELET_HTTPS=$ESKIMO_KUBE_KUBELET_HTTPS"
 
 export ESKIMO_KUBE_TOKEN_AUTH_FILE="/etc/k8s/token.csv"
 echo "   + Using ESKIMO_KUBE_TOKEN_AUTH_FILE=$ESKIMO_KUBE_TOKEN_AUTH_FILE"
@@ -126,17 +115,11 @@ export ESKIMO_KUBE_ADMISSION_CONTROL="NamespaceExists,NamespaceLifecycle,LimitRa
 echo "   + Using ESKIMO_KUBE_ADMISSION_CONTROL=$ESKIMO_KUBE_ADMISSION_CONTROL"
 
 # ServiceAccount configs
-#export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/ssl/ca.pem"
-# attempt to solve : [invalid bearer token, [invalid bearer token, square/go-jose: error in cryptographic primitive]]
-#export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE=$ESKIMO_KUBE_CLIENT_CA_FILE
 export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/ssl/kubernetes.pem"
 echo "   + Using ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE=$ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE"
 
-#export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/ssl/ca-key.pem"
 export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/ssl/kubernetes-key.pem"
 echo "   + Using ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE=$ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE"
-
-
 
 export ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER=api
 echo "   + Using ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER=$ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER"

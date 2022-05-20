@@ -47,6 +47,7 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
                 "    \"zookeeper\",\n" +
                 "    \"gluster\",\n" +
                 "    \"kube-master\",\n" +
+                "    \"kubernetes-dashboard\",\n" +
                 "    \"elasticsearch\",\n" +
                 "    \"cerebro\",\n" +
                 "    \"grafana\",\n" +
@@ -98,6 +99,7 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
                         "Build_zookeeper," +
                         "Build_gluster," +
                         "Build_kube-master," +
+                        "Build_kubernetes-dashboard," +
                         "Build_elasticsearch," +
                         "Build_cerebro," +
                         "Build_grafana," +

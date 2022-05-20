@@ -1,4 +1,4 @@
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service;
 
 import ch.niceideas.eskimo.services.mdStrategy.LogFileStrategy;
 import ch.niceideas.eskimo.services.mdStrategy.MdStrategy;

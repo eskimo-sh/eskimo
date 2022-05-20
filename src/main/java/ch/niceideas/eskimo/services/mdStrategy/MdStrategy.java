@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.services.mdStrategy;
 
-import ch.niceideas.eskimo.model.MasterDetection;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.MasterDetection;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
 
 import java.util.Date;

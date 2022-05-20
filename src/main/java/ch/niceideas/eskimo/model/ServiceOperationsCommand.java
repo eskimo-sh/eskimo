@@ -35,22 +35,17 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.SerializablePair;
+import ch.niceideas.eskimo.model.service.Dependency;
+import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
 public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> implements Serializable {
 

@@ -34,6 +34,10 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.model.service.Dependency;
+import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
+import ch.niceideas.eskimo.model.service.MemoryModel;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.eskimo.model.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.junit.jupiter.api.BeforeEach;

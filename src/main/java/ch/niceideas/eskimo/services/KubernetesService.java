@@ -4,6 +4,8 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.service.MemoryModel;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
 import org.apache.log4j.Logger;

@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.Service;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,8 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class KubeStatusParserTest {
 

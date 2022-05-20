@@ -1,4 +1,4 @@
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

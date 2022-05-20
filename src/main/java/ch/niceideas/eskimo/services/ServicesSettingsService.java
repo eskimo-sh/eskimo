@@ -38,8 +38,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import ch.niceideas.eskimo.model.service.MemoryModel;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,12 +49,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.lang.management.MemoryPoolMXBean;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-
-import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)

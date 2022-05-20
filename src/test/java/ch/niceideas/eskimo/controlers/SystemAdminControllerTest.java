@@ -2,7 +2,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.Service;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;

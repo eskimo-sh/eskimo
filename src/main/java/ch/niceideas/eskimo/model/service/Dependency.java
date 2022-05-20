@@ -32,55 +32,58 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.ConfigurationOwner;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-@Data
-public class UIConfig {
+public class Dependency {
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private final Service service;
+    @Getter @Setter
+    private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
 
-    private String urlTemplate;
-    private Integer proxyTargetPort;
-    private int waitTime;
-    private String title;
-    private String requiredRole;
+    @Getter @Setter
+    private String masterService = null;
 
-    private boolean applyStandardProxyReplacements = true;
-    private String statusPageLinkTitle;
-    private final List<ProxyReplacement> proxyReplacements = new ArrayList<>();
+    @Getter @Setter
+    private int numberOfMasters = 0;
 
-    public UIConfig (Service service) {
-        this.service = service;
+    @Getter @Setter
+    private boolean mandatory = true; // default is true
+
+    @Getter @Setter
+    private boolean restart = true; // default is true
+
+    private String conditional = null;
+
+    public boolean isMandatory(ConfigurationOwner wrapper) {
+        if (mandatory) {
+            return true;
+        }
+        if (StringUtils.isNotBlank(conditional)) {
+            return wrapper.hasServiceConfigured(conditional);
+        }
+        return false;
+    }
+
+    public void setConditional(String conditional) {
+        this.mandatory = false;
+        this.conditional = conditional;
     }
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
-            put("proxyContext", "./"+service.getName()+"/");
-            put("waitTime", waitTime);
-            put("title", title);
-            put("role", requiredRole);
-            put("unique", service.isUnique());
+            put("mes", mes == null ? "" : mes.name());
+            put("masterService", masterService == null ? "" : masterService);
+            put("numberOfMasters", numberOfMasters);
+            put("mandatory", mandatory);
+            put("restart", restart);
+            put("conditional", conditional);
         }});
     }
-
-    public String getServiceName() {
-        return service.getName();
-    }
-
-    public void addProxyReplacement(ProxyReplacement pr) {
-        proxyReplacements.add (pr);
-    }
-
 }

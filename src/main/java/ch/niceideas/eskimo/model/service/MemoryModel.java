@@ -32,59 +32,21 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service;
 
-import ch.niceideas.common.utils.StringUtils;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.json.JSONObject;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
 
-import java.util.HashMap;
+import java.util.Map;
 
-public class Dependency {
+public class MemoryModel {
 
-    @Getter @Setter
-    private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
+    private final Map<String, Map<String, Long>> innerModel;
 
-    @Getter @Setter
-    private String masterService = null;
-
-    @Getter @Setter
-    private int numberOfMasters = 0;
-
-    @Getter @Setter
-    private boolean mandatory = true; // default is true
-
-    @Getter @Setter
-    private boolean restart = true; // default is true
-
-    private String conditional = null;
-
-    public boolean isMandatory(ConfigurationOwner wrapper) {
-        if (mandatory) {
-            return true;
-        }
-        if (StringUtils.isNotBlank(conditional)) {
-            return wrapper.hasServiceConfigured(conditional);
-        }
-        return false;
+    public MemoryModel(Map<String, Map<String, Long>> innerModel) {
+        this.innerModel = innerModel;
     }
 
-    public void setConditional(String conditional) {
-        this.mandatory = false;
-        this.conditional = conditional;
-    }
-
-    public JSONObject toJSON () {
-        return new JSONObject(new HashMap<String, Object>() {{
-            put("mes", mes == null ? "" : mes.name());
-            put("masterService", masterService == null ? "" : masterService);
-            put("numberOfMasters", numberOfMasters);
-            put("mandatory", mandatory);
-            put("restart", restart);
-            put("conditional", conditional);
-        }});
+    public Map<String,Long> getModelForNode(NodesConfigWrapper nodesConfig, int nodeNbr) {
+        return innerModel.get(nodesConfig.getNodeAddress(nodeNbr));
     }
 }
