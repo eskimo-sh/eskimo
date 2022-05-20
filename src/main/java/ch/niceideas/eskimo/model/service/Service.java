@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.Command;
 import ch.niceideas.eskimo.model.ConditionalInstallation;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import lombok.Data;
 import org.json.JSONArray;
@@ -90,8 +91,14 @@ public class Service {
 
     private final List<Command> commands = new ArrayList<>();
 
+    private final List<WebCommand> webCommands = new ArrayList<>();
+
     public void addCommand (Command command) {
         commands.add (command);
+    }
+
+    public void addWebCommand (WebCommand command) {
+        webCommands.add (command);
     }
 
     public Command getCommand(String commandId) {

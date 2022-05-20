@@ -33,28 +33,18 @@
  */
 
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.model.service.proxy;
 
+import ch.niceideas.eskimo.model.service.Service;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public abstract class NodeOperationId implements OperationId {
+public class WebCommand {
 
-    private String node;
-
-    public NodeOperationId (String node) {
-        this.node = node;
-    }
-
-    public boolean isOnNode(String node) {
-        return this.node.equals(node);
-    }
-
-    public boolean isSameNode(OperationId other) {
-        return other.isOnNode(this.getNode());
-    }
+    private String id;
+    private Service service;
+    private String command;
 
 }

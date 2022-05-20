@@ -37,8 +37,10 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.proxy.ProxyReplacement;
+import ch.niceideas.eskimo.model.service.proxy.PageScripter;
+import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.*;
+import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
@@ -86,6 +88,8 @@ public class ServicesDefinition implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+
+        HashMap<WebCommand, String> webCommandServices = new HashMap<>();
 
         InputStream is = ResourceUtils.getResourceAsStream(servicesDefinitionFile);
         if (is == null) {
@@ -208,6 +212,32 @@ public class ServicesDefinition implements InitializingBean {
 
                 service.setUiConfig(uiConfig);
 
+                if (servicesConfig.hasPath(serviceString+".ui.pageScripters")) {
+
+                    JSONArray pageScripters = servicesConfig.getSubJSONObject(serviceString).getJSONObject("ui").getJSONArray("pageScripters");
+                    for (int i = 0; i < pageScripters.length(); i++) {
+
+                        JSONObject pageScripterObj = pageScripters.getJSONObject(i);
+
+                        PageScripter pageScriper = new PageScripter();
+
+                        String resourceUrl = pageScripterObj.getString("resourceUrl");
+                        if (StringUtils.isBlank(resourceUrl)) {
+                            throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " ui config is declaring a pageScripter without a resourceUrl");
+                        }
+                        pageScriper.setResourceUrl(resourceUrl);
+
+                        String script = pageScripterObj.getString("script");
+                        if (StringUtils.isBlank(script)) {
+                            throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " ui config is declaring a pageScripter without a script");
+                        }
+                        pageScriper.setScript(script);
+
+                        uiConfig.addPageScripter (pageScriper);
+                    }
+
+                }
+
                 if (servicesConfig.hasPath(serviceString+".ui.proxyReplacements")) {
 
                     JSONArray proxyReplacements = servicesConfig.getSubJSONObject(serviceString).getJSONObject("ui").getJSONArray("proxyReplacements");
@@ -269,6 +299,36 @@ public class ServicesDefinition implements InitializingBean {
 
                     service.addDependency(dependency);
                 }
+            }
+
+            if (servicesConfig.hasPath(serviceString+".webCommands")) {
+                JSONArray webCommandsConf = servicesConfig.getSubJSONObject(serviceString).getJSONArray("webCommands");
+                for (int i = 0; i < webCommandsConf.length(); i++) {
+
+                    JSONObject webCommandObj = webCommandsConf.getJSONObject(i);
+                    WebCommand command = new WebCommand();
+
+                    String commandId = webCommandObj.getString("id");
+                    if (StringUtils.isBlank(commandId)) {
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an id");
+                    }
+                    command.setId(commandId);
+
+                    String commandCall = webCommandObj.getString("command");
+                    if (StringUtils.isBlank(commandCall)) {
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a command");
+                    }
+                    command.setCommand(commandCall);
+
+                    String serviceName = webCommandObj.getString("service");
+                    if (StringUtils.isBlank(serviceName)) {
+                        throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a Web command without a service name");
+                    }
+                    webCommandServices.put (command, serviceName);
+
+                    service.addWebCommand (command);
+                }
+                
             }
 
             if (servicesConfig.hasPath(serviceString+".commands")) {
@@ -421,6 +481,11 @@ public class ServicesDefinition implements InitializingBean {
             services.put(serviceString, service);
         }
 
+        // post-processing web commands
+        webCommandServices.keySet().forEach(
+                command -> command.setService(getService(webCommandServices.get(command)))
+        );
+
         enforceConsistency();
     }
 
@@ -447,6 +512,21 @@ public class ServicesDefinition implements InitializingBean {
                         String master = dep.getMasterService();
                         if (services.get(master) == null) {
                             throw new IllegalArgumentException("Master service " + master + " doesn't exist");
+                        }
+                    });
+        } catch (IllegalArgumentException e) {
+            throw new ServiceDefinitionException(e.getMessage(), e);
+        }
+
+        // make sure all webCommand services are set !
+        try {
+            Arrays.stream(listUIServices())
+                    .map(this::getService)
+                    .map (Service::getWebCommands)
+                    .flatMap(List::stream)
+                    .forEach(webCommand -> {
+                        if (webCommand.getService() == null) {
+                            throw new IllegalArgumentException("Web command" + webCommand.getId() + " didn't get its service injected");
                         }
                     });
         } catch (IllegalArgumentException e) {

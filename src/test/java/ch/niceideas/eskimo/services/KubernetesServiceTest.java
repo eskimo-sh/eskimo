@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.utils.KubeStatusParser;

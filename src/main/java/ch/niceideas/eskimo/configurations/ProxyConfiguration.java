@@ -35,6 +35,9 @@
 package ch.niceideas.eskimo.configurations;
 
 import ch.niceideas.eskimo.proxy.*;
+import ch.niceideas.eskimo.services.ConfigurationService;
+import ch.niceideas.eskimo.services.ConnectionManagerService;
+import ch.niceideas.eskimo.services.SSHCommandService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +64,12 @@ public class ProxyConfiguration implements WebSocketConfigurer {
 
     @Autowired
     private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private SSHCommandService sshCommandService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Autowired
     private Environment env;
@@ -107,6 +116,18 @@ public class ProxyConfiguration implements WebSocketConfigurer {
         servletRegistrationBean.addInitParameter(ProxyServlet.P_LOG, env.getProperty("logging_enabled", "false"));
 
         servletRegistrationBean.setName("eskimo-proxy");
+        return servletRegistrationBean;
+    }
+
+    @Bean
+    public ServletRegistrationBean<WebCommandServlet> commandServletRegistrationBean(){
+
+        ServletRegistrationBean<WebCommandServlet> servletRegistrationBean = new ServletRegistrationBean<>(
+                new WebCommandServlet(
+                        servicesDefinition, sshCommandService, configurationService),
+                "/eskimo-command/*");
+
+        servletRegistrationBean.setName("login-handler-command");
         return servletRegistrationBean;
     }
 

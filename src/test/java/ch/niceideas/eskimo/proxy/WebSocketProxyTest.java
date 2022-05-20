@@ -1,7 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;

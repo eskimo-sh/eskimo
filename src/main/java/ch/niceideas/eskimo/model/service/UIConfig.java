@@ -34,7 +34,8 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import ch.niceideas.eskimo.model.proxy.ProxyReplacement;
+import ch.niceideas.eskimo.model.service.proxy.PageScripter;
+import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -59,7 +60,9 @@ public class UIConfig {
 
     private boolean applyStandardProxyReplacements = true;
     private String statusPageLinkTitle;
+
     private final List<ProxyReplacement> proxyReplacements = new ArrayList<>();
+    private final List<PageScripter> pageScripters = new ArrayList<>();
 
     public UIConfig (Service service) {
         this.service = service;
@@ -82,6 +85,10 @@ public class UIConfig {
 
     public void addProxyReplacement(ProxyReplacement pr) {
         proxyReplacements.add (pr);
+    }
+
+    public void addPageScripter(PageScripter ps) {
+        pageScripters.add (ps);
     }
 
 }
