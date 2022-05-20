@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.proxy.PageScripter;
 import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.service.Service;
@@ -275,6 +276,15 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         for (ProxyReplacement replacement : service.getUiConfig().getProxyReplacements()) {
             input = replacement.performReplacement(input, contextPath, prefixPath, requestURI);
+        }
+
+        for (PageScripter scripter : service.getUiConfig().getPageScripters()) {
+            if (requestURI.endsWith(scripter.getResourceUrl())) {
+                logger.info ("Applying " + scripter.getResourceUrl());
+                String script = scripter.getScript();
+                script = script.replace("{CONTEXT_PATH}", contextPath);
+                input = input.replace("</body>", "<script>" + script + "</script></body>");
+            }
         }
 
         for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
