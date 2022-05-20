@@ -83,6 +83,10 @@ echo " - Preparing file to store overriden eskimo memory settings"
 touch /usr/local/lib/kafka/config/eskimo-memory.opts
 chown kafka /usr/local/lib/kafka/config/eskimo-memory.opts
 
+echo " - Enabling kafka user to create /var/lib/kafka and chown it"
+sudo bash -c "echo \"kafka  ALL = NOPASSWD: /bin/chown -R kafka /var/lib/kafka\" >> /etc/sudoers.d/kafka"
+sudo bash -c "echo \"kafka  ALL = NOPASSWD: /bin/chmod 755 /var/lib/kafka\" >> /etc/sudoers.d/kafka"
+
 echo " - Adapting configuration in file server.properties"
 sudo sed -i s/"log.dirs=\/tmp\/kafka-logs"/"log.dirs=\/var\/lib\/kafka"/g /usr/local/etc/kafka/server.properties
 sudo sed -i s/"zookeeper.connection.timeout.ms=6000"/"zookeeper.connection.timeout.ms=22000"/g /usr/local/etc/kafka/server.properties

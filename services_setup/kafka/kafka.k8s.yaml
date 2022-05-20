@@ -63,22 +63,24 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: kafka-local-storage
+  storageClassName: kafka-gluster-storage
   volumeMode: Filesystem
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
-  local:
-    path: "/var/lib/kafka"
-  nodeAffinity: # dummy node affinity since one is required.
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/os
-              operator: In
-              values:
-                - linux
+  glusterfs:
+    endpoints: eskimo-glusterfs-cluster
+    path: kafka_data
+    readOnly: false
+#  nodeAffinity: # dummy node affinity since one is required.
+#    required:
+#      nodeSelectorTerms:
+#        - matchExpressions:
+#            - key: kubernetes.io/os
+#              operator: In
+#              values:
+#                - linux
 
 ---
 
@@ -87,7 +89,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: kafka-var-lib-claim
 spec:
-  storageClassName: kafka-local-storage
+  storageClassName: kafka-gluster-storage
   accessModes:
     - ReadWriteOnce
   resources:
@@ -146,6 +148,7 @@ spec:
               mountPath: /var/log/kafka
             - name: var-lib-kafka
               mountPath: /var/lib/kafka
+              subPathExpr: $(ESKIMO_POD_NAME) # Make sure every kafka gets it's own path in gluster share
             - name: var-run-kafka
               mountPath: /var/run/kafka
             - name: etc-eskimo-topology
@@ -158,6 +161,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
           securityContext:
+            privileged: true
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
             runAsUser: 3303

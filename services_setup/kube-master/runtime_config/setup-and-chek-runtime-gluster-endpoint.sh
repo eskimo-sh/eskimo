@@ -34,28 +34,52 @@
 # Software.
 #
 
-set -e
 
-echo " - Injecting topology"
-. /usr/local/sbin/inContainerInjectTopology.sh
+# Sourcing kubernetes environment
+. /etc/k8s/env.sh
 
-echo " - Inject settings"
-/usr/local/sbin/settingsInjector.sh kafka
+export HOME=/root
 
-# we rely on settings injector to add overriden memory setting in /usr/local/lib/kafka/config/eskimo-memory.opts
-if [[ -f /usr/local/lib/kafka/config/eskimo-memory.opts && `cat /usr/local/lib/kafka/config/eskimo-memory.opts` != "" ]]; then
+export RECREATE="no"
+for i in ${ALL_NODES_LIST_gluster//,/ }; do
+    if [[ `kubectl get endpoints | grep eskimo-glusterfs-cluster | grep $i` == "" ]]; then
+        export RECREATE="yes"
+        break
+    fi
+done
 
-    export KAFKA_HEAP_OPTS=""
-    for line in `cat /usr/local/lib/kafka/config/eskimo-memory.opts`; do
-        export KAFKA_HEAP_OPTS="$KAFKA_HEAP_OPTS -$line"
+if [[ "$RECREATE" == "yes" ]]; then
+
+    echo " - Recreating eskimo-glusterfs-cluster.yaml"
+
+    export GLUSTER_YAML_FILE="apiVersion: v1
+kind: Endpoints
+metadata:
+  name: eskimo-glusterfs-cluster
+subsets:"
+    for i in ${ALL_NODES_LIST_gluster//,/ }; do
+        export GLUSTER_YAML_FILE="$GLUSTER_YAML_FILE
+- addresses:
+  - ip: $i
+  ports:
+  - port: 1"
     done
 
-    echo " - Using overriden memory settings : $KAFKA_HEAP_OPTS"
+    export GLUSTER_YAML_FILE="$GLUSTER_YAML_FILE
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: glusterfs-cluster
+spec:
+  ports:
+  - port: 1"
+
+    echo "$GLUSTER_YAML_FILE" > /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml
+
+    echo " - Applying eskimo-glusterfs-cluster.yaml"
+    /usr/local/bin/kubectl apply -f /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml
+
 fi
-
-echo " - Changing rights of folder /var/lib/kafka"
-sudo /bin/chown -R kafka /var/lib/kafka
-sudo /bin/chmod 755 /var/lib/kafka
-
-echo " - Starting service"
-/usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties

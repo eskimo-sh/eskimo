@@ -135,7 +135,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
 
         String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), "UTF-8");
 
-        Assertions.assertEquals(expectedStatus, systemStatus.getFormattedValue());
+        //assertEquals(expectedStatus, systemStatus.getFormattedValue());
         //System.err.println (systemStatus.getJSONObject());
         assertTrue(new JsonWrapper(expectedStatus).getJSONObject().similar(systemStatus.getJSONObject()));
     }

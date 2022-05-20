@@ -216,10 +216,9 @@ public class KubernetesService {
         });
     }
 
-    // FIXME
     @PreAuthorize("hasAuthority('ADMIN')")
     public void restartService(Service service, String node) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Stopping", () -> restartServiceInternal(service, node));
+        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Restart", () -> restartServiceInternal(service, node));
     }
 
     protected String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
@@ -600,7 +599,7 @@ public class KubernetesService {
             String registryServices = sshCommandService.runSSHScript(kubeMasterNode,
                     "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/", false);
 
-            return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices);
+            return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, servicesDefinition);
 
         } catch (SSHCommandException | SetupException | FileException e) {
             logger.error (e, e);

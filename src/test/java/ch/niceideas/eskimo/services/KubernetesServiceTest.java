@@ -281,7 +281,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
                 String registryServices = "" +
                         "cerebro\n" +
                         "kibana\n";
-                return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices);
+                return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, servicesDefinition);
             }
         });
 

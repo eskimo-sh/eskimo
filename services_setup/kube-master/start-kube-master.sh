@@ -261,6 +261,11 @@ while : ; do
 
     sleep 10
 
+    /etc/k8s/runtime_config/setup-and-chek-runtime-gluster-endpoint.sh
+    if [[ $? != 0 ]]; then
+        exit 51
+    fi
+
     /etc/k8s/runtime_config/setup-and-check-runtime-kube-dns.sh MASTER
     if [[ $? != 0 ]]; then
         exit 51

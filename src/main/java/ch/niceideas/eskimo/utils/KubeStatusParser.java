@@ -4,6 +4,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.KubernetesService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -12,19 +13,21 @@ public class KubeStatusParser {
 
     final static Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z\\-]+(\\-[a-zA-Z0-9]+){1,2}");
 
-    final String allPodStatus;
-    final String allServicesStatus;
-    final String allRegistryServices;
+    private final String allPodStatus;
+    private final String allServicesStatus;
+    private final String allRegistryServices;
+    private final ServicesDefinition servicesDefinition;
 
-    final Map<String, Map<String, String>> podStatuses = new HashMap<>();
-    final Map<String, Map<String, String>> serviceStatuses = new HashMap<>();
-    final List<String> registryServices = new ArrayList<>();
+    private final Map<String, Map<String, String>> podStatuses = new HashMap<>();
+    private final Map<String, Map<String, String>> serviceStatuses = new HashMap<>();
+    private final List<String> registryServices = new ArrayList<>();
 
 
-    public KubeStatusParser(String allPodStatus, String allServicesStatus, String allRegistryServices) {
+    public KubeStatusParser(String allPodStatus, String allServicesStatus, String allRegistryServices, ServicesDefinition servicesDefinition) {
         this.allPodStatus = allPodStatus;
         this.allServicesStatus = allServicesStatus;
         this.allRegistryServices = allRegistryServices;
+        this.servicesDefinition = servicesDefinition;
         parse();
     }
 
@@ -97,13 +100,13 @@ public class KubeStatusParser {
         return serviceIp;
     }
 
-    private List<Pair<String, String>> getPodNodesAndStatus(String service) {
+    List<Pair<String, String>> getPodNodesAndStatus(String service) {
         List<Pair<String, String>> retList = new ArrayList<>();
 
         List<String> podList = new ArrayList<>(podStatuses.keySet());
         podList.sort(Comparator.naturalOrder()); // need reproduceable results
         for (String podName : podList) {
-            if (podName.startsWith(service)) {
+            if (podName.startsWith(service) && !podNameMatchOtherService (service, podName)) {
 
                 Map<String, String> podFields = podStatuses.get(podName);
                 if (podFields != null) {
@@ -115,6 +118,15 @@ public class KubeStatusParser {
         }
 
         return retList;
+    }
+
+    private boolean podNameMatchOtherService(String curService, String podName) {
+        return Arrays.stream(servicesDefinition.listKubernetesServices())
+                .filter (serviceName -> !serviceName.equals(curService))
+                .filter(serviceName -> serviceName.length() > curService.length())
+                .map (servicesDefinition::getService)
+                .filter (service -> podName.startsWith(service.getName()))
+                .findAny().orElse(null) != null;
     }
 
     public Pair<String, String> getServiceRuntimeNode(Service service, String kubeIp) {
