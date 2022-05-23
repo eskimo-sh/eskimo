@@ -528,6 +528,12 @@
         "name" : "Show State Change Logs",
         "command": "cat /var/log/kafka/state-change.log",
         "icon": "fa-file"
+      },
+      {
+        "id" : "mount_kafka_data",
+        "name" : "Mount kafka_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh kafka_data /var/lib/kafka/data kafka",
+        "icon": "fa-folder"
       }
     ]
   },
@@ -546,7 +552,15 @@
       "memory": "neglectable",
       "logo" : "images/kafka-logo.png",
       "icon" : "images/kafka-icon.png"
-    }
+    },
+    "commands" : [
+      {
+        "id" : "mount_kafka_data_kafkacli",
+        "name" : "Mount kafka_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh kafka_data /var/lib/kafka/data kafka",
+        "icon": "fa-folder"
+      }
+    ]
   },
 
 
@@ -608,6 +622,12 @@
         "name" : "Show Logs",
         "command": "cat /var/log/kafka/kafka-manager/application.log",
         "icon": "fa-file"
+      },
+      {
+        "id" : "mount_kafka_data_kafkamgr",
+        "name" : "Mount kafka_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh kafka_data /var/lib/kafka/data kafka",
+        "icon": "fa-folder"
       }
     ]
   },
@@ -653,8 +673,20 @@
       {
         "id" : "show_log",
         "name" : "Show Logs",
-        "command": "sudo cat /var/log/spark/logs/`ls -t /var/log/spark/logs/ | grep HistoryServer | head -n 1`",
+        "command": "sudo cat /var/log/spark/`ls -t /var/log/spark/ | grep HistoryServer | head -n 1`",
         "icon": "fa-file"
+      },
+      {
+        "id" : "mount_spark_eventlog_sparkhisto",
+        "name" : "Mount spark_eventlog on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/spark/eventlog spark",
+        "icon": "fa-folder"
+      },
+      {
+        "id" : "mount_spark_data_sparkhisto",
+        "name" : "Mount spark_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark",
+        "icon": "fa-folder"
       }
     ]
   },
@@ -748,6 +780,20 @@
           }
         ]
       }
+    ],
+    "commands" : [
+      {
+        "id" : "mount_spark_eventlog",
+        "name" : "Mount spark_eventlog on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/spark/eventlog spark",
+        "icon": "fa-folder"
+      },
+      {
+        "id" : "mount_spark_data",
+        "name" : "Mount spark_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark",
+        "icon": "fa-folder"
+      }
     ]
   },
 
@@ -765,7 +811,21 @@
       "memory": "neglectable",
       "logo" : "images/spark-runtime-logo.png",
       "icon" : "images/spark-runtime-icon.png"
-    }
+    },
+    "commands" : [
+      {
+        "id" : "mount_spark_eventlog_sparkcli",
+        "name" : "Mount spark_eventlog on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/spark/eventlog spark",
+        "icon": "fa-folder"
+      },
+      {
+        "id" : "mount_spark_data_sparkcli",
+        "name" : "Mount spark_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_data /var/lib/spark/data spark",
+        "icon": "fa-folder"
+      }
+    ]
   },
 
 
@@ -855,8 +915,20 @@
       {
         "id" : "show_log",
         "name" : "Show Logs",
-        "command": "sudo cat /var/log/flink/log/`ls -t /var/log/flink/log/ | grep flink- | head -n 1`",
+        "command": "sudo cat /var/log/flink/`ls -t /var/log/flink/ | grep flink- | head -n 1`",
         "icon": "fa-file"
+      },
+      {
+        "id" : "mount_flink_data",
+        "name" : "Mount flink_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink",
+        "icon": "fa-folder"
+      },
+      {
+        "id" : "mount_flink_completed_jobs",
+        "name" : "Mount flink_completed_jobs on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink",
+        "icon": "fa-folder"
       }
     ]
   },
@@ -875,7 +947,21 @@
       "memory": "neglectable",
       "logo" : "images/flink-logo.png",
       "icon" : "images/flink-icon.png"
-    }
+    },
+    "commands" : [
+      {
+        "id" : "mount_flink_data_flinkcli",
+        "name" : "Mount flink_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink",
+        "icon": "fa-folder"
+      },
+      {
+        "id" : "mount_flink_completed_jobs_flinkcli",
+        "name" : "Mount flink_completed_jobs on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh flink_completed_jobs /var/lib/flink/completed_jobs flink",
+        "icon": "fa-folder"
+      }
+    ]
   },
 
 
@@ -913,6 +999,12 @@
         "name" : "Show Remote Server Logs",
         "command": "cat /var/log/elasticsearch/logstash/logstash_remote.log",
         "icon": "fa-file"
+      },
+      {
+        "id" : "mount_logstash_data",
+        "name" : "Mount logstash_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch",
+        "icon": "fa-folder"
       }
     ]
   },
@@ -931,7 +1023,15 @@
       "memory": "neglectable",
       "logo": "images/logstash-logo.png",
       "icon": "images/logstash-icon.png"
-    }
+    },
+    "commands" : [
+      {
+        "id" : "mount_logstash_data_logstashcli",
+        "name" : "Mount logstash_data on Host",
+        "command": "sudo /usr/local/sbin/gluster_mount.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch",
+        "icon": "fa-folder"
+      }
+    ]
   },
 
 
@@ -1082,9 +1182,6 @@
           }
         ]
       }
-    ],
-    "additionalEnvironment": [
-      "ALL_NODES_LIST_elasticsearch"
     ],
     "commands" : [
       {

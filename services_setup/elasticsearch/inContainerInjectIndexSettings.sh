@@ -37,7 +37,7 @@
 set -e
 
 #echo " - Handling default indices settings (before framworked settings injection) "
-if [[ `echo $ALL_NODES_LIST_elasticsearch | grep ','` == "" ]]; then
+if [[ `echo $ALL_NODES_LIST_kube_slave | grep ','` == "" ]]; then
     export HAS_MASTER=0
 else
     export HAS_MASTER=1

@@ -110,7 +110,7 @@ public class SystemService {
     private int failedServicesTriggerCount = 5;
 
     @Value("${connectionManager.statusOperationTimeout}")
-    private int statusOperationTimeout = 45000; // ~ 13 minutes (for an individual step)
+    private int statusOperationTimeout = 60000; // ~ 13 minutes (for an individual step)
 
     @Value("${system.statusFetchThreadCount}")
     private int parallelismStatusThreadCount = 10;
@@ -193,7 +193,7 @@ public class SystemService {
     }
 
     public void delegateApplyNodesConfig(ServiceOperationsCommand command)
-            throws SystemException, ServiceDefinitionException, NodesConfigurationException {
+            throws SystemException, NodesConfigurationException {
         nodesConfigurationService.applyNodesConfig(command);
     }
 
