@@ -58,21 +58,6 @@ else
 fi
 echo "   + Using ESKIMO_ETCD_NODE_NAME=$ESKIMO_ETCD_NODE_NAME"
 
-# List of this member's peer URLs to advertise to the rest of the cluster
-#export ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS=
-#for i in ${ALL_NODES_LIST_etcd//,/ }; do
-#    if [[ "$ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS" == "" ]]; then
-#        export ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS="http://$i:2380"
-#    else
-#        export ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS="$ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS,http://$i:2380"
-#    fi
-#done
-## in case slaves are not yet getting installed
-#if [[ "$ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS" == "" ]]; then
-#    export ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS="http://$SELF_IP_ADDRESS:2380"
-#fi
-#echo "   + Using ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS=$ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS"
-
 export ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS="http://$SELF_IP_ADDRESS:2380"
 echo "   + Using ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS=$ESKIMO_ETCD_INITIAL_ADVERTISE_PEER_URLS"
 
@@ -113,24 +98,14 @@ if [[ "$ESKIMO_ETCD_INITIAL_CLUSTER" == "" ]]; then
     ESKIMO_ETCD_INITIAL_CLUSTER="node1=http://$SELF_IP_ADDRESS:2380"
 fi
 
-#counter=1
-#for i in ${ALL_NODES_LIST_etcd//,/ }; do
-#    if [[ "$ESKIMO_ETCD_INITIAL_CLUSTER" == "" ]]; then
-#        export ESKIMO_ETCD_INITIAL_CLUSTER="etcd$counter=http://$i:2380"
-#    else
-#        export ESKIMO_ETCD_INITIAL_CLUSTER="$ESKIMO_ETCD_INITIAL_CLUSTER,etcd$counter=http://$i:2380"
-#    fi
-#    let "counter=counter+1"
-#done
-
 echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER=$ESKIMO_ETCD_INITIAL_CLUSTER"
 
-# The initial cluster state
-#if [[ -f /etc/k8s/ssl/etcd_initialized ]]; then
-#    export ESKIMO_ETCD_INITIAL_CLUSTER_STATE="existing"
-#else
+# The initial cluster state - existing if there are already etcd nodes running
+if [[ `cat /etc/eskimo_topology.sh  | grep ESKIMO_INSTALLED_etcd` != "" ]]; then
+    export ESKIMO_ETCD_INITIAL_CLUSTER_STATE="existing"
+else
     export ESKIMO_ETCD_INITIAL_CLUSTER_STATE="new"
-#fi
+fi
 echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER_STATE=$ESKIMO_ETCD_INITIAL_CLUSTER_STATE"
 
 #SSL security disabled for now
@@ -160,8 +135,3 @@ echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER_STATE=$ESKIMO_ETCD_INITIAL_CLUSTER_
 
 export ESKIMO_ETCD_DATA_DIR="/var/lib/etcd"
 echo "   + Using ESKIMO_ETCD_DATA_DIR=$ESKIMO_ETCD_DATA_DIR"
-
-# Deprecated
-## flanneld etcd prefix
-#export ESKIMO_FLANNEL_ETCD_PREFIX="/eskimo/network"
-#echo "   + Using ESKIMO_FLANNEL_ETCD_PREFIX=$ESKIMO_FLANNEL_ETCD_PREFIX"

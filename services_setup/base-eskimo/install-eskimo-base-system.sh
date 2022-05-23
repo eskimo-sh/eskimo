@@ -612,4 +612,4 @@ set +e
 
 echo " - Creating /var/lib/eskimo/kube-services/"
 sudo mkdir -p /var/lib/eskimo/kube-services/
-shdo chown -R $USER. /var/lib/eskimo/
+sudo chown -R $USER. /var/lib/eskimo/

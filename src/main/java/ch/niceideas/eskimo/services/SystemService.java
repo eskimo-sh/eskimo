@@ -109,8 +109,8 @@ public class SystemService {
     @Value("${system.failedServicesTriggerCount}")
     private int failedServicesTriggerCount = 5;
 
-    @Value("${system.operationWaitTimoutSeconds}")
-    private int operationWaitTimoutSeconds = 800; // ~ 13 minutes (for an individual step)
+    @Value("${connectionManager.statusOperationTimeout}")
+    private int statusOperationTimeout = 45000; // ~ 13 minutes (for an individual step)
 
     @Value("${system.statusFetchThreadCount}")
     private int parallelismStatusThreadCount = 10;
@@ -361,7 +361,9 @@ public class SystemService {
 
                 threadPool.shutdown();
                 try {
-                    threadPool.awaitTermination(operationWaitTimoutSeconds, TimeUnit.SECONDS);
+                    if (!threadPool.awaitTermination(statusOperationTimeout, TimeUnit.MILLISECONDS)) {
+                        logger.warn ("Status operation fetching ended up in timeout.");
+                    }
                 } catch (InterruptedException e) {
                     logger.error(e, e);
                 }
