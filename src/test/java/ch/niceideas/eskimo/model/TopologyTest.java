@@ -43,7 +43,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,24 +57,36 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initFirstNodeDependencies();
 
-        NodesConfigWrapper nodesConfig = createStandardNodesConfig();
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        NodesConfigWrapper nodesConfig = createTestNodesConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.12\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
-    private KubernetesServicesConfigWrapper createStandardMarathonConfig() {
-        return new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
+    private KubernetesServicesConfigWrapper createTestKubernetesConfig() {
+        return new KubernetesServicesConfigWrapper(new HashMap<>() {{
             put("service_d_install", "on");
+            put("service_d_cpu", "1");
+            put("service_d_ram", "1024m");
         }});
     }
 
-    NodesConfigWrapper createStandardNodesConfig() {
-        return new NodesConfigWrapper(new HashMap<String, Object>() {{
+    private ServicesInstallStatusWrapper createTestInstallStatus() {
+        return new ServicesInstallStatusWrapper(new HashMap<>() {{
+            put("service_a" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + "192-168-10-11", "OK");
+            put("service_c" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + "192-168-10-11", "OK");
+            put("service_c" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + "192-168-10-12", "OK");
+            put("service_d" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK");
+        }});
+    }
+
+    NodesConfigWrapper createTestNodesConfig() {
+        return new NodesConfigWrapper(new HashMap<>() {{
                     put("node_id1", "192.168.10.11");
                     put("service_a1", "on");
                     put("service_c1", "on");
@@ -91,13 +102,14 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initSameNodeOrRandomDependencies();
 
-        NodesConfigWrapper nodesConfig = createStandardNodesConfig();
+        NodesConfigWrapper nodesConfig = createTestNodesConfig();
         nodesConfig.setValueForPath("service_b", "1");
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
+        assertEquals ("#Topology\n" +
+                "export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
+                "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -105,15 +117,16 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initRandomDependencies();
 
-        NodesConfigWrapper nodesConfig = createStandardNodesConfig();
+        NodesConfigWrapper nodesConfig = createTestNodesConfig();
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.12\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -134,9 +147,10 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
-                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript());
+                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -157,9 +171,10 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
-                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript());
+                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -176,8 +191,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript());
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -202,11 +218,12 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681012=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681013=192.168.10.14\n" +
-                "export MASTER_SERVICE_C_1921681014=192.168.10.11\n", topology.getTopologyScript());
+                "export MASTER_SERVICE_C_1921681014=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -237,10 +254,32 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(),  def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
                 "export MASTER_GLUSTER_1921681012=192.168.10.14\n" +
                 "export MASTER_GLUSTER_1921681013=192.168.10.12\n" +
-                "export MASTER_GLUSTER_1921681014=192.168.10.11\n", topology.getTopologyScript());
+                "export MASTER_GLUSTER_1921681014=192.168.10.11\n" +
+                "\n" +
+                "#Eskimo installation status\n" +
+                "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
+                "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
+                "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
+                "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
+                "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
+                "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
+                "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
+                "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
+                "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
+                "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
+                "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n", topology.getTopologyScript(StandardSetupHelpers.getStandard2NodesInstallStatus()));
     }
 
     @Test
@@ -259,7 +298,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("", topology.getTopologyScript());
+        assertEquals ("#Topology\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -267,7 +306,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initConditionalDependency();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("node_id2", "192.168.10.12");
@@ -276,9 +315,10 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n", topology.getTopologyScript());
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
 
-        final NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        final NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("node_id2", "192.168.10.12");
@@ -303,8 +343,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_1=192.168.10.12\n", topology.getTopologyScript());
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_1=192.168.10.12\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -312,7 +353,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initAdditionalEnvironment();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("node_id2", "192.168.10.12");
@@ -335,7 +376,11 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=1\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
                 "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(),
+                        emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -350,7 +395,11 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=2\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
                 "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 2));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(),
+                        emptyModel, 2));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -363,19 +412,121 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
                 "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(),
+                        emptyModel, 3));
     }
 
     @Test
     public void testAdditionalEnvironmentWithKubeTopology() throws Exception {
-        fail ("To Be Implemented");
+
+        KubernetesServicesConfigWrapper kubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfig.setValueForPath("cerebro_cpu", "1");
+        kubeConfig.setValueForPath("cerebro_ram", "1024");
+        kubeConfig.setValueForPath("kibana_cpu", "2");
+        kubeConfig.setValueForPath("kibana_ram", "2048m");
+
+        Topology topology = Topology.create(
+                StandardSetupHelpers.getStandard2NodesSetup(),
+                kubeConfig, def, null, "192.168.10.11");
+
+        assertEquals ("#Topology\n" +
+                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
+                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_NTP_1=192.168.10.11\n" +
+                        "export MASTER_ZOOKEEPER_1=192.168.10.13\n" +
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.13\n" +
+                        "export NODE_NBR_ETCD_1921681013=2\n" +
+                        "export NODE_NBR_ETCD_1921681011=1\n" +
+                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13\n" +
+                        "export ALL_NODES_LIST_kube_slave=192.168.10.11,192.168.10.13\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681013=2\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.11\n" +
+                        "export SELF_NODE_NUMBER=1\n" +
+                        "export ESKIMO_NODE_COUNT=2\n" +
+                        "export ALL_NODES_LIST=192.168.10.11,192.168.10.13\n" +
+                        "\n" +
+                        "#Kubernetes Topology\n" +
+                        "export ESKIMO_KUBE_REQUEST_CEREBRO_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_CEREBRO_RAM=1024\n" +
+                        "export ESKIMO_KUBE_REQUEST_KIBANA_CPU=2\n" +
+                        "export ESKIMO_KUBE_REQUEST_KIBANA_RAM=2048m\n",
+                topology.getTopologyScriptForNode (
+                        StandardSetupHelpers.getStandard2NodesSetup(),
+                        kubeConfig,
+                        ServicesInstallStatusWrapper.empty(),
+                        emptyModel, 1));
+    }
+
+    @Test
+    public void testServiceInstallationInTopology() throws Exception {
+
+        Topology topology = Topology.create(
+                StandardSetupHelpers.getStandard2NodesSetup(),
+                StandardSetupHelpers.getStandardKubernetesConfig(), def, null, "192.168.10.11");
+
+        assertEquals ("#Topology\n" +
+                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
+                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_NTP_1=192.168.10.11\n" +
+                        "export MASTER_ZOOKEEPER_1=192.168.10.13\n" +
+                        "\n" +
+                        "#Eskimo installation status\n" +
+                        "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.13\n" +
+                        "export NODE_NBR_ETCD_1921681013=2\n" +
+                        "export NODE_NBR_ETCD_1921681011=1\n" +
+                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13\n" +
+                        "export ALL_NODES_LIST_kube_slave=192.168.10.11,192.168.10.13\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681013=2\n" +
+                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.11\n" +
+                        "export SELF_NODE_NUMBER=1\n" +
+                        "export ESKIMO_NODE_COUNT=2\n" +
+                        "export ALL_NODES_LIST=192.168.10.11,192.168.10.13\n" +
+                        "\n" +
+                        "#Kubernetes Topology\n",
+                topology.getTopologyScriptForNode (
+                        StandardSetupHelpers.getStandard2NodesSetup(),
+                        StandardSetupHelpers.getStandardKubernetesConfig(),
+                        StandardSetupHelpers.getStandard2NodesInstallStatus(),
+                        emptyModel, 1));
     }
 
     @Test
     public void testMemoryModel() throws Exception {
 
-        MemoryModel memoryModel = new MemoryModel(new HashMap<String, Map<String, Long>>(){{
-            put ("192.168.10.11", new HashMap<String, Long>(){{
+        MemoryModel memoryModel = new MemoryModel(new HashMap<>(){{
+            put ("192.168.10.11", new HashMap<>(){{
                 put ("service_a", Long.valueOf("100"));
                 put ("service_b", Long.valueOf("200"));
                 put ("service_c", Long.valueOf("300"));
@@ -384,7 +535,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initAdditionalNodeList();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
@@ -409,15 +560,18 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export MEMORY_SERVICE_A=100\n" +
                 "export MEMORY_SERVICE_B=200\n" +
                 "export MEMORY_SERVICE_C=300\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), memoryModel, 1));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(), memoryModel, 1));
     }
 
 
     @Test
     public void testMemoryModelWithAdditional() throws Exception {
 
-        MemoryModel memoryModel = new MemoryModel(new HashMap<String, Map<String, Long>>(){{
-            put ("192.168.10.11", new HashMap<String, Long>(){{
+        MemoryModel memoryModel = new MemoryModel(new HashMap<>(){{
+            put ("192.168.10.11", new HashMap<>(){{
                 put ("service_a", Long.valueOf("100"));
                 put ("service_b", Long.valueOf("200"));
                 put ("service_c", Long.valueOf("300"));
@@ -450,7 +604,9 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export MEMORY_SERVICE_A=100\n" +
                 "export MEMORY_SERVICE_B=200\n" +
                 "export MEMORY_SERVICE_C=300\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), memoryModel, 1));
+                topology.getTopologyScriptForNode (nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(), memoryModel, 1));
     }
 
 
@@ -459,7 +615,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initAdditionalNodeList();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_b1", "on");
@@ -477,7 +633,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c5", "on");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
@@ -492,7 +648,10 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=1\n" +
                 "export ESKIMO_NODE_COUNT=5\n" +
                 "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(), emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.12\n" +
@@ -505,7 +664,11 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=5\n" +
                 "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(),
+                        emptyModel, 3));
     }
 
     @Test
@@ -526,7 +689,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initAdditionalEnvironment();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("node_id2", "192.168.10.12");
@@ -536,27 +699,30 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 put("service_c3", "on");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "\n" +
-                "#Additional Environment\n" +
-                "export NODE_NBR_SERVICE_A_1921681012=1\n" +
-                "export NODE_NBR_SERVICE_A_1921681011=0\n" +
-                "export NODE_NBR_SERVICE_C_1921681013=2\n" +
-                "export NODE_NBR_SERVICE_C_1921681012=1\n" +
-                "\n" +
-                "#Self identification\n" +
-                "export SELF_IP_ADDRESS=192.168.10.12\n" +
-                "export SELF_NODE_NUMBER=2\n" +
-                "export ESKIMO_NODE_COUNT=3\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 2));
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export NODE_NBR_SERVICE_A_1921681012=1\n" +
+                        "export NODE_NBR_SERVICE_A_1921681011=0\n" +
+                        "export NODE_NBR_SERVICE_C_1921681013=2\n" +
+                        "export NODE_NBR_SERVICE_C_1921681012=1\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.12\n" +
+                        "export SELF_NODE_NUMBER=2\n" +
+                        "export ESKIMO_NODE_COUNT=3\n" +
+                        "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        kubeServicesConfig,
+                        ServicesInstallStatusWrapper.empty(), emptyModel, 2));
 
         // now change topology and ensure node numbers for services A and C are unchanged
-        nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("node_id2", "192.168.10.14");
@@ -574,22 +740,25 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                "\n" +
-                "#Additional Environment\n" +
-                "export NODE_NBR_SERVICE_A_1921681012=1\n" +
-                "export NODE_NBR_SERVICE_A_1921681011=0\n" +
-                "export NODE_NBR_SERVICE_A_1921681015=3\n" +
-                "export NODE_NBR_SERVICE_A_1921681014=2\n" +
-                "export NODE_NBR_SERVICE_C_1921681013=2\n" +
-                "export NODE_NBR_SERVICE_C_1921681012=1\n" +
-                "export NODE_NBR_SERVICE_C_1921681015=3\n" +
-                "\n" +
-                "#Self identification\n" +
-                "export SELF_IP_ADDRESS=192.168.10.12\n" +
-                "export SELF_NODE_NUMBER=3\n" +
-                "export ESKIMO_NODE_COUNT=5\n" +
-                "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
+                        "\n" +
+                        "#Additional Environment\n" +
+                        "export NODE_NBR_SERVICE_A_1921681012=1\n" +
+                        "export NODE_NBR_SERVICE_A_1921681011=0\n" +
+                        "export NODE_NBR_SERVICE_A_1921681015=3\n" +
+                        "export NODE_NBR_SERVICE_A_1921681014=2\n" +
+                        "export NODE_NBR_SERVICE_C_1921681013=2\n" +
+                        "export NODE_NBR_SERVICE_C_1921681012=1\n" +
+                        "export NODE_NBR_SERVICE_C_1921681015=3\n" +
+                        "\n" +
+                        "#Self identification\n" +
+                        "export SELF_IP_ADDRESS=192.168.10.12\n" +
+                        "export SELF_NODE_NUMBER=3\n" +
+                        "export ESKIMO_NODE_COUNT=5\n" +
+                        "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13,192.168.10.14,192.168.10.15\n",
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        kubeServicesConfig,
+                        ServicesInstallStatusWrapper.empty(), emptyModel, 3));
     }
 
     @Test
@@ -619,7 +788,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         serviceD.addDependency (depD);
         def.addService(serviceD);
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("node_id2", "192.168.10.12");
@@ -627,7 +796,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("node_id3", "192.168.10.13");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
                 () -> Topology.create(nodesConfig, kubeServicesConfig,  def, null, "192.168.10.11"));
@@ -672,7 +841,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
         serviceD.addDependency (depD);
         def.addService(serviceD);
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("node_id2", "192.168.10.12");
@@ -680,7 +849,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("node_id3", "192.168.10.13");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
                 () -> Topology.create(nodesConfig, kubeServicesConfig,  def, null, "192.168.10.11"));
@@ -700,15 +869,18 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export SELF_NODE_NUMBER=3\n" +
                 "export ESKIMO_NODE_COUNT=3\n" +
                 "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n",
-                topology.getTopologyScriptForNode (nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 3));
+                topology.getTopologyScriptForNode (
+                        nodesConfig,
+                        createTestKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(), emptyModel, 3));
     }
 
     @Test
-    public void testMarathonServiceDependencies() throws Exception {
+    public void testKubernetesServiceDependencies() throws Exception {
 
         initRandomDependenciesFewer();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_c1", "on");
@@ -719,12 +891,13 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_c4", "on");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_C_1=192.168.10.11\n" +
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
 
@@ -733,7 +906,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         initRandomDependencies();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
@@ -748,12 +921,13 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
             put("service_c4", "on");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = createStandardMarathonConfig();
+        KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
-        assertEquals ("export MASTER_SERVICE_B_1=192.168.10.11\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_SERVICE_B_1=192.168.10.11\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript());
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 }

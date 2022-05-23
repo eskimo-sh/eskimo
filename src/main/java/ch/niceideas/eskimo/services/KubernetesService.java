@@ -502,7 +502,8 @@ public class KubernetesService {
                                     // topology
                                     if (error.get() == null) {
                                         try {
-                                            nodesConfigurationService.installTopologyAndSettings(nodesConfig, command.getRawConfig(), memoryModel, operation);
+                                            nodesConfigurationService.installTopologyAndSettings(
+                                                    nodesConfig, command.getRawConfig(), servicesInstallStatus, memoryModel, operation);
                                         } catch (SSHCommandException | IOException e) {
                                             logger.error (e, e);
                                             ml.addInfo(e.getMessage());

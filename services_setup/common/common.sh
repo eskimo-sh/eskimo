@@ -295,7 +295,8 @@ function deploy_kubernetes_only() {
     if [[ -z "$TEST_MODE" ]]; then
         echo " - Saving Kube deployment file $CONTAINER.k8s.yml in /var/lib/eskimo/kube-services"
         mkdir -p /var/lib/eskimo/kube-services/
-        /bin/cp -f $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/
+        /bin/cp -f $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/  >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 25
     fi
 
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"

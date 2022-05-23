@@ -225,13 +225,11 @@ public class NodesConfigController extends AbstractOperationController {
 
             return ReturnStatusHelper.createOKStatus();
 
-        } catch (SystemException e) {
+        } catch (JSONException | SetupException | FileException | NodesConfigurationException  e) {
             logger.error(e, e);
-            return ReturnStatusHelper.createEncodedErrorStatus(e);
-
-        } catch (JSONException | SetupException | FileException | NodesConfigurationException | ServiceDefinitionException e) {
-            logger.error(e, e);
-            notificationService.addError("Nodes installation failed !");
+            if (e.getCause() == null || !(e.getCause() instanceof SystemException)) {
+                notificationService.addError("Nodes installation failed !");
+            }
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }

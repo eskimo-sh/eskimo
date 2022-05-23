@@ -131,12 +131,14 @@ public class NodesConfigurationService {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyNodesConfig(ServiceOperationsCommand command)
-            throws SystemException, ServiceDefinitionException, NodesConfigurationException {
+            throws NodesConfigurationException {
 
-        logger.info ("Starting System Deployment Operations.");
         boolean success = false;
-        operationsMonitoringService.operationsStarted(command);
         try {
+
+            logger.info ("Starting System Deployment Operations.");
+
+            operationsMonitoringService.operationsStarted(command);
 
             NodesConfigWrapper rawNodesConfig = command.getRawConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
@@ -155,6 +157,7 @@ public class NodesConfigurationService {
                             .collect(Collectors.toList());
 
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+            ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
             MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadIps);
 
@@ -163,7 +166,7 @@ public class NodesConfigurationService {
             }
 
             // Nodes setup
-            systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
+            systemService.performPooledOperation(nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
                         String node = operation.getNode();
                         if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
@@ -183,7 +186,7 @@ public class NodesConfigurationService {
                                         // topology
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                             operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
-                                            installTopologyAndSettings(nodesConfig, kubeServicesConfig, memoryModel, node);
+                                            installTopologyAndSettings(nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
                                         }
 
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
@@ -211,7 +214,7 @@ public class NodesConfigurationService {
                             servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
                         });
                     } catch (FileException | SetupException e) {
-                        logger.error (e, e);
+                        logger.error(e, e);
                         throw new SystemException(e);
                     }
                 }
@@ -220,7 +223,7 @@ public class NodesConfigurationService {
             // Installation in batches (groups following dependencies)
             for (List<ServiceOperationsCommand.ServiceOperationId> installations : command.getInstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
 
-                systemService.performPooledOperation (installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
+                systemService.performPooledOperation(installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             if (liveIps.contains(operation.getNode())) {
                                 installService(operation);
@@ -247,7 +250,7 @@ public class NodesConfigurationService {
             }
 
             // restarts
-            for (List<ServiceOperationsCommand.ServiceOperationId> restarts : servicesInstallationSorter.orderOperations (
+            for (List<ServiceOperationsCommand.ServiceOperationId> restarts : servicesInstallationSorter.orderOperations(
                     command.getRestarts(), nodesConfig)) {
                 systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
@@ -259,10 +262,14 @@ public class NodesConfigurationService {
 
             if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getNodeAddresses()))) {
                 operationsMonitoringService.addGlobalInfo("At least one configured node was found dead");
-                throw new SystemException("At least one configured node was found dead");
+                throw new NodesConfigurationException("At least one configured node was found dead");
             }
 
             success = true;
+
+        } catch (SetupException | SystemException | FileException | ServiceDefinitionException e) {
+            logger.error (e, e);
+            throw new NodesConfigurationException(e);
         } finally {
             operationsMonitoringService.operationsFinished(success);
             logger.info ("System Deployment Operations Completed.");
@@ -318,7 +325,11 @@ public class NodesConfigurationService {
         }
     }
 
-    void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, MemoryModel memoryModel, String node)
+    void installTopologyAndSettings(
+            NodesConfigWrapper nodesConfig,
+            KubernetesServicesConfigWrapper kubeServicesConfig,
+            ServicesInstallStatusWrapper servicesInstallStatus,
+            MemoryModel memoryModel, String node)
             throws SystemException, SSHCommandException, IOException {
 
         SSHConnection connection = null;
@@ -336,7 +347,7 @@ public class NodesConfigurationService {
             try {
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
                         .getTopology(nodesConfig, kubeServicesConfig, node)
-                        .getTopologyScriptForNode(nodesConfig, kubeServicesConfig, memoryModel, nodesConfig.getNodeNumber (node)));
+                        .getTopologyScriptForNode(nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, nodesConfig.getNodeNumber (node)));
             } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
                 logger.error (e, e);
                 throw new SystemException(e);

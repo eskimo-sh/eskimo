@@ -77,6 +77,7 @@ spec:
   ports:
   - port: 1"
 
+
     echo "$GLUSTER_YAML_FILE" > /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml
 
     echo " - Applying eskimo-glusterfs-cluster.yaml"

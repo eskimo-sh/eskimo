@@ -609,3 +609,7 @@ sudo systemctl daemon-reload
 sudo systemctl start eskimo-startup-checks
 sudo systemctl enable eskimo-startup-checks
 set +e
+
+echo " - Creating /var/lib/eskimo/kube-services/"
+sudo mkdir -p /var/lib/eskimo/kube-services/
+shdo chown -R $USER. /var/lib/eskimo/

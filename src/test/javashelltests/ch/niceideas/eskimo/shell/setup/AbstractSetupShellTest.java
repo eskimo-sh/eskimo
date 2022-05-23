@@ -37,13 +37,11 @@ package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SetupService;
-import ch.niceideas.eskimo.services.StandardSetupHelpers;
-import ch.niceideas.eskimo.services.SystemServiceTest;
+import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,9 +104,18 @@ public abstract class AbstractSetupShellTest {
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 
+        ConfigurationService configurationService = new ConfigurationService() {
+            @Override
+            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
+                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            }
+        };
+
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 
-        FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"), topology.getTopologyScriptForNode(nodesConfig, kubeServicesConfig, new MemoryModel(new HashMap<>()), 1));
+        FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"),
+                topology.getTopologyScriptForNode(
+                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
         String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"));

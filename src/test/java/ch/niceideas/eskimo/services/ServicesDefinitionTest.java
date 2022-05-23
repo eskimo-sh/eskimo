@@ -41,7 +41,9 @@ import ch.niceideas.eskimo.model.service.EditableProperty;
 import ch.niceideas.eskimo.model.service.EditableSettings;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.Service;
+import jdk.javadoc.doclet.StandardDoclet;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -97,10 +99,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 KubernetesServicesConfigWrapper.empty(),
                 "192.168.56.23");
 
-        assertEquals ("export MASTER_NTP_1=192.168.56.21\n" +
+        assertEquals ("#Topology\n" +
+                "export MASTER_NTP_1=192.168.56.21\n" +
                 "export MASTER_PROMETHEUS_1=192.168.56.21\n" +
-                "export MASTER_ZOOKEEPER_1=192.168.56.21\n" +
-                "", topology.getTopologyScript());
+                "export MASTER_ZOOKEEPER_1=192.168.56.21\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -112,10 +114,11 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "192.168.10.11");
 
         assertEquals (
-                "export MASTER_GLUSTER_1=192.168.10.11\n" +
+                "#Topology\n" +
+                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
                         "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
                         "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n", topology.getTopologyScript());
+                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -133,6 +136,27 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
                         "export MASTER_NTP_1=192.168.10.11\n" +
                         "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "\n" +
+                        "#Eskimo installation status\n" +
+                        "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.12,192.168.10.13\n" +
@@ -153,7 +177,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n" +
                         "\n" +
                         "#Kubernetes Topology\n",
-                topology.getTopologyScriptForNode(nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
+                topology.getTopologyScriptForNode(nodesConfig, StandardSetupHelpers.getStandardKubernetesConfig(), StandardSetupHelpers.getStandard2NodesInstallStatus(), emptyModel, 1));
     }
 
     @Test
@@ -189,6 +213,27 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export MASTER_NTP_1=192.168.10.11\n" +
                         "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
                         "\n" +
+                        "#Eskimo installation status\n" +
+                        "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
+                        "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_etcd=192.168.10.11\n" +
                         "export NODE_NBR_ETCD_1921681011=1\n" +
@@ -203,7 +248,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ALL_NODES_LIST=192.168.10.11\n" +
                         "\n" +
                         "#Kubernetes Topology\n",
-                topology.getTopologyScriptForNode(nodesConfig, KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
+                topology.getTopologyScriptForNode(nodesConfig, StandardSetupHelpers.getStandardKubernetesConfig(), StandardSetupHelpers.getStandard2NodesInstallStatus(), emptyModel, 1));
     }
 
     @Test
@@ -370,7 +415,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             put("prometheus2", "on");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>());
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>());
 
         Topology topology = def.getTopology(
                 nrr.resolveRanges(nodesConfig),
@@ -392,7 +437,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export SELF_NODE_NUMBER=1\n" +
                         "export ESKIMO_NODE_COUNT=3\n" +
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.13,192.168.10.14\n",
-                topology.getTopologyScriptForNode(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(), emptyModel, 1));
+                topology.getTopologyScriptForNode(
+                        nrr.resolveRanges(nodesConfig),
+                        StandardSetupHelpers.getStandardKubernetesConfig(),
+                        ServicesInstallStatusWrapper.empty(), emptyModel, 1));
     }
 
     @Test

@@ -138,6 +138,7 @@ public class ServicesSettingsService {
 
                 NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
                 KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+                ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
                 ServiceRestartOperationsCommand restartCommand = ServiceRestartOperationsCommand.create(
                         servicesInstallationSorter, servicesDefinition, nodesConfig, dirtyServices);
@@ -180,7 +181,8 @@ public class ServicesSettingsService {
                                                 // topology
                                                 if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                                     operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
-                                                    nodesConfigurationService.installTopologyAndSettings(nodesConfig, kubeServicesConfig, memoryModel, node);
+                                                    nodesConfigurationService.installTopologyAndSettings(
+                                                            nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
                                                 }
                                             }, null);
                                 }

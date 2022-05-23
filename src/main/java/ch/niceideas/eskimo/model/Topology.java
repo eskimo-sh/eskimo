@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.service.Dependency;
@@ -469,22 +470,40 @@ public class Topology {
         sb.append("\n");
     }
 
-    public String getTopologyScript() {
+    public String getTopologyScript(ServicesInstallStatusWrapper serviceInstallStatus) throws SetupException, FileException {
         StringBuilder sb = new StringBuilder();
 
+        sb.append("#Topology\n");
         definedMasters.keySet().stream()
                 .sorted(Comparator.naturalOrder())
                 .forEach(master -> appendExport (sb, master, definedMasters.get(master)));
 
+        if (!serviceInstallStatus.isEmpty()) {
+
+            sb.append("\n#Eskimo installation status\n");
+
+            serviceInstallStatus.getInstalledServicesFlags()
+                    .forEach(serviceInstallStatusGlag -> {
+                        Pair<String, String> serviceInstall = ServicesInstallStatusWrapper.parseInstallStatusFlag(serviceInstallStatusGlag);
+                        String installedService = serviceInstall.getKey();
+                        String nodeName = serviceInstall.getValue();
+                        appendExport(sb,
+                                "ESKIMO_INSTALLED_" + installedService.replace("-", "_") + "_" + nodeName.replace("-", ""),
+                                serviceInstallStatus.getValueForPathAsString(serviceInstallStatusGlag));
+                    });
+        }
+
         return sb.toString();
     }
 
-    public String getTopologyScriptForNode(NodesConfigWrapper nodesConfig,
-                                           KubernetesServicesConfigWrapper kubeConfig, MemoryModel memoryModel, int nodeNbr)
-                    throws NodesConfigurationException {
+    public String getTopologyScriptForNode(
+            NodesConfigWrapper nodesConfig,
+            KubernetesServicesConfigWrapper kubeConfig,
+            ServicesInstallStatusWrapper serviceInstallStatus,
+            MemoryModel memoryModel, int nodeNbr)
+                    throws NodesConfigurationException, SetupException, FileException {
         StringBuilder sb = new StringBuilder();
-        sb.append("#Topology\n");
-        sb.append(getTopologyScript());
+        sb.append(getTopologyScript(serviceInstallStatus));
 
         // find all services on node
         Set<String> serviceNames = new HashSet<>();
@@ -545,10 +564,14 @@ public class Topology {
             for (String service : kubeConfig.getEnabledServices()) {
 
                 String cpuSetting = kubeConfig.getCpuSetting(service);
-                appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_CPU", cpuSetting);
+                if (StringUtils.isNotBlank(cpuSetting)) {
+                    appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_CPU", cpuSetting);
+                }
 
                 String ramSetting = kubeConfig.getRamSetting(service);
-                appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_RAM", ramSetting);
+                if (StringUtils.isNotBlank(ramSetting)) {
+                    appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_RAM", ramSetting);
+                }
 
             }
         }

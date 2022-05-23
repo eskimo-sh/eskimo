@@ -222,7 +222,7 @@ function uninstall_service() {
     envsubst < $SERVICE_FILE | kubectl delete -f -
 
     echo "   + Deleting service file"
-    sudo rm -Rf $SERVICE_FILE
+    sudo rm -f $SERVICE_FILE
 }
 
 

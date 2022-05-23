@@ -309,14 +309,11 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
             }
         });
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    nodesConfigurationService.applyNodesConfig(command);
-                } catch (SystemException | ServiceDefinitionException | NodesConfigurationException e) {
-                    logger.error (e, e);
-                }
+        new Thread(() -> {
+            try {
+                nodesConfigurationService.applyNodesConfig(command);
+            } catch (NodesConfigurationException e) {
+                logger.error (e, e);
             }
         }).start();
 

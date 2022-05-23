@@ -98,6 +98,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin()
                 .loginPage(LOGIN_PAGE_URL).permitAll()
                 .loginProcessingUrl("/login").permitAll()
+                    .usernameParameter("eskimo-username")
+                    .passwordParameter("eskimo-password")
                 .defaultSuccessUrl("/index.html",true)
                 .and()
             .logout().permitAll()

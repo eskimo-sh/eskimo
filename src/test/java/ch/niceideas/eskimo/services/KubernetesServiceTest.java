@@ -168,6 +168,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         kubernetesService.setNodesConfigurationService(new NodesConfigurationService() {
             @Override
             void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
+                                            ServicesInstallStatusWrapper servicesInstallStatus,
                                             MemoryModel memoryModel, String ipAddress) {
                 // No-Op
             }
