@@ -142,10 +142,11 @@ public class ProxyConfiguration implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketProxyServer(proxyManagerService, servicesDefinition), Arrays.stream(servicesDefinition.listProxiedServices())
+        String[] allWsUrls = Arrays.stream(servicesDefinition.listProxiedServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
                 .map(service -> "/ws/" + service.getName() + "/**")
-                .toArray(String[]::new));
+                .toArray(String[]::new);
+        registry.addHandler(new WebSocketProxyServer(proxyManagerService, servicesDefinition), allWsUrls);
     }
 
     @Bean

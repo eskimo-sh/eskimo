@@ -262,6 +262,7 @@
   },
 
 
+
   "etcd": {
     "config": {
       "order": 5,
@@ -286,6 +287,7 @@
       "SERVICE_NUMBER_1_BASED"
     ]
   },
+
 
 
   "kube-master": {
@@ -324,6 +326,7 @@
       }
     ]
   },
+
 
 
   "kube-slave": {
@@ -401,6 +404,23 @@
       "role" : "ADMIN",
       "title" : "Kubernetes Dashboard",
       "statusPageLinktitle" : "Manage Kubernetes Cluster",
+      "proxyReplacements" : [
+        {
+          "type" : "PLAIN",
+          "source" : "h=\"https\"===h.slice(0,5)?\"wss\"+h.slice(5):\"ws\"+h.slice(4),this.url=h,",
+          "target" : "h=\"https\"===h.slice(0,5)?\"wss\"+h.slice(5):\"ws\"+h.slice(4),this.url=h.replace(\"kubernetes-dashboard/api\",\"ws/kubernetes-dashboard/api\"),"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "\"WebSocket connection broken\"),d._cleanup()}}",
+          "target" : "\"WebSocket connection broken\"),d._cleanup()};let eskThat=this;eskThat.ws.onopen = function (event) {eskThat.ws.send(\"HELLO_ESKIMO\");};}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "kubernetes-dashboard//",
+          "target" : "kubernetes-dashboard/"
+        },
+      ],
       "pageScripters" : [
         {
           "resourceUrl" : "api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/",
