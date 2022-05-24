@@ -23,7 +23,7 @@ embedded services.
 
 The settings editor is available from the menu under "Configured Services":
 
-image::pngs/eskimo-setttings.png[800, 800, align="center"]
+image::pngs/eskimo-settings.png[800, 800, align="center"]
 
 For every service, administrators have access to supported configuration files and supported settings. +
 The default values enforced by eskimo right after installation are indicated.

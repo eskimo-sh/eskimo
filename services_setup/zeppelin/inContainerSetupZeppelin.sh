@@ -95,10 +95,13 @@ sudo sed -i s/"# export ZEPPELIN_IDENT_STRING"/"export ZEPPELIN_IDENT_STRING=esk
 
 sudo sed -i s/"# export SPARK_HOME"/"export SPARK_HOME=\/usr\/local\/lib\/spark\/"/g /usr/local/lib/zeppelin/conf/zeppelin-env.sh
 
-sudo bash -c 'echo -e "\n\nexport FLINK_HOME=/usr/local/lib/flink/" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
+sudo bash -c 'echo -e "\n\n# Eskimo settings" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
+
+sudo bash -c 'echo -e "\nexport FLINK_HOME=/usr/local/lib/flink/" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
+sudo bash -c 'echo -e "\nexport ZEPPELIN_INTERPRETER_OUTPUT_LIMIT=1024000" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
 
 # Disabling zeppelin interpreter execution as kubernetes pods (ZEPPELIN_RUN_MODE=k8s)
-sudo bash -c 'echo -e "\n\nexport ZEPPELIN_RUN_MODE=local" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
+sudo bash -c 'echo -e "\nexport ZEPPELIN_RUN_MODE=local" >> /usr/local/lib/zeppelin/conf/zeppelin-env.sh'
 
 
 
