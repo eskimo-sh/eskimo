@@ -50,6 +50,8 @@ ExecStartPre=/bin/rm -f /var/run/gluster/gluster.pid
 
 ExecStart=/bin/bash -c "/usr/local/sbin/startGlusterServiceContainer.sh"
 
+ExecStartPost=/bin/sleep 10
+
 ExecStop=/usr/bin/docker exec -t gluster /usr/local/sbin/inContainerStopService.sh
 
 # Attempt to slow down further process start after gluster

@@ -42,6 +42,7 @@ After=eskimo-startup-checks.service
 After=gluster.service
 After=ntp.service
 Wants=etcd.service
+Requires=gluster.service
 
 [Service]
 Type=simple

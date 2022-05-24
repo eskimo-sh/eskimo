@@ -82,6 +82,16 @@ echo " - Adapting configuration in file zoo.cfg"
 sudo sed -i s/"initLimit=10"/"initLimit=100"/g /etc/zookeeper/conf/zoo.cfg
 sudo sed -i s/"syncLimit=5"/"syncLimit=10"/g /etc/zookeeper/conf/zoo.cfg
 
+
+echo " - Adapting configuration in file /etc/zookeeper/conf/environment"
+
+sudo sed -i s/"JAVA_OPTS=\"\""/"JAVA_OPTS=\"-Xmx512m -Xms512m\""/g /etc/zookeeper/conf/environment
+
+echo " - Creating /usr/local folder structure to enable editable settings"
+sudo ln -s /etc/zookeeper /usr/local/lib/zookeeper
+
+
+
 echo " - Enabling user zookeeper to change config at runtime"
 chown -R zookeeper. /etc/zookeeper/conf/
 

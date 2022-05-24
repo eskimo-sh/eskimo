@@ -85,6 +85,9 @@ public class ServicesSettingsService {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
+    @Autowired
+    private NodeRangeResolver nodeRangeResolver;
+
     @Value("${system.operationWaitTimoutSeconds}")
     private int operationWaitTimoutSeconds = 800; // ~ 13 minutes (for an individual step)
 
@@ -121,6 +124,9 @@ public class ServicesSettingsService {
     void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
         this.nodesConfigurationService = nodesConfigurationService;
     }
+    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
+        this.nodeRangeResolver = nodeRangeResolver;
+    }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
@@ -136,7 +142,9 @@ public class ServicesSettingsService {
 
             if (dirtyServices != null && !dirtyServices.isEmpty()) {
 
-                NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
+                NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
+                NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
+
                 KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
                 ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 

@@ -139,7 +139,7 @@ if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
 
     echo " - Enabling gluster share $MOUNT_POINT"
     # XXX I change noauto to auto following issues after recover from suspend
-    bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.after=gluster.service 0 0\" >> /etc/fstab"
+    bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.requires=gluster.service,x-systemd.after=gluster.service 0 0\" >> /etc/fstab"
 
     sleep 1
 

@@ -66,6 +66,14 @@ create_binary_wrapper /usr/local/lib/logstash/bin/logstash /usr/local/bin/logsta
 echo " - Simlinking logstash config directory to /usr/local/etc"
 sudo ln -s /usr/local/lib/logstash/config /usr/local/etc/logstash
 
+echo " - Giving logstash user rights to change config at runtime"
+sudo chown -R elasticsearch. /usr/local/lib/logstash/config
+
+echo " - removing problematic comments from /usr/local/lib/logstash/config/jvm.options"
+# these cause troubles to the service settings injection
+sudo sed -i s/'.*represents the initial size of total heap space'//g /usr/local/lib/logstash/config/jvm.options
+sudo sed -i s/'.*represents the maximum size of total heap space'//g /usr/local/lib/logstash/config/jvm.options
+
 echo " - Simlinking logstash log directory to /var/log/logstash/"
 sudo rm -Rf /usr/local/lib/logstash/logs
 sudo ln -s /var/log/elasticsearch/logstash /usr/local/lib/logstash/logs

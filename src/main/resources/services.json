@@ -53,6 +53,27 @@
       }
     ],
     "additionalEnvironment": [ "SERVICE_NUMBER_1_BASED" ],
+    "editableSettings": [
+      {
+        "filename": "environment",
+        "propertyType": "REGEX",
+        "propertyFormat": "{name}{value}",
+        "commentPrefix": "#",
+        "filesystemService": "zookeeper",
+        "properties": [
+          {
+            "name": "Xms",
+            "comment": "Startup Heap Size for zookeeper\n [ESKIMO_DEFAULT] means memory allocator will decide of zookeeper memory share.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name": "Xmx",
+            "comment": "Maximum Heap Size for zookeeper\n [ESKIMO_DEFAULT] means memory allocator will decide of zookeeper memory share.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          }
+        ]
+      }
+    ],
     "commands" : [
       {
         "id" : "show_log",
@@ -1011,6 +1032,27 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      }
+    ],
+    "editableSettings": [
+      {
+        "filename": "jvm.options",
+        "propertyType": "REGEX",
+        "propertyFormat": "{name}{value}",
+        "commentPrefix": "#",
+        "filesystemService": "logstash",
+        "properties": [
+          {
+            "name": "Xms",
+            "comment": "Startup Heap Size for logstash process\n [ESKIMO_DEFAULT] means memory allocator will decide of logstash memory share.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          },
+          {
+            "name": "Xmx",
+            "comment": "Maximum Heap Size for logstash process\n [ESKIMO_DEFAULT] means memory allocator will decide of logstash memory share.",
+            "defaultValue": "[ESKIMO_DEFAULT]"
+          }
+        ]
       }
     ],
     "commands" : [
