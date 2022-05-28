@@ -271,6 +271,7 @@ rebuild_eskimo() {
 
     trap __returned_to_saved_dir 15
     trap __returned_to_saved_dir EXIT
+    trap __returned_to_saved_dir ERR
 
     cd $SCRIPT_DIR/../..
 

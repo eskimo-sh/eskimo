@@ -55,6 +55,7 @@ cleanup() {
 }
 trap cleanup 15
 trap cleanup EXIT
+trap cleanup ERR
 
 err_report() {
     echo "Error on line $1"

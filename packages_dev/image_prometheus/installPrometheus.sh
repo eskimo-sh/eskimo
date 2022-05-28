@@ -51,6 +51,8 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
+
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/prometheus_setup
@@ -99,6 +101,7 @@ function check_stop_es_prometheus(){
 }
 trap check_stop_es_prometheus 15
 trap check_stop_es_prometheus EXIT
+trap check_stop_es_prometheus ERR
 
 
 echo " - Starting Prometheus"

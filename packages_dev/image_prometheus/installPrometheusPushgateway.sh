@@ -56,6 +56,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/prometheus_pe_setup
@@ -106,6 +107,7 @@ function check_stop_pushgateway(){
 }
 trap check_stop_pushgateway 15
 trap check_stop_pushgateway EXIT
+trap check_stop_pushgateway ERR
 
 
 echo " - Starting Prometheus Pushgateway"

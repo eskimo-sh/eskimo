@@ -72,6 +72,8 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
+
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/zeppelin_build/
@@ -208,6 +210,7 @@ function check_stop_zeppelin(){
 }
 trap check_stop_zeppelin 15
 trap check_stop_zeppelin EXIT
+trap check_stop_zeppelin ERR
 
 
 echo " - Starting Zeppelin"

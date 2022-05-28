@@ -52,6 +52,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 rm -Rf /tmp/kafka_manager_source_setup
@@ -122,6 +123,8 @@ function check_stop_kafka_manager(){
 }
 trap check_stop_kafka_manager 15
 trap check_stop_kafka_manager EXIT
+trap check_stop_kafka_manager ERR
+
 
 echo " - Starting Kafka Manager"
 export ZK_HOSTS=localhost:2181

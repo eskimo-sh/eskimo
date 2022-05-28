@@ -84,6 +84,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         };
         servicesDefinition.afterPropertiesSet();
         scs.setServicesDefinition(servicesDefinition);
+        scs.setNodeRangeResolver(nodeRangeResolver);
 
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
     }

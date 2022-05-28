@@ -306,8 +306,13 @@ function install_debian_mesos_dependencies() {
 rm -Rf /tmp/setup_log
 
 # Extract Linux distribution
-export LINUX_DISTRIBUTION=`awk -F= '/^NAME/{print $2}' /etc/os-release | cut -d ' ' -f 1 | tr -d \" | tr '[:upper:]' '[:lower:]'`
+export LINUX_DISTRIBUTION=`cat /etc/os-release | grep -e "^ID="  | cut -d '=' -f 2 | sed s/'"'//g`
 echo "  - Linux distribution is $LINUX_DISTRIBUTION"
+
+if [[ "LINUX_DISTRIBUTION" == "rhel" ]]; then
+    echo "  - Overriding 'rel' repo with 'centos'. Docker only provides packages for centos"
+    export LINUX_DISTRIBUTION="centos"
+fi
 
 sudo mkdir -p /var/lib/eskimo
 sudo chown $USER.$USER /var/lib/eskimo

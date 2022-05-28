@@ -48,6 +48,8 @@ fi
 
 trap delete_gluster_check_lock_file 15
 trap delete_gluster_check_lock_file EXIT
+trap delete_gluster_check_lock_file ERR
+
 
 mkdir -p /var/lib/gluster/
 touch /var/lib/gluster/volume_management_lock_check

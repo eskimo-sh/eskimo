@@ -74,6 +74,8 @@ done
 
 trap delete_k8s_poststart_lock_file 15
 trap delete_k8s_poststart_lock_file EXIT
+trap delete_k8s_poststart_lock_file ERR
+
 
 touch /etc/k8s/k8s_poststart_management_lock
 

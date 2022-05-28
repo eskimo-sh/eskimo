@@ -104,6 +104,8 @@ fi
 
 trap delete_gluster_lock_file 15
 trap delete_gluster_lock_file EXIT
+trap delete_gluster_lock_file ERR
+
 
 touch /var/lib/gluster/volume_management_lock_$VOLUME
 

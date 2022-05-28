@@ -51,6 +51,8 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
+
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/kb_setup
@@ -131,6 +133,7 @@ function check_stop_es_kibana(){
 }
 trap check_stop_es_kibana 15
 trap check_stop_es_kibana EXIT
+trap check_stop_es_kibana ERR
 
 #echo " - Starting ElasticSearch"
 #export ES_JAVA_OPTS="-Dlog4j2.disable.jmx=true -Xmx1g -Xms800m"

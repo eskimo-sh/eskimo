@@ -59,6 +59,8 @@ touch /etc/k8s/ssl/k8s_master_management_lock
 
 trap delete_k8s_master_lock_file 15
 trap delete_k8s_master_lock_file EXIT
+trap delete_k8s_master_lock_file ERR
+
 
 echo "   + Sourcing kubernetes environment"
 . /etc/k8s/env.sh

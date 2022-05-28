@@ -55,6 +55,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/kafka_setup

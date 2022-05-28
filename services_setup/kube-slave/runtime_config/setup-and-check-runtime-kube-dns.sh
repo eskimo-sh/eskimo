@@ -72,6 +72,8 @@ if [[ ! -f /etc/k8s/flag-dns-setup ]]; then
     
     trap delete_k8s_dns_setup_lock_file 15
     trap delete_k8s_dns_setup_lock_file EXIT
+    trap delete_k8s_dns_setup_lock_file ERR
+
     
     touch /etc/k8s/k8s_dns_setup_management_lock
       

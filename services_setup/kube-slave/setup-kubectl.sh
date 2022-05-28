@@ -99,6 +99,7 @@ touch /etc/k8s/ssl/ssl_management_lock
 
 trap delete_ssl_lock_file 15
 trap delete_ssl_lock_file EXIT
+trap delete_ssl_lock_file ERR
 
 
 if [[ ! -f /etc/k8s/ssl/ca-config.json ]]; then

@@ -69,12 +69,14 @@ public class SystemStatusParser {
         for (int i = 0; i < contentLines.length; i++) {
 
             if (    (contentLines[i].startsWith("●")
-                 || contentLines[i].startsWith("×") )
+                 || contentLines[i].startsWith("×")
+                    || contentLines[i].startsWith("○"))
                     && contentLines[i].contains(".service")) {
 
                 handleServiceFound (
                         contentLines[i].substring(
-                                (contentLines[i].indexOf('●') > -1 ? contentLines[i].indexOf('●') : contentLines[i].indexOf('×')) + 2,
+                                (contentLines[i].indexOf('●') > -1 ? contentLines[i].indexOf('●') :
+                                        (contentLines[i].indexOf("○") > -1 ? contentLines[i].indexOf("○") : contentLines[i].indexOf('×'))) + 2,
                                 contentLines[i].indexOf(".service")),
                         i,
                         contentLines);

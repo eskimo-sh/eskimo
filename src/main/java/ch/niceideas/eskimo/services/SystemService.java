@@ -72,8 +72,6 @@ public class SystemService {
     public static final String SERVICE_PREFIX = "Service ";
     public static final String SHOULD_NOT_HAPPEN_FROM_HERE = " should not happen from here.";
 
-    @Deprecated
-    public static final String MARATHON_SERVICE_NAME = "marathon";
     public static final String KUBERNETES_SERVICE_NAME = KubernetesService.KUBE_MASTER;
 
     @Autowired
@@ -619,21 +617,31 @@ public class SystemService {
 
                         // if kubernetes is not available, don't do anything
                         String kubeNodeName = systemStatus.getFirstNodeName(KUBERNETES_SERVICE_NAME);
-                        if (StringUtils.isBlank(kubeNodeName)) { // if marathon is not found, don't touch anything. Let's wait for it to come back.
-                            //notificationService.addError("Marathon inconsistency.");
-                            //logger.warn("Marathon could not be found - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                        if (StringUtils.isBlank(kubeNodeName)) { // if Kubernetes is not found, don't touch anything. Let's wait for it to come back.
+                            //notificationService.addError("Kubernetes inconsistency.");
+                            //logger.warn("Kubernetes could not be found - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
                             continue;
                         }
 
                         if (!systemStatus.isServiceOKOnNode(KUBERNETES_SERVICE_NAME, kubeNodeName)) {
-                            //logger.warn("Marathon is not OK - not potentially flagging marathon services as disappeared as long as marathon is not back.");
+                            //logger.warn("Kubernetes is not OK - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
+
+                            // reset missing counter on kubernetes services when kube is down
+                            configuredNodesAndOtherLiveNodes.forEach(
+                                    nodeIp -> {
+                                        String effNodeName = nodeIp.replace(".", "-");
+                                        new ArrayList<>(serviceMissingCounter.keySet()).stream()
+                                                .filter(flag -> flag.equals(savedService + "-" + effNodeName))
+                                                .forEach(serviceMissingCounter::remove);
+                                    }
+                            );
                             continue;
                         }
 
                         // get first node actually running service
                         nodeName = systemStatus.getFirstNodeName(savedService);
                         if (StringUtils.isBlank(nodeName)) {
-                            // if none, consider marathon node as DEFAULT node running service
+                            // if none, consider kubernetes node as DEFAULT node running service
                             nodeName = kubeNodeName;
                         }
                     }

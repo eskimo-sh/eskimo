@@ -52,6 +52,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 rm -Rf /tmp/k8s_setup

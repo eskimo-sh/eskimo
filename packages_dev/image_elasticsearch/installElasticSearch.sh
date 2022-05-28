@@ -51,6 +51,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/es_setup
@@ -110,6 +111,7 @@ function check_stop_es(){
 }
 trap check_stop_es 15
 trap check_stop_es EXIT
+trap check_stop_es ERR
 
 echo " - creating test user to test elasticsearch startup"
 useradd estest

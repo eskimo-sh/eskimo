@@ -56,6 +56,7 @@ cleanup() {
 }
 trap cleanup 15
 trap cleanup EXIT
+trap cleanup ERR
 
 
 cd /tmp/package-kubernetes-dashboard

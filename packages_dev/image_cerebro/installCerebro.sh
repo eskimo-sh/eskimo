@@ -56,6 +56,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/cerebro_setup/
@@ -96,6 +97,7 @@ function check_stop_es_cerebro(){
 }
 trap check_stop_es_cerebro 15
 trap check_stop_es_cerebro EXIT
+trap check_stop_es_cerebro ERR
 
 #echo " - Starting ElasticSearch"
 #export ES_JAVA_OPTS="-Dlog4j2.disable.jmx=true -Xmx1g -Xms800m"

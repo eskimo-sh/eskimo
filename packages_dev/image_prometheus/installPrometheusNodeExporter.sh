@@ -56,6 +56,7 @@ function returned_to_saved_dir() {
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/prometheus_ne_setup
@@ -105,6 +106,7 @@ function check_stop_node_exporter(){
 }
 trap check_stop_node_exporter 15
 trap check_stop_node_exporter EXIT
+trap check_stop_node_exporter ERR
 
 
 echo " - Starting Prometheus Node Exporter"

@@ -61,6 +61,8 @@ touch /etc/k8s/k8s_slave_management_lock
 
 trap delete_k8s_slave_lock_file 15
 trap delete_k8s_slave_lock_file EXIT
+trap delete_k8s_slave_lock_file ERR
+
 
 echo "   + Sourcing kubernetes environment"
 . /etc/k8s/env.sh
