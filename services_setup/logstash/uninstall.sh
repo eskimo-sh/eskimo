@@ -39,7 +39,7 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Change current folder to script dir (important !)
-cd $SCRIPT_DIR
+cd $SCRIPT_DIR || exit 199
 
 # Loading topology
 . /etc/eskimo_topology.sh

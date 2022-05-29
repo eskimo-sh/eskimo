@@ -37,7 +37,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common/common.sh "$@"
 
-cd $SCRIPT_DIR
+cd $SCRIPT_DIR || exit 199
 
 package=""  # Default to empty package
 
