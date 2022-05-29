@@ -81,55 +81,17 @@ if [[ `ps -e | grep $NODE_EXPORTER_PROC_ID` == "" ]]; then
     exit 9
 fi
 
-# starting mesos master exporter process
-if [[ $MASTER_MESOS_MASTER_1 == $SELF_IP_ADDRESS ]]; then
-
-    echo " - Starting mesos master exporter"
-    /usr/local/lib/prometheus/exporters/mesos_exporter/bin/mesos_exporter \
-        -addr :9105 \
-        -master http://$SELF_IP_ADDRESS:5050 \
-        -logLevel info \
-        > /var/log/prometheus/mesos-master-exporter.log 2>&1 &
-    export MESOS_MASTER_EXPORTER_PROC_ID=$!
-
-    echo " - Checking Mesos master exporter startup"
-    sleep 5
-    if [[ `ps -e | grep $MESOS_MASTER_EXPORTER_PROC_ID` == "" ]]; then
-        echo " !! Failed to start Mesos master Exporter !!"
-        cat /var/log/prometheus/mesos-master-exporter.log
-        exit 10
-    fi
-else
-    echo " - (Not Starting mesos-master since mesos master is $MASTER_MESOS_MASTER_1 and I am $SELF_IP_ADDRESS)"
-fi
-
-
-# TODO staring mesos-agent exporter if node runs a mesos agent
-echo " - Starting mesos agent exporter"
-/usr/local/lib/prometheus/exporters/mesos_exporter/bin/mesos_exporter \
-    -addr :9106 \
-    -slave http://$SELF_IP_ADDRESS:5051 \
-    -logLevel info \
-    > /var/log/prometheus/mesos-agent-exporter.log 2>&1 &
-export MESOS_AGENT_EXPORTER=$!
-
 # running watch dogs
 
-echo " - Launching Watch Dog on Node exporter"
-/usr/local/sbin/containerWatchDog.sh $NODE_EXPORTER_PROC_ID $MESOS_AGENT_EXPORTER /var/log/prometheus/node-exporter-watchdog.log &
-
 if [[ $MASTER_PROMETHEUS_1 == $SELF_IP_ADDRESS ]]; then
+
     echo " - Launching Watch Dog on Node exporter"
-    /usr/local/sbin/containerWatchDog.sh $PROMETHEUS_PROC_ID $MESOS_AGENT_EXPORTER /var/log/prometheus/prometheus-watchdog.log &
+    /usr/local/sbin/containerWatchDog.sh $PROMETHEUS_PROC_ID $NODE_EXPORTER_PROC_ID /var/log/prometheus/node-exporter-watchdog.log &
 fi
 
-if [[ $MASTER_MESOS_MASTER_1 == $SELF_IP_ADDRESS ]]; then
-    echo " - Launching Watch Dog on Mesos Master"
-    /usr/local/sbin/containerWatchDog.sh $MESOS_MASTER_EXPORTER_PROC_ID $MESOS_AGENT_EXPORTER /var/log/prometheus/mesos-master-watchdog.log &
-fi
-
+# TODO launch other watchdogs as appropriate
 
 echo " - Now waiting on main process to exit"
-wait $MESOS_AGENT_EXPORTER
+wait $NODE_EXPORTER_PROC_ID
 
 

@@ -59,33 +59,33 @@ else
 fi
 
 
-echo " - Adding mesos-agent scrap config to prometheus"
-bash -c "echo -e \"\n  - job_name: mesos-slave\n    static_configs:\" >> /usr/local/lib/prometheus/prometheus.yml"
-
-if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
-
-    echo " - fetching from all mesos-agent nodes"
-    bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - ALL_NODES_LIST_prometheus\" >> /usr/local/lib/prometheus/prometheus.yml"
-    bash -c "echo -e \"    - targets:\" >> /usr/local/lib/prometheus/prometheus.yml"
-    for i in `echo "$ALL_NODES_LIST_prometheus"  | tr "," "\n"`; do
-        bash -c "echo -e \"      - $i:9106\" >> /usr/local/lib/prometheus/prometheus.yml"
-    done
-
-else
-    bash -c "echo -e \"    # (not any mesos-agent node configured since this node is not master)\" >> /usr/local/lib/prometheus/prometheus.yml"
-fi
-
-
-echo " - Adding mesos-master scrap config to prometheus"
-bash -c "echo -e \"\n  - job_name: mesos-master\n    static_configs:\" >> /usr/local/lib/prometheus/prometheus.yml"
-
-if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
-
-    echo " - fetching from mesos-master node"
-    bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - MASTER_MESOS_MASTER_1\" >> /usr/local/lib/prometheus/prometheus.yml"
-    bash -c "echo -e \"    - targets:\" >> /usr/local/lib/prometheus/prometheus.yml"
-    bash -c "echo -e \"      - $MASTER_MESOS_MASTER_1:9105\" >> /usr/local/lib/prometheus/prometheus.yml"
-
-else
-    bash -c "echo -e \"    # (not any mesos-agent node configured since this node is not master)\" >> /usr/local/lib/prometheus/prometheus.yml"
-fi
+#echo " - Adding mesos-agent scrap config to prometheus"
+#bash -c "echo -e \"\n  - job_name: mesos-slave\n    static_configs:\" >> /usr/local/lib/prometheus/prometheus.yml"
+#
+#if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
+#
+#    echo " - fetching from all mesos-agent nodes"
+#    bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - ALL_NODES_LIST_prometheus\" >> /usr/local/lib/prometheus/prometheus.yml"
+#    bash -c "echo -e \"    - targets:\" >> /usr/local/lib/prometheus/prometheus.yml"
+#    for i in `echo "$ALL_NODES_LIST_prometheus"  | tr "," "\n"`; do
+#        bash -c "echo -e \"      - $i:9106\" >> /usr/local/lib/prometheus/prometheus.yml"
+#    done
+#
+#else
+#    bash -c "echo -e \"    # (not any mesos-agent node configured since this node is not master)\" >> /usr/local/lib/prometheus/prometheus.yml"
+#fi
+#
+#
+#echo " - Adding mesos-master scrap config to prometheus"
+#bash -c "echo -e \"\n  - job_name: mesos-master\n    static_configs:\" >> /usr/local/lib/prometheus/prometheus.yml"
+#
+#if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
+#
+#    echo " - fetching from mesos-master node"
+#    bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - MASTER_MESOS_MASTER_1\" >> /usr/local/lib/prometheus/prometheus.yml"
+#    bash -c "echo -e \"    - targets:\" >> /usr/local/lib/prometheus/prometheus.yml"
+#    bash -c "echo -e \"      - $MASTER_MESOS_MASTER_1:9105\" >> /usr/local/lib/prometheus/prometheus.yml"
+#
+#else
+#    bash -c "echo -e \"    # (not any mesos-agent node configured since this node is not master)\" >> /usr/local/lib/prometheus/prometheus.yml"
+#fi

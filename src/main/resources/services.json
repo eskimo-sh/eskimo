@@ -112,9 +112,15 @@
     ],
     "commands" : [
       {
-        "id" : "show_log",
-        "name" : "Show Logs",
+        "id" : "show_prometheus_log",
+        "name" : "Show Prometheus Logs",
         "command": "cat /var/log/prometheus/prometheus.log",
+        "icon": "fa-file"
+      },
+      {
+        "id" : "show_nodeexporter_log",
+        "name" : "Show Node Exporter Logs",
+        "command": "cat /var/log/prometheus/node-exporter.log",
         "icon": "fa-file"
       }
     ]

@@ -48,7 +48,7 @@ rm -f /tmp/prometheus_build_log
 echo " - Building image prometheus"
 build_image prometheus_template /tmp/prometheus_build_log
 
-echo " - Installing go language environment (for mesos exporter)"
+echo " - Installing go language environment (for exporters)"
 docker exec -i prometheus_template apt-get install -y golang > /tmp/ntp_build_log 2>&1
 
 echo " - Installing prometheus"
