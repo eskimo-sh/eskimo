@@ -179,19 +179,59 @@ eskimo.Services = function () {
         return serviceInitialized[service];
     };
 
+    this.randomizeUrl = function (url) {
+        if (!url || (""+url) === "") {
+            return url;
+        }
+
+        let indexOfQuest = url.indexOf("?");
+        let indexOfHash = url.indexOf("#");
+
+        if (indexOfQuest < 0 && indexOfHash < 0) {
+
+            return url + "?dummyarg=" + Math.random();
+
+        } else if (indexOfQuest < 0 || (indexOfHash > 0 && indexOfQuest > indexOfHash)) {
+
+            return url.substring (0, indexOfHash)
+                + "?dummyarg=" + Math.random()
+                + url.substring (indexOfHash);
+
+        } else if (indexOfHash < 0) {
+
+            return url + "&dummyarg=" + Math.random();
+
+        } else {
+
+            return url.substring (0, indexOfHash)
+                + "&dummyarg=" + Math.random()
+                + url.substring (indexOfHash);
+        }
+    }
+
     this.refreshIframe = function (service) {
 
         let uiConfig = UI_SERVICES_CONFIG[service];
 
         if (eskimoMain.hasRole (uiConfig.role)) {
 
+            $("#iframe-content-" + service).attr('src', that.randomizeUrl (uiConfig.actualUrl));
+
+            /*
             // reset to empty frame ...
             $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
 
+            $("#iframe-content-" + service).load(EMPTY_FRAMETARGET, function () {
+                $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
+            });
+            */
+
+            /*
             // ... and back to URL
             setTimeout(function () {
                 $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
-            });
+            }, 20);
+            */
         }
     };
 

@@ -1,0 +1,15 @@
+state.savepoints.dir: file:///var/lib/flink/data/savepoints
+
+state.checkpoints.dir: file:///var/lib/flink/data/ckeckpoints
+
+jobmanager.archive.fs.dir: file:///var/lib/flink/completed_jobs/
+
+historyserver.archive.fs.dir: file:///var/lib/flink/completed_jobs/
+
+rest.port: 8081
+
+jobmanager.rpc.address: flink-runtime.default.svc.cluster.eskimo
+
+rest.bind-address: 0.0.0.0
+
+rest.address: flink-runtime-rest.default.svc.cluster.eskimo

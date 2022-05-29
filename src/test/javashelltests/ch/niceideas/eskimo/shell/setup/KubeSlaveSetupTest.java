@@ -134,8 +134,4 @@ public class KubeSlaveSetupTest extends AbstractSetupShellTest {
         }
     }
 
-    @Test
-    public void testConfigurationFileUpdate() throws Exception {
-        fail ("To Be Implemented");
-    }
 }

@@ -1,5 +1,0 @@
-jobmanager.rpc.address: 192.168.10.11
-
-rest.address: 192.168.10.11
-
-rest.bind-address: 192.168.10.11

@@ -108,8 +108,4 @@ public class KubeMasterSetupTest extends AbstractSetupShellTest {
         assertSystemDInstallation();
     }
 
-    @Test
-    public void testConfigurationFileUpdate() throws Exception {
-        fail ("To Be Implemented");
-    }
 }

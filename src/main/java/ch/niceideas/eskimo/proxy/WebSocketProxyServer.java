@@ -13,10 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.net.SocketException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -95,7 +92,7 @@ public class WebSocketProxyServer extends AbstractWebSocketHandler {
         logger.info ("Dropping all forwarders for session ID " + session.getId() + "");
         forwarders.values()
                 .forEach(forwardersForService -> {
-                            forwardersForService.keySet().stream()
+                            new ArrayList<>(forwardersForService.keySet()).stream()
                                     .filter(sessionId -> sessionId.equals(session.getId()))
                                     .map(forwardersForService::get)
                                     .forEach(forwardersForSession -> {

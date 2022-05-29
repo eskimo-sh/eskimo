@@ -56,10 +56,11 @@ if [[ $MASTER_PROMETHEUS_1 == $SELF_IP_ADDRESS ]]; then
     if [[ `ps -e | grep $PROMETHEUS_PROC_ID` == "" ]]; then
         echo " !! Failed to start Prometheus !!"
         cat /var/log/prometheus/prometheus.log
-        exit -8
+        exit 8
     fi
 else
-    echo " - (Not Starting service prometheus since master is $MASTER_PROMETHEUS_1 and I am $SELF_IP_ADDRESS)"
+    echo " - (Not Starting service prometheus since master is $MASTER_PROMETHEUS_1 and I am $SELF_IP_ADDRESS)" \
+        | tee /var/log/prometheus/prometheus.log
 fi
 
 
@@ -77,7 +78,7 @@ sleep 5
 if [[ `ps -e | grep $NODE_EXPORTER_PROC_ID` == "" ]]; then
     echo " !! Failed to start Node exporter !!"
     cat /var/log/prometheus/node-exporter.log
-    exit -8
+    exit 9
 fi
 
 # starting mesos master exporter process
@@ -96,7 +97,7 @@ if [[ $MASTER_MESOS_MASTER_1 == $SELF_IP_ADDRESS ]]; then
     if [[ `ps -e | grep $MESOS_MASTER_EXPORTER_PROC_ID` == "" ]]; then
         echo " !! Failed to start Mesos master Exporter !!"
         cat /var/log/prometheus/mesos-master-exporter.log
-        exit -8
+        exit 10
     fi
 else
     echo " - (Not Starting mesos-master since mesos master is $MASTER_MESOS_MASTER_1 and I am $SELF_IP_ADDRESS)"

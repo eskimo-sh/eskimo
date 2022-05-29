@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import org.json.JSONArray;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +44,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoServicesTest extends AbstractWebTest {
 
@@ -76,6 +77,20 @@ public class EskimoServicesTest extends AbstractWebTest {
                 "};");
 
         js("eskimoServices.setUiServicesConfig(UI_SERVICES_CONFIG);");
+    }
+
+    @Test
+    public void testRandomizeUrl() throws Exception {
+
+        js("Math.random = function () {return 0.111; };");
+
+        assertJavascriptEquals("a/b/c?dummyarg=0.111", "eskimoServices.randomizeUrl ('a/b/c');");
+        assertJavascriptEquals("a/b/c?dummyarg=0.111#/e/f", "eskimoServices.randomizeUrl ('a/b/c#/e/f');");
+
+        assertJavascriptEquals("a/b/c?a=2&c=3&dummyarg=0.111", "eskimoServices.randomizeUrl ('a/b/c?a=2&c=3');");
+        assertJavascriptEquals("a/b/c?a=2&c=3&dummyarg=0.111#/e/f", "eskimoServices.randomizeUrl ('a/b/c?a=2&c=3#/e/f');");
+
+        assertJavascriptEquals("a/b/c?dummyarg=0.111#/e/f?test=a", "eskimoServices.randomizeUrl ('a/b/c#/e/f?test=a');");
     }
 
     @Test
