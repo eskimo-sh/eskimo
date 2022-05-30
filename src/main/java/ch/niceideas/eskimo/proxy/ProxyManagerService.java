@@ -146,7 +146,10 @@ public class ProxyManagerService {
 
             String effNode = runtimeNode;
             if (service.isKubernetes()) {
-                // Kubernetes services are redirected to kubernetes master node (running proxy service)
+
+                // Kubernetes services are redirected to kubernetes master node
+                // - for services reached through the kubectl proxy, this is mandatory
+                // - for services using 'NodePort', since the port is made available on every node, this works as well
                 ServicesInstallStatusWrapper servicesInstallationStatus = null;
                 try {
                     servicesInstallationStatus = configurationService.loadServicesInstallationStatus();

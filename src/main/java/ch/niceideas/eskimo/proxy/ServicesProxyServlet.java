@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.service.proxy.PageScripter;
 import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -59,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ServicesProxyServlet extends ProxyServlet {
 
@@ -118,6 +120,10 @@ public class ServicesProxyServlet extends ProxyServlet {
     private String getPrefixPath(HttpServletRequest servletRequest, String contextPathPrefix) {
         String serviceName = getServiceName(servletRequest);
         Service service = servicesDefinition.getService(serviceName);
+
+        if (service == null) {
+            throw new IllegalStateException("Couldn't find service " + serviceName + " in service definition.");
+        }
 
         if (service.isUnique()) {
             return contextPathPrefix + serviceName;
@@ -216,6 +222,12 @@ public class ServicesProxyServlet extends ProxyServlet {
         return -1L;
     }
 
+    private String getAppRootUrl (HttpServletRequest servletRequest) {
+        return servletRequest.getScheme() + "://"
+                + servletRequest.getServerName() + ":" + servletRequest.getServerPort()
+                + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? "/" + servletRequest.getContextPath() : "");
+    }
+
     /** Copy response body data (the entity) from the proxy to the servlet client. */
     @Override
     protected void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse,
@@ -228,8 +240,9 @@ public class ServicesProxyServlet extends ProxyServlet {
         HttpEntity entity = proxyResponse.getEntity();
 
         String contextPathPrefix = getContextPath ();
-
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
+        String appRootUrl = getAppRootUrl (servletRequest);
+        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, appRootUrl);
 
         boolean isText = false;
         if (entity != null && entity.getContentType() != null) {
@@ -248,7 +261,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
             String inputString = StreamUtils.getAsString(entity.getContent());
 
-            String resultString = performReplacements(service, servletRequest.getRequestURI(), contextPathPrefix, prefixPath, inputString);
+            String resultString = performReplacements(service, servletRequest.getRequestURI(), context, inputString);
 
             byte[] result = resultString.getBytes();
 
@@ -260,29 +273,29 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
     }
 
-    String performReplacements(Service service, String requestURI, String contextPath, String prefixPath, String input) {
+    String performReplacements(Service service, String requestURI, ReplacementContext context, String input) {
         if (service.getUiConfig().isApplyStandardProxyReplacements()) {
 
-            input = input.replace("src=\"/", "src=\"/" + prefixPath + "/");
-            input = input.replace("action=\"/", "action=\"/" + prefixPath + "/");
-            input = input.replace("href=\"/", "href=\"/" + prefixPath + "/");
-            input = input.replace("href='/", "href='/" + prefixPath + "/");
-            input = input.replace("url(\"/", "url(\"/" + prefixPath + "/");
-            input = input.replace("url('/", "url('/" + prefixPath + "/");
-            input = input.replace("url(/", "url(/" + prefixPath + "/");
-            input = input.replace("/api/v1", "/" + prefixPath + "/api/v1");
-            input = input.replace("\"/static/", "\"/" + prefixPath + "/static/");
+            input = input.replace("src=\"/", "src=\"/" + context.getPrefixPath() + "/");
+            input = input.replace("action=\"/", "action=\"/" + context.getPrefixPath() + "/");
+            input = input.replace("href=\"/", "href=\"/" + context.getPrefixPath() + "/");
+            input = input.replace("href='/", "href='/" + context.getPrefixPath() + "/");
+            input = input.replace("url(\"/", "url(\"/" + context.getPrefixPath() + "/");
+            input = input.replace("url('/", "url('/" + context.getPrefixPath() + "/");
+            input = input.replace("url(/", "url(/" + context.getPrefixPath() + "/");
+            input = input.replace("/api/v1", "/" + context.getPrefixPath() + "/api/v1");
+            input = input.replace("\"/static/", "\"/" + context.getPrefixPath() + "/static/");
         }
 
         for (ProxyReplacement replacement : service.getUiConfig().getProxyReplacements()) {
-            input = replacement.performReplacement(input, contextPath, prefixPath, requestURI);
+            input = replacement.performReplacement(input, requestURI, context);
         }
 
         for (PageScripter scripter : service.getUiConfig().getPageScripters()) {
             if (requestURI.endsWith(scripter.getResourceUrl())) {
                 logger.info ("Applying " + scripter.getResourceUrl());
                 String script = scripter.getScript();
-                script = script.replace("{CONTEXT_PATH}", contextPath);
+                script = context.getResolved(script);
                 input = input.replace("</body>", "<script>" + script + "</script></body>");
             }
         }
@@ -337,11 +350,27 @@ public class ServicesProxyServlet extends ProxyServlet {
     @Override
     protected String rewriteUrlFromResponse(HttpServletRequest servletRequest, String theUrl) {
 
-        // FIXME hack for spark history server send redirects
-        if (theUrl.startsWith("http://localhost:9191/history/")) {
-            return "http://localhost:9191/spark-history-server/history/" + theUrl.substring(30);
-        }
+        String contextPathPrefix = getContextPath ();
+        String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
+        String appRootUrl = getAppRootUrl (servletRequest);
+        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, appRootUrl);
 
+        String rewritten = Arrays.stream(servicesDefinition.listUIServices())
+                .map (servicesDefinition::getService)
+                .map (service -> service.getUiConfig().getUrlRewritings())
+                .flatMap(List::stream)
+                .map(urlRewriting -> {
+                    if (urlRewriting.matches (theUrl, context)) {
+                        return urlRewriting.rewrite (theUrl, context);
+                    }
+                    return null;
+                })
+                .filter(StringUtils::isNotBlank)
+                .findFirst().orElse(null);
+
+        if (StringUtils.isNotBlank(rewritten)) {
+            return rewritten;
+        }
 
         final String targetUri = getTargetUri(servletRequest);
 

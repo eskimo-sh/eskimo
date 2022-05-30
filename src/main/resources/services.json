@@ -705,7 +705,13 @@
       "role" : "*",
       "title" : "Spark Console",
       "statusPageLinktitle" : "Monitor your Spark jobs",
-      "applyStandardProxyReplacements": false
+      "applyStandardProxyReplacements": false,
+      "urlRewriting" : [
+        {
+          "startUrl" : "{APP_ROOT_URL}/history/",
+          "replacement" : "{APP_ROOT_URL}/spark-history-server/history/"
+        }
+      ]
     },
     "dependencies": [
       {

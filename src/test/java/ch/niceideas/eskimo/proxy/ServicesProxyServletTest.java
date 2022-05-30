@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.*;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.HttpHeaders;
@@ -46,6 +47,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Replace;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,6 +57,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ServicesProxyServletTest {
 
@@ -161,6 +164,12 @@ public class ServicesProxyServletTest {
                             return "server=192.168.10.13";
                         case "getContextPath":
                             return null;
+                        case "getScheme":
+                            return "http";
+                        case "getServerName":
+                            return "localhost";
+                        case "getServerPort":
+                            return 9191;
                         default:
                             throw new UnsupportedOperationException(
                                     "Unsupported method: " + method.getName());
@@ -182,21 +191,29 @@ public class ServicesProxyServletTest {
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
                         case "getRequestURI":
-                            return "/history/spark-application-1652639268719/jobs/";
+                            return "/spark-history-server/history/spark-application-1653861510346/jobs/";
                         case "getPathInfo":
-                            return "/history/spark-application-1652639268719/jobs/";
+                            return "/history/spark-application-1653861510346/jobs/";
                         case "getRequestURL":
                             return new StringBuffer("http://localhost:9191/history/spark-application-1652639268719/jobs/");
                         case "getQueryString":
                             return "";
                         case "getContextPath":
-                            return null;
+                            return "";
+                        case "getScheme":
+                            return "http";
+                        case "getServerName":
+                            return "localhost";
+                        case "getServerPort":
+                            return 9191;
                         default:
                             throw new UnsupportedOperationException(
                                     "Unsupported method: " + method.getName());
                     }
                 });
         pms.updateServerForService("spark-history-server", "192.168.10.11");
+
+        http://localhost:9191/history/spark-application-1653861510346/jobs/
 
         assertEquals("http://localhost:9191/spark-history-server/history/spark-application-1652639268719/jobs/",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:9191/history/spark-application-1652639268719/jobs/"));
@@ -208,7 +225,9 @@ public class ServicesProxyServletTest {
         Service kafkaManagerService = sd.getService("kafka-manager");
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
-        String result = servlet.performReplacements(kafkaManagerService, "", "", "test/test", toReplace );
+        //String contextPath, String prefixPath
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "");
+        String result = servlet.performReplacements(kafkaManagerService, "", ctx, toReplace );
         assertEquals("\n" +
                 " <a href='/test/test/toto.txt'>\n" +
                 "a/a>", result);
@@ -250,7 +269,8 @@ public class ServicesProxyServletTest {
                 "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}";
 
-        String result = servlet.performReplacements(zeppelinService, "controllers.js", "", "test/test", toReplace );
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "");
+        String result = servlet.performReplacements(zeppelinService, "controllers.js", ctx, toReplace );
 
         assertEquals("function(e, t, n) {\n" +
                 "    \"use strict\";\n" +
@@ -329,6 +349,12 @@ public class ServicesProxyServletTest {
                             return "server=192.168.10.13";
                         case "getContextPath":
                             return null;
+                        case "getScheme":
+                            return "http";
+                        case "getServerName":
+                            return "localhost";
+                        case "getServerPort":
+                            return 9191;
                         default:
                             throw new UnsupportedOperationException(
                                     "Unsupported method: " + method.getName());
@@ -400,6 +426,12 @@ public class ServicesProxyServletTest {
                             return "server=192.168.10.13";
                         case "getContextPath":
                             return null;
+                        case "getScheme":
+                            return "http";
+                        case "getServerName":
+                            return "localhost";
+                        case "getServerPort":
+                            return 9191;
                         default:
                             throw new UnsupportedOperationException(
                                     "Unsupported method: " + method.getName());

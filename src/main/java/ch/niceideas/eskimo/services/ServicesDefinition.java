@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.proxy.PageScripter;
 import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.*;
+import ch.niceideas.eskimo.model.service.proxy.UrlRewriting;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -236,6 +237,30 @@ public class ServicesDefinition implements InitializingBean {
                         uiConfig.addPageScripter (pageScriper);
                     }
 
+                }
+
+                if (servicesConfig.hasPath(serviceString+".ui.urlRewriting")) {
+                    JSONArray urlRewritings = servicesConfig.getSubJSONObject(serviceString).getJSONObject("ui").getJSONArray("urlRewriting");
+                    for (int i = 0; i < urlRewritings.length(); i++) {
+
+                        JSONObject urlRewritingsObj = urlRewritings.getJSONObject(i);
+
+                        UrlRewriting urlRewriting = new UrlRewriting();
+
+                        String startUrl = urlRewritingsObj.getString("startUrl");
+                        if (StringUtils.isBlank(startUrl)) {
+                            throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring an urlRewriting without a startUrl");
+                        }
+                        urlRewriting.setStartUrl(startUrl);
+
+                        String replacement = urlRewritingsObj.getString("replacement");
+                        if (StringUtils.isBlank(replacement)) {
+                            throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring an urlRewriting without a replacement");
+                        }
+                        urlRewriting.setReplacement(replacement);
+
+                        uiConfig.addUrlRewriting(urlRewriting);
+                    }
                 }
 
                 if (servicesConfig.hasPath(serviceString+".ui.proxyReplacements")) {
