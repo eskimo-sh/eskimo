@@ -151,7 +151,7 @@ ajaxterm.Terminal=function(id,options) {
 			}
 			var query=query1+send+"&t="+screenTimestamp;
             if (additionalQueryString)  query+='&'+additionalQueryString;
-console.log (query);
+
 			if(optGet.className == 'on') {
 				r.open("GET",endpoint+"?"+query,true);
 				if(ie) {
@@ -163,22 +163,22 @@ console.log (query);
 			r.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 			r.onreadystatechange = function () {
 //				debug("xhr:"+((new Date).getTime())+" state:"+r.readyState+" status:"+r.status+" statusText:"+r.statusText);
-				if (r.readyState==4) {
-					if(r.status==200) {
+				if (r.readyState == 4) {
+					if(r.status == 200) {
 						window.clearTimeout(error_timeout);
-						if(r.responseText.trim()!="<idem/>") {
+						if(r.responseText.trim() != "<idem/>") {
                             dterm.innerHTML = r.responseText;
 							rmax=100;
 						} else {
-							rmax*=2;
-							if(rmax>1000) {
-								rmax=1000;
+							rmax *= 2;
+							if(rmax > 1000) {
+								rmax = 1000;
                             }
 						}
 
                         // update cursor position
                         var cxs = r.getResponseHeader("Cursor-X");
-                        if(cxs!=null) {
+                        if (cxs != null) {
                             var cx = Number(cxs);
                             var cy = Number(r.getResponseHeader("Cursor-Y"));
                             var sx = Number(r.getResponseHeader("Screen-X"));
@@ -378,8 +378,6 @@ console.log (query);
 			if(k=="+") {
 				queue("%2B");
 			} else {
-
-console.log (escape(k));
 
 				queue(escape(k));
 			}

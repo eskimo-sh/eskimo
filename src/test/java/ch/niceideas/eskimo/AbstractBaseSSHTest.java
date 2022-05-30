@@ -54,6 +54,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -191,7 +192,7 @@ public abstract class AbstractBaseSSHTest {
     public static byte[] encode(RSAPublicKey key) {
         try {
             ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            byte[] name = "ssh-rsa".getBytes("US-ASCII");
+            byte[] name = "ssh-rsa".getBytes(StandardCharsets.US_ASCII);
             write(name, buf);
             write(key.getPublicExponent().toByteArray(), buf);
             write(key.getModulus().toByteArray(), buf);

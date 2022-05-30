@@ -63,7 +63,7 @@ MULTIPLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:
 SINGLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$'`
 
 MULTIPLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$' | sed 's/\([a-z]*\).*/\1/'`
-SINGLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$' | sed 's/\([a-z\-]\+\)-[a-z0-9]\+-[a-z0-9]\+/\1/'`
+#SINGLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$' | sed 's/\([a-z\-]\+\)-[a-z0-9]\+-[a-z0-9]\+/\1/'`
 
 
 function get_multiple_service_pod() {

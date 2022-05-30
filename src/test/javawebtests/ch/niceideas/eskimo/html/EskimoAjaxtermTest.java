@@ -66,12 +66,25 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
                 "            t.setShowPrevTab(function() { window.showPrevTabCalled = true;} );" +
                 "");
 
+        js("window.XMLHttpRequestBAK = window.XMLHttpRequest;");
+
+        js("window.XMLHttpRequest = function() {" +
+                "    this.open = function (method, url) {" +
+                "        window.xhrOpenedOn = url;" +
+                //"        console.log (url);" +
+                "    };" +
+                "    this.setRequestHeader = function () { };" +
+                "    this.getResponseHeader = function () { };" +
+                "    this.send = function (data) {" +
+                "        let re = new RegExp('.*k=([a-zA-Z]+).*'); " +
+                "        let res = re.exec (data); "+
+                "        window.ajtData = data;" +
+                "    };" +
+                "}");
     }
 
     @Test
     public void testNominal() throws Exception {
-
-        js("window.XMLHttpRequestBAK = window.XMLHttpRequest;");
 
         js("window.XMLHttpRequest = function() {" +
                 "    this.open = function (method, url) {" +
@@ -96,14 +109,35 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
         ((HtmlDivision)page.getElementById("test-term")).type("a");
 
-        //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
-        Thread.sleep (2000);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        //Thread.sleep (2000);
         assertJavascriptEquals("./terminal?node=test", "window.xhrOpenedOn");
 
         assertJavascriptEquals("a", "$('.screen div:first-child').html()");
+    }
 
-        // need to restore this for further code which require it
-        js("window.XMLHttpRequest = window.XMLHttpRequestBAK;");
+    @Test
+    public void testOnKeyDown_a() throws Exception {
+        // a
+        js("var e = jQuery.Event(\"keypress\"); e.which = 65; $('#test-term').trigger(e);");
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=A&t=0"));
+    }
+
+    @Test
+    public void testOnKeyDown_F1() throws Exception {
+        // a + alt key
+        js("var e = jQuery.Event(\"keypress\"); e.keyCode = 112; e.which = 0; $('#test-term').trigger(e);");
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=%1B%5B%5BA&t=0"));
+    }
+
+    @Test
+    public void testOnKeyDown_backspace() throws Exception {
+        // a + alt key
+        js("var e = jQuery.Event(\"keypress\"); e.keyCode = 8; e.which = 0; $('#test-term').trigger(e);");
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=%7F&t=0"));
     }
 
 }

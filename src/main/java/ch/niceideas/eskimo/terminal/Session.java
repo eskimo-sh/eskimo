@@ -148,16 +148,6 @@ public final class Session extends Thread {
     /**
      * Receives the call from the client-side JavaScript.
      */
-    public void handleUpdate(HttpServletRequest req, HttpServletResponse rsp) throws IOException, InterruptedException {
-        handleUpdate(
-                req.getParameter("k"),
-                req.getParameter("c") != null,
-                Integer.parseInt(req.getParameter("t"))).renderResponse(rsp);
-    }
-
-    /**
-     * Receives the call from the client-side JavaScript.
-     */
     public ScreenImage handleUpdate(String keys, boolean color, int clientTimestamp) throws IOException, InterruptedException {
         lastAccess = System.currentTimeMillis();
         write(keys);
