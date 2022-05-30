@@ -52,7 +52,7 @@ if [[ $3 == "" ]]; then
 fi
 export NODE=$3
 
-export PATH=/usr/local/bin:$PATH
+export PATH=$PATH:/usr/local/bin
 
 if [[ $TEST_MODE != "true" ]]; then
     . /etc/eskimo_topology.sh
