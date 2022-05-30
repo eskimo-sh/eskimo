@@ -41,8 +41,8 @@ Software.
 
 == Eskimo Introduction
 
-A state of the art _Big Data Infrastructure_ and _Management Web Console_ to _build_, _manage_ and _operate_
-*Big Data 2.0 Analytics clusters*
+A state of the art _Big Data Infrastructure_ and _Management Platform_ to _build_, _manage_ and _operate_
+*Big Data 2.0 Analytics clusters* on *Kubernetes*.
 
 
 image::doc/guides/eskimo-guide/pngs/eskimo-status.png[800, 800, align="center"]
@@ -52,10 +52,11 @@ Eskimo is in a certain way the Operating System of your Big Data Cluster:
 * A _plug and play_, working _out of the Box_, *Big Data Analytics platform* fulfilling _enterprise environment
 requirements_.
 * A *state of the art Big Data 2.0 platform*
-** based on _Docker_, _Marathon_, _Mesos_ and _Systemd_
-** packaging _Gluster_, _Spark_, _Kafka_, _Flink_, _Nifi_ and _ElasticSearch_
+** based on _Kubernetes_ (as well as  _Docker_ and _SystemD_)
+** packaging _Gluster_, _Spark_, _Kafka_, _Flink_, _ElasticSearch_
 ** with all the administration and management consoles such as _Cerebro_, _Kibana_, _Zeppelin_, _Kafka-Manager_,
-_Grafana_ and _Prometheus_.
+_Grafana_, _Prometheus_ and of course the _Kubernetes Dashboard_.
+** everything all 100% pre-configured and setup to work perfectly together.
 * An _Administration Application_ aimed at drastically simplifying the *deployment, administration and operation* of
 your Big Data Cluster
 * A _Data Science Laboratory_ and _Production environment_ where Data Analytics is both
@@ -66,11 +67,11 @@ Eskimo is as well:
 
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
   all the _nuts and bolds_ required to make them work well together.
-* a framework for developing, building and deploying Big Data and NoSQL services based on _Docker_, _SystemD_ and
-_Marathon_.
+* a framework for developing, building and deploying Big Data and NoSQL services based on _Kubernetes_, _Docker_ and
+_SystemD_.
 
 Eskimo Packages all the components above and takes care of all the nuts and bolts required to make them work together
-smoothly and without the user or administrator needing to take care of anything.
+smoothly and without the user or administrator needing to take care of anything, Big Data the _Plug & Play_ way.
 
 image::doc/guides/eskimo-guide/pngs/eskimo_platform.png[800, 800, align="center"]
 
@@ -192,9 +193,9 @@ supported running Linux.
 
 In order to run eskimo, one needs to have
 
-* At least 15Gb of disk storage space on the machine running Eskimo
+* At least 20Gb of disk storage space on the machine running Eskimo
 * At least one linux machine available on the network (can be the same machine than the one running Eskimo) with either
-  a debian-based (Ubuntu, Debian, etc.), red-hat-based (CentOS, Fedora, etc.) or OpenSUSE Operating System.
+  a debian-based (Ubuntu, Debian, etc.), red-hat-based (CentOS, RHEL, etc.) or OpenSUSE Operating System.
 
 (See https://github.com/eskimo-sh/eskimo/blob/master/doc/guides/eskimo-guide/eskimo-guide.adoc[The Eskimo User Guide]
 for more information on Eskimo cluster requirements.)
