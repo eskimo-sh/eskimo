@@ -57,5 +57,53 @@ echo " - Changing rights of folder /var/lib/kafka"
 sudo /bin/chown -R kafka /var/lib/kafka
 sudo /bin/chmod 755 /var/lib/kafka
 
+if [[ -f /var/log/kafka/server.log ]]; then
+    echo " - Archiving log file"
+    mv /var/log/kafka/server.log /var/log/kafka/server.log.previous
+fi
+
 echo " - Starting service"
-/usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties
+/usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties &
+KAFKA_PID=$!
+echo $KAFKA_PID > /var/run/kafka/Kafka.pid
+
+
+echo " - Entering corruption and error detection loop"
+# trying for 100 seconds
+for i in `seq 1 20`; do
+
+    # Ensure process is still up otherwise crash with exit code != 0
+    if [[ `ps -e | grep $KAFKA_PID` == "" ]]; then
+        echo " - ! Couldn't successfully start kafka"
+        exit 10
+    fi
+
+    sleep 5
+
+    if [[ `tail -800 /var/log/kafka/server.log  | grep -E "Registered broker [0-9]+ at path"` != "" ]]; then
+        echo " - Kafka started successfully, now waiting on kafka process to exit"
+        break
+    fi
+
+    if [[ `tail -800 /var/log/kafka/server.log  | grep -E "doesn't match stored clusterId"` != "" ]]; then
+        echo " - Detected cluster mismatch. Wiping out kafka folder !!!"
+        rm -Rf /var/lib/kafka/*
+        mv /var/log/kafka/server.log /var/log/kafka/server.log.backup-post-wipeout
+
+        sleep 1
+
+        echo " - Restarting kafka"
+        /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties &
+        KAFKA_PID=$!
+        echo $KAFKA_PID > /var/run/kafka/Kafka.pid
+    fi
+
+    # Issue a warning if i == 30
+   if [[ $i == 20 ]]; then
+       echo " - Couldn't successfully find kafka startup marker";
+   fi
+
+done
+
+
+wait $KAFKA_PID

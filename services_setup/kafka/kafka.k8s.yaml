@@ -61,7 +61,7 @@ kind: PersistentVolume
 metadata:
   name: kafka-var-lib-volume
   labels:
-    type: local
+    type: gluster
 spec:
   storageClassName: kafka-gluster-storage
   volumeMode: Filesystem

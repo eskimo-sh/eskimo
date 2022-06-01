@@ -54,7 +54,7 @@ nohup /usr/bin/docker run \
         eskimo:gluster \
         /usr/local/sbin/inContainerStartService.sh | tee /var/log/gluster/gluster-container-out-log &
 
-#         -p 111:111 \ # RPC Bind is not supported in docke rcontainer since in use on the host in anyway
+#         -p 111:111 \ # RPC Bind is not supported in docker container since in use on the host in anyway
 # as a consequence if gluster has to be used through nfs, this is not supported without "network host" I guess
 
 #        -p 28901:28901 \
