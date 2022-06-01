@@ -1,4 +1,4 @@
-FROM eskimo:k8s-master_template
+FROM eskimo:kube-master_template
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

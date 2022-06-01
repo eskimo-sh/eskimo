@@ -543,7 +543,7 @@ function build_container() {
     fi
 
     # build
-    echo " - Building docker container"
+    echo " - Building docker container from image eskimo:$CONTAINER"
     docker build --iidfile id_file --tag eskimo:$CONTAINER . >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 7
 }

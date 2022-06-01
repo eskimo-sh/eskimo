@@ -309,7 +309,7 @@ rm -Rf /tmp/setup_log
 export LINUX_DISTRIBUTION=`cat /etc/os-release | grep -e "^ID="  | cut -d '=' -f 2 | sed s/'"'//g`
 echo "  - Linux distribution is $LINUX_DISTRIBUTION"
 
-if [[ "LINUX_DISTRIBUTION" == "rhel" ]]; then
+if [[ "$LINUX_DISTRIBUTION" == "rhel" ]]; then
     echo "  - Overriding 'rel' repo with 'centos'. Docker only provides packages for centos"
     export LINUX_DISTRIBUTION="centos"
 fi

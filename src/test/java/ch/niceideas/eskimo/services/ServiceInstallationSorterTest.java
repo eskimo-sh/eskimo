@@ -34,11 +34,11 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -49,18 +49,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTest  {
 
-    private ServicesInstallationSorter sio = null;
+    private ServicesInstallationSorter sis = null;
 
     NodesConfigWrapper nodesConfig = null;
 
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        sio = new ServicesInstallationSorter();
-        sio.setServicesDefinition(def);
+        sis = new ServicesInstallationSorter();
+        sis.setServicesDefinition(def);
 
         ConfigurationService cs = new ConfigurationService();
-        sio.setConfigurationService(cs);
+        sis.setConfigurationService(cs);
         cs.setSetupService(new SetupService() {
             public String getConfigStoragePath() {
                 return "/tmp";
@@ -71,13 +71,56 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
     }
 
     @Test
+    public void testNoMixUpOfKubeAndNonKube() throws Exception {
+
+        ServiceOperationsCommand restartCommand = ServiceOperationsCommand.createForRestartsOnly(
+                def,
+                nrr,
+                new String[] {"kube-master", "kube-slave", "gluster", "cerebro", "kibana"},
+                StandardSetupHelpers.getStandard2NodesInstallStatus(),
+                StandardSetupHelpers.getStandard2NodesSetup()
+            );
+
+        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedRestart = restartCommand.getRestartsInOrder(
+                sis, StandardSetupHelpers.getStandard2NodesSetup()
+        );
+
+        List<ServiceOperationsCommand.ServiceOperationId> group1 = orderedRestart.get(0);
+        assertEquals(2, group1.size());
+        assertEquals("gluster", group1.get(0).getService());
+        assertEquals("192.168.10.11", group1.get(0).getNode());
+
+        assertEquals("gluster", group1.get(1).getService());
+        assertEquals("192.168.10.13", group1.get(1).getNode());
+
+        List<ServiceOperationsCommand.ServiceOperationId> group2 = orderedRestart.get(1);
+        assertEquals(1, group2.size());
+        assertEquals("kube-master", group2.get(0).getService());
+        assertEquals("192.168.10.11", group2.get(0).getNode());
+
+        List<ServiceOperationsCommand.ServiceOperationId> group3 = orderedRestart.get(2);
+        assertEquals(2, group3.size());
+        assertEquals("kube-slave", group3.get(0).getService());
+        assertEquals("192.168.10.11", group3.get(0).getNode());
+
+        assertEquals("kube-slave", group3.get(1).getService());
+        assertEquals("192.168.10.13", group3.get(1).getNode());
+
+        List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedRestart.get(3);
+        assertEquals(1, group4.size());
+        assertEquals("cerebro", group4.get(0).getService());
+        assertEquals("(kubernetes)", group4.get(0).getNode());
+
+    }
+
+    @Test
     public void testNominal() throws Exception {
 
         ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>());
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
 
-        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedInstall = sio.orderOperations (oc.getInstallations(), nodesConfig);
+        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedInstall = sis.orderOperations (oc.getInstallations(), nodesConfig);
 
         assertNotNull(orderedInstall);
 

@@ -92,7 +92,7 @@ elif [[ $package == "all_images" ]]; then
     echo "BUILDING ALL PACKAGES"
     set -e
 
-    all_services='base-eskimo ntp zookeeper gluster kube-master kube-slave kube-dashboard prometheus grafana elasticsearch logstash cerebro kibana kafka flink kafka-manager spark zeppelin'
+    all_services='base-eskimo ntp zookeeper gluster kube-master kubernetes-dashboard prometheus grafana elasticsearch logstash cerebro kibana kafka flink kafka-manager spark zeppelin'
 
     IFS=$' '
     for service in $all_services; do

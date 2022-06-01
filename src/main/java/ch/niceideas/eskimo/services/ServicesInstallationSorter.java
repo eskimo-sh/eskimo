@@ -101,7 +101,7 @@ public class ServicesInstallationSorter {
 
             List<T> group = groupedOperations.get(service.getName());
 
-            // If service has it's own in dependency, this is where we have an issue
+            // If service has its own in dependency, this is where we have an issue
             // then it depends on the type of dependency:
             // if master is random, don't bother
             // if master is fixed, install it first
@@ -152,7 +152,7 @@ public class ServicesInstallationSorter {
             if (i > 0) {
                 List<T> prev = orderedOperationsSteps.get(i - 1);
 
-                // Does any service in curent have any dependency on any servic in prev ?
+                // Does any service in current have any dependency on any service in prev ?
                 Set<Service> currentServices = new HashSet<>();
                 for (OperationId installation : current) {
                     currentServices.add(servicesDefinition.getService(installation.getService()));
@@ -164,11 +164,15 @@ public class ServicesInstallationSorter {
                 }
 
                 boolean hasDependency = false;
+                boolean mixUpKubernetes = false;
                 for (Service currentService : currentServices) {
                     for (Service prevService : prevServices) {
                         if (currentService.hasDependency(prevService)) {
                             hasDependency = true;
-                            break;
+                        }
+                        if (   (currentService.isKubernetes() && !prevService.isKubernetes())
+                            || (!currentService.isKubernetes() && prevService.isKubernetes())) {
+                            mixUpKubernetes = true;
                         }
                     }
                 }
@@ -185,7 +189,7 @@ public class ServicesInstallationSorter {
                 }
 
 
-                if (!hasDependency && !hasSameNode) {
+                if (!hasDependency && !hasSameNode && !mixUpKubernetes) {
                     prev.addAll(current);
                     orderedOperationsSteps.remove(i);
                 }

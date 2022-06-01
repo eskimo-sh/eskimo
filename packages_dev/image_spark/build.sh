@@ -104,7 +104,7 @@ fi
 
 
 #echo " - TODO"
-docker exec -it spark_template bash
+#docker exec -it spark_template bash
 
 
 echo " - Cleaning up image"

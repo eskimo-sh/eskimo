@@ -71,9 +71,11 @@ while [[ -f /etc/k8s/k8s_poststart_management_lock ]] ; do
     fi
 done
 
+
 trap delete_k8s_poststart_lock_file 15
 trap delete_k8s_poststart_lock_file EXIT
 trap delete_k8s_poststart_lock_file ERR
+
 
 touch /etc/k8s/k8s_poststart_management_lock
 
@@ -88,6 +90,7 @@ if [[ `id -u` != 0 ]]; then
     exit 200
 fi
 
+# Making /root/.kube/config available
 export HOME=/root
 
 

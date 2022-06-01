@@ -39,23 +39,23 @@ echoerr() { echo "$@" 1>&2; }
 echo " - Starting K8s Eskimo Master"
 
 function delete_k8s_master_lock_file() {
-     rm -Rf /etc/k8s/ssl/k8s_master_management_lock
+     rm -Rf /var/lib/kubernetes/k8s_master_management_lock
 }
 
 # From here we will be messing with gluster and hence we need to take a lock
 counter=0
-while [[ -f /etc/k8s/ssl/k8s_master_management_lock ]] ; do
-    echo "   + /etc/k8s/ssl/k8s_master_management_lock exist. waiting 2 secs ... "
+while [[ -f /var/lib/kubernetes/k8s_master_management_lock ]] ; do
+    echo "   + /var/lib/kubernetes/k8s_master_management_lock exist. waiting 2 secs ... "
     sleep 2
     let counter=counter+1
     if [[ $counter -ge 15 ]]; then
-        echo " !!! Couldn't get /etc/k8s/ssl/k8s_master_management_lock in 30 seconds. crashing !"
+        echo " !!! Couldn't get /var/lib/kubernetes/k8s_master_management_lock in 30 seconds. crashing !"
         exit 150
     fi
 done
 
 echo "   + Taking startup lock"
-touch /etc/k8s/ssl/k8s_master_management_lock
+touch /var/lib/kubernetes/k8s_master_management_lock
 
 trap delete_k8s_master_lock_file 15
 trap delete_k8s_master_lock_file EXIT
@@ -228,10 +228,10 @@ if [[ $? != 0 ]]; then
     exit 49
 fi
 
-sleep 10
 
 echo "   + Deleting lock file"
 delete_k8s_master_lock_file
+
 
 echo "   + Entering monitoring / remediation loop"
 ping_cnt=0
