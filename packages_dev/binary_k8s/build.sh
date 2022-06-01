@@ -164,13 +164,13 @@ fail_if_error $? "package-k8s-log" -12
 
 set -e
 
-if [[ -f "$SCRIPT_DIR/../../packages_distrib/eskimo_k8s-$K8S_VERSION.tar.gz" ]]; then
-    echo " - renaming previous k8s-$K8S_VERSION.tar.gz"
-    mv $SCRIPT_DIR/../../packages_distrib/eskimo_k8s-$K8S_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_k8s-$K8S_VERSION.tar.gz.old
+if [[ -f "$SCRIPT_DIR/../../packages_distrib/eskimo_kube-$K8S_VERSION.tar.gz" ]]; then
+    echo " - renaming previous kube-$K8S_VERSION.tar.gz"
+    mv $SCRIPT_DIR/../../packages_distrib/eskimo_kube-$K8S_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_kube-$K8S_VERSION.tar.gz.old
 fi
 
 echo " - Copying K8s archive to distribution folder"
-mv k8s-$K8S_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_k8s_"$K8S_VERSION"_1.tar.gz
+mv k8s-$K8S_VERSION.tar.gz $SCRIPT_DIR/../../packages_distrib/eskimo_kube_"$K8S_VERSION"_1.tar.gz
 
 echo " - Destroying Docker container"
 #vagrant destroy --force > /tmp/package-k8s-log 2>&1

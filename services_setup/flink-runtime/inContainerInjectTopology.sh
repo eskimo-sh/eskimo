@@ -58,7 +58,7 @@ sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /
 bash -c "echo -e \"kubernetes.jobmanager.cpu: $ESKIMO_KUBE_REQUEST_FLINK_RUNTIME_CPU\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 bash -c "echo -e \"kubernetes.taskmanager.cpu: $ESKIMO_KUBE_REQUEST_FLINK_RUNTIME_CPU\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-if [[ $MEMORY_SPARK_RUNTIME != "" ]]; then
+if [[ $MEMORY_FLINK_RUNTIME != "" ]]; then
     bash -c "sed -i s/\"jobmanager.memory.process.size: 1600m\"/\"jobmanager.memory.process.size: "$MEMORY_FLINK_RUNTIME"m\"/g /usr/local/lib/flink/conf/flink-conf.yaml"
     bash -c "sed -i s/\"taskmanager.memory.process.size: 1728m\"/\"taskmanager.memory.process.size: "$MEMORY_FLINK_RUNTIME"m\"/g /usr/local/lib/flink/conf/flink-conf.yaml"
 else
