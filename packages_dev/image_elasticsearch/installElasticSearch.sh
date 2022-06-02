@@ -54,6 +54,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/es_setup
 mkdir -p /tmp/es_setup
 cd /tmp/es_setup
 

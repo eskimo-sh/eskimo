@@ -99,7 +99,7 @@ sleep 5
 echo "   + checking startup"
 if [[ `ps -efl | grep docker-registry | grep -v grep` == "" ]]; then
     echo "Checking startup failed !!"
-    exit -6
+    exit 6
 fi
 
 echo "   + stopping docker registry"

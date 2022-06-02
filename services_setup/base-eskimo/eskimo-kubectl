@@ -58,7 +58,7 @@ if [[ $TEST_MODE != "true" ]]; then
     . /etc/eskimo_topology.sh
 fi
 
-# FIXME Implement me
+# FIXME implement retry policy on every call to kubectl (implement a function call_kubectl)
 MULTIPLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$'`
 SINGLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$'`
 

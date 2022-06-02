@@ -71,6 +71,7 @@ trap returned_to_saved_dir ERR
 
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/spark_streaming_kafka_deps
 mkdir -p /tmp/spark_streaming_kafka_deps
 cd /tmp/spark_streaming_kafka_deps
 
@@ -119,6 +120,10 @@ returned_to_saved_dir
 
 echo " - Cleaning up maven repository"
 sudo rm -Rf $HOME/.m2/repository
+
+echo " - Cleaning build directory"
+rm -Rf /tmp/spark_streaming_kafka_deps
+returned_to_saved_dir
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container install SUCCESS"

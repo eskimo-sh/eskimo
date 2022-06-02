@@ -58,6 +58,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/kafka_setup
 mkdir -p /tmp/kafka_setup
 cd /tmp/kafka_setup
 
@@ -104,6 +105,11 @@ if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
     echo "Kafka process not started successfully !"
     exit 10
 fi
+
+
+echo " - Cleaning build directory"
+cd $saved_dir
+rm -Rf /tmp/kafka_setup
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

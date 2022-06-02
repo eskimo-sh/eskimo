@@ -53,6 +53,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/ls_setup
 mkdir -p /tmp/ls_setup
 cd /tmp/ls_setup
 
@@ -97,6 +98,7 @@ if [[ $? != 0 ]]; then
     cat /tmp/logstash_run_log
 fi
 
+echo " - Cleaning build directory"
 sudo rm -Rf /tmp/ls_setup
 returned_to_saved_dir
 

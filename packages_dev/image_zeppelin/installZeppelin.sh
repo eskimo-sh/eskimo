@@ -54,6 +54,7 @@ trap returned_to_saved_dir ERR
 
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/zeppelin_setup/
 mkdir -p /tmp/zeppelin_setup/
 cd /tmp/zeppelin_setup/
 
@@ -150,7 +151,7 @@ echo " - Checking Zeppelin startup"
 sleep 30
 if [[ `ps -e | grep $ZEPPELIN_PROC_ID` == "" ]]; then
     echo " !! Failed to start Zeppelin !!"
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Zeppelin"
@@ -159,13 +160,14 @@ export ZEPPELIN_PROC_ID=-1
 
 sleep 6
 
+echo " - Cleaning build directory"
 returned_to_saved_dir
 sudo rm -Rf /tmp/zeppelin_setup/
 
 
 if [[ ! -f /usr/local/lib/zeppelin/conf/interpreter.json ]]; then
    echo "PROBLEM : interpreter.json was not created !"
-   exit -50
+   exit 50
 fi
 
 

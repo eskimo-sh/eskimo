@@ -71,7 +71,7 @@ public class NodesConfigurationChecker {
         checkIDSWithinNodeRanges(nodesConfig, nodeCount);
 
         // foolproof bug check : make sure no marathon service can be selected here
-        checkNoMarathonServicesSelected(nodesConfig);
+        checkNoKubernetesServicesSelected(nodesConfig);
 
         // enforce mandatory services
         enforceMandatoryServices(nodesConfig, nodeCount);
@@ -215,8 +215,7 @@ public class NodesConfigurationChecker {
         }
     }
 
-    @Deprecated /* To be renamed */
-    void checkNoMarathonServicesSelected(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
+    void checkNoKubernetesServicesSelected(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
 
         // foolproof bug check : make sure no marathon service can be selected here
         for (String key : nodesConfig.keySet()) {

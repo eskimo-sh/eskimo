@@ -82,7 +82,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public boolean isServiceInstalledAnywhere(String service) {
         try {
-            for (String node : getNodesAndMarathonFlags()) {
+            for (String node : getNodesAndKubeFlags()) {
                 if ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.replace(".", "-")))
                         || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.replace(".", "-")))) {
                     return true;
@@ -127,7 +127,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .collect(Collectors.toList());
     }
 
-    public Set<String> getNodesAndMarathonFlags() {
+    public Set<String> getNodesAndKubeFlags() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
@@ -165,7 +165,6 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
-                /* Deprecated */
                 .filter(key -> !key.equals(KUBERNETES_NODE))
                 .map(key -> key.replace("-", "."))
                 .collect(Collectors.toSet());

@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-/* @Deprecated To Be renamed */
+
 eskimo.KubernetesServicesConfig = function() {
 
     const INSTALL_FLAG = "_install";

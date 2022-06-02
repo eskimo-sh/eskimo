@@ -59,6 +59,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/prometheus_pe_setup
 mkdir -p /tmp/prometheus_pe_setup
 cd /tmp/prometheus_pe_setup
 
@@ -67,7 +68,7 @@ wget https://github.com/prometheus/pushgateway/releases/download/v$PROMETHEUS_PU
         > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad pushgateway-$PROMETHEUS_PUSHGATEWAY_VERSION from github. Trying to download from niceideas.ch"
-    exit -1
+    exit 1
     #wget http://niceideas.ch/mes/prometheus-$PROMETHEUS_VERSION.tar.gz >> /tmp/prometheus_install_log 2>&1
     #fail_if_error $? "/tmp/prometheus_install_log" -1
 fi
@@ -119,12 +120,17 @@ sleep 10
 if [[ `ps -e | grep $PUSHGATEWAY_PROC_ID` == "" ]]; then
     echo " !! Failed to start Pushgateway !!"
     cat /tmp/prometheus_run_log
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Pushgateway"
 kill -15 $PUSHGATEWAY_PROC_ID
 export PUSHGATEWAY_PROC_ID=-1
+
+
+echo " - Cleaning build directory"
+rm -Rf /tmp/prometheus_pe_setup
+returned_to_saved_dir
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

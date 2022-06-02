@@ -55,6 +55,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/grafana_setup
 mkdir -p /tmp/grafana_setup
 cd /tmp/grafana_setup
 
@@ -163,6 +164,10 @@ export GRAFANA_PROC_ID=-1
 
 echo " - Moving grafana plugins to grafana directory"
 sudo mv /var/lib/grafana/plugins /usr/local/lib/grafana/
+
+echo " - Cleaning build directory"
+cd $saved_dir
+rm -Rf /tmp/grafana_setup
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

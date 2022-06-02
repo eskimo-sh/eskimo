@@ -55,6 +55,7 @@ trap returned_to_saved_dir ERR
 
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/kb_setup
 mkdir -p /tmp/kb_setup
 cd /tmp/kb_setup
 
@@ -173,6 +174,7 @@ export KIBANA_PROC_ID=-1
 #kill -15 $ES_PROC_ID
 #export ES_PROC_ID=-1
 
+echo " - Cleaning build directory"
 sudo rm -Rf /tmp/kb_setup
 returned_to_saved_dir
 

@@ -53,6 +53,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/zeppelin_setup_dep/
 mkdir -p /tmp/zeppelin_setup_dep/
 cd /tmp/zeppelin_setup_dep/
 

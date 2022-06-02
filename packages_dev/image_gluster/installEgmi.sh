@@ -47,6 +47,20 @@ if [ -z "$EGMI_VERSION" ]; then
 fi
 
 
+saved_dir=`pwd`
+function returned_to_saved_dir() {
+     cd $saved_dir
+}
+trap returned_to_saved_dir 15
+trap returned_to_saved_dir EXIT
+trap returned_to_saved_dir ERR
+
+echo " - Changing to temp directory"
+rm -Rf /tmp/egmi_setup
+mkdir -p /tmp/egmi_setup
+cd /tmp/egmi_setup
+
+
 echo " - Testing if local EGMI is found "
 export EGMI_LOCAL_ARCHIVE=
 for i in `find /tmp -name 'egmi*tar.gz'`; do
@@ -57,23 +71,10 @@ if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
 fi
 
 
-
-
-saved_dir=`pwd`
-function returned_to_saved_dir() {
-     cd $saved_dir
-}
-trap returned_to_saved_dir 15
-trap returned_to_saved_dir EXIT
-trap returned_to_saved_dir ERR
-
-echo " - Changing to temp directory"
-mkdir -p /tmp/egmi_setup
-cd /tmp/egmi_setup
-
 if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
     echo " - Using local archive"
-    mv $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION-bin.tar.gz
+    rm -f egmi-$EGMI_VERSION-bin.tar.gz
+    mv -f $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION-bin.tar.gz
 else
     echo " - Downloading archive egmi-$EGMI_VERSION"
     wget "https://github.com/eskimo-sh/egmi/releases/download/$EGMI_VERSION/egmi-"$EGMI_VERSION"-bin.tar.gz" > /tmp/egmi_install_log 2>&1
@@ -100,6 +101,9 @@ fail_if_error $? "/tmp/egmi_install_log" -2
 
 echo " - Checking EGMI Installation"
 
+echo "   + cleaning up previous execution state"
+sudo rm -Rf /tmp/test
+
 echo "   + temporary messing with config file"
 sudo cp /usr/local/lib/egmi/conf/egmi.properties /usr/local/lib/egmi/conf/egmi.properties.bak
 
@@ -124,10 +128,12 @@ fi
 echo "   + Restoring config file"
 sudo mv -f /usr/local/lib/egmi/conf/egmi.properties.bak /usr/local/lib/egmi/conf/egmi.properties
 
+echo " - Cleaning build directory"
 sudo rm -Rf /tmp/egmi_setup
 returned_to_saved_dir
 
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
+rm -Rf /tmp/egmi_setup
 echo " - In container install SUCCESS"

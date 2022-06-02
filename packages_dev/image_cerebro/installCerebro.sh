@@ -59,6 +59,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+sudo rm -Rf /tmp/cerebro_setup/
 mkdir -p /tmp/cerebro_setup/
 cd /tmp/cerebro_setup/
 
@@ -119,7 +120,7 @@ echo " - Checking Cerebro startup"
 sleep 10
 if [[ `ps -e | grep $CEREBRO_PROC_ID` == "" ]]; then
     echo " !! Failed to start Cerebro !!"
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Cerebro"

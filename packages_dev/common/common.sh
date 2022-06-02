@@ -120,8 +120,10 @@ check_for_internet() {
         wget https://www.google.com -O /tmp/test.html >/dev/null 2>&1
         if [[ $? != 0 ]]; then
             echo "No internet connection available"
+            rm -Rf /tmp/test.html
             exit 10
         fi
+        rm -Rf /tmp/test.html
     else
         echo "No wget command available"
         exit 11
@@ -279,7 +281,11 @@ function build_image() {
         export TMP_FOLDER=$BUILD_TEMP_FOLDER
 
         echo " - making sure I can write in $BUILD_TEMP_FOLDER"
-        touch $BUILD_TEMP_FOLDER/test > $LOG_FILE 2>&1
+        temp_file_created=`mktemp`
+        rm -Rf $temp_file_created
+        temp_file_name=`basename $temp_file_created`
+
+        touch $BUILD_TEMP_FOLDER/$temp_file_name > $LOG_FILE 2>&1
         fail_if_error $? $LOG_FILE -11
     fi
 

@@ -55,6 +55,7 @@ trap returned_to_saved_dir ERR
 
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/prometheus_setup
 mkdir -p /tmp/prometheus_setup
 cd /tmp/prometheus_setup
 
@@ -121,6 +122,10 @@ echo " - Stopping Prometheus"
 kill -15 $PROMETHEUS_PROC_ID
 export PROMETHEUS_PROC_ID=-1
 
+
+echo " - Cleaning build directory"
+rm -Rf /tmp/prometheus_setup
+returned_to_saved_dir
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo " - In container install SUCCESS"

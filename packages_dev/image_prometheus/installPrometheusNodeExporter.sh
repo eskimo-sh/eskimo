@@ -59,6 +59,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/prometheus_ne_setup
 mkdir -p /tmp/prometheus_ne_setup
 cd /tmp/prometheus_ne_setup
 
@@ -66,7 +67,7 @@ echo " - Downloading node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION"
 wget https://github.com/prometheus/node_exporter/releases/download/v$PROMETHEUS_NODE_EXPORTER_VERSION/node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad ode_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION from github. Trying to download from niceideas.ch"
-    exit -1
+    exit 1
     #wget http://niceideas.ch/mes/prometheus-$PROMETHEUS_VERSION.tar.gz >> /tmp/prometheus_install_log 2>&1
     #fail_if_error $? "/tmp/prometheus_install_log" -1
 fi
@@ -118,12 +119,17 @@ sleep 10
 if [[ `ps -e | grep $NODE_EXPORTER_PROC_ID` == "" ]]; then
     echo " !! Failed to start Node Exporter !!"
     cat /tmp/prometheus_run_log
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Node Exporter"
 kill -15 $NODE_EXPORTER_PROC_ID
 export NODE_EXPORTER_PROC_ID=-1
+
+
+echo " - Cleaning build directory"
+rm -Rf /tmp/prometheus_ne_setup
+returned_to_saved_dir
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

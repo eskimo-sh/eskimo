@@ -98,7 +98,6 @@ public class StandardSetupHelpers {
             put("service_elasticsearch_192-168-10-13", "OK");
             put("service_gluster_192-168-10-11", "OK");
             put("service_gluster_192-168-10-13", "OK");
-            put("service_marathon_192-168-10-11", "OK");
             put("service_kafka_192-168-10-11", "OK");
             put("service_kafka_192-168-10-13", "OK");
             put("service_kafka-manager_192-168-10-11", "OK");

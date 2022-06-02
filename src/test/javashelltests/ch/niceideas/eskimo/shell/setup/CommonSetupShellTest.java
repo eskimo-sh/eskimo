@@ -292,7 +292,7 @@ public class CommonSetupShellTest {
                 "   + Decompressing archive\n" +
                 "   + Docker loading archive\n" +
                 " - Killing any previous containers\n" +
-                " - Building docker container\n", result);
+                " - Building docker container from image eskimo:cerebro\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
         if (StringUtils.isNotBlank(dockerLogs)) {

@@ -54,7 +54,6 @@ eskimo.Main = function() {
     let eskimoServices = null;
     let eskimoServicesSelection = null;
 
-    /* @Deprecated To Be renamed */
     let eskimoKubernetesServicesSelection = null;
     let eskimoKubernetesServicesConfig = null;
 

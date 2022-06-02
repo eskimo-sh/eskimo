@@ -51,6 +51,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/gluster_setup
 mkdir -p /tmp/gluster_setup
 cd /tmp/gluster_setup
 

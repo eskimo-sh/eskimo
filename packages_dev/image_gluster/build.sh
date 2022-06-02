@@ -74,6 +74,7 @@ if [[ -d "$SCRIPT_DIR/../../../EGMI/target" ]]; then
         echo "   + Copying "`basename $i`
         docker cp $i gluster_template:/tmp/`basename $i`  > /tmp/gluster_build_log 2>&1
         fail_if_error $? "/tmp/gluster_build_log" 6
+        break # stopping at first one
     done
 fi
 

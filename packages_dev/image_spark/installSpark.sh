@@ -55,6 +55,7 @@ trap returned_to_saved_dir ERR
 
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/spark_setup
 mkdir -p /tmp/spark_setup
 cd /tmp/spark_setup
 
@@ -94,6 +95,7 @@ echo " - Checking Spark Installation"
 fail_if_error $? "/tmp/spark_run_log" -3
 
 
+echo " - Cleaning build directory"
 sudo rm -Rf /tmp/spark_setup
 returned_to_saved_dir
 

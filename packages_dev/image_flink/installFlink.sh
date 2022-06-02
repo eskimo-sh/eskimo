@@ -74,6 +74,7 @@ trap returned_to_saved_dir EXIT
 trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
+rm -Rf /tmp/flink_setup
 mkdir -p /tmp/flink_setup
 cd /tmp/flink_setup
 

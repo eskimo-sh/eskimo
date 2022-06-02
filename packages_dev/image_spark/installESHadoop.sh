@@ -113,6 +113,7 @@ fi
 echo " - Cleaning up maven repository"
 sudo rm -Rf $HOME/.m2/repository
 
+echo " - Cleaning build directory"
 sudo rm -Rf /tmp/eshadoop_setup
 returned_to_saved_dir
 

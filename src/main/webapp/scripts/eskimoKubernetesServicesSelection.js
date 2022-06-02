@@ -35,7 +35,7 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
-/* @Deprecated To Be renamed */
+
 eskimo.KubernetesServicesSelection = function() {
 
     // will be injected eventually from constructorObject

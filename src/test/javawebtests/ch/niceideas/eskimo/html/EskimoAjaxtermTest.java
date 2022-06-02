@@ -109,8 +109,8 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
         ((HtmlDivision)page.getElementById("test-term")).type("a");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
-        //Thread.sleep (2000);
+        //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        Thread.sleep (2000);
         assertJavascriptEquals("./terminal?node=test", "window.xhrOpenedOn");
 
         assertJavascriptEquals("a", "$('.screen div:first-child').html()");
@@ -120,7 +120,8 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
     public void testOnKeyDown_a() throws Exception {
         // a
         js("var e = jQuery.Event(\"keypress\"); e.which = 65; $('#test-term').trigger(e);");
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        Thread.sleep (2000);
         assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=A&t=0"));
     }
 
@@ -128,7 +129,8 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
     public void testOnKeyDown_F1() throws Exception {
         // a + alt key
         js("var e = jQuery.Event(\"keypress\"); e.keyCode = 112; e.which = 0; $('#test-term').trigger(e);");
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        Thread.sleep (2000);
         assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=%1B%5B%5BA&t=0"));
     }
 
@@ -136,7 +138,8 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
     public void testOnKeyDown_backspace() throws Exception {
         // a + alt key
         js("var e = jQuery.Event(\"keypress\"); e.keyCode = 8; e.which = 0; $('#test-term').trigger(e);");
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
+        Thread.sleep (2000);
         assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=%7F&t=0"));
     }
 
