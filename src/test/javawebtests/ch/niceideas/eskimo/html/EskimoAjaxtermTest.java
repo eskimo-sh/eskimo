@@ -87,6 +87,7 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
     @AfterEach
     public void tearDown() throws Exception {
         // need to restore this for further code which require it
+        // it's impossible for me to figure, but without this the github build completes in ... multiple jours.
         js("window.XMLHttpRequest = window.XMLHttpRequestBAK;");
     }
 

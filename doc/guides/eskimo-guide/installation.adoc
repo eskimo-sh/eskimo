@@ -15,8 +15,8 @@ The eskimo backend itself can either be installed:
 
 * on one of the nodes from the eskimo cluster (for instance one of the node where master services will be installed). +
 Doing so is however not recommended since that node would need to have the HTTP port on which Eskimo is listening opened
-to external accesses and in addition Eskimo would eat some of the resources (RAM and disk) that would be better left to
-the business services.
+to external accesses (which is against eskimo's philisophy) and in addition Eskimo would eat some of the resources (RAM
+and disk) that would be better left to the business services.
 * or on a dedicated node where only the eskimo backend runs (i.e. separated from the Eskimo cluster nodes). This is the
 recommended approach.
 
@@ -132,8 +132,8 @@ Linux distributions successfully tested with Eskimo and officially supported are
 * Debian Stretch and greater
 * Ubuntu Xenial and greater
 * CentOS 7.x and 8.x
-* Fedora 29 and greater
 * OpenSUSE 15.1 and greater
+* RHEL 8.2 and greater
 
 Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far and may require the
 administrator to adapt the setup scripts located in `services_setup`.
