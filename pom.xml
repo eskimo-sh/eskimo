@@ -328,9 +328,13 @@ Software.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.0.0-M6</version>
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <environmentVariables>
+                        <LANG>C</LANG>
+                        <LC_ALL>C</LC_ALL>
+                    </environmentVariables>
                 </configuration>
             </plugin>
 

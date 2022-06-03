@@ -366,7 +366,6 @@ public class SettingsInjectorTest {
 
         // ensure nothing's found
         assertTrue(result.endsWith("== finding filenames\n"));
-
     }
 
 

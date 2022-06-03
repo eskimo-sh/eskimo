@@ -72,6 +72,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @BeforeEach
     public void setUp() throws Exception {
+
         setupService = new SetupService();
         String tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);

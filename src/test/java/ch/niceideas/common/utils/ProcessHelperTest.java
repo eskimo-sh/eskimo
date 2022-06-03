@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProcessHelperTest {
 
-
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
