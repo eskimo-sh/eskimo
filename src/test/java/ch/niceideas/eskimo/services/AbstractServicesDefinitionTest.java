@@ -347,7 +347,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceC = new Service();
         serviceC.setName("service_c");
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
-        serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLECTABLE);
+        serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLIGIBLE);
         def.addService(serviceC);
 
         Service serviceD = new Service();
@@ -380,7 +380,7 @@ public abstract class AbstractServicesDefinitionTest {
         Service serviceC = new Service();
         serviceC.setName("service_c");
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
-        serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLECTABLE);
+        serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLIGIBLE);
         def.addService(serviceC);
 
         Service serviceD = new Service();

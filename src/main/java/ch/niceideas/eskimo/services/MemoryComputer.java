@@ -106,7 +106,7 @@ public class MemoryComputer {
 
             long totalMemory = entry.getValue();
 
-            // 2..1  Compute total amount of memory shards (high = 3, medium = 2, small = 1, neglectable = 0)
+            // 2..1  Compute total amount of memory shards (high = 3, medium = 2, small = 1, negligible = 0)
             //       assume filesystem cache has to keep a high share (3) or medium share (2) => dynamical
             Set<String> services = new HashSet<>(nodesConfig.getServicesForNode(node));
 

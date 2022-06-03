@@ -171,7 +171,7 @@ public class ServicesDefinition implements InitializingBean {
 
             String memoryConsumptionString = (String) servicesConfig.getValueForPath(serviceString+".config.memory");
             service.setMemoryConsumptionSize(StringUtils.isBlank(memoryConsumptionString) ?
-                    MemoryConsumptionSize.NEGLECTABLE :
+                    MemoryConsumptionSize.NEGLIGIBLE :
                     MemoryConsumptionSize.valueOf(memoryConsumptionString.toUpperCase()));
 
             service.setLogo((String) servicesConfig.getValueForPath(serviceString+".config.logo"));

@@ -58,6 +58,18 @@ cd $tmp_dir
 # Making /root/.kube/config available
 export HOME=/root
 
+echo "   + Creating runtime resolv.conf"
+
+# copy resolve.conf somewhere else and remove 127.0.0.x (and add 8.8.8.8 if it now has no nameserve ranymore)
+# and use that one if it contains 12.0.0.X and other stuff
+# Copy it to /etc/k8s/resolv.conf
+cat /etc/resolv.conf | sed s/'nameserver 127.0.0.*'//g > /etc/k8s/resolv.conf
+
+# if no nameserver remains, add 8.8.8.8
+if [[ `cat /etc/k8s/resolv.conf | grep nameserver` == "" ]]; then
+  echo "nameserver 8.8.8.8" >> /etc/k8s/resolv.conf
+fi
+
 echo "   + Creating runtime core-dns file"
 /bin/cp -f /etc/k8s/services/core-dns.yaml /var/lib/kubernetes/core-dns.yaml
 

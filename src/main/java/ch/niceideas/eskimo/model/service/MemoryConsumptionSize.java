@@ -38,7 +38,7 @@ import lombok.Getter;
 
 public enum MemoryConsumptionSize {
 
-    NEGLECTABLE(0), SMALL(1), MEDIUM(2), LARGE(3), VERYLARGE (5);
+    NEGLIGIBLE(0), SMALL(1), MEDIUM(2), LARGE(3), VERYLARGE (5);
 
     @Getter
     private final int nbrParts;

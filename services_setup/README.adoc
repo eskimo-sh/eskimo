@@ -263,13 +263,13 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     },
 
     ## memory to allocate to the service
-    ## (neglectable means the service is excluded from the memory allocation policy
+    ## (negligible means the service is excluded from the memory allocation policy
     ##  Kubernetes services are accounted specifically:
     ##  - services running on all nodes are account as native services
     ##  - services running as replicaSet are accounted globally and their total
     ##    required memory is divided amongst all nodes.
     ## )
-    "memory": "[neglectable|small|medium|large|verylarge]",
+    "memory": "[negligible|small|medium|large|verylarge]",
 
     ## [mandatory] The logo to use whenever displaying the service in the UI is
     ##     required
@@ -361,6 +361,36 @@ A service declaration in `services.json` for instance for `serviceX` would be de
         ## [mandatory] replacement text
         "target" : "{proxied_URL}" ## e.g. "/eskimo/kibana/API"
       }
+    ],
+
+     ## [optional] List of page scripter
+     ## Page scripts are added to the target resource just aboce the closing 'body'
+     ## tag
+    "pageScripters" : [
+      {
+
+        # [mandatory] the target resource where the script should be added
+        "resourceUrl" : "{relative path to target resource}",
+
+        # [mandatpry] content of the 'script' tag to be added
+        "script": "{javascript script}"
+      }
+    ],
+
+    ## [optional] list of URL in headers (e.g. for redirects) that should be
+    ## rewritten
+    "urlRewriting" : [
+      {
+
+        # [mandatory] the start pattern of the URL to be searched in returned headers
+        "startUrl" : "{searched prefix}" ## e.g. "{APP_ROOT_URL}/history/",
+
+        # [mandatory] the replacement for that pattern
+        "replacement" : "{replacement}" ## e.g.
+                                   ## "{APP_ROOT_URL}/spark-history-server/history/"
+      }
+    ]
+
   },
 
   ## [optional] array of dependencies that need to be available and configured
@@ -605,7 +635,7 @@ This setting only applies to native (or SystemD) services, marathon services mem
 
 The possible values for that property are as follows :
 
-* `neglectable` : the service is not accounted in memory allocation
+* `negligible` : the service is not accounted in memory allocation
 * `small` : the service gets a single share of memory
 * `medium` : the service gets two shares of memory
 * `large` : the service gets three shares of memory
@@ -615,18 +645,29 @@ to every service by dividing it amongst shares and allocating the corresponding 
 Of course, the system first removes from the available memory a significant portion to ensure some room for kernel and
 filesystem cache.
 
+Also, Kubernetes servcies deployed as statefulSet on ever node are accounted on every node; while unique kubernetes
+services are accounted only partially, with a reat corresponding to the amount of memory it would take divided by the
+number of nodes. +
+Since unique Kubernetes services are spread among nodes, this works well in practice and is realistic.
+
 ===== Examples of memory allocation
 
 Let's imagine the following services installed on a cluster node, along with their memory setting:
 
-* *ntp* - neglectable
-* *prometheus* - neglectable
-* *gluster* - neglectable
-* *mesos agent* - *verylarge*
+Native services :
+
+* *ntp* - negligible
+* *prometheus* - negligible
+* *gluster* - negligible
+* *zookeeper* - small
+
+Kubernetes services :
+
 * *elasticsearch* - large
 * *logstash* - small
-* *kafka* - medium
-* *zookeeper* - neglectable
+* *kafka* - large
+* *kibana* - medium
+* *zeppelin* - very large
 
 The following table gives various examples in terms of memory allocation for three different total RAM size values on the
 cluster node running these services. +
@@ -635,59 +676,39 @@ size of total RAM.
 
 [width="80%",frame="topbot",options="header"]
 |===================
-| Node total RAM                | 8 Gb  | 16 Gb | 20 Gb
-| *ntp*                         |  -    |  -    |  -
-| *prometheus*                  |  -    |  -    |  -
-| *gluster*                     |  -    |  -    |  -
-| *mesos agent*                 | 2500m | 5357m | 6786m
-| *elasticsearch*               | 1500m | 3214m | 4071m
-| *logstash*                    |  500m | 1071m | 1357m
-| *kafka*                       | 1000m | 2143m | 2714m
-| *zookeeper*                   |  -    |  -    |  -
-| *_Filesystem cache reserve_*  | 1500m | 3214m | 4071m
-| *_OS reserve_*                | 1000m | 1000m | 1000m
+| Node total RAM                | Nbr. parts | 8 Gb node | 16 Gb node | 20 Gb node
+|                               |       |       |       |
+| *ntp*                         |   0   |  -    |  -    |  -
+| *prometheus*                  |   0   |  -    |  -    |  -
+| *gluster*                     |   0   |  -    |  -    |  -
+| *zookeeper*                   |   1   |  525m | 1125m | 1425m
+|                               |       |       |       |
+| *elasticsearch*               |   3   | 1575m | 3375m | 4275m
+| *logstash*                    |   1   |  525m | 1125m | 1425m
+| *kafka*                       |   3   | 1575m | 3375m | 4275m
+| *kibana*                      |  2/3*  |  350m |  750m | 950m
+| *zeppelin*                    |  5/3*  |  875m | 1875m | 2375m
+|                               |       |       |       |
+| *_Filesystem cache reserve_*  |   3   | 1575m | 3375m | 4275m
+| *_OS reserve_*                |   -   | 1000m | 1000m | 1000m
 |===================
 
-*Importantly*, all marathon services - such as Kibana, Cerebro, Kafka-manager, etc. - as well as all services operated by mesos -
-such as the spark executors and flink workers - don't get any specific amount of memory assigned here. +
-*Instead, they share the memory available for mesos-agents accross all nodes.* +
-The amount of memory they will request from mesos is explained in the next section.
+(*For 3 nodes)
 
-===== Marathon services memory configuration
+The services Kibana and Zeppelin are unique services running on Kubernetes, this example above accounts that there would
+be 3 nodes in the clzster, hence their memory share is split by 3 on each node.
 
-Marathon services define the memory they will request from mesos in the *marathon service configuration file*.
+===== Kubernetes services memory configuration
 
-For Instance the file `cerebro.marathon.json` configures the resources that _Cerebro_ will request from Mesos as follows:
+The memory configures above is injected directly in the services themselves, without any consideration for the memory
+requested by the corresponding Kubernetes POD. One should take that into account and declare a comparable amount of
+memory when declaring the requested POD memory for Kubernetes Services.
+In fact, one should declare a little more memory as Kubernetes requested memory for POD accounting for overhead.
 
-.portion of cerebro.marathon.json
-----
-{
-  "id": "cerebro",
-  "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.1,
-  "mem": 300,
-  "disk": 100,
-  "instances": 1,
-  ...
-----
+===== Custom memory allocation
 
-So cerebro requests only 300 MB from Mesos.
-
-Another example would be the Zeppelin configuration file:
-
-.portion of zeppelin.marathon.json
-----
-{
-  "id": "zeppelin",
-  "cmd": "/usr/local/sbin/inContainerStartService.sh",
-  "cpus": 0.5,
-  "mem": 4500,
-  "disk": 800,
-  "instances": 1,
-  ...
-----
-
-So Zeppelin request 4.5 GB of RAM from mesos (which wouldn't be sufficient in a production environment BTW.)
+Every Eskimo service provides a mean to administrator to specify the memory the service process should be using in the
+*Eskimo Service Settings* Configuration page.
 
 
 ==== Topology file on cluster nodes
@@ -816,18 +837,7 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-// marker for exclusion : line 830
+// marker for exclusion : line 840
 
 
 

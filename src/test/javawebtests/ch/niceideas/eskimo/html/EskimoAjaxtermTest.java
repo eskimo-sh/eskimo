@@ -118,29 +118,55 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
     @Test
     public void testOnKeyDown_a() throws Exception {
-        // a
         js("var e = jQuery.Event(\"keypress\"); e.which = 65; $('#test-term').trigger(e);");
         //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
-        Thread.sleep (2000);
-        assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=A&t=0"));
+        //Thread.sleep (2000);
+        // active wait
+        boolean found = false;
+        for (int i = 0; i < 100; i++) { // 10 seconds
+            String sentData = js("window.ajtData").getJavaScriptResult().toString();
+            Thread.sleep(100);
+            if (sentData.endsWith("k=A&t=0")) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
     @Test
     public void testOnKeyDown_F1() throws Exception {
-        // a + alt key
         js("var e = jQuery.Event(\"keypress\"); e.keyCode = 112; e.which = 0; $('#test-term').trigger(e);");
         //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
-        Thread.sleep (2000);
-        assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=%1B%5B%5BA&t=0"));
+        //Thread.sleep (2000);
+        // active wait
+        boolean found = false;
+        for (int i = 0; i < 100; i++) { // 10 seconds
+            String sentData = js("window.ajtData").getJavaScriptResult().toString();
+            Thread.sleep(100);
+            if (sentData.endsWith("k=%1B%5B%5BA&t=0")) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
     @Test
     public void testOnKeyDown_backspace() throws Exception {
-        // a + alt key
         js("var e = jQuery.Event(\"keypress\"); e.keyCode = 8; e.which = 0; $('#test-term').trigger(e);");
         //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
-        Thread.sleep (2000);
-        assertTrue(js("window.ajtData").getJavaScriptResult().toString().endsWith("k=%7F&t=0"));
+        // active wait
+        boolean found = false;
+        for (int i = 0; i < 100; i++) { // 10 seconds
+            String sentData = js("window.ajtData").getJavaScriptResult().toString();
+            Thread.sleep(100);
+            if (sentData.endsWith("k=%7F&t=0")) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
 }

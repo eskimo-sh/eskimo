@@ -65,7 +65,7 @@ data:
             ttl 30
         }
         prometheus :9153
-        forward . 8.8.8.8
+        forward . /etc/k8s/resolv.conf
         loop
         cache 30        
         reload
@@ -73,6 +73,7 @@ data:
     }
 
 # originally : forward . /etc/resolv.conf
+# also tried : forward . 8.8.8.8
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -129,6 +130,9 @@ spec:
             - name: config-volume
               mountPath: /etc/coredns
               readOnly: true
+            - name: etc-k8s
+              mountPath: /etc/k8s
+              readOnly: true
           ports:
             - containerPort: 53
               name: dns
@@ -163,6 +167,9 @@ spec:
               scheme: HTTP
       dnsPolicy: Default
       volumes:
+        - name: etc-k8s
+          hostPath:
+            path: /etc/k8s
         - name: config-volume
           configMap:
             name: coredns

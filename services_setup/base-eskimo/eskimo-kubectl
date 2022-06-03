@@ -58,12 +58,46 @@ if [[ $TEST_MODE != "true" ]]; then
     . /etc/eskimo_topology.sh
 fi
 
-# FIXME implement retry policy on every call to kubectl (implement a function call_kubectl)
-MULTIPLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$'`
-SINGLE_SERVICES_PODS=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$'`
 
-MULTIPLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$' | sed 's/\([a-z]*\).*/\1/'`
-#SINGLE_SERVICES_NAMES=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$' | sed 's/\([a-z\-]\+\)-[a-z0-9]\+-[a-z0-9]\+/\1/'`
+function call-kubectl () {
+    # all args as "$@"
+    tmpfile=$(mktemp /tmp/kube-ctl-error-logs.XXXXXX)
+
+    for i in `seq 1 4`; do
+
+        result=`kubectl "$@" 2> $tmpfile`
+        retCode=$?
+
+        if [[ $retCode == 0 ]]; then
+            if [[ "$result" != "" ]]; then
+                echo "$result"
+            fi
+            cat $tmpfile 2>&1
+            #rm -f $tmpfile
+            return 0
+        fi
+
+        if [[ `cat $tmpfile | grep "did you specify the right host or port"` != "" && $i -lt 4 ]]; then
+            # kube-api is not answering, retry in 4 seconds
+            sleep 4
+        else
+
+            if [[ "$result" != "" ]]; then
+                echo "$result"
+            fi
+            cat $tmpfile 2>&1
+            #rm -f $tmpfile
+            return $retCode
+        fi
+    done
+}
+
+
+MULTIPLE_SERVICES_PODS=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$'`
+SINGLE_SERVICES_PODS=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$'`
+
+MULTIPLE_SERVICES_NAMES=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$' | sed 's/\([a-z]*\).*/\1/'`
+#SINGLE_SERVICES_NAMES=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$' | sed 's/\([a-z\-]\+\)-[a-z0-9]\+-[a-z0-9]\+/\1/'`
 
 
 function get_multiple_service_pod() {
@@ -92,7 +126,7 @@ function get_multiple_service_pod() {
 
     CANDIDATES=`echo "$MULTIPLE_SERVICES_PODS" | grep $SERVICE`
     IFS=$'\n'
-    for pod in `kubectl get pods --all-namespaces -o custom-columns=NAME:metadata.name,NODE:status.hostIP`; do
+    for pod in `call-kubectl get pods --all-namespaces -o custom-columns=NAME:metadata.name,NODE:status.hostIP`; do
         for candidate in `echo "$CANDIDATES"`; do
             if [[ `echo $pod | grep $candidate` != "" ]]; then
                 #FOUND_NODE=`echo $pod | sed 's/ \+/ /' | cut -d ' ' -f 2`
@@ -154,7 +188,7 @@ function get_namespace() {
     fi
     POD=$1
 
-    NAMESPACE=`kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace | grep $POD | sed 's/  \+/ /g' | cut -d ' ' -f 2`
+    NAMESPACE=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace | grep $POD | sed 's/  \+/ /g' | cut -d ' ' -f 2`
     if [[ "$NAMESPACE" == "" ]]; then
         echo "ERROR: Couldn't get namespace for pod $POD"
         exit 2
@@ -198,7 +232,7 @@ function show_log() {
 
     echo "   + NAMESPACE is $NAMESPACE"
 
-    kubectl -n $NAMESPACE logs $POD
+    call-kubectl -n $NAMESPACE logs $POD
 }
 
 
@@ -219,7 +253,7 @@ function uninstall_service() {
     fi
 
     echo "   + Deleting $SERVICE"
-    envsubst < $SERVICE_FILE | kubectl delete -f -
+    envsubst < $SERVICE_FILE | call-kubectl delete -f -
 
     echo "   + Deleting service file"
     sudo rm -f $SERVICE_FILE
@@ -240,10 +274,10 @@ function restart_service() {
 
     if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
         echo "   + Deleting $SERVICE"
-        envsubst < $SERVICE_FILE | kubectl delete -f -
+        envsubst < $SERVICE_FILE | call-kubectl delete -f -
 
         echo "   + (Re-)applying $SERVICE"
-        envsubst < $SERVICE_FILE | kubectl apply -f -
+        envsubst < $SERVICE_FILE | call-kubectl apply -f -
     fi
 }
 
@@ -282,12 +316,12 @@ function stop_service() {
     if [[ $IS_MULTIPLE ]]; then
 
         echo "   + Deleting statefulset $SERVICE"
-        kubectl -n $NAMESPACE delete statefulset $SERVICE
+        call-kubectl -n $NAMESPACE delete statefulset $SERVICE
 
     else
 
         echo "   + Deleting deployment $SERVICE"
-        kubectl -n $NAMESPACE delete deployment $SERVICE
+        call-kubectl -n $NAMESPACE delete deployment $SERVICE
     fi
 }
 
@@ -309,7 +343,7 @@ function start_service() {
     fi
 
     echo "   + (Re-)applying $SERVICE"
-    envsubst < $SERVICE_FILE | kubectl apply -f -
+    envsubst < $SERVICE_FILE | call-kubectl apply -f -
 }
 
 
