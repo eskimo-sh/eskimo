@@ -117,6 +117,9 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
         assertJavascriptEquals("./terminal?node=test", "window.xhrOpenedOn");
 
         assertJavascriptEquals("a", "$('.screen div:first-child').html()");
+
+        // need to restore this for further code which require it
+        js("window.XMLHttpRequest = window.XMLHttpRequestBAK;");
     }
 
     /* This takes 3 hours to run on github ... no ides why.
