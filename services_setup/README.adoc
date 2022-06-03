@@ -629,9 +629,7 @@ Look at other examples to get inspired.
 Another pretty important property in a service configuration in `services.json` is the memory consumption property:
 `memory`.
 
-This setting only applies to native (or SystemD) services, marathon services memory is defined in another way.
-
-===== Native (SystemD) services memory configuration
+===== Services memory configuration
 
 The possible values for that property are as follows :
 
@@ -645,8 +643,8 @@ to every service by dividing it amongst shares and allocating the corresponding 
 Of course, the system first removes from the available memory a significant portion to ensure some room for kernel and
 filesystem cache.
 
-Also, Kubernetes servcies deployed as statefulSet on ever node are accounted on every node; while unique kubernetes
-services are accounted only partially, with a reat corresponding to the amount of memory it would take divided by the
+Also, Kubernetes services deployed as statefulSet on every node are accounted on every node; while unique kubernetes
+services are accounted only partially, with a ratio corresponding to the amount of memory it would take divided by the
 number of nodes. +
 Since unique Kubernetes services are spread among nodes, this works well in practice and is realistic.
 
@@ -718,27 +716,23 @@ generate for every node of the cluster a "*topology definition file*".
 
 That topology definition file defines all the dependencies and where to find them (using the notion of MASTER) for every
 service running on every node.
+It also gives indications about the last known services installation status along with kubernetes memory and cpu
+requests, etc.
 
 The "topology definition file" can be fond on nodes in `/etc/eskimo_topology.sh`.
 
 [[proxying]]
 === Proxying services web consoles
 
-Many services managed by eskimo have web consoles used to administer them, such as mesos-agents, mesos-master,
+Many services managed by eskimo have web consoles used to administer them, such as the kubernetes dashboard, cerebro,
 kafka-manager, etc.
 Some are even only web consoles used to administer other services or perform Data Science tasks, such as Kibana,
 Zeppelin or EGMI, etc.
 
-Eskimo supports two modes for providing these web consoles in its own UI as presented in configuration above:
-
-1. (A) Configuration of an `urlTemplate` which is used by eskimo to show an iframe displaying directly the web console
-from the node on which it is installed. *This method is supported for backwards compatibility purpose but it is not
-recommended*
-2. (B) Configuration of a `proxyTargetPort` for full proxying and tunnelling (using SSH) of the whole HTTP flow to the
-web console using eskimo embedded proxying and tunneling feature. *This is the recommended way* and this is the way
-used by all eskimo pre-packaged services and web consoles.
-
-Proxying works as explained  in the User Guide in the section "SSH Tunnelling".
+With Eskimo, these consoles, either running natively or managed by kubernetes, are reach from within Eskimo and can be
+completely isolated from the client network. +
+Eskimo provides these Graphical User Interfaces in its own UI and proxies the backend call through SSH tunnels to the
+actual service.
 
 Proxying is however a little more complicated to set up since eskimo needs to perform a lot of rewriting on the text
 resources (javascript, html and json) served by the proxied web console to rewrite served URLs to make them pass
@@ -747,7 +741,14 @@ through the proxy.
 Eskimo provides a powerful rewrite engine that one can use to implement the rewrite rules defined in the configuration
 as presented above.
 
-==== Rewrite rules
+*The minimum configuration that needs to be given to put in place a proxy for a service is to give a value to the
+property `[serviceName].ui.proxyTargetPort` indicating the target port where to find the service (either on the cluster
+npdes where it runs or through the Kubernetes proxy.).*
+
+The different possibilities to configure rewrite rules and replacements are presented above in the section
+<<services_json>>.
+
+==== Source text replacements
 
 Proxying web consoles HTTP flow means that a lot of the text resources served by the individual target web consoles
 need to be processed in such a way that absolute URLs are rewritten.
@@ -755,18 +756,18 @@ This is unfortunately tricky and many different situations can occur, from URL b
 resources URLs in CSS files for instance.
 
 An eskimo service developer needs to analyze the application, debug it and understand every pattern that needs to be
-replaced and define a *rewrite rule* for each of them.
+replaced and define a *proxy replacement* for each of them.
 
-==== Standard rewrite rules
+===== Standard replacements
 
-A set of standard rewrite rules are implemented once and for all by the eskimo HTTP proxy for all services. By default
+A set of standard proxy replacements are implemented once and for all by the eskimo HTTP proxy for all services. By default
 these standard rewrite rules are enabled for a service unless the service config declares
 `"applyStandardProxyReplacements": false` in which case they are not applied to that specific service. +
 This is useful when a standard rule is actually harming a specific web console behaviour.
 
-The standard rewrite rules are as follows:
+The standard replacements are as follows:
 
-.Standard rewrite rules
+.Standard replacements
 ----
 
 {
@@ -816,7 +817,7 @@ The standard rewrite rules are as follows:
 },
 ----
 
-==== Custom rewrite rules
+===== Custom replacements
 
 In addition to the standard rewrite rules - that can be used or not by a service web console - an eskimo service
 developer can define as many custom rewrite rules as he wants in the service configuration in `services.json` as
@@ -829,6 +830,36 @@ are searched, respectively injected, in the text stream:
 instance `eskimo`
 * `PREFIX_PATH` will be resolved by the specific context path of the service web console context, such as for instance
 for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no context root is used.
+* `APP_ROOT_URL` will be resolved to the full URL used to reach eskimo, e.g. `http://localhost:9191/eskimo`
+
+
+==== URL rewriting
+
+URL rewriting is another mechanism available to fine tune eskimo proxying. +
+Sometimes, a service backend sends a redirect (HTTP code 302 or else) to an absolute URL. In such cases, the absolute
+URL needs to be replaced by the corresponding sub-path in the eskimo context.
+
+This is achieved using URL rewriting rules.
+
+.URL rewriting rule example for spark-history-server
+----
+
+      "urlRewriting" : [
+        {
+          "startUrl" : "{APP_ROOT_URL}/history/",
+          "replacement" : "{APP_ROOT_URL}/spark-history-server/history/"
+        }
+----
+
+The spark history servre uses such redirect when it is loading a spark log file for as long as the spark log file is
+being loaded.
+The rule above takes care or replacing such URL used in the HTTP redirect.
+
+
+==== Page scripters
+
+Page scripters form a third mechanism aimed at customizing the behaviour of proxied application. They consists of
+declaring a javascript snippet that is injected at the bottom of the `body` tag in the referenced HTML document.
 
 
 
@@ -836,8 +867,7 @@ for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no conte
 
 
 
-
-// marker for exclusion : line 840
+// marker for exclusion : line 870
 
 
 
