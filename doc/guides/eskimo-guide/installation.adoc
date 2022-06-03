@@ -162,43 +162,6 @@ capacity for this node is as follows:
 * 32 GB RAM (64 GB RAM recommended)
 
 
-===== Latest Fedora and Debian Bullseye (or greater) nodes specificities
-
-Latest Fedora as well as Debian from version Bullseye have switched to cgroups v2 by default now,
-but Mesos (and some Docker versions) are not working well with cgroups v2 and may fail to start. +
-With Eskimo and current version of mesos, one needs to revert cgroups to v1 on latest Fedora or
-Debian Bullseye nodes by adding the `systemd.unified_cgroup_hierarchy=0` kernel argument.
-
-.Add systemd.unified_cgroup_hierarchy=0 to the default GRUB config with sed.
-----
-sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
-----
-
-Then rebuild your GRUB config.
-
-.If you’re using BIOS boot
-----
-sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-----
-
-.If you’re running EFI
-----
-sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
-----
-
-With this, the _Mesos Agent_ should be able to start successfully on your fedora nodes after a reboot.
-
-====== How to detect this mesos startup problem ?
-
-If you see the following line in file `/var/log/mesos/mesos-slave.ERROR`:
-
-----
-E0125 11:06:41.591089 112533 main.cpp:497] EXIT with status 1: Failed to initialize systemd: Failed to locate systemd cgroups hierarchy: 'mesos_executors.slice' is not a valid cgroup
-----
-
-Then this is an indication that your system is using CGroups V2 and you might want to apply the procedure above to revert
-back to cgroups V1.
-
 [[eskimo_nodes_required_packages]]
 ==== Required packages installation and Internet access on cluster nodes
 
@@ -233,7 +196,7 @@ add-apt-repository deb [arch=amd64] https://download.docker.com/linux/$LINUX_DIS
 apt-get -yq update
 apt-get -yq install docker-ce docker-ce-cli containerd.io
 
-# mesos dependencies
+# other dependencies
 apt-get -y install libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev
 
 # other dependencies
@@ -264,7 +227,7 @@ yum install -y yum-utils device-mapper-persistent-data lvm2
 yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUTION/docker-ce.repo
 yum install -y docker-ce docker-ce-cli containerd.io
 
-# mesos dependencies
+# other dependencies
 yum install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel
 
 # other dependencies
@@ -284,7 +247,7 @@ sudo zypper --non-interactive refresh | echo 'a'
 # install docker
 sudo zypper install -y docker
 
-# mesos dependencies
+# other dependencies
 sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel
 
 # other dependencies
@@ -325,9 +288,9 @@ In case a firewall (firewalld or simple iptables configuration) is installed on 
 the following port numbers need to be explicitly open (for both UDP and TCP) on every single node in the cluster for
 eskimo access:
 
-*IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE MESOS MASTER. MESOS AGENTS,
-MARATHON, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE FLY
-AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
+*IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE KUBERBNETES INFRASTRUCTURE,
+ELASTICSEARCH, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE
+FLY AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKING.*
 
 *For this reason, whenever the eskimo cluster nodes are protected by a firewall, it is of UTMOST IMPORTANCE that the
 firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
@@ -346,8 +309,7 @@ For the sake of information, the list of static ports used by the different serv
 * [kafka] : 9092, 9093, 9999
 * [kafka-manager] : 22080, 31220
 * [kibana] : 5601, 31561
-* [mesos] : 53, 61003, 61003, 61091, 61420, 62080, 62501, 64000, 5050, 7070, 8101, 8123, 8200, 8201, 8443, 8888, 9090,
-9443, 9990, 15055, 15201, 61053, 61430, 61053
+* [kubernetes] : 2379, 2380, 6443, 8091, 8472, 10250, 10251, 10252, 10255
 * [ntp] 123
 * [prometheus] : 9090, 9091, 9093, 9094, 9100
 * [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
@@ -355,7 +317,6 @@ For the sake of information, the list of static ports used by the different serv
 * [spark-history-server] : 18080, 31810
 * [zeppelin] : 38080, 38081, 31008, 31009
 * [zookeeper] : 2181, 2888, 3888
-* [marathon] : 5000, 28080
 
 Again, this list is incomplete since it doesn't reveal the dynamic port ranges mentioned above.
 
@@ -445,7 +406,7 @@ Upon first run, eskimo needs to be setup before it can be used.
 
 Right after its first start, one single screen is available : *the setup page*. +
 It is the only accessible page as long as initial setup is not properly completed and service
-docker images (plus mesos packages) have not been either downloaded or built.
+docker images (plus kubernetes packages) have not been either downloaded or built.
 
 
 The setup page is as follows:
@@ -460,8 +421,8 @@ access to. The dynamic configuration and state persistence of eskimo will be sto
 managed by eskimo needs to have granted access using SSH Public Key authentication to this user.
 * *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
 in regards to how to generate this key : <<ssh_key_authentication>>
-* *Mesos Origin* : the user needs to choose whether Mesos packages need to be *built locally* (on eskimo host node) or
-whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
+* *Kube Origin* : the user needs to choose whether Kubernetes package need to be *built locally* (on eskimo host node) or
+whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.eskimo.sd.)
 * *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
 they need to be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
 
@@ -595,7 +556,7 @@ usermod -a -G docker $USER
 
 At any time after initial setup - and if and only if the chosen installation method is *downloading* packages, the user
 can _apply setup_ again to check on the packages server (by default https://www.eskimo.sh) if updates are available
-for service docker images or mesos packages.
+for service docker images or kubernetes packages.
 
 === Typical startup issues
 

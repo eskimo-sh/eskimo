@@ -40,6 +40,7 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -68,7 +69,6 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
         js("window.XMLHttpRequestBAK = window.XMLHttpRequest;");
 
-        /*
         js("window.XMLHttpRequest = function() {" +
                 "    this.open = function (method, url) {" +
                 "        window.xhrOpenedOn = url;" +
@@ -82,8 +82,12 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
                 "        window.ajtData = data;" +
                 "    };" +
                 "}");
+    }
 
-         */
+    @AfterEach
+    public void tearDown() throws Exception {
+        // need to restore this for further code which require it
+        js("window.XMLHttpRequest = window.XMLHttpRequestBAK;");
     }
 
     @Test
@@ -117,12 +121,7 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
         assertJavascriptEquals("./terminal?node=test", "window.xhrOpenedOn");
 
         assertJavascriptEquals("a", "$('.screen div:first-child').html()");
-
-        // need to restore this for further code which require it
-        js("window.XMLHttpRequest = window.XMLHttpRequestBAK;");
     }
-
-    /* This takes 3 hours to run on github ... no ides why.
 
     @Test
     public void testOnKeyDown_a() throws Exception {
@@ -176,5 +175,4 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
         }
         assertTrue(found);
     }
-    */
 }
