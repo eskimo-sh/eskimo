@@ -386,7 +386,13 @@ public class SetupService {
             Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate)
             throws SetupException {
 
-        File packagesDistribFolder = new File (packageDistributionPath);
+        File packagesDistribFolder = null;
+        try {
+            packagesDistribFolder = new File(packageDistributionPath).getCanonicalFile();
+        } catch (IOException e) {
+            logger.error (e, e);
+            throw new SetupException (e.getMessage(), e);
+        }
         if (!packagesDistribFolder.exists()) {
             if (!packagesDistribFolder.mkdirs()) {
                 throw new SetupException ("Failed to create directory " + packagesDistribFolder.getAbsolutePath());

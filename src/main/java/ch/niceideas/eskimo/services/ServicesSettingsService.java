@@ -140,9 +140,10 @@ public class ServicesSettingsService {
 
             configurationService.saveServicesSettings(servicesSettings);
 
-            if (dirtyServices != null && !dirtyServices.isEmpty()) {
+            NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
 
-                NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
+            if (dirtyServices != null && !dirtyServices.isEmpty() && rawNodesConfig != null && !rawNodesConfig.isEmpty()) {
+
                 NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
                 KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();

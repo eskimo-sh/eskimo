@@ -561,18 +561,20 @@ public class Topology {
              */
             sb.append("\n#Kubernetes Topology\n");
 
-            for (String service : kubeConfig.getEnabledServices()) {
+            if (kubeConfig != null) {
+                for (String service : kubeConfig.getEnabledServices()) {
 
-                String cpuSetting = kubeConfig.getCpuSetting(service);
-                if (StringUtils.isNotBlank(cpuSetting)) {
-                    appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_CPU", cpuSetting);
+                    String cpuSetting = kubeConfig.getCpuSetting(service);
+                    if (StringUtils.isNotBlank(cpuSetting)) {
+                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_CPU", cpuSetting);
+                    }
+
+                    String ramSetting = kubeConfig.getRamSetting(service);
+                    if (StringUtils.isNotBlank(ramSetting)) {
+                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_RAM", ramSetting);
+                    }
+
                 }
-
-                String ramSetting = kubeConfig.getRamSetting(service);
-                if (StringUtils.isNotBlank(ramSetting)) {
-                    appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_RAM", ramSetting);
-                }
-
             }
         }
 

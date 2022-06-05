@@ -327,7 +327,7 @@ __dp_build_box() {
         # ----------------------------------------------------------------------------------------------------------------------
 
         echo_date "   + Installing utilities"
-        vagrant ssh -c "sudo yum install -y wget git gcc glibc-static" $1 >> /tmp/integration-test.log 2>&1
+        vagrant ssh -c "sudo yum install -y wget git gcc glibc" $1 >> /tmp/integration-test.log 2>&1
 
         echo_date "   + Installing Java"
         vagrant ssh -c "sudo yum install -y java-11-openjdk" $1 >> /tmp/integration-test.log 2>&1
@@ -420,7 +420,7 @@ initial_setup_eskimo() {
         -c $SCRIPT_DIR/cookies \
         -H 'Content-Type: application/x-www-form-urlencoded' \
         -XPOST http://$BOX_IP/login \
-        -d 'username=admin&password=password' \
+        -d 'eskimo-username=admin&eskimo-password=password' \
         >> /tmp/integration-test.log 2>&1
 
     # fetch status now and test it
@@ -463,23 +463,23 @@ setup_eskimo() {
         -c $SCRIPT_DIR/cookies \
         -H 'Content-Type: application/x-www-form-urlencoded' \
         -XPOST http://$BOX_IP/login \
-        -d 'username=admin&password=password' \
+        -d 'eskimo-username=admin&eskimo-password=password' \
         >> /tmp/integration-test.log 2>&1
 
-    # fetch status now and test it
-    echo_date " - CALL Fetching status"
-    status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
-    if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
-        echo "Couldn't successfuly fetch status !"
-        echo "Got status : $status"
-        exit 4
-    fi
-    # should be clear setup before setup is applied
-    if [[ $(echo $status | jq -r '.clear') != "nodes" ]]; then
-        echo "Didn't get expected 'clear' status"
-        echo "Got status : $status"
-        exit 5
-    fi
+#    # fetch status now and test it
+#    echo_date " - CALL Fetching status"
+#    status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
+#    if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
+#        echo "Couldn't successfuly fetch status !"
+#        echo "Got status : $status"
+#        exit 4
+#    fi
+#    # should be clear setup before setup is applied
+#    if [[ $(echo $status | jq -r '.clear') != "nodes" ]]; then
+#        echo "Didn't get expected 'clear' status"
+#        echo "Got status : $status"
+#        exit 5
+#    fi
 
     # Services configuration
     # ----------------------------------------------------------------------------------------------------------------------
@@ -495,36 +495,48 @@ setup_eskimo() {
     call_eskimo \
         "save-services-settings" \
         "{
-    \"elasticsearch-bootstrap-memory_lock\":\"\",
-    \"elasticsearch-action-destructive_requires_name\":\"\",
-    \"elasticsearch-index-refresh_interval\":\"\",
-    \"elasticsearch-index-number_of_replicas\":\"\",
-    \"elasticsearch-index-number_of_shards\":\"\",
-    \"flink-runtime-jobmanager-heap-size\":\"\",
-    \"flink-runtime-taskmanager-heap-size\":\"\",
-    \"flink-runtime-parallelism-default\":\"\",
-    \"flink-runtime-mesos-resourcemanager-tasks-cpus\":\"\",
-    \"flink-runtime-mesos-resourcemanager-tasks-mem\":\"\",
-    \"flink-runtime-taskmanager-numberOfTaskSlots\":\"\",
-    \"kafka-num-network-threads\":\"\",
-    \"kafka-num-io-threads\":\"\",
-    \"kafka-socket-send-buffer-bytes\":\"\",
-    \"kafka-socket-receive-buffer-bytes\":\"\",
-    \"kafka-socket-request-max-bytes\":\"\",
-    \"kafka-num-partitions\":\"\",
-    \"kafka-log-retention-hours\":\"\",
-    \"marathon-task_launch_timeout\":\"\",
-    \"mesos-agent-cpu_additional\":\"\",
-    \"mesos-agent-ram_additional\":\"$additional_RAM\",
-    \"spark-runtime-spark-driver-memory\":\"\",
-    \"spark-runtime-spark-rpc-numRetries\":\"\",
-    \"spark-runtime-spark-rpc-retry-wait\":\"\",
-    \"spark-runtime-spark-scheduler-mode\":\"\",
-    \"spark-runtime-spark-locality-wait\":\"\",
-    \"spark-runtime-spark-dynamicAllocation-executorIdleTimeout\":\"\",
-    \"spark-runtime-spark-dynamicAllocation-cachedExecutorIdleTimeout\":\"\",
-    \"spark-runtime-spark-executor-memory\":\"\"
-    }"
+           \"cerebro-Xms\": \"\",
+           \"cerebro-Xmx\": \"\",
+           \"elasticsearch-Xms\": \"\",
+           \"elasticsearch-Xmx\": \"\",
+           \"elasticsearch-action---destructive_requires_name\": \"\",
+           \"elasticsearch-index---refresh_interval\": \"\",
+           \"elasticsearch-index---number_of_replicas\": \"\",
+           \"elasticsearch-index---number_of_shards\": \"\",
+           \"flink-runtime-jobmanager---memory---process---size\": \"\",
+           \"flink-runtime-taskmanager---memory---process---size:\": \"\",
+           \"flink-runtime-parallelism---default\": \"\",
+           \"flink-runtime-taskmanager---numberOfTaskSlots\": \"\",
+           \"gluster-target---volumes\": \"spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_ssl\",
+           \"grafana-admin_user\": \"\",
+           \"grafana-admin_password\": \"\",
+           \"kafka-Xms\": \"\",
+           \"kafka-Xmx\": \"\",
+           \"kafka-num---network---threads\": \"\",
+           \"kafka-num---io---threads\": \"\",
+           \"kafka-socket---send---buffer---bytes\": \"\",
+           \"kafka-socket---receive---buffer---bytes\": \"\",
+           \"kafka-socket---request---max---bytes\": \"\",
+           \"kafka-num---partitions\": \"\",
+           \"kafka-log---retention---hours\": \"\",
+           \"kibana-max-old-space-size\": \"\",
+           \"logstash-Xms\": \"\",
+           \"logstash-Xmx\": \"\",
+           \"spark-runtime-spark---driver---memory\": \"\",
+           \"spark-runtime-spark---rpc---numRetries\": \"\",
+           \"spark-runtime-spark---rpc---retry---wait\": \"\",
+           \"spark-runtime-spark---scheduler---mode\": \"\",
+           \"spark-runtime-spark---locality---wait\": \"\",
+           \"spark-runtime-spark---dynamicAllocation---executorIdleTimeout\": \"\",
+           \"spark-runtime-spark---dynamicAllocation---cachedExecutorIdleTimeout\": \"\",
+           \"spark-runtime-spark---dynamicAllocation---shuffleTracking---timeout\": \"\",
+           \"spark-runtime-spark---dynamicAllocation---schedulerBacklogTimeout\": \"\",
+           \"spark-runtime-spark---executor---memory\": \"\",
+           \"zeppelin-Xmx\": \"\",
+           \"zeppelin-zeppelin_note_isolation\": \"\",
+           \"zookeeper-Xms\": \"600m\",
+           \"zookeeper-Xmx\": \"700m\"
+         }"
 
     # Now need to apply command
     echo_date " - CALL applying services config"
@@ -541,19 +553,13 @@ setup_eskimo() {
             "save-nodes-config" \
             '{
         "node_id1":"172.17.0.1",
-        "flink-app-master":"1",
-        "marathon":"1",
-        "mesos-master":"1",
+        "kube-master":"1",
+        "kube-slave1":"on",
         "zookeeper":"1",
-        "elasticsearch1":"on",
-        "flink-runtime1":"on",
         "gluster1":"on",
-        "kafka1":"on",
-        "logstash1":"on",
-        "mesos-agent1":"on",
         "ntp1":"on",
+        "etcd1":"on",
         "prometheus1":"on",
-        "spark-runtime1":"on"
         }'
     else
         call_eskimo \
@@ -563,34 +569,20 @@ setup_eskimo() {
         "node_id2":"192.168.10.52",
         "node_id3":"192.168.10.53",
         "node_id4":"192.168.10.54",
-        "flink-app-master":"2",
-        "marathon":"2",
-        "mesos-master":"1",
+        "kube-master":"1",
         "zookeeper":"1",
-        "elasticsearch1":"on",
-        "elasticsearch2":"on",
-        "elasticsearch3":"on",
-        "elasticsearch4":"on",
-        "flink-runtime1":"on",
-        "flink-runtime2":"on",
-        "flink-runtime3":"on",
-        "flink-runtime4":"on",
+        "etcd1":"on",
+        "etcd2":"on",
+        "etcd3":"on",
+        "etcd4":"on",
+        "kube-slave1":"on",
+        "kube-slave2":"on",
+        "kube-slave3":"on",
+        "kube-slave4":"on",
         "gluster1":"on",
         "gluster2":"on",
         "gluster3":"on",
         "gluster4":"on",
-        "kafka1":"on",
-        "kafka2":"on",
-        "kafka3":"on",
-        "kafka4":"on",
-        "logstash1":"on",
-        "logstash2":"on",
-        "logstash3":"on",
-        "logstash4":"on",
-        "mesos-agent1":"on",
-        "mesos-agent2":"on",
-        "mesos-agent3":"on",
-        "mesos-agent4":"on",
         "ntp1":"on",
         "ntp2":"on",
         "ntp3":"on",
@@ -598,11 +590,7 @@ setup_eskimo() {
         "prometheus1":"on",
         "prometheus2":"on",
         "prometheus3":"on",
-        "prometheus4":"on",
-        "spark-runtime1":"on",
-        "spark-runtime2":"on",
-        "spark-runtime3":"on",
-        "spark-runtime4":"on"
+        "prometheus4":"on"
         }'
     fi
 
@@ -611,25 +599,55 @@ setup_eskimo() {
     call_eskimo \
         "apply-nodes-config"
 
-    # Apply marathon config
+    # Apply kubernetes config
     # ----------------------------------------------------------------------------------------------------------------------
 
-    echo_date " - CALL saving marathon config"
+    echo_date " - CALL saving kubernetes config"
     call_eskimo \
-        "save-marathon-services-config" \
+        "save-kubernetes-services-config" \
         '{
-    "cerebro_install":"on",
-    "grafana_install":"on",
-    "kafka-manager_install":"on",
-    "kibana_install":"on",
-    "spark-history-server_install":"on",
-    "zeppelin_install":"on"
-    }'
+          "cerebro_install": "on",
+          "cerebro_cpu": "0.2",
+          "cerebro_ram": "800M",
+          "elasticsearch_install": "on",
+          "elasticsearch_cpu": "0.3",
+          "elasticsearch_ram": "1024M",
+          "flink-runtime_install": "on",
+          "flink-runtime_cpu": "0.3",
+          "flink-runtime_ram": "1.2G",
+          "grafana_install": "on",
+          "grafana_cpu": "0.2",
+          "grafana_ram": "800M",
+          "kafka_install": "on",
+          "kafka_cpu": "0.2",
+          "kafka_ram": "1G",
+          "kafka-manager_install": "on",
+          "kafka-manager_cpu": "0.1",
+          "kafka-manager_ram": "1G",
+          "kibana_install": "on",
+          "kibana_cpu": "0.2",
+          "kibana_ram": "1024M",
+          "kubernetes-dashboard_install": "on",
+          "kubernetes-dashboard_cpu": "0.1",
+          "kubernetes-dashboard_ram": "1G",
+          "logstash_install": "on",
+          "logstash_cpu": "0.3",
+          "logstash_ram": "1G",
+          "spark-history-server_install": "on",
+          "spark-history-server_cpu": "0.1",
+          "spark-history-server_ram": "1G",
+          "spark-runtime_install": "on",
+          "spark-runtime_cpu": "0.3",
+          "spark-runtime_ram": "1.2G",
+          "zeppelin_install": "on",
+          "zeppelin_cpu": "0.3",
+          "zeppelin_ram": "3G"
+        }'
 
     # Now need to apply command
-    echo_date " - CALL applying marathon config"
+    echo_date " - CALL applying kubernetes config"
     call_eskimo \
-        "apply-marathon-services-config"
+        "apply-kubernetes-services-config"
 }
 
 check_all_services_up() {
@@ -639,7 +657,7 @@ check_all_services_up() {
     all_found=true
 
     if [[ -z $MULTIPLE_NODE ]]; then
-        for i in "service_marathon_172-17-0-1" \
+        for i in "service_kubernetes_172-17-0-1" \
             "service_mesos-agent_172-17-0-1" \
             "service_prometheus_172-17-0-1" \
             "service_flink-runtime_172-17-0-1" \
@@ -665,7 +683,7 @@ check_all_services_up() {
             fi
         done
     else
-        for i in "service_marathon_192-168-10-52" \
+        for i in "service_kubernetes_192-168-10-52" \
             "service_mesos-agent_192-168-10-51" \
             "service_mesos-agent_192-168-10-52" \
             "service_mesos-agent_192-168-10-53" \
@@ -1271,12 +1289,12 @@ test_web_apps() {
         exit 103
     fi
 
-    echo_date "   + testing marathon application count"
-    marathon_apps=$(query_eskimo "marathon/v2/apps" | jq -r ' .apps | .[] | .id' 2> /dev/null)
-    if [[ $(echo "$marathon_apps" | wc -l) != $EXPECTED_NBR_APPS_MARATHON ]]; then
-        echo_date "Didn't find $EXPECTED_NBR_APPS_MARATHON apps in marathon"
+    echo_date "   + testing kubernetes application count"
+    kubernetes_apps=$(query_eskimo "kubernetes/v2/apps" | jq -r ' .apps | .[] | .id' 2> /dev/null)
+    if [[ $(echo "$kubernetes_apps" | wc -l) != $EXPECTED_NBR_APPS_kubernetes ]]; then
+        echo_date "Didn't find $EXPECTED_NBR_APPS_kubernetes apps in kubernetes"
         echo_date "Found apps:"
-        echo "$marathon_apps"
+        echo "$kubernetes_apps"
         exit 104
     fi
 
@@ -1492,9 +1510,9 @@ usage() {
     echo "    -n  Don't rebuild the software (use last build)"
 }
 
-export EXPECTED_NBR_APPS_MARATHON=6
+export EXPECTED_NBR_APPS_kubernetes=6
 
-export BOX_IP=192.168.10.41
+export BOX_IP=192.168.56.41
 export DOCKER_LOCAL=172.17.0.1
 export TARGET_MASTER_VM="integration-test"
 
@@ -1522,7 +1540,7 @@ while getopts ":hdrfmn" opt; do
         m)
             export MULTIPLE_NODE=multiple
             export TARGET_MASTER_VM="integration-test1"
-            export BOX_IP=192.168.10.51
+            export BOX_IP=192.168.56.51
             ;;
         :)
             break
@@ -1544,14 +1562,6 @@ check_for_virtualbox
 check_for_vagrant
 
 
-# FIXME remove me
-#    curl \
-#        -c $SCRIPT_DIR/cookies \
-#        -H 'Content-Type: application/x-www-form-urlencoded' \
-#        -XPOST http://$BOX_IP/login \
-#        -d 'username=admin&password=password' \
-#        >> /tmp/integration-test.log 2>&1
-
 if [[ -z $DONT_REBUILD ]]; then
     rebuild_eskimo
 fi
@@ -1563,6 +1573,8 @@ fi
 install_eskimo
 
 initial_setup_eskimo
+
+exit
 
 if [[ -z $REBUILD_ONLY ]]; then
 
