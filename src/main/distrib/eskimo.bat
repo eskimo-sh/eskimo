@@ -59,5 +59,6 @@ REM encoding UTF-8 is required to parse SSH command results properly.
     -Xmx1024m ^
     -Dfile.encoding=UTF-8 ^
     -jar %scriptpath%..\lib\%WAR_FILE% ^
+    -DservicesDefinitionFile=%scriptpath%..\conf\services.json \
     --spring.config.location=%scriptpath%..\conf\eskimo.properties
 

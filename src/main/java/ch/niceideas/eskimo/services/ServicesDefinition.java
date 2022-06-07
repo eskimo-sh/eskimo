@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.*;
 import ch.niceideas.eskimo.model.service.proxy.UrlRewriting;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
@@ -63,13 +64,15 @@ import java.util.stream.Collectors;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServicesDefinition implements InitializingBean {
 
+    private static final Logger logger = Logger.getLogger(ServicesDefinition.class);
+
     public static final String SERVICE_PREFIX = "Service ";
+
     @Autowired
     private SetupService setupService;
 
     @Value("${servicesDefinitionFile}")
     private String servicesDefinitionFile = "classpath:services.json";
-
 
     @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
@@ -91,6 +94,8 @@ public class ServicesDefinition implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
 
         HashMap<WebCommand, String> webCommandServices = new HashMap<>();
+
+        logger.info ("Using services definition from file : " + servicesDefinitionFile);
 
         InputStream is = ResourceUtils.getResourceAsStream(servicesDefinitionFile);
         if (is == null) {

@@ -58,4 +58,5 @@ ESKIMO_WAR=`cd lib; ls -1 eskimo*war`
 java \
     -Xmx1024m \
     -jar lib/$ESKIMO_WAR \
+    -DservicesDefinitionFile=conf/services.json \
     --spring.config.location=conf/eskimo.properties
