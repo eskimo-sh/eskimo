@@ -163,21 +163,21 @@ call_eskimo() {
 
 wait_for_taskmanager_registered() {
 
-    echo_date " - Now waiting for mesos to report flink taskmanager"
-    for attempt in $(seq 1 30); do
+    echo_date " - Now waiting for Kubernetes to report flink taskmanager"
+    for attempt in $(seq 1 60); do
         sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("taskmanager")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        set +e
+        spark_exec_status=$(vagrant ssh -c \
+                "sudo /usr/local/bin/kubectl get pod 2>/dev/null" \
+                $TARGET_MASTER_VM \
+                | grep 'flink-runtime-taskmanager' | grep Running)
+        set -e
         if [[ $spark_exec_status != "" ]]; then
-            echo_date "   + Found zeppelin flink taskmanager running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
+            echo_date "   + Found zeppelin flink taskmanager running"
             break
         fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Could not get flink taskmanager up and running within 300 seconds. Crashing"
+        if [[ $attempt == 60 ]]; then
+            echo_date "Could not get flink taskmanager up and running within 600 seconds. Crashing"
 
             return 1
         fi
@@ -188,21 +188,21 @@ wait_for_taskmanager_registered() {
 
 wait_for_taskmanager_unregistered() {
 
-    echo_date " - Waiting for mesos to unregister taskmanager (not to compromise other tests)"
-    for attempt in $(seq 1 30); do
+    echo_date " - Waiting for Kubernetes to unregister taskmanager (not to compromise other tests)"
+    for attempt in $(seq 1 60); do
         sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("taskmanager")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        set +e
+        spark_exec_status=$(vagrant ssh -c \
+                    "sudo /usr/local/bin/kubectl get pod" \
+                    $TARGET_MASTER_VM \
+                    | grep 'flink-runtime-taskmanager' | grep Running  )
+        set -e
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Flink taskmanager found anymore, can continue ..."
             break
         fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
+        if [[ $attempt == 60 ]]; then
+            echo_date "Kubernetes did not unregister executor within 600 seconds. Crashing"
             #exit 41
         fi
     done
@@ -210,22 +210,21 @@ wait_for_taskmanager_unregistered() {
 
 wait_for_executor_registered() {
 
-    echo_date " - Now waiting for mesos to report spark executor"
-    for attempt in $(seq 1 30); do
+    echo_date " - Now waiting for Kubernetes to report spark executor"
+    for attempt in $(seq 1 60); do
         sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("zeppelin_spark")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        set +e
+        spark_exec_status=$(vagrant ssh -c \
+                  "sudo /usr/local/bin/kubectl get pod 2>/dev/null" \
+                  $TARGET_MASTER_VM \
+                  | grep -E 'zeppelin-spark|spark-integration' | grep Running  )
+        set -e
         if [[ $spark_exec_status != "" ]]; then
-            #echo_date "   + Found zeppelin spark executor running on $(echo $spark_exec_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
             echo_date "   + Found zeppelin spark executor running"
             break
         fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Could not get spark executor up and running within 300 seconds. Crashing"
+        if [[ $attempt == 60 ]]; then
+            echo_date "Could not get spark executor up and running within 600 seconds. Crashing"
 
             return 1
         fi
@@ -236,21 +235,21 @@ wait_for_executor_registered() {
 
 wait_for_executor_unregistered() {
 
-    echo_date " - Waiting for mesos to unregister executor (not to compromise other tests)"
-    for attempt in $(seq 1 30); do
+    echo_date " - Waiting for Kubernetes to unregister executor (not to compromise other tests)"
+    for attempt in $(seq 1 60); do
         sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("zeppelin_spark")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        set +e
+        spark_exec_status=$(vagrant ssh -c \
+                  "sudo /usr/local/bin/kubectl get pod" \
+                  $TARGET_MASTER_VM \
+                  | grep -E 'zeppelin-spark|spark-integration' | grep Running  )
+        set -e
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
             break
         fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
+        if [[ $attempt == 60 ]]; then
+            echo_date "Kubernetes did not unregister executor within 600 seconds. Crashing"
             exit 41
         fi
     done
@@ -423,6 +422,9 @@ initial_setup_eskimo() {
         -d 'eskimo-username=admin&eskimo-password=password' \
         >> /tmp/integration-test.log 2>&1
 
+# fixme remove me
+return
+
     # fetch status now and test it
     echo_date " - CALL Fetching status"
     status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
@@ -552,7 +554,7 @@ setup_eskimo() {
         call_eskimo \
             "save-nodes-config" \
             '{
-        "node_id1":"172.17.0.1",
+        "node_id1":"192.168.56.41",
         "kube-master":"1",
         "kube-slave1":"on",
         "zookeeper":"1",
@@ -560,6 +562,10 @@ setup_eskimo() {
         "ntp1":"on",
         "etcd1":"on",
         "prometheus1":"on",
+        "logstash-cli1":"on",
+        "spark-cli1":"on",
+        "kafka-cli1":"on",
+        "flink-cli1":"on"
         }'
     else
         call_eskimo \
@@ -590,7 +596,23 @@ setup_eskimo() {
         "prometheus1":"on",
         "prometheus2":"on",
         "prometheus3":"on",
-        "prometheus4":"on"
+        "prometheus4":"on",
+        "logstash-cli1":"on",
+        "logstash-cli2":"on",
+        "logstash-cli3":"on",
+        "logstash-cli4":"on",
+        "spark-cli1":"on",
+        "spark-cli2":"on",
+        "spark-cli3":"on",
+        "spark-cli4":"on",
+        "kafka-cli1":"on",
+        "kafka-cli2":"on",
+        "kafka-cli3":"on",
+        "kafka-cli4":"on",
+        "flink-cli1":"on",
+        "flink-cli2":"on",
+        "flink-cli3":"on",
+        "flink-cli4":"on"
         }'
     fi
 
@@ -657,26 +679,26 @@ check_all_services_up() {
     all_found=true
 
     if [[ -z $MULTIPLE_NODE ]]; then
-        for i in "service_kubernetes_172-17-0-1" \
-            "service_mesos-agent_172-17-0-1" \
-            "service_prometheus_172-17-0-1" \
-            "service_flink-runtime_172-17-0-1" \
-            "service_kibana_172-17-0-1" \
-            "service_zookeeper_172-17-0-1" \
-            "service_spark-runtime_172-17-0-1" \
-            "service_mesos-master_172-17-0-1" \
-            "service_zeppelin_172-17-0-1" \
-            "service_spark-history-server_172-17-0-1" \
-            "service_elasticsearch_172-17-0-1" \
-            "service_logstash_172-17-0-1" \
-            "service_cerebro_172-17-0-1" \
-            "service_kafka_172-17-0-1" \
-            "service_ntp_172-17-0-1" \
-            "service_kafka-manager_172-17-0-1" \
-            "service_gluster_172-17-0-1" \
-            "node_alive_172-17-0-1" \
-            "service_flink-app-master_172-17-0-1" \
-            "service_grafana_172-17-0-1"; do
+        for i in "service_kubernetes_192-168-56-41" \
+            "service_mesos-agent_192-168-56-41" \
+            "service_prometheus_192-168-56-41" \
+            "service_flink-runtime_192-168-56-41" \
+            "service_kibana_192-168-56-41" \
+            "service_zookeeper_192-168-56-41" \
+            "service_spark-runtime_192-168-56-41" \
+            "service_mesos-master_192-168-56-41" \
+            "service_zeppelin_192-168-56-41" \
+            "service_spark-history-server_192-168-56-41" \
+            "service_elasticsearch_192-168-56-41" \
+            "service_logstash_192-168-56-41" \
+            "service_cerebro_192-168-56-41" \
+            "service_kafka_192-168-56-41" \
+            "service_ntp_192-168-56-41" \
+            "service_kafka-manager_192-168-56-41" \
+            "service_gluster_192-168-56-41" \
+            "node_alive_192-168-56-41" \
+            "service_flink-app-master_192-168-56-41" \
+            "service_grafana_192-168-56-41"; do
             if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
                 echo "not found $i"
                 return
@@ -769,7 +791,7 @@ query_zeppelin_notebook () {
     curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/notebook \
+            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook \
             2> /dev/null |
             jq -r " .body | .[] | select (.path == \"$nb_path\") | .id"
 }
@@ -781,12 +803,12 @@ run_all_zeppelin_pararaphs () {
     for i in `curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
 
         echo_date "  + running $i"
         call_eskimo \
-            "zeppelin/api/notebook/run/$nb_id/$i"
+            "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/run/$nb_id/$i"
 
     done
 }
@@ -796,7 +818,7 @@ clear_zeppelin_results () {
     nb_id=`query_zeppelin_notebook "$nb_path"`
 
     call_eskimo \
-        "zeppelin/api/notebook/$nb_id/clear" \
+        "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id/clear" \
         "" \
         "PUT"
 }
@@ -811,7 +833,7 @@ run_zeppelin_pararaph () {
     for i in `curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
 
         cnt=$((cnt + 1))
@@ -819,7 +841,7 @@ run_zeppelin_pararaph () {
         if [[ $cnt == $par_nbr ]]; then
             echo_date "  + running $i"
             call_eskimo \
-                "zeppelin/api/notebook/run/$nb_id/$i" "$params"
+                "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/run/$nb_id/$i" "$params"
             break
         fi
     done
@@ -834,7 +856,7 @@ get_zeppelin_paragraph_status () {
     for i in `curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
 
         cnt=$((cnt + 1))
@@ -844,7 +866,7 @@ get_zeppelin_paragraph_status () {
             curl \
                 -b $SCRIPT_DIR/cookies \
                 -H 'Content-Type: application/json' \
-                -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+                -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
                 2> /dev/null | jq -r " .body | .paragraphs | .[] | select(.id==\"$i\") | .status "
 
             break
@@ -861,7 +883,7 @@ start_zeppelin_pararaph () {
     for i in `curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
 
         cnt=$((cnt + 1))
@@ -869,7 +891,7 @@ start_zeppelin_pararaph () {
         if [[ $cnt == $par_nbr ]]; then
             echo_date "  + running $i"
             call_eskimo \
-                "zeppelin/api/notebook/job/$nb_id/$i"
+                "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i"
             break
         fi
     done
@@ -884,7 +906,7 @@ stop_zeppelin_pararaph () {
     for i in `curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/notebook/$nb_id \
+            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
 
         cnt=$((cnt + 1))
@@ -895,7 +917,7 @@ stop_zeppelin_pararaph () {
             curl \
                     -b $SCRIPT_DIR/cookies \
                     -H 'Content-Type: application/json' \
-                    -XDELETE http://$BOX_IP/zeppelin/api/notebook/job/$nb_id/$i \
+                    -XDELETE http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i \
                     >> /tmp/integration-test.log 2>&1
 
 
@@ -910,17 +932,15 @@ run_zeppelin_data_load() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     # First I need to wait for zeppelin to be up and running
-    echo_date " - Waiting for Zeppelin to be up and running (querying mesos for TASK_RUNNING)"
+    echo_date " - Waiting for Zeppelin to be up and running (querying kubernetes)"
     for attempt in $(seq 1 30); do
         sleep 10
-        zeppelin_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.id|contains("zeppelin")) | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        zeppelin_status=$(vagrant ssh -c \
+                "sudo /usr/local/bin/kubectl get pod -o wide" \
+                $TARGET_MASTER_VM \
+                | grep zeppelin | grep Running | sed s/'  *'/' '/g | cut -d ' ' -f 7)
         if [[ $zeppelin_status != "" ]]; then
-            echo_date "   + Found zeppelin running on $(echo $zeppelin_status | jq -r '.container_status | .network_infos | .[] | .ip_addresses | .[] | .ip_address')"
+            echo_date "   + Found zeppelin running on $zeppelin_status"
             break
         fi
         if [[ $attempt == 30 ]]; then
@@ -929,6 +949,7 @@ run_zeppelin_data_load() {
         fi
     done
     # Giving it a little more time to really start
+
     sleep 40
 
     echo_date " - ZEPPELIN logstash demo"
@@ -941,21 +962,19 @@ run_zeppelin_data_load() {
     echo_date " - ZEPPELIN Spark ES demo "
     run_all_zeppelin_pararaphs "/Spark Integration ES"
 
-    echo_date " - Waiting for mesos to unregister executor (not to compromise other tests)"
-    for attempt in $(seq 1 30); do
+    echo_date " - Waiting for kubernetes to unregister spark executor (not to compromise other tests)"
+    for attempt in $(seq 1 60); do
         sleep 10
-        spark_exec_status=$(curl \
-            -b $SCRIPT_DIR/cookies \
-            -H 'Content-Type: application/json' \
-            -XPOST http://$BOX_IP/mesos-master/tasks \
-            2> /dev/null |
-            jq -r ' .tasks | .[] | select (.name|contains("Zeppelin ")) | select (.state == "TASK_RUNNING") | .statuses | .[] | select (.state == "TASK_RUNNING")')
+        spark_exec_status=$(vagrant ssh -c \
+                "sudo /usr/local/bin/kubectl get pod" \
+                $TARGET_MASTER_VM \
+                | grep -E 'zeppelin-spark|spark-integration' | grep Running )
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
             break
         fi
-        if [[ $attempt == 30 ]]; then
-            echo_date "Mesos did not unregister executor within 300 seconds. Crashing"
+        if [[ $attempt == 60 ]]; then
+            echo_date "Kubernetes did not unregister executor within 600 seconds. Crashing"
             exit 41
         fi
     done
@@ -984,15 +1003,18 @@ run_zeppelin_spark_kafka() {
     # Now running Spark Kafka demo zeppelin paragraphs
     # ----------------------------------------------------------------------------------------------------------------------
 
+
+    run_zeppelin_pararaph "/Spark Integration Kafka" 1
+
     # Paragraph 2
     echo_date " - ZEPPELIN spark Kafka demo - start paragraph SPARK (async)"
-    start_zeppelin_pararaph "/Spark Integration Kafka" 5
+    start_zeppelin_pararaph "/Spark Integration Kafka" 8
 
     wait_for_executor_registered
     if [[ $? != 0 ]]; then
         set +e
 
-        stop_zeppelin_pararaph "/Spark Integration Kafka" 5
+        stop_zeppelin_pararaph "/Spark Integration Kafka" 8
 
         exit 31
     fi
@@ -1002,11 +1024,11 @@ run_zeppelin_spark_kafka() {
 
     # Paragraph 1
     echo_date " - ZEPPELIN spark Kafka demo - start paragraph python feeder (async)"
-    start_zeppelin_pararaph "/Spark Integration Kafka" 3
+    start_zeppelin_pararaph "/Spark Integration Kafka" 5
 
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server $DOCKER_LOCAL:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
+        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
         $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
@@ -1016,9 +1038,9 @@ run_zeppelin_spark_kafka() {
         set +e
 
         # stop both paragraphs
-        stop_zeppelin_pararaph "/Spark Integration Kafka" 3
-
         stop_zeppelin_pararaph "/Spark Integration Kafka" 5
+
+        stop_zeppelin_pararaph "/Spark Integration Kafka" 8
 
         rm -f kafka-berka-payments-aggregate-results
 
@@ -1028,10 +1050,12 @@ run_zeppelin_spark_kafka() {
     rm -f kafka-berka-payments-aggregate-results
 
     echo_date " - ZEPPELIN spark Kafka demo - stop paragraph python feeder (async)"
-    stop_zeppelin_pararaph "/Spark Integration Kafka" 3
+    stop_zeppelin_pararaph "/Spark Integration Kafka" 5
 
     echo_date " - ZEPPELIN spark Kafka demo - stop paragraph SPARK (async)"
-    stop_zeppelin_pararaph "/Spark Integration Kafka" 5
+    stop_zeppelin_pararaph "/Spark Integration Kafka" 8
+
+    run_zeppelin_pararaph "/Spark Integration Kafka" 10
 
     wait_for_executor_unregistered
 
@@ -1044,6 +1068,8 @@ run_zeppelin_spark_kafka() {
     run_zeppelin_pararaph "/Spark Integration Kafka" 2
 
     run_zeppelin_pararaph "/Spark Integration Kafka" 4
+
+    run_zeppelin_pararaph "/Spark Integration Kafka" 6
 }
 
 run_zeppelin_kafka_streams() {
@@ -1054,53 +1080,55 @@ run_zeppelin_kafka_streams() {
     # Paragraph 2
     echo_date " - ZEPPELIN Kafka Streams demo - start paragraph Kafka Streams (async)"
 
-    start_zeppelin_pararaph "/Kafka Streams Demo" 3
+    run_zeppelin_pararaph "/Kafka Streams Demo" 3
+
+    start_zeppelin_pararaph "/Kafka Streams Demo" 5
 
     # Give it a little time to start
     sleep 8
 
     # Check status
-    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 3` != "RUNNING" ]]; then
+    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 5` != "RUNNING" ]]; then
 
         echo_date "Failed to start Kafka Streams Demo program"
 
         set +e
 
-        stop_zeppelin_pararaph "/Kafka Streams Demo" 3
+        stop_zeppelin_pararaph "/Kafka Streams Demo" 5
 
-        # This is actually the way to stop paragraph 3
-        run_zeppelin_pararaph "/Kafka Streams Demo" 5
+        # This is actually the way to stop paragraph 5
+        run_zeppelin_pararaph "/Kafka Streams Demo" 7
 
         exit 100
     fi
 
-    # start paragraph 7
+    # start paragraph 9
     echo_date " - ZEPPELIN Kafka Streams demo - start console consummer"
-    start_zeppelin_pararaph "/Kafka Streams Demo" 7
+    start_zeppelin_pararaph "/Kafka Streams Demo" 9
 
     # Give it a little time to start
     sleep 5
 
     # Check status
-    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 7` != "RUNNING" ]]; then
+    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 9` != "RUNNING" ]]; then
 
         echo_date "Failed to start Kafka Streams Demo program - console consummer paragraph"
 
         set +e
 
-        stop_zeppelin_pararaph "/Kafka Streams Demo" 3
+        stop_zeppelin_pararaph "/Kafka Streams Demo" 5
 
-        # This is actually the way to stop paragraph 3
-        run_zeppelin_pararaph "/Kafka Streams Demo" 5
+        # This is actually the way to stop paragraph 5
+        run_zeppelin_pararaph "/Kafka Streams Demo" 7
 
-        stop_zeppelin_pararaph "/Kafka Streams Demo" 7
+        stop_zeppelin_pararaph "/Kafka Streams Demo" 9
 
         exit 101
     fi
 
     # run paragraph 9
     echo_date " - ZEPPELIN Kafka Streams demo - publish message"
-    run_zeppelin_pararaph "/Kafka Streams Demo" 9 '{"params" : { "input": "some additional text with some more words" }}'
+    run_zeppelin_pararaph "/Kafka Streams Demo" 11 '{"params" : { "input": "some additional text with some more words" }}'
 
     # Give it a little time to run
     sleep 5
@@ -1109,14 +1137,14 @@ run_zeppelin_kafka_streams() {
 
     # This is actually the way to stop paragraph 3
     echo_date " - ZEPPELIN Kafka Streams demo - Stopping all paragraphs"
-    run_zeppelin_pararaph "/Kafka Streams Demo" 5
+    run_zeppelin_pararaph "/Kafka Streams Demo" 7
 
-    stop_zeppelin_pararaph "/Kafka Streams Demo" 7
+    stop_zeppelin_pararaph "/Kafka Streams Demo" 9
 
     # Now check results
     echo_date " - ZEPPELIN Kafka Streams demo - Checking results"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server $DOCKER_LOCAL:9092 --topic streams-wordcount-output --timeout-ms 10000 --from-beginning --max-messages 100" \
+        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 10000 --from-beginning --max-messages 100" \
         $TARGET_MASTER_VM \
         > streams-wordcount-output-results 2> /dev/null
 
@@ -1138,14 +1166,14 @@ run_zeppelin_flink_kafka() {
     # Paragraph 2
     echo_date " - ZEPPELIN flink Kafka demo - start paragraph FLINK (async)"
 
-    start_zeppelin_pararaph "/Flink Integration Kafka" 5
+    start_zeppelin_pararaph "/Flink Integration Kafka" 7
 
     wait_for_taskmanager_registered
     if [[ $? != 0 ]]; then
 
         set +e
 
-        stop_zeppelin_pararaph "/Flink Integration Kafka" 5
+        stop_zeppelin_pararaph "/Flink Integration Kafka" 7
 
         exit 31
     fi
@@ -1155,11 +1183,11 @@ run_zeppelin_flink_kafka() {
 
     # Paragraph 1
     echo_date " - ZEPPELIN flink Kafka demo - start paragraph python feeder (async)"
-    start_zeppelin_pararaph "/Flink Integration Kafka" 3
+    start_zeppelin_pararaph "/Flink Integration Kafka" 5
 
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server $DOCKER_LOCAL:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
+        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
         $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
@@ -1169,9 +1197,9 @@ run_zeppelin_flink_kafka() {
         set +e
 
         # stop both paragraphs
-        stop_zeppelin_pararaph "/Flink Integration Kafka" 3
-
         stop_zeppelin_pararaph "/Flink Integration Kafka" 5
+
+        stop_zeppelin_pararaph "/Flink Integration Kafka" 7
 
         rm -f kafka-berka-payments-aggregate-results
 
@@ -1181,10 +1209,10 @@ run_zeppelin_flink_kafka() {
     rm -f kafka-berka-payments-aggregate-results
 
     echo_date " - ZEPPELIN flink Kafka demo - stop paragraph python feeder (async)"
-    stop_zeppelin_pararaph "/Flink Integration Kafka" 3
+    stop_zeppelin_pararaph "/Flink Integration Kafka" 5
 
     echo_date " - ZEPPELIN flink Kafka demo - stop paragraph FLINK (async)"
-    stop_zeppelin_pararaph "/Flink Integration Kafka" 5
+    stop_zeppelin_pararaph "/Flink Integration Kafka" 7
 
     wait_for_taskmanager_unregistered
 
@@ -1197,6 +1225,8 @@ run_zeppelin_flink_kafka() {
     run_zeppelin_pararaph "/Flink Integration Kafka" 2
 
     run_zeppelin_pararaph "/Flink Integration Kafka" 4
+
+    run_zeppelin_pararaph "/Flink Integration Kafka" 6
 }
 
 run_zeppelin_other_notes() {
@@ -1513,7 +1543,7 @@ usage() {
 export EXPECTED_NBR_APPS_kubernetes=6
 
 export BOX_IP=192.168.56.41
-export DOCKER_LOCAL=172.17.0.1
+export DOCKER_LOCAL=192.168.56.41
 export TARGET_MASTER_VM="integration-test"
 
 sudo rm -Rf /tmp/integration-test.log
@@ -1561,44 +1591,43 @@ check_for_virtualbox
 
 check_for_vagrant
 
-
-if [[ -z $DONT_REBUILD ]]; then
-    rebuild_eskimo
-fi
-
-if [[ -z $REBUILD_ONLY ]]; then
-    build_box
-fi
-
-install_eskimo
-
+#
+#if [[ -z $DONT_REBUILD ]]; then
+#    rebuild_eskimo
+#fi
+#
+#if [[ -z $REBUILD_ONLY ]]; then
+#    build_box
+#fi
+#
+#install_eskimo
+#
 initial_setup_eskimo
-
-exit
-
-if [[ -z $REBUILD_ONLY ]]; then
-
-    setup_eskimo
-
-    wait_all_services_up
-
-    run_zeppelin_data_load
-
-    create_kafka_topics
-
-    run_zeppelin_spark_kafka
-
-    run_zeppelin_flink_kafka
-
-    run_zeppelin_kafka_streams
-
-    run_zeppelin_other_notes
+#
+#if [[ -z $REBUILD_ONLY ]]; then
+#
+#    setup_eskimo
+#
+#    wait_all_services_up
+#
+#    run_zeppelin_data_load
+#
+#    create_kafka_topics
+#
+#    run_zeppelin_spark_kafka
+#
+#    run_zeppelin_flink_kafka
+#
+#    run_zeppelin_kafka_streams
+#
+#    run_zeppelin_other_notes
 
     test_web_apps
 
     test_doc
 
     do_cleanup
+
 fi
 
 if [[ $DEMO == "demo" ]]; then

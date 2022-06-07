@@ -150,6 +150,22 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"zeppelin_spark\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"PYSPARK_PYTHON\",\n'\
+'          \"value\": \"python\",'\
+'/'\
+'          \"name\": \"PYSPARK_PYTHON\",\n'\
+'          \"value\": \"python3.7\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"PYSPARK_DRIVER_PYTHON\",\n'\
+'          \"value\": \"python\",'\
+'/'\
+'          \"name\": \"PYSPARK_DRIVER_PYTHON\",\n'\
+'          \"value\": \"python3.7\",'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
 
 echo " - Configuring ElasticSearch interpreter"
 
