@@ -98,15 +98,6 @@ for i in `ls -1 /usr/local/lib/spark/sbin/stop*`; do
     create_binary_wrapper $i /usr/local/sbin/spark-`basename $i`
 done
 
-# Deprecated
-#echo " - Symlinking some RHEL mesos dependencies "
-#saved_dir=`pwd`
-#cd /usr/lib/x86_64-linux-gnu/
-#sudo ln -s libsvn_delta-1.so.1.0.0 libsvn_delta-1.so.0
-#sudo ln -s libsvn_subr-1.so.1.0.0 libsvn_subr-1.so.0
-#sudo ln -s libsasl2.so.2 libsasl2.so.3
-#cd $saved_dir
-
 echo " - Simlinking spark logs to /var/log/"
 sudo rm -Rf /usr/local/lib/spark/logs
 sudo ln -s /var/log/spark /usr/local/lib/spark/logs
@@ -143,29 +134,14 @@ sudo bash -c "echo -e \"spark.serializer=org.apache.spark.serializer.KryoSeriali
 sudo bash -c "echo -e \"\n#Limiting the driver (client) memory\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.driver.memory=800m\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
-# FIXME change to 'cluster' to attempt to run spark driver in pod as well
+# XXX change to 'cluster' to attempt to run spark driver in pod as well
 sudo bash -c "echo -e \"spark.submit.deployMode=client\" >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-#sudo bash -c "echo -e \"spark.driver.host=RUNTIME_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.driver.bindAddress=0.0.0.0\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Number of times to retry before an RPC task gives up. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"#An RPC task will run at most times of this number.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.rpc.numRetries=5\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"\n# Duration for an RPC ask operation to wait before retrying.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.rpc.retry.wait=5s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-# Deprecated
-#sudo bash -c "echo -e \"\n#Settings required for Spark driver distribution over mesos cluster (Cluster Mode through Mesos Dispatcher)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.mesos.executor.home=/usr/local/lib/spark/\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-# Deprecated
-#sudo bash -c "echo -e \"\n#If set to true, runs over Mesos clusters in coarse-grained sharing mode, \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"#where Spark acquires one long-lived Mesos task on each machine. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"#If set to false, runs over Mesos cluster in fine-grained sharing mode,\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"#where one Mesos task is created per Spark task.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"#(Fine grained mode is deprecated and one should consider dynamic allocation instead)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.mesos.coarse=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n#The scheduling mode between jobs submitted to the same SparkContext.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"#Can be FIFO or FAIR. FAIR Seem not to work well with mesos\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
@@ -187,8 +163,7 @@ sudo bash -c "echo -e \"spark.dynamicAllocation.schedulerBacklogTimeout=5s\"  >>
 
 sudo bash -c "echo -e \"\n# Configuring spark shuffle service (required for dynamic allocation)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.dynamicAllocation.shuffleTracking.enabled=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-# TODO This one neds to be made configuranle by the settingd editor mandatorily !!
-sudo bash -c "echo -e \"spark.dynamicAllocation.shuffleTracking.timeout=600s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.dynamicAllocation.shuffleTracking.timeout=300s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"\n# Directory to use for scratch space in Spark, including map output files and RDDs that get stored on disk. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"# Spark Mesos Shuffle service and spark executors need to have access to the same folder there cross containers. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
@@ -204,18 +179,6 @@ sudo bash -c "echo -e \"spark.kubernetes.driver.podTemplateFile=/usr/local/lib/s
 sudo bash -c "echo -e \"spark.kubernetes.executor.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.authenticate.driver.serviceAccountName=eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
-# TODO Honestly I am not sure that this works.
-# But since I have --net host in my container anyway I am not touching anything else
-#sudo bash -c "echo -e \"spark.mesos.executor.docker.parameters.network=host\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.options.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlogspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.options.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.varlibspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.mount.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.options.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.mount.readOnly=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
@@ -223,14 +186,6 @@ sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopolog
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimoservicessettings.mount.path=/etc/eskimo_services-settings.json\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimoservicessettings.options.path=/etc/eskimo_services-settings.json\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimoservicessettings.mount.readOnly=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlogspark.mount.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlogspark.options.path=/var/log/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlogspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlibspark.mount.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlibspark.options.path=/var/lib/spark\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-#sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.varlibspark.mount.readOnly=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimotopology.mount.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.driver.volumes.hostPath.eskimotopology.options.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

@@ -441,6 +441,12 @@ fi
 echo "  - Enabling docker"
 enable_docker
 
+echo " - Creating eskimo docker bridge interface"
+
+if [[ `docker network ls | grep docker-eskimo` == "" ]]; then
+    docker network create -d bridge --subnet 117.1.0.0/16 docker-eskimo
+fi
+
 
 # kubelet works for now with cgroupfs, need to ensure docker is working with cgroupfs as well
 if [[ `grep cgroup /proc/mounts | grep cgroup2` != "" && `grep cgroup /proc/mounts | wc -l` -lt 4 ]]; then

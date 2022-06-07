@@ -64,6 +64,8 @@ Type=simple
 #        -p 2888:2888 \
 #        -p 3888:3888 \
 
+#        --network docker-eskimo \
+
 Restart=always
 StartLimitBurst=3
 StartLimitInterval=30

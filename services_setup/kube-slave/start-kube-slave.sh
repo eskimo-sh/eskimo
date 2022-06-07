@@ -145,7 +145,7 @@ echo "   + Starting Kube-router"
   --master=$ESKIMO_KUBEROUTER_APISERVER \
   --hostname-override=$ESKIMO_KUBEROUTER_HOST_NAME_OVERRIDE \
   --kubeconfig=$ESKIMO_KUBEROUTER_KUBECONFIG \
-  --run-firewall=true \
+  --run-firewall=$ESKIMO_KUBEROUTER_RUN_FIREWALL \
   --run-service-proxy=true \
   --run-router=true \
   > /var/log/kubernetes/kuberouter.log 2>&1' &

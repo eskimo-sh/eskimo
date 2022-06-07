@@ -82,11 +82,6 @@ fi
 
 bash -c "echo -e \"spark.kubernetes.executor.request.cores=$ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_CPU\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
-#echo " - Updating spark environment file"
-#bash -c "echo -e \"\n#Binding Spark driver to local address \"  >> /usr/local/lib/spark/conf/spark-env.sh"
-#bash -c "echo -e \"export LIBPROCESS_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
-#bash -c "echo -e \"export SPARK_LOCAL_IP=$SELF_IP_ADDRESS\"  >> /usr/local/lib/spark/conf/spark-env.sh"
-
 echo " - Creating required directories (this is the only place I can do it)"
 sudo /bin/mkdir -p /var/lib/spark/tmp
 sudo /bin/chown -R spark /var/lib/spark
