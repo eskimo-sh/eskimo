@@ -35,16 +35,9 @@ others when `127.0.0.1` is used as installation target.
 
 *So something else needs to be found as target IP address.*
 
-The easiest way out here is to use the docker host address (most of the time `172.17.0.1` but may be configured
-differently on one's specific local docker environment).
-
-In case one doesn't have docker installed locally on his machine when processing with Docker installation, Eskimo
-usually installs docker on its own. +
-Unfortunately, there is a _chicken and egg_ problem here since the docker host IP address needs to be passed as target IP
-address for the Eskimo node in "Node configuration" before Eskimo can proceed with docker installation.
-
-So one's left with installing docker on his own before proceeding with Eskimo Node setup on his local machine. +
-For this, follow the same steps as those described here: <<build_packages_locally>>.
+The best approach is tu use the external interface IP address since in every possible configuration, this IP address
+will be made available from within Kubernetes PODs and native docker containers, just as services running on
+hosts themselves.
 
 ==== Installing eskimo on Windows.
 
@@ -76,7 +69,7 @@ Use for instance the following commands on Linux:
 
 .Put java in PATH on Linux
 ----
-export JAVA_HOME=/usr/local/lib/jdk-11
+export JAVA_HOME=/usr/local/lib/jdk-11 # or wherever it's installed
 export PATH=$JAVA_HOME/bin:$PATH
 ----
 
@@ -86,7 +79,7 @@ Use for instance the following commands on Windows:
 
 .Put java in PATH on Windows
 ----
-set JAVA_HOME=C:\programs\jdk-11
+set JAVA_HOME=C:\programs\jdk-11 # or wherever it's installed
 set PATH=%JAVA_HOME%\bin;%PATH%
 ----
 
@@ -98,7 +91,7 @@ Variables")
 
 In order to run eskimo, one needs to have
 
-* At least 15Gb of disk storage space on the machine running Eskimo
+* At least 20Gb of disk storage space on the machine running Eskimo
 * *At least one linux machine* available on the network (can be the same machine than the one running Eskimo) that will
 be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
 the eskimo cluster.
