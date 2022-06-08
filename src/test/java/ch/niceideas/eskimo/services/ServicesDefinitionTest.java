@@ -478,7 +478,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         assertEquals("spark.dynamicAllocation.shuffleTracking.timeout", lastProp.getName());
         assertEquals("When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout.", lastProp.getComment());
-        assertEquals("600s", lastProp.getDefaultValue());
+        assertEquals("300s", lastProp.getDefaultValue());
 
         String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"));
 
