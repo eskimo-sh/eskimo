@@ -39,12 +39,12 @@
     {
       "name": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
       "defaultValue": "300s",
-      "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+      "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed - should be consistent with spark.dynamicAllocation.shuffleTracking.timeout. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
     },
     {
       "name": "spark.dynamicAllocation.shuffleTracking.timeout",
-      "defaultValue": "600s",
-      "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data."
+      "defaultValue": "300s",
+      "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout."
     },
     {
       "name": "spark.dynamicAllocation.schedulerBacklogTimeout",
